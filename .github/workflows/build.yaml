@@ -3,7 +3,7 @@ on: [pull_request]
 # Gradle build all modules and run tests
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
