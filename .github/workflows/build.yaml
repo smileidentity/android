@@ -1,4 +1,4 @@
-name: build
+name: Build, Test, and Lint
 on: [push, pull_request]
 # Gradle build all modules and run tests
 jobs:
@@ -10,9 +10,5 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Build with Gradle
+      - name: Build, Test, Lint
         run: ./gradlew build
-      - name: Run tests
-        run: ./gradlew test
-      - name: Run ktlint
-        run: ./gradlew ktlintCheck
