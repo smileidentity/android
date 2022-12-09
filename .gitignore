@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+local.properties
+
+# Build artifacts
+*.apk
+*.aab
+*.aar
+*.class
+*.dex
+.externalNativeBuild
+.cxx
+
+# Generated files
+gen/
+javadoc/
+captures/
+
+# IntelliJ
+*.iml
+.idea/
+
+# macOS
+.DS_Store
