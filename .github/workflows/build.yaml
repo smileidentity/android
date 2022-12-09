@@ -1,5 +1,5 @@
 name: Build, Test, and Lint
-on: [push, pull_request]
+on: [pull_request]
 # Gradle build all modules and run tests
 jobs:
   build:
@@ -17,4 +17,4 @@ jobs:
         env:
           CI: true
       - name: Build, Test, Lint
-        run: ./gradlew build
+        run: ./gradlew build -PSENTRY_DSN=${{ secrets.SENTRY_DSN}}
