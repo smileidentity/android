@@ -1,6 +1,6 @@
-name: Build, Test, and Lint
+name: Lint, Build, and Test
 on: [pull_request]
-# Gradle build all modules and run tests
+# Lints code, builds all modules, and runs tests
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,10 +11,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
-      # Although not strictly necessary, it is useful for better caching
-      - name: Setup Gradle
+      - name: Setup Gradle # Although not strictly necessary, it is useful for better caching
         uses: gradle/gradle-build-action@v2
-        env:
-          CI: true
       - name: Build, Test, Lint
-        run: ./gradlew build -PSENTRY_DSN=${{ secrets.SENTRY_DSN}}
+        run: ./gradlew build -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
