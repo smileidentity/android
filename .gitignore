@@ -21,5 +21,15 @@ captures/
 *.iml
 .idea/
 
+# Keystore files
+*.jks
+*.keystore
+
 # macOS
 .DS_Store
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof
