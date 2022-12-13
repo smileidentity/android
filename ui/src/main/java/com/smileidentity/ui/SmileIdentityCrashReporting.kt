@@ -19,6 +19,7 @@ import io.sentry.UncaughtExceptionHandlerIntegration
  * as we do not use the global static Sentry class, and we use our own DSN.
  */
 object SmileIdentityCrashReporting {
+    private const val SMILE_IDENTITY_PACKAGE_PREFIX = "com.smileidentity"
     internal var hub: IHub = NoOpHub.getInstance()
 
     @JvmStatic
@@ -72,8 +73,6 @@ object SmileIdentityCrashReporting {
         }
         hub = NoOpHub.getInstance()
     }
-
-    private const val SMILE_IDENTITY_PACKAGE_PREFIX = "com.smileidentity"
 
     /**
      * Checks whether the provided throwable involves Smile Identity SDK. This is done by checking

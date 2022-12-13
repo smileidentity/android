@@ -26,3 +26,11 @@ To run the linter, run `./gradlew ktlintCheck`. To run the formatter, run `./gra
 The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce the code style
 (taken from https://pinterest.github.io/ktlint/rules/configuration-intellij-idea/)
 
+## FAQs
+- Q: Why are source sets are located in `$module/src/main/java`, even though we're using Kotlin?
+  - A: This is to simplify configuration. `$module/src/main/kotlin` would require custom build setup
+    And at the end of the day, it doesn't really matter. Kotline files can go in `java` just fine
+- Q: What is the `public` top level directory?
+  - A: This indicates which components are open source. Currently they reside in the same repo, but
+    will be moved to a separate repo in the future, and included here as a git submodule.
+- 
