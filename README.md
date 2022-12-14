@@ -34,7 +34,7 @@ The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce
     the end of the day, it doesn't really matter. Kotlin files can go in `java` just fine
 - Q: What is the `public` top level directory?
   - A: This indicates which components are open source. Currently they reside in the same repo, but
-    will be moved to a separate repo in the future, and included here as a git submodule.
+    will be moved to a separate repo in the future, and included here as a git submodule instead
 - Q: Why can't I see coverage info inside Android Studio?
   - A: https://issuetracker.google.com/issues/241258667
 - Q: How come I can't preview Markdown files within Android Studio?
