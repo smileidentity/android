@@ -18,6 +18,8 @@ android {
 
     buildTypes {
         all {
+            def sentryDsn = project.hasProperty("SENTRY_DSN") ? "\"${SENTRY_DSN}\"" : "\"\""
+            buildConfigField "String", "SENTRY_DSN", sentryDsn
             buildConfigField "String", "VERSION_NAME", "\"${project.version}\""
             buildConfigField "String", "SENTRY_DSN", project.hasProperty("SENTRY_DSN") ? "\"${SENTRY_DSN}\"" : "\"\""
         }
