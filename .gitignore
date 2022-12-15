@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+local.properties
+
+# Build artifacts
+*.apk
+*.aab
+*.aar
+*.class
+*.dex
+.externalNativeBuild
+.cxx
+
+# Generated files
+gen/
+javadoc/
+captures/
+
+# IntelliJ
+*.iml
+.idea/
+
+# Keystore files
+*.jks
+*.keystore
+
+# macOS
+.DS_Store
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof
