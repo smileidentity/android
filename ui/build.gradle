@@ -6,6 +6,7 @@ plugins {
 
 android {
     namespace "com.smileidentity.ui"
+    resourcePrefix "si_"
     compileSdk 33
 
     defaultConfig {
@@ -21,7 +22,6 @@ android {
             def sentryDsn = project.hasProperty("SENTRY_DSN") ? "\"${SENTRY_DSN}\"" : "\"\""
             buildConfigField "String", "SENTRY_DSN", sentryDsn
             buildConfigField "String", "VERSION_NAME", "\"${project.version}\""
-            buildConfigField "String", "SENTRY_DSN", project.hasProperty("SENTRY_DSN") ? "\"${SENTRY_DSN}\"" : "\"\""
         }
 
         release {
@@ -45,7 +45,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.5.1"
     implementation "com.google.android.material:material:1.7.0"
     implementation "com.jakewharton.timber:timber:5.0.1" // Logging
-    implementation "io.sentry:sentry:6.9.1" // Crash Reporting
+    implementation "io.sentry:sentry:6.9.2" // Crash Reporting
 
     testImplementation "junit:junit:4.13.2"
 
