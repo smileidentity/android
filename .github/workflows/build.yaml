@@ -3,6 +3,9 @@ on: [pull_request]
 # Lints code, builds all modules, and runs tests
 jobs:
   build:
+    strategy:
+      matrix:
+        agp_version: ["7.3.1", "7.3.0", "7.2.2", "7.2.1"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,4 +17,4 @@ jobs:
       - name: Setup Gradle # Although not strictly necessary, it is useful for better caching
         uses: gradle/gradle-build-action@v2
       - name: Build, Test, Lint
-        run: ./gradlew build -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
+        run: ./gradlew build -PAGP_VERSION=${{ matrix.agp_version }} -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
