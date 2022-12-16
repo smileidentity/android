@@ -9,9 +9,16 @@ buildscript {
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id "com.android.application" version "$android_gradle_plugin_version" apply false
-    id "com.android.library" version "$android_gradle_plugin_version" apply false
-    id "org.jetbrains.kotlin.android" version "$kotlin_version" apply false
+    // Applied to all sub-modules
+    id "org.jlleitschuh.gradle.ktlint" version "11.0.0"
+
+    // Applied depending on sub-module
     id "org.jetbrains.kotlin.jvm" version "$kotlin_version" apply false
-    id "org.jlleitschuh.gradle.ktlint" version "11.0.0" apply false
+    id "com.android.library" version "$android_gradle_plugin_version" apply false
+    id "com.android.application" version "$android_gradle_plugin_version" apply false
+    id "org.jetbrains.kotlin.android" version "$kotlin_version" apply false
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

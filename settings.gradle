@@ -1,8 +1,10 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
         google()
         mavenCentral()
+        // gradlePluginPortal is last for faster builds
+        // see: https://developer.android.com/studio/build/optimize-your-build#gradle_plugin_portal
+        gradlePluginPortal()
     }
 }
 
