@@ -7,15 +7,13 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 
 class SelfieFragment : Fragment() {
 
     companion object {
+        @JvmStatic
         fun newInstance() = SelfieFragment()
     }
-
-    private lateinit var viewModel: SelfieViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,11 +26,5 @@ class SelfieFragment : Fragment() {
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
             setContent { SelfieCaptureOrPermissionScreen() }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[SelfieViewModel::class.java]
-        // TODO: Use the ViewModel
     }
 }

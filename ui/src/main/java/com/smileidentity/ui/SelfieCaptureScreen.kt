@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,17 +46,16 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState
-import com.ujizin.camposer.state.ImageCaptureResult
 import com.ujizin.camposer.state.ImplementationMode
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
-import timber.log.Timber
-import java.io.File
+import com.ujizin.camposer.state.rememberImageAnalyzer
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -74,8 +72,7 @@ fun SelfieCaptureOrPermissionScreen() {
                 // The user has permanently denied the permission, so we can't request it again.
                 // We can, however, direct the user to the app settings screen to manually
                 // enable the permission.
-                Toast.makeText(context, R.string.si_camera_permission_rationale, Toast.LENGTH_LONG)
-                    .show()
+                context.toast(R.string.si_camera_permission_rationale)
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
                 }
@@ -98,13 +95,11 @@ fun SelfieCaptureScreen() {
 fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
+    val imageAnalyzer = cameraState.rememberImageAnalyzer(analyze = viewModel::analyzeImage)
     // The progress of the multiple liveness captures
-    // TODO: Replace with actual progress
-    val captureProgress = 0.5f
     val viewfinderSize = 256.dp
     val progressStrokeWidth = 8.dp
     val progressBarSize = viewfinderSize + progressStrokeWidth * 2
-    val context = LocalContext.current
     // TODO: Replace hardcoded colors with themes
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,17 +115,16 @@ fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
         val shouldShouldAgentModeSwitch = uiState.allowAgentMode && cameraState.hasMultipleCameras
         val isAgentModeEnabled = camSelector == CamSelector.Back
         if (shouldShouldAgentModeSwitch) {
+            val agentModeBackgroundColor =
+                (if (isAgentModeEnabled) MaterialTheme.colorScheme.primary else Color.Gray)
+                    .copy(alpha = 0.25f)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .align(Alignment.End)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(
-                        (if (isAgentModeEnabled) MaterialTheme.colorScheme.primary else Color.Gray).copy(
-                            alpha = 0.25f
-                        )
-                    )
+                    .background(agentModeBackgroundColor)
                     .padding(8.dp, 0.dp),
             ) {
                 Text(text = stringResource(R.string.si_agent_mode), color = Color.Black)
@@ -158,6 +152,8 @@ fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
                 cameraState = cameraState,
                 camSelector = camSelector,
                 implementationMode = ImplementationMode.Compatible,
+                imageAnalyzer = imageAnalyzer,
+                isImageAnalysisEnabled = true,
                 // TODO: We should use FitCenter and crop rather than Fill?
                 // scaleType = ScaleType.FitCenter,
                 scaleType = ScaleType.FillCenter,
@@ -167,7 +163,7 @@ fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
                     .align(Alignment.Center)
             )
             CircularProgressIndicator(
-                captureProgress,
+                uiState.progress,
                 modifier = Modifier
                     .size(progressBarSize)
                     .align(Alignment.Center),
@@ -176,31 +172,13 @@ fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
             )
         }
         Text(
-            text = stringResource(id = R.string.si_selfie_capture_directive_smile),
+            text = stringResource(id = uiState.currentDirective),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
         )
         // TODO: Remove manual capture once liveness is implemented
-        Button(onClick = {
-            // Save to temporary file, which does not require any storage permissions. It will be
-            // saved to the app's cache directory, which is cleared when the app is uninstalled.
-            // Images will be saved in the format "si_selfie_<random number>.jpg"
-            val file = File.createTempFile("si_selfie_", ".jpg")
-
-            // Deletes file when the *VM* is exited (*not* when the app is closed)
-            file.deleteOnExit()
-            cameraState.takePicture(file) {
-                if (it is ImageCaptureResult.Success) {
-                    Timber.d("Image captured successfully: $it, saved to file: $file")
-                    context.toast("Image captured successfully: $it, saved to file: $file")
-                } else if (it is ImageCaptureResult.Error) {
-                    Timber.e(it.throwable, "Image capture error: $it")
-                }
-            }
-        }) {
-            Text(text = "Take Picture")
-        }
+        Button(onClick = { viewModel.takePicture(cameraState) }) { Text(text = "Take Picture") }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
