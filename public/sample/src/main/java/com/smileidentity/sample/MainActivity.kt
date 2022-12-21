@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.smileidentity.ui.theme.SmileIdentityTheme
 import com.smileidentity.ui.SelfieCaptureOrPermissionScreen
+import com.smileidentity.ui.theme.SmileIdentityTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
