@@ -1,0 +1,193 @@
+package com.smileidentity.ui
+
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import com.smileidentity.ui.theme.SmileIdentityTheme
+import com.ujizin.camposer.CameraPreview
+import com.ujizin.camposer.state.CamSelector
+import com.ujizin.camposer.state.CameraState
+import com.ujizin.camposer.state.ImageCaptureResult
+import com.ujizin.camposer.state.ImplementationMode
+import com.ujizin.camposer.state.ScaleType
+import com.ujizin.camposer.state.rememberCamSelector
+import com.ujizin.camposer.state.rememberCameraState
+import timber.log.Timber
+import java.io.File
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun SelfieCaptureOrPermissionScreen() {
+    val context = LocalContext.current
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    if (cameraPermissionState.status.isGranted) {
+        SelfieCaptureScreenContent()
+    } else {
+        SideEffect {
+            if (cameraPermissionState.status.shouldShowRationale) {
+                cameraPermissionState.launchPermissionRequest()
+            } else {
+                // The user has permanently denied the permission, so we can't request it again.
+                // We can, however, direct the user to the app settings screen to manually
+                // enable the permission.
+                Toast.makeText(context, R.string.si_camera_permission_rationale, Toast.LENGTH_LONG)
+                    .show()
+                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                })
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SelfieCaptureScreen() {
+    // Pseudo-flash: use a white background to implicitly light up user's face
+    SmileIdentityTheme(darkTheme = false, dynamicColor = false) {
+        SelfieCaptureScreenContent()
+    }
+}
+
+@Composable
+fun SelfieCaptureScreenContent() {
+    val cameraState = rememberCameraState()
+    val camSelector = rememberCamSelector(CamSelector.Front)
+    // The progress of the multiple liveness captures
+    // TODO: Replace with actual progress
+    val captureProgress = 0.5f
+    val viewfinderSize = 256.dp
+    val progressStrokeWidth = 8.dp
+    val progressBarSize = viewfinderSize + progressStrokeWidth * 2
+    val context = LocalContext.current
+    // TODO: Replace hardcoded colors with themes
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxSize()
+            // Force use a white background in order to light up the user's face
+            .background(Color.White)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        if (cameraState.hasMultipleCameras) {
+            Button(
+                modifier = Modifier.align(Alignment.End),
+                onClick = { camSelector.value = camSelector.value.inverse },
+            ) {
+                Icon(Icons.Outlined.Refresh, contentDescription = null)
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(text = stringResource(R.string.si_switch_camera))
+            }
+        }
+
+        // Display only this shape in the Preview -- however, capture the whole image. This is so
+        // that the user only sees their face but captures the whole scene, which may provide
+        // additional information for the verification process/identifying fraud
+        Box(modifier = Modifier.fillMaxWidth()) {
+            CameraPreview(
+                cameraState = cameraState,
+                camSelector = camSelector.value,
+                implementationMode = ImplementationMode.Compatible,
+                // TODO: We should use FitCenter and crop rather than Fill?
+                // scaleType = ScaleType.FitCenter,
+                scaleType = ScaleType.FillCenter,
+                modifier = Modifier
+                    .size(viewfinderSize)
+                    .clip(CircleShape)
+                    .align(Alignment.Center)
+            )
+            CircularProgressIndicator(
+                captureProgress,
+                modifier = Modifier
+                    .size(progressBarSize)
+                    .align(Alignment.Center),
+                // color = SmileIdentityLightBlue,
+                strokeWidth = progressStrokeWidth
+            )
+        }
+        Text(
+            text = stringResource(id = R.string.si_selfie_capture_directive_smile),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        // TODO: Remove manual capture once liveness is implemented
+        Button(onClick = {
+            // Save to temporary file, which does not require any storage permissions. It will be
+            // saved to the app's cache directory, which is cleared when the app is uninstalled.
+            // Images will be saved in the format "si_selfie_<random number>.jpg"
+            val file = File.createTempFile("si_selfie_", ".jpg")
+
+            // Deletes file when the *VM* is exited (*not* when the app is closed)
+            file.deleteOnExit()
+            cameraState.takePicture(file) {
+                if (it is ImageCaptureResult.Success) {
+                    Timber.d("Image captured successfully: $it, saved to file: $file")
+                } else if (it is ImageCaptureResult.Error) {
+                    Timber.e(it.throwable, "Image capture error: $it")
+                }
+            }
+
+        }) {
+            Text(text = "Take Picture")
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+        ) {
+            // Because we force use a white background, the icon+text color must be forced to black
+            Icon(imageVector = Icons.Outlined.Info, contentDescription = null, tint = Color.Black)
+            Text(
+                text = stringResource(id = R.string.si_selfie_capture_instructions),
+                color = Color.Black
+            )
+        }
+        SmileIdentityAttribution()
+    }
+}
+
+val CameraState.hasMultipleCameras
+    get() = hasCamera(CamSelector.Front) && hasCamera(CamSelector.Back)

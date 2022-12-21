@@ -1,6 +1,7 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.core
 
 import android.os.Build
+import com.smileidentity.ui.BuildConfig
 import io.sentry.Hint
 import io.sentry.Hub
 import io.sentry.IHub

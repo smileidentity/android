@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.core
 
 import android.content.Context
 

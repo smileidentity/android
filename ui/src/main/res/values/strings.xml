@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="si_library_name">Smile Identity Android SDK</string>
-    <string name="si_selfie_capture_instructions">Put your face inside the oval frame and wait until it turns blue</string>
-    <string name="si_switch_camera">Switch Camera</string>
+    <string name="si_library_name" translatable="false">Smile Identity Android SDK</string>
+    <string name="si_attribution">Powered by Smile Identity</string>
     <string name="si_camera_permission_rationale">The camera permission is required to complete the verification process</string>
+    <string name="si_switch_camera">Switch Camera</string>
+
+    <!--  Selfie Capture  -->
+    <string name="si_selfie_capture_instructions">Put your face inside the oval frame and wait until it turns blue</string>
+    <string name="si_selfie_capture_directive_smile">Smile for the camera</string>
+    <string name="si_selfie_capture_directive_capturing">Capturing…</string>
+    <string name="si_selfie_capture_directive_unable_to_detect_face">Unable to detect face. Please ensure your face is in the oval</string>
+    <string name="si_selfie_capture_directive_face_too_far">Face is too far. Please move closer</string>
 </resources>

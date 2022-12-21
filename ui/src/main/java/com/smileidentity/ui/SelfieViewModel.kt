@@ -8,5 +8,4 @@ data class SelfieUiState(
 
 class SelfieViewModel : ViewModel() {
     // TODO: Implement the ViewModel
-
 }
