@@ -76,9 +76,10 @@ fun SelfieCaptureOrPermissionScreen() {
                 // enable the permission.
                 Toast.makeText(context, R.string.si_camera_permission_rationale, Toast.LENGTH_LONG)
                     .show()
-                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
-                })
+                }
+                context.startActivity(intent)
             }
         }
     }
@@ -197,7 +198,6 @@ fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
                     Timber.e(it.throwable, "Image capture error: $it")
                 }
             }
-
         }) {
             Text(text = "Take Picture")
         }

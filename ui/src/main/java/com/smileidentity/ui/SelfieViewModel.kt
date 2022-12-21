@@ -15,11 +15,7 @@ class SelfieViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState("Smile for the camera!"))
     val uiState: StateFlow<SelfieUiState> = _uiState.asStateFlow()
 
-    fun switchCamera() {
+    fun switchCamera() = Unit
 
-    }
-
-    fun takePicture() {
-
-    }
+    fun takePicture() = Unit
 }
