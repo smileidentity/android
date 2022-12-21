@@ -4,17 +4,12 @@ import android.content.Context
 
 object SmileIdentity {
     @JvmStatic
-    fun init(config: SmileIdentityConfig) {
-
-    }
+    fun init(config: SmileIdentityConfig) = Unit
 
     @JvmStatic
-    fun init(context: Context) {
-        // TODO: Grab the config from assets
-    }
+    // TODO: Grab the config from assets
+    fun init(context: Context) = Unit
 
     @JvmStatic
-    fun enrollSelfie() {
-
-    }
+    fun enrollSelfie() = Unit
 }
