@@ -10,23 +10,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -88,9 +94,9 @@ fun SelfieCaptureScreen() {
 }
 
 @Composable
-fun SelfieCaptureScreenContent() {
+fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
     val cameraState = rememberCameraState()
-    val camSelector = rememberCamSelector(CamSelector.Front)
+    var camSelector by rememberCamSelector(CamSelector.Front)
     // The progress of the multiple liveness captures
     // TODO: Replace with actual progress
     val captureProgress = 0.5f
@@ -109,14 +115,37 @@ fun SelfieCaptureScreenContent() {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        if (cameraState.hasMultipleCameras) {
-            Button(
-                modifier = Modifier.align(Alignment.End),
-                onClick = { camSelector.value = camSelector.value.inverse },
+        val uiState = viewModel.uiState.collectAsState().value
+        val shouldShouldAgentModeSwitch = uiState.allowAgentMode && cameraState.hasMultipleCameras
+        val isAgentModeEnabled = camSelector == CamSelector.Back
+        if (shouldShouldAgentModeSwitch) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        (if (isAgentModeEnabled) MaterialTheme.colorScheme.primary else Color.Gray).copy(
+                            alpha = 0.25f
+                        )
+                    )
+                    .padding(8.dp, 0.dp),
             ) {
-                Icon(Icons.Outlined.Refresh, contentDescription = null)
-                Spacer(modifier = Modifier.size(4.dp))
-                Text(text = stringResource(R.string.si_switch_camera))
+                Text(text = stringResource(R.string.si_agent_mode), color = Color.Black)
+                Switch(
+                    checked = isAgentModeEnabled,
+                    onCheckedChange = { camSelector = camSelector.inverse },
+                    thumbContent = {
+                        if (isAgentModeEnabled) {
+                            Icon(
+                                imageVector = Icons.Outlined.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -126,7 +155,7 @@ fun SelfieCaptureScreenContent() {
         Box(modifier = Modifier.fillMaxWidth()) {
             CameraPreview(
                 cameraState = cameraState,
-                camSelector = camSelector.value,
+                camSelector = camSelector,
                 implementationMode = ImplementationMode.Compatible,
                 // TODO: We should use FitCenter and crop rather than Fill?
                 // scaleType = ScaleType.FitCenter,
@@ -163,6 +192,7 @@ fun SelfieCaptureScreenContent() {
             cameraState.takePicture(file) {
                 if (it is ImageCaptureResult.Success) {
                     Timber.d("Image captured successfully: $it, saved to file: $file")
+                    context.toast("Image captured successfully: $it, saved to file: $file")
                 } else if (it is ImageCaptureResult.Error) {
                     Timber.e(it.throwable, "Image capture error: $it")
                 }
