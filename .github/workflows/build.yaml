@@ -25,4 +25,3 @@ jobs:
       - uses: musichin/ktlint-check@v2
         with:
           ktlint-version: "0.48.0"
-          android: true
