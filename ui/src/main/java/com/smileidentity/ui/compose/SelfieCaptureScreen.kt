@@ -63,7 +63,7 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SelfieCaptureOrPermissionScreen(
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {}
+    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -99,7 +99,7 @@ fun SelfieCaptureScreen() {
 @Composable
 fun SelfieCaptureScreenContent(
     viewModel: SelfieViewModel = viewModel(),
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {}
+    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
@@ -117,7 +117,7 @@ fun SelfieCaptureScreenContent(
             // Force use a white background in order to light up the user's face
             .background(Color.White)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         val uiState = viewModel.uiState.collectAsState().value
         val shouldShouldAgentModeSwitch = uiState.allowAgentMode && cameraState.hasMultipleCameras
@@ -144,10 +144,10 @@ fun SelfieCaptureScreenContent(
                             Icon(
                                 imageVector = Icons.Outlined.Check,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
-                    }
+                    },
                 )
             }
         }
@@ -168,7 +168,7 @@ fun SelfieCaptureScreenContent(
                 modifier = Modifier
                     .size(viewfinderSize)
                     .clip(CircleShape)
-                    .align(Alignment.Center)
+                    .align(Alignment.Center),
             )
             CircularProgressIndicator(
                 uiState.progress,
@@ -176,14 +176,14 @@ fun SelfieCaptureScreenContent(
                     .size(progressBarSize)
                     .align(Alignment.Center),
                 // color = SmileIdentityLightBlue,
-                strokeWidth = progressStrokeWidth
+                strokeWidth = progressStrokeWidth,
             )
         }
         Text(
             text = stringResource(id = uiState.currentDirective),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
         )
         // TODO: Remove manual capture once liveness is implemented
         Button(onClick = { viewModel.takePicture(cameraState, onResult) }) {
@@ -200,7 +200,7 @@ fun SelfieCaptureScreenContent(
             Icon(imageVector = Icons.Outlined.Info, contentDescription = null, tint = Color.Black)
             Text(
                 text = stringResource(id = R.string.si_selfie_capture_instructions),
-                color = Color.Black
+                color = Color.Black,
             )
         }
         SmileIdentityAttribution()

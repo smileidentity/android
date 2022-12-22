@@ -32,7 +32,7 @@ fun SmileIdentityAttribution() {
             .border(1.dp, Color.LightGray.copy(alpha = 0.2f), shape)
             .shadow(2.dp, shape)
             .clip(shape)
-            .background(Color.White)
+            .background(Color.White),
     ) {
         Image(
             painterResource(R.drawable.si_logo_lock_white),
@@ -40,14 +40,14 @@ fun SmileIdentityAttribution() {
             modifier = Modifier
                 .size(24.dp)
                 .background(SmileIdentityMediumBlue, shape)
-                .padding(2.dp)
+                .padding(2.dp),
         )
         // Spacer(modifier = Modifier.size(8.dp))
         Text(
             text = stringResource(id = R.string.si_attribution),
             style = MaterialTheme.typography.labelSmall,
             color = Color.Black,
-            modifier = Modifier.padding(4.dp, 0.dp)
+            modifier = Modifier.padding(4.dp, 0.dp),
         )
     }
 }

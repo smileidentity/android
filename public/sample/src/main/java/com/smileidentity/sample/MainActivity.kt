@@ -81,7 +81,7 @@ fun MainScreen() {
     SmileIdentityTheme {
         Surface(
             color = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onBackground
+            contentColor = MaterialTheme.colorScheme.onBackground,
         ) {
             Scaffold(
                 topBar = { TopBar() },
@@ -94,7 +94,7 @@ fun MainScreen() {
                             composable("about") { AboutScreen() }
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -109,7 +109,7 @@ fun TopBar() {
         title = {
             Text(
                 stringResource(R.string.app_name),
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
             )
         },
         actions = {
@@ -118,9 +118,7 @@ fun TopBar() {
                 Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
             }
         },
-        colors = centerAlignedTopAppBarColors(
-            MaterialTheme.colorScheme.primary
-        )
+        colors = centerAlignedTopAppBarColors(MaterialTheme.colorScheme.primary),
     )
 }
 
@@ -142,7 +140,7 @@ fun BottomBar(onDestinationSelected: (String) -> Unit = {}) {
                 onClick = {
                     selectedItem = index
                     onDestinationSelected(item.second)
-                }
+                },
             )
         }
     }
@@ -176,13 +174,13 @@ fun ProductSelectionScreen() {
                 android.R.id.content,
                 SelfieFragment.newInstance { context.toast(it.toString()) },
             ).commit()
-        }
+        },
     )
     Column(
         horizontalAlignment = CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         Text("Test Our Products", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(16.dp))
@@ -192,7 +190,7 @@ fun ProductSelectionScreen() {
                     Column(
                         horizontalAlignment = CenterHorizontally,
                         verticalArrangement = SpaceAround,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         Image(imageVector = Icons.Default.Face, contentDescription = null)
                         Text(text = it.first, textAlign = TextAlign.Center)
@@ -213,18 +211,14 @@ fun ResourcesScreen() {
         Pair("View FAQs", "Explore frequently asked questions"),
         Pair("Supported ID types and documents", "See our coverage range across the continent"),
     )
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         val context = LocalContext.current
         resources.forEach {
             ListItem(
                 headlineText = { Text(it.first) },
                 supportingText = { Text(it.second) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { context.toast(it.first) }
+                modifier = Modifier.clickable { context.toast(it.first) },
             )
             Divider()
         }
@@ -240,18 +234,14 @@ fun AboutScreen() {
         Pair("Visit our website", Icons.Default.Star),
         Pair("Contact support", Icons.Default.Email),
     )
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         val context = LocalContext.current
         abouts.forEach {
             ListItem(
                 headlineText = { Text(it.first) },
                 leadingContent = { Icon(it.second, null) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { context.toast(it.first) }
+                modifier = Modifier.clickable { context.toast(it.first) },
             )
             Divider()
         }

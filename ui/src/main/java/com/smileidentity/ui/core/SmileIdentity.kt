@@ -7,8 +7,7 @@ object SmileIdentity {
     fun init(config: SmileIdentityConfig) = Unit
 
     @JvmStatic
-    // TODO: Grab the config from assets
-    fun init(context: Context) = Unit
+    fun init(context: Context) = Unit // TODO: Grab the config from assets
 
     @JvmStatic
     fun enrollSelfie() = Unit

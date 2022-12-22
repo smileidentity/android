@@ -81,7 +81,7 @@ class SelfieViewModelTest {
             R.string.si_selfie_capture_directive_smile,
             R.string.si_selfie_capture_directive_capturing,
             R.string.si_selfie_capture_directive_face_too_far,
-            R.string.si_selfie_capture_directive_unable_to_detect_face
+            R.string.si_selfie_capture_directive_unable_to_detect_face,
         )
 
         // when

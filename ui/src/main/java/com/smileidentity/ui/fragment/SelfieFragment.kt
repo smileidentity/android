@@ -11,21 +11,21 @@ import com.smileidentity.ui.compose.SelfieCaptureOrPermissionScreen
 import com.smileidentity.ui.core.SelfieCaptureResultCallback
 
 class SelfieFragment private constructor(
-    private val callback: SelfieCaptureResultCallback
+    private val callback: SelfieCaptureResultCallback,
 ) : Fragment() {
 
     companion object {
         @JvmStatic
         @JvmOverloads
         fun newInstance(
-            callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback { }
+            callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback { },
         ) = SelfieFragment(callback)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
             // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:

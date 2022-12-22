@@ -18,13 +18,13 @@ import androidx.core.view.WindowCompat
 private val DarkColorScheme = darkColorScheme(
     primary = SmileIdentityLightBlue,
     secondary = SmileIdentityDarkBlue,
-    tertiary = SmileIdentityMediumBlue
+    tertiary = SmileIdentityMediumBlue,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = SmileIdentityLightBlue,
     secondary = SmileIdentityDarkBlue,
-    tertiary = SmileIdentityMediumBlue
+    tertiary = SmileIdentityMediumBlue,
 )
 
 @Composable
@@ -32,7 +32,7 @@ fun SmileIdentityTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -54,6 +54,6 @@ fun SmileIdentityTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = SmileIdentityTypography,
-        content = content
+        content = content,
     )
 }

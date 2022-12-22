@@ -27,7 +27,7 @@ class SelfieViewModel : ViewModel() {
 
     fun takePicture(
         cameraState: CameraState,
-        callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {}
+        callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
     ) {
         // Save to temporary file, which does not require any storage permissions. It will be saved
         // to the app's cache directory, which is cleared when the app is uninstalled. Images will
@@ -53,7 +53,7 @@ class SelfieViewModel : ViewModel() {
             R.string.si_selfie_capture_directive_smile,
             R.string.si_selfie_capture_directive_capturing,
             R.string.si_selfie_capture_directive_face_too_far,
-            R.string.si_selfie_capture_directive_unable_to_detect_face
+            R.string.si_selfie_capture_directive_unable_to_detect_face,
         )
         _uiState.update {
             val newDirective = if ((count % 25) == 0) directives.random() else it.currentDirective
