@@ -59,11 +59,13 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SelfieCaptureOrPermissionScreen() {
+fun SelfieCaptureOrPermissionScreen(
+    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {}
+) {
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     if (cameraPermissionState.status.isGranted) {
-        SelfieCaptureScreenContent()
+        SelfieCaptureScreenContent(onResult = onResult)
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
@@ -92,7 +94,10 @@ fun SelfieCaptureScreen() {
 }
 
 @Composable
-fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
+fun SelfieCaptureScreenContent(
+    viewModel: SelfieViewModel = viewModel(),
+    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {}
+) {
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
     val imageAnalyzer = cameraState.rememberImageAnalyzer(analyze = viewModel::analyzeImage)
@@ -178,7 +183,9 @@ fun SelfieCaptureScreenContent(viewModel: SelfieViewModel = viewModel()) {
             color = Color.Black
         )
         // TODO: Remove manual capture once liveness is implemented
-        Button(onClick = { viewModel.takePicture(cameraState) }) { Text(text = "Take Picture") }
+        Button(onClick = { viewModel.takePicture(cameraState, onResult) }) {
+            Text(text = "Take Picture")
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),

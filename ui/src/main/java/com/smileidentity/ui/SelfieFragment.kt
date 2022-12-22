@@ -8,11 +8,15 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.fragment.app.Fragment
 
-class SelfieFragment : Fragment() {
+class SelfieFragment private constructor(
+    private val callback: SelfieCaptureResultCallback
+) : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() = SelfieFragment()
+        fun newInstance(
+            callback: SelfieCaptureResultCallback
+        ) = SelfieFragment(callback)
     }
 
     override fun onCreateView(
@@ -24,7 +28,7 @@ class SelfieFragment : Fragment() {
             // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
             // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
-            setContent { SelfieCaptureOrPermissionScreen() }
+            setContent { SelfieCaptureOrPermissionScreen(callback) }
         }
     }
 }

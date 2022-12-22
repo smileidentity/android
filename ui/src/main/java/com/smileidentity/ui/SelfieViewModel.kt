@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 import java.io.File
 
 data class SelfieUiState(
@@ -22,17 +21,22 @@ class SelfieViewModel : ViewModel() {
     private val _uiState =
         MutableStateFlow(SelfieUiState(R.string.si_selfie_capture_directive_smile))
     val uiState: StateFlow<SelfieUiState> = _uiState.asStateFlow()
+    var count = 0
 
-    fun takePicture(cameraState: CameraState) {
+    fun takePicture(
+        cameraState: CameraState,
+        callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {}
+    ) {
         // Save to temporary file, which does not require any storage permissions. It will be saved
         // to the app's cache directory, which is cleared when the app is uninstalled. Images will
         // be saved in the format "si_selfie_<random number>.jpg"
         val file = File.createTempFile("si_selfie_", ".jpg")
         cameraState.takePicture(file) {
-            if (it is ImageCaptureResult.Success) {
-                Timber.d("Image captured successfully: $it, saved to file: $file")
-            } else if (it is ImageCaptureResult.Error) {
-                Timber.e(it.throwable, "Image capture error: $it")
+            when (it) {
+                is ImageCaptureResult.Success ->
+                    callback.onResult(SelfieCaptureResult.Success(file.absolutePath))
+                is ImageCaptureResult.Error ->
+                    callback.onResult(SelfieCaptureResult.Error(it.throwable))
             }
         }
 
@@ -49,10 +53,10 @@ class SelfieViewModel : ViewModel() {
             R.string.si_selfie_capture_directive_unable_to_detect_face
         )
         _uiState.update {
-            it.copy(
-                currentDirective = directives.random(),
-                progress = (((it.progress * 100) + 1) % 100) / 100
-            )
+            val newDirective = if ((count % 25) == 0) directives.random() else it.currentDirective
+            val newProgress = (((it.progress * 100) + 1) % 100) / 100
+            it.copy(currentDirective = newDirective, progress = newProgress)
         }
+        count += 1
     }
 }

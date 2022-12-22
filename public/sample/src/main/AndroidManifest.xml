@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <application
-        android:name="com.smileidentity.sample.SmileIdentityApplication"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.SmileIdentity">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
+            android:name="com.smileidentity.sample.SmileIdentityApplication"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:supportsRtl="true"
             android:theme="@style/Theme.SmileIdentity">
+        <activity
+                android:name=".MainActivity"
+                android:exported="true"
+                android:theme="@style/Theme.SmileIdentity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-            <meta-data android:name="android.app.lib_name" android:value="" />
+        </activity>
+        <activity
+                android:name=".JavaActivity"
+                android:label="Java Activity"
+                android:exported="true"
+                android:theme="@style/Theme.SmileIdentity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
     </application>
 </manifest>
