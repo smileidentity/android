@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.compose
 
 import android.Manifest
 import android.content.Intent
@@ -46,8 +46,11 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.smileidentity.ui.R
+import com.smileidentity.ui.core.SelfieCaptureResultCallback
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.theme.SmileIdentityTheme
+import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState

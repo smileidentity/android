@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.core
 
 sealed class SelfieCaptureResult {
     data class Success(val selfieFile: String) : SelfieCaptureResult()

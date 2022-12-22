@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.smileidentity.ui.SelfieCaptureResult;
-import com.smileidentity.ui.SelfieCaptureResultCallback;
-import com.smileidentity.ui.SelfieFragment;
+import com.smileidentity.ui.core.SelfieCaptureResult;
+import com.smileidentity.ui.core.SelfieCaptureResultCallback;
+import com.smileidentity.ui.fragment.SelfieFragment;
 
 import timber.log.Timber;
 

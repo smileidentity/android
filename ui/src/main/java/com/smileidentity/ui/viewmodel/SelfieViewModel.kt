@@ -1,8 +1,11 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.viewmodel
 
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
+import com.smileidentity.ui.R
+import com.smileidentity.ui.core.SelfieCaptureResult
+import com.smileidentity.ui.core.SelfieCaptureResultCallback
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import kotlinx.coroutines.flow.MutableStateFlow

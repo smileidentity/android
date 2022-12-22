@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.fragment.app.Fragment
+import com.smileidentity.ui.compose.SelfieCaptureOrPermissionScreen
+import com.smileidentity.ui.core.SelfieCaptureResultCallback
 
 class SelfieFragment private constructor(
     private val callback: SelfieCaptureResultCallback
