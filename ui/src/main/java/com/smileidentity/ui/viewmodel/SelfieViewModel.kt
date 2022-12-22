@@ -15,16 +15,15 @@ import kotlinx.coroutines.flow.update
 import java.io.File
 
 data class SelfieUiState(
-    @StringRes val currentDirective: Int,
+    @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
     val allowAgentMode: Boolean = true,
     val progress: Float = 0f,
 )
 
 class SelfieViewModel : ViewModel() {
-    private val _uiState =
-        MutableStateFlow(SelfieUiState(R.string.si_selfie_capture_directive_smile))
+    private val _uiState = MutableStateFlow(SelfieUiState())
     val uiState: StateFlow<SelfieUiState> = _uiState.asStateFlow()
-    var count = 0
+    var count = 0 // TODO: Remove this count, it is for demo purposes only
 
     fun takePicture(
         cameraState: CameraState,
@@ -48,6 +47,7 @@ class SelfieViewModel : ViewModel() {
     }
 
     fun analyzeImage(proxy: ImageProxy) {
+        // TODO: Implement image analysis
         proxy.close()
         val directives = setOf(
             R.string.si_selfie_capture_directive_smile,

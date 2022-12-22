@@ -4,5 +4,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <!--  Override the minSdk 23 requirement of the library  -->
+    <!--  see: https://github.com/ujizin/Camposer/discussions/3  -->
     <uses-sdk tools:overrideLibrary="com.ujizin.camposer"/>
 </manifest>
