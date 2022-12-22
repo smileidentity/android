@@ -16,7 +16,10 @@ class SelfieFragment private constructor(
 
     companion object {
         @JvmStatic
-        fun newInstance(callback: SelfieCaptureResultCallback) = SelfieFragment(callback)
+        @JvmOverloads
+        fun newInstance(
+            callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback { }
+        ) = SelfieFragment(callback)
     }
 
     override fun onCreateView(
