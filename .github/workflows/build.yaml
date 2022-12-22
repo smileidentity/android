@@ -18,3 +18,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Build, Test, Lint
         run: ./gradlew build -PAGP_VERSION=${{ matrix.agp_version }} -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
+  lint:
+    steps:
+      - uses: actions/checkout@v2
+      - uses: musichin/ktlint-check@v2
+        with:
+          ktlint-version: "0.48.0"
+          android: true
