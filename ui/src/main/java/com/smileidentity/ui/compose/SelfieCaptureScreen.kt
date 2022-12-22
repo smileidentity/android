@@ -48,12 +48,12 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SelfieCaptureResultCallback
+import com.smileidentity.ui.core.hasMultipleCameras
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
-import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImplementationMode
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
@@ -206,6 +206,3 @@ fun SelfieCaptureScreenContent(
         SmileIdentityAttribution()
     }
 }
-
-val CameraState.hasMultipleCameras
-    get() = hasCamera(CamSelector.Front) && hasCamera(CamSelector.Back)
