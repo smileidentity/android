@@ -62,6 +62,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.ui.compose.SelfieCaptureOrPermissionScreen
 import com.smileidentity.ui.core.SelfieCaptureResult
+import com.smileidentity.ui.fragment.SelfieFragment
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import timber.log.Timber
 
@@ -166,9 +167,16 @@ fun MainContent() {
 @Preview
 @Composable
 fun ProductSelectionScreen() {
-    val context = LocalContext.current
-    val products = listOf(
-        Pair("SmartSelfie™ Authentication") { context.toast("Clicked on Auth") },
+    val context = LocalContext.current as MainActivity
+    val products: List<Pair<String, () -> Unit>> = listOf(
+        // TODO: Use the Compose version (SelfieScreen)
+        // This is not the right way to do this, but it's a quick way to get the demo working
+        Pair("SmartSelfie™ Authentication") {
+            context.supportFragmentManager.beginTransaction().add(
+                android.R.id.content,
+                SelfieFragment.newInstance { context.toast(it.toString()) },
+            ).commit()
+        }
     )
     Column(
         horizontalAlignment = CenterHorizontally,
