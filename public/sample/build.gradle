@@ -71,6 +71,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling" // Android Studio Preview support
     debugImplementation "androidx.compose.ui:ui-test-manifest" // UI Tests
 
+    implementation "androidx.navigation:navigation-compose:2.5.3"
+
     testImplementation "junit:junit:4.13.2"
 
     androidTestImplementation composeBom
