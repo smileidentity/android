@@ -5,6 +5,9 @@
     <string name="si_camera_permission_rationale">The camera permission is required to complete the verification process</string>
     <string name="si_agent_mode">Agent Mode</string>
 
+    <!--  Content Descriptions (for accessibility)  -->
+    <string name="si_cd_logo">Smile Identity logo</string>
+
     <!--  Selfie Capture  -->
     <string name="si_selfie_capture_instructions">Put your face inside the oval frame and wait until it turns blue</string>
     <string name="si_selfie_capture_directive_smile">Smile for the camera!</string>

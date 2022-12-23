@@ -193,7 +193,7 @@ fun ProductSelectionScreen() {
                         modifier = Modifier.fillMaxSize(),
                     ) {
                         Image(imageVector = Icons.Default.Face, contentDescription = null)
-                        Text(text = it.first, textAlign = TextAlign.Center)
+                        Text(it.first, textAlign = TextAlign.Center)
                     }
                 }
             }

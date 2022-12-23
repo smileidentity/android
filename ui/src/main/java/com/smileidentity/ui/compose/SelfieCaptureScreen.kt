@@ -180,14 +180,14 @@ fun SelfieCaptureScreenContent(
             )
         }
         Text(
-            text = stringResource(id = uiState.currentDirective),
+            text = stringResource(uiState.currentDirective),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
         )
         // TODO: Remove manual capture once liveness is implemented
         Button(onClick = { viewModel.takePicture(cameraState, onResult) }) {
-            Text(text = "Take Picture")
+            Text("Take Picture")
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -199,7 +199,7 @@ fun SelfieCaptureScreenContent(
             // Because we force use a white background, the icon+text color must be forced to black
             Icon(imageVector = Icons.Outlined.Info, contentDescription = null, tint = Color.Black)
             Text(
-                text = stringResource(id = R.string.si_selfie_capture_instructions),
+                text = stringResource(R.string.si_selfie_capture_instructions),
                 color = Color.Black,
             )
         }

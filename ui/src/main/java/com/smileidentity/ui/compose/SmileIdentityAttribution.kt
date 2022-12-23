@@ -36,14 +36,14 @@ fun SmileIdentityAttribution() {
     ) {
         Image(
             painterResource(R.drawable.si_logo_lock_white),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.si_cd_logo),
             modifier = Modifier
                 .size(24.dp)
                 .background(SmileIdentityMediumBlue, shape)
                 .padding(2.dp),
         )
         Text(
-            text = stringResource(id = R.string.si_attribution),
+            text = stringResource(R.string.si_attribution),
             style = MaterialTheme.typography.labelSmall,
             color = Color.Black,
             modifier = Modifier.padding(4.dp, 0.dp),
