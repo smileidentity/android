@@ -89,14 +89,6 @@ fun SelfieCaptureOrPermissionScreen(
 
 @Preview
 @Composable
-fun SelfieCaptureScreen() {
-    // Pseudo-flash: use a white background to implicitly light up user's face
-    SmileIdentityTheme(darkTheme = false, dynamicColor = false) {
-        SelfieCaptureScreenContent()
-    }
-}
-
-@Composable
 fun SelfieCaptureScreenContent(
     viewModel: SelfieViewModel = viewModel(),
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},

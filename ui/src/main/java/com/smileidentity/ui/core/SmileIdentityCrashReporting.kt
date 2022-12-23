@@ -10,6 +10,7 @@ import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.SentryOptions.BeforeSendCallback
 import io.sentry.UncaughtExceptionHandlerIntegration
+import timber.log.Timber
 
 /**
  * This class is used to enable crash reporting for the Smile Identity SDKs. You must explicitly
@@ -37,7 +38,7 @@ object SmileIdentityCrashReporting {
                 } catch (e: Exception) {
                     // Catch all exceptions to prevent Sentry itself from crashing, in case there is
                     // a bug in our crash reporting code.
-                    println("Error while processing crash report for Sentry: $e")
+                    Timber.e(e, "Error while processing crash report for Sentry")
                 }
                 return@BeforeSendCallback null
             }
@@ -87,14 +88,14 @@ object SmileIdentityCrashReporting {
             return false
         }
         if (throwable.toString().contains(SMILE_IDENTITY_PACKAGE_PREFIX)) {
-            println("Throwable involves Smile Identity SDK")
+            Timber.d("Throwable involves Smile Identity SDK")
             return true
         }
 
         // Check if any item of the stack trace is from a Smile Identity SDK
         throwable.stackTrace.forEach {
             if (it.className.contains(SMILE_IDENTITY_PACKAGE_PREFIX)) {
-                println("Found a class from Smile Identity SDK: ${it.className}")
+                Timber.d("Found a class from Smile Identity SDK: ${it.className}")
                 return true
             }
         }
