@@ -62,12 +62,13 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SelfieCaptureOrPermissionScreen(
+    allowAgentMode: Boolean = false,
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     if (cameraPermissionState.status.isGranted) {
-        SelfieCaptureScreenContent(onResult = onResult)
+        SelfieCaptureScreenContent(allowAgentMode, onResult = onResult)
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
@@ -89,9 +90,11 @@ fun SelfieCaptureOrPermissionScreen(
 @Preview
 @Composable
 fun SelfieCaptureScreenContent(
+    allowAgentMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
+    val uiState = viewModel.uiState.collectAsState().value
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
     val imageAnalyzer = cameraState.rememberImageAnalyzer(analyze = viewModel::analyzeImage)
@@ -110,8 +113,7 @@ fun SelfieCaptureScreenContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        val uiState = viewModel.uiState.collectAsState().value
-        val shouldShowAgentModeSwitch = uiState.allowAgentMode && cameraState.hasMultipleCameras
+        val shouldShowAgentModeSwitch = allowAgentMode && cameraState.hasMultipleCameras
         val isAgentModeEnabled = camSelector == CamSelector.Back
         if (shouldShowAgentModeSwitch) {
             val agentModeBackgroundColor =

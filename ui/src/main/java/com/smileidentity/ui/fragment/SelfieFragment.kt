@@ -31,7 +31,7 @@ class SelfieFragment private constructor(
             // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
             // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
-            setContent { SelfieCaptureOrPermissionScreen(callback) }
+            setContent { SelfieCaptureOrPermissionScreen(true, callback) }
         }
     }
 }

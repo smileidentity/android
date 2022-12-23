@@ -11,6 +11,7 @@
     <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
 
     <!--  Selfie Capture  -->
+    <string name="si_selfie_capture_product_name">SmartSelfie™ Authentication</string>
     <string name="si_selfie_capture_instructions">Put your face inside the oval frame and wait until it turns blue</string>
     <string name="si_selfie_capture_directive_smile">Smile for the camera!</string>
     <string name="si_selfie_capture_directive_capturing">Capturing…</string>

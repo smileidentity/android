@@ -16,7 +16,6 @@ import java.io.File
 
 data class SelfieUiState(
     @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
-    val allowAgentMode: Boolean = false,
     val progress: Float = 0f,
 )
 

@@ -1,9 +1,8 @@
 package com.smileidentity.sample
 
-import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,25 +17,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -44,7 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults.smallTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +55,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.ui.compose.SelfieCaptureOrPermissionScreen
 import com.smileidentity.ui.core.SelfieCaptureResult
-import com.smileidentity.ui.fragment.SelfieFragment
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import timber.log.Timber
 
@@ -83,15 +75,55 @@ fun MainScreen() {
             color = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.onBackground,
         ) {
+            var currentScreen by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
-                topBar = { TopBar() },
-                bottomBar = { BottomBar { navController.navigate(it) } },
+                topBar = {
+                    var checked by remember { mutableStateOf(false) }
+                    TopAppBar(
+                        title = { Text(stringResource(currentScreen), color = MaterialTheme.colorScheme.onPrimary) },
+                        navigationIcon = {
+                            if (navController.previousBackStackEntry != null) {
+                                IconButton(onClick = { navController.navigateUp() }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowBack,
+                                        contentDescription = stringResource(R.string.back),
+                                    )
+                                }
+                            }
+                        },
+                        actions = {
+                            IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
+                                val icon = if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
+                                Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
+                            }
+                        },
+                        colors = smallTopAppBarColors(MaterialTheme.colorScheme.primary),
+                    )
+                },
+                bottomBar = { BottomBar { navController.navigate(it) { popUpTo("home") } } },
                 content = {
                     Box(Modifier.padding(it)) {
                         NavHost(navController = navController, startDestination = "home") {
-                            composable("home") { ProductSelectionScreen() }
-                            composable("resources") { ResourcesScreen() }
-                            composable("about") { AboutScreen() }
+                            composable("home") {
+                                currentScreen = R.string.app_name
+                                ProductsScreen { selectedProduct ->
+                                    when(selectedProduct) {
+                                        com.smileidentity.ui.R.string.si_selfie_capture_product_name -> navController.navigate("selfie", )
+                                    }
+                                }
+                            }
+                            composable("resources") {
+                                currentScreen = R.string.resources
+                                ResourcesScreen()
+                            }
+                            composable("about_us") {
+                                currentScreen = R.string.about_us
+                                AboutScreen()
+                            }
+                            composable("selfie") {
+                                currentScreen = com.smileidentity.ui.R.string.si_selfie_capture_product_name
+                                SelfieCaptureScreen()
+                            }
                         }
                     }
                 },
@@ -103,23 +135,8 @@ fun MainScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun TopBar() {
-    var checked by remember { mutableStateOf(false) }
-    TopAppBar(
-        title = {
-            Text(
-                stringResource(R.string.app_name),
-                color = MaterialTheme.colorScheme.onPrimary,
-            )
-        },
-        actions = {
-            IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
-                val icon = if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
-                Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
-            }
-        },
-        colors = centerAlignedTopAppBarColors(MaterialTheme.colorScheme.primary),
-    )
+fun TopBar(@StringRes title: Int = R.string.app_name) {
+
 }
 
 @Preview
@@ -128,8 +145,8 @@ fun BottomBar(onDestinationSelected: (String) -> Unit = {}) {
     var selectedItem by remember { mutableStateOf(0) }
     val bottomNavItems = listOf(
         Triple("Home", "home", Icons.Rounded.Home),
-        Triple("Resources", "resources", Icons.Rounded.Info),
-        Triple("About Us", "about", Icons.Rounded.Settings),
+        Triple(stringResource(R.string.resources), "resources", Icons.Rounded.Info),
+        Triple(stringResource(R.string.about_us), "about_us", Icons.Rounded.Settings),
     )
     NavigationBar {
         bottomNavItems.forEachIndexed { index, item ->
@@ -146,36 +163,27 @@ fun BottomBar(onDestinationSelected: (String) -> Unit = {}) {
     }
 }
 
+@Preview
 @Composable
-fun MainContent() {
-    val context = LocalContext.current
-    SelfieCaptureOrPermissionScreen {
-        if (it is SelfieCaptureResult.Success) {
-            val message = "Image captured successfully: ${it.selfieFile}"
-            context.toast(message)
-            Timber.d(message)
-        } else if (it is SelfieCaptureResult.Error) {
-            val message = "Image capture error: $it"
-            context.toast(message)
-            Timber.e(it.throwable, message)
+fun ProductsScreen(onProductSelected: (Int) -> Unit = {}) {
+    var selected by remember { mutableStateOf(-1) }
+    val products = listOf(com.smileidentity.ui.R.string.si_selfie_capture_product_name)
+    when (selected) {
+        -1 -> SelectionScreen(products) {
+            selected = it
+            onProductSelected(it)
         }
+        com.smileidentity.ui.R.string.si_selfie_capture_product_name -> SelfieCaptureScreen()
+        else -> Text("Unknown screen: $selected")
     }
 }
 
 @Preview
 @Composable
-fun ProductSelectionScreen() {
-    val context = LocalContext.current as MainActivity
-    val products: List<Pair<String, () -> Unit>> = listOf(
-        // TODO: Use the Compose version (SelfieScreen)
-        // This is not the right way to do this, but it's a quick way to get the demo working
-        Pair("SmartSelfie™ Authentication") {
-            context.supportFragmentManager.beginTransaction().add(
-                android.R.id.content,
-                SelfieFragment.newInstance { context.toast(it.toString()) },
-            ).commit()
-        },
-    )
+fun SelectionScreen(
+    products: List<Int> = listOf(),
+    onProductSelected: (Int) -> Unit = {},
+) {
     Column(
         horizontalAlignment = CenterHorizontally,
         modifier = Modifier
@@ -189,7 +197,9 @@ fun ProductSelectionScreen() {
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
             items(products) {
-                Card(modifier = Modifier.size(96.dp).clickable(onClick = it.second)) {
+                Card(modifier = Modifier
+                    .size(96.dp)
+                    .clickable(onClick = { onProductSelected(it) })) {
                     Column(
                         horizontalAlignment = CenterHorizontally,
                         verticalArrangement = SpaceAround,
@@ -197,9 +207,9 @@ fun ProductSelectionScreen() {
                     ) {
                         Image(
                             Icons.Default.Face,
-                            stringResource(R.string.product_name_icon, it.first),
+                            stringResource(R.string.product_name_icon, stringResource(it)),
                         )
-                        Text(it.first, textAlign = TextAlign.Center)
+                        Text(stringResource(it), textAlign = TextAlign.Center)
                     }
                 }
             }
@@ -207,53 +217,20 @@ fun ProductSelectionScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun ResourcesScreen() {
-    val resources = listOf(
-        Pair("Explore our documentation", "Read everything related to our solution stack"),
-        Pair("Privacy Policy", "Learn more about how we handle data"),
-        Pair("View FAQs", "Explore frequently asked questions"),
-        Pair("Supported ID types and documents", "See our coverage range across the continent"),
-    )
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        val context = LocalContext.current
-        resources.forEach {
-            ListItem(
-                headlineText = { Text(it.first) },
-                supportingText = { Text(it.second) },
-                trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { context.toast(it.first) },
-            )
-            Divider()
+fun SelfieCaptureScreen() {
+    val context = LocalContext.current
+    SelfieCaptureOrPermissionScreen(true) {
+        if (it is SelfieCaptureResult.Success) {
+            val message = "Image captured successfully: ${it.selfieFile}"
+            context.toast(message)
+            Timber.d(message)
+        } else if (it is SelfieCaptureResult.Error) {
+            val message = "Image capture error: $it"
+            context.toast(message)
+            Timber.e(it.throwable, message)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun AboutScreen() {
-    val abouts = listOf(
-        Pair("Who we are", Icons.Default.Info),
-        Pair("Visit our website", Icons.Default.Star),
-        Pair("Contact support", Icons.Default.Email),
-    )
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        val context = LocalContext.current
-        abouts.forEach {
-            ListItem(
-                headlineText = { Text(it.first) },
-                leadingContent = { Icon(it.second, null) },
-                trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { context.toast(it.first) },
-            )
-            Divider()
-        }
-    }
-}
-
-private fun Context.toast(message: String) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-}
