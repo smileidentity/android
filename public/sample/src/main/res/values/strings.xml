@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Smile Identity</string>
+    <string name="test_our_products">Test Our Products</string>
+    <string name="product_name_icon">%1$s icon</string>
 </resources>

@@ -182,17 +182,25 @@ fun ProductSelectionScreen() {
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        Text("Test Our Products", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            stringResource(R.string.test_our_products),
+            style = MaterialTheme.typography.headlineSmall,
+        )
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
             items(products) {
-                Card(modifier = Modifier.size(96.dp).clickable(onClick = it.second)) {
+                Card(modifier = Modifier
+                    .size(96.dp)
+                    .clickable(onClick = it.second)) {
                     Column(
                         horizontalAlignment = CenterHorizontally,
                         verticalArrangement = SpaceAround,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        Image(imageVector = Icons.Default.Face, contentDescription = null)
+                        Image(
+                            Icons.Default.Face,
+                            stringResource(R.string.product_name_icon, it.first),
+                        )
                         Text(it.first, textAlign = TextAlign.Center)
                     }
                 }

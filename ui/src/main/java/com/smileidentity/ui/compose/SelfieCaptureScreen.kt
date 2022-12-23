@@ -131,10 +131,11 @@ fun SelfieCaptureScreenContent(
                     checked = isAgentModeEnabled,
                     onCheckedChange = { camSelector = camSelector.inverse },
                     thumbContent = {
+                        val contentDescription = stringResource(R.string.si_cd_agent_mode_enabled)
                         if (isAgentModeEnabled) {
                             Icon(
-                                imageVector = Icons.Outlined.Check,
-                                contentDescription = null,
+                                Icons.Outlined.Check,
+                                contentDescription = contentDescription,
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -187,10 +188,15 @@ fun SelfieCaptureScreenContent(
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally),
         ) {
-            // Because we force use a white background, the icon+text color must be forced to black
-            Icon(imageVector = Icons.Outlined.Info, contentDescription = null, tint = Color.Black)
+            Icon(
+                Icons.Outlined.Info,
+                contentDescription = stringResource(R.string.si_cd_selfie_capture_instructions),
+                // The icon color must be forced to black due to white background
+                tint = Color.Black,
+            )
             Text(
                 text = stringResource(R.string.si_selfie_capture_instructions),
+                // The text color must be forced to black due to white background
                 color = Color.Black,
             )
         }

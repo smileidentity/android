@@ -7,6 +7,8 @@
 
     <!--  Content Descriptions (for accessibility)  -->
     <string name="si_cd_logo">Smile Identity logo</string>
+    <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
+    <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
 
     <!--  Selfie Capture  -->
     <string name="si_selfie_capture_instructions">Put your face inside the oval frame and wait until it turns blue</string>
