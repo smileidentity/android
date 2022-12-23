@@ -43,7 +43,7 @@ fun ResourcesScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         val context = LocalContext.current
         resources.forEach {

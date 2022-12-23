@@ -33,7 +33,7 @@ fun AboutScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         val context = LocalContext.current
         abouts.forEach {

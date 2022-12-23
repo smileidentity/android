@@ -2,7 +2,6 @@ package com.smileidentity.sample
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -70,6 +69,12 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    var selectedItem by remember { mutableStateOf(0) }
+    val bottomNavItems = listOf(
+        Triple("Home", "home", Icons.Rounded.Home),
+        Triple(stringResource(R.string.resources), "resources", Icons.Rounded.Info),
+        Triple(stringResource(R.string.about_us), "about_us", Icons.Rounded.Settings),
+    )
     SmileIdentityTheme {
         Surface(
             color = MaterialTheme.colorScheme.background,
@@ -80,7 +85,10 @@ fun MainScreen() {
                 topBar = {
                     var checked by remember { mutableStateOf(false) }
                     TopAppBar(
-                        title = { Text(stringResource(currentScreen), color = MaterialTheme.colorScheme.onPrimary) },
+                        title = {
+                            Text(stringResource(currentScreen),
+                                color = MaterialTheme.colorScheme.onPrimary)
+                        },
                         navigationIcon = {
                             if (navController.previousBackStackEntry != null) {
                                 IconButton(onClick = { navController.navigateUp() }) {
@@ -92,23 +100,40 @@ fun MainScreen() {
                             }
                         },
                         actions = {
-                            IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
-                                val icon = if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
+                            IconToggleButton(checked = checked,
+                                onCheckedChange = { checked = it }) {
+                                val icon =
+                                    if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
                                 Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
                             }
                         },
                         colors = smallTopAppBarColors(MaterialTheme.colorScheme.primary),
                     )
                 },
-                bottomBar = { BottomBar { navController.navigate(it) { popUpTo("home") } } },
+                bottomBar = {
+                    NavigationBar {
+                        bottomNavItems.forEachIndexed { index, item ->
+                            NavigationBarItem(
+                                selected = selectedItem == index,
+                                icon = { Icon(item.third, item.first) },
+                                label = { Text(item.first) },
+                                onClick = {
+                                    selectedItem = index
+                                    navController.navigate(item.second) { popUpTo("home") }
+                                },
+                            )
+                        }
+                    }
+                },
                 content = {
                     Box(Modifier.padding(it)) {
                         NavHost(navController = navController, startDestination = "home") {
                             composable("home") {
                                 currentScreen = R.string.app_name
                                 ProductsScreen { selectedProduct ->
-                                    when(selectedProduct) {
-                                        com.smileidentity.ui.R.string.si_selfie_capture_product_name -> navController.navigate("selfie", )
+                                    when (selectedProduct) {
+                                        com.smileidentity.ui.R.string.si_selfie_capture_product_name -> navController.navigate(
+                                            "selfie")
                                     }
                                 }
                             }
@@ -121,42 +146,12 @@ fun MainScreen() {
                                 AboutScreen()
                             }
                             composable("selfie") {
-                                currentScreen = com.smileidentity.ui.R.string.si_selfie_capture_product_name
+                                currentScreen =
+                                    com.smileidentity.ui.R.string.si_selfie_capture_product_name
                                 SelfieCaptureScreen()
                             }
                         }
                     }
-                },
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun TopBar(@StringRes title: Int = R.string.app_name) {
-
-}
-
-@Preview
-@Composable
-fun BottomBar(onDestinationSelected: (String) -> Unit = {}) {
-    var selectedItem by remember { mutableStateOf(0) }
-    val bottomNavItems = listOf(
-        Triple("Home", "home", Icons.Rounded.Home),
-        Triple(stringResource(R.string.resources), "resources", Icons.Rounded.Info),
-        Triple(stringResource(R.string.about_us), "about_us", Icons.Rounded.Settings),
-    )
-    NavigationBar {
-        bottomNavItems.forEachIndexed { index, item ->
-            NavigationBarItem(
-                selected = selectedItem == index,
-                icon = { Icon(item.third, item.first) },
-                label = { Text(item.first) },
-                onClick = {
-                    selectedItem = index
-                    onDestinationSelected(item.second)
                 },
             )
         }
@@ -197,9 +192,11 @@ fun SelectionScreen(
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
             items(products) {
-                Card(modifier = Modifier
-                    .size(96.dp)
-                    .clickable(onClick = { onProductSelected(it) })) {
+                Card(
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clickable(onClick = { onProductSelected(it) })
+                ) {
                     Column(
                         horizontalAlignment = CenterHorizontally,
                         verticalArrangement = SpaceAround,
