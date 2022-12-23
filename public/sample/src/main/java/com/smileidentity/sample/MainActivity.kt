@@ -133,18 +133,22 @@ fun MainScreen() {
                     Box(Modifier.padding(it)) {
                         NavHost(navController = navController, startDestination = "home") {
                             composable("home") {
+                                selectedItem = 0
                                 currentScreen = R.string.app_name
                                 ProductsScreen { navController.navigate("selfie") }
                             }
                             composable("resources") {
+                                selectedItem = 1
                                 currentScreen = R.string.resources
                                 ResourcesScreen()
                             }
                             composable("about_us") {
+                                selectedItem = 2
                                 currentScreen = R.string.about_us
                                 AboutUsScreen()
                             }
                             composable("selfie") {
+                                selectedItem = 0
                                 currentScreen =
                                     com.smileidentity.ui.R.string.si_selfie_capture_product_name
                                 SelfieCaptureScreen()
