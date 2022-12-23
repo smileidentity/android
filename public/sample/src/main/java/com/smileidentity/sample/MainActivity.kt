@@ -86,8 +86,10 @@ fun MainScreen() {
                     var checked by remember { mutableStateOf(false) }
                     TopAppBar(
                         title = {
-                            Text(stringResource(currentScreen),
-                                color = MaterialTheme.colorScheme.onPrimary)
+                            Text(
+                                stringResource(currentScreen),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         },
                         navigationIcon = {
                             if (navController.previousBackStackEntry != null) {
@@ -100,8 +102,10 @@ fun MainScreen() {
                             }
                         },
                         actions = {
-                            IconToggleButton(checked = checked,
-                                onCheckedChange = { checked = it }) {
+                            IconToggleButton(
+                                checked = checked,
+                                onCheckedChange = { checked = it }
+                            ) {
                                 val icon =
                                     if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
                                 Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
