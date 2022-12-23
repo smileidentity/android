@@ -16,7 +16,7 @@ import java.io.File
 
 data class SelfieUiState(
     @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
-    val allowAgentMode: Boolean = true,
+    val allowAgentMode: Boolean = false,
     val progress: Float = 0f,
 )
 
@@ -56,6 +56,7 @@ class SelfieViewModel : ViewModel() {
             R.string.si_selfie_capture_directive_unable_to_detect_face,
         )
         _uiState.update {
+            // TODO: Remove. For demo purposes only
             val newDirective = if ((count % 25) == 0) directives.random() else it.currentDirective
             val newProgress = (((it.progress * 100) + 1) % 100) / 100
             it.copy(currentDirective = newDirective, progress = newProgress)

@@ -120,9 +120,9 @@ fun SelfieCaptureScreenContent(
             .padding(16.dp),
     ) {
         val uiState = viewModel.uiState.collectAsState().value
-        val shouldShouldAgentModeSwitch = uiState.allowAgentMode && cameraState.hasMultipleCameras
+        val shouldShowAgentModeSwitch = uiState.allowAgentMode && cameraState.hasMultipleCameras
         val isAgentModeEnabled = camSelector == CamSelector.Back
-        if (shouldShouldAgentModeSwitch) {
+        if (shouldShowAgentModeSwitch) {
             val agentModeBackgroundColor =
                 (if (isAgentModeEnabled) MaterialTheme.colorScheme.primary else Color.Gray)
                     .copy(alpha = 0.25f)

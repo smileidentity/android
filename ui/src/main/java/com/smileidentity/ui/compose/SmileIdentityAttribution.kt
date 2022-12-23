@@ -42,7 +42,6 @@ fun SmileIdentityAttribution() {
                 .background(SmileIdentityMediumBlue, shape)
                 .padding(2.dp),
         )
-        // Spacer(modifier = Modifier.size(8.dp))
         Text(
             text = stringResource(id = R.string.si_attribution),
             style = MaterialTheme.typography.labelSmall,
