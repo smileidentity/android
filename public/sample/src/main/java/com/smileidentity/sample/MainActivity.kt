@@ -189,9 +189,7 @@ fun ProductSelectionScreen() {
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
             items(products) {
-                Card(modifier = Modifier
-                    .size(96.dp)
-                    .clickable(onClick = it.second)) {
+                Card(modifier = Modifier.size(96.dp).clickable(onClick = it.second)) {
                     Column(
                         horizontalAlignment = CenterHorizontally,
                         verticalArrangement = SpaceAround,
