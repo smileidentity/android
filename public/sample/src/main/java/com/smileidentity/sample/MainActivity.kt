@@ -2,6 +2,7 @@ package com.smileidentity.sample
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -44,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -64,6 +66,12 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+data class BottomNavItem(
+    @StringRes val label: Int,
+    val route: String,
+    val icon: ImageVector,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
@@ -71,9 +79,9 @@ fun MainScreen() {
     val navController = rememberNavController()
     var selectedItem by remember { mutableStateOf(0) }
     val bottomNavItems = listOf(
-        Triple("Home", "home", Icons.Rounded.Home),
-        Triple(stringResource(R.string.resources), "resources", Icons.Rounded.Info),
-        Triple(stringResource(R.string.about_us), "about_us", Icons.Rounded.Settings),
+        BottomNavItem(R.string.home, "home", Icons.Rounded.Home),
+        BottomNavItem(R.string.resources, "resources", Icons.Rounded.Info),
+        BottomNavItem(R.string.about_us, "about_us", Icons.Rounded.Settings),
     )
     SmileIdentityTheme {
         Surface(
@@ -119,11 +127,11 @@ fun MainScreen() {
                         bottomNavItems.forEachIndexed { index, item ->
                             NavigationBarItem(
                                 selected = selectedItem == index,
-                                icon = { Icon(item.third, item.first) },
-                                label = { Text(item.first) },
+                                icon = { Icon(item.icon, stringResource(item.label)) },
+                                label = { Text(stringResource(item.label)) },
                                 onClick = {
                                     selectedItem = index
-                                    navController.navigate(item.second) { popUpTo("home") }
+                                    navController.navigate(item.route) { popUpTo("home") }
                                 },
                             )
                         }
