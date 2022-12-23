@@ -88,7 +88,7 @@ fun MainScreen() {
                         title = {
                             Text(
                                 stringResource(currentScreen),
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onPrimary,
                             )
                         },
                         navigationIcon = {
@@ -104,7 +104,7 @@ fun MainScreen() {
                         actions = {
                             IconToggleButton(
                                 checked = checked,
-                                onCheckedChange = { checked = it }
+                                onCheckedChange = { checked = it },
                             ) {
                                 val icon =
                                     if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
@@ -134,12 +134,7 @@ fun MainScreen() {
                         NavHost(navController = navController, startDestination = "home") {
                             composable("home") {
                                 currentScreen = R.string.app_name
-                                ProductsScreen { selectedProduct ->
-                                    when (selectedProduct) {
-                                        com.smileidentity.ui.R.string.si_selfie_capture_product_name -> navController.navigate(
-                                            "selfie")
-                                    }
-                                }
+                                ProductsScreen { navController.navigate("selfie") }
                             }
                             composable("resources") {
                                 currentScreen = R.string.resources
@@ -199,7 +194,7 @@ fun SelectionScreen(
                 Card(
                     modifier = Modifier
                         .size(96.dp)
-                        .clickable(onClick = { onProductSelected(it) })
+                        .clickable(onClick = { onProductSelected(it) }),
                 ) {
                     Column(
                         horizontalAlignment = CenterHorizontally,
@@ -234,4 +229,3 @@ fun SelfieCaptureScreen() {
         }
     }
 }
-
