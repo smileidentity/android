@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun AboutScreen() {
+fun AboutUsScreen() {
     var shouldShowWhoWeAreDialog by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val abouts = listOf(

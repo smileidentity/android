@@ -142,7 +142,7 @@ fun MainScreen() {
                             }
                             composable("about_us") {
                                 currentScreen = R.string.about_us
-                                AboutScreen()
+                                AboutUsScreen()
                             }
                             composable("selfie") {
                                 currentScreen =
