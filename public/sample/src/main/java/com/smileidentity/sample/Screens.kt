@@ -13,16 +13,16 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Screen(
+sealed class Screens(
     val route: String,
     @StringRes val label: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 ) {
-    object Home : Screen("home", R.string.home, Filled.Home, Outlined.Home)
-    object Resources : Screen("resources", R.string.resources, Filled.Info, Outlined.Info)
-    object AboutUs : Screen("about_us", R.string.about_us, Filled.Settings, Outlined.Settings)
-    object SmartSelfie : Screen(
+    object Home : Screens("home", R.string.home, Filled.Home, Outlined.Home)
+    object Resources : Screens("resources", R.string.resources, Filled.Info, Outlined.Info)
+    object AboutUs : Screens("about_us", R.string.about_us, Filled.Settings, Outlined.Settings)
+    object SmartSelfie : Screens(
         "smart_selfie",
         com.smileidentity.ui.R.string.si_selfie_capture_product_name,
         // TODO: Replace icons with Smile Identity branded icons

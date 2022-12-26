@@ -1,6 +1,5 @@
 package com.smileidentity.sample
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -36,8 +35,8 @@ import com.smileidentity.ui.theme.SmileIdentityTheme
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    var bottomNavSelection: Screen by remember { mutableStateOf(Screen.Home) }
-    val bottomNavItems = listOf(Screen.Home, Screen.Resources, Screen.AboutUs)
+    var bottomNavSelection: Screens by remember { mutableStateOf(Screens.Home) }
+    val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
     SmileIdentityTheme {
         Surface(
             color = MaterialTheme.colorScheme.background,
@@ -83,44 +82,43 @@ fun MainScreen() {
                             NavigationBarItem(
                                 selected = it == bottomNavSelection,
                                 icon = {
-                                    Icon(
-                                        if (it == bottomNavSelection) it.selectedIcon else
-                                            it.unselectedIcon,
-                                        stringResource(it.label),
-                                    )
+                                    val imageVector = if (it == bottomNavSelection) {
+                                        it.selectedIcon
+                                    } else {
+                                        it.unselectedIcon
+                                    }
+                                    Icon(imageVector, stringResource(it.label))
                                 },
                                 label = { Text(stringResource(it.label)) },
                                 onClick = {
-                                    navController.navigate(it.route) { popUpTo(Screen.Home.route) }
+                                    navController.navigate(it.route) { popUpTo(Screens.Home.route) }
                                 },
                             )
                         }
                     }
                 },
                 content = {
-                    Box(Modifier.padding(it)) {
-                        NavHost(navController, startDestination = Screen.Home.route) {
-                            composable(Screen.Home.route) {
-                                bottomNavSelection = Screen.Home
-                                // Display "Smile Identity" in the top bar instead of "Home" label
-                                currentScreenTitle = R.string.app_name
-                                ProductSelectionScreen { navController.navigate(it.route) }
-                            }
-                            composable(Screen.Resources.route) {
-                                bottomNavSelection = Screen.Resources
-                                currentScreenTitle = Screen.Resources.label
-                                ResourcesScreen()
-                            }
-                            composable(Screen.AboutUs.route) {
-                                bottomNavSelection = Screen.AboutUs
-                                currentScreenTitle = Screen.AboutUs.label
-                                AboutUsScreen()
-                            }
-                            composable(Screen.SmartSelfie.route) {
-                                bottomNavSelection = Screen.Home
-                                currentScreenTitle = Screen.SmartSelfie.label
-                                SelfieCaptureScreen()
-                            }
+                    NavHost(navController, Screens.Home.route, Modifier.padding(it)) {
+                        composable(Screens.Home.route) {
+                            bottomNavSelection = Screens.Home
+                            // Display "Smile Identity" in the top bar instead of "Home" label
+                            currentScreenTitle = R.string.app_name
+                            ProductSelectionScreen { navController.navigate(it.route) }
+                        }
+                        composable(Screens.Resources.route) {
+                            bottomNavSelection = Screens.Resources
+                            currentScreenTitle = Screens.Resources.label
+                            ResourcesScreen()
+                        }
+                        composable(Screens.AboutUs.route) {
+                            bottomNavSelection = Screens.AboutUs
+                            currentScreenTitle = Screens.AboutUs.label
+                            AboutUsScreen()
+                        }
+                        composable(Screens.SmartSelfie.route) {
+                            bottomNavSelection = Screens.Home
+                            currentScreenTitle = Screens.SmartSelfie.label
+                            SelfieCaptureScreen()
                         }
                     }
                 },

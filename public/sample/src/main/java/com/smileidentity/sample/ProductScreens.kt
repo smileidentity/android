@@ -31,8 +31,8 @@ import timber.log.Timber
 
 @Preview
 @Composable
-fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
-    val products = listOf(Screen.SmartSelfie)
+fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
+    val products = listOf(Screens.SmartSelfie)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
