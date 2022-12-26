@@ -1,7 +1,8 @@
 package com.smileidentity.sample
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.Icons.Outlined
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -57,7 +58,7 @@ fun MainScreen() {
                             if (navController.previousBackStackEntry != null) {
                                 IconButton(onClick = { navController.navigateUp() }) {
                                     Icon(
-                                        imageVector = Icons.Filled.ArrowBack,
+                                        imageVector = Filled.ArrowBack,
                                         contentDescription = stringResource(R.string.back),
                                     )
                                 }
@@ -68,8 +69,7 @@ fun MainScreen() {
                                 checked = checked,
                                 onCheckedChange = { checked = it },
                             ) {
-                                val icon =
-                                    if (checked) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow
+                                val icon = if (checked) Filled.PlayArrow else Outlined.PlayArrow
                                 Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
                             }
                         },
