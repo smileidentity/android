@@ -17,7 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarDefaults.smallTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,7 +74,7 @@ fun MainScreen() {
                                 Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
                             }
                         },
-                        colors = TopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.primary),
+                        colors = smallTopAppBarColors(MaterialTheme.colorScheme.primary),
                     )
                 },
                 bottomBar = {
