@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,12 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SelfieCaptureResultCallback
-import com.smileidentity.ui.core.hasMultipleCameras
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.ujizin.camposer.CameraPreview
@@ -65,8 +66,26 @@ fun SelfieCaptureOrPermissionScreen(
     allowAgentMode: Boolean = false,
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
+    SelfieCaptureOrPermissionScreen(
+        allowAgentMode,
+        rememberPermissionState(Manifest.permission.CAMERA),
+        onResult,
+    )
+}
+
+/**
+ * The internal modifier is used to prevent the function from being called from outside the module
+ * as this is for testing purposes only. This is because others consumers would need to use the
+ * @OptIn(ExperimentalPermissionsApi::class) annotation to use this function.
+ */
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+internal fun SelfieCaptureOrPermissionScreen(
+    allowAgentMode: Boolean = false,
+    cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
+    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
+) {
     val context = LocalContext.current
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     if (cameraPermissionState.status.isGranted) {
         SelfieCaptureScreenContent(allowAgentMode, onResult = onResult)
     } else {
@@ -113,12 +132,13 @@ fun SelfieCaptureScreenContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        val shouldShowAgentModeSwitch = allowAgentMode && cameraState.hasMultipleCameras
         val isAgentModeEnabled = camSelector == CamSelector.Back
-        if (shouldShowAgentModeSwitch) {
-            val agentModeBackgroundColor =
-                (if (isAgentModeEnabled) MaterialTheme.colorScheme.primary else Color.Gray)
-                    .copy(alpha = 0.25f)
+        if (allowAgentMode) {
+            val agentModeBackgroundColor = if (isAgentModeEnabled) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                Color.Gray
+            }.copy(alpha = 0.25f)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -130,6 +150,7 @@ fun SelfieCaptureScreenContent(
             ) {
                 Text(text = stringResource(R.string.si_agent_mode), color = Color.Black)
                 Switch(
+                    modifier = Modifier.testTag("agentModeSwitch"),
                     checked = isAgentModeEnabled,
                     onCheckedChange = { camSelector = camSelector.inverse },
                     thumbContent = {
@@ -162,7 +183,8 @@ fun SelfieCaptureScreenContent(
                 modifier = Modifier
                     .size(viewfinderSize)
                     .clip(CircleShape)
-                    .align(Alignment.Center),
+                    .align(Alignment.Center)
+                    .testTag("cameraPreview"),
             )
             CircularProgressIndicator(
                 uiState.progress,
@@ -180,8 +202,11 @@ fun SelfieCaptureScreenContent(
             color = Color.Black,
         )
         // TODO: Remove manual capture once liveness is implemented
-        Button(onClick = { viewModel.takePicture(cameraState, onResult) }) {
-            Text("Take Picture")
+        if (cameraState.isInitialized) {
+            Button(
+                modifier = Modifier.testTag("takePictureButton"),
+                onClick = { viewModel.takePicture(cameraState, onResult) },
+            ) { Text("Take Picture") }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,

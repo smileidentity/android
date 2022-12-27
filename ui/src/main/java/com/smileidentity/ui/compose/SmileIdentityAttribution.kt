@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +33,8 @@ fun SmileIdentityAttribution() {
             .border(1.dp, Color.LightGray.copy(alpha = 0.2f), shape)
             .shadow(2.dp, shape)
             .clip(shape)
-            .background(Color.White),
+            .background(Color.White)
+            .testTag("smileIdentityAttribution"),
     ) {
         Image(
             painterResource(R.drawable.si_logo_lock_white),
