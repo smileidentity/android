@@ -91,7 +91,10 @@ fun MainScreen() {
                                 },
                                 label = { Text(stringResource(it.label)) },
                                 onClick = {
-                                    navController.navigate(it.route) { popUpTo(Screens.Home.route) }
+                                    navController.navigate(it.route) {
+                                        popUpTo(Screens.Home.route)
+                                        launchSingleTop = true
+                                    }
                                 },
                             )
                         }
