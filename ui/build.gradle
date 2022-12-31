@@ -89,7 +89,7 @@ dependencies {
     // Permissions Compose component
     implementation "com.google.accompanist:accompanist-permissions:0.28.0"
     // CameraX Compose component
-    implementation "io.github.ujizin:camposer:0.1.0"
+    implementation "io.github.ujizin:camposer:0.1.1"
     implementation "androidx.camera:camera-camera2"
 
     testImplementation "junit:junit:4.13.2"
