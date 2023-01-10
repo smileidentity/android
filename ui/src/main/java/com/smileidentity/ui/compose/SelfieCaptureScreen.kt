@@ -62,7 +62,6 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SelfieCaptureOrPermissionScreen(

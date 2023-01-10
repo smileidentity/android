@@ -25,7 +25,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-
 data class SelfieUiState(
     @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
     val progress: Float = 0f,
@@ -71,12 +70,14 @@ class SelfieViewModel : ViewModel() {
         val file = createSelfieFile()
         cameraState.takePicture(file) { result ->
             when (result) {
-                is ImageCaptureResult.Success -> it.resume(postProcessImage(
-                    file,
-                    saveAsGrayscale = false,
-                    compressionQuality = 80,
-                    desiredOutputSize = Size(320, 320),
-                ))
+                is ImageCaptureResult.Success -> it.resume(
+                    postProcessImage(
+                        file,
+                        saveAsGrayscale = false,
+                        compressionQuality = 80,
+                        desiredOutputSize = Size(320, 320),
+                    )
+                )
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
         }
@@ -86,12 +87,14 @@ class SelfieViewModel : ViewModel() {
         val file = createLivenessFile()
         cameraState.takePicture(file) { result ->
             when (result) {
-                is ImageCaptureResult.Success -> it.resume(postProcessImage(
-                    file,
-                    saveAsGrayscale = true,
-                    compressionQuality = 80,
-                    desiredOutputSize = Size(256, 256),
-                ))
+                is ImageCaptureResult.Success -> it.resume(
+                    postProcessImage(
+                        file,
+                        saveAsGrayscale = true,
+                        compressionQuality = 80,
+                        desiredOutputSize = Size(256, 256),
+                    )
+                )
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
         }
