@@ -76,7 +76,7 @@ class SelfieViewModel : ViewModel() {
                         saveAsGrayscale = false,
                         compressionQuality = 80,
                         desiredOutputSize = Size(320, 320),
-                    )
+                    ),
                 )
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
@@ -93,7 +93,7 @@ class SelfieViewModel : ViewModel() {
                         saveAsGrayscale = true,
                         compressionQuality = 80,
                         desiredOutputSize = Size(256, 256),
-                    )
+                    ),
                 )
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
