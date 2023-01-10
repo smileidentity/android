@@ -52,12 +52,12 @@ internal fun postProcessImage(
  * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
  * format "si_${imageType}_<random number>.jpg"
  */
-internal fun createTempFile(imageType: String): File {
+internal fun createSmileTempFile(imageType: String): File {
     return File.createTempFile("si_${imageType}_", ".jpg").apply {
         // Deletes file when the *VM* is exited (*not* when the app is closed)
         deleteOnExit()
     }
 }
 
-internal fun createLivenessFile() = createTempFile("liveness")
-internal fun createSelfieFile() = createTempFile("selfie")
+internal fun createLivenessFile() = createSmileTempFile("liveness")
+internal fun createSelfieFile() = createSmileTempFile("selfie")

@@ -3,26 +3,42 @@ package com.smileidentity.ui.viewmodel
 import androidx.camera.core.ImageProxy
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SelfieCaptureResult
+import com.smileidentity.ui.setupPostProcessMocks
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 
 class SelfieViewModelTest {
     private val subject = SelfieViewModel()
 
+    @Before
+    fun setup() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
         assertEquals(R.string.si_selfie_capture_directive_smile, uiState.currentDirective)
         assertEquals(0f, uiState.progress)
+        assertEquals(false, uiState.isCapturing)
     }
 
     @Test
@@ -30,15 +46,16 @@ class SelfieViewModelTest {
         // given
         val cameraState = mockk<CameraState>()
         val callback = { it: SelfieCaptureResult -> assertTrue(it is SelfieCaptureResult.Success) }
-        val slot = slot<(ImageCaptureResult) -> Unit>()
-        every { cameraState.takePicture(any<File>(), capture(slot)) } returns Unit
+        val slots = mutableListOf<(ImageCaptureResult) -> Unit>()
+        every { cameraState.takePicture(any<File>(), capture(slots)) } returns Unit
+        setupPostProcessMocks()
 
         // when
         subject.takePicture(cameraState, callback)
-        slot.captured(ImageCaptureResult.Success(null))
+        slots.forEach { it(ImageCaptureResult.Success(null)) }
 
         // then
-        verify(exactly = 1) { cameraState.takePicture(any<File>(), any()) }
+        verify(exactly = slots.size) { cameraState.takePicture(any<File>(), any()) }
         confirmVerified(cameraState)
     }
 
@@ -47,15 +64,15 @@ class SelfieViewModelTest {
         // given
         val cameraState = mockk<CameraState>()
         val callback = { it: SelfieCaptureResult -> assertTrue(it is SelfieCaptureResult.Error) }
-        val slot = slot<(ImageCaptureResult) -> Unit>()
-        every { cameraState.takePicture(any<File>(), capture(slot)) } returns Unit
+        val slots = mutableListOf<(ImageCaptureResult) -> Unit>()
+        every { cameraState.takePicture(any<File>(), capture(slots)) } returns Unit
 
         // when
         subject.takePicture(cameraState, callback)
-        slot.captured(ImageCaptureResult.Error(RuntimeException()))
+        slots.forEach { it(ImageCaptureResult.Error(RuntimeException())) }
 
         // then
-        verify(exactly = 1) { cameraState.takePicture(any<File>(), any()) }
+        verify(exactly = slots.size) { cameraState.takePicture(any<File>(), any()) }
         confirmVerified(cameraState)
     }
 

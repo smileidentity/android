@@ -24,6 +24,7 @@ import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.time.Duration.Companion.milliseconds
 
 data class SelfieUiState(
     @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
@@ -52,7 +53,7 @@ class SelfieViewModel : ViewModel() {
                 _uiState.update { it.copy(progress = 1f / totalSteps) }
                 val livenessFiles = mutableListOf<File>()
                 for (stepNum in 2..totalSteps) {
-                    delay(500)
+                    delay(500.milliseconds)
                     val livenessFile = captureLivenessImage(cameraState)
                     livenessFiles.add(livenessFile)
                     _uiState.update { it.copy(progress = stepNum / totalSteps.toFloat()) }
@@ -70,6 +71,7 @@ class SelfieViewModel : ViewModel() {
         val file = createSelfieFile()
         cameraState.takePicture(file) { result ->
             when (result) {
+                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                 is ImageCaptureResult.Success -> it.resume(
                     postProcessImage(
                         file,
@@ -78,7 +80,6 @@ class SelfieViewModel : ViewModel() {
                         desiredOutputSize = Size(320, 320),
                     ),
                 )
-                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
         }
     }
@@ -87,6 +88,7 @@ class SelfieViewModel : ViewModel() {
         val file = createLivenessFile()
         cameraState.takePicture(file) { result ->
             when (result) {
+                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                 is ImageCaptureResult.Success -> it.resume(
                     postProcessImage(
                         file,
@@ -95,7 +97,6 @@ class SelfieViewModel : ViewModel() {
                         desiredOutputSize = Size(256, 256),
                     ),
                 )
-                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
         }
     }
