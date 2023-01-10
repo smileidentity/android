@@ -1,7 +1,9 @@
 package com.smileidentity.ui.core
 
+import java.io.File
+
 sealed class SelfieCaptureResult {
-    data class Success(val selfieFile: String) : SelfieCaptureResult()
+    data class Success(val selfieFile: File, val livenessFiles: List<File>) : SelfieCaptureResult()
 
     // TODO: Do we want to explicitly disambiguate all error cases as part of the sealed hierarchy?
     //  (e.g. PermissionDenied, NetworkError, IOError, etc.)

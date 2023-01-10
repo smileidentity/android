@@ -72,7 +72,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
 @Composable
 fun SelfieCaptureScreen() {
     val context = LocalContext.current
-    SelfieCaptureOrPermissionScreen(true) {
+    SelfieCaptureOrPermissionScreen(agentMode = true, manualCaptureMode = true) {
         if (it is SelfieCaptureResult.Success) {
             val message = "Image captured successfully: ${it.selfieFile}"
             context.toast(message)

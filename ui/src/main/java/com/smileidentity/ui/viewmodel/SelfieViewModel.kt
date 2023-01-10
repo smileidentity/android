@@ -1,22 +1,35 @@
 package com.smileidentity.ui.viewmodel
 
+import android.util.Size
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SelfieCaptureResult
 import com.smileidentity.ui.core.SelfieCaptureResultCallback
+import com.smileidentity.ui.core.createLivenessFile
+import com.smileidentity.ui.core.createSelfieFile
+import com.smileidentity.ui.core.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
 
 data class SelfieUiState(
     @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
     val progress: Float = 0f,
+    val isCapturing: Boolean = false,
 )
 
 class SelfieViewModel : ViewModel() {
@@ -28,21 +41,60 @@ class SelfieViewModel : ViewModel() {
         cameraState: CameraState,
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
     ) {
-        // Save to temporary file, which does not require any storage permissions. It will be saved
-        // to the app's cache directory, which is cleared when the app is uninstalled. Images will
-        // be saved in the format "si_selfie_<random number>.jpg"
-        val file = File.createTempFile("si_selfie_", ".jpg")
-        cameraState.takePicture(file) {
-            when (it) {
-                is ImageCaptureResult.Success ->
-                    callback.onResult(SelfieCaptureResult.Success(file.absolutePath))
-                is ImageCaptureResult.Error ->
-                    callback.onResult(SelfieCaptureResult.Error(it.throwable))
+        _uiState.update { it.copy(isCapturing = true) }
+
+        // Take 1 color photo
+        // Take 7 B&W photos
+        viewModelScope.launch {
+            val numLivenessImages = 7
+            val totalSteps = numLivenessImages + 1
+            try {
+                val selfieFile = captureSelfieImage(cameraState)
+                _uiState.update { it.copy(progress = 1f / totalSteps) }
+                val livenessFiles = mutableListOf<File>()
+                for (stepNum in 2..totalSteps) {
+                    delay(500)
+                    val livenessFile = captureLivenessImage(cameraState)
+                    livenessFiles.add(livenessFile)
+                    _uiState.update { it.copy(progress = stepNum / totalSteps.toFloat()) }
+                }
+                callback.onResult(SelfieCaptureResult.Success(selfieFile, livenessFiles))
+            } catch (e: Exception) {
+                Timber.e("Error capturing images", e)
+                _uiState.update { it.copy(progress = 0f) }
+            }
+            _uiState.update { it.copy(isCapturing = false) }
+        }
+    }
+
+    private suspend fun captureSelfieImage(cameraState: CameraState) = suspendCoroutine {
+        val file = createSelfieFile()
+        cameraState.takePicture(file) { result ->
+            when (result) {
+                is ImageCaptureResult.Success -> it.resume(postProcessImage(
+                    file,
+                    saveAsGrayscale = false,
+                    compressionQuality = 80,
+                    desiredOutputSize = Size(320, 320),
+                ))
+                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
             }
         }
+    }
 
-        // Deletes file when the *VM* is exited (*not* when the app is closed)
-        file.deleteOnExit()
+    private suspend fun captureLivenessImage(cameraState: CameraState) = suspendCoroutine {
+        val file = createLivenessFile()
+        cameraState.takePicture(file) { result ->
+            when (result) {
+                is ImageCaptureResult.Success -> it.resume(postProcessImage(
+                    file,
+                    saveAsGrayscale = true,
+                    compressionQuality = 80,
+                    desiredOutputSize = Size(256, 256),
+                ))
+                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
+            }
+        }
     }
 
     fun analyzeImage(proxy: ImageProxy) {
@@ -57,8 +109,7 @@ class SelfieViewModel : ViewModel() {
         _uiState.update {
             // TODO: Remove. For demo purposes only
             val newDirective = if ((count % 25) == 0) directives.random() else it.currentDirective
-            val newProgress = (((it.progress * 100) + 1) % 100) / 100
-            it.copy(currentDirective = newDirective, progress = newProgress)
+            it.copy(currentDirective = newDirective)
         }
         count += 1
     }

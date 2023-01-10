@@ -35,12 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -60,14 +62,17 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SelfieCaptureOrPermissionScreen(
-    allowAgentMode: Boolean = false,
+    agentMode: Boolean = false,
+    manualCaptureMode: Boolean = false,
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
     SelfieCaptureOrPermissionScreen(
-        allowAgentMode,
+        agentMode,
+        manualCaptureMode,
         rememberPermissionState(Manifest.permission.CAMERA),
         onResult,
     )
@@ -81,13 +86,14 @@ fun SelfieCaptureOrPermissionScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun SelfieCaptureOrPermissionScreen(
-    allowAgentMode: Boolean = false,
+    agentMode: Boolean = false,
+    manualCaptureMode: Boolean = false,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
     val context = LocalContext.current
     if (cameraPermissionState.status.isGranted) {
-        SelfieCaptureScreenContent(allowAgentMode, onResult = onResult)
+        SelfieCaptureScreenContent(agentMode, manualCaptureMode, onResult = onResult)
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
@@ -109,7 +115,8 @@ internal fun SelfieCaptureOrPermissionScreen(
 @Preview
 @Composable
 fun SelfieCaptureScreenContent(
-    allowAgentMode: Boolean = false,
+    agentMode: Boolean = false,
+    manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
     onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
 ) {
@@ -117,8 +124,7 @@ fun SelfieCaptureScreenContent(
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
     val imageAnalyzer = cameraState.rememberImageAnalyzer(analyze = viewModel::analyzeImage)
-    // The progress of the multiple liveness captures
-    val viewfinderSize = 256.dp
+    val viewfinderSize = min(LocalConfiguration.current.screenWidthDp.dp * (2 / 3f), 256.dp)
     val progressStrokeWidth = 8.dp
     val progressBarSize = viewfinderSize + progressStrokeWidth * 2
     // TODO: Replace hardcoded colors with themes
@@ -133,7 +139,7 @@ fun SelfieCaptureScreenContent(
             .padding(16.dp),
     ) {
         val isAgentModeEnabled = camSelector == CamSelector.Back
-        if (allowAgentMode) {
+        if (agentMode) {
             val agentModeBackgroundColor = if (isAgentModeEnabled) {
                 MaterialTheme.colorScheme.primary
             } else {
@@ -201,8 +207,8 @@ fun SelfieCaptureScreenContent(
             fontWeight = FontWeight.Bold,
             color = Color.Black,
         )
-        // TODO: Remove manual capture once liveness is implemented
-        if (cameraState.isInitialized) {
+
+        if (manualCaptureMode && cameraState.isInitialized && !uiState.isCapturing) {
             Button(
                 modifier = Modifier.testTag("takePictureButton"),
                 onClick = { viewModel.takePicture(cameraState, onResult) },
