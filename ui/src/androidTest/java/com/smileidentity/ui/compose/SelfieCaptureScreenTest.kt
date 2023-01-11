@@ -146,7 +146,7 @@ class SelfieCaptureScreenTest {
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
         val callback = SelfieCaptureResultCallback { }
-        every { viewModel.takePicture(any(), any()) } just Runs
+        every { viewModel.takeButtonInitiatedPictures(any(), any()) } just Runs
 
         // when
         composeTestRule.apply {
@@ -156,7 +156,9 @@ class SelfieCaptureScreenTest {
         composeTestRule.onNodeWithTag(takePictureTag).performClick()
 
         // then
-        verify(exactly = 1, timeout = 1000) { viewModel.takePicture(any(), eq(callback)) }
+        verify(exactly = 1, timeout = 1000) {
+            viewModel.takeButtonInitiatedPictures(any(), eq(callback))
+        }
     }
 
     @Test
@@ -164,7 +166,7 @@ class SelfieCaptureScreenTest {
         // given
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
-        every { viewModel.analyzeImage(any()) } just Runs
+        every { viewModel.analyzeImage(any(), any()) } just Runs
 
         // when
         composeTestRule.apply {
@@ -173,6 +175,6 @@ class SelfieCaptureScreenTest {
         }
 
         // then
-        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any()) }
+        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any(), any()) }
     }
 }

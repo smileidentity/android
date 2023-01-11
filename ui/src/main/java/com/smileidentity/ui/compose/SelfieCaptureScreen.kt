@@ -54,8 +54,10 @@ import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SelfieCaptureResultCallback
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.viewmodel.SelfieViewModel
+import com.smileidentity.ui.viewmodel.isCapturing
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
+import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
 import com.ujizin.camposer.state.ImplementationMode
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
@@ -122,7 +124,11 @@ fun SelfieCaptureScreenContent(
     val uiState = viewModel.uiState.collectAsState().value
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-    val imageAnalyzer = cameraState.rememberImageAnalyzer(analyze = viewModel::analyzeImage)
+    val imageAnalyzer = cameraState.rememberImageAnalyzer(
+        analyze = { viewModel.analyzeImage(it, onResult) },
+        // Guarantees only one image will be delivered for analysis at a time
+        imageAnalysisBackpressureStrategy = KeepOnlyLatest,
+    )
     val viewfinderSize = min(LocalConfiguration.current.screenWidthDp.dp * (2 / 3f), 256.dp)
     val progressStrokeWidth = 8.dp
     val progressBarSize = viewfinderSize + progressStrokeWidth * 2
@@ -210,7 +216,7 @@ fun SelfieCaptureScreenContent(
         if (manualCaptureMode && cameraState.isInitialized && !uiState.isCapturing) {
             Button(
                 modifier = Modifier.testTag("takePictureButton"),
-                onClick = { viewModel.takePicture(cameraState, onResult) },
+                onClick = { viewModel.takeButtonInitiatedPictures(cameraState, onResult) },
             ) { Text("Take Picture") }
         }
         Row(

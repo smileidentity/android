@@ -51,7 +51,7 @@ class SelfieViewModelTest {
         setupPostProcessMocks()
 
         // when
-        subject.takePicture(cameraState, callback)
+        subject.takeButtonInitiatedPictures(cameraState, callback)
         slots.forEach { it(ImageCaptureResult.Success(null)) }
 
         // then
@@ -68,7 +68,7 @@ class SelfieViewModelTest {
         every { cameraState.takePicture(any<File>(), capture(slots)) } returns Unit
 
         // when
-        subject.takePicture(cameraState, callback)
+        subject.takeButtonInitiatedPictures(cameraState, callback)
         slots.forEach { it(ImageCaptureResult.Error(RuntimeException())) }
 
         // then
