@@ -102,7 +102,10 @@ object BitmapUtils {
 
     /** Rotates a bitmap if it is converted from a bytebuffer.  */
     private fun rotateBitmap(
-        bitmap: Bitmap, rotationDegrees: Int, flipX: Boolean, flipY: Boolean,
+        bitmap: Bitmap,
+        rotationDegrees: Int,
+        flipX: Boolean,
+        flipY: Boolean,
     ): Bitmap {
         val matrix = Matrix()
 
@@ -139,7 +142,9 @@ object BitmapUtils {
      * them to the NV21 array.
      */
     private fun yuv420ThreePlanesToNV21(
-        yuv420888planes: Array<Plane>, width: Int, height: Int,
+        yuv420888planes: Array<Plane>,
+        width: Int,
+        height: Int,
     ): ByteBuffer {
         val imageSize = width * height
         val out = ByteArray(imageSize + 2 * (imageSize / 4))
@@ -198,7 +203,12 @@ object BitmapUtils {
      * spaced by 'pixelStride'. Note that there is no row padding on the output.
      */
     private fun unpackPlane(
-        plane: Plane, width: Int, height: Int, out: ByteArray, offset: Int, pixelStride: Int,
+        plane: Plane,
+        width: Int,
+        height: Int,
+        out: ByteArray,
+        offset: Int,
+        pixelStride: Int,
     ) {
         val buffer = plane.buffer
         buffer.rewind()
