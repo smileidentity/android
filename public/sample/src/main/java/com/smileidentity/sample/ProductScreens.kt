@@ -70,7 +70,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
 
 @Preview
 @Composable
-fun SelfieCaptureScreen() {
+fun SelfieCaptureScreen(onCompleted: () -> Unit = {}) {
     val context = LocalContext.current
     SelfieCaptureOrPermissionScreen(agentMode = true, manualCaptureMode = true) {
         if (it is SelfieCaptureResult.Success) {
@@ -82,5 +82,6 @@ fun SelfieCaptureScreen() {
             context.toast(message)
             Timber.e(it.throwable, message)
         }
+        onCompleted()
     }
 }

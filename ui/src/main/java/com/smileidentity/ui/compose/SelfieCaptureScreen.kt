@@ -145,104 +145,124 @@ fun SelfieCaptureScreenContent(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        val isAgentModeEnabled = camSelector == CamSelector.Back
-        if (agentMode) {
-            val agentModeBackgroundColor = if (isAgentModeEnabled) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                Color.Gray
-            }.copy(alpha = 0.25f)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(agentModeBackgroundColor)
-                    .padding(8.dp, 0.dp),
-            ) {
-                Text(text = stringResource(R.string.si_agent_mode), color = Color.Black)
-                Switch(
-                    modifier = Modifier.testTag("agentModeSwitch"),
-                    checked = isAgentModeEnabled,
-                    onCheckedChange = { camSelector = camSelector.inverse },
-                    thumbContent = {
-                        val contentDescription = stringResource(R.string.si_cd_agent_mode_enabled)
-                        if (isAgentModeEnabled) {
-                            Icon(
-                                Icons.Outlined.Check,
-                                contentDescription = contentDescription,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    },
+        // Top Aligned Content
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            val isAgentModeEnabled = camSelector == CamSelector.Back
+            if (agentMode) {
+                val agentModeBackgroundColor = if (isAgentModeEnabled) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Gray
+                }.copy(alpha = 0.25f)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(agentModeBackgroundColor)
+                        .padding(8.dp, 0.dp),
+                ) {
+                    Text(text = stringResource(R.string.si_agent_mode), color = Color.Black)
+                    Switch(
+                        modifier = Modifier.testTag("agentModeSwitch"),
+                        checked = isAgentModeEnabled,
+                        onCheckedChange = { camSelector = camSelector.inverse },
+                        thumbContent = {
+                            val contentDescription =
+                                stringResource(R.string.si_cd_agent_mode_enabled)
+                            if (isAgentModeEnabled) {
+                                Icon(
+                                    Icons.Outlined.Check,
+                                    contentDescription = contentDescription,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+
+            // Display only this shape in the Preview -- however, capture the whole image. This is
+            // so that the user only sees their face but captures the whole scene, which may provide
+            // additional information for the verification process/identifying fraud
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
+                CameraPreview(
+                    cameraState = cameraState,
+                    camSelector = camSelector,
+                    implementationMode = ImplementationMode.Compatible,
+                    imageAnalyzer = imageAnalyzer,
+                    isImageAnalysisEnabled = true,
+                    // TODO: We should use FitCenter and crop rather than Fill?
+                    // scaleType = ScaleType.FitCenter,
+                    scaleType = ScaleType.FillCenter,
+                    modifier = Modifier
+                        .size(viewfinderSize)
+                        .clip(CircleShape)
+                        .align(Alignment.Center)
+                        .testTag("cameraPreview"),
+                )
+                val animatedProgress = animateFloatAsState(
+                    targetValue = uiState.progress,
+                    animationSpec = tween(),
+                ).value
+                CircularProgressIndicator(
+                    progress = animatedProgress,
+                    strokeWidth = progressStrokeWidth,
+                    modifier = Modifier
+                        .size(progressBarSize)
+                        .align(Alignment.Center),
                 )
             }
         }
 
-        // Display only this shape in the Preview -- however, capture the whole image. This is so
-        // that the user only sees their face but captures the whole scene, which may provide
-        // additional information for the verification process/identifying fraud
-        Box(modifier = Modifier.fillMaxWidth()) {
-            CameraPreview(
-                cameraState = cameraState,
-                camSelector = camSelector,
-                implementationMode = ImplementationMode.Compatible,
-                imageAnalyzer = imageAnalyzer,
-                isImageAnalysisEnabled = true,
-                // TODO: We should use FitCenter and crop rather than Fill?
-                // scaleType = ScaleType.FitCenter,
-                scaleType = ScaleType.FillCenter,
-                modifier = Modifier
-                    .size(viewfinderSize)
-                    .clip(CircleShape)
-                    .align(Alignment.Center)
-                    .testTag("cameraPreview"),
-            )
-            val animatedProgress = animateFloatAsState(
-                targetValue = uiState.progress,
-                animationSpec = tween(),
-            ).value
-            CircularProgressIndicator(
-                progress = animatedProgress,
-                strokeWidth = progressStrokeWidth,
-                modifier = Modifier
-                    .size(progressBarSize)
-                    .align(Alignment.Center),
-            )
-        }
-        Text(
-            text = stringResource(uiState.currentDirective),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-        )
-
-        if (manualCaptureMode && cameraState.isInitialized && !uiState.isCapturing) {
-            Button(
-                modifier = Modifier.testTag("takePictureButton"),
-                onClick = { viewModel.takeButtonInitiatedPictures(cameraState, onResult) },
-            ) { Text("Take Picture") }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally),
+        // Bottom Aligned Content
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
         ) {
-            Icon(
-                Icons.Outlined.Info,
-                contentDescription = stringResource(R.string.si_cd_selfie_capture_instructions),
-                // The icon color must be forced to black due to white background
-                tint = Color.Black,
-            )
             Text(
-                text = stringResource(R.string.si_selfie_capture_instructions),
-                // The text color must be forced to black due to white background
+                text = stringResource(uiState.currentDirective),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color.Black,
+                modifier = Modifier.padding(8.dp),
             )
+
+            if (manualCaptureMode && cameraState.isInitialized && !uiState.isCapturing) {
+                Button(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .testTag("takePictureButton"),
+                    onClick = { viewModel.takeButtonInitiatedPictures(cameraState, onResult) },
+                ) { Text("Take Picture") }
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .align(Alignment.CenterHorizontally),
+            ) {
+                Icon(
+                    Icons.Outlined.Info,
+                    contentDescription = stringResource(R.string.si_cd_selfie_capture_instructions),
+                    // The icon color must be forced to black due to white background
+                    tint = Color.Black,
+                )
+                Text(
+                    text = stringResource(R.string.si_selfie_capture_instructions),
+                    // The text color must be forced to black due to white background
+                    color = Color.Black,
+                )
+            }
+            SmileIdentityAttribution()
         }
-        SmileIdentityAttribution()
     }
 }

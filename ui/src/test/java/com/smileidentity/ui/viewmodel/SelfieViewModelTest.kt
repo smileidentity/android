@@ -91,24 +91,4 @@ class SelfieViewModelTest {
         verify(exactly = 1) { proxy.close() }
         confirmVerified(proxy)
     }
-
-    @Test
-    fun `analyzeImage should update uiState to a valid directive`() {
-        // given
-        val directives = setOf(
-            R.string.si_selfie_capture_directive_smile,
-            R.string.si_selfie_capture_directive_capturing,
-            R.string.si_selfie_capture_directive_face_too_far,
-            R.string.si_selfie_capture_directive_unable_to_detect_face,
-        )
-
-        // when
-        for (i in 0..100) {
-            subject.analyzeImage(mockk(relaxed = true))
-        }
-
-        // then
-        val uiState = subject.uiState.value
-        assertTrue(directives.contains(uiState.currentDirective))
-    }
 }

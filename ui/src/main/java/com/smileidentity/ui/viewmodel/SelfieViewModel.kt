@@ -3,7 +3,6 @@ package com.smileidentity.ui.viewmodel
 import android.util.Size
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -130,7 +129,6 @@ class SelfieViewModel : ViewModel() {
         }
     }
 
-    @ExperimentalGetImage
     fun analyzeImage(
         proxy: ImageProxy,
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
@@ -161,7 +159,7 @@ class SelfieViewModel : ViewModel() {
             val largestFace = faces.maxBy { it.boundingBox.area }
             val faceFillRatio = (largestFace.boundingBox.area / inputImage.area.toFloat())
 
-            // Check that the Face is close enough to the camera
+            // Check that the face is close enough to the camera
             val minFaceAreaThreshold = 0.25
             if (faceFillRatio < minFaceAreaThreshold) {
                 _uiState.update {
@@ -187,6 +185,10 @@ class SelfieViewModel : ViewModel() {
                     it.copy(currentDirective = R.string.si_selfie_capture_directive_smile)
                 }
                 return@addOnSuccessListener
+            }
+
+            _uiState.update {
+                it.copy(currentDirective = R.string.si_selfie_capture_directive_capturing)
             }
 
             BitmapUtils.getBitmap(proxy)?.let { bitmap ->

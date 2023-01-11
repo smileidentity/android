@@ -121,7 +121,7 @@ fun MainScreen() {
                         composable(Screens.SmartSelfie.route) {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.SmartSelfie.label
-                            SelfieCaptureScreen()
+                            SelfieCaptureScreen { navController.popBackStack() }
                         }
                     }
                 },
