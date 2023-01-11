@@ -1,5 +1,6 @@
 package com.smileidentity.ui.viewmodel
 
+import android.annotation.SuppressLint
 import android.util.Size
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -129,6 +130,7 @@ class SelfieViewModel : ViewModel() {
         }
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     fun analyzeImage(
         proxy: ImageProxy,
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},

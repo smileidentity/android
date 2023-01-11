@@ -16,6 +16,7 @@
 
 package com.smileidentity.ui.core
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
@@ -90,6 +91,7 @@ object BitmapUtils {
     }
 
     /** Converts a YUV_420_888 image from CameraX API to a bitmap.  */
+    @SuppressLint("UnsafeOptInUsageError")
     fun getBitmap(image: ImageProxy): Bitmap? {
         val frameMetadata = FrameMetadata.Builder()
             .setWidth(image.width)
