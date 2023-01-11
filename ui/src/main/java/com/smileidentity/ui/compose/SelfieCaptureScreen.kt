@@ -189,9 +189,11 @@ fun SelfieCaptureScreenContent(
             // Display only this shape in the Preview -- however, capture the whole image. This is
             // so that the user only sees their face but captures the whole scene, which may provide
             // additional information for the verification process/identifying fraud
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+            ) {
                 CameraPreview(
                     cameraState = cameraState,
                     camSelector = camSelector,
