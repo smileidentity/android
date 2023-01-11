@@ -61,11 +61,13 @@ internal fun postProcessImageFile(
     desiredOutputSize: Size? = null,
 ): File {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-    return postProcessImageBitmap(bitmap,
+    return postProcessImageBitmap(
+        bitmap,
         file,
         saveAsGrayscale,
         compressionQuality,
-        desiredOutputSize)
+        desiredOutputSize
+    )
 }
 
 /**
