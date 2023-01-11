@@ -31,10 +31,8 @@ import java.nio.ByteBuffer
 
 // https://stackoverflow.com/questions/56772967/converting-imageproxy-to-bitmap
 
-
 /** Describing a frame info.  */
 class FrameMetadata private constructor(val width: Int, val height: Int, val rotation: Int) {
-
     /** Builder of [FrameMetadata].  */
     class Builder {
         private var width = 0
@@ -61,7 +59,6 @@ class FrameMetadata private constructor(val width: Int, val height: Int, val rot
     }
 }
 
-
 /** Utils functions for bitmap conversions.  */
 object BitmapUtils {
     /** Converts NV21 format byte buffer to bitmap.  */
@@ -71,9 +68,18 @@ object BitmapUtils {
         data[imageInBuffer, 0, imageInBuffer.size]
         try {
             val image = YuvImage(
-                imageInBuffer, ImageFormat.NV21, metadata.width, metadata.height, null)
+                imageInBuffer,
+                ImageFormat.NV21,
+                metadata.width,
+                metadata.height,
+                null,
+            )
             val stream = ByteArrayOutputStream()
-            image.compressToJpeg(Rect(0, 0, metadata.width, metadata.height), 80, stream)
+            image.compressToJpeg(
+                Rect(0, 0, metadata.width, metadata.height),
+                80,
+                stream,
+            )
             val bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size())
             stream.close()
             return rotateBitmap(bmp, metadata.rotation, false, false)
@@ -84,15 +90,13 @@ object BitmapUtils {
     }
 
     /** Converts a YUV_420_888 image from CameraX API to a bitmap.  */
-    // @ExperimentalGetImage
     fun getBitmap(image: ImageProxy): Bitmap? {
         val frameMetadata = FrameMetadata.Builder()
             .setWidth(image.width)
             .setHeight(image.height)
             .setRotation(image.imageInfo.rotationDegrees)
             .build()
-        val nv21Buffer = yuv420ThreePlanesToNV21(image.image!!
-            .planes, image.width, image.height)
+        val nv21Buffer = yuv420ThreePlanesToNV21(image.image!!.planes, image.width, image.height)
         return getBitmap(nv21Buffer, frameMetadata)
     }
 
@@ -120,13 +124,11 @@ object BitmapUtils {
     /**
      * Converts YUV_420_888 to NV21 bytebuffer.
      *
-     *
      * The NV21 format consists of a single byte array containing the Y, U and V values. For an
      * image of size S, the first S positions of the array contain all the Y values. The remaining
      * positions contain interleaved V and U values. U and V are subsampled by a factor of 2 in both
      * dimensions, so there are S/4 U values and S/4 V values. In summary, the NV21 array will contain
      * S Y values followed by S/4 VU values: YYYYYYYYYYYYYY(...)YVUVUVUVU(...)VU
-     *
      *
      * YUV_420_888 is a generic format that can describe any YUV image where U and V are subsampled
      * by a factor of 2 in both dimensions. [Image.getPlanes] returns an array with the Y, U and
@@ -174,7 +176,8 @@ object BitmapUtils {
 
         // Advance the V buffer by 1 byte, since the U buffer will not contain the first V value.
         vBuffer.position(vBufferPosition + 1)
-        // Chop off the last byte of the U buffer, since the V buffer will not contain the last U value.
+        // Chop off the last byte of the U buffer, since the V buffer will not contain the last U
+        // value.
         uBuffer.limit(uBufferLimit - 1)
 
         // Check that the buffers are equal and have the expected number of elements.
