@@ -21,11 +21,12 @@ import org.junit.Test
 import java.io.File
 
 class SelfieViewModelTest {
-    private val subject = SelfieViewModel()
+    private lateinit var subject: SelfieViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
+        subject = SelfieViewModel()
     }
 
     @After
@@ -77,10 +78,11 @@ class SelfieViewModelTest {
     }
 
     @Test
-    fun `analyzeImage should call close on the proxy`() {
+    fun `analyzeImage should close the proxy when capture is already complete`() {
         // given
         val proxy = mockk<ImageProxy>()
         every { proxy.close() } returns Unit
+        subject.isAutoCaptureComplete = true
 
         // when
         subject.analyzeImage(proxy)

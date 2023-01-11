@@ -2,6 +2,8 @@ package com.smileidentity.ui.viewmodel
 
 import android.util.Size
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +17,8 @@ import com.smileidentity.ui.core.SelfieCaptureResultCallback
 import com.smileidentity.ui.core.area
 import com.smileidentity.ui.core.createLivenessFile
 import com.smileidentity.ui.core.createSelfieFile
-import com.smileidentity.ui.core.postProcessImage
+import com.smileidentity.ui.core.postProcessImageBitmap
+import com.smileidentity.ui.core.postProcessImageFile
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import kotlinx.coroutines.delay
@@ -49,7 +52,9 @@ class SelfieViewModel : ViewModel() {
     private val selfieImageSize = Size(320, 320)
     private val livenessFiles = mutableListOf<File>()
     private var lastAutoCaptureTimeMs = 0L
-    private var isComplete = false
+
+    @VisibleForTesting
+    internal var isAutoCaptureComplete = false
 
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -58,7 +63,7 @@ class SelfieViewModel : ViewModel() {
         //  actually need to detect the smile for the last image
         setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
     }.build()
-    private val faceDetector = FaceDetection.getClient(faceDetectorOptions)
+    private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
     fun takeButtonInitiatedPictures(
         cameraState: CameraState,
@@ -97,7 +102,7 @@ class SelfieViewModel : ViewModel() {
             when (result) {
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                 is ImageCaptureResult.Success -> it.resume(
-                    postProcessImage(
+                    postProcessImageFile(
                         file,
                         saveAsGrayscale = false,
                         compressionQuality = 80,
@@ -114,7 +119,7 @@ class SelfieViewModel : ViewModel() {
             when (result) {
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                 is ImageCaptureResult.Success -> it.resume(
-                    postProcessImage(
+                    postProcessImageFile(
                         file,
                         saveAsGrayscale = true,
                         compressionQuality = 80,
@@ -125,99 +130,104 @@ class SelfieViewModel : ViewModel() {
         }
     }
 
+    @ExperimentalGetImage
     fun analyzeImage(
         proxy: ImageProxy,
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
     ) {
         val elapsedTime = System.currentTimeMillis() - lastAutoCaptureTimeMs
-        if (isComplete || elapsedTime < intraImageMinDelayMs) {
+        if (isAutoCaptureComplete || elapsedTime < intraImageMinDelayMs) {
             proxy.close()
             return
         }
-        // TODO: Implement image analysis
-        proxy.image?.let {
-            val image = InputImage.fromMediaImage(it, proxy.imageInfo.rotationDegrees)
-            faceDetector.process(image).addOnSuccessListener { faces ->
-                Timber.d("Faces: $faces")
-                if (faces.isEmpty()) {
-                    _uiState.update {
-                        it.copy(currentDirective = R.string.si_selfie_capture_directive_unable_to_detect_face)
-                    }
-                    return@addOnSuccessListener
+
+        val image = proxy.image
+        if (image == null) {
+            proxy.close()
+            return
+        }
+
+        val inputImage = InputImage.fromMediaImage(image, proxy.imageInfo.rotationDegrees)
+        faceDetector.process(inputImage).addOnSuccessListener { faces ->
+            Timber.d("Detected Faces: $faces")
+            if (faces.isEmpty()) {
+                _uiState.update {
+                    it.copy(currentDirective = R.string.si_selfie_capture_directive_unable_to_detect_face)
                 }
-
-                // Pick the largest face
-                val largestFace = faces.maxBy { it.boundingBox.area }
-
-                // // Check that the Face is close enough to the camera
-                // val minFaceAreaThreshold = 0.15
-                // if ((largestFace.boundingBox.area / image.area) < minFaceAreaThreshold) {
-                //     _uiState.update {
-                //         it.copy(currentDirective = R.string.si_selfie_capture_directive_face_too_far)
-                //     }
-                //     return@addOnSuccessListener
-                // }
-                //
-                // // Check that the face is not too close to the camera
-                // val maxFaceAreaThreshold = 0.65
-                // if ((largestFace.boundingBox.area / image.area) > maxFaceAreaThreshold) {
-                //     _uiState.update {
-                //         it.copy(currentDirective = R.string.si_selfie_capture_directive_face_too_close)
-                //     }
-                //     return@addOnSuccessListener
-                // }
-
-                // Ensure that the last image contains a smile
-                val smileThreshold = 0.8
-                val isSmiling = (largestFace.smilingProbability ?: 0f) > smileThreshold
-                if (livenessFiles.size == numLivenessImages && !isSmiling) {
-                    _uiState.update {
-                        it.copy(currentDirective = R.string.si_selfie_capture_directive_smile)
-                    }
-                    return@addOnSuccessListener
-                }
-
-                BitmapUtils.getBitmap(proxy)?.let { bitmap ->
-                    // All conditions satisfied, capture the image
-                    lastAutoCaptureTimeMs = System.currentTimeMillis()
-                    if (livenessFiles.size < numLivenessImages) {
-                        Timber.d("Capturing liveness image")
-                        val file = createLivenessFile()
-                        postProcessImage(
-                            bitmap = bitmap,
-                            file = file,
-                            saveAsGrayscale = true,
-                            compressionQuality = 80,
-                            desiredOutputSize = livenessImageSize,
-                        )
-                        livenessFiles.add(file)
-                        _uiState.update {
-                            it.copy(progress = livenessFiles.size / totalSteps.toFloat())
-                        }
-                    } else {
-                        Timber.d("Capturing selfie image")
-                        val file = createSelfieFile()
-                        postProcessImage(
-                            bitmap = bitmap,
-                            file = file,
-                            saveAsGrayscale = false,
-                            compressionQuality = 80,
-                            desiredOutputSize = selfieImageSize,
-                        )
-                        _uiState.update {
-                            it.copy(progress = 1f)
-                        }
-                        callback.onResult(SelfieCaptureResult.Success(file, livenessFiles))
-                        isComplete = true
-                    }
-                }
-            }.addOnFailureListener {
-                Timber.e(it, "Error detecting faces")
-            }.addOnCompleteListener { faces ->
-                Timber.d("Complete: $faces")
-                // Closing the proxy allows the next image to be delivered to the analyzer
-                proxy.close()
+                return@addOnSuccessListener
             }
+
+            // Pick the largest face
+            val largestFace = faces.maxBy { it.boundingBox.area }
+
+            // Check that the Face is close enough to the camera
+            val minFaceAreaThreshold = 0.15
+            if ((largestFace.boundingBox.area / inputImage.area) < minFaceAreaThreshold) {
+                _uiState.update {
+                    it.copy(currentDirective = R.string.si_selfie_capture_directive_face_too_far)
+                }
+                return@addOnSuccessListener
+            }
+
+            // Check that the face is not too close to the camera
+            val maxFaceAreaThreshold = 0.65
+            if ((largestFace.boundingBox.area / inputImage.area) > maxFaceAreaThreshold) {
+                _uiState.update {
+                    it.copy(currentDirective = R.string.si_selfie_capture_directive_face_too_close)
+                }
+                return@addOnSuccessListener
+            }
+
+            // Ensure that the last image contains a smile
+            val smileThreshold = 0.8
+            val isSmiling = (largestFace.smilingProbability ?: 0f) > smileThreshold
+            if (livenessFiles.size == numLivenessImages && !isSmiling) {
+                _uiState.update {
+                    it.copy(currentDirective = R.string.si_selfie_capture_directive_smile)
+                }
+                return@addOnSuccessListener
+            }
+
+            BitmapUtils.getBitmap(proxy)?.let { bitmap ->
+                // All conditions satisfied, capture the image
+                lastAutoCaptureTimeMs = System.currentTimeMillis()
+                if (livenessFiles.size < numLivenessImages) {
+                    Timber.d("Capturing liveness image")
+                    val file = createLivenessFile()
+                    postProcessImageBitmap(
+                        bitmap = bitmap,
+                        file = file,
+                        saveAsGrayscale = true,
+                        compressionQuality = 80,
+                        desiredOutputSize = livenessImageSize,
+                    )
+                    livenessFiles.add(file)
+                    _uiState.update {
+                        it.copy(progress = livenessFiles.size / totalSteps.toFloat())
+                    }
+                } else {
+                    Timber.d("Capturing selfie image")
+                    val file = createSelfieFile()
+                    postProcessImageBitmap(
+                        bitmap = bitmap,
+                        file = file,
+                        saveAsGrayscale = false,
+                        compressionQuality = 80,
+                        desiredOutputSize = selfieImageSize,
+                    )
+                    _uiState.update {
+                        it.copy(progress = 1f)
+                    }
+                    callback.onResult(SelfieCaptureResult.Success(file, livenessFiles))
+                    isAutoCaptureComplete = true
+                }
+            }
+        }.addOnFailureListener {
+            Timber.e(it, "Error detecting faces")
+        }.addOnCompleteListener { faces ->
+            Timber.d("Complete: $faces")
+            // Closing the proxy allows the next image to be delivered to the analyzer
+            proxy.close()
         }
     }
 }

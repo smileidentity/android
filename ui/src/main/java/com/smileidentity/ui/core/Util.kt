@@ -15,7 +15,6 @@ import androidx.annotation.StringRes
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
 import java.io.File
-import java.nio.ByteBuffer
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -27,7 +26,7 @@ internal val InputImage.area get() = height * width
 /**
  * Post-processes the image stored in `bitmap` and saves to `file`
  */
-internal fun postProcessImage(
+internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
     saveAsGrayscale: Boolean = false,
@@ -55,28 +54,18 @@ internal fun postProcessImage(
 /**
  * Post-processes the image stored in `file`, in-place
  */
-internal fun postProcessImage(
+internal fun postProcessImageFile(
     file: File,
     saveAsGrayscale: Boolean = false,
     compressionQuality: Int = 100,
     desiredOutputSize: Size? = null,
 ): File {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-    return postProcessImage(bitmap, file, saveAsGrayscale, compressionQuality, desiredOutputSize)
-}
-
-/**
- * Post-processes the image stored in `buffer` and saves to `file`
- */
-internal fun postProcessImage(
-    buffer: ByteBuffer,
-    file: File,
-    saveAsGrayscale: Boolean = false,
-    compressionQuality: Int = 100,
-    desiredOutputSize: Size? = null,
-): File {
-    val bitmap = BitmapFactory.decodeByteArray(buffer.array(), 0, buffer.array().size)
-    return postProcessImage(bitmap, file, saveAsGrayscale, compressionQuality, desiredOutputSize)
+    return postProcessImageBitmap(bitmap,
+        file,
+        saveAsGrayscale,
+        compressionQuality,
+        desiredOutputSize)
 }
 
 /**
