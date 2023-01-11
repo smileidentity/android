@@ -66,7 +66,7 @@ internal fun postProcessImageFile(
         file,
         saveAsGrayscale,
         compressionQuality,
-        desiredOutputSize
+        desiredOutputSize,
     )
 }
 

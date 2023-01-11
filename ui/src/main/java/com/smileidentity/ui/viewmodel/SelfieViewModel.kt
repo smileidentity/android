@@ -159,10 +159,11 @@ class SelfieViewModel : ViewModel() {
 
             // Pick the largest face
             val largestFace = faces.maxBy { it.boundingBox.area }
+            val faceFillRatio = (largestFace.boundingBox.area / inputImage.area.toFloat())
 
             // Check that the Face is close enough to the camera
-            val minFaceAreaThreshold = 0.15
-            if ((largestFace.boundingBox.area / inputImage.area) < minFaceAreaThreshold) {
+            val minFaceAreaThreshold = 0.25
+            if (faceFillRatio < minFaceAreaThreshold) {
                 _uiState.update {
                     it.copy(currentDirective = R.string.si_selfie_capture_directive_face_too_far)
                 }
@@ -170,8 +171,8 @@ class SelfieViewModel : ViewModel() {
             }
 
             // Check that the face is not too close to the camera
-            val maxFaceAreaThreshold = 0.65
-            if ((largestFace.boundingBox.area / inputImage.area) > maxFaceAreaThreshold) {
+            val maxFaceAreaThreshold = 0.50
+            if (faceFillRatio > maxFaceAreaThreshold) {
                 _uiState.update {
                     it.copy(currentDirective = R.string.si_selfie_capture_directive_face_too_close)
                 }

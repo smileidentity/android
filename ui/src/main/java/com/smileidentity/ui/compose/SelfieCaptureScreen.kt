@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -197,13 +199,16 @@ fun SelfieCaptureScreenContent(
                     .align(Alignment.Center)
                     .testTag("cameraPreview"),
             )
+            val animatedProgress = animateFloatAsState(
+                targetValue = uiState.progress,
+                animationSpec = tween(),
+            ).value
             CircularProgressIndicator(
-                uiState.progress,
+                progress = animatedProgress,
+                strokeWidth = progressStrokeWidth,
                 modifier = Modifier
                     .size(progressBarSize)
                     .align(Alignment.Center),
-                // color = SmileIdentityLightBlue,
-                strokeWidth = progressStrokeWidth,
             )
         }
         Text(
