@@ -81,6 +81,7 @@ class SelfieViewModelTest {
     fun `analyzeImage should close the proxy when capture is already complete`() {
         // given
         val proxy = mockk<ImageProxy>()
+        every { proxy.image } returns mockk(relaxed = true)
         every { proxy.close() } returns Unit
         subject.shouldAnalyzeImages = false
 
@@ -89,6 +90,7 @@ class SelfieViewModelTest {
 
         // then
         verify(exactly = 1) { proxy.close() }
+        verify(exactly = 1) { proxy.image }
         confirmVerified(proxy)
     }
 }
