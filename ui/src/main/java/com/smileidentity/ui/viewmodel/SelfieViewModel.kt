@@ -54,7 +54,7 @@ class SelfieViewModel : ViewModel() {
     private var lastAutoCaptureTimeMs = 0L
 
     @VisibleForTesting
-    internal var isAutoCaptureComplete = false
+    internal var shouldAnalyzeImages = true
 
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -69,9 +69,8 @@ class SelfieViewModel : ViewModel() {
         cameraState: CameraState,
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
     ) {
-        _uiState.update {
-            it.copy(currentDirective = R.string.si_selfie_capture_directive_capturing)
-        }
+        shouldAnalyzeImages = false
+        _uiState.update { it.copy(currentDirective = R.string.si_selfie_capture_directive_capturing) }
 
         viewModelScope.launch {
             try {
@@ -83,15 +82,13 @@ class SelfieViewModel : ViewModel() {
                     livenessFiles.add(livenessFile)
                     _uiState.update { it.copy(progress = stepNum / totalSteps.toFloat()) }
                 }
+                delay(intraImageMinDelayMs)
                 val selfieFile = captureSelfieImage(cameraState)
                 _uiState.update { it.copy(progress = 1f) }
                 callback.onResult(SelfieCaptureResult.Success(selfieFile, livenessFiles))
             } catch (e: Exception) {
                 Timber.e("Error capturing images", e)
-                _uiState.update { it.copy(progress = 0f) }
-            }
-            _uiState.update {
-                it.copy(currentDirective = R.string.si_selfie_capture_directive_smile)
+                shouldAnalyzeImages = false
             }
         }
     }
@@ -135,14 +132,9 @@ class SelfieViewModel : ViewModel() {
         proxy: ImageProxy,
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
     ) {
-        val elapsedTime = System.currentTimeMillis() - lastAutoCaptureTimeMs
-        if (isAutoCaptureComplete || elapsedTime < intraImageMinDelayMs) {
-            proxy.close()
-            return
-        }
-
         val image = proxy.image
-        if (image == null) {
+        val elapsedTime = System.currentTimeMillis() - lastAutoCaptureTimeMs
+        if (!shouldAnalyzeImages || elapsedTime < intraImageMinDelayMs || image == null) {
             proxy.close()
             return
         }
@@ -224,7 +216,7 @@ class SelfieViewModel : ViewModel() {
                         it.copy(progress = 1f)
                     }
                     callback.onResult(SelfieCaptureResult.Success(file, livenessFiles))
-                    isAutoCaptureComplete = true
+                    shouldAnalyzeImages = false
                 }
             }
         }.addOnFailureListener {

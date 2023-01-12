@@ -82,7 +82,7 @@ class SelfieViewModelTest {
         // given
         val proxy = mockk<ImageProxy>()
         every { proxy.close() } returns Unit
-        subject.isAutoCaptureComplete = true
+        subject.shouldAnalyzeImages = false
 
         // when
         subject.analyzeImage(proxy)
