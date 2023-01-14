@@ -34,12 +34,10 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 data class SelfieUiState(
-    @StringRes val currentDirective: Int = R.string.si_selfie_capture_directive_smile,
+    @StringRes val currentDirective: Int = R.string.si_selfie_capture_instructions,
     val progress: Float = 0f,
+    val isCapturing: Boolean = false,
 )
-
-val SelfieUiState.isCapturing: Boolean
-    get() = currentDirective == R.string.si_selfie_capture_directive_capturing
 
 class SelfieViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -70,7 +68,12 @@ class SelfieViewModel : ViewModel() {
         callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
     ) {
         shouldAnalyzeImages = false
-        _uiState.update { it.copy(currentDirective = R.string.si_selfie_capture_directive_capturing) }
+        _uiState.update {
+            it.copy(
+                currentDirective = R.string.si_selfie_capture_directive_capturing,
+                isCapturing = true,
+            )
+        }
 
         viewModelScope.launch {
             try {
@@ -88,7 +91,8 @@ class SelfieViewModel : ViewModel() {
                 callback.onResult(SelfieCaptureResult.Success(selfieFile, livenessFiles))
             } catch (e: Exception) {
                 Timber.e("Error capturing images", e)
-                shouldAnalyzeImages = false
+                shouldAnalyzeImages = true
+                _uiState.update { it.copy(isCapturing = false) }
             }
         }
     }

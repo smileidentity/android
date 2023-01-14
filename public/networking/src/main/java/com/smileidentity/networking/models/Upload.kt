@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.smileidentity.networking.models
 
 import com.squareup.moshi.Json

@@ -1,5 +1,7 @@
 package com.smileidentity.networking
 
+import com.smileidentity.networking.models.JobStatusRequest
+import com.smileidentity.networking.models.JobStatusResponse
 import com.smileidentity.networking.models.PrepUploadRequest
 import com.smileidentity.networking.models.PrepUploadResponse
 import com.smileidentity.networking.models.UploadRequest

@@ -1,5 +1,8 @@
-package com.smileidentity.networking
+@file:Suppress("unused")
 
+package com.smileidentity.networking.models
+
+import com.smileidentity.networking.StringifiedBoolean
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

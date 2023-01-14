@@ -56,7 +56,6 @@ import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SelfieCaptureResultCallback
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.viewmodel.SelfieViewModel
-import com.smileidentity.ui.viewmodel.isCapturing
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
