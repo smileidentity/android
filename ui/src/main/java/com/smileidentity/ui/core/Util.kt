@@ -24,7 +24,7 @@ internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
 
 /**
- * Post-processes the image stored in `bitmap` and saves to `file`
+ * Post-processes the image stored in [bitmap] and saves to [file]
  */
 internal fun postProcessImageBitmap(
     bitmap: Bitmap,
@@ -52,7 +52,7 @@ internal fun postProcessImageBitmap(
 }
 
 /**
- * Post-processes the image stored in `file`, in-place
+ * Post-processes the image stored in [file], in-place
  */
 internal fun postProcessImageFile(
     file: File,
