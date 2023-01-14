@@ -99,8 +99,6 @@ internal fun SelfieCaptureOrPermissionScreen(
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
-                cameraPermissionState.launchPermissionRequest()
-            } else {
                 // The user has permanently denied the permission, so we can't request it again.
                 // We can, however, direct the user to the app settings screen to manually
                 // enable the permission.
@@ -109,6 +107,8 @@ internal fun SelfieCaptureOrPermissionScreen(
                     data = Uri.fromParts("package", context.packageName, null)
                 }
                 context.startActivity(intent)
+            } else {
+                cameraPermissionState.launchPermissionRequest()
             }
         }
     }
