@@ -227,7 +227,7 @@ internal fun SelfieCaptureScreen(
             verticalArrangement = Arrangement.Top,
         ) {
             Text(
-                text = stringResource(uiState.currentDirective),
+                text = stringResource(uiState.currentDirective.displayText),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,

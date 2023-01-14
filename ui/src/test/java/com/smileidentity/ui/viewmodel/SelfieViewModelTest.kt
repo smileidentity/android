@@ -1,7 +1,6 @@
 package com.smileidentity.ui.viewmodel
 
 import androidx.camera.core.ImageProxy
-import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.setupPostProcessMocks
 import com.ujizin.camposer.state.CameraState
@@ -37,7 +36,7 @@ class SelfieViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(R.string.si_smartselfie_instructions, uiState.currentDirective)
+        assertEquals(Directive.InitialInstruction, uiState.currentDirective)
         assertEquals(0f, uiState.progress)
         assertEquals(false, uiState.isCapturing)
     }
