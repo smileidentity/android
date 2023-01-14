@@ -1,5 +1,6 @@
 package com.smileidentity.networking
 
+import com.smileidentity.networking.models.Config
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.Interceptor

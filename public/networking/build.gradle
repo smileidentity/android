@@ -20,5 +20,4 @@ dependencies {
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
     ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
-
 }

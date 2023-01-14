@@ -1,5 +1,8 @@
 package com.smileidentity.networking
 
+import com.smileidentity.networking.models.ImageType
+import com.smileidentity.networking.models.UploadImageInfo
+import com.smileidentity.networking.models.UploadRequest
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.ToJson
@@ -23,7 +26,8 @@ fun UploadRequest.zip(): File {
 
     // Write info.json
     zipOutputStream.putNextEntry(ZipEntry("info.json"))
-    zipOutputStream.write(SmileIdentity.moshi.adapter(UploadRequest::class.java).toJson(this).toByteArray())
+    zipOutputStream.write(SmileIdentity.moshi.adapter(UploadRequest::class.java).toJson(this)
+        .toByteArray())
     zipOutputStream.closeEntry()
 
     // Write images
@@ -48,7 +52,7 @@ fun File.asLivenessImage() = UploadImageInfo(
     image = this,
 )
 
-object UploadRequestConverterFactory: Converter.Factory() {
+object UploadRequestConverterFactory : Converter.Factory() {
     override fun requestBodyConverter(
         type: Type,
         parameterAnnotations: Array<out Annotation>,
@@ -69,6 +73,7 @@ object FileAdapter {
 
     @ToJson
     fun toJson(file: File): String = file.name
+
     @FromJson
     fun fromJson(fileName: String): File = throw NotImplementedError()
 }

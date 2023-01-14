@@ -1,5 +1,8 @@
 package com.smileidentity.networking
 
+import com.smileidentity.networking.models.PrepUploadRequest
+import com.smileidentity.networking.models.PrepUploadResponse
+import com.smileidentity.networking.models.UploadRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -9,11 +12,11 @@ import retrofit2.http.Url
 @Suppress("unused")
 interface SmileIdentityService {
     @POST("/v1/upload")
-    fun registerUser(@Body registerUserRequest: RegisterUserRequest): Call<RegisterUserResponse>
+    fun registerUser(@Body request: PrepUploadRequest): Call<PrepUploadResponse>
 
     @PUT
-    fun upload(@Url url: String, @Body uploadRequest: UploadRequest): Call<Unit>
+    fun upload(@Url url: String, @Body request: UploadRequest): Call<Unit>
 
     @POST("/v1/job_status")
-    fun getJobStatus(@Body jobStatusRequest: JobStatusRequest): Call<JobStatusResponse>
+    fun getJobStatus(@Body request: JobStatusRequest): Call<JobStatusResponse>
 }
