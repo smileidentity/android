@@ -44,6 +44,7 @@ object SmileIdentity {
         return Retrofit.Builder()
             .baseUrl(url)
             .client(okHttpClientBuilder)
+            .addCallAdapterFactory(SmileIdentityCallAdapterFactory)
             .addConverterFactory(UploadRequestConverterFactory)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

@@ -1,20 +1,15 @@
 package com.smileidentity.networking
 
+import com.smileidentity.networking.SmileIdentity.moshi
 import com.smileidentity.networking.models.ImageType
 import com.smileidentity.networking.models.UploadImageInfo
 import com.smileidentity.networking.models.UploadRequest
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonQualifier
-import com.squareup.moshi.ToJson
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import retrofit2.Converter
-import retrofit2.Retrofit
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.reflect.Type
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.TimeZone
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -26,8 +21,7 @@ fun UploadRequest.zip(): File {
 
     // Write info.json
     zipOutputStream.putNextEntry(ZipEntry("info.json"))
-    zipOutputStream.write(SmileIdentity.moshi.adapter(UploadRequest::class.java).toJson(this)
-        .toByteArray())
+    zipOutputStream.write(moshi.adapter(UploadRequest::class.java).toJson(this).toByteArray())
     zipOutputStream.closeEntry()
 
     // Write images
@@ -52,43 +46,7 @@ fun File.asLivenessImage() = UploadImageInfo(
     image = this,
 )
 
-object UploadRequestConverterFactory : Converter.Factory() {
-    override fun requestBodyConverter(
-        type: Type,
-        parameterAnnotations: Array<out Annotation>,
-        methodAnnotations: Array<out Annotation>,
-        retrofit: Retrofit,
-    ): Converter<*, RequestBody>? {
-        if (type != UploadRequest::class.java) {
-            return null
-        }
-        return Converter<UploadRequest, RequestBody> {
-            it.zip().asRequestBody("application/zip".toMediaType())
-        }
-    }
-}
-
-@Suppress("unused")
-object FileAdapter {
-
-    @ToJson
-    fun toJson(file: File): String = file.name
-
-    @FromJson
-    fun fromJson(fileName: String): File = throw NotImplementedError()
-}
-
-@JsonQualifier
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
-annotation class StringifiedBoolean
-
-@Suppress("unused")
-object StringifiedBooleanAdapter {
-    @ToJson
-    fun toJson(@StringifiedBoolean value: Boolean): String = value.toString()
-
-    @FromJson
-    @StringifiedBoolean
-    fun fromJson(value: String): Boolean = value.toBoolean()
-}
+val Date.iso8601: String
+    get() = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }.format(this)
