@@ -22,8 +22,8 @@ import com.smileidentity.networking.models.PrepUploadRequest
 import com.smileidentity.networking.models.UploadRequest
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.BitmapUtils
-import com.smileidentity.ui.core.SmartSelfieCallback
 import com.smileidentity.ui.core.SmartSelfieResult
+import com.smileidentity.ui.core.SmartSelfieResult.Success
 import com.smileidentity.ui.core.area
 import com.smileidentity.ui.core.createLivenessFile
 import com.smileidentity.ui.core.createSelfieFile
@@ -31,6 +31,7 @@ import com.smileidentity.ui.core.postProcessImageBitmap
 import com.smileidentity.ui.core.postProcessImageFile
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -81,42 +82,30 @@ class SelfieViewModel : ViewModel() {
 
     fun takeButtonInitiatedPictures(
         cameraState: CameraState,
-        callback: SmartSelfieCallback = SmartSelfieCallback {},
+        callback: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
     ) {
         shouldAnalyzeImages = false
         _uiState.update {
             it.copy(
-                currentDirective = R.string.si_selfie_capture_directive_capturing,
                 isCapturing = true,
+                currentDirective = R.string.si_selfie_capture_directive_capturing,
             )
         }
 
-        viewModelScope.launch {
-            try {
-                // Resume from where we left off, if we already have already taken some images
-                val startingImageNum = livenessFiles.size + 1
-                for (stepNum in startingImageNum..numLivenessImages) {
-                    delay(intraImageMinDelayMs)
-                    val livenessFile = captureLivenessImage(cameraState)
-                    livenessFiles.add(livenessFile)
-                    _uiState.update { it.copy(progress = stepNum / totalSteps.toFloat()) }
-                }
+        viewModelScope.launch(getExceptionHandler(callback)) {
+            // Resume from where we left off, if we already have already taken some images
+            val startingImageNum = livenessFiles.size + 1
+            for (stepNum in startingImageNum..numLivenessImages) {
                 delay(intraImageMinDelayMs)
-                val selfieFile = captureSelfieImage(cameraState)
-                _uiState.update { it.copy(progress = 1f) }
-                val result = SmartSelfieResult.Success(selfieFile, livenessFiles)
-                try {
-                    submit(result)
-                    callback.onResult(result)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error submitting selfie")
-                    callback.onResult(SmartSelfieResult.Error(e))
-                }
-            } catch (e: Exception) {
-                Timber.e("Error capturing images", e)
-                shouldAnalyzeImages = true
-                _uiState.update { it.copy(isCapturing = false) }
+                val livenessFile = captureLivenessImage(cameraState)
+                livenessFiles.add(livenessFile)
+                _uiState.update { it.copy(progress = stepNum / totalSteps.toFloat()) }
             }
+            delay(intraImageMinDelayMs)
+            val selfieFile = captureSelfieImage(cameraState)
+            _uiState.update { it.copy(progress = 1f) }
+            val jobStatusResponse = submit(selfieFile, livenessFiles)
+            callback.onResult(Success(selfieFile, livenessFiles, jobStatusResponse))
         }
     }
 
@@ -155,10 +144,7 @@ class SelfieViewModel : ViewModel() {
     }
 
     @SuppressLint("UnsafeOptInUsageError")
-    fun analyzeImage(
-        proxy: ImageProxy,
-        callback: SmartSelfieCallback = SmartSelfieCallback {},
-    ) {
+    fun analyzeImage(proxy: ImageProxy, callback: SmartSelfieResult.Callback) {
         val image = proxy.image
         val elapsedTime = System.currentTimeMillis() - lastAutoCaptureTimeMs
         if (!shouldAnalyzeImages || elapsedTime < intraImageMinDelayMs || image == null) {
@@ -216,25 +202,25 @@ class SelfieViewModel : ViewModel() {
                 // All conditions satisfied, capture the image
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
                 if (livenessFiles.size < numLivenessImages) {
-                    Timber.d("Capturing liveness image")
-                    val file = createLivenessFile()
+                    Timber.v("Capturing liveness image")
+                    val livenessFile = createLivenessFile()
                     postProcessImageBitmap(
                         bitmap = bitmap,
-                        file = file,
+                        file = livenessFile,
                         saveAsGrayscale = true,
                         compressionQuality = 80,
                         desiredOutputSize = livenessImageSize,
                     )
-                    livenessFiles.add(file)
+                    livenessFiles.add(livenessFile)
                     _uiState.update {
                         it.copy(progress = livenessFiles.size / totalSteps.toFloat())
                     }
                 } else {
-                    Timber.d("Capturing selfie image")
-                    val file = createSelfieFile()
+                    Timber.v("Capturing selfie image")
+                    val selfieFile = createSelfieFile()
                     postProcessImageBitmap(
                         bitmap = bitmap,
-                        file = file,
+                        file = selfieFile,
                         saveAsGrayscale = false,
                         compressionQuality = 80,
                         desiredOutputSize = selfieImageSize,
@@ -243,15 +229,9 @@ class SelfieViewModel : ViewModel() {
                         it.copy(progress = 1f)
                     }
                     shouldAnalyzeImages = false
-                    val smartSelfieResult = SmartSelfieResult.Success(file, livenessFiles)
                     viewModelScope.launch {
-                        try {
-                            val jobResult = submit(smartSelfieResult)
-                            callback.onResult(smartSelfieResult)
-                        } catch (e: Exception) {
-                            Timber.e(e, "Error submitting selfie")
-                            callback.onResult(SmartSelfieResult.Error(e))
-                        }
+                        val jobStatusResponse = submit(selfieFile, livenessFiles)
+                        callback.onResult(Success(selfieFile, livenessFiles, jobStatusResponse))
                     }
                 }
             }
@@ -264,7 +244,7 @@ class SelfieViewModel : ViewModel() {
         }
     }
 
-    private suspend fun submit(result: SmartSelfieResult.Success): JobStatusResponse? {
+    private suspend fun submit(selfieFile: File, livenessFiles: List<File>): JobStatusResponse {
         _uiState.update { it.copy(isWaitingForResult = true) }
         val config = Config(
             baseUrl = "https://api.smileidentity.com/v1/",
@@ -294,9 +274,9 @@ class SelfieViewModel : ViewModel() {
         )
         val prepUploadResponse = service.prepUpload(prepUploadRequest)
         Timber.d("Prep Upload Response: $prepUploadResponse")
-        val livenessImageInfos = result.livenessFiles.map { it.asLivenessImage() }
-        val selfieImageInfo = result.selfieFile.asSelfieImage()
-        val uploadRequest = UploadRequest(livenessImageInfos + selfieImageInfo)
+        val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
+        val selfieImageInfo = selfieFile.asSelfieImage()
+        val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
         service.upload(prepUploadResponse.uploadUrl, uploadRequest)
         Timber.d("Upload finished")
         val jobStatusRequest = JobStatusRequest(
@@ -309,8 +289,7 @@ class SelfieViewModel : ViewModel() {
             includeHistory = false,
         )
 
-        // TODO: Pass this back in Callback
-        var jobStatusResponse: JobStatusResponse? = null
+        lateinit var jobStatusResponse: JobStatusResponse
         val jobStatusPollDelay = 1.seconds
         for (i in 1..10) {
             Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
@@ -322,5 +301,12 @@ class SelfieViewModel : ViewModel() {
             }
         }
         return jobStatusResponse
+    }
+
+    private fun getExceptionHandler(callback: SmartSelfieResult.Callback): CoroutineExceptionHandler {
+        return CoroutineExceptionHandler { _, throwable ->
+            Timber.e(throwable, "Error capturing/submitting/polling SmartSelfie")
+            callback.onResult(SmartSelfieResult.Error(throwable))
+        }
     }
 }

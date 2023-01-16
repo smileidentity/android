@@ -8,17 +8,17 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.fragment.app.Fragment
 import com.smileidentity.ui.compose.SmartSelfieOrPermissionScreen
-import com.smileidentity.ui.core.SmartSelfieCallback
+import com.smileidentity.ui.core.SmartSelfieResult
 
 class SmartSelfieFragment private constructor(
-    private val callback: SmartSelfieCallback,
+    private val callback: SmartSelfieResult.Callback,
 ) : Fragment() {
 
     companion object {
         @JvmStatic
         @JvmOverloads
         fun newInstance(
-            callback: SmartSelfieCallback = SmartSelfieCallback { },
+            callback: SmartSelfieResult.Callback = SmartSelfieResult.Callback { },
         ) = SmartSelfieFragment(callback)
     }
 

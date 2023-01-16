@@ -8,12 +8,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.smileidentity.ui.core.SmartSelfieResult;
-import com.smileidentity.ui.core.SmartSelfieCallback;
 import com.smileidentity.ui.fragment.SmartSelfieFragment;
 
 import timber.log.Timber;
 
-public class JavaActivity extends AppCompatActivity implements SmartSelfieCallback {
+public class JavaActivity extends AppCompatActivity implements SmartSelfieResult.Callback {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

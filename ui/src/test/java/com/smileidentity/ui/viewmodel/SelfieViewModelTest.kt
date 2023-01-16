@@ -86,7 +86,7 @@ class SelfieViewModelTest {
         subject.shouldAnalyzeImages = false
 
         // when
-        subject.analyzeImage(proxy)
+        subject.analyzeImage(proxy) { }
 
         // then
         verify(exactly = 1) { proxy.close() }

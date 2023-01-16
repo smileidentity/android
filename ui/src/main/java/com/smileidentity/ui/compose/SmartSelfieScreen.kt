@@ -55,7 +55,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
-import com.smileidentity.ui.core.SmartSelfieCallback
+import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.ujizin.camposer.CameraPreview
@@ -72,7 +72,7 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 fun SmartSelfieOrPermissionScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
-    onResult: SmartSelfieCallback = SmartSelfieCallback {},
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     SmartSelfieOrPermissionScreen(
         agentMode,
@@ -93,7 +93,7 @@ internal fun SmartSelfieOrPermissionScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
-    onResult: SmartSelfieCallback = SmartSelfieCallback {},
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val context = LocalContext.current
     if (cameraPermissionState.status.isGranted) {
@@ -122,7 +122,7 @@ private fun SmartSelfieScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
-    onResult: SmartSelfieCallback = SmartSelfieCallback {},
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     if (uiState.isWaitingForResult) {
@@ -138,7 +138,7 @@ internal fun SelfieCaptureScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
-    onResult: SmartSelfieCallback = SmartSelfieCallback {},
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val cameraState = rememberCameraState()
