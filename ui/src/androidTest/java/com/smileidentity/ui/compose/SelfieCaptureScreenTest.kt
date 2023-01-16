@@ -12,7 +12,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.smileidentity.ui.core.SmartSelfieCallback
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.smileidentity.ui.waitUntilExists
 import io.mockk.Runs
@@ -57,7 +58,7 @@ class SelfieCaptureScreenTest {
         val cameraPreviewTag = "cameraPreview"
 
         // when
-        composeTestRule.setContent { SmartSelfieOrPermissionScreen() }
+        composeTestRule.setContent { SmileIdentity.SmartSelfieRegistrationScreen() }
 
         // then
         verify(exactly = 0) { permissionState.launchPermissionRequest() }
@@ -145,7 +146,7 @@ class SelfieCaptureScreenTest {
         // given
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
-        val callback = SmartSelfieCallback { }
+        val callback = SmartSelfieResult.Callback { }
         every { viewModel.takeButtonInitiatedPictures(any(), any()) } just Runs
 
         // when

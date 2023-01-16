@@ -79,7 +79,6 @@ enum class ActionResult {
     @Json(name = "Under Review") UnderReview,
     @Json(name = "Unable To Determine") UnableToDetermine,
     @Json(name = "Not Applicable") NotApplicable,
-    Unknown,
 }
 
 @JsonClass(generateAdapter = true)

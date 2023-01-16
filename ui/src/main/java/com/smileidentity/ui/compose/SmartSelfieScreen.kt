@@ -69,26 +69,6 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SmartSelfieOrPermissionScreen(
-    agentMode: Boolean = false,
-    manualCaptureMode: Boolean = false,
-    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
-) {
-    SmartSelfieOrPermissionScreen(
-        agentMode,
-        manualCaptureMode,
-        rememberPermissionState(Manifest.permission.CAMERA),
-        onResult,
-    )
-}
-
-/**
- * The internal modifier is used to prevent the function from being called from outside the module
- * as this is for testing purposes only. This is because others consumers would need to use the
- * @OptIn(ExperimentalPermissionsApi::class) annotation to use this function.
- */
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
 internal fun SmartSelfieOrPermissionScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
@@ -97,7 +77,7 @@ internal fun SmartSelfieOrPermissionScreen(
 ) {
     val context = LocalContext.current
     if (cameraPermissionState.status.isGranted) {
-        SmartSelfieScreen(agentMode, manualCaptureMode, onResult = onResult)
+        SmartSelfieRegistrationScreen(agentMode, manualCaptureMode, onResult = onResult)
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
@@ -118,7 +98,7 @@ internal fun SmartSelfieOrPermissionScreen(
 
 @Preview
 @Composable
-private fun SmartSelfieScreen(
+private fun SmartSelfieRegistrationScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),

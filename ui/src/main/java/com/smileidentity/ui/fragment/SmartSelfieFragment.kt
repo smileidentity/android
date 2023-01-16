@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.fragment.app.Fragment
-import com.smileidentity.ui.compose.SmartSelfieOrPermissionScreen
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.ui.core.SmartSelfieResult
 
 class SmartSelfieFragment private constructor(
@@ -32,7 +33,7 @@ class SmartSelfieFragment private constructor(
             // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                SmartSelfieOrPermissionScreen(
+                SmileIdentity.SmartSelfieRegistrationScreen(
                     agentMode = true,
                     manualCaptureMode = true,
                     onResult = callback,

@@ -25,7 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smileidentity.ui.compose.SmartSelfieOrPermissionScreen
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.ui.core.SmartSelfieResult
 import timber.log.Timber
 
@@ -72,7 +73,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
 @Composable
 fun SelfieCaptureScreen(onCompleted: () -> Unit = {}) {
     val context = LocalContext.current
-    SmartSelfieOrPermissionScreen(agentMode = true, manualCaptureMode = true) {
+    SmileIdentity.SmartSelfieRegistrationScreen(agentMode = true, manualCaptureMode = true) {
         if (it is SmartSelfieResult.Success) {
             val message = "Image captured successfully: ${it.selfieFile}"
             context.toast(message)
