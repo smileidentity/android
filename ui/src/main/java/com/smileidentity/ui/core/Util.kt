@@ -24,14 +24,15 @@ internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
 
 /**
- * Post-processes the image stored in [bitmap] and saves to [file]
+ * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
+ * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
  */
 internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
     saveAsGrayscale: Boolean = false,
     compressionQuality: Int = 100,
-    desiredOutputSize: Size? = null,
+    maxOutputSize: Size? = null,
 ): File {
     val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
@@ -40,12 +41,25 @@ internal fun postProcessImageBitmap(
         val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(colorMatrix) }
         canvas.drawBitmap(mutableBitmap, 0f, 0f, paint)
     }
-    // if size is the original Bitmap size, then no scaling will be performed by the underlying call
-    val size = desiredOutputSize ?: Size(mutableBitmap.width, mutableBitmap.height)
+
+    // If size is the original Bitmap size, then no scaling will be performed by the underlying call
+    // Aspect ratio will be maintained by retaining the larger dimension
+    val size = maxOutputSize ?: Size(mutableBitmap.width, mutableBitmap.height)
+    val aspectRatioInput = mutableBitmap.width.toFloat() / mutableBitmap.height
+    val aspectRatioMax = size.width.toFloat() / size.height
+    var outputWidth = size.width
+    var outputHeight = size.height
+    if (aspectRatioInput > aspectRatioMax) {
+        outputHeight = (outputWidth / aspectRatioInput).toInt()
+    } else {
+        outputWidth = (outputHeight * aspectRatioInput).toInt()
+    }
+
+
     file.outputStream().use {
         mutableBitmap
             // Filter is set to false for improved performance at the expense of image quality
-            .scale(size.width, size.height, filter = false)
+            .scale(outputWidth, outputHeight, filter = false)
             .compress(JPEG, compressionQuality, it)
     }
     return file
@@ -58,7 +72,7 @@ internal fun postProcessImageFile(
     file: File,
     saveAsGrayscale: Boolean = false,
     compressionQuality: Int = 100,
-    desiredOutputSize: Size? = null,
+    maxOutputSize: Size? = null,
 ): File {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
     return postProcessImageBitmap(
@@ -66,7 +80,7 @@ internal fun postProcessImageFile(
         file,
         saveAsGrayscale,
         compressionQuality,
-        desiredOutputSize,
+        maxOutputSize,
     )
 }
 

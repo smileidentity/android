@@ -119,7 +119,7 @@ class SelfieViewModel : ViewModel() {
                         file,
                         saveAsGrayscale = false,
                         compressionQuality = 80,
-                        desiredOutputSize = selfieImageSize,
+                        maxOutputSize = selfieImageSize,
                     ),
                 )
             }
@@ -136,7 +136,7 @@ class SelfieViewModel : ViewModel() {
                         file,
                         saveAsGrayscale = true,
                         compressionQuality = 80,
-                        desiredOutputSize = livenessImageSize,
+                        maxOutputSize = livenessImageSize,
                     ),
                 )
             }
@@ -209,7 +209,7 @@ class SelfieViewModel : ViewModel() {
                         file = livenessFile,
                         saveAsGrayscale = true,
                         compressionQuality = 80,
-                        desiredOutputSize = livenessImageSize,
+                        maxOutputSize = livenessImageSize,
                     )
                     livenessFiles.add(livenessFile)
                     _uiState.update {
@@ -223,7 +223,7 @@ class SelfieViewModel : ViewModel() {
                         file = selfieFile,
                         saveAsGrayscale = false,
                         compressionQuality = 80,
-                        desiredOutputSize = selfieImageSize,
+                        maxOutputSize = selfieImageSize,
                     )
                     _uiState.update {
                         it.copy(progress = 1f)
