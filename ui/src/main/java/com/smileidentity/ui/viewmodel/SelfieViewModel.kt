@@ -104,7 +104,14 @@ class SelfieViewModel : ViewModel() {
                 delay(intraImageMinDelayMs)
                 val selfieFile = captureSelfieImage(cameraState)
                 _uiState.update { it.copy(progress = 1f) }
-                submit(SmartSelfieResult.Success(selfieFile, livenessFiles), callback)
+                val result = SmartSelfieResult.Success(selfieFile, livenessFiles)
+                try {
+                    submit(result)
+                    callback.onResult(result)
+                } catch (e: Exception) {
+                    Timber.e(e, "Error submitting selfie")
+                    callback.onResult(SmartSelfieResult.Error(e))
+                }
             } catch (e: Exception) {
                 Timber.e("Error capturing images", e)
                 shouldAnalyzeImages = true
@@ -238,7 +245,13 @@ class SelfieViewModel : ViewModel() {
                     shouldAnalyzeImages = false
                     val smartSelfieResult = SmartSelfieResult.Success(file, livenessFiles)
                     viewModelScope.launch {
-                        submit(smartSelfieResult, callback)
+                        try {
+                            val jobResult = submit(smartSelfieResult)
+                            callback.onResult(smartSelfieResult)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error submitting selfie")
+                            callback.onResult(SmartSelfieResult.Error(e))
+                        }
                     }
                 }
             }
@@ -251,10 +264,7 @@ class SelfieViewModel : ViewModel() {
         }
     }
 
-    private suspend fun submit(
-        result: SmartSelfieResult.Success,
-        callback: SmartSelfieCallback,
-    ) {
+    private suspend fun submit(result: SmartSelfieResult.Success): JobStatusResponse? {
         _uiState.update { it.copy(isWaitingForResult = true) }
         val config = Config(
             baseUrl = "https://api.smileidentity.com/v1/",
@@ -300,8 +310,7 @@ class SelfieViewModel : ViewModel() {
         )
 
         // TODO: Pass this back in Callback
-        var jobStatusResponse: JobStatusResponse
-
+        var jobStatusResponse: JobStatusResponse? = null
         val jobStatusPollDelay = 1.seconds
         for (i in 1..10) {
             Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
@@ -312,7 +321,6 @@ class SelfieViewModel : ViewModel() {
                 break
             }
         }
-
-        callback.onResult(result)
+        return jobStatusResponse
     }
 }

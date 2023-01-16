@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -116,7 +118,7 @@ internal fun SmartSelfieOrPermissionScreen(
 
 @Preview
 @Composable
-fun SmartSelfieScreen(
+private fun SmartSelfieScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
@@ -132,7 +134,7 @@ fun SmartSelfieScreen(
 
 @Preview
 @Composable
-fun SelfieCaptureScreen(
+internal fun SelfieCaptureScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
@@ -199,6 +201,7 @@ fun SelfieCaptureScreen(
                         },
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             // Display only this shape in the Preview -- however, capture the whole image. This is
@@ -289,16 +292,17 @@ fun SelfieCaptureScreen(
 private fun ProcessingScreen() {
     Column(
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
         CircularProgressIndicator(modifier = Modifier.size(64.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(R.string.si_selfie_capture_processing),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
             modifier = Modifier.padding(8.dp),
         )
     }
