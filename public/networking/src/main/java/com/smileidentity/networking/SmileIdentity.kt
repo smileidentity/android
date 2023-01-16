@@ -22,29 +22,29 @@ object SmileIdentity {
      * Initialize the SDK. This must be called before any other SDK methods.
      *
      * @param config The [Config] to use
-     * @param isTest Whether to use the test environment. If false, uses production
+     * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
      */
     @JvmStatic
     @JvmOverloads
     fun init(
         config: Config,
-        isTest: Boolean = false,
+        useSandbox: Boolean = false,
         okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
     ): SmileIdentityService {
         this.config = config
         this.moshi = Moshi.Builder()
-            .add(FileAdapter)
-            .add(StringifiedBooleanAdapter)
             .add(Date::class.java, Rfc3339DateJsonAdapter())
+            .add(StringifiedBooleanAdapter)
+            .add(FileAdapter)
+            .add(JobResultAdapter)
             .build()
 
-        val url = if (isTest) config.testLambdaUrl else config.prodLambdaUrl
+        val url = if (useSandbox) config.sandboxBaseUrl else config.baseUrl
 
         return Retrofit.Builder()
             .baseUrl(url)
             .client(okHttpClientBuilder)
-            .addCallAdapterFactory(SmileIdentityCallAdapterFactory)
             .addConverterFactory(UploadRequestConverterFactory)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
@@ -67,8 +67,10 @@ object SmileIdentity {
             val request = chain.request()
             for (attempt in 1..3) {
                 try {
-                    Logger.getLogger("SmileIdentity")
-                        .log(Level.INFO, "Smile Identity network request attempt #$attempt")
+                    // Using Logger here/Can't user Timber because this module has no Android
+                    // dependencies, but Timber/Log does
+                    Logger.getLogger(SmileIdentity::class.simpleName)
+                        .log(Level.FINE, "Smile Identity SDK network attempt #$attempt")
                     // println("Smile Identity network request attempt #$attempt")
                     val response = chain.proceed(request)
                     if (response.code < 500) {

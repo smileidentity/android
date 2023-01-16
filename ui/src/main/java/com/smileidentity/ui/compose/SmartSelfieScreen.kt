@@ -53,7 +53,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
-import com.smileidentity.ui.core.SelfieCaptureResultCallback
+import com.smileidentity.ui.core.SmartSelfieCallback
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.ujizin.camposer.CameraPreview
@@ -67,12 +67,12 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SelfieCaptureOrPermissionScreen(
+fun SmartSelfieOrPermissionScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
+    onResult: SmartSelfieCallback = SmartSelfieCallback {},
 ) {
-    SelfieCaptureOrPermissionScreen(
+    SmartSelfieOrPermissionScreen(
         agentMode,
         manualCaptureMode,
         rememberPermissionState(Manifest.permission.CAMERA),
@@ -87,15 +87,15 @@ fun SelfieCaptureOrPermissionScreen(
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-internal fun SelfieCaptureOrPermissionScreen(
+internal fun SmartSelfieOrPermissionScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
+    onResult: SmartSelfieCallback = SmartSelfieCallback {},
 ) {
     val context = LocalContext.current
     if (cameraPermissionState.status.isGranted) {
-        SelfieCaptureScreenContent(agentMode, manualCaptureMode, onResult = onResult)
+        SmartSelfieScreen(agentMode, manualCaptureMode, onResult = onResult)
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
@@ -116,11 +116,27 @@ internal fun SelfieCaptureOrPermissionScreen(
 
 @Preview
 @Composable
-fun SelfieCaptureScreenContent(
+fun SmartSelfieScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
+    onResult: SmartSelfieCallback = SmartSelfieCallback {},
+) {
+    val uiState = viewModel.uiState.collectAsState().value
+    if (uiState.isWaitingForResult) {
+        ProcessingScreen()
+    } else {
+        SelfieCaptureScreen(agentMode, manualCaptureMode, onResult = onResult)
+    }
+}
+
+@Preview
+@Composable
+fun SelfieCaptureScreen(
+    agentMode: Boolean = false,
+    manualCaptureMode: Boolean = false,
+    viewModel: SelfieViewModel = viewModel(),
+    onResult: SmartSelfieCallback = SmartSelfieCallback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val cameraState = rememberCameraState()
@@ -265,5 +281,25 @@ fun SelfieCaptureScreenContent(
             }
             SmileIdentityAttribution()
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ProcessingScreen() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+    ) {
+        CircularProgressIndicator(modifier = Modifier.size(64.dp))
+        Text(
+            text = stringResource(R.string.si_selfie_capture_processing),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.padding(8.dp),
+        )
     }
 }

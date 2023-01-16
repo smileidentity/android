@@ -19,7 +19,6 @@ data class PrepUploadRequest(
     @Json(name = "callback_url") val callbackUrl: String? = null,
 )
 
-
 @JsonClass(generateAdapter = true)
 data class PrepUploadResponse(
     @Json(name = "code") val code: Int,

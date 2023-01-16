@@ -2,7 +2,7 @@ package com.smileidentity.ui.viewmodel
 
 import androidx.camera.core.ImageProxy
 import com.smileidentity.ui.R
-import com.smileidentity.ui.core.SelfieCaptureResult
+import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.setupPostProcessMocks
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -46,7 +46,7 @@ class SelfieViewModelTest {
     fun `takePicture should call callback with Success when ImageCaptureResult is Success`() {
         // given
         val cameraState = mockk<CameraState>()
-        val callback = { it: SelfieCaptureResult -> assertTrue(it is SelfieCaptureResult.Success) }
+        val callback = { it: SmartSelfieResult -> assertTrue(it is SmartSelfieResult.Success) }
         val slots = mutableListOf<(ImageCaptureResult) -> Unit>()
         every { cameraState.takePicture(any<File>(), capture(slots)) } returns Unit
         setupPostProcessMocks()
@@ -64,7 +64,7 @@ class SelfieViewModelTest {
     fun `takePicture should call callback with Error when ImageCaptureResult is Error`() {
         // given
         val cameraState = mockk<CameraState>()
-        val callback = { it: SelfieCaptureResult -> assertTrue(it is SelfieCaptureResult.Error) }
+        val callback = { it: SmartSelfieResult -> assertTrue(it is SmartSelfieResult.Error) }
         val slots = mutableListOf<(ImageCaptureResult) -> Unit>()
         every { cameraState.takePicture(any<File>(), capture(slots)) } returns Unit
 

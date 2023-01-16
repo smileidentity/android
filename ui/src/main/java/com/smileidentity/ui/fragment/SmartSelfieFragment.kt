@@ -7,19 +7,19 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.fragment.app.Fragment
-import com.smileidentity.ui.compose.SelfieCaptureOrPermissionScreen
-import com.smileidentity.ui.core.SelfieCaptureResultCallback
+import com.smileidentity.ui.compose.SmartSelfieOrPermissionScreen
+import com.smileidentity.ui.core.SmartSelfieCallback
 
-class SelfieFragment private constructor(
-    private val callback: SelfieCaptureResultCallback,
+class SmartSelfieFragment private constructor(
+    private val callback: SmartSelfieCallback,
 ) : Fragment() {
 
     companion object {
         @JvmStatic
         @JvmOverloads
         fun newInstance(
-            callback: SelfieCaptureResultCallback = SelfieCaptureResultCallback { },
-        ) = SelfieFragment(callback)
+            callback: SmartSelfieCallback = SmartSelfieCallback { },
+        ) = SmartSelfieFragment(callback)
     }
 
     override fun onCreateView(
@@ -32,7 +32,7 @@ class SelfieFragment private constructor(
             // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                SelfieCaptureOrPermissionScreen(
+                SmartSelfieOrPermissionScreen(
                     agentMode = true,
                     manualCaptureMode = true,
                     onResult = callback,

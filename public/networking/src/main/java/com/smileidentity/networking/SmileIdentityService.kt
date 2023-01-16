@@ -13,11 +13,11 @@ import retrofit2.http.Url
 @Suppress("unused")
 interface SmileIdentityService {
     @POST("/v1/upload")
-    fun registerUser(@Body request: PrepUploadRequest): SmileIdentityCall<PrepUploadResponse>
+    suspend fun prepUpload(@Body request: PrepUploadRequest): PrepUploadResponse
 
     @PUT
-    fun upload(@Url url: String, @Body request: UploadRequest): SmileIdentityCall<Unit>
+    suspend fun upload(@Url url: String, @Body request: UploadRequest)
 
     @POST("/v1/job_status")
-    fun getJobStatus(@Body request: JobStatusRequest): SmileIdentityCall<JobStatusResponse>
+    suspend fun getJobStatus(@Body request: JobStatusRequest): JobStatusResponse
 }

@@ -16,6 +16,7 @@ data class JobStatusRequest(
     @Json(name = "image_links") val includeImageLinks: Boolean,
     @Json(name = "history") val includeHistory: Boolean,
 )
+
 @JsonClass(generateAdapter = true)
 data class JobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
@@ -23,25 +24,33 @@ data class JobStatusResponse(
     @Json(name = "job_complete") val jobComplete: Boolean,
     @Json(name = "job_success") val jobSuccess: Boolean,
     @Json(name = "code") val code: Int,
-    @Json(name = "result") val result: JobResultEntry?,
-    @Json(name = "history") val history: List<JobResultEntry>?,
+    @Json(name = "result") val result: JobResult?,
+    @Json(name = "history") val history: List<JobResult.Entry>?,
     @Json(name = "image_links") val imageLinks: ImageLinks?,
 )
 
-@JsonClass(generateAdapter = true)
-data class JobResultEntry(
-    @Json(name = "Source") val source: String,
-    @Json(name = "Actions") val actions: Actions,
-    @Json(name = "ResultCode") val resultCode: Int,
-    @Json(name = "ResultText") val resultText: String,
-    @Json(name = "ResultType") val resultType: String,
-    @Json(name = "SmileJobID") val smileJobId: String,
-    @Json(name = "JSONVersion") val jsonVersion: String,
-    @StringifiedBoolean @Json(name = "IsFinalResult") val isFinalResult: Boolean,
-    @Json(name = "ConfidenceValue") val confidence: Int,
-    @StringifiedBoolean @Json(name = "IsMachineResult") val isMachineResult: Boolean,
-    @Json(name = "PartnerParams") val partnerParams: PartnerParams,
-)
+/**
+ * The job result might sometimes be a freeform text field instead of an object (i.e. when the
+ * zip uploading has not finished processing on the backend, and so "No zip uploaded" is
+ * returned).
+ */
+sealed interface JobResult {
+    data class Freeform(val result: String) : JobResult
+    @JsonClass(generateAdapter = true)
+    data class Entry(
+        @Json(name = "Source") val source: String,
+        @Json(name = "Actions") val actions: Actions,
+        @Json(name = "ResultCode") val resultCode: Int,
+        @Json(name = "ResultText") val resultText: String,
+        @Json(name = "ResultType") val resultType: String,
+        @Json(name = "SmileJobID") val smileJobId: String,
+        @Json(name = "JSONVersion") val jsonVersion: String,
+        @StringifiedBoolean @Json(name = "IsFinalResult") val isFinalResult: Boolean,
+        @Json(name = "ConfidenceValue") val confidence: Int,
+        @StringifiedBoolean @Json(name = "IsMachineResult") val isMachineResult: Boolean,
+        @Json(name = "PartnerParams") val partnerParams: PartnerParams,
+    ) : JobResult
+}
 
 @JsonClass(generateAdapter = true)
 data class Actions(
@@ -75,5 +84,6 @@ enum class ActionResult {
 
 @JsonClass(generateAdapter = true)
 data class ImageLinks(
-    @Json(name = "selfie_image") val selfieImageUrl: String,
+    @Json(name = "selfie_image") val selfieImageUrl: String?,
+    @Json(name = "error") val error: String?
 )

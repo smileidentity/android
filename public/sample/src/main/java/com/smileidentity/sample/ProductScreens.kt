@@ -25,8 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smileidentity.ui.compose.SelfieCaptureOrPermissionScreen
-import com.smileidentity.ui.core.SelfieCaptureResult
+import com.smileidentity.ui.compose.SmartSelfieOrPermissionScreen
+import com.smileidentity.ui.core.SmartSelfieResult
 import timber.log.Timber
 
 @Preview
@@ -72,12 +72,12 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
 @Composable
 fun SelfieCaptureScreen(onCompleted: () -> Unit = {}) {
     val context = LocalContext.current
-    SelfieCaptureOrPermissionScreen(agentMode = true, manualCaptureMode = true) {
-        if (it is SelfieCaptureResult.Success) {
+    SmartSelfieOrPermissionScreen(agentMode = true, manualCaptureMode = true) {
+        if (it is SmartSelfieResult.Success) {
             val message = "Image captured successfully: ${it.selfieFile}"
             context.toast(message)
             Timber.d(message)
-        } else if (it is SelfieCaptureResult.Error) {
+        } else if (it is SmartSelfieResult.Error) {
             val message = "Image capture error: $it"
             context.toast(message)
             Timber.e(it.throwable, message)
