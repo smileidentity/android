@@ -2,25 +2,25 @@ package com.smileidentity.networking
 
 import com.smileidentity.networking.models.Config
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.util.Date
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.logging.Logger
 
 @Suppress("unused")
 object SmileIdentity {
+    lateinit var apiKey: String
     lateinit var config: Config
     lateinit var moshi: Moshi
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
      *
+     * @param apiKey The API key for your Smile Identity account
      * @param config The [Config] to use
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
@@ -28,13 +28,14 @@ object SmileIdentity {
     @JvmStatic
     @JvmOverloads
     fun init(
+        apiKey: String,
         config: Config,
         useSandbox: Boolean = false,
         okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
     ): SmileIdentityService {
+        this.apiKey = apiKey
         this.config = config
         this.moshi = Moshi.Builder()
-            .add(Date::class.java, Rfc3339DateJsonAdapter())
             .add(StringifiedBooleanAdapter)
             .add(FileAdapter)
             .add(JobResultAdapter)

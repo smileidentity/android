@@ -2,19 +2,21 @@
 
 package com.smileidentity.networking.models
 
+import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.networking.StringifiedBoolean
+import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class JobStatusRequest(
-    @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "signature") val signature: String,
     @Json(name = "user_id") val userId: String,
     @Json(name = "job_id") val jobId: String,
-    @Json(name = "partner_id") val partnerId: String,
     @Json(name = "image_links") val includeImageLinks: Boolean,
     @Json(name = "history") val includeHistory: Boolean,
+    @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
+    @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
+    @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 )
 
 @JsonClass(generateAdapter = true)

@@ -13,9 +13,9 @@ data class SmileIdentityServerError(
 
 @JsonClass(generateAdapter = true)
 data class PartnerParams(
-    @Json(name = "job_type") val jobType: JobType,
     @Json(name = "job_id") val jobId: String,
     @Json(name = "user_id") val userId: String,
+    @Json(name = "job_type") val jobType: JobType,
 )
 
 enum class JobType {

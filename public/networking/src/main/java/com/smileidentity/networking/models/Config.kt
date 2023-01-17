@@ -8,6 +8,4 @@ data class Config(
     @Json(name = "prod_lambda_url") val baseUrl: String,
     @Json(name = "test_lambda_url") val sandboxBaseUrl: String,
     @Json(name = "partner_id") val partnerId: String,
-    @Json(name = "auth_token") val authToken: String,
-    @Json(name = "version") val version: String,
 )

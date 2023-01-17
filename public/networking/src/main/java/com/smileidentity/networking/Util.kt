@@ -4,14 +4,17 @@ import com.smileidentity.networking.SmileIdentity.moshi
 import com.smileidentity.networking.models.ImageType
 import com.smileidentity.networking.models.UploadImageInfo
 import com.smileidentity.networking.models.UploadRequest
+import okio.ByteString.Companion.encode
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+
+internal fun calculateSignature(timestamp: String): String {
+    val hashContent = timestamp + SmileIdentity.config.partnerId + "sid_request"
+    return hashContent.encode().hmacSha256(SmileIdentity.apiKey.encode()).base64()
+}
 
 fun UploadRequest.zip(): File {
     val zipFile = File.createTempFile("upload", ".zip")
@@ -45,8 +48,3 @@ fun File.asLivenessImage() = UploadImageInfo(
     imageTypeId = ImageType.LivenessPngOrJpgFile,
     image = this,
 )
-
-val Date.iso8601: String
-    get() = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }.format(this)

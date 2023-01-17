@@ -40,9 +40,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -249,22 +246,15 @@ class SelfieViewModel : ViewModel() {
         val config = Config(
             baseUrl = "https://api.smileidentity.com/v1/",
             sandboxBaseUrl = "https://testapi.smileidentity.com/v1/",
-            authToken = "<REDACTED>",
             partnerId = "2343",
-            version = "2.0.0",
         )
-        val service = SmileIdentity.init(config, useSandbox = true)
-        val date = Date()
-        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }
+        val service = SmileIdentity.init(
+            apiKey = "<REDACTED>",
+            config = config,
+            useSandbox = true,
+        )
 
-        val timestamp = "2023-01-15T14:53:27.282124"
-        val signature = "<REDACTED>"
         val prepUploadRequest = PrepUploadRequest(
-            partnerId = SmileIdentity.config.partnerId,
-            signature = signature,
-            timestamp = timestamp,
             callbackUrl = "",
             partnerParams = PartnerParams(
                 jobType = JobType.SmartSelfieEnrollment,
@@ -280,11 +270,8 @@ class SelfieViewModel : ViewModel() {
         service.upload(prepUploadResponse.uploadUrl, uploadRequest)
         Timber.d("Upload finished")
         val jobStatusRequest = JobStatusRequest(
-            timestamp = timestamp,
-            signature = signature,
             jobId = prepUploadRequest.partnerParams.jobId,
             userId = prepUploadRequest.partnerParams.userId,
-            partnerId = prepUploadRequest.partnerId,
             includeImageLinks = false,
             includeHistory = false,
         )

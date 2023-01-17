@@ -2,21 +2,23 @@
 
 package com.smileidentity.networking.models
 
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PrepUploadRequest(
-    @Json(name = "source_sdk") val sourceSdk: String = "android",
-    @Json(name = "source_sdk_version") val sourceSdkVersion: String = "2.0.0",
     @Json(name = "file_name") val filename: String = "upload.zip",
-    @Json(name = "signature") val signature: String,
-    @Json(name = "timestamp") val timestamp: String, // TODO: Date
-    @Json(name = "smile_client_id") val partnerId: String,
     @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "model_parameters") val modelParameters: Map<String, Any> = mapOf(),
     // Callback URL *must* be defined either within your Partner Portal or here
     @Json(name = "callback_url") val callbackUrl: String? = null,
+    @Json(name = "smile_client_id") val partnerId: String = SmileIdentity.config.partnerId,
+    @Json(name = "source_sdk") val sourceSdk: String = "android",
+    @Json(name = "source_sdk_version") val sourceSdkVersion: String = "2.0.0",
+    @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
+    @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 )
 
 @JsonClass(generateAdapter = true)
