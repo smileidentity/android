@@ -134,7 +134,7 @@ fun MainScreen() {
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Registration success"
                                     context.toast(message)
-                                    Timber.d("$message: $it")
+                                    Timber.d("$message: $result")
                                 } else if (result is SmartSelfieResult.Error) {
                                     val message = "SmartSelfie Registration error"
                                     context.toast(message)
