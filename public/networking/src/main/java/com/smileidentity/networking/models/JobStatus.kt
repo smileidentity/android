@@ -38,6 +38,7 @@ data class JobStatusResponse(
  */
 sealed interface JobResult {
     data class Freeform(val result: String) : JobResult
+
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Source") val source: String,
@@ -47,10 +48,14 @@ sealed interface JobResult {
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") val smileJobId: String,
         @Json(name = "JSONVersion") val jsonVersion: String,
-        @StringifiedBoolean @Json(name = "IsFinalResult") val isFinalResult: Boolean,
-        @Json(name = "ConfidenceValue") val confidence: Int,
-        @StringifiedBoolean @Json(name = "IsMachineResult") val isMachineResult: Boolean,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
+        @Json(name = "ConfidenceValue") val confidence: Int,
+
+        @Json(name = "IsFinalResult") @StringifiedBoolean
+        val isFinalResult: Boolean,
+
+        @Json(name = "IsMachineResult") @StringifiedBoolean
+        val isMachineResult: Boolean,
     ) : JobResult
 }
 

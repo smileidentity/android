@@ -22,18 +22,25 @@ data class UploadImageInfo(
 enum class ImageType {
     @Json(name = "0")
     SelfiePngOrJpgFile,
+
     @Json(name = "1")
     IdCardPngOrJpgFile,
+
     @Json(name = "2")
     SelfiePngOrJpgBase64,
+
     @Json(name = "3")
     IdCardPngOrJpgBase64,
+
     @Json(name = "4")
     LivenessPngOrJpgFile,
+
     @Json(name = "5")
     IdCardRearPngOrJpgFile,
+
     @Json(name = "6")
     LivenessPngOrJpgBase64,
+
     @Json(name = "7")
     IdCardRearPngOrJpgBase64,
 }
