@@ -22,9 +22,9 @@ sealed class Screens(
     object Home : Screens("home", R.string.home, Filled.Home, Outlined.Home)
     object Resources : Screens("resources", R.string.resources, Filled.Info, Outlined.Info)
     object AboutUs : Screens("about_us", R.string.about_us, Filled.Settings, Outlined.Settings)
-    object SmartSelfie : Screens(
-        "smart_selfie",
-        com.smileidentity.ui.R.string.si_selfie_capture_product_name,
+    object SmartSelfieRegistration : Screens(
+        "smart_selfie_registration",
+        com.smileidentity.ui.R.string.si_smartselfie_registration_product_name,
         // TODO: Replace icons with Smile Identity branded icons
         Filled.Face,
         Outlined.Face,

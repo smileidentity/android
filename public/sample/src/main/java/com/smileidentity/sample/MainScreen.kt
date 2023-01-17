@@ -24,12 +24,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.theme.SmileIdentityTheme
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -118,10 +123,25 @@ fun MainScreen() {
                             currentScreenTitle = Screens.AboutUs.label
                             AboutUsScreen()
                         }
-                        composable(Screens.SmartSelfie.route) {
+                        composable(Screens.SmartSelfieRegistration.route) {
                             bottomNavSelection = Screens.Home
-                            currentScreenTitle = Screens.SmartSelfie.label
-                            SelfieCaptureScreen { navController.popBackStack() }
+                            currentScreenTitle = Screens.SmartSelfieRegistration.label
+                            val context = LocalContext.current
+                            SmileIdentity.SmartSelfieRegistrationScreen(
+                                agentMode = true,
+                                manualCaptureMode = true
+                            ) { result ->
+                                if (result is SmartSelfieResult.Success) {
+                                    val message = "SmartSelfie Registration success"
+                                    context.toast(message)
+                                    Timber.d("$message: $it")
+                                } else if (result is SmartSelfieResult.Error) {
+                                    val message = "SmartSelfie Registration error"
+                                    context.toast(message)
+                                    Timber.e(result.throwable, message)
+                                }
+                                navController.popBackStack()
+                            }
                         }
                     }
                 },

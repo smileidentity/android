@@ -257,7 +257,7 @@ internal fun SelfieCaptureScreen(
                     tint = Color.Black,
                 )
                 Text(
-                    text = stringResource(R.string.si_selfie_capture_instructions),
+                    text = stringResource(R.string.si_smartselfie_instructions),
                     // The text color must be forced to black due to white background
                     color = Color.Black,
                 )
@@ -280,7 +280,7 @@ private fun ProcessingScreen() {
         CircularProgressIndicator(modifier = Modifier.size(64.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = stringResource(R.string.si_selfie_capture_processing),
+            text = stringResource(R.string.si_smartselfie_processing),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp),

@@ -6,6 +6,12 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
+data class SmileIdentityServerError(
+    @Json(name = "code") val code: Int,
+    @Json(name = "error") val message: String,
+)
+
+@JsonClass(generateAdapter = true)
 data class PartnerParams(
     @Json(name = "job_type") val jobType: JobType,
     @Json(name = "job_id") val jobId: String,

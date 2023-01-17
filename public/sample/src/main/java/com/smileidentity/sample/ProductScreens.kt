@@ -20,20 +20,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smileidentity.networking.SmileIdentity
-import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.ui.core.SmartSelfieResult
-import timber.log.Timber
 
 @Preview
 @Composable
 fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
-    val products = listOf(Screens.SmartSelfie)
+    val products = listOf(Screens.SmartSelfieRegistration)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -72,17 +67,5 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
 @Preview
 @Composable
 fun SelfieCaptureScreen(onCompleted: () -> Unit = {}) {
-    val context = LocalContext.current
-    SmileIdentity.SmartSelfieRegistrationScreen(agentMode = true, manualCaptureMode = true) {
-        if (it is SmartSelfieResult.Success) {
-            val message = "Image captured successfully: ${it.selfieFile}"
-            context.toast(message)
-            Timber.d(message)
-        } else if (it is SmartSelfieResult.Error) {
-            val message = "Image capture error: $it"
-            context.toast(message)
-            Timber.e(it.throwable, message)
-        }
-        onCompleted()
-    }
+
 }
