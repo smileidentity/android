@@ -55,7 +55,6 @@ internal fun postProcessImageBitmap(
         outputWidth = (outputHeight * aspectRatioInput).toInt()
     }
 
-
     file.outputStream().use {
         mutableBitmap
             // Filter is set to false for improved performance at the expense of image quality

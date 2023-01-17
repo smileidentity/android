@@ -62,27 +62,28 @@ object SmileIdentity {
         connectTimeout(30, TimeUnit.SECONDS)
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)
-        addNetworkInterceptor(Interceptor { chain: Interceptor.Chain ->
-            // Retry on exception (network error) and 5xx
-            val request = chain.request()
-            for (attempt in 1..3) {
-                try {
-                    // Using Logger here/Can't user Timber because this module has no Android
-                    // dependencies, but Timber/Log does
-                    Logger.getLogger(SmileIdentity::class.simpleName)
-                        .log(Level.FINE, "Smile Identity SDK network attempt #$attempt")
-                    // println("Smile Identity network request attempt #$attempt")
-                    val response = chain.proceed(request)
-                    if (response.code < 500) {
-                        return@Interceptor response
+        addNetworkInterceptor(
+            Interceptor { chain: Interceptor.Chain ->
+                // Retry on exception (network error) and 5xx
+                val request = chain.request()
+                for (attempt in 1..3) {
+                    try {
+                        // Using Logger here because this networking module has no Android
+                        // dependencies, whilst Timber/Log does
+                        Logger.getLogger(SmileIdentity::class.simpleName)
+                            .log(Level.FINE, "Smile Identity SDK network attempt #$attempt")
+                        // println("Smile Identity network request attempt #$attempt")
+                        val response = chain.proceed(request)
+                        if (response.code < 500) {
+                            return@Interceptor response
+                        }
+                    } catch (e: Exception) {
+                        // Network failures end up here. Retry these
                     }
-                } catch (e: Exception) {
-                    // Network failures end up here. Retry these
                 }
+                return@Interceptor chain.proceed(request)
             }
-            return@Interceptor chain.proceed(request)
-        })
+        )
         addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
     }
 }
-

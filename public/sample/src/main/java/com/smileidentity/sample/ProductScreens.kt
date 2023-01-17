@@ -63,9 +63,3 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
         }
     }
 }
-
-@Preview
-@Composable
-fun SelfieCaptureScreen(onCompleted: () -> Unit = {}) {
-
-}
