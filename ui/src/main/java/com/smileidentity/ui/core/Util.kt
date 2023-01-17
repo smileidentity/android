@@ -14,6 +14,11 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.networking.models.SmileIdentityException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import retrofit2.HttpException
+import timber.log.Timber
 import java.io.File
 
 internal fun Context.toast(@StringRes message: Int) {
@@ -97,3 +102,33 @@ internal fun createSmileTempFile(imageType: String): File {
 
 internal fun createLivenessFile() = createSmileTempFile("liveness")
 internal fun createSelfieFile() = createSmileTempFile("selfie")
+
+/**
+ * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
+ * SmileIdentityServerError if it is an [HttpException] (this may not always be possible, i.e. if
+ * we get an error during S3 upload, or if we get an unconventional 500 error from the API)
+ *
+ * @param proxy Callback to be invoked with the exception
+ */
+internal fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExceptionHandler {
+    return CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable, "Error during coroutine execution")
+        val converted = if (throwable is HttpException) {
+            try {
+                SmileIdentityException(
+                    SmileIdentity.retrofit.responseBodyConverter<SmileIdentityException.Details>(
+                        SmileIdentityException.Details::class.java,
+                        emptyArray(),
+                    ).convert(throwable.response()?.errorBody()!!)!!
+                )
+            } catch (e: Exception) {
+                Timber.w(e, "Unable to convert HttpException to SmileIdentityServerError")
+                // More informative to pass back the original exception than the conversion error
+                throwable
+            }
+        } else {
+            throwable
+        }
+        proxy(converted)
+    }
+}

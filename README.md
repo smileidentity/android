@@ -13,11 +13,12 @@ project consisting of the following modules:
 
 ## Setup
 
-- Android Studio 2021.3.1 or higher
-- Android Gradle Plugin 7.3.1 or higher
+- Android Studio 2022.1.1 or higher
+- Android Gradle Plugin 7.4.0 or higher
 - Android SDK 33
 - Local JDK 11 installation (potentially up to JDK 18, but not tested)
-- Add `SENTRY_DSN=<sentry dsn value from Sentry Portal>` to `~/.gradle/gradle.properties`
+- Add `SMILE_IDENTITY_API_KEY=<API Key from Smile Identity Portal>` to `~/.gradle/gradle.properties`
+- Add `SENTRY_DSN=<Android project Sentry DSN from Sentry Portal>` to `~/.gradle/gradle.properties`
 
 ## Building
 

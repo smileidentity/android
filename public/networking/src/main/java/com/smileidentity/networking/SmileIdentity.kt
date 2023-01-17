@@ -13,9 +13,12 @@ import java.util.logging.Logger
 
 @Suppress("unused")
 object SmileIdentity {
-    lateinit var apiKey: String
-    lateinit var config: Config
-    lateinit var moshi: Moshi
+    @JvmStatic
+    lateinit var api: SmileIdentityService private set
+    internal lateinit var apiKey: String
+    internal lateinit var config: Config
+    internal lateinit var moshi: Moshi
+    lateinit var retrofit: Retrofit
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
@@ -32,7 +35,7 @@ object SmileIdentity {
         config: Config,
         useSandbox: Boolean = false,
         okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
-    ): SmileIdentityService {
+    ) {
         this.apiKey = apiKey
         this.config = config
         this.moshi = Moshi.Builder()
@@ -43,13 +46,14 @@ object SmileIdentity {
 
         val url = if (useSandbox) config.sandboxBaseUrl else config.baseUrl
 
-        return Retrofit.Builder()
+        retrofit = Retrofit.Builder()
             .baseUrl(url)
             .client(okHttpClientBuilder)
             .addConverterFactory(UploadRequestConverterFactory)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
-            .create(SmileIdentityService::class.java)
+
+        api = retrofit.create(SmileIdentityService::class.java)
     }
 
     /**

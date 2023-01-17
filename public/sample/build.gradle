@@ -22,6 +22,11 @@ android {
     }
 
     buildTypes {
+        all {
+            def smileIdentityApiKey = project.hasProperty("SMILE_IDENTITY_API_KEY") ?
+                    "\"${SMILE_IDENTITY_API_KEY}\"" : "\"\""
+            buildConfigField "String", "SMILE_IDENTITY_API_KEY", smileIdentityApiKey
+        }
         release {
             minifyEnabled false
         }

@@ -13,7 +13,6 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
-import com.smileidentity.networking.models.Config
 import com.smileidentity.networking.models.JobStatusRequest
 import com.smileidentity.networking.models.JobStatusResponse
 import com.smileidentity.networking.models.JobType
@@ -27,11 +26,11 @@ import com.smileidentity.ui.core.SmartSelfieResult.Success
 import com.smileidentity.ui.core.area
 import com.smileidentity.ui.core.createLivenessFile
 import com.smileidentity.ui.core.createSelfieFile
+import com.smileidentity.ui.core.getExceptionHandler
 import com.smileidentity.ui.core.postProcessImageBitmap
 import com.smileidentity.ui.core.postProcessImageFile
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -89,7 +88,8 @@ class SelfieViewModel : ViewModel() {
             )
         }
 
-        viewModelScope.launch(getExceptionHandler(callback)) {
+        val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(e)) }
+        viewModelScope.launch(getExceptionHandler(proxy)) {
             // Resume from where we left off, if we already have already taken some images
             val startingImageNum = livenessFiles.size + 1
             for (stepNum in startingImageNum..numLivenessImages) {
@@ -243,16 +243,6 @@ class SelfieViewModel : ViewModel() {
 
     private suspend fun submit(selfieFile: File, livenessFiles: List<File>): JobStatusResponse {
         _uiState.update { it.copy(isWaitingForResult = true) }
-        val config = Config(
-            baseUrl = "https://api.smileidentity.com/v1/",
-            sandboxBaseUrl = "https://testapi.smileidentity.com/v1/",
-            partnerId = "2343",
-        )
-        val service = SmileIdentity.init(
-            apiKey = "<REDACTED>",
-            config = config,
-            useSandbox = true,
-        )
 
         val prepUploadRequest = PrepUploadRequest(
             callbackUrl = "",
@@ -262,12 +252,12 @@ class SelfieViewModel : ViewModel() {
                 userId = "user-${UUID.randomUUID()}",
             ),
         )
-        val prepUploadResponse = service.prepUpload(prepUploadRequest)
+        val prepUploadResponse = SmileIdentity.api.prepUpload(prepUploadRequest)
         Timber.d("Prep Upload Response: $prepUploadResponse")
         val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
         val selfieImageInfo = selfieFile.asSelfieImage()
         val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
-        service.upload(prepUploadResponse.uploadUrl, uploadRequest)
+        SmileIdentity.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
         Timber.d("Upload finished")
         val jobStatusRequest = JobStatusRequest(
             jobId = prepUploadRequest.partnerParams.jobId,
@@ -281,19 +271,12 @@ class SelfieViewModel : ViewModel() {
         for (i in 1..10) {
             Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
             delay(jobStatusPollDelay)
-            jobStatusResponse = service.getJobStatus(jobStatusRequest)
+            jobStatusResponse = SmileIdentity.api.getJobStatus(jobStatusRequest)
             Timber.v("Job Status Response: $jobStatusResponse")
             if (jobStatusResponse.jobComplete) {
                 break
             }
         }
         return jobStatusResponse
-    }
-
-    private fun getExceptionHandler(callback: SmartSelfieResult.Callback): CoroutineExceptionHandler {
-        return CoroutineExceptionHandler { _, throwable ->
-            Timber.e(throwable, "Error capturing/submitting/polling SmartSelfie")
-            callback.onResult(SmartSelfieResult.Error(throwable))
-        }
     }
 }

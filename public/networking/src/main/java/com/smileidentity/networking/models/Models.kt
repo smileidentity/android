@@ -5,11 +5,17 @@ package com.smileidentity.networking.models
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-@JsonClass(generateAdapter = true)
-data class SmileIdentityServerError(
-    @Json(name = "code") val code: Int,
-    @Json(name = "error") val message: String,
-)
+@Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
+class SmileIdentityException(val details: Details): Exception(details.toString()) {
+
+    // This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
+    // to have parent classes - i.e. Exception as a parent class)
+    @JsonClass(generateAdapter = true)
+    data class Details(
+        @Json(name = "code") val code: Int,
+        @Json(name = "error") val message: String,
+    )
+}
 
 @JsonClass(generateAdapter = true)
 data class PartnerParams(
