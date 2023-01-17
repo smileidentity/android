@@ -78,18 +78,33 @@ data class Actions(
 )
 
 enum class ActionResult {
-    @Json(name = "Passed") Passed,
-    @Json(name = "Approved") Approved,
-    @Json(name = "Provisionally Approved") ProvisionallyApproved,
-    @Json(name = "Failed") Failed,
-    @Json(name = "Rejected") Rejected,
-    @Json(name = "Under Review") UnderReview,
-    @Json(name = "Unable To Determine") UnableToDetermine,
-    @Json(name = "Not Applicable") NotApplicable,
+    @Json(name = "Passed")
+    Passed,
+
+    @Json(name = "Approved")
+    Approved,
+
+    @Json(name = "Provisionally Approved")
+    ProvisionallyApproved,
+
+    @Json(name = "Failed")
+    Failed,
+
+    @Json(name = "Rejected")
+    Rejected,
+
+    @Json(name = "Under Review")
+    UnderReview,
+
+    @Json(name = "Unable To Determine")
+    UnableToDetermine,
+
+    @Json(name = "Not Applicable")
+    NotApplicable,
 }
 
 @JsonClass(generateAdapter = true)
 data class ImageLinks(
     @Json(name = "selfie_image") val selfieImageUrl: String?,
-    @Json(name = "error") val error: String?
+    @Json(name = "error") val error: String?,
 )
