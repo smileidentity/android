@@ -6,7 +6,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
-class SmileIdentityException(val details: Details): Exception(details.toString()) {
+class SmileIdentityException(val details: Details) : Exception(details.toString()) {
 
     // This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
     // to have parent classes - i.e. Exception as a parent class)
@@ -25,5 +25,6 @@ data class PartnerParams(
 )
 
 enum class JobType {
-    @Json(name = "4") SmartSelfieEnrollment,
+    @Json(name = "4")
+    SmartSelfieEnrollment,
 }
