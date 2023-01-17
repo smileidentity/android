@@ -129,7 +129,7 @@ fun MainScreen() {
                             val context = LocalContext.current
                             SmileIdentity.SmartSelfieRegistrationScreen(
                                 agentMode = true,
-                                manualCaptureMode = true
+                                manualCaptureMode = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Registration success"

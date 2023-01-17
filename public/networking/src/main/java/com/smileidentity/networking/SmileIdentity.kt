@@ -87,7 +87,7 @@ object SmileIdentity {
                     }
                 }
                 return@Interceptor chain.proceed(request)
-            }
+            },
         )
         addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
     }

@@ -119,7 +119,7 @@ internal fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExc
                     SmileIdentity.retrofit.responseBodyConverter<SmileIdentityException.Details>(
                         SmileIdentityException.Details::class.java,
                         emptyArray(),
-                    ).convert(throwable.response()?.errorBody()!!)!!
+                    ).convert(throwable.response()?.errorBody()!!)!!,
                 )
             } catch (e: Exception) {
                 Timber.w(e, "Unable to convert HttpException to SmileIdentityServerError")
