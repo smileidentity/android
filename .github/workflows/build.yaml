@@ -24,4 +24,5 @@ jobs:
       - uses: actions/checkout@v3
       - uses: musichin/ktlint-check@v2
         with:
-          ktlint-version: "0.48.0"
+          ktlint-version: "0.48.1"
+          android: true
