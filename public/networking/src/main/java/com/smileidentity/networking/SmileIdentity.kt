@@ -15,15 +15,51 @@ import java.util.logging.Logger
 object SmileIdentity {
     @JvmStatic
     lateinit var api: SmileIdentityService private set
-    internal lateinit var apiKey: String
-    internal lateinit var config: Config
-    internal lateinit var moshi: Moshi
-    lateinit var retrofit: Retrofit
+    val moshi: Moshi = initMoshi()
+    internal lateinit var config: Config private set
+    private lateinit var retrofit: Retrofit
+    // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
+    internal var useSandbox: Boolean = true
+
+    internal var apiKey: String? = null
 
     /**
-     * Initialize the SDK. This must be called before any other SDK methods.
+     * Initialize the SDK. This must be called before any other SDK methods. API calls must first be
+     * authenticated with a call to [SmileIdentityService.authenticate], since this initialization
+     * method does not use an API Key, but rather the auth token from the Config to create a
+     * signature
      *
-     * @param apiKey The API key for your Smile Identity account
+     * @param config The [Config] to use, from the Smile Identity Portal
+     * @param useSandbox Whether to use the sandbox environment. If false, uses production
+     * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun init(
+        config: Config,
+        useSandbox: Boolean = false,
+        okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
+    ) {
+        this.config = config
+        this.useSandbox = useSandbox
+        val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
+
+        retrofit = Retrofit.Builder()
+            .baseUrl(url)
+            .client(okHttpClientBuilder)
+            .addConverterFactory(UploadRequestConverterFactory)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+
+        api = retrofit.create(SmileIdentityService::class.java)
+    }
+
+    /**
+     * Initialize the SDK with an API Key. This must be called before any other SDK methods. API
+     * keys are different from the auth token in the Config. If this initialization method is used,
+     * authToken from [config] need not be used.
+     *
+     * @param apiKey The API Key to use
      * @param config The [Config] to use
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
@@ -37,22 +73,13 @@ object SmileIdentity {
         okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         this.apiKey = apiKey
-        this.config = config
-        this.moshi = Moshi.Builder()
-            .add(StringifiedBooleanAdapter)
-            .add(FileAdapter)
-            .add(JobResultAdapter)
-            .build()
+        init(config, useSandbox, okHttpClientBuilder)
+    }
 
-        val url = if (useSandbox) config.sandboxBaseUrl else config.baseUrl
-
-        retrofit = Retrofit.Builder()
-            .baseUrl(url)
-            .client(okHttpClientBuilder)
-            .addConverterFactory(UploadRequestConverterFactory)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
+    fun setEnvironment(useSandbox: Boolean) {
+        this.useSandbox = useSandbox
+        val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
+        retrofit = retrofit.newBuilder().baseUrl(url).build()
         api = retrofit.create(SmileIdentityService::class.java)
     }
 
@@ -90,5 +117,18 @@ object SmileIdentity {
             },
         )
         addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+    }
+
+    /**
+     * Create the [Moshi] instance used by the SDK. It is declared here instead of [init] because
+     * [Moshi] needs to already be initialized when the UI module attempts to read the config JSON
+     * file directly into a [Config], which needs to happen as a prerequisite to the [init] call
+     */
+    private fun initMoshi(): Moshi {
+        return Moshi.Builder()
+            .add(StringifiedBooleanAdapter)
+            .add(FileAdapter)
+            .add(JobResultAdapter)
+            .build()
     }
 }

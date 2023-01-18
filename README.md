@@ -17,8 +17,8 @@ project consisting of the following modules:
 - Android Gradle Plugin 7.4.0 or higher
 - Android SDK 33
 - Local JDK 11 installation (potentially up to JDK 18, but not tested)
-- Add `SMILE_IDENTITY_API_KEY=<API Key from Smile Identity Portal>` to `~/.gradle/gradle.properties`
 - Add `SENTRY_DSN=<Android project Sentry DSN from Sentry Portal>` to `~/.gradle/gradle.properties`
+- Add `smile_config.json` to the Sample App's assets (`public/sample/src/main/assets`)
 
 ## Building
 

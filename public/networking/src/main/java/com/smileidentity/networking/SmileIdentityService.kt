@@ -1,5 +1,7 @@
 package com.smileidentity.networking
 
+import com.smileidentity.networking.models.AuthenticationRequest
+import com.smileidentity.networking.models.AuthenticationResponse
 import com.smileidentity.networking.models.JobStatusRequest
 import com.smileidentity.networking.models.JobStatusResponse
 import com.smileidentity.networking.models.PrepUploadRequest
@@ -12,6 +14,9 @@ import retrofit2.http.Url
 
 @Suppress("unused")
 interface SmileIdentityService {
+    @POST("/v1/auth_smile")
+    suspend fun authenticate(@Body request: AuthenticationRequest): AuthenticationResponse
+
     @POST("/v1/upload")
     suspend fun prepUpload(@Body request: PrepUploadRequest): PrepUploadResponse
 

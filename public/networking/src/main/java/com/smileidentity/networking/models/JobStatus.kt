@@ -33,7 +33,7 @@ data class JobStatusResponse(
 
 /**
  * The job result might sometimes be a freeform text field instead of an object (i.e. when the
- * zip uploading has not finished processing on the backend, and so "No zip uploaded" is
+ * zip upload has not finished processing on the backend, in which case "No zip uploaded" is
  * returned).
  */
 sealed interface JobResult {

@@ -12,12 +12,14 @@ java {
 
 dependencies {
     def retrofitVersion = "2.9.0"
+    // Retrofit is exposed in public SmileIdentity interface, hence "api" vs "implementation"
     api "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
 
     def moshiVersion = "1.14.0"
-    implementation "com.squareup.moshi:moshi:$moshiVersion"
+    // Moshi is exposed in public SmileIdentity interface, hence "api" vs "implementation"
+    api "com.squareup.moshi:moshi:$moshiVersion"
     implementation "com.squareup.moshi:moshi-adapters:$moshiVersion"
     ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
 }

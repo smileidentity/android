@@ -13,10 +13,10 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.networking.models.AuthenticationRequest
 import com.smileidentity.networking.models.JobStatusRequest
 import com.smileidentity.networking.models.JobStatusResponse
 import com.smileidentity.networking.models.JobType
-import com.smileidentity.networking.models.PartnerParams
 import com.smileidentity.networking.models.PrepUploadRequest
 import com.smileidentity.networking.models.UploadRequest
 import com.smileidentity.ui.R
@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -244,13 +243,17 @@ class SelfieViewModel : ViewModel() {
     private suspend fun submit(selfieFile: File, livenessFiles: List<File>): JobStatusResponse {
         _uiState.update { it.copy(isWaitingForResult = true) }
 
+        val authRequest = AuthenticationRequest(
+            jobType = JobType.SmartSelfieEnrollment,
+            enrollment = true,
+        )
+        val authResponse = SmileIdentity.api.authenticate(authRequest)
+
         val prepUploadRequest = PrepUploadRequest(
             callbackUrl = "",
-            partnerParams = PartnerParams(
-                jobType = JobType.SmartSelfieEnrollment,
-                jobId = "job-${UUID.randomUUID()}",
-                userId = "user-${UUID.randomUUID()}",
-            ),
+            partnerParams = authResponse.partnerParams,
+            signature = authResponse.signature,
+            timestamp = authResponse.timestamp,
         )
         val prepUploadResponse = SmileIdentity.api.prepUpload(prepUploadRequest)
         Timber.d("Prep Upload Response: $prepUploadResponse")
@@ -260,10 +263,12 @@ class SelfieViewModel : ViewModel() {
         SmileIdentity.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
         Timber.d("Upload finished")
         val jobStatusRequest = JobStatusRequest(
-            jobId = prepUploadRequest.partnerParams.jobId,
-            userId = prepUploadRequest.partnerParams.userId,
+            jobId = authResponse.partnerParams.jobId,
+            userId = authResponse.partnerParams.userId,
             includeImageLinks = false,
             includeHistory = false,
+            signature = authResponse.signature,
+            timestamp = authResponse.timestamp,
         )
 
         lateinit var jobStatusResponse: JobStatusResponse

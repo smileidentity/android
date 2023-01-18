@@ -14,9 +14,12 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
-import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.networking.SmileIdentity.moshi
+import com.smileidentity.networking.models.Config
 import com.smileidentity.networking.models.SmileIdentityException
 import kotlinx.coroutines.CoroutineExceptionHandler
+import okio.buffer
+import okio.source
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
@@ -114,13 +117,10 @@ internal fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExc
     return CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable, "Error during coroutine execution")
         val converted = if (throwable is HttpException) {
+            val adapter = moshi.adapter(SmileIdentityException.Details::class.java)
             try {
-                SmileIdentityException(
-                    SmileIdentity.retrofit.responseBodyConverter<SmileIdentityException.Details>(
-                        SmileIdentityException.Details::class.java,
-                        emptyArray(),
-                    ).convert(throwable.response()?.errorBody()!!)!!,
-                )
+                val details = adapter.fromJson(throwable.response()?.errorBody()?.source()!!)!!
+                SmileIdentityException(details)
             } catch (e: Exception) {
                 Timber.w(e, "Unable to convert HttpException to SmileIdentityServerError")
                 // More informative to pass back the original exception than the conversion error
@@ -130,5 +130,11 @@ internal fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExc
             throwable
         }
         proxy(converted)
+    }
+}
+
+fun Config.Companion.fromAssets(context: Context): Config {
+    context.assets.open("smile_config.json").source().buffer().use {
+        return moshi.adapter(Config::class.java).fromJson(it)!!
     }
 }

@@ -11,9 +11,10 @@ import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-internal fun calculateSignature(timestamp: String): String {
+fun calculateSignature(timestamp: String): String {
+    val apiKey = SmileIdentity.apiKey ?: throw IllegalStateException("API key not set")
     val hashContent = timestamp + SmileIdentity.config.partnerId + "sid_request"
-    return hashContent.encode().hmacSha256(SmileIdentity.apiKey.encode()).base64()
+    return hashContent.encode().hmacSha256(apiKey.encode()).base64()
 }
 
 fun UploadRequest.zip(): File {
