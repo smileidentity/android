@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.core
 
 import io.sentry.Hub
 import io.sentry.NoOpHub

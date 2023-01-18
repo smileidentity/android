@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">Smile Identity Sample</string>
+    <string name="app_name">Smile Identity</string>
+    <string name="home">Home</string>
+    <string name="back">Back</string>
+    <string name="test_our_products">Test Our Products</string>
+    <string name="product_name_icon">%1$s icon</string>
+    <string name="okay">Okay</string>
+
+    <string name="resources">Resources</string>
+    <string name="resources_explore_docs_title">Explore our documentation</string>
+    <string name="resources_explore_docs_subtitle">Read everything related to our solution stack</string>
+    <string name="resources_privacy_policy_title">Privacy Policy</string>
+    <string name="resources_privacy_policy_subtitle">Learn more about how we handle data</string>
+    <string name="resources_faqs_title">View FAQs</string>
+    <string name="resources_faqs_subtitle">Explore frequently asked questions</string>
+    <string name="resources_supported_types_title">Supported ID types and documents</string>
+    <string name="resources_supported_types_subtitle">See our coverage range across the continent</string>
+
+
+    <string name="about_us">About Us</string>
+    <string name="about_us_who_we_are">Who we are</string>
+    <string name="about_us_who_we_are_content">Smile Identity products are tools for developers to perform real-time digital KYC, identity verification, user onboarding, and user authentication across Africa</string>
+    <string name="about_us_visit_our_website">Visit our website</string>
+    <string name="about_us_contact_support">Contact support</string>
 </resources>
