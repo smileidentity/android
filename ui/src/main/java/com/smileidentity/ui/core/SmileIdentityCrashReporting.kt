@@ -68,7 +68,7 @@ object SmileIdentityCrashReporting {
     @JvmStatic
     fun disable() {
         hub.options.isEnableUncaughtExceptionHandler = false
-        hub.options.integrations.forEach {
+        for (it in hub.options.integrations) {
             if (it is UncaughtExceptionHandlerIntegration) {
                 it.close()
             }
