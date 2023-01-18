@@ -1,7 +1,7 @@
 buildscript {
     ext {
         android_gradle_plugin_version = project.getProperties().get("AGP_VERSION", "7.4.0")
-        kotlin_version = "1.7.20"
+        kotlin_version = "1.8.0"
         ksp_version = "$kotlin_version-1.0.8"
     }
 }
