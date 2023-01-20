@@ -17,11 +17,16 @@ class SmileIdentityException(val details: Details) : Exception(details.toString(
     )
 }
 
-@JsonClass(generateAdapter = true)
+/**
+ * Custom values specific to partners can be placed in [extras]
+ */
+// The class uses a custom adapter in order to support placing the key-value pairs in [extras] into
+// top level fields in the JSON
 data class PartnerParams(
-    @Json(name = "job_id") val jobId: String,
-    @Json(name = "user_id") val userId: String,
-    @Json(name = "job_type") val jobType: JobType,
+    val jobId: String,
+    val userId: String,
+    val jobType: JobType,
+    val extras: Map<String, String> = mapOf(),
 )
 
 enum class JobType {

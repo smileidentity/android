@@ -1,11 +1,14 @@
 package com.smileidentity.networking
 
 import com.smileidentity.networking.models.JobResult
+import com.smileidentity.networking.models.JobType
+import com.smileidentity.networking.models.PartnerParams
 import com.smileidentity.networking.models.UploadRequest
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
@@ -14,6 +17,39 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import java.io.File
 import java.lang.reflect.Type
+
+@Suppress("unused")
+object PartnerParamsAdapter {
+    @ToJson
+    fun toJson(
+        writer: JsonWriter,
+        partnerParams: PartnerParams,
+        mapDelegate: JsonAdapter<Map<String, String>>,
+        jobTypeDelegate: JsonAdapter<JobType>,
+    ) {
+        val map = partnerParams.extras + mapOf(
+            "job_id" to partnerParams.jobId,
+            "user_id" to partnerParams.userId,
+            "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as String,
+        )
+        mapDelegate.toJson(writer, map)
+    }
+
+    @FromJson
+    fun fromJson(
+        jsonReader: JsonReader,
+        mapDelegate: JsonAdapter<Map<String, String>>,
+        jobTypeDelegate: JsonAdapter<JobType>,
+    ): PartnerParams {
+        val paramsJson = mapDelegate.fromJson(jsonReader) ?: mapOf()
+        return PartnerParams(
+            jobId = paramsJson["job_id"] ?: "",
+            userId = paramsJson["user_id"] ?: "",
+            jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"] as String)!!,
+            extras = paramsJson - listOf("job_id", "user_id", "job_type"),
+        )
+    }
+}
 
 object UploadRequestConverterFactory : Converter.Factory() {
     override fun requestBodyConverter(

@@ -127,6 +127,7 @@ object SmileIdentity {
      */
     private fun initMoshi(): Moshi {
         return Moshi.Builder()
+            .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
             .add(FileAdapter)
             .add(JobResultAdapter)
