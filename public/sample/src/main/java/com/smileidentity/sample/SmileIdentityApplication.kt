@@ -14,13 +14,12 @@ class SmileIdentityApplication : Application() {
         Timber.plant(Timber.DebugTree())
         DynamicColors.applyToActivitiesIfAvailable(this)
         @Suppress("DEPRECATION")
+        val chucker = ChuckerInterceptor(this)
         SmileIdentity.init(
             context = this,
             useSandbox = BuildConfig.DEBUG,
             enableCrashReporting = BuildConfig.DEBUG,
-            okHttpClient = getOkHttpClientBuilder()
-                .addInterceptor(ChuckerInterceptor(this))
-                .build()
+            okHttpClient = getOkHttpClientBuilder().addInterceptor(chucker).build(),
         )
     }
 }
