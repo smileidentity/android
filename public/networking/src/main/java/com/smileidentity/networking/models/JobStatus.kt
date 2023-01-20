@@ -49,7 +49,7 @@ sealed interface JobResult {
         @Json(name = "SmileJobID") val smileJobId: String,
         @Json(name = "JSONVersion") val jsonVersion: String,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
-        @Json(name = "ConfidenceValue") val confidence: Int,
+        @Json(name = "ConfidenceValue") val confidence: Double,
 
         @Json(name = "IsFinalResult") @StringifiedBoolean
         val isFinalResult: Boolean,

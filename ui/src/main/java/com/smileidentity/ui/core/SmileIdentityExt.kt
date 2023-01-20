@@ -13,14 +13,14 @@ import okhttp3.OkHttpClient
  * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
  * Identity related crashes. This is powered by Sentry, and further details on inner workings can be
  * found in the source docs for [SmileIdentityCrashReporting]
- * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
+ * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
  */
 @JvmOverloads
 fun SmileIdentity.init(
     context: Context,
     useSandbox: Boolean = false,
     enableCrashReporting: Boolean = false,
-    okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
+    okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
 ) {
     if (enableCrashReporting) {
         SmileIdentityCrashReporting.enable()
@@ -28,6 +28,6 @@ fun SmileIdentity.init(
     init(
         config = Config.fromAssets(context),
         useSandbox = useSandbox,
-        okHttpClientBuilder = okHttpClientBuilder,
+        okHttpClient = okHttpClient,
     )
 }

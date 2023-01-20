@@ -32,14 +32,14 @@ object SmileIdentity {
      *
      * @param config The [Config] to use, from the Smile Identity Portal
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
+     * @param okHttpClient The [OkHttpClient] to use for the network requests
      */
     @JvmStatic
     @JvmOverloads
     fun init(
         config: Config,
         useSandbox: Boolean = false,
-        okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         this.config = config
         this.useSandbox = useSandbox
@@ -47,7 +47,7 @@ object SmileIdentity {
 
         retrofit = Retrofit.Builder()
             .baseUrl(url)
-            .client(okHttpClientBuilder)
+            .client(okHttpClient)
             .addConverterFactory(UploadRequestConverterFactory)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
