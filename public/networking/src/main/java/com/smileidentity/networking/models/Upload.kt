@@ -52,7 +52,7 @@ data class UploadPackageInformation(
 
 @JsonClass(generateAdapter = true)
 data class ApiVersion(
-    @Json(name = "buildNumber") val buildNumber: Int = 0,
+    @Json(name = "buildNumber") val buildNumber: Int = 2,
     @Json(name = "majorVersion") val majorVersion: Int = 2,
-    @Json(name = "minorVersion") val minorVersion: Int = 0,
+    @Json(name = "minorVersion") val minorVersion: Int = 1,
 )
