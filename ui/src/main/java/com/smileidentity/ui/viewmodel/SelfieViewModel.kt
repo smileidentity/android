@@ -140,15 +140,15 @@ class SelfieViewModel : ViewModel() {
     }
 
     @SuppressLint("UnsafeOptInUsageError")
-    fun analyzeImage(proxy: ImageProxy, callback: SmartSelfieResult.Callback) {
-        val image = proxy.image
+    fun analyzeImage(imageProxy: ImageProxy, callback: SmartSelfieResult.Callback) {
+        val image = imageProxy.image
         val elapsedTime = System.currentTimeMillis() - lastAutoCaptureTimeMs
         if (!shouldAnalyzeImages || elapsedTime < intraImageMinDelayMs || image == null) {
-            proxy.close()
+            imageProxy.close()
             return
         }
 
-        val inputImage = InputImage.fromMediaImage(image, proxy.imageInfo.rotationDegrees)
+        val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
             Timber.d("Detected Faces: $faces")
             if (faces.isEmpty()) {
@@ -194,7 +194,7 @@ class SelfieViewModel : ViewModel() {
                 it.copy(currentDirective = R.string.si_smartselfie_directive_capturing)
             }
 
-            BitmapUtils.getBitmap(proxy)?.let { bitmap ->
+            BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
                 // All conditions satisfied, capture the image
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
                 if (livenessFiles.size < numLivenessImages) {
@@ -225,7 +225,8 @@ class SelfieViewModel : ViewModel() {
                         it.copy(progress = 1f)
                     }
                     shouldAnalyzeImages = false
-                    viewModelScope.launch {
+                    val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(e)) }
+                    viewModelScope.launch(getExceptionHandler(proxy)) {
                         val jobStatusResponse = submit(selfieFile, livenessFiles)
                         callback.onResult(Success(selfieFile, livenessFiles, jobStatusResponse))
                     }
@@ -236,7 +237,7 @@ class SelfieViewModel : ViewModel() {
         }.addOnCompleteListener { faces ->
             Timber.d("Complete: $faces")
             // Closing the proxy allows the next image to be delivered to the analyzer
-            proxy.close()
+            imageProxy.close()
         }
     }
 
