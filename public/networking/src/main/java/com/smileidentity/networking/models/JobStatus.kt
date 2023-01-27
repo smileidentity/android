@@ -61,20 +61,47 @@ sealed interface JobResult {
 
 @JsonClass(generateAdapter = true)
 data class Actions(
-    @Json(name = "Human_Review_Compare") val humanReviewCompare: ActionResult,
-    @Json(name = "Human_Review_Liveness_Check") val humanReviewLivenessCheck: ActionResult,
-    @Json(name = "Human_Review_Selfie_Check") val humanReviewSelfieCheck: ActionResult,
-    @Json(name = "Human_Review_Update_Selfie") val humanReviewUpdateSelfie: ActionResult,
-    @Json(name = "Liveness_Check") val livenessCheck: ActionResult,
-    @Json(name = "Selfie_Check") val selfieCheck: ActionResult,
-    @Json(name = "Register_Selfie") val registerSelfie: ActionResult,
-    @Json(name = "Return_Personal_Info") val returnPersonalInfo: ActionResult,
-    @Json(name = "Selfie_Provided") val selfieProvided: ActionResult,
-    @Json(name = "Selfie_To_ID_Authority_Compare") val selfieToIdAuthorityCompare: ActionResult,
-    @Json(name = "Selfie_To_ID_Card_Compare") val selfieToIdCardCompare: ActionResult,
-    @Json(name = "Selfie_To_Registered_Selfie_Compare") val selfieToRegisteredSelfieCompare: ActionResult,
-    @Json(name = "Update_Registered_Selfie_On_File") val updateRegisteredSelfieOnFile: ActionResult,
-    @Json(name = "Verify_ID_Number") val verifyIdNumber: ActionResult,
+    @Json(name = "Human_Review_Compare")
+    val humanReviewCompare: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Human_Review_Liveness_Check")
+    val humanReviewLivenessCheck: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Human_Review_Selfie_Check")
+    val humanReviewSelfieCheck: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Human_Review_Update_Selfie")
+    val humanReviewUpdateSelfie: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Liveness_Check")
+    val livenessCheck: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Selfie_Check")
+    val selfieCheck: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Register_Selfie")
+    val registerSelfie: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Return_Personal_Info")
+    val returnPersonalInfo: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Selfie_Provided")
+    val selfieProvided: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Selfie_To_ID_Authority_Compare")
+    val selfieToIdAuthorityCompare: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Selfie_To_ID_Card_Compare")
+    val selfieToIdCardCompare: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Selfie_To_Registered_Selfie_Compare")
+    val selfieToRegisteredSelfieCompare: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Update_Registered_Selfie_On_File")
+    val updateRegisteredSelfieOnFile: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Verify_ID_Number")
+    val verifyIdNumber: ActionResult = ActionResult.NotApplicable,
 )
 
 enum class ActionResult {
