@@ -18,6 +18,7 @@ data class PrepUploadRequest(
     @Json(name = "callback_url") val callbackUrl: String? = null,
     @Json(name = "smile_client_id") val partnerId: String = SmileIdentity.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
+    // TODO: Fetch the version from gradle, once we are set up for distribution
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = "2.0.0",
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
