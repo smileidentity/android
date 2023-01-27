@@ -63,7 +63,7 @@ object SmileIdentity {
      * @param apiKey The API Key to use
      * @param config The [Config] to use
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param okHttpClientBuilder An optional [OkHttpClient.Builder] to use for the network requests
+     * @param okHttpClient The [OkHttpClient] to use for the network requests
      */
     @JvmStatic
     @JvmOverloads
@@ -71,10 +71,10 @@ object SmileIdentity {
         apiKey: String,
         config: Config,
         useSandbox: Boolean = false,
-        okHttpClientBuilder: OkHttpClient = getOkHttpClientBuilder().build(),
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         this.apiKey = apiKey
-        init(config, useSandbox, okHttpClientBuilder)
+        init(config, useSandbox, okHttpClient)
     }
 
     fun setEnvironment(useSandbox: Boolean) {
