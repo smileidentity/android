@@ -221,9 +221,7 @@ class SelfieViewModel : ViewModel() {
                         compressionQuality = 80,
                         maxOutputSize = selfieImageSize,
                     )
-                    _uiState.update {
-                        it.copy(progress = 1f)
-                    }
+                    _uiState.update { it.copy(progress = 1f) }
                     shouldAnalyzeImages = false
                     val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(e)) }
                     viewModelScope.launch(getExceptionHandler(proxy)) {
