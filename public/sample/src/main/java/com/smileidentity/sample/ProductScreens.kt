@@ -28,7 +28,10 @@ import androidx.compose.ui.unit.dp
 @Preview
 @Composable
 fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
-    val products = listOf(Screens.SmartSelfieRegistration)
+    val products = listOf(
+        Screens.SmartSelfieRegistration,
+        Screens.SmartSelfieAuthentication,
+    )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -44,6 +47,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
             items(products) {
                 Card(
                     modifier = Modifier
+                        .padding(8.dp)
                         .size(96.dp)
                         .clickable(onClick = { onProductSelected(it) }),
                 ) {

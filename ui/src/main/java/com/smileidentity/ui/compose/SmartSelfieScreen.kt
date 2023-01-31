@@ -56,7 +56,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SmartSelfieResult
+import com.smileidentity.ui.core.randomUserId
 import com.smileidentity.ui.core.toast
+import com.smileidentity.ui.core.viewModelFactory
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
@@ -70,14 +72,22 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun SmartSelfieOrPermissionScreen(
-    agentMode: Boolean = false,
-    manualCaptureMode: Boolean = false,
+    userId: String = randomUserId(),
+    isEnroll: Boolean = false,
+    allowAgentMode: Boolean = false,
+    allowManualCapture: Boolean = false,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val context = LocalContext.current
     if (cameraPermissionState.status.isGranted) {
-        SmartSelfieRegistrationScreen(agentMode, manualCaptureMode, onResult = onResult)
+        SmartSelfieRegistrationScreen(
+            userId,
+            isEnroll,
+            allowAgentMode,
+            allowManualCapture,
+            onResult = onResult,
+        )
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
@@ -99,25 +109,29 @@ internal fun SmartSelfieOrPermissionScreen(
 @Preview
 @Composable
 private fun SmartSelfieRegistrationScreen(
-    agentMode: Boolean = false,
-    manualCaptureMode: Boolean = false,
-    viewModel: SelfieViewModel = viewModel(),
+    userId: String = randomUserId(),
+    isEnroll: Boolean = false,
+    allowAgentMode: Boolean = false,
+    allowManualCapture: Boolean = false,
+    viewModel: SelfieViewModel = viewModel(factory = viewModelFactory { SelfieViewModel(isEnroll, userId) }),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     if (uiState.isWaitingForResult) {
         ProcessingScreen()
     } else {
-        SelfieCaptureScreen(agentMode, manualCaptureMode, onResult = onResult)
+        SelfieCaptureScreen(userId, isEnroll, allowAgentMode, allowManualCapture, onResult = onResult)
     }
 }
 
 @Preview
 @Composable
 internal fun SelfieCaptureScreen(
-    agentMode: Boolean = false,
-    manualCaptureMode: Boolean = false,
-    viewModel: SelfieViewModel = viewModel(),
+    userId: String = randomUserId(),
+    isEnroll: Boolean = false,
+    allowAgentMode: Boolean = false,
+    allowManualCapture: Boolean = false,
+    viewModel: SelfieViewModel = viewModel(factory = viewModelFactory { SelfieViewModel(isEnroll, userId) }),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
@@ -148,7 +162,7 @@ internal fun SelfieCaptureScreen(
             verticalArrangement = Arrangement.Top,
         ) {
             val isAgentModeEnabled = camSelector == CamSelector.Back
-            if (agentMode) {
+            if (allowAgentMode) {
                 val agentModeBackgroundColor = if (isAgentModeEnabled) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -234,7 +248,7 @@ internal fun SelfieCaptureScreen(
                 modifier = Modifier.padding(8.dp),
             )
 
-            if (manualCaptureMode && cameraState.isInitialized && !uiState.isCapturing) {
+            if (allowManualCapture && cameraState.isInitialized && !uiState.isCapturing) {
                 Button(
                     modifier = Modifier
                         .padding(8.dp)

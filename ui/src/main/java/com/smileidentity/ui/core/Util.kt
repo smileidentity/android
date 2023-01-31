@@ -13,6 +13,8 @@ import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.graphics.scale
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.networking.SmileIdentity.moshi
 import com.smileidentity.networking.models.Config
@@ -138,3 +140,11 @@ fun Config.Companion.fromAssets(context: Context): Config {
         return moshi.adapter(Config::class.java).fromJson(it)!!
     }
 }
+
+@Suppress("UNCHECKED_CAST")
+inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =
+    object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = f() as T
+    }
+
+fun randomUserId() = "user-" + java.util.UUID.randomUUID().toString()

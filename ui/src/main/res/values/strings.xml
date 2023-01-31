@@ -12,6 +12,7 @@
 
     <!--  SmartSelfie  -->
     <string name="si_smartselfie_registration_product_name">SmartSelfie™ Registration</string>
+    <string name="si_smartselfie_authentication_product_name">SmartSelfie™ Authentication</string>
     <string name="si_smartselfie_instructions">Put your face inside the oval frame and wait until it turns blue</string>
     <string name="si_smartselfie_directive_smile">Smile for the camera!</string>
     <string name="si_smartselfie_directive_capturing">Capturing…</string>
