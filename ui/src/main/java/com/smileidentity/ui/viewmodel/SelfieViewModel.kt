@@ -45,11 +45,20 @@ import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration.Companion.seconds
 
 data class SelfieUiState(
-    @StringRes val currentDirective: Int = R.string.si_smartselfie_instructions,
+    val currentDirective: Directive = Directive.InitialInstruction,
     val progress: Float = 0f,
     val isCapturing: Boolean = false,
     val isWaitingForResult: Boolean = false,
 )
+
+enum class Directive(@StringRes val displayText: Int) {
+    InitialInstruction(R.string.si_smartselfie_instructions),
+    Capturing(R.string.si_smartselfie_directive_capturing),
+    EnsureFaceInFrame(R.string.si_smartselfie_directive_unable_to_detect_face),
+    MoveCloser(R.string.si_smartselfie_directive_face_too_far),
+    MoveAway(R.string.si_smartselfie_directive_face_too_close),
+    Smile(R.string.si_smartselfie_directive_smile),
+}
 
 class SelfieViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -81,10 +90,7 @@ class SelfieViewModel : ViewModel() {
     ) {
         shouldAnalyzeImages = false
         _uiState.update {
-            it.copy(
-                isCapturing = true,
-                currentDirective = R.string.si_smartselfie_directive_capturing,
-            )
+            it.copy(isCapturing = true, currentDirective = Directive.Capturing)
         }
 
         val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(e)) }
@@ -152,9 +158,7 @@ class SelfieViewModel : ViewModel() {
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
             Timber.d("Detected Faces: $faces")
             if (faces.isEmpty()) {
-                _uiState.update {
-                    it.copy(currentDirective = R.string.si_smartselfie_directive_unable_to_detect_face)
-                }
+                _uiState.update { it.copy(currentDirective = Directive.EnsureFaceInFrame) }
                 return@addOnSuccessListener
             }
 
@@ -165,18 +169,14 @@ class SelfieViewModel : ViewModel() {
             // Check that the face is close enough to the camera
             val minFaceAreaThreshold = 0.25
             if (faceFillRatio < minFaceAreaThreshold) {
-                _uiState.update {
-                    it.copy(currentDirective = R.string.si_smartselfie_directive_face_too_far)
-                }
+                _uiState.update { it.copy(currentDirective = Directive.MoveCloser) }
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
             val maxFaceAreaThreshold = 0.50
             if (faceFillRatio > maxFaceAreaThreshold) {
-                _uiState.update {
-                    it.copy(currentDirective = R.string.si_smartselfie_directive_face_too_close)
-                }
+                _uiState.update { it.copy(currentDirective = Directive.MoveAway) }
                 return@addOnSuccessListener
             }
 
@@ -184,15 +184,11 @@ class SelfieViewModel : ViewModel() {
             val smileThreshold = 0.8
             val isSmiling = (largestFace.smilingProbability ?: 0f) > smileThreshold
             if (livenessFiles.size == numLivenessImages && !isSmiling) {
-                _uiState.update {
-                    it.copy(currentDirective = R.string.si_smartselfie_directive_smile)
-                }
+                _uiState.update { it.copy(currentDirective = Directive.Smile) }
                 return@addOnSuccessListener
             }
 
-            _uiState.update {
-                it.copy(currentDirective = R.string.si_smartselfie_directive_capturing)
-            }
+            _uiState.update { it.copy(currentDirective = Directive.Capturing) }
 
             BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
                 // All conditions satisfied, capture the image
