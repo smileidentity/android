@@ -15,9 +15,12 @@ import com.smileidentity.ui.core.randomUserId
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
- * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be displayed
- * allowing toggling between the back camera and front camera. If not allowed, only the front camera
- * will be used.
+ * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often, this
+ * will correspond to a unique User ID within your own system. If not provided, a random user ID
+ * will be generated.
+ * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be
+ * displayed allowing toggling between the back camera and front camera. If not allowed, only the
+ * front camera will be used.
  * @param allowManualCapture Whether to allow the manual capture mode or not. If not allowed,
  * captures will be automatically taken when a face is detected. If allowed, a button will be
  * displayed to allow the user to manually initiate liveness and selfie capture. This has a higher
@@ -47,6 +50,21 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
 
 /**
  * Perform a SmartSelfie™ Authentication
+ *
+ * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
+ *
+ * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
+ * an ID that was previously passed to a SmartSelfie™ Registration
+ * (see: [SmileIdentity.SmartSelfieRegistrationScreen])
+ * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be
+ * displayed allowing toggling between the back camera and front camera. If not allowed, only the
+ * front camera will be used.
+ * @param allowManualCapture Whether to allow the manual capture mode or not. If not allowed,
+ * captures will be automatically taken when a face is detected. If allowed, a button will be
+ * displayed to allow the user to manually initiate liveness and selfie capture. This has a higher
+ * likelihood of Job failure, as the user may not take the selfie under the correct conditions. When
+ * this mode is enabled, face detection will still be performed.
+ * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
 // Since Experimental APIs are *not* exposed in the outward-facing API, consumers won't need to
 // add the @OptIn annotation to use this API.
