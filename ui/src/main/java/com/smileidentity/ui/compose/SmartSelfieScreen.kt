@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -53,10 +55,9 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
-import com.smileidentity.ui.core.SelfieCaptureResultCallback
+import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.viewmodel.SelfieViewModel
-import com.smileidentity.ui.viewmodel.isCapturing
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
@@ -68,40 +69,18 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SelfieCaptureOrPermissionScreen(
-    agentMode: Boolean = false,
-    manualCaptureMode: Boolean = false,
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
-) {
-    SelfieCaptureOrPermissionScreen(
-        agentMode,
-        manualCaptureMode,
-        rememberPermissionState(Manifest.permission.CAMERA),
-        onResult,
-    )
-}
-
-/**
- * The internal modifier is used to prevent the function from being called from outside the module
- * as this is for testing purposes only. This is because others consumers would need to use the
- * @OptIn(ExperimentalPermissionsApi::class) annotation to use this function.
- */
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-internal fun SelfieCaptureOrPermissionScreen(
+internal fun SmartSelfieOrPermissionScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val context = LocalContext.current
     if (cameraPermissionState.status.isGranted) {
-        SelfieCaptureScreenContent(agentMode, manualCaptureMode, onResult = onResult)
+        SmartSelfieRegistrationScreen(agentMode, manualCaptureMode, onResult = onResult)
     } else {
         SideEffect {
             if (cameraPermissionState.status.shouldShowRationale) {
-                cameraPermissionState.launchPermissionRequest()
-            } else {
                 // The user has permanently denied the permission, so we can't request it again.
                 // We can, however, direct the user to the app settings screen to manually
                 // enable the permission.
@@ -110,6 +89,8 @@ internal fun SelfieCaptureOrPermissionScreen(
                     data = Uri.fromParts("package", context.packageName, null)
                 }
                 context.startActivity(intent)
+            } else {
+                cameraPermissionState.launchPermissionRequest()
             }
         }
     }
@@ -117,11 +98,27 @@ internal fun SelfieCaptureOrPermissionScreen(
 
 @Preview
 @Composable
-fun SelfieCaptureScreenContent(
+private fun SmartSelfieRegistrationScreen(
     agentMode: Boolean = false,
     manualCaptureMode: Boolean = false,
     viewModel: SelfieViewModel = viewModel(),
-    onResult: SelfieCaptureResultCallback = SelfieCaptureResultCallback {},
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
+) {
+    val uiState = viewModel.uiState.collectAsState().value
+    if (uiState.isWaitingForResult) {
+        ProcessingScreen()
+    } else {
+        SelfieCaptureScreen(agentMode, manualCaptureMode, onResult = onResult)
+    }
+}
+
+@Preview
+@Composable
+internal fun SelfieCaptureScreen(
+    agentMode: Boolean = false,
+    manualCaptureMode: Boolean = false,
+    viewModel: SelfieViewModel = viewModel(),
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val cameraState = rememberCameraState()
@@ -184,6 +181,7 @@ fun SelfieCaptureScreenContent(
                         },
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             // Display only this shape in the Preview -- however, capture the whole image. This is
@@ -259,12 +257,33 @@ fun SelfieCaptureScreenContent(
                     tint = Color.Black,
                 )
                 Text(
-                    text = stringResource(R.string.si_selfie_capture_instructions),
+                    text = stringResource(R.string.si_smartselfie_instructions),
                     // The text color must be forced to black due to white background
                     color = Color.Black,
                 )
             }
             SmileIdentityAttribution()
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ProcessingScreen() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+    ) {
+        CircularProgressIndicator(modifier = Modifier.size(64.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.si_smartselfie_processing),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(8.dp),
+        )
     }
 }

@@ -9,13 +9,15 @@
 N/A
 
 ### Dependencies
+- Retrofit
+- Moshi
+- Timber
 - AndroidX
   - Core
   - AppCompat
   - Lifecycle
   - Compose
   - Camera
-- Timber
 - Sentry
 - Accompanist
 - Camposer

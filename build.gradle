@@ -1,9 +1,8 @@
 buildscript {
     ext {
-        android_gradle_plugin_version = project.getProperties().get("AGP_VERSION", "7.3.1")
-        kotlin_version = "1.7.20"
-        retrofit_version = "2.9.0"
-        moshi_version = "1.14.0"
+        android_gradle_plugin_version = project.getProperties().get("AGP_VERSION", "7.4.0")
+        kotlin_version = "1.8.0"
+        ksp_version = "$kotlin_version-1.0.8"
     }
 }
 
@@ -17,6 +16,7 @@ plugins {
     id "com.android.library" version "$android_gradle_plugin_version" apply false
     id "com.android.application" version "$android_gradle_plugin_version" apply false
     id "org.jetbrains.kotlin.android" version "$kotlin_version" apply false
+    id "com.google.devtools.ksp" version "$ksp_version" apply false
 }
 
 task clean(type: Delete) {

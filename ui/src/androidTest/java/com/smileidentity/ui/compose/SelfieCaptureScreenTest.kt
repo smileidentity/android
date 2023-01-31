@@ -12,7 +12,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.smileidentity.ui.core.SelfieCaptureResultCallback
+import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.smileidentity.ui.waitUntilExists
 import io.mockk.Runs
@@ -41,7 +42,7 @@ class SelfieCaptureScreenTest {
 
         // when
         composeTestRule.setContent {
-            SelfieCaptureOrPermissionScreen(cameraPermissionState = permissionState)
+            SmartSelfieOrPermissionScreen(cameraPermissionState = permissionState)
         }
 
         // then
@@ -57,7 +58,7 @@ class SelfieCaptureScreenTest {
         val cameraPreviewTag = "cameraPreview"
 
         // when
-        composeTestRule.setContent { SelfieCaptureOrPermissionScreen() }
+        composeTestRule.setContent { SmileIdentity.SmartSelfieRegistrationScreen() }
 
         // then
         verify(exactly = 0) { permissionState.launchPermissionRequest() }
@@ -70,7 +71,7 @@ class SelfieCaptureScreenTest {
         val attributionTag = "smileIdentityAttribution"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreenContent() }
+        composeTestRule.setContent { SelfieCaptureScreen() }
 
         // then
         composeTestRule.onNodeWithTag(attributionTag).assertIsDisplayed()
@@ -83,7 +84,7 @@ class SelfieCaptureScreenTest {
         val switchTag = "agentModeSwitch"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreenContent(agentMode = true) }
+        composeTestRule.setContent { SelfieCaptureScreen(agentMode = true) }
 
         // then
         composeTestRule.onNodeWithText(labelText).assertIsDisplayed()
@@ -97,7 +98,7 @@ class SelfieCaptureScreenTest {
         val switchTag = "agentModeSwitch"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreenContent(agentMode = false) }
+        composeTestRule.setContent { SelfieCaptureScreen(agentMode = false) }
 
         // then
         composeTestRule.onNodeWithText(labelText).assertDoesNotExist()
@@ -110,7 +111,7 @@ class SelfieCaptureScreenTest {
         val cameraPreviewTag = "cameraPreview"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreenContent() }
+        composeTestRule.setContent { SelfieCaptureScreen() }
 
         // then
         composeTestRule.onNodeWithTag(cameraPreviewTag).assertIsDisplayed()
@@ -122,7 +123,7 @@ class SelfieCaptureScreenTest {
         val instructionsSubstring = "Put your face inside the oval"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreenContent() }
+        composeTestRule.setContent { SelfieCaptureScreen() }
 
         // then
         composeTestRule.onNodeWithText(instructionsSubstring, substring = true).assertIsDisplayed()
@@ -134,7 +135,7 @@ class SelfieCaptureScreenTest {
         val directiveSubstring = "Smile for the camera"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreenContent() }
+        composeTestRule.setContent { SelfieCaptureScreen() }
 
         // then
         composeTestRule.onNodeWithText(directiveSubstring, substring = true).assertIsDisplayed()
@@ -145,12 +146,12 @@ class SelfieCaptureScreenTest {
         // given
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
-        val callback = SelfieCaptureResultCallback { }
+        val callback = SmartSelfieResult.Callback { }
         every { viewModel.takeButtonInitiatedPictures(any(), any()) } just Runs
 
         // when
         composeTestRule.apply {
-            setContent { SelfieCaptureScreenContent(viewModel = viewModel, onResult = callback) }
+            setContent { SelfieCaptureScreen(viewModel = viewModel, onResult = callback) }
             waitUntilExists(hasTestTag(takePictureTag))
         }
         composeTestRule.onNodeWithTag(takePictureTag).performClick()
@@ -170,7 +171,7 @@ class SelfieCaptureScreenTest {
 
         // when
         composeTestRule.apply {
-            setContent { SelfieCaptureScreenContent(viewModel = viewModel) }
+            setContent { SelfieCaptureScreen(viewModel = viewModel) }
             waitUntilExists(hasTestTag(takePictureTag))
         }
 

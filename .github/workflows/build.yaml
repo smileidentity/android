@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        agp_version: ["7.3.1", "7.2.1"]
+        agp_version: ["7.4.0", "7.3.1", "7.2.1"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,4 +24,4 @@ jobs:
       - uses: actions/checkout@v3
       - uses: musichin/ktlint-check@v2
         with:
-          ktlint-version: "0.48.0"
+          ktlint-version: "0.48.1"

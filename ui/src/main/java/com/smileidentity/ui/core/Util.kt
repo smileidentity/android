@@ -14,6 +14,14 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
+import com.smileidentity.networking.SmileIdentity.moshi
+import com.smileidentity.networking.models.Config
+import com.smileidentity.networking.models.SmileIdentityException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import okio.buffer
+import okio.source
+import retrofit2.HttpException
+import timber.log.Timber
 import java.io.File
 
 internal fun Context.toast(@StringRes message: Int) {
@@ -24,14 +32,15 @@ internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
 
 /**
- * Post-processes the image stored in `bitmap` and saves to `file`
+ * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
+ * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
  */
 internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
     saveAsGrayscale: Boolean = false,
     compressionQuality: Int = 100,
-    desiredOutputSize: Size? = null,
+    maxOutputSize: Size? = null,
 ): File {
     val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
@@ -40,25 +49,37 @@ internal fun postProcessImageBitmap(
         val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(colorMatrix) }
         canvas.drawBitmap(mutableBitmap, 0f, 0f, paint)
     }
-    // if size is the original Bitmap size, then no scaling will be performed by the underlying call
-    val size = desiredOutputSize ?: Size(mutableBitmap.width, mutableBitmap.height)
+
+    // If size is the original Bitmap size, then no scaling will be performed by the underlying call
+    // Aspect ratio will be maintained by retaining the larger dimension
+    val size = maxOutputSize ?: Size(mutableBitmap.width, mutableBitmap.height)
+    val aspectRatioInput = mutableBitmap.width.toFloat() / mutableBitmap.height
+    val aspectRatioMax = size.width.toFloat() / size.height
+    var outputWidth = size.width
+    var outputHeight = size.height
+    if (aspectRatioInput > aspectRatioMax) {
+        outputHeight = (outputWidth / aspectRatioInput).toInt()
+    } else {
+        outputWidth = (outputHeight * aspectRatioInput).toInt()
+    }
+
     file.outputStream().use {
         mutableBitmap
             // Filter is set to false for improved performance at the expense of image quality
-            .scale(size.width, size.height, filter = false)
+            .scale(outputWidth, outputHeight, filter = false)
             .compress(JPEG, compressionQuality, it)
     }
     return file
 }
 
 /**
- * Post-processes the image stored in `file`, in-place
+ * Post-processes the image stored in [file], in-place
  */
 internal fun postProcessImageFile(
     file: File,
     saveAsGrayscale: Boolean = false,
     compressionQuality: Int = 100,
-    desiredOutputSize: Size? = null,
+    maxOutputSize: Size? = null,
 ): File {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
     return postProcessImageBitmap(
@@ -66,7 +87,7 @@ internal fun postProcessImageFile(
         file,
         saveAsGrayscale,
         compressionQuality,
-        desiredOutputSize,
+        maxOutputSize,
     )
 }
 
@@ -84,3 +105,36 @@ internal fun createSmileTempFile(imageType: String): File {
 
 internal fun createLivenessFile() = createSmileTempFile("liveness")
 internal fun createSelfieFile() = createSmileTempFile("selfie")
+
+/**
+ * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
+ * SmileIdentityServerError if it is an [HttpException] (this may not always be possible, i.e. if
+ * we get an error during S3 upload, or if we get an unconventional 500 error from the API)
+ *
+ * @param proxy Callback to be invoked with the exception
+ */
+internal fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExceptionHandler {
+    return CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable, "Error during coroutine execution")
+        val converted = if (throwable is HttpException) {
+            val adapter = moshi.adapter(SmileIdentityException.Details::class.java)
+            try {
+                val details = adapter.fromJson(throwable.response()?.errorBody()?.source()!!)!!
+                SmileIdentityException(details)
+            } catch (e: Exception) {
+                Timber.w(e, "Unable to convert HttpException to SmileIdentityServerError")
+                // More informative to pass back the original exception than the conversion error
+                throwable
+            }
+        } else {
+            throwable
+        }
+        proxy(converted)
+    }
+}
+
+fun Config.Companion.fromAssets(context: Context): Config {
+    context.assets.open("smile_config.json").source().buffer().use {
+        return moshi.adapter(Config::class.java).fromJson(it)!!
+    }
+}

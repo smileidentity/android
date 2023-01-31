@@ -35,12 +35,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = 11
     }
 
     buildFeatures {
@@ -48,11 +48,12 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "1.3.2"
+        kotlinCompilerExtensionVersion "1.4.0"
     }
 }
 
 dependencies {
+    api project(":public:networking")
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.6.0"
 
@@ -60,7 +61,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:5.0.1"
 
     // Sentry (crash reporting, tracing, breadcrumbs)
-    implementation platform("io.sentry:sentry-bom:6.11.0")
+    implementation platform("io.sentry:sentry-bom:6.13.0")
     implementation "io.sentry:sentry"
     // TODO: Integrate these more directly so that we get automatic breadcrumbs
     // implementation "io.sentry:sentry-android-core"
