@@ -79,7 +79,7 @@ fun MainScreen() {
                                     if (isProduction) {
                                         Icon(
                                             imageVector = Filled.Warning,
-                                            contentDescription = null,
+                                            contentDescription = stringResource(R.string.production),
                                         )
                                     }
                                 },
@@ -96,7 +96,7 @@ fun MainScreen() {
                                     selectedContainerColor = MaterialTheme.colorScheme.errorContainer,
                                     selectedLabelColor = MaterialTheme.colorScheme.onErrorContainer,
                                     selectedLeadingIconColor = MaterialTheme.colorScheme.onErrorContainer,
-                                )
+                                ),
                             )
                         },
                         colors = smallTopAppBarColors(MaterialTheme.colorScheme.primary),
