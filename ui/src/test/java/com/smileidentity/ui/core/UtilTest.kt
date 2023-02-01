@@ -15,7 +15,7 @@ class UtilTest {
         assertTrue(
             timestampLong in (
                 System.currentTimeMillis() - 1000
-                )..(System.currentTimeMillis())
+                )..(System.currentTimeMillis()),
         )
     }
 }
