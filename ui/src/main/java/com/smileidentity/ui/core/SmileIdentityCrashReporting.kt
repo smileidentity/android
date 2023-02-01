@@ -45,16 +45,16 @@ object SmileIdentityCrashReporting {
         }
 
         hub = Hub(options).apply {
-            setTag("sdk_version", BuildConfig.VERSION_NAME)
-            setTag("build_type", BuildConfig.BUILD_TYPE) // Distinguish between debug and release
-            setTag("os_version", Build.VERSION.RELEASE)
-            setTag("os_api_level", Build.VERSION.SDK_INT.toString())
-            setTag("cpu_abi", Build.SUPPORTED_ABIS?.first() ?: "unknown")
-            setTag("product", Build.PRODUCT)
-            setTag("manufacturer", Build.MANUFACTURER)
             setTag("brand", Build.BRAND)
+            setTag("build_type", BuildConfig.BUILD_TYPE) // Distinguish between debug and release
+            setTag("cpu_abi", Build.SUPPORTED_ABIS?.first() ?: "unknown")
             setTag("device", Build.DEVICE)
+            setTag("manufacturer", Build.MANUFACTURER)
             setTag("model", Build.MODEL)
+            setTag("os_api_level", Build.VERSION.SDK_INT.toString())
+            setTag("os_version", Build.VERSION.RELEASE)
+            setTag("product", Build.PRODUCT)
+            setTag("sdk_version", BuildConfig.VERSION_NAME)
         }
 
         // Once this UncaughtExceptionHandler handles the exception, it will pass the exception on
