@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Smile Identity</string>
+    <string name="production">Production</string>
+    <string name="sandbox">Sandbox</string>
     <string name="home">Home</string>
     <string name="back">Back</string>
     <string name="test_our_products">Test Our Products</string>

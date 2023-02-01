@@ -145,6 +145,10 @@ internal fun SelfieCaptureScreen(
     val viewfinderSize = min(LocalConfiguration.current.screenWidthDp.dp * (2 / 3f), 256.dp)
     val progressStrokeWidth = 8.dp
     val progressBarSize = viewfinderSize + progressStrokeWidth * 2
+
+    // Force maximum brightness to light up the user's face
+    ForceBrightness()
+
     // TODO: Replace hardcoded colors with themes
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
