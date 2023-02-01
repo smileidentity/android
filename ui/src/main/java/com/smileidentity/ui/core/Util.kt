@@ -99,7 +99,6 @@ internal fun postProcessImageFile(
  * format "si_${imageType}_<random number>.jpg"
  */
 internal fun createSmileTempFile(imageType: String): File {
-    // add current timestamp in ms to the file_name
     return File.createTempFile("si_${imageType}_${System.currentTimeMillis()}_", ".jpg").apply {
         // Deletes file when the *VM* is exited (*not* when the app is closed)
         deleteOnExit()
