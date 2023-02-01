@@ -108,6 +108,9 @@ enum class ActionResult {
     @Json(name = "Passed")
     Passed,
 
+    @Json(name = "Completed")
+    Completed,
+
     @Json(name = "Approved")
     Approved,
 

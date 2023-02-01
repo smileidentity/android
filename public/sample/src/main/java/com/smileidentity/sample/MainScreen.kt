@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults.filterChipColors
@@ -12,6 +14,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,6 +34,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.theme.SmileIdentityTheme
@@ -149,8 +154,8 @@ fun MainScreen() {
                             currentScreenTitle = Screens.SmartSelfieRegistration.label
                             val context = LocalContext.current
                             SmileIdentity.SmartSelfieRegistrationScreen(
-                                agentMode = true,
-                                manualCaptureMode = true,
+                                allowAgentMode = true,
+                                allowManualCapture = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Registration success"
@@ -158,6 +163,58 @@ fun MainScreen() {
                                     Timber.d("$message: $result")
                                 } else if (result is SmartSelfieResult.Error) {
                                     val message = "SmartSelfie Registration error"
+                                    context.toast(message)
+                                    Timber.e(result.throwable, message)
+                                }
+                                navController.popBackStack()
+                            }
+                        }
+                        composable(Screens.SmartSelfieAuthentication.route) {
+                            bottomNavSelection = Screens.Home
+                            currentScreenTitle = Screens.SmartSelfieAuthentication.label
+                            var userId by remember { mutableStateOf("") }
+                            AlertDialog(
+                                title = { Text(stringResource(R.string.user_id_dialog_title)) },
+                                text = {
+                                    OutlinedTextField(
+                                        value = userId,
+                                        onValueChange = { newValue -> userId = newValue.trim() },
+                                        label = { Text(stringResource(R.string.user_id_label)) },
+                                    )
+                                },
+                                onDismissRequest = { navController.popBackStack() },
+                                dismissButton = {
+                                    OutlinedButton(onClick = { navController.popBackStack() }) {
+                                        Text(stringResource(R.string.cancel))
+                                    }
+                                },
+                                confirmButton = {
+                                    Button(
+                                        enabled = userId.isNotBlank(),
+                                        onClick = {
+                                            navController.navigate(
+                                                "${Screens.SmartSelfieAuthentication.route}/$userId",
+                                            ) { popUpTo(Screens.Home.route) }
+                                        },
+                                    ) { Text(stringResource(R.string.cont)) }
+                                },
+                            )
+                        }
+                        composable(Screens.SmartSelfieAuthentication.route + "/{userId}") {
+                            bottomNavSelection = Screens.Home
+                            currentScreenTitle = Screens.SmartSelfieAuthentication.label
+                            val context = LocalContext.current
+                            SmileIdentity.SmartSelfieAuthenticationScreen(
+                                userId = it.arguments?.getString("userId")!!,
+                                allowAgentMode = true,
+                                allowManualCapture = true,
+                            ) { result ->
+                                if (result is SmartSelfieResult.Success) {
+                                    val message = "SmartSelfie Authentication success"
+                                    context.toast(message)
+                                    Timber.d("$message: $result")
+                                } else if (result is SmartSelfieResult.Error) {
+                                    val message = "SmartSelfie Authentication error"
                                     context.toast(message)
                                     Timber.e(result.throwable, message)
                                 }

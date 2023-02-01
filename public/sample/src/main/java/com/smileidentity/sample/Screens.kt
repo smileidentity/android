@@ -29,4 +29,12 @@ sealed class Screens(
         Filled.Face,
         Outlined.Face,
     )
+
+    object SmartSelfieAuthentication : Screens(
+        "smart_selfie_authentication",
+        com.smileidentity.ui.R.string.si_smartselfie_authentication_product_name,
+        // TODO: Replace icons with Smile Identity branded icons
+        Filled.Face,
+        Outlined.Face,
+    )
 }

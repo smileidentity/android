@@ -34,8 +34,8 @@ class SmartSelfieFragment private constructor(
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 SmileIdentity.SmartSelfieRegistrationScreen(
-                    agentMode = true,
-                    manualCaptureMode = true,
+                    allowAgentMode = true,
+                    allowManualCapture = true,
                     onResult = callback,
                 )
             }

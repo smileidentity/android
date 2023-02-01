@@ -16,7 +16,8 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.networking.models.AuthenticationRequest
 import com.smileidentity.networking.models.JobStatusRequest
 import com.smileidentity.networking.models.JobStatusResponse
-import com.smileidentity.networking.models.JobType
+import com.smileidentity.networking.models.JobType.SmartSelfieAuthentication
+import com.smileidentity.networking.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.networking.models.PrepUploadRequest
 import com.smileidentity.networking.models.UploadRequest
 import com.smileidentity.ui.R
@@ -60,7 +61,7 @@ enum class Directive(@StringRes val displayText: Int) {
     Smile(R.string.si_smartselfie_directive_smile),
 }
 
-class SelfieViewModel : ViewModel() {
+class SelfieViewModel(private val isEnroll: Boolean, private val userId: String) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
     val uiState: StateFlow<SelfieUiState> = _uiState.asStateFlow()
 
@@ -238,9 +239,11 @@ class SelfieViewModel : ViewModel() {
     private suspend fun submit(selfieFile: File, livenessFiles: List<File>): JobStatusResponse {
         _uiState.update { it.copy(isWaitingForResult = true) }
 
+        val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
         val authRequest = AuthenticationRequest(
-            jobType = JobType.SmartSelfieEnrollment,
-            enrollment = true,
+            jobType = jobType,
+            enrollment = isEnroll,
+            userId = userId,
         )
         val authResponse = SmileIdentity.api.authenticate(authRequest)
 

@@ -43,8 +43,8 @@ object PartnerParamsAdapter {
     ): PartnerParams {
         val paramsJson = mapDelegate.fromJson(jsonReader) ?: mapOf()
         return PartnerParams(
-            jobId = paramsJson["job_id"] ?: "",
-            userId = paramsJson["user_id"] ?: "",
+            jobId = paramsJson["job_id"]!!,
+            userId = paramsJson["user_id"]!!,
             jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"] as String)!!,
             extras = paramsJson - listOf("job_id", "user_id", "job_type"),
         )

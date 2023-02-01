@@ -84,7 +84,7 @@ class SelfieCaptureScreenTest {
         val switchTag = "agentModeSwitch"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen(agentMode = true) }
+        composeTestRule.setContent { SelfieCaptureScreen(allowAgentMode = true) }
 
         // then
         composeTestRule.onNodeWithText(labelText).assertIsDisplayed()
@@ -98,7 +98,7 @@ class SelfieCaptureScreenTest {
         val switchTag = "agentModeSwitch"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen(agentMode = false) }
+        composeTestRule.setContent { SelfieCaptureScreen(allowAgentMode = false) }
 
         // then
         composeTestRule.onNodeWithText(labelText).assertDoesNotExist()
