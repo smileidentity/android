@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
     val products = listOf(
         Screens.SmartSelfieRegistration,
-        Screens.SmartSelfieAuthentication,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

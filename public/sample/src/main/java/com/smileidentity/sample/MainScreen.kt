@@ -3,12 +3,9 @@ package com.smileidentity.sample
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults.filterChipColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -73,37 +70,6 @@ fun MainScreen() {
                                 }
                             }
                         },
-                        actions = {
-                            FilterChip(
-                                selected = isProduction,
-                                onClick = {
-                                    isProduction = !isProduction
-                                    SmileIdentity.setEnvironment(useSandbox = !isProduction)
-                                },
-                                leadingIcon = {
-                                    if (isProduction) {
-                                        Icon(
-                                            imageVector = Filled.Warning,
-                                            contentDescription = stringResource(R.string.production),
-                                        )
-                                    }
-                                },
-                                label = {
-                                    val environmentName = if (isProduction) {
-                                        R.string.production
-                                    } else {
-                                        R.string.sandbox
-                                    }
-                                    Text(stringResource(environmentName))
-                                },
-                                colors = filterChipColors(
-                                    labelColor = MaterialTheme.colorScheme.onPrimary,
-                                    selectedContainerColor = MaterialTheme.colorScheme.errorContainer,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onErrorContainer,
-                                    selectedLeadingIconColor = MaterialTheme.colorScheme.onErrorContainer,
-                                ),
-                            )
-                        },
                         colors = smallTopAppBarColors(MaterialTheme.colorScheme.primary),
                     )
                 },
@@ -154,8 +120,8 @@ fun MainScreen() {
                             currentScreenTitle = Screens.SmartSelfieRegistration.label
                             val context = LocalContext.current
                             SmileIdentity.SmartSelfieRegistrationScreen(
-                                allowAgentMode = true,
-                                allowManualCapture = true,
+                                allowAgentMode = false,
+                                allowManualCapture = false,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Registration success"
