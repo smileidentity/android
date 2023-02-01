@@ -2,14 +2,13 @@ package com.smileidentity.sample
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons.Filled
-import androidx.compose.material.icons.Icons.Outlined
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults.filterChipColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -51,7 +50,7 @@ fun MainScreen() {
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
                 topBar = {
-                    var checked by remember { mutableStateOf(false) }
+                    var isProduction by remember { mutableStateOf(false) }
                     TopAppBar(
                         title = {
                             Text(
@@ -70,13 +69,35 @@ fun MainScreen() {
                             }
                         },
                         actions = {
-                            IconToggleButton(
-                                checked = checked,
-                                onCheckedChange = { checked = it },
-                            ) {
-                                val icon = if (checked) Filled.PlayArrow else Outlined.PlayArrow
-                                Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
-                            }
+                            FilterChip(
+                                selected = isProduction,
+                                onClick = {
+                                    isProduction = !isProduction
+                                    SmileIdentity.setEnvironment(useSandbox = !isProduction)
+                                },
+                                leadingIcon = {
+                                    if (isProduction) {
+                                        Icon(
+                                            imageVector = Filled.Warning,
+                                            contentDescription = stringResource(R.string.production),
+                                        )
+                                    }
+                                },
+                                label = {
+                                    val environmentName = if (isProduction) {
+                                        R.string.production
+                                    } else {
+                                        R.string.sandbox
+                                    }
+                                    Text(stringResource(environmentName))
+                                },
+                                colors = filterChipColors(
+                                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                                    selectedContainerColor = MaterialTheme.colorScheme.errorContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onErrorContainer,
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.onErrorContainer,
+                                ),
+                            )
                         },
                         colors = smallTopAppBarColors(MaterialTheme.colorScheme.primary),
                     )
