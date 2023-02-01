@@ -30,4 +30,8 @@ fun SmileIdentity.init(
         useSandbox = useSandbox,
         okHttpClient = okHttpClient,
     )
+    // enabled after init to allow partner_id to be fetched from lateinit config.
+    if (enableCrashReporting) {
+        SmileIdentityCrashReporting.hub.setTag("partner_id", config.partnerId)
+    }
 }
