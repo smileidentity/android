@@ -1,6 +1,7 @@
 buildscript {
     ext {
-        android_gradle_plugin_version = project.getProperties().get("AGP_VERSION", "7.4.0")
+        // Using properties, so that GitHub Actions can override the version for its test matrix
+        android_gradle_plugin_version = project.getProperties().get("AGP_VERSION", "7.4.1")
         kotlin_version = "1.8.0"
         ksp_version = "$kotlin_version-1.0.8"
     }
