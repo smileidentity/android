@@ -55,7 +55,7 @@ android {
 dependencies {
     api project(":public:networking")
     implementation "androidx.core:core-ktx:1.9.0"
-    implementation "androidx.appcompat:appcompat:1.6.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
 
     // Logging
     implementation "com.jakewharton.timber:timber:5.0.1"
