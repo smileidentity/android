@@ -30,9 +30,12 @@ data class PartnerParams(
 )
 
 enum class JobType {
+    @Json(name = "2")
+    SmartSelfieAuthentication,
+
     @Json(name = "4")
     SmartSelfieEnrollment,
 
-    @Json(name = "2")
-    SmartSelfieAuthentication,
+    @Json(name = "5")
+    EnhancedKyc,
 }

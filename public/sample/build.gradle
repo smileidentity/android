@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace "com.smileidentity.sample"
-    compileSdk 33
+    compileSdkPreview "UpsideDownCake"
 
     defaultConfig {
         applicationId "com.smileidentity.sample"
         minSdk 21
-        targetSdk 33
+        targetSdkPreview "UpsideDownCake"
         versionCode 1
         versionName "1.0"
 
@@ -41,7 +41,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion "1.4.0"
+        kotlinCompilerExtensionVersion "1.4.2"
     }
 
     packagingOptions {
@@ -54,7 +54,7 @@ android {
 dependencies {
     implementation project(":ui")
     implementation "androidx.core:core-ktx:1.9.0"
-    implementation "androidx.appcompat:appcompat:1.6.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
     implementation "androidx.activity:activity-compose:1.6.1"
     implementation "com.google.android.material:material:1.8.0"

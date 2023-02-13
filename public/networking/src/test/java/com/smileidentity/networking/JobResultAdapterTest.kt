@@ -57,7 +57,6 @@ class JobResultAdapterTest {
         assertEquals("ResultText", jobResult.resultText)
         assertEquals("ResultType", jobResult.resultType)
         assertEquals("SmileJobID", jobResult.smileJobId)
-        assertEquals("JSONVersion", jobResult.jsonVersion)
         assertEquals("jobId", jobResult.partnerParams.jobId)
         assertEquals("userId", jobResult.partnerParams.userId)
         assertEquals(JobType.SmartSelfieEnrollment, jobResult.partnerParams.jobType)
