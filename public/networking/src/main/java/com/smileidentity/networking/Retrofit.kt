@@ -18,19 +18,27 @@ import retrofit2.Retrofit
 import java.io.File
 import java.lang.reflect.Type
 
+object JobTypeAdapter {
+    @ToJson
+    fun toJson(jobType: JobType): Int = jobType.value
+
+    @FromJson
+    fun fromJson(value: Int): JobType? = JobType.fromValue(value)
+}
+
 @Suppress("unused")
 object PartnerParamsAdapter {
     @ToJson
     fun toJson(
         writer: JsonWriter,
         partnerParams: PartnerParams,
-        mapDelegate: JsonAdapter<Map<String, String>>,
+        mapDelegate: JsonAdapter<Map<String, Any>>,
         jobTypeDelegate: JsonAdapter<JobType>,
     ) {
         val map = partnerParams.extras + mapOf(
             "job_id" to partnerParams.jobId,
             "user_id" to partnerParams.userId,
-            "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as String,
+            "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
         )
         mapDelegate.toJson(writer, map)
     }
@@ -43,9 +51,9 @@ object PartnerParamsAdapter {
     ): PartnerParams {
         val paramsJson = mapDelegate.fromJson(jsonReader) ?: mapOf()
         return PartnerParams(
+            jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"]),
             jobId = paramsJson["job_id"]!!,
             userId = paramsJson["user_id"]!!,
-            jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"] as String)!!,
             extras = paramsJson - listOf("job_id", "user_id", "job_type"),
         )
     }

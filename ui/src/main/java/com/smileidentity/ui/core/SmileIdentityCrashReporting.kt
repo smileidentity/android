@@ -29,6 +29,8 @@ object SmileIdentityCrashReporting {
         val options = SentryOptions().apply {
             dsn = BuildConfig.SENTRY_DSN
             isEnableUncaughtExceptionHandler = true
+            isEnableUserInteractionBreadcrumbs = true
+            isEnableUserInteractionTracing = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
                 try {
                     // Only report crashes from the SmileIdentity SDK

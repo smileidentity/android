@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace "com.smileidentity.sample"
-    compileSdkPreview "UpsideDownCake"
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.smileidentity.sample"
         minSdk 21
-        targetSdkPreview "UpsideDownCake"
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 

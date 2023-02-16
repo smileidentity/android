@@ -34,7 +34,6 @@ import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -63,7 +62,7 @@ enum class Directive(@StringRes val displayText: Int) {
 
 class SelfieViewModel(private val isEnroll: Boolean, private val userId: String) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
-    val uiState: StateFlow<SelfieUiState> = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     private val intraImageMinDelayMs = 350L
     private val numLivenessImages = 7

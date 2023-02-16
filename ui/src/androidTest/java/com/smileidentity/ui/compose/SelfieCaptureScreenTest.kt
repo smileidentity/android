@@ -24,6 +24,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 class SelfieCaptureScreenTest {
     @get:Rule
@@ -152,7 +153,7 @@ class SelfieCaptureScreenTest {
         // when
         composeTestRule.apply {
             setContent { SelfieCaptureScreen(viewModel = viewModel, onResult = callback) }
-            waitUntilExists(hasTestTag(takePictureTag))
+            waitUntilExists(hasTestTag(takePictureTag), 1.seconds)
         }
         composeTestRule.onNodeWithTag(takePictureTag).performClick()
 
@@ -172,7 +173,7 @@ class SelfieCaptureScreenTest {
         // when
         composeTestRule.apply {
             setContent { SelfieCaptureScreen(viewModel = viewModel) }
-            waitUntilExists(hasTestTag(takePictureTag))
+            waitUntilExists(hasTestTag(takePictureTag), 1.seconds)
         }
 
         // then

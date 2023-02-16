@@ -7,11 +7,11 @@ plugins {
 android {
     namespace "com.smileidentity.ui"
     resourcePrefix "si_"
-    compileSdkPreview "UpsideDownCake"
+    compileSdk 33
 
     defaultConfig {
         minSdk 21
-        targetSdkPreview "UpsideDownCake"
+        targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"

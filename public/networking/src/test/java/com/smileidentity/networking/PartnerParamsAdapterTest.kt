@@ -10,6 +10,7 @@ import org.junit.Test
 
 class PartnerParamsAdapterTest {
     private val adapter = Moshi.Builder()
+        .add(JobTypeAdapter)
         .add(PartnerParamsAdapter)
         .build()
         .adapter(PartnerParams::class.java)!!
@@ -18,9 +19,9 @@ class PartnerParamsAdapterTest {
     fun `extras should be serialized to top level of json object`() {
         // given
         val partnerParams = PartnerParams(
+            jobType = JobType.SmartSelfieEnrollment,
             jobId = "jobId",
             userId = "userId",
-            jobType = JobType.SmartSelfieEnrollment,
             extras = mapOf("extra1" to "value1", "extra2" to "value2"),
         )
         val kepMap = mapOf("jobId" to "job_id", "userId" to "user_id", "jobType" to "job_type")

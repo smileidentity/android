@@ -31,6 +31,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
     val products = listOf(
         Screens.SmartSelfieRegistration,
         Screens.SmartSelfieAuthentication,
+        Screens.EnhancedKyc,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

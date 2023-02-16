@@ -6,16 +6,16 @@ import org.junit.Test
 class UtilTest {
 
     @Test
-    fun `should add timestamp to filename`() {
+    fun `should include timestamp in filename`() {
+        // when
         val file = createLivenessFile()
-        // name is si_liveness_{timestamp}_{random_indentifier}.jpg
+        // name is si_liveness_{timestamp}_{random_identifier}.jpg
         val stringTokens = file.name.split("_")
-        val timestamp = stringTokens[stringTokens.size - 2]
-        val timestampLong = timestamp.toLong()
+        val timestamp = stringTokens[stringTokens.size - 2].toLong()
+
+        // then
         assertTrue(
-            timestampLong in (
-                System.currentTimeMillis() - 1000
-                )..(System.currentTimeMillis()),
+            timestamp in (System.currentTimeMillis() - 1000)..(System.currentTimeMillis()),
         )
     }
 }

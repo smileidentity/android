@@ -118,7 +118,7 @@ private fun SmartSelfieRegistrationScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     if (uiState.isWaitingForResult) {
-        ProcessingScreen()
+        ProcessingScreen(R.string.si_smartselfie_processing)
     } else {
         SelfieCaptureScreen(userId, isEnroll, allowAgentMode, allowManualCapture, onResult = onResult)
     }
@@ -282,26 +282,5 @@ internal fun SelfieCaptureScreen(
             }
             SmileIdentityAttribution()
         }
-    }
-}
-
-@Preview
-@Composable
-private fun ProcessingScreen() {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        CircularProgressIndicator(modifier = Modifier.size(64.dp))
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.si_smartselfie_processing),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(8.dp),
-        )
     }
 }

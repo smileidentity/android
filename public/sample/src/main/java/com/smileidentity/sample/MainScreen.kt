@@ -34,8 +34,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.compose.EnhancedKycScreen
 import com.smileidentity.ui.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.ui.core.EnhancedKycResult
 import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import timber.log.Timber
@@ -162,9 +164,10 @@ fun MainScreen() {
                                     context.toast(message)
                                     Timber.d("$message: $result")
                                 } else if (result is SmartSelfieResult.Error) {
-                                    val message = "SmartSelfie Registration error"
+                                    val th = result.throwable
+                                    val message = "SmartSelfie Registration error: ${th.message}"
                                     context.toast(message)
-                                    Timber.e(result.throwable, message)
+                                    Timber.e(th, message)
                                 }
                                 navController.popBackStack()
                             }
@@ -214,9 +217,28 @@ fun MainScreen() {
                                     context.toast(message)
                                     Timber.d("$message: $result")
                                 } else if (result is SmartSelfieResult.Error) {
-                                    val message = "SmartSelfie Authentication error"
+                                    val th = result.throwable
+                                    val message = "SmartSelfie Authentication error: ${th.message}"
                                     context.toast(message)
-                                    Timber.e(result.throwable, message)
+                                    Timber.e(th, message)
+                                }
+                                navController.popBackStack()
+                            }
+                        }
+                        composable(Screens.EnhancedKyc.route) {
+                            bottomNavSelection = Screens.Home
+                            currentScreenTitle = Screens.EnhancedKyc.label
+                            val context = LocalContext.current
+                            EnhancedKycScreen { result ->
+                                if (result is EnhancedKycResult.Success) {
+                                    val message = "Enhanced KYC success"
+                                    context.toast(message)
+                                    Timber.d("$message: $result")
+                                } else if (result is EnhancedKycResult.Error) {
+                                    val th = result.throwable
+                                    val message = "Enhanced KYC error: ${th.message}"
+                                    context.toast(message)
+                                    Timber.e(th, message)
                                 }
                                 navController.popBackStack()
                             }
