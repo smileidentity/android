@@ -114,6 +114,6 @@ fun SmileIdentity.EnhancedKycScreen(
 ) {
     com.smileidentity.ui.compose.EnhancedKycScreen(
         sessionId = sessionId,
-        onResult = onResult
+        onResult = onResult,
     )
 }

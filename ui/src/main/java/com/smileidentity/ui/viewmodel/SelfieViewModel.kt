@@ -229,7 +229,7 @@ class SelfieViewModel(
                     viewModelScope.launch(getExceptionHandler(proxy)) {
                         val jobStatusResponse = submit(selfieFile, livenessFiles)
                         callback.onResult(
-                            Success(sessionId, selfieFile, livenessFiles, jobStatusResponse)
+                            Success(sessionId, selfieFile, livenessFiles, jobStatusResponse),
                         )
                     }
                 }
