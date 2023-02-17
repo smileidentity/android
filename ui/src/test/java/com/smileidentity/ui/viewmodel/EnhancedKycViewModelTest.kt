@@ -1,6 +1,7 @@
 package com.smileidentity.ui.viewmodel
 
 import com.smileidentity.networking.models.IdType
+import com.smileidentity.ui.core.randomSessionId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -20,7 +21,7 @@ class EnhancedKycViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = EnhancedKycViewModel()
+        subject = EnhancedKycViewModel(randomSessionId())
     }
 
     @After
