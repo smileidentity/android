@@ -1,5 +1,8 @@
 package com.smileidentity.sample;
 
+import static com.smileidentity.ui.core.UtilKt.randomSessionId;
+import static com.smileidentity.ui.core.UtilKt.randomUserId;
+
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -18,7 +21,13 @@ public class JavaActivity extends AppCompatActivity implements SmartSelfieResult
         super.onCreate(savedInstanceState);
         Toast.makeText(this, "Java Activity", Toast.LENGTH_SHORT).show();
         getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, SmartSelfieFragment.newInstance(this))
+                .replace(android.R.id.content, SmartSelfieFragment.newInstance(
+                        randomUserId(),
+                        true,
+                        true,
+                        randomSessionId(),
+                        this
+                ))
                 .commit();
     }
 

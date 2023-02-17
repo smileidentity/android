@@ -8,7 +8,7 @@ import io.mockk.mockkStatic
 
 fun setupPostProcessMocks() {
     mockkStatic(::createSmileTempFile)
-    every { createSmileTempFile(any()) } returns mockk(relaxed = true)
+    every { createSmileTempFile(any(), any()) } returns mockk(relaxed = true)
 
     mockkStatic(::postProcessImageFile)
     every { postProcessImageFile(any(), any(), any(), any()) } returns mockk(relaxed = true)
