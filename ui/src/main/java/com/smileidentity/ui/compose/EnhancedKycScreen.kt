@@ -134,13 +134,13 @@ fun EnhancedKycScreen(
                 }
             }
 
-            uiState.selectedIdType?.requiredFields?.forEach {
+            for (field in uiState.selectedIdType?.requiredFields ?: emptyList()) {
                 val focusManager = LocalFocusManager.current
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(viewModel.getFieldDisplayName(it))) },
-                    value = uiState.idInputFieldValues[it] ?: "",
-                    onValueChange = { newValue -> viewModel.onIdInputFieldChanged(it, newValue) },
+                    label = { Text(stringResource(viewModel.getFieldDisplayName(field))) },
+                    value = uiState.idInputFieldValues[field] ?: "",
+                    onValueChange = { viewModel.onIdInputFieldChanged(field, it) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
