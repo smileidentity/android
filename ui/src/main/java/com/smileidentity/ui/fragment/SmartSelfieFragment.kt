@@ -10,17 +10,33 @@ import androidx.fragment.app.Fragment
 import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.ui.core.SmartSelfieResult
+import com.smileidentity.ui.core.randomSessionId
+import com.smileidentity.ui.core.randomUserId
 
 class SmartSelfieFragment private constructor(
-    private val callback: SmartSelfieResult.Callback,
+    private val userId: String,
+    private val allowAgentMode: Boolean,
+    private val allowManualCapture: Boolean,
+    private val sessionId: String,
+    private val onResult: SmartSelfieResult.Callback,
 ) : Fragment() {
 
     companion object {
         @JvmStatic
         @JvmOverloads
         fun newInstance(
-            callback: SmartSelfieResult.Callback = SmartSelfieResult.Callback { },
-        ) = SmartSelfieFragment(callback)
+            userId: String = randomUserId(),
+            allowAgentMode: Boolean = false,
+            allowManualCapture: Boolean = false,
+            sessionId: String = randomSessionId(),
+            onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
+        ) = SmartSelfieFragment(
+            userId = userId,
+            allowAgentMode = allowAgentMode,
+            allowManualCapture = allowManualCapture,
+            sessionId = sessionId,
+            onResult = onResult,
+        )
     }
 
     override fun onCreateView(
@@ -34,9 +50,11 @@ class SmartSelfieFragment private constructor(
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 SmileIdentity.SmartSelfieRegistrationScreen(
-                    allowAgentMode = true,
-                    allowManualCapture = true,
-                    onResult = callback,
+                    userId = userId,
+                    allowAgentMode = allowAgentMode,
+                    allowManualCapture = allowManualCapture,
+                    sessionId = sessionId,
+                    onResult = onResult,
                 )
             }
         }
