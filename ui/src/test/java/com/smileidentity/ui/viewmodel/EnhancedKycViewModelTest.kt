@@ -81,7 +81,7 @@ class EnhancedKycViewModelTest {
         // given
         subject.onCountrySelected(SupportedCountry.Nigeria)
         subject.onIdTypeSelected(IdType.NigeriaDriversLicense)
-        subject.onIdInputFieldChanged(IdType.InputField.IdNumber, "1234567890")
+        subject.onIdInputFieldChanged(IdType.InputField.IdNumber, "AAA-123456")
         subject.onIdInputFieldChanged(IdType.InputField.FirstName, "John")
         subject.onIdInputFieldChanged(IdType.InputField.LastName, "Doe")
         subject.onIdInputFieldChanged(IdType.InputField.Dob, "01/01/2000")
@@ -91,6 +91,23 @@ class EnhancedKycViewModelTest {
 
         // then
         assertTrue(result)
+    }
+
+    @Test
+    fun `allInputsSatisfied should be false when ID number format invalid`() {
+        // given
+        subject.onCountrySelected(SupportedCountry.Nigeria)
+        subject.onIdTypeSelected(IdType.NigeriaDriversLicense)
+        subject.onIdInputFieldChanged(IdType.InputField.IdNumber, "AAA")
+        subject.onIdInputFieldChanged(IdType.InputField.FirstName, "John")
+        subject.onIdInputFieldChanged(IdType.InputField.LastName, "Doe")
+        subject.onIdInputFieldChanged(IdType.InputField.Dob, "01/01/2000")
+
+        // when
+        val result = subject.allInputsSatisfied()
+
+        // then
+        assertFalse(result)
     }
 
     @Test
