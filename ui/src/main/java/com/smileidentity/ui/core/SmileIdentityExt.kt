@@ -4,6 +4,7 @@ import android.content.Context
 import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.networking.models.Config
 import okhttp3.OkHttpClient
+import java.io.File
 
 /**
  * Initialize the SDK. This must be called before any other SDK methods.
@@ -34,4 +35,14 @@ fun SmileIdentity.init(
     if (enableCrashReporting) {
         SmileIdentityCrashReporting.hub.setTag("partner_id", config.partnerId)
     }
+}
+
+/**
+ * Retrieve the captured images for a given session ID. This is useful for collecting all files
+ * across multiple job types (e.g. SmartSelfie and Document Verification)
+ */
+fun SmileIdentity.retrieveCapturedImages(sessionId: String): List<File> {
+    val tmpdir = File(System.getProperty("java.io.tmpdir", ".") ?: ".")
+    val files = tmpdir.listFiles { _, name -> name.contains(sessionId) }
+    return files?.toList() ?: emptyList()
 }

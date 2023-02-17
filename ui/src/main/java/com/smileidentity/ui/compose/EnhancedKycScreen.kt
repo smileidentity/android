@@ -19,6 +19,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,18 +34,25 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.networking.models.IdType
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.EnhancedKycResult
+import com.smileidentity.ui.core.randomSessionId
+import com.smileidentity.ui.core.viewModelFactory
+import com.smileidentity.ui.theme.SmileIdentityTheme
 import com.smileidentity.ui.viewmodel.EnhancedKycViewModel
 import com.smileidentity.ui.viewmodel.SupportedCountry
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun EnhancedKycScreen(
-    viewModel: EnhancedKycViewModel = viewModel(),
+internal fun EnhancedKycScreen(
+    sessionId: String,
+    viewModel: EnhancedKycViewModel = viewModel(
+        factory = viewModelFactory { EnhancedKycViewModel(sessionId) },
+    ),
     onResult: EnhancedKycResult.Callback = EnhancedKycResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
@@ -218,5 +226,15 @@ fun EnhancedKycScreen(
             enabled = viewModel.allInputsSatisfied(),
             onClick = { viewModel.doEnhancedKyc(callback = onResult) },
         ) { Text(stringResource(R.string.si_enhanced_kyc_submit_button)) }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEnhancedKycScreen() {
+    SmileIdentityTheme {
+        Surface {
+            EnhancedKycScreen(sessionId = randomSessionId())
+        }
     }
 }

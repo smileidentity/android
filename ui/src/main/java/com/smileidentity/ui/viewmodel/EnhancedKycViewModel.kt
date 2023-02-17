@@ -25,13 +25,13 @@ data class EnhancedKycUiState(
     val isWaitingForResult: Boolean = false,
 )
 
-class EnhancedKycViewModel : ViewModel() {
+class EnhancedKycViewModel(private val sessionId: String) : ViewModel() {
     private val _uiState = MutableStateFlow(EnhancedKycUiState())
     val uiState = _uiState.asStateFlow()
 
     fun doEnhancedKyc(callback: EnhancedKycResult.Callback = EnhancedKycResult.Callback {}) {
         _uiState.value = _uiState.value.copy(isWaitingForResult = true)
-        val proxy = { e: Throwable -> callback.onResult(EnhancedKycResult.Error(e)) }
+        val proxy = { e: Throwable -> callback.onResult(EnhancedKycResult.Error(sessionId, e)) }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 jobType = JobType.EnhancedKyc,
@@ -52,7 +52,7 @@ class EnhancedKycViewModel : ViewModel() {
                 bankCode = _uiState.value.idInputFieldValues[IdType.InputField.BankCode],
             )
             val response = SmileIdentity.api.doEnhancedKyc(enhancedKycRequest)
-            callback.onResult(EnhancedKycResult.Success(enhancedKycRequest, response))
+            callback.onResult(EnhancedKycResult.Success(sessionId, enhancedKycRequest, response))
         }
     }
 

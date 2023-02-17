@@ -8,7 +8,7 @@ class UtilTest {
     @Test
     fun `should include timestamp in filename`() {
         // when
-        val file = createLivenessFile()
+        val file = createLivenessFile("test")
         // name is si_liveness_{timestamp}_{random_identifier}.jpg
         val stringTokens = file.name.split("_")
         val timestamp = stringTokens[stringTokens.size - 2].toLong()

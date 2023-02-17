@@ -56,6 +56,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.SmartSelfieResult
+import com.smileidentity.ui.core.randomSessionId
 import com.smileidentity.ui.core.randomUserId
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.core.viewModelFactory
@@ -76,6 +77,7 @@ internal fun SmartSelfieOrPermissionScreen(
     isEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     allowManualCapture: Boolean = false,
+    sessionId: String = randomSessionId(),
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
@@ -86,6 +88,7 @@ internal fun SmartSelfieOrPermissionScreen(
             isEnroll,
             allowAgentMode,
             allowManualCapture,
+            sessionId,
             onResult = onResult,
         )
     } else {
@@ -113,14 +116,24 @@ private fun SmartSelfieRegistrationScreen(
     isEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     allowManualCapture: Boolean = false,
-    viewModel: SelfieViewModel = viewModel(factory = viewModelFactory { SelfieViewModel(isEnroll, userId) }),
+    sessionId: String = randomSessionId(),
+    viewModel: SelfieViewModel = viewModel(
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, sessionId) },
+    ),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     if (uiState.isWaitingForResult) {
         ProcessingScreen(R.string.si_smartselfie_processing)
     } else {
-        SelfieCaptureScreen(userId, isEnroll, allowAgentMode, allowManualCapture, onResult = onResult)
+        SelfieCaptureScreen(
+            userId,
+            isEnroll,
+            allowAgentMode,
+            allowManualCapture,
+            sessionId,
+            onResult = onResult,
+        )
     }
 }
 
@@ -131,7 +144,10 @@ internal fun SelfieCaptureScreen(
     isEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     allowManualCapture: Boolean = false,
-    viewModel: SelfieViewModel = viewModel(factory = viewModelFactory { SelfieViewModel(isEnroll, userId) }),
+    sessionId: String = randomSessionId(),
+    viewModel: SelfieViewModel = viewModel(
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, sessionId) },
+    ),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value

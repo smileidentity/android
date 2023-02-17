@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.ui.core.EnhancedKycResult
 import com.smileidentity.ui.core.SmartSelfieResult
+import com.smileidentity.ui.core.randomSessionId
 import com.smileidentity.ui.core.randomUserId
 
 /**
@@ -26,6 +28,9 @@ import com.smileidentity.ui.core.randomUserId
  * displayed to allow the user to manually initiate liveness and selfie capture. This has a higher
  * likelihood of Job failure, as the user may not take the selfie under the correct conditions. When
  * this mode is enabled, face detection will still be performed.
+ * @param sessionId The session token to associate with this job. If not provided, a random one will
+ * be generated. Useful for tracking multiple jobs, and to retrieve image capture files directly at
+ * a later time via [com.smileidentity.ui.core.retrieveCapturedImages].
  * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
 // Since Experimental APIs are *not* exposed in the outward-facing API, consumers won't need to
@@ -36,6 +41,7 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
     userId: String = randomUserId(),
     allowAgentMode: Boolean = false,
     allowManualCapture: Boolean = false,
+    sessionId: String = randomSessionId(),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     SmartSelfieOrPermissionScreen(
@@ -43,6 +49,7 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
         true,
         allowAgentMode,
         allowManualCapture,
+        sessionId,
         rememberPermissionState(Manifest.permission.CAMERA),
         onResult,
     )
@@ -64,6 +71,9 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
  * displayed to allow the user to manually initiate liveness and selfie capture. This has a higher
  * likelihood of Job failure, as the user may not take the selfie under the correct conditions. When
  * this mode is enabled, face detection will still be performed.
+ * @param sessionId The session token to associate with this job. If not provided, a random one will
+ * be generated. Useful for tracking multiple jobs, and to retrieve image capture files directly at
+ * a later time via [com.smileidentity.ui.core.retrieveCapturedImages].
  * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
 // Since Experimental APIs are *not* exposed in the outward-facing API, consumers won't need to
@@ -74,6 +84,7 @@ fun SmileIdentity.SmartSelfieAuthenticationScreen(
     userId: String,
     allowAgentMode: Boolean = false,
     allowManualCapture: Boolean = false,
+    sessionId: String = randomSessionId(),
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     SmartSelfieOrPermissionScreen(
@@ -81,7 +92,28 @@ fun SmileIdentity.SmartSelfieAuthenticationScreen(
         false,
         allowAgentMode,
         allowManualCapture,
+        sessionId,
         rememberPermissionState(Manifest.permission.CAMERA),
         onResult,
+    )
+}
+
+/**
+ * Perform an Enhanced KYC (using the synchronous API)
+ *
+ * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/identity-lookup)
+ *
+ * @param sessionId The session token to associate with this job. If not provided, a random one will
+ * be generated. Useful for tracking multiple jobs, and to retrieve image capture files directly at
+ * a later time via [com.smileidentity.ui.core.retrieveCapturedImages].
+ */
+@Composable
+fun SmileIdentity.EnhancedKycScreen(
+    sessionId: String = randomSessionId(),
+    onResult: EnhancedKycResult.Callback = EnhancedKycResult.Callback {},
+) {
+    com.smileidentity.ui.compose.EnhancedKycScreen(
+        sessionId = sessionId,
+        onResult = onResult
     )
 }

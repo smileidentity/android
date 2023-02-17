@@ -14,6 +14,7 @@ sealed interface SmartSelfieResult {
      * success can be checked with [JobStatusResponse.jobSuccess]
      */
     data class Success(
+        val sessionId: String,
         val selfieFile: File,
         val livenessFiles: List<File>,
         val jobStatusResponse: JobStatusResponse,
@@ -23,7 +24,7 @@ sealed interface SmartSelfieResult {
      * An error was encountered during the SmartSelfie flow. This includes, but is not limited to,
      * denied Camera permissions, file errors, network errors, API errors, and unexpected errors.
      */
-    data class Error(val throwable: Throwable) : SmartSelfieResult
+    data class Error(val sessionId: String, val throwable: Throwable) : SmartSelfieResult
 
     // Using a Functional (SAM) interface for best Java inter-op (otherwise typealias would do)
     fun interface Callback {

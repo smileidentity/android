@@ -2,6 +2,7 @@ package com.smileidentity.ui.viewmodel
 
 import androidx.camera.core.ImageProxy
 import com.smileidentity.ui.core.SmartSelfieResult
+import com.smileidentity.ui.core.randomSessionId
 import com.smileidentity.ui.core.randomUserId
 import com.smileidentity.ui.setupPostProcessMocks
 import com.ujizin.camposer.state.CameraState
@@ -28,7 +29,7 @@ class SelfieViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = SelfieViewModel(true, randomUserId())
+        subject = SelfieViewModel(true, randomUserId(), randomSessionId())
     }
 
     @After

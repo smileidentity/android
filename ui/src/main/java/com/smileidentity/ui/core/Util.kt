@@ -98,15 +98,18 @@ internal fun postProcessImageFile(
  * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
  * format "si_${imageType}_<random number>.jpg"
  */
-internal fun createSmileTempFile(imageType: String): File {
-    return File.createTempFile("si_${imageType}_${System.currentTimeMillis()}_", ".jpg").apply {
+internal fun createSmileTempFile(imageType: String, sessionId: String): File {
+    return File.createTempFile(
+        "si_${sessionId}_${imageType}_${System.currentTimeMillis()}_",
+        ".jpg",
+    ).apply {
         // Deletes file when the *VM* is exited (*not* when the app is closed)
         deleteOnExit()
     }
 }
 
-internal fun createLivenessFile() = createSmileTempFile("liveness")
-internal fun createSelfieFile() = createSmileTempFile("selfie")
+internal fun createLivenessFile(sessionId: String) = createSmileTempFile("liveness", sessionId)
+internal fun createSelfieFile(sessionId: String) = createSmileTempFile("selfie", sessionId)
 
 /**
  * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
@@ -148,3 +151,5 @@ inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =
     }
 
 fun randomUserId() = "user-" + java.util.UUID.randomUUID().toString()
+
+fun randomSessionId() = "session-" + java.util.UUID.randomUUID().toString()

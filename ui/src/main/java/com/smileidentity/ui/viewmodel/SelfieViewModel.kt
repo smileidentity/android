@@ -60,7 +60,11 @@ enum class Directive(@StringRes val displayText: Int) {
     Smile(R.string.si_smartselfie_directive_smile),
 }
 
-class SelfieViewModel(private val isEnroll: Boolean, private val userId: String) : ViewModel() {
+class SelfieViewModel(
+    private val isEnroll: Boolean,
+    private val userId: String,
+    private val sessionId: String,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -93,7 +97,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             it.copy(isCapturing = true, currentDirective = Directive.Capturing)
         }
 
-        val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(e)) }
+        val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(sessionId, e)) }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             // Resume from where we left off, if we already have already taken some images
             val startingImageNum = livenessFiles.size + 1
@@ -107,12 +111,12 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             val selfieFile = captureSelfieImage(cameraState)
             _uiState.update { it.copy(progress = 1f) }
             val jobStatusResponse = submit(selfieFile, livenessFiles)
-            callback.onResult(Success(selfieFile, livenessFiles, jobStatusResponse))
+            callback.onResult(Success(sessionId, selfieFile, livenessFiles, jobStatusResponse))
         }
     }
 
     private suspend fun captureSelfieImage(cameraState: CameraState) = suspendCoroutine {
-        val file = createSelfieFile()
+        val file = createSelfieFile(sessionId)
         cameraState.takePicture(file) { result ->
             when (result) {
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
@@ -129,7 +133,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     }
 
     private suspend fun captureLivenessImage(cameraState: CameraState) = suspendCoroutine {
-        val file = createLivenessFile()
+        val file = createLivenessFile(sessionId)
         cameraState.takePicture(file) { result ->
             when (result) {
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
@@ -195,7 +199,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
                 if (livenessFiles.size < numLivenessImages) {
                     Timber.v("Capturing liveness image")
-                    val livenessFile = createLivenessFile()
+                    val livenessFile = createLivenessFile(sessionId)
                     postProcessImageBitmap(
                         bitmap = bitmap,
                         file = livenessFile,
@@ -209,7 +213,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                     }
                 } else {
                     Timber.v("Capturing selfie image")
-                    val selfieFile = createSelfieFile()
+                    val selfieFile = createSelfieFile(sessionId)
                     postProcessImageBitmap(
                         bitmap = bitmap,
                         file = selfieFile,
@@ -219,10 +223,14 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                     )
                     _uiState.update { it.copy(progress = 1f) }
                     shouldAnalyzeImages = false
-                    val proxy = { e: Throwable -> callback.onResult(SmartSelfieResult.Error(e)) }
+                    val proxy = { e: Throwable ->
+                        callback.onResult(SmartSelfieResult.Error(sessionId, e))
+                    }
                     viewModelScope.launch(getExceptionHandler(proxy)) {
                         val jobStatusResponse = submit(selfieFile, livenessFiles)
-                        callback.onResult(Success(selfieFile, livenessFiles, jobStatusResponse))
+                        callback.onResult(
+                            Success(sessionId, selfieFile, livenessFiles, jobStatusResponse)
+                        )
                     }
                 }
             }
