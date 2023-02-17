@@ -48,7 +48,6 @@ import timber.log.Timber
 @Preview
 @Composable
 fun MainScreen() {
-    val sessionId = "testSessionId"
     val navController = rememberNavController()
     var bottomNavSelection: Screens by remember { mutableStateOf(Screens.Home) }
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
@@ -167,7 +166,6 @@ fun MainScreen() {
                             SmileIdentity.SmartSelfieRegistrationScreen(
                                 allowAgentMode = true,
                                 allowManualCapture = true,
-                                sessionId = sessionId,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Registration success"
@@ -221,7 +219,6 @@ fun MainScreen() {
                                 userId = it.arguments?.getString("userId")!!,
                                 allowAgentMode = true,
                                 allowManualCapture = true,
-                                sessionId = sessionId,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Authentication success"
@@ -240,7 +237,7 @@ fun MainScreen() {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.EnhancedKyc.label
                             val context = LocalContext.current
-                            SmileIdentity.EnhancedKycScreen(sessionId) { result ->
+                            SmileIdentity.EnhancedKycScreen { result ->
                                 if (result is EnhancedKycResult.Success) {
                                     val message = "Enhanced KYC success"
                                     context.toast(message)
