@@ -46,7 +46,6 @@ data class EnhancedKycResponse(
     val isFinalResult: Boolean,
 )
 
-// todo: convert to object or sealed class, with id types nested by country
 enum class IdType(
     val countryCode: String,
     val idType: String,
