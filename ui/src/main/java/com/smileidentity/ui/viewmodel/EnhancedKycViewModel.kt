@@ -72,12 +72,15 @@ class EnhancedKycViewModel : ViewModel() {
     }
 
     fun onIdInputFieldChanged(it: IdType.InputField, newValue: String) {
-        _uiState.value.idInputFieldValues[it] = newValue
+        _uiState.value.idInputFieldValues[it] = newValue.trim()
     }
 
     fun allInputsSatisfied(): Boolean {
         val state = _uiState.value
         return state.selectedCountry != null && state.selectedIdType != null &&
+            state.selectedIdType.isValidIdNumber(
+                state.idInputFieldValues[IdType.InputField.IdNumber] ?: "",
+            ) &&
             state.selectedIdType.requiredFields.all {
                 (state.idInputFieldValues[it] ?: "").isNotBlank()
             }

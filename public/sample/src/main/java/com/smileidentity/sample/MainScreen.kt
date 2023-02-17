@@ -1,5 +1,7 @@
 package com.smileidentity.sample
 
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
@@ -42,7 +44,7 @@ import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun MainScreen() {
@@ -134,7 +136,13 @@ fun MainScreen() {
                     }
                 },
                 content = {
-                    NavHost(navController, Screens.Home.route, Modifier.padding(it)) {
+                    NavHost(
+                        navController,
+                        Screens.Home.route,
+                        Modifier
+                            .padding(it)
+                            .consumedWindowInsets(it),
+                    ) {
                         composable(Screens.Home.route) {
                             bottomNavSelection = Screens.Home
                             // Display "Smile Identity" in the top bar instead of "Home" label

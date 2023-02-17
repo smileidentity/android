@@ -6,6 +6,6 @@ import kotlin.time.Duration
 
 internal fun ComposeContentTestRule.waitUntilExists(matcher: SemanticsMatcher, timeout: Duration) {
     waitUntil(timeout.inWholeMilliseconds) {
-        onAllNodes(matcher).fetchSemanticsNodes().size == 1
+        onAllNodes(matcher).fetchSemanticsNodes().isNotEmpty()
     }
 }

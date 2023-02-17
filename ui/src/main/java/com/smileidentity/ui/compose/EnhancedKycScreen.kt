@@ -2,8 +2,11 @@ package com.smileidentity.ui.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imeNestedScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,14 +32,16 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.networking.models.IdType
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.EnhancedKycResult
 import com.smileidentity.ui.viewmodel.EnhancedKycViewModel
 import com.smileidentity.ui.viewmodel.SupportedCountry
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun EnhancedKycScreen(
     viewModel: EnhancedKycViewModel = viewModel(),
@@ -47,7 +52,12 @@ fun EnhancedKycScreen(
         ProcessingScreen(textRes = R.string.si_enhanced_kyc_processing)
         return
     }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .imePadding()
+            .imeNestedScroll()
+            .fillMaxSize(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -134,27 +144,79 @@ fun EnhancedKycScreen(
                 }
             }
 
-            for (field in uiState.selectedIdType?.requiredFields ?: emptyList()) {
+            uiState.selectedIdType?.requiredFields?.forEachIndexed { index, field ->
                 val focusManager = LocalFocusManager.current
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(viewModel.getFieldDisplayName(field))) },
-                    value = uiState.idInputFieldValues[field] ?: "",
-                    onValueChange = { viewModel.onIdInputFieldChanged(field, it) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(Down) }),
+                val label = stringResource(viewModel.getFieldDisplayName(field))
+                val value = uiState.idInputFieldValues[field] ?: ""
+                val onValueChange = { it: String -> viewModel.onIdInputFieldChanged(field, it) }
+                val keyboardOpts = if (index == uiState.selectedIdType.requiredFields.lastIndex) {
+                    KeyboardOptions(imeAction = ImeAction.Done)
+                } else {
+                    KeyboardOptions(imeAction = ImeAction.Next)
+                }
+                val keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(Down) },
+                    onDone = { focusManager.clearFocus() },
                 )
+                val modifier = Modifier.fillMaxWidth()
+                when (field) {
+                    IdType.InputField.IdNumber -> OutlinedTextField(
+                        modifier = modifier,
+                        label = { Text(label) },
+                        value = value,
+                        onValueChange = onValueChange,
+                        isError = value.isNotBlank() && !uiState.selectedIdType.isValidIdNumber(
+                            value,
+                        ),
+                        singleLine = true,
+                        keyboardActions = keyboardActions,
+                        keyboardOptions = keyboardOpts,
+                    )
+                    IdType.InputField.FirstName -> OutlinedTextField(
+                        modifier = modifier,
+                        label = { Text(label) },
+                        value = value,
+                        onValueChange = onValueChange,
+                        singleLine = true,
+                        keyboardActions = keyboardActions,
+                        keyboardOptions = keyboardOpts,
+                    )
+                    IdType.InputField.LastName -> OutlinedTextField(
+                        modifier = modifier,
+                        label = { Text(label) },
+                        value = value,
+                        onValueChange = onValueChange,
+                        singleLine = true,
+                        keyboardActions = keyboardActions,
+                        keyboardOptions = keyboardOpts,
+                    )
+                    IdType.InputField.Dob -> OutlinedTextField(
+                        modifier = modifier,
+                        label = { Text(label) },
+                        value = value,
+                        onValueChange = onValueChange,
+                        singleLine = true,
+                        keyboardActions = keyboardActions,
+                        keyboardOptions = keyboardOpts,
+                    )
+                    IdType.InputField.BankCode -> OutlinedTextField(
+                        modifier = modifier,
+                        label = { Text(label) },
+                        value = value,
+                        onValueChange = onValueChange,
+                        singleLine = true,
+                        keyboardActions = keyboardActions,
+                        keyboardOptions = keyboardOpts.copy(keyboardType = NumberPassword),
+                    )
+                }
             }
         }
         Button(
             modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(8.dp),
             enabled = viewModel.allInputsSatisfied(),
             onClick = { viewModel.doEnhancedKyc(callback = onResult) },
-        ) {
-            Text(stringResource(R.string.si_enhanced_kyc_submit_button))
-        }
+        ) { Text(stringResource(R.string.si_enhanced_kyc_submit_button)) }
     }
 }
