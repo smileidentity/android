@@ -60,12 +60,13 @@ internal fun EnhancedKycScreen(
         ProcessingScreen(textRes = R.string.si_enhanced_kyc_processing)
         return
     }
-    Column(
-        modifier = Modifier
-            .imePadding()
-            .imeNestedScroll()
-            .fillMaxSize(),
-    ) {
+    // Only allow IME scroll when an ID Type is selected
+    val columnModifier = if (uiState.selectedIdType?.requiredFields.isNullOrEmpty()) {
+        Modifier.fillMaxSize()
+    } else {
+        Modifier.fillMaxSize().imePadding().imeNestedScroll()
+    }
+    Column(modifier = columnModifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
