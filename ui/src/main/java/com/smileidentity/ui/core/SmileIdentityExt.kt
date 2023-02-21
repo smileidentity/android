@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient
  * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
  */
 @JvmOverloads
-fun SmileIdentity.init(
+fun SmileIdentity.initialize(
     context: Context,
     useSandbox: Boolean = false,
     enableCrashReporting: Boolean = false,
@@ -25,7 +25,7 @@ fun SmileIdentity.init(
     if (enableCrashReporting) {
         SmileIdentityCrashReporting.enable()
     }
-    init(
+    initialize(
         config = Config.fromAssets(context),
         useSandbox = useSandbox,
         okHttpClient = okHttpClient,

@@ -5,7 +5,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.google.android.material.color.DynamicColors
 import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.networking.SmileIdentity.getOkHttpClientBuilder
-import com.smileidentity.ui.core.init
+import com.smileidentity.ui.core.initialize
 import timber.log.Timber
 
 class SmileIdentityApplication : Application() {
@@ -15,7 +15,7 @@ class SmileIdentityApplication : Application() {
         DynamicColors.applyToActivitiesIfAvailable(this)
         @Suppress("DEPRECATION")
         val chucker = ChuckerInterceptor(this)
-        SmileIdentity.init(
+        SmileIdentity.initialize(
             context = this,
             useSandbox = BuildConfig.DEBUG,
             enableCrashReporting = BuildConfig.DEBUG,
