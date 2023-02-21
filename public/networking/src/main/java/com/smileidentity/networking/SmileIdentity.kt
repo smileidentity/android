@@ -36,7 +36,7 @@ object SmileIdentity {
      */
     @JvmStatic
     @JvmOverloads
-    fun init(
+    fun initialize(
         config: Config,
         useSandbox: Boolean = false,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
@@ -67,14 +67,14 @@ object SmileIdentity {
      */
     @JvmStatic
     @JvmOverloads
-    fun init(
+    fun initialize(
         apiKey: String,
         config: Config,
         useSandbox: Boolean = false,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         this.apiKey = apiKey
-        init(config, useSandbox, okHttpClient)
+        initialize(config, useSandbox, okHttpClient)
     }
 
     fun setEnvironment(useSandbox: Boolean) {
@@ -121,9 +121,10 @@ object SmileIdentity {
     }
 
     /**
-     * Create the [Moshi] instance used by the SDK. It is declared here instead of [init] because
-     * [Moshi] needs to already be initialized when the UI module attempts to read the config JSON
-     * file directly into a [Config], which needs to happen as a prerequisite to the [init] call
+     * Create the [Moshi] instance used by the SDK. It is declared here instead of [initialize]
+     * because [Moshi] needs to already be initialized when the UI module attempts to read the
+     * config JSON file directly into a [Config], which needs to happen as a prerequisite to the
+     * [initialize] call
      */
     private fun initMoshi(): Moshi {
         return Moshi.Builder()
