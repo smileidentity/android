@@ -1,4 +1,4 @@
-package com.smileidentity.ui.viewmodel
+package com.smileidentity.sample.viewmodel
 
 import com.smileidentity.networking.models.IdType
 import kotlinx.coroutines.Dispatchers
