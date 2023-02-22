@@ -1,4 +1,4 @@
-package com.smileidentity.ui.viewmodel
+package com.smileidentity.sample.viewmodel
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.mutableStateMapOf

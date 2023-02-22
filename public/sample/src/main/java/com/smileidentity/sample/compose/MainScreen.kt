@@ -1,4 +1,4 @@
-package com.smileidentity.sample
+package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumedWindowInsets
@@ -36,7 +36,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.networking.SmileIdentity
-import com.smileidentity.ui.compose.EnhancedKycScreen
+import com.smileidentity.sample.R
+import com.smileidentity.sample.Screens
+import com.smileidentity.sample.toast
 import com.smileidentity.ui.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.ui.core.EnhancedKycResult

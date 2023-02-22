@@ -1,4 +1,4 @@
-package com.smileidentity.ui.compose
+package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,10 +36,11 @@ import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.networking.models.IdType
+import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
+import com.smileidentity.sample.viewmodel.SupportedCountry
 import com.smileidentity.ui.R
+import com.smileidentity.ui.compose.ProcessingScreen
 import com.smileidentity.ui.core.EnhancedKycResult
-import com.smileidentity.ui.viewmodel.EnhancedKycViewModel
-import com.smileidentity.ui.viewmodel.SupportedCountry
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable

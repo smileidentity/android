@@ -115,7 +115,7 @@ internal fun createSelfieFile() = createSmileTempFile("selfie")
  *
  * @param proxy Callback to be invoked with the exception
  */
-internal fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExceptionHandler {
+fun getExceptionHandler(proxy: (Throwable) -> Unit = { }): CoroutineExceptionHandler {
     return CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable, "Error during coroutine execution")
         val converted = if (throwable is HttpException) {
