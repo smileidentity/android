@@ -151,8 +151,8 @@ enum class ActionResult {
     IssuerUnavailable,
 
     /**
-     * This is a special value used to indicate that the value returned from the server is not yet
-     * supported by the SDK. Please update the SDK to the latest version to support this value.
+     * Special value used to indicate that the value returned from the server is not yet supported
+     * by the SDK. Please update the SDK to the latest version to support the latest values.
      */
     Unknown,
 }
