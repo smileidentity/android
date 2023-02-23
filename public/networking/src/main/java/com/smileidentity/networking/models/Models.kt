@@ -2,7 +2,6 @@
 
 package com.smileidentity.networking.models
 
-import com.serjltt.moshi.adapters.FallbackEnum
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.UUID
@@ -31,16 +30,20 @@ data class PartnerParams(
     val extras: Map<String, String> = mapOf(),
 )
 
-@FallbackEnum(name = "Unknown")
 enum class JobType(val value: Int) {
     SmartSelfieAuthentication(2),
     SmartSelfieEnrollment(4),
     EnhancedKyc(5),
-    Unknown(-1)
+
+    /**
+     * This is a special value used to indicate that the value returned from the server is not yet
+     * supported by the SDK. Please update the SDK to the latest version to support this value.
+     */
+    Unknown(-1),
     ;
 
     companion object {
         @JvmStatic
-        fun fromValue(value: Int): JobType? = values().find { it.value == value }
+        fun fromValue(value: Int): JobType = values().find { it.value == value } ?: Unknown
     }
 }

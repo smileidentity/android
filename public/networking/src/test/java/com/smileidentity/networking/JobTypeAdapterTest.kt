@@ -2,6 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.networking.models.JobType
 import com.squareup.moshi.Moshi
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -33,5 +34,17 @@ class JobTypeAdapterTest {
             // then
             assertTrue(result == value)
         }
+    }
+
+    @Test
+    fun `should default to Unknown`() {
+        // given
+        val value = "999"
+
+        // when
+        val result = adapter.fromJson(value)
+
+        // then
+        assertEquals(JobType.Unknown, result)
     }
 }
