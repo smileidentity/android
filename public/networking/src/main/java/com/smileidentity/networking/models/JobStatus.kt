@@ -2,6 +2,7 @@
 
 package com.smileidentity.networking.models
 
+import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.networking.SmileIdentity
 import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
@@ -102,6 +103,7 @@ data class Actions(
     val verifyIdNumber: ActionResult = ActionResult.NotApplicable,
 )
 
+@FallbackEnum(name = "Unknown")
 enum class ActionResult {
     @Json(name = "Passed")
     Passed,
@@ -147,6 +149,8 @@ enum class ActionResult {
 
     @Json(name = "Issuer Unavailable")
     IssuerUnavailable,
+
+    Unknown,
 }
 
 @JsonClass(generateAdapter = true)

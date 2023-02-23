@@ -2,6 +2,7 @@
 
 package com.smileidentity.networking.models
 
+import com.serjltt.moshi.adapters.FallbackEnum
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.UUID
@@ -30,10 +31,12 @@ data class PartnerParams(
     val extras: Map<String, String> = mapOf(),
 )
 
+@FallbackEnum(name = "Unknown")
 enum class JobType(val value: Int) {
     SmartSelfieAuthentication(2),
     SmartSelfieEnrollment(4),
     EnhancedKyc(5),
+    Unknown(-1)
     ;
 
     companion object {
