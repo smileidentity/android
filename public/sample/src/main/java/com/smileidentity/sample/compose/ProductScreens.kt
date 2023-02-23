@@ -1,4 +1,4 @@
-package com.smileidentity.sample
+package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.smileidentity.sample.R
+import com.smileidentity.sample.Screens
 
 @Preview
 @Composable
@@ -31,6 +33,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
     val products = listOf(
         Screens.SmartSelfieRegistration,
         Screens.SmartSelfieAuthentication,
+        Screens.EnhancedKyc,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

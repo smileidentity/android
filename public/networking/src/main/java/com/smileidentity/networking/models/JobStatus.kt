@@ -22,7 +22,6 @@ data class JobStatusRequest(
 @JsonClass(generateAdapter = true)
 data class JobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "signature") val signature: String,
     @Json(name = "job_complete") val jobComplete: Boolean,
     @Json(name = "job_success") val jobSuccess: Boolean,
     @Json(name = "code") val code: Int,
@@ -47,7 +46,6 @@ sealed interface JobResult {
         @Json(name = "ResultText") val resultText: String,
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") val smileJobId: String,
-        @Json(name = "JSONVersion") val jsonVersion: String,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
         @Json(name = "ConfidenceValue") val confidence: Double,
 
@@ -114,8 +112,17 @@ enum class ActionResult {
     @Json(name = "Approved")
     Approved,
 
+    @Json(name = "Verified")
+    Verified,
+
     @Json(name = "Provisionally Approved")
     ProvisionallyApproved,
+
+    @Json(name = "Returned")
+    Returned,
+
+    @Json(name = "Not Returned")
+    NotReturned,
 
     @Json(name = "Failed")
     Failed,
@@ -131,6 +138,15 @@ enum class ActionResult {
 
     @Json(name = "Not Applicable")
     NotApplicable,
+
+    @Json(name = "Not Verified")
+    NotVerified,
+
+    @Json(name = "Not Done")
+    NotDone,
+
+    @Json(name = "Issuer Unavailable")
+    IssuerUnavailable,
 }
 
 @JsonClass(generateAdapter = true)

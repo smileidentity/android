@@ -6,10 +6,12 @@ import androidx.compose.material.icons.Icons.Outlined
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -36,5 +38,12 @@ sealed class Screens(
         // TODO: Replace icons with Smile Identity branded icons
         Filled.Face,
         Outlined.Face,
+    )
+
+    object EnhancedKyc : Screens(
+        "enhanced_kyc",
+        com.smileidentity.ui.R.string.si_enhanced_kyc_product_name,
+        Filled.Person,
+        Outlined.Person,
     )
 }

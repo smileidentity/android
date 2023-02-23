@@ -1,4 +1,4 @@
-package com.smileidentity.sample;
+package com.smileidentity.sample.activity;
 
 import android.os.Bundle;
 import android.widget.Toast;

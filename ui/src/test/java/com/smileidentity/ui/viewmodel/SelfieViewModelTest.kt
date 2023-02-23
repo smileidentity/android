@@ -11,6 +11,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -20,6 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SelfieViewModelTest {
     private lateinit var subject: SelfieViewModel
 

@@ -21,7 +21,7 @@ sealed interface SmartSelfieResult {
 
     /**
      * An error was encountered during the SmartSelfie flow. This includes, but is not limited to,
-     * denied Camera permissions, file errors, network errors, API errors, and other errors.
+     * denied Camera permissions, file errors, network errors, API errors, and unexpected errors.
      */
     data class Error(val throwable: Throwable) : SmartSelfieResult
 
