@@ -23,7 +23,7 @@ object JobTypeAdapter {
     fun toJson(jobType: JobType): Int = jobType.value
 
     @FromJson
-    fun fromJson(value: Int): JobType? = JobType.fromValue(value)
+    fun fromJson(value: Int) = JobType.fromValue(value)
 }
 
 @Suppress("unused")
