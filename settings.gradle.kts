@@ -1,3 +1,8 @@
+@file:Suppress("UnstableApiUsage")
+
+rootProject.name = "SmileIdentity"
+include("networking", "sample", "ui")
+
 pluginManagement {
     repositories {
         google()
@@ -15,8 +20,3 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-rootProject.name = "SmileIdentity"
-include ":networking"
-include ":sample"
-include ":ui"
