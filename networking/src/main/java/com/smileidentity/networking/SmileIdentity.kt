@@ -1,5 +1,6 @@
 package com.smileidentity.networking
 
+import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.networking.models.Config
 import com.squareup.moshi.Moshi
 import okhttp3.Interceptor
@@ -133,6 +134,7 @@ object SmileIdentity {
             .add(StringifiedBooleanAdapter)
             .add(FileAdapter)
             .add(JobResultAdapter)
+            .add(FallbackEnum.ADAPTER_FACTORY)
             .build()
     }
 }
