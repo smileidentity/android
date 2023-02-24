@@ -17,6 +17,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "SmileIdentity"
-include ":public:networking"
-include ":public:sample"
+include ":networking"
+include ":sample"
 include ":ui"
