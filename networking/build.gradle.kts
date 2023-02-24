@@ -22,8 +22,9 @@ dependencies {
 
     // Moshi is exposed in public SmileIdentity interface, hence "api" vs "implementation"
     api(libs.moshi)
-    implementation(libs.moshi.adapters)
     ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.moshi.adapters)
+    implementation(libs.moshi.adapters.lazy)
 
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
