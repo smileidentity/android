@@ -1,6 +1,6 @@
 [versions]
 accompanist-permissions = "0.28.0"
-android-gradle-plugin = "7.4.1"
+android-gradle-plugin = "7.4.2"
 androidx-activity = "1.6.1"
 androidx-appcompat = "1.6.1"
 androidx-camera2 = "1.2.1"
