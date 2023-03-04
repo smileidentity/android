@@ -39,10 +39,10 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Partner ${{ github.event.inputs.partnerId }} Sample App (${{ github.ref }})
           prerelease: true
-      - name: Internal Google Play Release
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
-          packageName: com.smileidentity.sample
-          releaseFiles: sample/build/outputs/apk/debug/sample-debug.apk
-          track: internal
+#      - name: Internal Google Play Release
+#        uses: r0adkll/upload-google-play@v1
+#        with:
+#          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+#          packageName: com.smileidentity.sample
+#          releaseFiles: sample/build/outputs/apk/debug/sample-debug.apk
+#          track: internal
