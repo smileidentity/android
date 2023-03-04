@@ -1,0 +1,36 @@
+name: Assemble SDK and Sample App
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+      - name: Setup Gradle # Although not strictly necessary, it is useful for better caching
+        uses: gradle/gradle-build-action@v2
+      - name: Write smile_config.json
+        run: echo ${{ secrets.SMILE_CONFIG }} > sample/src/main/assets/smile_config.json
+      - name: Build
+        run: ./gradlew assembleDebug -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
+      - name: Archive UI SDK AAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: UI SDK AAR
+          path: ui/build/outputs/aar/ui-debug.aar
+      - name: Archive Networking SDK AAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: Networking SDK JAR
+          path: networking/build/libs/networking.jar
+      - name: Archive Sample App
+        uses: actions/upload-artifact@v2
+        with:
+          name: Sample App APK
+          path: sample/build/outputs/apk/debug/sample-debug.apk

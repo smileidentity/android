@@ -1,0 +1,48 @@
+name: Deploy Sample App
+on:
+  workflow_dispatch:
+    inputs:
+      partnerId:
+        description: "Partner ID"
+        required: true
+      smileConfig:
+        description: "smile_config.json of the Partner"
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+      - name: Setup Gradle # Although not strictly necessary, it is useful for better caching
+        uses: gradle/gradle-build-action@v2
+      - name: Write smile_config.json
+        run: echo ${{ github.event.inputs.smileConfig }} > sample/src/main/assets/smile_config.json
+      - name: Assemble APK
+        run: ./gradlew assembleDebug -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Partner ${{ github.event.inputs.partnerId }} Sample App APK
+          path: sample/build/outputs/apk/debug/sample-debug.apk
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Partner ${{ github.event.inputs.partnerId }} Sample App (${{ github.ref }})
+          prerelease: true
+      - name: Internal Google Play Release
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          packageName: com.smileidentity.sample
+          releaseFiles: sample/build/outputs/apk/debug/sample-debug.apk
+          track: internal
