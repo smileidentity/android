@@ -30,15 +30,12 @@ jobs:
         with:
           name: Partner ${{ github.event.inputs.partnerId }} Sample App APK
           path: sample/build/outputs/apk/debug/sample-debug.apk
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Partner ${{ github.event.inputs.partnerId }} Sample App (${{ github.ref }})
+          name: Partner ${{ github.event.inputs.partnerId }} Sample App (${{ github.ref }})
           prerelease: true
+          files: sample/build/outputs/apk/debug/sample-debug.apk
 #      - name: Internal Google Play Release
 #        uses: r0adkll/upload-google-play@v1
 #        with:
