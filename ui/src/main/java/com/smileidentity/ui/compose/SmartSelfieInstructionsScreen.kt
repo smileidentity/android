@@ -39,8 +39,7 @@ fun SmartSelfieInstructionsScreen(
     val columnWidth = 320.dp
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,14 +61,13 @@ fun SmartSelfieInstructionsScreen(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(modifier = Modifier.size(16.dp))
             Text(
                 text = stringResource(id = R.string.si_smart_selfie_instruction_subtitle),
                 style = SmileIdentityTypography.bodySmall,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp, bottom = 32.dp),
             )
-            Spacer(modifier = Modifier.size(32.dp))
             val instructions = listOf(
                 Triple(
                     R.drawable.si_smart_selfie_instruction_good_light,
@@ -93,7 +91,7 @@ fun SmartSelfieInstructionsScreen(
                         painter = painterResource(id = imageId),
                         contentDescription = null,
                     )
-                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                    Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
                             text = stringResource(title),
                             style = MaterialTheme.typography.titleMedium,
@@ -115,8 +113,8 @@ fun SmartSelfieInstructionsScreen(
         ) {
             Button(
                 onClick = onInstructionsAcknowledged,
-                modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = SmileIdentityLightBlue),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.si_smart_selfie_instruction_ready_button))
             }
