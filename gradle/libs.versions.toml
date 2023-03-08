@@ -3,7 +3,6 @@ accompanist-permissions = "0.28.0"
 android-gradle-plugin = "7.4.2"
 androidx-activity = "1.6.1"
 androidx-appcompat = "1.6.1"
-androidx-camera2 = "1.2.1"
 androidx-compose-bom = "2023.01.00"
 androidx-compose-compiler = "1.4.3"
 androidx-core = "1.9.0"
@@ -43,7 +42,6 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
-androidx-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx-camera2" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }

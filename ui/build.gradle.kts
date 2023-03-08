@@ -98,7 +98,6 @@ dependencies {
     implementation(libs.accompanist.permissions)
     // CameraX Compose component
     implementation(libs.camposer)
-    implementation(libs.androidx.camera2)
 
     // Unbundled model -- will be dynamically downloaded via Google Play Services
     implementation(libs.play.services.mlkit.face.detection)
