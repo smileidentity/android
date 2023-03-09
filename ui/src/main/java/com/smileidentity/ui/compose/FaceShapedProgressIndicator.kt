@@ -27,7 +27,8 @@ import com.smileidentity.ui.theme.SmileIdentitySemiTransparentBackground
  * @param faceHeight The height of the face shape. The aspect ratio of the face shape is preserved.
  * @param modifier The modifier to be applied to the indicator.
  * @param strokeWidth The width of the progress indicator stroke.
- * @param strokeColor The color of the progress indicator stroke.
+ * @param completeProgressStrokeColor The color of the progress indicator stroke.
+ * @param incompleteProgressStrokeColor The color of the progress indicator track.
  * @param backgroundColor The color of the background that is drawn around the face shape.
  */
 @Composable
@@ -36,7 +37,8 @@ fun FaceShapedProgressIndicator(
     faceHeight: Dp,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
-    strokeColor: Color = ProgressIndicatorDefaults.circularColor,
+    completeProgressStrokeColor: Color = ProgressIndicatorDefaults.circularColor,
+    incompleteProgressStrokeColor: Color = Color.Gray,
     backgroundColor: Color = SmileIdentitySemiTransparentBackground,
 ) {
     val stroke = with(LocalDensity.current) { Stroke(strokeWidth.toPx()) }
@@ -55,15 +57,18 @@ fun FaceShapedProgressIndicator(
                 drawRect(color = backgroundColor)
             }
 
+            // 4. Draw the Progress Indicator Track
+            drawPath(FaceShape.path, color = incompleteProgressStrokeColor, style = stroke)
+
             // Note: Height grows downwards
             val faceShapeSize = faceShapeBounds.size
             val left = faceShapeBounds.left - strokeWidth.toPx() / 2
             val top = faceShapeBounds.top - strokeWidth.toPx() / 2
             val right = left + faceShapeSize.width + strokeWidth.toPx()
             val bottom = top + (faceShapeSize.height + strokeWidth.toPx()) * (1 - progress)
-            // 4. Draw the progress indicator by clipping the face shape path out of a rectangle
+            // 5. Draw the Progress Indicator by clipping the face shape path out of a rectangle
             clipRect(left, top, right, bottom, clipOp = ClipOp.Difference) {
-                drawPath(FaceShape.path, color = strokeColor, style = stroke)
+                drawPath(FaceShape.path, color = completeProgressStrokeColor, style = stroke)
             }
         }
     }
