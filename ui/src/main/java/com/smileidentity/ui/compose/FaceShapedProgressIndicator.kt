@@ -1,0 +1,76 @@
+package com.smileidentity.ui.compose
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.progressSemantics
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.ClipOp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.smileidentity.ui.theme.SmileIdentitySemiTransparentBackground
+
+/**
+ * A progress indicator that is shaped like a face, has a semi-transparent background, and where the
+ * progress fills up symmetrically on either side of the face.
+ *
+ * @param progress The progress of the indicator, from 0 to 1.
+ * @param faceHeight The height of the face shape. The aspect ratio of the face shape is preserved.
+ * @param modifier The modifier to be applied to the indicator.
+ * @param strokeWidth The width of the progress indicator stroke.
+ * @param strokeColor The color of the progress indicator stroke.
+ * @param backgroundColor The color of the background that is drawn around the face shape.
+ */
+@Composable
+fun FaceShapedProgressIndicator(
+    progress: Float,
+    faceHeight: Dp,
+    modifier: Modifier = Modifier,
+    strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
+    strokeColor: Color = ProgressIndicatorDefaults.circularColor,
+    backgroundColor: Color = SmileIdentitySemiTransparentBackground,
+) {
+    val stroke = with(LocalDensity.current) { Stroke(strokeWidth.toPx()) }
+    Canvas(modifier.progressSemantics(progress).fillMaxSize()) {
+        val faceShapeBounds = FaceShape.path.getBounds()
+        // Scale the face shape to the desired size
+        scale(faceHeight.toPx() / faceShapeBounds.height) {
+            // 1. Move the Face Shape to the center of the Canvas
+            val centeredFaceOffset = with((size.center - faceShapeBounds.center)) {
+                copy(y = y - faceShapeBounds.height / 3)
+            }
+            FaceShape.path.translate(centeredFaceOffset)
+            // 2. Draw the Face Shape, clipping it out of the background
+            clipPath(FaceShape.path, clipOp = ClipOp.Difference) {
+                // 3. Set the background color using a rectangle
+                drawRect(color = backgroundColor)
+            }
+
+            // Note: Height grows downwards
+            val faceShapeSize = faceShapeBounds.size
+            val left = faceShapeBounds.left - strokeWidth.toPx() / 2
+            val top = faceShapeBounds.top - strokeWidth.toPx() / 2
+            val right = left + faceShapeSize.width + strokeWidth.toPx()
+            val bottom = top + (faceShapeSize.height + strokeWidth.toPx()) * (1 - progress)
+            // 4. Draw the progress indicator by clipping the face shape path out of a rectangle
+            clipRect(left, top, right, bottom, clipOp = ClipOp.Difference) {
+                drawPath(FaceShape.path, color = strokeColor, style = stroke)
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FaceShapedProgressIndicatorPreview() {
+    FaceShapedProgressIndicator(progress = 0.5f, faceHeight = 400.dp)
+}
