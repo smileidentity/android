@@ -28,6 +28,10 @@
     <string name="si_smartselfie_directive_unable_to_detect_face">Unable to detect face. Please ensure your face is in the oval</string>
     <string name="si_smartselfie_directive_face_too_far">Face is too far. Please move closer</string>
     <string name="si_smartselfie_directive_face_too_close">Face is too close. Please move farther away</string>
+    <string name="si_smartselfie_selfie_confirmation_dialog_title">Is this a good quality selfie?</string>
+    <string name="si_smartselfie_selfie_confirmation_dialog_subtitle">Make sure your whole face is visible and clear</string>
+    <string name="si_smartselfie_selfie_confirmation_dialog_confirm_button">Yes, use this</string>
+    <string name="si_smartselfie_selfie_confirmation_dialog_retake_button">No, retake selfie</string>
     <string name="si_smartselfie_processing">Processing SmartSelfie™…</string>
 
     <!--  Country Names  -->
