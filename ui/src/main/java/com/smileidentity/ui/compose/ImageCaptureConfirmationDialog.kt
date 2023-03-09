@@ -2,6 +2,7 @@ package com.smileidentity.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -12,8 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +59,8 @@ fun ImageCaptureConfirmationDialog(
                 Image(
                     painter = painter,
                     contentDescription = null,
-                    modifier = Modifier.clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier.height(256.dp).clip(RoundedCornerShape(16.dp)),
                 )
             }
         },
@@ -74,7 +79,9 @@ private fun PreviewImageCaptureConfirmationDialog() {
     ImageCaptureConfirmationDialog(
         titleText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_title),
         subtitleText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_subtitle),
-        painter = painterResource(R.drawable.placeholder2),
+        painter = BrushPainter(
+            brush = linearGradient(listOf(Color(0xFF11B33E), Color(0xFF1B73AD))),
+        ),
         confirmButtonText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_confirm_button),
         onConfirm = {},
         retakeButtonText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_retake_button),
