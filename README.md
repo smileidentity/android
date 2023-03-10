@@ -34,6 +34,13 @@ To run the linter, run `./gradlew ktlintCheck`. To run the formatter, run `./gra
 The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce the code style
 (taken from https://pinterest.github.io/ktlint/rules/configuration-intellij-idea/)
 
+## Other Notes
+
+- When adding new resources, please use the `si_` prefix to avoid conflicts with other libraries and
+  applications
+- When adding drawables, please compress them as much as possible (tinypng.com is a good resource
+  for this) as well as `avocado` (`npm install -g avocado`) for compressing android vector drawables
+
 ## FAQs
 
 - Q: Why are source sets are located in `$module/src/main/java`, even though we're using Kotlin?
