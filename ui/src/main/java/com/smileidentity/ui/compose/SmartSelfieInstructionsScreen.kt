@@ -52,7 +52,7 @@ fun SmartSelfieInstructionsScreen(
                 .weight(1f),
         ) {
             Image(
-                painter = painterResource(id = R.drawable.si_smart_selfie_hero),
+                painter = painterResource(id = R.drawable.si_smart_selfie_instructions_hero),
                 modifier = Modifier.size(128.dp),
                 contentDescription = null,
             )
