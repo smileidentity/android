@@ -52,7 +52,7 @@ data class SelfieUiState(
 )
 
 enum class Directive(@StringRes val displayText: Int) {
-    InitialInstruction(R.string.si_smartselfie_instructions),
+    InitialInstruction(R.string.si_smart_selfie_instructions),
     Capturing(R.string.si_smartselfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smartselfie_directive_unable_to_detect_face),
     MoveCloser(R.string.si_smartselfie_directive_face_too_far),
