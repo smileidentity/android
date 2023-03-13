@@ -30,6 +30,28 @@ import com.smileidentity.ui.R
 import com.smileidentity.ui.theme.SmileIdentityAffirmationColor
 import com.smileidentity.ui.theme.SmileIdentityLightBlue
 
+/**
+ * This screen represents a generic Processing state. It has 3 sub-states: In Progress, Success, and
+ * Error. These sub-states are represented by the [processingState] parameter.
+ *
+ * @param processingState The state of the processing. It can be null, true, or false. null
+ * represents In Progress, true represents Success, and false represents Error.
+ * @param successTitle The title to display when the processing is successful.
+ * @param successSubtitle The subtitle to display when the processing is successful.
+ * @param successIcon The icon to display when the processing is successful.
+ * @param errorTitle The title to display when the processing is unsuccessful.
+ * @param errorSubtitle The subtitle to display when the processing is unsuccessful.
+ * @param errorIcon The icon to display when the processing is unsuccessful.
+ * @param continueButtonText The text to display on the continue button when the processing is
+ * successful.
+ * @param onContinue The callback to invoke when the continue button is clicked.
+ * @param retryButtonText The text to display on the retry button when the processing is
+ * unsuccessful.
+ * @param onRetry The callback to invoke when the retry button is clicked.
+ * @param closeButtonText The text to display on the close button when the processing is
+ * unsuccessful.
+ * @param onClose The callback to invoke when the close button is clicked.
+ */
 @Composable
 fun ProcessingScreen(
     processingState: Boolean?,
