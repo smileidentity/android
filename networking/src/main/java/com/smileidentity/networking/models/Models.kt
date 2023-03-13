@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 import java.util.UUID
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
-class SmileIdentityException(val details: Details) : Exception(details.toString()) {
+class SmileIdentityException(val details: Details) : Exception(details.message) {
 
     // This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
     // to have parent classes - i.e. Exception as a parent class)

@@ -12,6 +12,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -50,7 +55,24 @@ fun EnhancedKycScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     if (uiState.isWaitingForResult) {
-        ProcessingScreen(textRes = R.string.si_enhanced_kyc_processing)
+        ProcessingScreen(
+            processingState = uiState.processingState,
+            inProgressTitle = stringResource(R.string.si_enhanced_kyc_processing_title),
+            inProgressSubtitle = stringResource(R.string.si_enhanced_kyc_processing_subtitle),
+            inProgressIcon = rememberVectorPainter(Icons.Default.MailOutline),
+            successTitle = stringResource(R.string.si_enhanced_kyc_processing_success_title),
+            successSubtitle = stringResource(R.string.si_enhanced_kyc_processing_success_subtitle),
+            successIcon = rememberVectorPainter(Icons.Default.Done),
+            errorTitle = stringResource(R.string.si_enhanced_kyc_processing_error_title),
+            errorSubtitle = uiState.errorMessage ?: stringResource(R.string.si_enhanced_kyc_processing_error_subtitle),
+            errorIcon = rememberVectorPainter(Icons.Default.Warning),
+            continueButtonText = stringResource(R.string.si_enhanced_kyc_processing_continue_button),
+            onContinue = { viewModel.onFinished(onResult) },
+            retryButtonText = stringResource(R.string.si_enhanced_kyc_processing_retry_button),
+            onRetry = { viewModel.doEnhancedKyc() },
+            closeButtonText = stringResource(R.string.si_enhanced_kyc_processing_close_button),
+            onClose = { viewModel.onFinished(onResult) },
+        )
         return
     }
     Column(
@@ -217,7 +239,7 @@ fun EnhancedKycScreen(
                 .fillMaxWidth()
                 .padding(8.dp),
             enabled = viewModel.allInputsSatisfied(),
-            onClick = { viewModel.doEnhancedKyc(callback = onResult) },
+            onClick = { viewModel.doEnhancedKyc() },
         ) { Text(stringResource(R.string.si_enhanced_kyc_submit_button)) }
     }
 }

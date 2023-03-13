@@ -156,7 +156,6 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
 
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
-            Timber.d("Detected Faces: $faces")
             if (faces.isEmpty()) {
                 _uiState.update { it.copy(currentDirective = Directive.EnsureFaceInFrame) }
                 return@addOnSuccessListener
@@ -229,7 +228,6 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
         }.addOnFailureListener {
             Timber.e(it, "Error detecting faces")
         }.addOnCompleteListener { faces ->
-            Timber.d("Complete: $faces")
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
         }

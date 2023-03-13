@@ -78,5 +78,13 @@
     <string name="si_enhanced_kyc_country_picker_label">Country</string>
     <string name="si_enhanced_kyc_id_type_picker_label">ID Type</string>
     <string name="si_enhanced_kyc_submit_button">Submit</string>
-    <string name="si_enhanced_kyc_processing">Processing Enhanced KYC…</string>
+    <string name="si_enhanced_kyc_processing_title">Processing Enhanced KYC…</string>
+    <string name="si_enhanced_kyc_processing_subtitle">Just a few more seconds</string>
+    <string name="si_enhanced_kyc_processing_success_title">Enhanced KYC Complete</string>
+    <string name="si_enhanced_kyc_processing_success_subtitle">You can now proceed</string>
+    <string name="si_enhanced_kyc_processing_error_title">Enhanced KYC Failed</string>
+    <string name="si_enhanced_kyc_processing_error_subtitle">This could be because of internet connectivity</string>
+    <string name="si_enhanced_kyc_processing_continue_button">Continue</string>
+    <string name="si_enhanced_kyc_processing_retry_button">Retry</string>
+    <string name="si_enhanced_kyc_processing_close_button">Close</string>
 </resources>

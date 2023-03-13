@@ -36,6 +36,9 @@ import com.smileidentity.ui.theme.SmileIdentityLightBlue
  *
  * @param processingState The state of the processing. It can be null, true, or false. null
  * represents In Progress, true represents Success, and false represents Error.
+ * @param inProgressTitle The title to display when the processing is in progress.
+ * @param inProgressSubtitle The subtitle to display when the processing is in progress.
+ * @param inProgressIcon The icon to display when the processing is in progress.
  * @param successTitle The title to display when the processing is successful.
  * @param successSubtitle The subtitle to display when the processing is successful.
  * @param successIcon The icon to display when the processing is successful.
@@ -55,6 +58,9 @@ import com.smileidentity.ui.theme.SmileIdentityLightBlue
 @Composable
 fun ProcessingScreen(
     processingState: Boolean?,
+    inProgressTitle: String,
+    inProgressSubtitle: String,
+    inProgressIcon: Painter,
     successTitle: String,
     successSubtitle: String,
     successIcon: Painter,
@@ -70,9 +76,9 @@ fun ProcessingScreen(
 ) {
     when (processingState) {
         null -> ProcessingInProgressScreen(
-            icon = painterResource(R.drawable.si_smart_selfie_processing_hero),
-            title = stringResource(R.string.si_smart_selfie_processing_title),
-            subtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
+            icon = inProgressIcon,
+            title = inProgressTitle,
+            subtitle = inProgressSubtitle,
         )
         true -> ProcessingSuccessScreen(
             icon = successIcon,
@@ -117,6 +123,7 @@ internal fun ProcessingInProgressScreen(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 LinearProgressIndicator(
                     color = progressIndicatorColor,
@@ -157,6 +164,7 @@ internal fun ProcessingSuccessScreen(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         confirmButton = {
@@ -199,6 +207,7 @@ internal fun ProcessingErrorScreen(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         confirmButton = {
