@@ -1,6 +1,6 @@
 package com.smileidentity.ui.compose
 
-import androidx.compose.foundation.Image
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,15 +71,16 @@ fun ProcessingScreen(
     }
 }
 
+@VisibleForTesting
 @Composable
-private fun ProcessingInProgressScreen(
+internal fun ProcessingInProgressScreen(
     icon: Painter,
     title: String,
     subtitle: String,
     progressIndicatorColor: Color = SmileIdentityAffirmationColor,
 ) {
     AlertDialog(
-        icon = { Image(painter = icon, contentDescription = null) },
+        icon = { Icon(painter = icon, contentDescription = null, tint = Color.Unspecified) },
         title = {
             Text(
                 text = title,
@@ -104,11 +107,13 @@ private fun ProcessingInProgressScreen(
         confirmButton = { /* */ },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        modifier = Modifier.testTag("processing_screen_in_progress"),
     )
 }
 
+@VisibleForTesting
 @Composable
-private fun ProcessingSuccessScreen(
+internal fun ProcessingSuccessScreen(
     icon: Painter,
     title: String,
     subtitle: String,
@@ -116,7 +121,7 @@ private fun ProcessingSuccessScreen(
     onContinue: () -> Unit,
 ) {
     AlertDialog(
-        icon = { Image(painter = icon, contentDescription = null) },
+        icon = { Icon(painter = icon, contentDescription = null, tint = Color.Unspecified) },
         title = {
             Text(
                 text = title,
@@ -142,11 +147,13 @@ private fun ProcessingSuccessScreen(
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        modifier = Modifier.testTag("processing_screen_success"),
     )
 }
 
+@VisibleForTesting
 @Composable
-private fun ProcessingErrorScreen(
+internal fun ProcessingErrorScreen(
     icon: Painter,
     title: String,
     subtitle: String,
@@ -156,7 +163,7 @@ private fun ProcessingErrorScreen(
     onClose: () -> Unit,
 ) {
     AlertDialog(
-        icon = { Image(painter = icon, contentDescription = null) },
+        icon = { Icon(painter = icon, contentDescription = null, tint = Color.Unspecified) },
         title = {
             Text(
                 text = title,
@@ -188,6 +195,7 @@ private fun ProcessingErrorScreen(
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        modifier = Modifier.testTag("processing_screen_error"),
     )
 }
 
