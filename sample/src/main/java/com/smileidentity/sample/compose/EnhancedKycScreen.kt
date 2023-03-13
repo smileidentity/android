@@ -54,7 +54,7 @@ fun EnhancedKycScreen(
     onResult: EnhancedKycResult.Callback = EnhancedKycResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
-    if (uiState.isWaitingForResult) {
+    if (uiState.submitted) {
         ProcessingScreen(
             processingState = uiState.processingState,
             inProgressTitle = stringResource(R.string.si_enhanced_kyc_processing_title),

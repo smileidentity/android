@@ -22,7 +22,7 @@ data class EnhancedKycUiState(
     val selectedCountry: SupportedCountry? = null,
     val selectedIdType: IdType? = null,
     val idInputFieldValues: SnapshotStateMap<IdType.InputField, String> = mutableStateMapOf(),
-    val isWaitingForResult: Boolean = false,
+    val submitted: Boolean = false,
     val processingState: Boolean? = null,
     val errorMessage: String? = null,
 )
@@ -33,7 +33,7 @@ class EnhancedKycViewModel : ViewModel() {
     var result: EnhancedKycResult? = null
 
     fun doEnhancedKyc() {
-        _uiState.value = _uiState.value.copy(isWaitingForResult = true, processingState = null)
+        _uiState.value = _uiState.value.copy(submitted = true, processingState = null)
         val proxy = { e: Throwable ->
             result = EnhancedKycResult.Error(e)
             _uiState.value = _uiState.value.copy(processingState = false, errorMessage = e.message)

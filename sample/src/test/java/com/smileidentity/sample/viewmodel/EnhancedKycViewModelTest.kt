@@ -34,7 +34,7 @@ class EnhancedKycViewModelTest {
         assertNull(uiState.selectedCountry)
         assertNull(uiState.selectedIdType)
         assertTrue(uiState.idInputFieldValues.isEmpty())
-        assertFalse(uiState.isWaitingForResult)
+        assertFalse(uiState.submitted)
     }
 
     @Test
@@ -168,7 +168,7 @@ class EnhancedKycViewModelTest {
         subject.doEnhancedKyc()
 
         // then
-        assertTrue(uiState.isWaitingForResult)
+        assertTrue(uiState.submitted)
     }
 
     @Test
