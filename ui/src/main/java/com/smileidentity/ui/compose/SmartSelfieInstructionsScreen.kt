@@ -1,5 +1,9 @@
 package com.smileidentity.ui.compose
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,13 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,13 +33,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
-import com.smileidentity.ui.theme.SmileIdentityLightBlue
+import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.theme.SmileIdentityTheme
 import com.smileidentity.ui.theme.SmileIdentityTypography
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SmartSelfieInstructionsScreen(
+    cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onInstructionsAcknowledged: () -> Unit = { },
 ) {
     val columnWidth = 320.dp
@@ -44,7 +56,7 @@ fun SmartSelfieInstructionsScreen(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .fillMaxHeight()
                 .width(columnWidth)
@@ -88,9 +100,10 @@ fun SmartSelfieInstructionsScreen(
             )
             instructions.forEach { (imageId, title, subtitle) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
+                    Icon(
                         painter = painterResource(id = imageId),
                         contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
                     )
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
@@ -112,10 +125,27 @@ fun SmartSelfieInstructionsScreen(
                 .width(columnWidth)
                 .padding(8.dp),
         ) {
+            val context = LocalContext.current
             Button(
-                onClick = onInstructionsAcknowledged,
-                colors = ButtonDefaults.buttonColors(containerColor = SmileIdentityLightBlue),
-                modifier = Modifier.fillMaxWidth().testTag("readyButton"),
+                onClick = {
+                    if (cameraPermissionState.status.isGranted) {
+                        onInstructionsAcknowledged()
+                    } else if (cameraPermissionState.status.shouldShowRationale) {
+                        // The user has permanently denied the permission, so we can't request it
+                        // again. We can, however, direct the user to the app settings screen to
+                        // manually enable the permission.
+                        context.toast(R.string.si_camera_permission_rationale)
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    } else {
+                        cameraPermissionState.launchPermissionRequest()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("readyButton"),
             ) {
                 Text(stringResource(R.string.si_smart_selfie_instruction_ready_button))
             }
@@ -124,6 +154,7 @@ fun SmartSelfieInstructionsScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Preview
 @Composable
 fun SmartSelfieInstructionsScreenPreview() {

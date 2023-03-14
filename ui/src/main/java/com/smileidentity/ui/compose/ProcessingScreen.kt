@@ -30,12 +30,17 @@ import com.smileidentity.ui.R
 import com.smileidentity.ui.theme.SmileIdentityAffirmationColor
 import com.smileidentity.ui.theme.SmileIdentityLightBlue
 
+enum class ProcessingState {
+    InProgress,
+    Success,
+    Error,
+}
+
 /**
  * This screen represents a generic Processing state. It has 3 sub-states: In Progress, Success, and
  * Error. These sub-states are represented by the [processingState] parameter.
  *
- * @param processingState The state of the processing. It can be null, true, or false. null
- * represents In Progress, true represents Success, and false represents Error.
+ * @param processingState The state of the processing.
  * @param inProgressTitle The title to display when the processing is in progress.
  * @param inProgressSubtitle The subtitle to display when the processing is in progress.
  * @param inProgressIcon The icon to display when the processing is in progress.
@@ -57,7 +62,7 @@ import com.smileidentity.ui.theme.SmileIdentityLightBlue
  */
 @Composable
 fun ProcessingScreen(
-    processingState: Boolean?,
+    processingState: ProcessingState,
     inProgressTitle: String,
     inProgressSubtitle: String,
     inProgressIcon: Painter,
@@ -75,19 +80,19 @@ fun ProcessingScreen(
     onClose: () -> Unit,
 ) {
     when (processingState) {
-        null -> ProcessingInProgressScreen(
+        ProcessingState.InProgress -> ProcessingInProgressScreen(
             icon = inProgressIcon,
             title = inProgressTitle,
             subtitle = inProgressSubtitle,
         )
-        true -> ProcessingSuccessScreen(
+        ProcessingState.Success -> ProcessingSuccessScreen(
             icon = successIcon,
             title = successTitle,
             subtitle = successSubtitle,
             continueButtonText = continueButtonText,
             onContinue = onContinue,
         )
-        false -> ProcessingErrorScreen(
+        ProcessingState.Error -> ProcessingErrorScreen(
             icon = errorIcon,
             title = errorTitle,
             subtitle = errorSubtitle,

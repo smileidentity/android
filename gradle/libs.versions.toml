@@ -21,8 +21,10 @@ kotlin = "1.8.10"
 ksp = "1.8.10-1.0.9"
 ktlint-plugin = "11.2.0"
 leakcanary = "2.10"
-mockk = "1.13.4"
+material-components = "1.8.0"
+mockk = "1.13.3"
 moshi = "1.14.0"
+moshix = "0.21.0"
 moshi-lazy-adapters = "2.2"
 okhttp = "4.10.0"
 play-services-mlkit-face-detection = "17.1.0"
@@ -37,6 +39,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
+moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
@@ -66,6 +69,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 junit = { module = "junit:junit", version.ref = "junit" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 leakcanary-noop = { module = "com.squareup.leakcanary:leakcanary-android-release", version.ref = "leakcanary" }
+material-components = { module = "com.google.android.material:material", version.ref = "material-components" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }

@@ -19,7 +19,7 @@ class ProcessingScreenTest {
         // when
         composeTestRule.setContent {
             ProcessingScreen(
-                processingState = null,
+                processingState = ProcessingState.InProgress,
                 inProgressTitle = "",
                 inProgressSubtitle = "",
                 inProgressIcon = ColorPainter(Color.Blue),
@@ -47,7 +47,7 @@ class ProcessingScreenTest {
         // when
         composeTestRule.setContent {
             ProcessingScreen(
-                processingState = true,
+                processingState = ProcessingState.Success,
                 inProgressTitle = "",
                 inProgressSubtitle = "",
                 inProgressIcon = ColorPainter(Color.Blue),
@@ -75,7 +75,7 @@ class ProcessingScreenTest {
         // when
         composeTestRule.setContent {
             ProcessingScreen(
-                processingState = false,
+                processingState = ProcessingState.Error,
                 inProgressTitle = "",
                 inProgressSubtitle = "",
                 inProgressIcon = ColorPainter(Color.Blue),

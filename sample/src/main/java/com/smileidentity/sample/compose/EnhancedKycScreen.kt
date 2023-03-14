@@ -54,7 +54,7 @@ fun EnhancedKycScreen(
     onResult: EnhancedKycResult.Callback = EnhancedKycResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
-    if (uiState.submitted) {
+    if (uiState.processingState != null) {
         ProcessingScreen(
             processingState = uiState.processingState,
             inProgressTitle = stringResource(R.string.si_enhanced_kyc_processing_title),
@@ -64,7 +64,8 @@ fun EnhancedKycScreen(
             successSubtitle = stringResource(R.string.si_enhanced_kyc_processing_success_subtitle),
             successIcon = rememberVectorPainter(Icons.Default.Done),
             errorTitle = stringResource(R.string.si_enhanced_kyc_processing_error_title),
-            errorSubtitle = uiState.errorMessage ?: stringResource(R.string.si_enhanced_kyc_processing_error_subtitle),
+            errorSubtitle = uiState.errorMessage
+                ?: stringResource(R.string.si_enhanced_kyc_processing_error_subtitle),
             errorIcon = rememberVectorPainter(Icons.Default.Warning),
             continueButtonText = stringResource(R.string.si_enhanced_kyc_processing_continue_button),
             onContinue = { viewModel.onFinished(onResult) },
