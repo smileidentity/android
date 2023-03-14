@@ -118,7 +118,7 @@ private fun SmartSelfieRegistrationScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     if (uiState.isWaitingForResult) {
-        ProcessingScreen(R.string.si_smartselfie_processing)
+        // ProcessingScreen(R.string.si_smart_selfie_processing_title)
     } else {
         SelfieCaptureScreen(userId, isEnroll, allowAgentMode, allowManualCapture, onResult = onResult)
     }
@@ -275,7 +275,7 @@ internal fun SelfieCaptureScreen(
                     tint = Color.Black,
                 )
                 Text(
-                    text = stringResource(R.string.si_smartselfie_instructions),
+                    text = stringResource(R.string.si_smart_selfie_instructions),
                     // The text color must be forced to black due to white background
                     color = Color.Black,
                 )

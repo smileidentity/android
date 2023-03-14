@@ -22,16 +22,22 @@ data class EnhancedKycUiState(
     val selectedCountry: SupportedCountry? = null,
     val selectedIdType: IdType? = null,
     val idInputFieldValues: SnapshotStateMap<IdType.InputField, String> = mutableStateMapOf(),
-    val isWaitingForResult: Boolean = false,
+    val submitted: Boolean = false,
+    val processingState: Boolean? = null,
+    val errorMessage: String? = null,
 )
 
 class EnhancedKycViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(EnhancedKycUiState())
     val uiState = _uiState.asStateFlow()
+    var result: EnhancedKycResult? = null
 
-    fun doEnhancedKyc(callback: EnhancedKycResult.Callback = EnhancedKycResult.Callback {}) {
-        _uiState.value = _uiState.value.copy(isWaitingForResult = true)
-        val proxy = { e: Throwable -> callback.onResult(EnhancedKycResult.Error(e)) }
+    fun doEnhancedKyc() {
+        _uiState.value = _uiState.value.copy(submitted = true, processingState = null)
+        val proxy = { e: Throwable ->
+            result = EnhancedKycResult.Error(e)
+            _uiState.value = _uiState.value.copy(processingState = false, errorMessage = e.message)
+        }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 jobType = JobType.EnhancedKyc,
@@ -52,8 +58,13 @@ class EnhancedKycViewModel : ViewModel() {
                 bankCode = _uiState.value.idInputFieldValues[IdType.InputField.BankCode],
             )
             val response = SmileIdentity.api.doEnhancedKyc(enhancedKycRequest)
-            callback.onResult(EnhancedKycResult.Success(enhancedKycRequest, response))
+            result = EnhancedKycResult.Success(enhancedKycRequest, response)
+            _uiState.value = _uiState.value.copy(processingState = true)
         }
+    }
+
+    fun onFinished(callback: EnhancedKycResult.Callback) {
+        callback.onResult(result!!)
     }
 
     fun onCountrySelected(selectedCountry: SupportedCountry) {

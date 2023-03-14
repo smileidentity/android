@@ -1,6 +1,7 @@
 package com.smileidentity.sample.viewmodel
 
 import com.smileidentity.networking.models.IdType
+import com.smileidentity.ui.core.EnhancedKycResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -33,7 +34,7 @@ class EnhancedKycViewModelTest {
         assertNull(uiState.selectedCountry)
         assertNull(uiState.selectedIdType)
         assertTrue(uiState.idInputFieldValues.isEmpty())
-        assertFalse(uiState.isWaitingForResult)
+        assertFalse(uiState.submitted)
     }
 
     @Test
@@ -162,13 +163,28 @@ class EnhancedKycViewModelTest {
         subject.onCountrySelected(SupportedCountry.Ghana)
         subject.onIdTypeSelected(IdType.GhanaPassport)
         subject.onIdInputFieldChanged(IdType.InputField.IdNumber, "1234567890")
-        var callbackInvoked = false
 
         // when
-        subject.doEnhancedKyc { callbackInvoked = true }
+        subject.doEnhancedKyc()
 
         // then
-        assertTrue(uiState.isWaitingForResult)
+        assertTrue(uiState.submitted)
+    }
+
+    @Test
+    fun `should finish with result`() {
+        // given
+        subject.onCountrySelected(SupportedCountry.Ghana)
+        subject.onIdTypeSelected(IdType.GhanaPassport)
+        subject.onIdInputFieldChanged(IdType.InputField.IdNumber, "1234567890")
+        var callbackInvoked = false
+        val callback = EnhancedKycResult.Callback { callbackInvoked = true }
+
+        // when
+        subject.doEnhancedKyc()
+        subject.onFinished(callback)
+
+        // then
         assertTrue(callbackInvoked)
     }
 }

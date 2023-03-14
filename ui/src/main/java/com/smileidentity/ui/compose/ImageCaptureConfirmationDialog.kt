@@ -64,9 +64,7 @@ fun ImageCaptureConfirmationDialog(
                 )
             }
         },
-        // We do nothing onDismissRequest since we have disabled back press and click outside
-        // in [properties] below
-        onDismissRequest = { },
+        onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
         confirmButton = { TextButton(onClick = onConfirm) { Text(confirmButtonText) } },
         dismissButton = { TextButton(onClick = onRetake) { Text(retakeButtonText) } },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -77,14 +75,14 @@ fun ImageCaptureConfirmationDialog(
 @Composable
 private fun PreviewImageCaptureConfirmationDialog() {
     ImageCaptureConfirmationDialog(
-        titleText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_title),
-        subtitleText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_subtitle),
+        titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
+        subtitleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_subtitle),
         painter = BrushPainter(
             brush = linearGradient(listOf(Color(0xFF11B33E), Color(0xFF1B73AD))),
         ),
-        confirmButtonText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_confirm_button),
+        confirmButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_confirm_button),
         onConfirm = {},
-        retakeButtonText = stringResource(R.string.si_smartselfie_selfie_confirmation_dialog_retake_button),
+        retakeButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_retake_button),
         onRetake = {},
     )
 }
