@@ -48,7 +48,7 @@ fun FaceShapedProgressIndicator(
         scale(faceHeight.toPx() / faceShapeBounds.height) {
             // 1. Move the Face Shape to the center of the Canvas
             val centeredFaceOffset = with((size.center - faceShapeBounds.center)) {
-                // 1.5 Offset a little bit above center
+                // 1.5. Offset a little bit above center
                 copy(y = y - faceShapeBounds.height / 5)
             }
             FaceShape.path.translate(centeredFaceOffset)

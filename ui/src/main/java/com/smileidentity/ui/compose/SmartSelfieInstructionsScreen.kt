@@ -41,7 +41,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.ui.R
 import com.smileidentity.ui.core.toast
 import com.smileidentity.ui.theme.SmileIdentityTheme
-import com.smileidentity.ui.theme.SmileIdentityTypography
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
