@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -34,7 +35,7 @@ class EnhancedKycViewModelTest {
         assertNull(uiState.selectedCountry)
         assertNull(uiState.selectedIdType)
         assertTrue(uiState.idInputFieldValues.isEmpty())
-        assertFalse(uiState.submitted)
+        assertNull(uiState.processingState)
     }
 
     @Test
@@ -168,7 +169,7 @@ class EnhancedKycViewModelTest {
         subject.doEnhancedKyc()
 
         // then
-        assertTrue(uiState.submitted)
+        assertNotNull(uiState.processingState)
     }
 
     @Test
