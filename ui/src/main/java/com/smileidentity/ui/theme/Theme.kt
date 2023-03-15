@@ -51,7 +51,6 @@ fun SmileIdentityTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = SmileIdentityTypography,
         content = content,
     )
 }

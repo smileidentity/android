@@ -163,7 +163,6 @@ internal fun SelfieCaptureScreen(
             progress = animatedProgress,
             faceHeight = viewfinderSize,
             completeProgressStrokeColor = SmileIdentityAffirmationColor,
-            backgroundColor = SmileIdentitySemiTransparentBackground,
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
@@ -174,12 +173,12 @@ internal fun SelfieCaptureScreen(
         ) {
             Text(
                 text = stringResource(uiState.currentDirective.displayText),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             AgentModeSwitch(
                 allowAgentMode = allowAgentMode,
                 camSelector = camSelector,

@@ -70,13 +70,13 @@ fun SmartSelfieInstructionsScreen(
             )
             Text(
                 text = stringResource(R.string.si_smart_selfie_instruction_title),
-                style = SmileIdentityTypography.headlineLarge,
+                style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
             Text(
                 text = stringResource(id = R.string.si_smart_selfie_instruction_subtitle),
-                style = SmileIdentityTypography.bodySmall,
+                style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 16.dp, bottom = 32.dp),
