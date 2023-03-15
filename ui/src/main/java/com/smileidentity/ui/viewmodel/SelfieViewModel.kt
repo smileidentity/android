@@ -8,6 +8,7 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.networking.SmileIdentity
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 private const val INTRA_IMAGE_MIN_DELAY_MS = 350L
@@ -70,6 +72,9 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
+    private var previousHeadRotationX = Float.POSITIVE_INFINITY
+    private var previousHeadRotationY = Float.POSITIVE_INFINITY
+    private var previousHeadRotationZ = Float.POSITIVE_INFINITY
 
     @VisibleForTesting
     internal var shouldAnalyzeImages = true
@@ -118,14 +123,14 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             val faceFillRatio = (largestFace.boundingBox.area / inputImage.area.toFloat())
 
             // Check that the face is close enough to the camera
-            val minFaceAreaThreshold = 0.25
+            val minFaceAreaThreshold = 0.15
             if (faceFillRatio < minFaceAreaThreshold) {
                 _uiState.update { it.copy(currentDirective = Directive.MoveCloser) }
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
-            val maxFaceAreaThreshold = 0.50
+            val maxFaceAreaThreshold = 0.25
             if (faceFillRatio > maxFaceAreaThreshold) {
                 _uiState.update { it.copy(currentDirective = Directive.MoveAway) }
                 return@addOnSuccessListener
@@ -140,6 +145,16 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             }
 
             _uiState.update { it.copy(currentDirective = Directive.Capturing) }
+
+            // Perform the rotation checks *after* changing directive to Capturing -- we don't want
+            // to explicitly tell the user to move their head
+            if (!hasFaceRotatedEnough(largestFace)) {
+                Timber.v("Not enough face rotation between captures. Waiting...")
+                return@addOnSuccessListener
+            }
+            previousHeadRotationX = largestFace.headEulerAngleX
+            previousHeadRotationY = largestFace.headEulerAngleY
+            previousHeadRotationZ = largestFace.headEulerAngleZ
 
             BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
                 // All conditions satisfied, capture the image
@@ -178,6 +193,16 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
         }
+    }
+
+    private fun hasFaceRotatedEnough(face: Face): Boolean {
+        val rotationThreshold = 1.5f
+        val rotationXDelta = (face.headEulerAngleX - previousHeadRotationX).absoluteValue
+        val rotationYDelta = (face.headEulerAngleY - previousHeadRotationY).absoluteValue
+        val rotationZDelta = (face.headEulerAngleZ - previousHeadRotationZ).absoluteValue
+        return rotationXDelta > rotationThreshold ||
+            rotationYDelta > rotationThreshold ||
+            rotationZDelta > rotationThreshold
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
