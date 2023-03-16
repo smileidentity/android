@@ -2,7 +2,6 @@ package com.smileidentity.ui.compose
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.progressSemantics
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -42,7 +41,7 @@ fun FaceShapedProgressIndicator(
     backgroundColor: Color = SmileIdentitySemiTransparentBackground,
 ) {
     val stroke = with(LocalDensity.current) { Stroke(strokeWidth.toPx()) }
-    Canvas(modifier.progressSemantics(progress).fillMaxSize()) {
+    Canvas(modifier.fillMaxSize()) {
         val faceShapeBounds = FaceShape.path.getBounds()
         // Scale the face shape to the desired size
         scale(faceHeight.toPx() / faceShapeBounds.height) {
@@ -60,6 +59,9 @@ fun FaceShapedProgressIndicator(
 
             // 4. Draw the Progress Indicator Track
             drawPath(FaceShape.path, color = incompleteProgressStrokeColor, style = stroke)
+
+            // To prevent a bug where the progress initially shows up as a full circle
+            if (progress == 0f) return@Canvas
 
             // Note: Height grows downwards
             val faceShapeSize = faceShapeBounds.size

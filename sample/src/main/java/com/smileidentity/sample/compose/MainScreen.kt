@@ -63,7 +63,8 @@ fun MainScreen() {
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
     SmileIdentityTheme {
         Surface {
-            val appBarState = rememberTopAppBarState(0f)
+            val appBarState = rememberTopAppBarState()
+            appBarState.heightOffset = appBarState.heightOffsetLimit
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = appBarState)
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
