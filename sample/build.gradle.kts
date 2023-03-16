@@ -77,6 +77,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest) // UI Tests
 
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.material.components)
 
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)

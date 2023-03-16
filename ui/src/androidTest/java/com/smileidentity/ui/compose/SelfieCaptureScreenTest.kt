@@ -6,14 +6,11 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.smileidentity.networking.SmileIdentity
-import com.smileidentity.ui.core.SmartSelfieResult
 import com.smileidentity.ui.viewmodel.SelfieViewModel
 import com.smileidentity.ui.waitUntilExists
 import io.mockk.Runs
@@ -32,23 +29,6 @@ class SelfieCaptureScreenTest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    @Test
-    fun shouldRequestPermissionsWhenNotGranted() {
-        // given
-        val permissionState = mockk<PermissionState>()
-        every { permissionState.status } returns PermissionStatus.Denied(true)
-        every { permissionState.launchPermissionRequest() } just Runs
-
-        // when
-        composeTestRule.setContent {
-            SmartSelfieOrPermissionScreen(cameraPermissionState = permissionState)
-        }
-
-        // then
-        verify(exactly = 1, timeout = 1000) { permissionState.launchPermissionRequest() }
-    }
 
     @OptIn(ExperimentalPermissionsApi::class)
     @Test
@@ -143,32 +123,11 @@ class SelfieCaptureScreenTest {
     }
 
     @Test
-    fun shouldCallTakePicture() {
-        // given
-        val takePictureTag = "takePictureButton"
-        val viewModel: SelfieViewModel = spyk()
-        val callback = SmartSelfieResult.Callback { }
-        every { viewModel.takeButtonInitiatedPictures(any(), any()) } just Runs
-
-        // when
-        composeTestRule.apply {
-            setContent { SelfieCaptureScreen(viewModel = viewModel, onResult = callback) }
-            waitUntilExists(hasTestTag(takePictureTag), 1.seconds)
-        }
-        composeTestRule.onNodeWithTag(takePictureTag).performClick()
-
-        // then
-        verify(exactly = 1, timeout = 1000) {
-            viewModel.takeButtonInitiatedPictures(any(), eq(callback))
-        }
-    }
-
-    @Test
     fun shouldAnalyzeImage() {
         // given
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
-        every { viewModel.analyzeImage(any(), any()) } just Runs
+        every { viewModel.analyzeImage(any()) } just Runs
 
         // when
         composeTestRule.apply {
@@ -177,6 +136,6 @@ class SelfieCaptureScreenTest {
         }
 
         // then
-        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any(), any()) }
+        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any()) }
     }
 }

@@ -20,7 +20,7 @@
     <string name="si_smart_selfie_instruction_clear_image_title">Clear Image</string>
     <string name="si_smart_selfie_instruction_clear_image_subtitle">Hold your phone steady so the selfie is clear and sharp. Don’t take blurry images</string>
     <string name="si_smart_selfie_instruction_remove_obstructions_title">Remove Obstructions</string>
-    <string name="si_smart_selfie_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such glasses, masks, hats and scarves</string>
+    <string name="si_smart_selfie_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such as glasses, masks, hats and scarves</string>
     <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
     <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns blue</string>
     <string name="si_smartselfie_directive_smile">Smile for the camera!</string>

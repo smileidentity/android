@@ -2,6 +2,7 @@ package com.smileidentity.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BrushPainter
@@ -50,7 +52,10 @@ fun ImageCaptureConfirmationDialog(
     AlertDialog(
         title = { Text(titleText, textAlign = TextAlign.Center) },
         text = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Text(
                     text = subtitleText,
                     style = MaterialTheme.typography.bodySmall,
@@ -60,7 +65,7 @@ fun ImageCaptureConfirmationDialog(
                     painter = painter,
                     contentDescription = null,
                     contentScale = ContentScale.FillHeight,
-                    modifier = Modifier.height(256.dp).clip(RoundedCornerShape(16.dp)),
+                    modifier = Modifier.height(256.dp).clip(RoundedCornerShape(16.dp)).scale(1.25f),
                 )
             }
         },

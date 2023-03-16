@@ -2,7 +2,7 @@ plugins {
     id("java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.moshix)
 }
 
 java {
@@ -22,7 +22,6 @@ dependencies {
 
     // Moshi is exposed in public SmileIdentity interface, hence "api" vs "implementation"
     api(libs.moshi)
-    ksp(libs.moshi.kotlin.codegen)
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.adapters.lazy)
 

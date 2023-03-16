@@ -17,5 +17,3 @@ tasks.create("clean", Delete::class.java) {
 ktlint {
     android.set(true)
 }
-
-project.gradle.startParameter.excludedTaskNames.add("ktlintGeneratedByKspKotlinSourceSetCheck")

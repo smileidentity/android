@@ -35,7 +35,6 @@ class SmartSelfieFragment private constructor(
             setContent {
                 SmileIdentity.SmartSelfieRegistrationScreen(
                     allowAgentMode = true,
-                    allowManualCapture = true,
                     onResult = callback,
                 )
             }

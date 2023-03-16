@@ -15,7 +15,7 @@ class SmileIdentityApplication : Application() {
         SmileIdentity.initialize(
             context = this,
             useSandbox = BuildConfig.DEBUG,
-            enableCrashReporting = !BuildConfig.DEBUG,
+            enableCrashReporting = false,
             okHttpClient = getOkHttpClientBuilder().addInterceptor(chucker).build(),
         )
     }

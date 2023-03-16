@@ -48,7 +48,8 @@ fun FaceShapedProgressIndicator(
         scale(faceHeight.toPx() / faceShapeBounds.height) {
             // 1. Move the Face Shape to the center of the Canvas
             val centeredFaceOffset = with((size.center - faceShapeBounds.center)) {
-                copy(y = y - faceShapeBounds.height / 3)
+                // 1.5. Offset a little bit above center
+                copy(y = y - faceShapeBounds.height / 5)
             }
             FaceShape.path.translate(centeredFaceOffset)
             // 2. Draw the Face Shape, clipping it out of the background
@@ -59,6 +60,9 @@ fun FaceShapedProgressIndicator(
 
             // 4. Draw the Progress Indicator Track
             drawPath(FaceShape.path, color = incompleteProgressStrokeColor, style = stroke)
+
+            // To prevent a bug where the progress initially shows up as a full circle
+            if (progress == 0f) return@Canvas
 
             // Note: Height grows downwards
             val faceShapeSize = faceShapeBounds.size

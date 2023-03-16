@@ -17,7 +17,7 @@ data class EnhancedKycRequest(
     @Json(name = "dob") val dob: String? = null,
     @Json(name = "phone_number") val phoneNumber: String? = null,
     @Json(name = "bank_code") val bankCode: String? = null,
-    @Json(name = "partner_params") val partnerParams: PartnerParams = PartnerParams(),
+    @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
     // TODO: Fetch the version from gradle, once we are set up for distribution
