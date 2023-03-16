@@ -1,9 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
+// TODO: KTIJ-19369: should be fixed with Gradle 8.1
+//  https://github.com/gradle/gradle/issues/22797
+//  https://youtrack.jetbrains.com/issue/KTIJ-19369
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.moshix)
 }
 
 android {
@@ -57,7 +62,15 @@ android {
 }
 
 dependencies {
-    api(project(":networking"))
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Moshi is exposed in public SmileIdentity interface, hence "api" vs "implementation"
+    api(libs.moshi)
+    implementation(libs.moshi.adapters)
+    implementation(libs.moshi.adapters.lazy)
+
     implementation(libs.androidx.core)
 
     // Logging
@@ -103,8 +116,8 @@ dependencies {
     implementation(libs.play.services.mlkit.face.detection)
 
     testImplementation(libs.junit)
+    testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.coroutines.test)
-
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
 

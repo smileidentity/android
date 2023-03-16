@@ -8,9 +8,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import java.util.logging.Level
-import java.util.logging.Logger
 
 @Suppress("unused")
 object SmileIdentity {
@@ -42,8 +41,8 @@ object SmileIdentity {
         useSandbox: Boolean = false,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
-        this.config = config
-        this.useSandbox = useSandbox
+        SmileIdentity.config = config
+        SmileIdentity.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
 
         retrofit = Retrofit.Builder()
@@ -74,12 +73,12 @@ object SmileIdentity {
         useSandbox: Boolean = false,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
-        this.apiKey = apiKey
+        SmileIdentity.apiKey = apiKey
         initialize(config, useSandbox, okHttpClient)
     }
 
     fun setEnvironment(useSandbox: Boolean) {
-        this.useSandbox = useSandbox
+        SmileIdentity.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
         retrofit = retrofit.newBuilder().baseUrl(url).build()
         api = retrofit.create(SmileIdentityService::class.java)
@@ -102,17 +101,14 @@ object SmileIdentity {
                 val request = chain.request()
                 for (attempt in 1..3) {
                     try {
-                        // Using Logger here because this networking module has no Android
-                        // dependencies, whilst Timber/Log does
-                        Logger.getLogger(SmileIdentity::class.simpleName)
-                            .log(Level.FINE, "Smile Identity SDK network attempt #$attempt")
-                        // println("Smile Identity network request attempt #$attempt")
+                        Timber.v("Smile Identity SDK network attempt #$attempt")
                         val response = chain.proceed(request)
                         if (response.code < 500) {
                             return@Interceptor response
                         }
                     } catch (e: Exception) {
-                        // Network failures end up here. Retry these
+                        Timber.w(e, "Smile Identity SDK network attempt #$attempt failed")
+                        // Network failures end up here. These will be retried
                     }
                 }
                 return@Interceptor chain.proceed(request)

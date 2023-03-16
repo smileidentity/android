@@ -18,6 +18,7 @@ import retrofit2.Retrofit
 import java.io.File
 import java.lang.reflect.Type
 
+@Suppress("unused")
 object JobTypeAdapter {
     @ToJson
     fun toJson(jobType: JobType): Int = jobType.value

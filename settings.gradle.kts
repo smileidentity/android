@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 rootProject.name = "SmileIdentity"
-include("networking", "sample", "ui")
+include("sample", "ui")
 
 pluginManagement {
     repositories {
