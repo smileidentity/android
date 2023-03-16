@@ -54,7 +54,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":ui"))
+    implementation(project(":lib"))
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime)

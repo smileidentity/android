@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("SameParameterValue", "BooleanLiteralArgument", "MemberVisibilityCanBePrivate")
+
 package com.smileidentity.ui.core
 
 import android.annotation.SuppressLint
