@@ -156,6 +156,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             previousHeadRotationY = largestFace.headEulerAngleY
             previousHeadRotationZ = largestFace.headEulerAngleZ
 
+            // TODO: CameraX 1.3.0-alpha04 added built0n API to convert ImageProxy to Bitmap
             BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
                 // All conditions satisfied, capture the image
                 lastAutoCaptureTimeMs = System.currentTimeMillis()

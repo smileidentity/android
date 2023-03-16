@@ -63,8 +63,7 @@ fun MainScreen() {
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
     SmileIdentityTheme {
         Surface {
-            val appBarState = rememberTopAppBarState()
-            appBarState.heightOffset = appBarState.heightOffsetLimit
+            val appBarState = rememberTopAppBarState(0f)
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = appBarState)
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
@@ -111,6 +110,11 @@ fun MainScreen() {
                     )
                 },
                 bottomBar = {
+                    // Don't show bottom bar when navigating to any product screens
+                    val currentRouteValue = currentRoute.value?.destination?.route ?: ""
+                    if (bottomNavItems.none { it.route.contains(currentRouteValue) }) {
+                        return@Scaffold
+                    }
                     NavigationBar {
                         bottomNavItems.forEach {
                             NavigationBarItem(

@@ -4,9 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -38,8 +39,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(16.dp),
+        modifier = Modifier.padding(16.dp),
     ) {
         Text(
             stringResource(R.string.test_our_products),
@@ -52,7 +52,10 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
                 Button(
                     onClick = { onProductSelected(it) },
                     shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.size(96.dp).padding(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(4.dp),
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
