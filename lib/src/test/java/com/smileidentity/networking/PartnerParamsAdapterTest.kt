@@ -35,7 +35,9 @@ class PartnerParamsAdapterTest {
         assertTrue(jsonString.contains("\"extra2\":\"value2\""))
         // Since the adapter has to manually decode the other keys, check that they are all present
         // in case new ones get added later
-        val nonExtras = PartnerParams::class.java.declaredFields.filter { it.name != "extras" }
+        val nonExtras = PartnerParams::class.java.declaredFields
+            // re: the $stable field - https://developer.android.com/reference/kotlin/androidx/compose/runtime/internal/StabilityInferred
+            .filterNot { setOf("extras", "\$stable").contains(it.name) }
         for (it in nonExtras) {
             val expectedKey = kepMap[it.name]!!
             assertTrue(jsonString.contains(expectedKey))

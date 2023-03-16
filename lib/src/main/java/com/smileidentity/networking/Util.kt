@@ -5,9 +5,9 @@ import com.smileidentity.networking.models.ImageType
 import com.smileidentity.networking.models.UploadImageInfo
 import com.smileidentity.networking.models.UploadRequest
 import okio.ByteString.Companion.encode
-import okio.buffer
-import okio.sink
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -19,7 +19,7 @@ fun calculateSignature(timestamp: String): String {
 
 fun UploadRequest.zip(): File {
     val zipFile = File.createTempFile("upload", ".zip")
-    val zipOutputStream = ZipOutputStream(zipFile.sink().buffer().outputStream())
+    val zipOutputStream = ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFile)))
 
     // Write info.json
     zipOutputStream.putNextEntry(ZipEntry("info.json"))
