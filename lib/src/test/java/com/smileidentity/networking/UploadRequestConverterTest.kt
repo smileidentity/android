@@ -1,6 +1,6 @@
 package com.smileidentity.networking
 
-import com.smileidentity.networking.models.UploadRequest
+import com.smileidentity.models.UploadRequest
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer

@@ -1,14 +1,14 @@
 package com.smileidentity.networking
 
-import com.smileidentity.networking.models.AuthenticationRequest
-import com.smileidentity.networking.models.AuthenticationResponse
-import com.smileidentity.networking.models.EnhancedKycRequest
-import com.smileidentity.networking.models.EnhancedKycResponse
-import com.smileidentity.networking.models.JobStatusRequest
-import com.smileidentity.networking.models.JobStatusResponse
-import com.smileidentity.networking.models.PrepUploadRequest
-import com.smileidentity.networking.models.PrepUploadResponse
-import com.smileidentity.networking.models.UploadRequest
+import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.AuthenticationResponse
+import com.smileidentity.models.EnhancedKycRequest
+import com.smileidentity.models.EnhancedKycResponse
+import com.smileidentity.models.JobStatusRequest
+import com.smileidentity.models.JobStatusResponse
+import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.PrepUploadResponse
+import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -18,7 +18,7 @@ import retrofit2.http.Url
 interface SmileIdentityService {
     /**
      * Returns a signature and timestamp that can be used to authenticate future requests. This is
-     * necessary only when using the [com.smileidentity.networking.models.Config.authToken] and
+     * necessary only when using the [com.smileidentity.models.Config.authToken] and
      * *not* using the API key.
      */
     @POST("/v1/auth_smile")

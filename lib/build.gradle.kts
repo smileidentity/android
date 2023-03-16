@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.smileidentity.ui"
+    namespace = "com.smileidentity"
     resourcePrefix = "si_"
     compileSdk = 33
 

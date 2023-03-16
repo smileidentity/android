@@ -40,12 +40,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.networking.models.IdType
+import com.smileidentity.R
+import com.smileidentity.compose.ProcessingScreen
+import com.smileidentity.models.IdType
+import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
 import com.smileidentity.sample.viewmodel.SupportedCountry
-import com.smileidentity.ui.R
-import com.smileidentity.ui.compose.ProcessingScreen
-import com.smileidentity.ui.core.EnhancedKycResult
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable

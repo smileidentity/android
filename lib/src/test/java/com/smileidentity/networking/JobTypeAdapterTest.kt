@@ -1,6 +1,6 @@
 package com.smileidentity.networking
 
-import com.smileidentity.networking.models.JobType
+import com.smileidentity.models.JobType
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

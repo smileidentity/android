@@ -36,15 +36,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.smileidentity.networking.SmileIdentity
+import com.smileidentity.SmileIdentity
+import com.smileidentity.compose.SmartSelfieAuthenticationScreen
+import com.smileidentity.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.compose.theme.SmileIdentityTheme
+import com.smileidentity.results.EnhancedKycResult
+import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screens
 import com.smileidentity.sample.toast
-import com.smileidentity.ui.compose.SmartSelfieAuthenticationScreen
-import com.smileidentity.ui.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.ui.core.EnhancedKycResult
-import com.smileidentity.ui.core.SmartSelfieResult
-import com.smileidentity.ui.theme.SmileIdentityTheme
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

@@ -1,6 +1,7 @@
 package com.smileidentity.networking
 
-import com.smileidentity.networking.models.ActionResult
+import com.smileidentity.SmileIdentity
+import com.smileidentity.models.ActionResult
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

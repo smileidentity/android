@@ -1,9 +1,9 @@
 package com.smileidentity.networking
 
-import com.smileidentity.networking.models.JobResult
-import com.smileidentity.networking.models.JobType
-import com.smileidentity.networking.models.PartnerParams
-import com.smileidentity.networking.models.UploadRequest
+import com.smileidentity.models.JobResult
+import com.smileidentity.models.JobType
+import com.smileidentity.models.PartnerParams
+import com.smileidentity.models.UploadRequest
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
