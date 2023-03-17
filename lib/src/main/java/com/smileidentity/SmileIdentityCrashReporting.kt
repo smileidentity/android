@@ -56,7 +56,12 @@ object SmileIdentityCrashReporting {
             setTag("os_version", Build.VERSION.RELEASE)
             setTag("product", Build.PRODUCT)
             setTag("sdk_version", BuildConfig.VERSION_NAME)
-            setTag("partner_id", SmileIdentity.config.partnerId)
+            try {
+                setTag("partner_id", SmileIdentity.config.partnerId)
+            } catch (e: Exception) {
+                // Ignore
+                Timber.w(e, "Error while setting partner_id tag for Sentry")
+            }
         }
 
         // Once this UncaughtExceptionHandler handles the exception, it will pass the exception on
