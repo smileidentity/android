@@ -26,7 +26,7 @@ sealed class Screens(
     object AboutUs : Screens("about_us", R.string.about_us, Filled.Settings, Outlined.Settings)
     object SmartSelfieRegistration : Screens(
         "smart_selfie_registration",
-        com.smileidentity.ui.R.string.si_smartselfie_registration_product_name,
+        com.smileidentity.R.string.si_smartselfie_registration_product_name,
         // TODO: Replace icons with Smile Identity branded icons
         Filled.Face,
         Outlined.Face,
@@ -34,7 +34,7 @@ sealed class Screens(
 
     object SmartSelfieAuthentication : Screens(
         "smart_selfie_authentication",
-        com.smileidentity.ui.R.string.si_smartselfie_authentication_product_name,
+        com.smileidentity.R.string.si_smartselfie_authentication_product_name,
         // TODO: Replace icons with Smile Identity branded icons
         Filled.Face,
         Outlined.Face,
@@ -42,7 +42,7 @@ sealed class Screens(
 
     object EnhancedKyc : Screens(
         "enhanced_kyc",
-        com.smileidentity.ui.R.string.si_enhanced_kyc_product_name,
+        com.smileidentity.R.string.si_enhanced_kyc_product_name,
         Filled.Person,
         Outlined.Person,
     )

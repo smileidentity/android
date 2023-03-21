@@ -5,11 +5,10 @@
 This repo encompasses everything necessary for the Smile Identity Android SDK. It is a multi-module
 project consisting of the following modules:
 
-- [`networking`](https://github.com/smileidentity/android/tree/main/networking) -
-  handles all network requests to the API
+- [`lib`](https://github.com/smileidentity/android/tree/main/lib) -
+  The SDK distributed to partners
 - [`sample`](https://github.com/smileidentity/android/tree/main/sample) - a sample app
-  that demonstrates the SDK (both UI and networking)
-- [`ui`](https://github.com/smileidentity/android/tree/main/ui) - all UI and CV components
+  that demonstrates SDK integration and showcases Smile Identity products 
 
 ## Setup
 
