@@ -2,9 +2,8 @@ package com.smileidentity.sample
 
 import android.app.Application
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.smileidentity.networking.SmileIdentity
-import com.smileidentity.networking.SmileIdentity.getOkHttpClientBuilder
-import com.smileidentity.ui.core.initialize
+import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileIdentity.getOkHttpClientBuilder
 import timber.log.Timber
 
 class SmileIdentityApplication : Application() {
@@ -15,7 +14,7 @@ class SmileIdentityApplication : Application() {
         SmileIdentity.initialize(
             context = this,
             useSandbox = BuildConfig.DEBUG,
-            enableCrashReporting = BuildConfig.DEBUG,
+            enableCrashReporting = false,
             okHttpClient = getOkHttpClientBuilder().addInterceptor(chucker).build(),
         )
     }

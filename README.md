@@ -5,11 +5,10 @@
 This repo encompasses everything necessary for the Smile Identity Android SDK. It is a multi-module
 project consisting of the following modules:
 
-- [`networking`](https://github.com/smileidentity/android/tree/main/networking) -
-  handles all network requests to the API
+- [`lib`](https://github.com/smileidentity/android/tree/main/lib) -
+  The SDK distributed to partners
 - [`sample`](https://github.com/smileidentity/android/tree/main/sample) - a sample app
-  that demonstrates the SDK (both UI and networking)
-- [`ui`](https://github.com/smileidentity/android/tree/main/ui) - all UI and CV components
+  that demonstrates SDK integration and showcases Smile Identity products 
 
 ## Setup
 
@@ -33,6 +32,13 @@ To run the linter, run `./gradlew ktlintCheck`. To run the formatter, run `./gra
 
 The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce the code style
 (taken from https://pinterest.github.io/ktlint/rules/configuration-intellij-idea/)
+
+## Other Notes
+
+- When adding new resources, please use the `si_` prefix to avoid conflicts with other libraries and
+  applications
+- When adding drawables, please compress them as much as possible (tinypng.com is a good resource
+  for this) as well as `avocado` (`npm install -g avocado`) for compressing android vector drawables
 
 ## FAQs
 

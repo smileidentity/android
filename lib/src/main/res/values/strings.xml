@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="si_company_name">Smile Identity</string>
+    <string name="si_attribution_powered_by">Powered by</string>
+    <string name="si_camera_permission_rationale">The camera permission is required to complete the verification process</string>
+    <string name="si_agent_mode">Agent Mode</string>
+
+    <!--  Content Descriptions (for accessibility)  -->
+    <string name="si_cd_logo">Smile Identity logo</string>
+    <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
+    <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
+
+    <!--  SmartSelfie  -->
+    <string name="si_smartselfie_registration_product_name">SmartSelfie™ Registration</string>
+    <string name="si_smartselfie_authentication_product_name">SmartSelfie™ Authentication</string>
+    <string name="si_smart_selfie_instruction_title">Next, we\'ll take a quick selfie</string>
+    <string name="si_smart_selfie_instruction_subtitle">We\'ll use it to verify your identity.\nPlease follow the instructions below.</string>
+    <string name="si_smart_selfie_instruction_good_light_title">Good Light</string>
+    <string name="si_smart_selfie_instruction_good_light_subtitle">Make sure you are in a well-lit environment where your face is clear and visible</string>
+    <string name="si_smart_selfie_instruction_clear_image_title">Clear Image</string>
+    <string name="si_smart_selfie_instruction_clear_image_subtitle">Hold your phone steady so the selfie is clear and sharp. Don’t take blurry images</string>
+    <string name="si_smart_selfie_instruction_remove_obstructions_title">Remove Obstructions</string>
+    <string name="si_smart_selfie_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such as glasses, masks, hats and scarves</string>
+    <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
+    <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns blue</string>
+    <string name="si_smartselfie_directive_smile">Smile for the camera!</string>
+    <string name="si_smartselfie_directive_capturing">Capturing…</string>
+    <string name="si_smartselfie_directive_unable_to_detect_face">Unable to detect face. Please ensure your face is in the oval</string>
+    <string name="si_smartselfie_directive_face_too_far">Face is too far. Please move closer</string>
+    <string name="si_smartselfie_directive_face_too_close">Face is too close. Please move farther away</string>
+    <string name="si_smart_selfie_confirmation_dialog_title">Is this a good quality selfie?</string>
+    <string name="si_smart_selfie_confirmation_dialog_subtitle">Make sure your whole face is visible and clear</string>
+    <string name="si_smart_selfie_confirmation_dialog_confirm_button">Yes, use this</string>
+    <string name="si_smart_selfie_confirmation_dialog_retake_button">No, retake selfie</string>
+    <string name="si_smart_selfie_processing_title">Processing Selfie</string>
+    <string name="si_smart_selfie_processing_subtitle">Just a few more seconds</string>
+    <string name="si_smart_selfie_processing_success_title">Selfie Capture Complete</string>
+    <string name="si_smart_selfie_processing_success_subtitle">Your selfie was successfully taken. You can now proceed</string>
+    <string name="si_smart_selfie_processing_error_title">Your selfie failed to process</string>
+    <string name="si_smart_selfie_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
+    <string name="si_smart_selfie_processing_continue_button">Continue</string>
+    <string name="si_smart_selfie_processing_retry_button">Retry</string>
+    <string name="si_smart_selfie_processing_close_button">Close</string>
+
+    <!--  Country Names  -->
+    <string name="si_country_name_ghana">Ghana</string>
+    <string name="si_country_name_kenya">Kenya</string>
+    <string name="si_country_name_nigeria">Nigeria</string>
+    <string name="si_country_name_south_africa">South Africa</string>
+    <string name="si_country_name_uganda">Uganda</string>
+
+    <!--  ID Type Names  -->
+    <string name="si_id_type_name_drivers_license">Driver\'s License</string>
+    <string name="si_id_type_name_passport">Passport</string>
+    <string name="si_id_type_name_ssnit">SSNIT</string>
+    <string name="si_id_type_name_voter_id">Voter ID</string>
+    <string name="si_id_type_name_new_voter_id">New Voter ID</string>
+    <string name="si_id_type_name_alien_card">Alien Card</string>
+    <string name="si_id_type_name_national_id">National ID</string>
+    <string name="si_id_type_name_national_id_no_photo">National ID (No Photo)</string>
+    <string name="si_id_type_name_bank_account">Bank Account</string>
+    <string name="si_id_type_name_bvn">BVN</string>
+    <string name="si_id_type_name_nin_v2">NIN v2</string>
+    <string name="si_id_type_name_nin_slip">NIN Slip</string>
+    <string name="si_id_type_name_v_nin">Virtual NIN</string>
+    <string name="si_id_type_name_phone_number">Phone Number</string>
+
+    <!--  ID Field Names  -->
+    <string name="si_id_field_name_id_number">ID Number</string>
+    <string name="si_id_field_name_first_name">First Name</string>
+    <string name="si_id_field_name_last_name">Last Name</string>
+    <string name="si_id_field_name_dob">Date of Birth</string>
+    <string name="si_id_field_name_bank_code">Bank Code</string>
+
+    <!--  Enhanced KYC  -->
+    <string name="si_enhanced_kyc_product_name">Enhanced KYC</string>
+    <string name="si_enhanced_kyc_instructions">Provide ID Information</string>
+    <string name="si_enhanced_kyc_country_picker_label">Country</string>
+    <string name="si_enhanced_kyc_id_type_picker_label">ID Type</string>
+    <string name="si_enhanced_kyc_submit_button">Submit</string>
+    <string name="si_enhanced_kyc_processing_title">Processing Enhanced KYC…</string>
+    <string name="si_enhanced_kyc_processing_subtitle">Just a few more seconds</string>
+    <string name="si_enhanced_kyc_processing_success_title">Enhanced KYC Complete</string>
+    <string name="si_enhanced_kyc_processing_success_subtitle">You can now proceed</string>
+    <string name="si_enhanced_kyc_processing_error_title">Enhanced KYC Failed</string>
+    <string name="si_enhanced_kyc_processing_error_subtitle">This could be because of internet connectivity</string>
+    <string name="si_enhanced_kyc_processing_continue_button">Continue</string>
+    <string name="si_enhanced_kyc_processing_retry_button">Retry</string>
+    <string name="si_enhanced_kyc_processing_close_button">Close</string>
+</resources>

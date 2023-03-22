@@ -1,4 +1,6 @@
-@file:Suppress("UnstableApiUsage")
+// TODO: Remove DSL_SCOPE_VIOLATION on release of Gradle 8.1
+//  https://github.com/gradle/gradle/issues/22797
+@file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
 
 plugins {
     alias(libs.plugins.android.application)
@@ -52,7 +54,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":ui"))
+    implementation(project(":lib"))
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime)
@@ -77,6 +79,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest) // UI Tests
 
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.material.components)
 
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
