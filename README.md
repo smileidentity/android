@@ -43,7 +43,8 @@ Versions ending in `-SNAPSHOT` will be published to Sonatype's snapshot
 [repository](https://oss.sonatype.org/content/repositories/snapshots/com/smileidentity/android-sdk/)
 
 Otherwise, the version will be released as a production build to
-[Maven Central](https://repo1.maven.org/maven2/com/smileidentity/android-sdk/)
+[Maven Central](https://repo1.maven.org/maven2/com/smileidentity/android-sdk/). Note that it can
+take up to 30 minutes for a production release to sync with Maven Central.
 
 To publish, run the command `./gradlew publishAllPublicationsToMavenCentral`
 
