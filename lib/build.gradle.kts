@@ -2,15 +2,22 @@
 //  https://github.com/gradle/gradle/issues/22797
 @file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
 
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.moshix)
+    alias(libs.plugins.maven.publish)
 }
 
+val groupId = "com.smileidentity"
+val artifactId = "android-sdk"
+val version = "8.0.0-SNAPSHOT"
+
 android {
-    namespace = "com.smileidentity"
+    namespace = groupId
     resourcePrefix = "si_"
     compileSdk = 33
 
@@ -23,9 +30,10 @@ android {
 
     buildTypes {
         all {
-            val sentryDsn = findProperty("SENTRY_DSN") ?: ""
+            val sentryDsn = findProperty("SENTRY_DSN")
+                ?: throw IllegalArgumentException("Please set the SENTRY_DSN gradle property")
             buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
-            buildConfigField("String", "VERSION_NAME", "\"${project.version}\"")
+            buildConfigField("String", "VERSION_NAME", "\"${version}\"")
         }
 
         release {
@@ -56,6 +64,48 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
+    }
+}
+
+mavenPublishing {
+    // Reads the mavenCentralUsername and mavenCentralPassword Gradle Properties
+    publishToMavenCentral(host = SonatypeHost.DEFAULT, automaticRelease = true)
+    signAllPublications()
+    coordinates(groupId, artifactId, version)
+    pom {
+        name.set("Smile Identity Android SDK")
+        description.set("The Official Smile Identity Android SDK")
+        url.set("https://docs.smileidentity.com/mobile/android")
+        licenses {
+            license {
+                name.set("Smile Identity Terms Of Use")
+                url.set("https://smileidentity.com/terms-and-conditions")
+                distribution.set("repo")
+            }
+        }
+        scm {
+            url.set("https://github.com/smileidentity/android")
+            connection.set("scm:git:git://github.com/smileidentity/android.git")
+            developerConnection.set("scm:git:ssh://github.com/smileidentity/android.git")
+        }
+        developers {
+            developer {
+                id.set("vanshg")
+                name.set("Vansh Gandhi")
+                email.set("vansh@smileidentity.com")
+                url.set("https://github.com/vanshg")
+                organization.set("Smile Identity")
+                organizationUrl.set("https://smileidentity.com")
+            }
+            developer {
+                id.set("JNdhlovu")
+                name.set("Japhet Ndhlovu")
+                email.set("japhet@smileidentity.com")
+                url.set("https://github.com/jndhlovu")
+                organization.set("Smile Identity")
+                organizationUrl.set("https://smileidentity.com")
+            }
+        }
     }
 }
 

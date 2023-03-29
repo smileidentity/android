@@ -1,6 +1,7 @@
 package com.smileidentity.compose
 
 import android.Manifest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -12,7 +13,6 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.smileidentity.SmileIdentity
 import com.smileidentity.viewmodel.SelfieViewModel
-import com.smileidentity.waitUntilExists
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -21,7 +21,6 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.Duration.Companion.seconds
 
 class SelfieCaptureScreenTest {
     @get:Rule
@@ -122,6 +121,7 @@ class SelfieCaptureScreenTest {
         composeTestRule.onNodeWithText(directiveSubstring, substring = true).assertIsDisplayed()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun shouldAnalyzeImage() {
         // given
@@ -132,7 +132,7 @@ class SelfieCaptureScreenTest {
         // when
         composeTestRule.apply {
             setContent { SelfieCaptureScreen(viewModel = viewModel) }
-            waitUntilExists(hasTestTag(takePictureTag), 1.seconds)
+            waitUntilAtLeastOneExists(hasTestTag(takePictureTag))
         }
 
         // then

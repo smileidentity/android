@@ -1,5 +1,6 @@
 package com.smileidentity.models
 
+import com.smileidentity.BuildConfig
 import com.smileidentity.SmileIdentity
 import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
@@ -20,8 +21,7 @@ data class EnhancedKycRequest(
     @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
-    // TODO: Fetch the version from gradle, once we are set up for distribution
-    @Json(name = "source_sdk_version") val sourceSdkVersion: String = "2.0.0",
+    @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 )

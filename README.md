@@ -8,7 +8,7 @@ project consisting of the following modules:
 - [`lib`](https://github.com/smileidentity/android/tree/main/lib) -
   The SDK distributed to partners
 - [`sample`](https://github.com/smileidentity/android/tree/main/sample) - a sample app
-  that demonstrates SDK integration and showcases Smile Identity products 
+  that demonstrates SDK integration and showcases Smile Identity products
 
 ## Setup
 
@@ -33,12 +33,61 @@ To run the linter, run `./gradlew ktlintCheck`. To run the formatter, run `./gra
 The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce the code style
 (taken from https://pinterest.github.io/ktlint/rules/configuration-intellij-idea/)
 
+## Releasing
+
+Generally speaking, releases should be performed via GitHub Actions. The SDK version is determined
+by the `version` variable
+in [`lib/build.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/build.gradle.kts)
+
+Versions ending in `-SNAPSHOT` will be published to Sonatype's snapshot
+[repository](https://oss.sonatype.org/content/repositories/snapshots/com/smileidentity/android-sdk/)
+
+Otherwise, the version will be released as a production build to
+[Maven Central](https://repo1.maven.org/maven2/com/smileidentity/android-sdk/)
+
+To publish, run the command `./gradlew publishAllPublicationsToMavenCentral`
+
+Manual publishing requires setup.
+
+### Create a Sonatype Account
+
+1. Visit https://issues.sonatype.org/secure/Dashboard.jspa and Sign Up
+2. Request access to the `com.smileidentity` Group ID by commenting on this JIRA Issue:
+   https://issues.sonatype.org/browse/OSSRH-50589. Alternatively, create a new JIRA Issue
+
+### Generate a GPG Key Pair
+
+Follow the instructions at https://central.sonatype.org/publish/requirements/gpg/
+The summary is:
+
+1. Install GPG
+2. Generate a GPG Key (`gpg —-gen-key`)
+3. List the generated key and determine the Key ID (`gpg --list-keys --keyid-format LONG`)
+4. Distribute the public key to a well-known keyserver
+   (`gpg --keyserver keys.openpgp.org --send-keys KEY_ID`)
+5. Verify key was distributed (`gpg --keyserver keys.openpgp.org --search-key KEY_ID`)
+
+### Configure Gradle Properties
+
+Add the following properties to `~/.gradle/gradle.properties`:
+
+```properties
+# suppress inspection "UnusedProperty" for whole file
+mavenCentralUsername=<Your Maven Central Username>
+mavenCentralPassword=<Your Maven Central Password>
+signing.keyId=<Your GPG Key ID>
+signing.password=<Your GPG Key Password>
+signing.secretKeyRingFile=<Your GPG Keyring path (e.g. ~/.gnupg/secring.gpg)>
+```
+
 ## Other Notes
 
 - When adding new resources, please use the `si_` prefix to avoid conflicts with other libraries and
   applications
 - When adding drawables, please compress them as much as possible (tinypng.com is a good resource
   for this) as well as `avocado` (`npm install -g avocado`) for compressing android vector drawables
+- Any new developer should add themselves to the the `developers` block in
+  [`lib/build.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/build.gradle.kts)
 
 ## FAQs
 

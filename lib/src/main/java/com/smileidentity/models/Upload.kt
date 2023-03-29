@@ -2,6 +2,7 @@
 
 package com.smileidentity.models
 
+import com.smileidentity.BuildConfig
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.io.File
@@ -59,8 +60,7 @@ data class ApiVersion(
 
 @JsonClass(generateAdapter = true)
 data class VersionNames(
-    // TODO: Grab the version once build.gradle is updated with versioning
-    @Json(name = "sid_sdk_version") val version: String = "2.0.0",
+    @Json(name = "sid_sdk_version") val version: String = BuildConfig.VERSION_NAME,
     @Json(name = "sid_sdk_type") val type: String = "Android",
     @Json(name = "sid_sdk_ux_version") val uxVersion: String = "1.0",
 )
