@@ -35,8 +35,9 @@ The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce
 
 ## Releasing
 
-Generally speaking, releases should be performed via GitHub Actions. The SDK version is determined
-by the `version` variable
+Generally speaking, releases should be performed by pushing a tag. This will kick off a GitHub 
+Actions workflow which will perform the release. The SDK version is determined by the `version` 
+variable
 in [`lib/build.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/build.gradle.kts)
 
 Versions ending in `-SNAPSHOT` will be published to Sonatype's snapshot
@@ -46,9 +47,9 @@ Otherwise, the version will be released as a production build to
 [Maven Central](https://repo1.maven.org/maven2/com/smileidentity/android-sdk/). Note that it can
 take up to 30 minutes for a production release to sync with Maven Central.
 
-To publish, run the command `./gradlew publishAllPublicationsToMavenCentral`
+To publish, run the command `./gradlew publish`
 
-Manual publishing requires setup.
+Manual publishing requires setup:
 
 ### Create a Sonatype Account
 

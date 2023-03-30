@@ -2,8 +2,6 @@
 //  https://github.com/gradle/gradle/issues/22797
 @file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
 
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -39,14 +37,10 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro",
             )
         }
-    }
-
-    packagingOptions {
-        resources.excludes += "META-INF/*"
     }
 
     compileOptions {
@@ -68,8 +62,7 @@ android {
 }
 
 mavenPublishing {
-    // Reads the mavenCentralUsername and mavenCentralPassword Gradle Properties
-    publishToMavenCentral(host = SonatypeHost.DEFAULT, automaticRelease = true)
+    publishToMavenCentral()
     signAllPublications()
     coordinates(groupId, artifactId, version)
     pom {
