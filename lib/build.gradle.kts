@@ -50,6 +50,7 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+        moduleName = "${groupId}_$artifactId"
     }
 
     buildFeatures {
