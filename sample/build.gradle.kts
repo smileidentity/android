@@ -25,13 +25,16 @@ android {
         }
     }
 
+    val uploadKeystoreFile = file("upload.jks")
     signingConfigs {
-        create("release") {
-            val uploadKeystorePassword = findProperty("uploadKeystorePassword") as? String
-            storeFile = file("upload.jks")
-            keyAlias = "upload"
-            storePassword = uploadKeystorePassword
-            keyPassword = uploadKeystorePassword
+        if (uploadKeystoreFile.exists()) {
+            create("release") {
+                val uploadKeystorePassword = findProperty("uploadKeystorePassword") as? String
+                storeFile = file("upload.jks")
+                keyAlias = "upload"
+                storePassword = uploadKeystorePassword
+                keyPassword = uploadKeystorePassword
+            }
         }
     }
 
@@ -39,7 +42,9 @@ android {
         release {
             isMinifyEnabled = false
             isDebuggable = false
-            signingConfig = signingConfigs.getByName("release")
+            if (uploadKeystoreFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
