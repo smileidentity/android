@@ -19,14 +19,22 @@ jobs:
       - name: Write Smile Config
         run: |
           echo '${{ secrets.SMILE_CONFIG_PARTNER_002 }}' > sample/src/main/assets/smile_config.json
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'upload.jks'
+          fileDir: './sample'
+          encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Build, Test, Lint, Assemble, Publish
-#        run: ./gradlew build assembleRelease publish -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
-        run: ./gradlew build assembleRelease -PSENTRY_DSN=${{ secrets.SENTRY_DSN }}
+        run: ./gradlew checkSmileConfigFile build assembleRelease publish
         env:
+          ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
       - name: Archive SDK AAR
         uses: actions/upload-artifact@v2
         with:

@@ -25,10 +25,21 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val uploadKeystorePassword = findProperty("uploadKeystorePassword") as? String
+            storeFile = file("upload.jks")
+            keyAlias = "upload"
+            storePassword = uploadKeystorePassword
+            keyPassword = uploadKeystorePassword
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -62,10 +73,6 @@ tasks.register(checkSmileConfigFileTaskName) {
             throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
         }
     }
-}
-
-tasks.matching { it.name.startsWith("assemble") }.configureEach {
-    dependsOn(checkSmileConfigFileTaskName)
 }
 
 dependencies {
