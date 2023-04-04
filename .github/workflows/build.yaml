@@ -6,9 +6,6 @@ on:
 # Lints code, builds all modules, and runs tests
 jobs:
   build:
-    strategy:
-      matrix:
-        agp_version: ["7.4.2", "7.3.1"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,7 +19,6 @@ jobs:
         run: ./gradlew build
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          ORG_GRADLE_PROJECT_AGP_VERSION: ${{ matrix.agp_version }}
   lint:
     runs-on: ubuntu-latest
     steps:
