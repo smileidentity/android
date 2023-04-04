@@ -28,6 +28,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isDebuggable = false
         }
     }
 
@@ -51,6 +52,20 @@ android {
     packagingOptions {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+}
+
+val checkSmileConfigFileTaskName = "checkSmileConfigFile"
+tasks.register(checkSmileConfigFileTaskName) {
+    doLast {
+        val configFile = file("src/main/assets/smile_config.json")
+        if (!configFile.exists()) {
+            throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
+        }
+    }
+}
+
+tasks.matching { it.name.startsWith("assemble") }.configureEach {
+    dependsOn(checkSmileConfigFileTaskName)
 }
 
 dependencies {
