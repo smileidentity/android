@@ -1,7 +1,7 @@
 package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -145,7 +145,7 @@ fun MainScreen() {
                         Screens.Home.route,
                         Modifier
                             .padding(it)
-                            .consumedWindowInsets(it),
+                            .consumeWindowInsets(it),
                     ) {
                         composable(Screens.Home.route) {
                             bottomNavSelection = Screens.Home

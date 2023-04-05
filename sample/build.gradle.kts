@@ -17,7 +17,8 @@ android {
         minSdk = 21
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        // Include the SDK version in the app version name
+        versionName = "1.0.0_sdk-" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -25,9 +26,26 @@ android {
         }
     }
 
+    val uploadKeystoreFile = file("upload.jks")
+    signingConfigs {
+        if (uploadKeystoreFile.exists()) {
+            create("release") {
+                val uploadKeystorePassword = findProperty("uploadKeystorePassword") as? String
+                storeFile = file("upload.jks")
+                keyAlias = "upload"
+                storePassword = uploadKeystorePassword
+                keyPassword = uploadKeystorePassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            isDebuggable = false
+            if (uploadKeystoreFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
@@ -51,6 +69,20 @@ android {
     packagingOptions {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+}
+
+val checkSmileConfigFileTaskName = "checkSmileConfigFile"
+tasks.register(checkSmileConfigFileTaskName) {
+    doLast {
+        val configFile = file("src/main/assets/smile_config.json")
+        if (!configFile.exists()) {
+            throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
+        }
+    }
+}
+
+tasks.named("assemble") {
+    dependsOn(checkSmileConfigFileTaskName)
 }
 
 dependencies {

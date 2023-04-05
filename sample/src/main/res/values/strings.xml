@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smile Identity</string>
+    <string name="app_name">Smile ID</string>
     <string name="production">Production</string>
     <string name="sandbox">Sandbox</string>
     <string name="home">Home</string>
