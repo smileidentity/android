@@ -31,7 +31,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       - name: Archive Sample App
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Sample App APK
           path: sample/build/outputs/apk/debug/sample-debug.apk
