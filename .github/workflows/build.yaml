@@ -22,7 +22,7 @@ jobs:
         id: version
         # Read version number from the VERSION file and append -SNAPSHOT if not already present
         run: |
-          VERSION=$(cat VERSION)
+          VERSION=$(cat ./lib/VERSION)
           if [[ $VERSION == *"-SNAPSHOT" ]]; then
             echo "Version $VERSION already contains -SNAPSHOT"
             echo "::set-output name=version::$VERSION"
