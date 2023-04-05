@@ -33,7 +33,7 @@ jobs:
         run: |
           if [ -n "${{ github.event.inputs.version_override }}" ]; then
             echo "Using version override: ${{ github.event.inputs.version_override }}"
-            echo "::set-output name=version::${{ github.event.inputs.version_override }}"
+            echo "version=${{ github.event.inputs.version_override }}" >> $GITHUB_OUTPUT
           else
             version=$(cat ./lib/VERSION)
             if [[ $version != *-SNAPSHOT ]]; then
@@ -41,7 +41,7 @@ jobs:
               exit 1
             fi
             version=${version%-SNAPSHOT}
-            echo "::set-output name=version::$version"
+            echo "version=$version" >> $GITHUB_OUTPUT
           fi
       - name: Push Tag
         uses: actions-ecosystem/action-push-tag@v1
