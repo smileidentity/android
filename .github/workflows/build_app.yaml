@@ -15,8 +15,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
-      - name: Setup Gradle # Although not strictly necessary, it is useful for better caching
-        uses: gradle/gradle-build-action@v2
       - name: Write Smile Config
         # Mask the config so it doesn't show up in the logs
         run: |
@@ -27,7 +25,9 @@ jobs:
           fi
           echo '::add-mask::$SMILE_CONFIG' > sample/src/main/assets/smile_config.json
       - name: Assemble
-        run: ./gradlew assembleDebug
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleDebug
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       - name: Archive Sample App
