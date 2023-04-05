@@ -72,7 +72,7 @@ mavenPublishing {
         url.set("https://docs.smileidentity.com/mobile/android")
         licenses {
             license {
-                name.set("Smile Identity Terms Of Use")
+                name.set("Smile Identity Terms of Use")
                 url.set("https://smileidentity.com/terms-and-conditions")
                 distribution.set("repo")
             }
