@@ -17,7 +17,8 @@ android {
         minSdk = 21
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        // Include the SDK version in the app version name
+        versionName = "1.0.0_sdk-" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -78,6 +79,10 @@ tasks.register(checkSmileConfigFileTaskName) {
             throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
         }
     }
+}
+
+tasks.named("assemble") {
+    dependsOn(checkSmileConfigFileTaskName)
 }
 
 dependencies {

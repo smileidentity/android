@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     branches: [ main ]
-# Lints code, builds all modules, and runs tests
+# Lints code, builds all modules, runs tests, assembles AAR and APK, and publishes Snapshot
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,10 +15,41 @@ jobs:
           java-version: 11
       - name: Setup Gradle # Although not strictly necessary, it is useful for better caching
         uses: gradle/gradle-build-action@v2
-      - name: Build, Test, Lint
-        run: ./gradlew build
+      - name: Write Smile Config
+        run: |
+          echo '${{ secrets.SMILE_CONFIG_PARTNER_002 }}' > sample/src/main/assets/smile_config.json
+      - name: Calculate Snapshot Version
+        id: version
+        # Read version number from the VERSION file and append -SNAPSHOT if not already present
+        run: |
+          VERSION=$(cat VERSION)
+          if [[ $VERSION == *"-SNAPSHOT" ]]; then
+            echo "Version $VERSION already contains -SNAPSHOT"
+            echo "::set-output name=version::$VERSION"
+          else
+            echo "Version $VERSION does not contain -SNAPSHOT"
+            echo "::set-output name=version::$VERSION-SNAPSHOT"
+          fi
+      - name: Build, Test, Lint, Assemble, Publish Snapshot
+        run: ./gradlew build assembleDebug publish
         env:
+          ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY_ID }}
+      - name: Archive SDK AAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: SDK AAR
+          path: lib/build/outputs/aar/lib-debug.aar
+      - name: Archive Sample App
+        uses: actions/upload-artifact@v2
+        with:
+          name: Sample App APK
+          path: sample/build/outputs/apk/debug/sample-debug.apk
+
   lint:
     runs-on: ubuntu-latest
     steps:
