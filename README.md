@@ -69,6 +69,13 @@ The summary is:
    (`gpg --keyserver keys.openpgp.org --send-keys KEY_ID`)
 5. Verify key was distributed (`gpg --keyserver keys.openpgp.org --search-key KEY_ID`)
 
+### Configure Play Store Upload Keystore
+
+The upload keystore lives in 1Password. It is named `Play Store Upload Keystore`. Download this file
+and save it to `sample/upload.jks`. 
+
+It is also stored in this project as a Base64 encoded secret for use by GitHub Actions.
+
 ### Configure Gradle Properties
 
 Add the following properties to `~/.gradle/gradle.properties`:
@@ -80,6 +87,7 @@ mavenCentralPassword=<Your Maven Central Password>
 signing.keyId=<Your GPG Key ID>
 signing.password=<Your GPG Key Password>
 signing.secretKeyRingFile=<Your GPG Keyring path (e.g. ~/.gnupg/secring.gpg)>
+uploadKeystorePassword=<The password for the upload keystore>
 ```
 
 ## Other Notes

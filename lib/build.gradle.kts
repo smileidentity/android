@@ -12,7 +12,7 @@ plugins {
 
 val groupId = "com.smileidentity"
 val artifactId = "android-sdk"
-val version = "8.0.0-SNAPSHOT"
+project.version = findProperty("VERSION_NAME") as? String ?: file("VERSION").readText().trim()
 
 android {
     namespace = groupId
@@ -65,7 +65,7 @@ android {
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-    coordinates(groupId, artifactId, version)
+    coordinates(groupId, artifactId, project.version.toString())
     pom {
         name.set("Smile Identity Android SDK")
         description.set("The Official Smile Identity Android SDK")
