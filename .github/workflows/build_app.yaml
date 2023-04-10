@@ -5,7 +5,6 @@ on:
       smile_config:
         description: 'The contents of the smile_config.json file (default: Partner 002)'
         required: false
-        default: ''
 
 jobs:
   build:
