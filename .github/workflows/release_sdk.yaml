@@ -18,7 +18,9 @@ jobs:
           java-version: 11
       - name: Write Smile Config
         run: |
-          echo '${{ secrets.SMILE_CONFIG_PARTNER_002 }}' > sample/src/main/assets/smile_config.json
+          echo "$SMILE_CONFIG_PARTNER_002" > sample/src/main/assets/smile_config.json
+        env:
+          SMILE_CONFIG_PARTNER_002: ${{ secrets.SMILE_CONFIG_PARTNER_002 }}
       - name: Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1
@@ -72,7 +74,7 @@ jobs:
       - name: Archive Sample App
         uses: actions/upload-artifact@v3
         with:
-          name: Sample App APK
+          name: Sample App APK (Partner 002)
           path: sample/build/outputs/apk/release/sample-release.apk
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -106,8 +108,9 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.smileidentity.sample
-          release_track: internal
+          track: internal
           releaseFiles: sample/build/outputs/apk/release/sample-release.apk
+          releaseName: Smile ID (Partner 002)
       - name: Bump Version
         run: |
           version=${{ steps.read_version.outputs.version }}
