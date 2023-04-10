@@ -24,13 +24,11 @@ jobs:
           if [ -n "$INPUT_SMILE_CONFIG" ]; then
             SMILE_CONFIG="$INPUT_SMILE_CONFIG"
           else
-            SMILE_CONFIG="$SMILE_CONFIG_PARTNER_002"
+            SMILE_CONFIG="${{ secrets.SMILE_CONFIG_PARTNER_002 }}"
           fi
           echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
           PARTNER_ID=$(jq -r '.partner_id' sample/src/main/assets/smile_config.json)
           echo "partner_id=$PARTNER_ID" >> $GITHUB_OUTPUT
-        env:
-          SMILE_CONFIG_PARTNER_002: ${{ secrets.SMILE_CONFIG_PARTNER_002 }}
       - name: Assemble
         uses: gradle/gradle-build-action@v2
         with:
@@ -50,11 +48,7 @@ jobs:
           packageName: com.smileidentity.sample
           track: internalsharing
           releaseFiles: sample/build/outputs/apk/debug/sample-debug.apk
-      - name: Link to App Download
-        run: |
-          echo "***********************************"
-          echo "Download: ${{ steps.upload.outputs.internalSharingDownloadUrl }}"
-          echo "***********************************"
+          releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
       - name: Send Slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
