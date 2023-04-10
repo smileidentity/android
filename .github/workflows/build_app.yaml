@@ -25,7 +25,7 @@ jobs:
           if [ -n "$INPUT_SMILE_CONFIG" ]; then
             SMILE_CONFIG="$INPUT_SMILE_CONFIG"
           else
-            SMILE_CONFIG="$SMILE_CONFIG_PARTNER_002"
+            SMILE_CONFIG="${SMILE_CONFIG_PARTNER_002//$'\n'/ }"
           fi
           echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
           PARTNER_ID=$(jq -r '.partner_id' sample/src/main/assets/smile_config.json)
