@@ -1,4 +1,4 @@
-name: Build Ad-hoc Sample App
+name: Build Sample App
 on:
   workflow_dispatch:
     inputs:
@@ -20,9 +20,9 @@ jobs:
         # Mask the config so it doesn't show up in the logs
         run: |
           if [ -n "${{ github.event.inputs.smile_config }}" ]; then
-            SMILE_CONFIG=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.smile_config' )
+            SMILE_CONFIG="$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.smile_config' )"
           else
-            SMILE_CONFIG=${{ secrets.SMILE_CONFIG_PARTNER_002 }}
+            SMILE_CONFIG="${{ secrets.SMILE_CONFIG_PARTNER_002 }}"
           fi
           echo '$SMILE_CONFIG' > sample/src/main/assets/smile_config.json
       - name: Assemble
