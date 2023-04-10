@@ -17,14 +17,17 @@ jobs:
           distribution: temurin
           java-version: 11
       - name: Write Smile Config
+        id: write_smile_config
         # Mask the config so it doesn't show up in the logs
         run: |
-          if [ -n "${{ github.event.inputs.smile_config }}" ]; then
-            SMILE_CONFIG="$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.smile_config' )"
+          if [ -n '${{ github.event.inputs.smile_config }}' ]; then
+            SMILE_CONFIG='$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.smile_config' )'
           else
-            SMILE_CONFIG="${{ secrets.SMILE_CONFIG_PARTNER_002 }}"
+            SMILE_CONFIG='${{ secrets.SMILE_CONFIG_PARTNER_002 }}'
           fi
           echo '$SMILE_CONFIG' > sample/src/main/assets/smile_config.json
+          PARTNER_ID=$(jq -r '.partner_id' < sample/src/main/assets/smile_config.json)
+          echo "partner_id=$PARTNER_ID" >> $GITHUB_OUTPUT
       - name: Assemble
         uses: gradle/gradle-build-action@v2
         with:
@@ -34,11 +37,11 @@ jobs:
       - name: Archive Sample App
         uses: actions/upload-artifact@v3
         with:
-          name: Sample App APK
+          name: Sample App APK (Partner ${{ steps.write_smile_config.outputs.partner_id }})
           path: sample/build/outputs/apk/debug/sample-debug.apk
       - name: Create Internal App Sharing Link
         uses: r0adkll/upload-google-play@v1
-        id: upload_to_play_store
+        id: upload
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.smileidentity.sample
@@ -47,5 +50,16 @@ jobs:
       - name: Link to App Download
         run: |
           echo "***********************************"
-          echo "Download: ${{ steps.upload_to_play_store.outputs.internalSharingDownloadUrl }}"
+          echo "Download: ${{ steps.upload.outputs.internalSharingDownloadUrl }}"
           echo "***********************************"
+      - name: Send Slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}"
+              "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}"
+              "branch": "${{ github.ref }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_SAMPLE_APP_DOWNLOAD }}
