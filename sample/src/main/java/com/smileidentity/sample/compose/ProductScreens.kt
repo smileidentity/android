@@ -14,7 +14,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screens
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
@@ -49,12 +51,13 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxSize()) {
             items(products) {
-                Button(
+                FilledTonalButton(
                     onClick = { onProductSelected(it) },
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
+                        .height(96.dp)
                         .padding(4.dp),
                 ) {
                     Column(

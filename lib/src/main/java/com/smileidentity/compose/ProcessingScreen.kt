@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -27,8 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
-import com.smileidentity.compose.theme.SmileIdentityAffirmationColor
-import com.smileidentity.compose.theme.SmileIdentityLightBlue
 
 enum class ProcessingState {
     InProgress,
@@ -110,7 +107,7 @@ internal fun ProcessingInProgressScreen(
     icon: Painter,
     title: String,
     subtitle: String,
-    progressIndicatorColor: Color = SmileIdentityAffirmationColor,
+    progressIndicatorColor: Color = MaterialTheme.colorScheme.tertiary,
 ) {
     AlertDialog(
         icon = { Icon(painter = icon, contentDescription = null, tint = Color.Unspecified) },
@@ -177,7 +174,6 @@ internal fun ProcessingSuccessScreen(
                 onClick = onContinue,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = SmileIdentityLightBlue),
             ) { Text(text = continueButtonText) }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
@@ -220,7 +216,6 @@ internal fun ProcessingErrorScreen(
                 onClick = onRetry,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = SmileIdentityLightBlue),
             ) { Text(text = retryButtonText) }
         },
         dismissButton = {
