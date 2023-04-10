@@ -20,7 +20,8 @@ jobs:
         id: write_smile_config
         # Mask the config so it doesn't show up in the logs
         run: |
-          INPUT_SMILE_CONFIG="::add-mask::${{ github.event.inputs.smile_config }}"
+          INPUT_SMILE_CONFIG=$(jq -r '.inputs.smile_config' $GITHUB_EVENT_PATH)
+          echo "::add-mask::$INPUT_SMILE_CONFIG"
           if [ -n "$INPUT_SMILE_CONFIG" ]; then
             SMILE_CONFIG="$INPUT_SMILE_CONFIG"
           else
