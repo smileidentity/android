@@ -1,10 +1,11 @@
 name: Build Ad-hoc Sample App
 on:
   workflow_dispatch:
-    smile_config:
-      description: 'The contents of the smile_config.json file (default: Partner 002)'
-      required: false
-      default: ''
+    inputs:
+      smile_config:
+        description: 'The contents of the smile_config.json file (default: Partner 002)'
+        required: false
+        default: ''
 
 jobs:
   build:
