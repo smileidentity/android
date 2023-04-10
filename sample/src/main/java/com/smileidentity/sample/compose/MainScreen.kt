@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose
 
+import SmileIdentityTheme
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,7 +37,6 @@ import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileIdentity
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.compose.theme.SmileIdentityTheme
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.sample.R
@@ -61,7 +60,6 @@ fun MainScreen() {
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
     SmileIdentityTheme {
         Surface {
-            val appBarState = rememberTopAppBarState()
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
                 topBar = {

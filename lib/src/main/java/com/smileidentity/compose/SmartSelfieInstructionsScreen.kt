@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,7 +38,6 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
-import com.smileidentity.compose.theme.SmileIdentityTheme
 import com.smileidentity.toast
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -157,9 +155,5 @@ fun SmartSelfieInstructionsScreen(
 @Preview
 @Composable
 fun SmartSelfieInstructionsScreenPreview() {
-    SmileIdentityTheme {
-        Surface {
-            SmartSelfieInstructionsScreen()
-        }
-    }
+    SmartSelfieInstructionsScreen()
 }
