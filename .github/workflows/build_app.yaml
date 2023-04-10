@@ -20,7 +20,7 @@ jobs:
         id: write_smile_config
         # Mask the config so it doesn't show up in the logs
         run: |
-          if [ -n "${{ github.event.inputs.smile_config }}" ]; then
+          if [ -n "${{ ::add-mask::github.event.inputs.smile_config }}" ]; then
             SMILE_CONFIG="$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.smile_config' )"
           else
             SMILE_CONFIG="${{ secrets.SMILE_CONFIG_PARTNER_002 }}"
@@ -57,9 +57,10 @@ jobs:
         with:
           payload: |
             {
-              "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}"
-              "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}"
-              "branch": "${{ github.ref }}"
+              "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}",
+              "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}",
+              "branch": "${{ github.ref }}",
+              "commit_sha": "${{ github.sha }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_SAMPLE_APP_DOWNLOAD }}
