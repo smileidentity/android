@@ -43,9 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.smileidentity.R
-import com.smileidentity.compose.theme.SmileIdentityAffirmationColor
 import com.smileidentity.compose.theme.SmileIdentityDarkerBlue
-import com.smileidentity.compose.theme.SmileIdentitySemiTransparentBackground
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -162,7 +160,6 @@ internal fun SelfieCaptureScreen(
         FaceShapedProgressIndicator(
             progress = animatedProgress,
             faceHeight = viewfinderSize,
-            completeProgressStrokeColor = SmileIdentityAffirmationColor,
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
@@ -199,7 +196,7 @@ private fun AgentModeSwitch(
         val agentModeBackgroundColor = if (isAgentModeEnabled) {
             SmileIdentityDarkerBlue
         } else {
-            SmileIdentitySemiTransparentBackground
+            MaterialTheme.colorScheme.scrim
         }
         val agentModeTextColor = if (isAgentModeEnabled) {
             MaterialTheme.colorScheme.onBackground
@@ -225,7 +222,7 @@ private fun AgentModeSwitch(
                 checked = isAgentModeEnabled,
                 onCheckedChange = onCamSelectorChange,
                 colors = SwitchDefaults.colors(
-                    checkedTrackColor = SmileIdentityAffirmationColor,
+                    checkedTrackColor = MaterialTheme.colorScheme.tertiary,
                 ),
                 modifier = Modifier.testTag("agentModeSwitch"),
             )

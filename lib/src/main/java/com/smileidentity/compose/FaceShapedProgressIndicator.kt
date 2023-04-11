@@ -3,6 +3,7 @@ package com.smileidentity.compose
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.progressSemantics
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,7 +18,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.smileidentity.compose.theme.SmileIdentitySemiTransparentBackground
 
 /**
  * A progress indicator that is shaped like a face, has a semi-transparent background, and where the
@@ -37,9 +37,9 @@ fun FaceShapedProgressIndicator(
     faceHeight: Dp,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
-    completeProgressStrokeColor: Color = ProgressIndicatorDefaults.circularColor,
+    completeProgressStrokeColor: Color = MaterialTheme.colorScheme.tertiary,
     incompleteProgressStrokeColor: Color = Color.Gray,
-    backgroundColor: Color = SmileIdentitySemiTransparentBackground,
+    backgroundColor: Color = MaterialTheme.colorScheme.scrim,
 ) {
     val stroke = with(LocalDensity.current) { Stroke(strokeWidth.toPx()) }
     Canvas(modifier.progressSemantics(progress).fillMaxSize()) {
