@@ -4,8 +4,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 // TODO: Use Color Resources
-val SmileIdentityDarkerBlue = Color(0xFF001096)
-
 val SmileIdentityColorScheme = lightColorScheme(
     primary = Color(0xFF001096),
     onPrimary = Color(0xFFFFFFFF),

@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.smileidentity.R
-import com.smileidentity.compose.theme.SmileIdentityDarkerBlue
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -194,7 +193,7 @@ private fun AgentModeSwitch(
     if (allowAgentMode) {
         val isAgentModeEnabled = camSelector == CamSelector.Back
         val agentModeBackgroundColor = if (isAgentModeEnabled) {
-            SmileIdentityDarkerBlue
+            MaterialTheme.colorScheme.secondary
         } else {
             MaterialTheme.colorScheme.scrim
         }
