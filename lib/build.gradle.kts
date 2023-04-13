@@ -1,6 +1,4 @@
-// TODO: Remove DSL_SCOPE_VIOLATION on release of Gradle 8.1
-//  https://github.com/gradle/gradle/issues/22797
-@file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
+@file:Suppress("UnstableApiUsage")
 
 plugins {
     alias(libs.plugins.android.library)

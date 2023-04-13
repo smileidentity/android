@@ -1,5 +1,3 @@
-// TODO: Remove @Suppress on release of Gradle 8.1 (https://github.com/gradle/gradle/issues/22797)
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     // Applied to all sub-modules
     alias(libs.plugins.ktlint)

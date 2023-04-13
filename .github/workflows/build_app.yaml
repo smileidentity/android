@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 20
+          java-version: 17
       - name: Write Smile Config
         id: write_smile_config
         # Mask the config so it doesn't show up in the logs
