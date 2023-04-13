@@ -32,12 +32,12 @@ jobs:
         env:
           SMILE_CONFIG_PARTNER_002: ${{ secrets.SMILE_CONFIG_PARTNER_002 }}
       - name: Decode Keystore
-          id: decode_keystore
-          uses: timheuer/base64-to-file@v1
-          with:
-            fileName: 'upload.jks'
-            fileDir: './sample'
-            encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'upload.jks'
+          fileDir: './sample'
+          encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Assemble
         uses: gradle/gradle-build-action@v2
         with:
