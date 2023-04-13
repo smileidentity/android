@@ -107,6 +107,7 @@ fun SmartSelfieInstructionsScreen(
                         Text(
                             text = stringResource(title),
                             style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
                         )
                         Text(
                             text = stringResource(subtitle),
