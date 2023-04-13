@@ -13,11 +13,11 @@ N/A
 - Moshi
 - Timber
 - AndroidX
-  - Core
-  - AppCompat
-  - Lifecycle
-  - Compose
   - Camera
+  - Compose
+  - Core
+  - Fragment
+  - Lifecycle
 - Sentry
 - Accompanist
 - Camposer

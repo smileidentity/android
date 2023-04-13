@@ -89,7 +89,6 @@ tasks.named("assemble") {
 dependencies {
     implementation(project(":lib"))
     implementation(libs.androidx.core)
-    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.activity.compose)
     implementation(libs.timber)
