@@ -21,9 +21,13 @@ import com.smileidentity.results.SmartSelfieResult
  * A [Fragment] wrapper for the [SmartSelfieRegistrationScreen] to be used if not using Jetpack
  * Compose. New instances *must* be created via [newInstance]. Results are communicated back to the
  * caller via [setFragmentResult]. Therefore, the caller must use
- * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result.
+ * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result. If
+ * using parent/child fragments, the caller must use the appropriate child/parent FragmentManager.
  * The result key is [KEY_REQUEST] and the result is a [SmartSelfieResult] in the bundle under the
  * key [KEY_RESULT].
+ *
+ * To theme the UI, override the si_color_* resources
+ *
  * Usage example:
  * ```java
  * SmartSelfieRegistrationFragment smartSelfieFragment = SmartSelfieRegistrationFragment
@@ -41,8 +45,6 @@ import com.smileidentity.results.SmartSelfieResult
  *     }
  *   );
  * ```
- *
- * To theme the UI, override the si_color_* resources
  */
 class SmartSelfieRegistrationFragment : Fragment() {
     companion object {
