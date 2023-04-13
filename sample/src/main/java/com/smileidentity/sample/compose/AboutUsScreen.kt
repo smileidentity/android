@@ -49,6 +49,8 @@ fun AboutUsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // .padding(16.dp)
+            // .clip(MaterialTheme.shapes.small)
             .verticalScroll(rememberScrollState()),
     ) {
         abouts.forEach {

@@ -23,6 +23,7 @@ import com.smileidentity.results.SmartSelfieResult
  * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
+ * @param showAttribution Whether to show the Smile Identity attribution or not.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * Identity branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile
@@ -33,6 +34,7 @@ import com.smileidentity.results.SmartSelfieResult
 fun SmileIdentity.SmartSelfieRegistrationScreen(
     userId: String = randomUserId(),
     allowAgentMode: Boolean = false,
+    showAttribution: Boolean = true,
     colorScheme: ColorScheme = SmileIdentityColorScheme,
     typography: Typography = SmileIdentityTypography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
@@ -41,7 +43,13 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
         colorScheme = colorScheme,
         typography = typography,
     ) {
-        OrchestratedSelfieCaptureScreen(userId, true, allowAgentMode, onResult = onResult)
+        OrchestratedSelfieCaptureScreen(
+            userId,
+            true,
+            allowAgentMode,
+            showAttribution,
+            onResult = onResult,
+        )
     }
 }
 
@@ -56,6 +64,7 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
  * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
+ * @param showAttribution Whether to show the Smile Identity attribution or not.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * Identity branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile
@@ -66,6 +75,7 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
 fun SmileIdentity.SmartSelfieAuthenticationScreen(
     userId: String,
     allowAgentMode: Boolean = false,
+    showAttribution: Boolean = true,
     colorScheme: ColorScheme = SmileIdentityColorScheme,
     typography: Typography = SmileIdentityTypography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
@@ -74,6 +84,12 @@ fun SmileIdentity.SmartSelfieAuthenticationScreen(
         colorScheme = colorScheme,
         typography = typography,
     ) {
-        OrchestratedSelfieCaptureScreen(userId, false, allowAgentMode, onResult = onResult)
+        OrchestratedSelfieCaptureScreen(
+            userId,
+            false,
+            allowAgentMode,
+            showAttribution,
+            onResult = onResult,
+        )
     }
 }

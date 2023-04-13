@@ -1,12 +1,15 @@
 package com.smileidentity.models
 
+import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileIdentity
 import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class EnhancedKycRequest(
     @Json(name = "country") val country: String,
@@ -24,8 +27,9 @@ data class EnhancedKycRequest(
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
-)
+) : Parcelable
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class EnhancedKycResponse(
     @Json(name = "SmileJobID") val smileJobId: String,
@@ -44,7 +48,7 @@ data class EnhancedKycResponse(
 
     @Json(name = "IsFinalResult") @StringifiedBoolean
     val isFinalResult: Boolean,
-)
+) : Parcelable
 
 enum class IdType(
     val countryCode: String,

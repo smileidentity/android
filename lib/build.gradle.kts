@@ -6,8 +6,9 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.moshix)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.moshix)
+    alias(libs.plugins.parcelize)
 }
 
 val groupId = "com.smileidentity"
@@ -114,6 +115,7 @@ dependencies {
     implementation(libs.moshi.adapters.lazy)
 
     implementation(libs.androidx.core)
+    implementation(libs.androidx.fragment)
 
     // Logging
     implementation(libs.timber)

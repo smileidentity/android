@@ -43,6 +43,7 @@ import com.smileidentity.toast
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SmartSelfieInstructionsScreen(
+    showAttribution: Boolean = true,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onInstructionsAcknowledged: () -> Unit = { },
 ) {
@@ -100,7 +101,7 @@ fun SmartSelfieInstructionsScreen(
                     Icon(
                         painter = painterResource(id = imageId),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
@@ -146,7 +147,9 @@ fun SmartSelfieInstructionsScreen(
             ) {
                 Text(stringResource(R.string.si_smart_selfie_instruction_ready_button))
             }
-            SmileIdentityAttribution()
+            if (showAttribution) {
+                SmileIdentityAttribution()
+            }
         }
     }
 }
