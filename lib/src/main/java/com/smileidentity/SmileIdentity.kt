@@ -1,6 +1,8 @@
 package com.smileidentity
 
 import android.content.Context
+import com.fingerprintjs.android.fingerprint.Fingerprinter
+import com.fingerprintjs.android.fingerprint.FingerprinterFactory
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.models.Config
 import com.smileidentity.networking.FileAdapter
@@ -11,7 +13,6 @@ import com.smileidentity.networking.SmileIdentityService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
 import com.squareup.moshi.Moshi
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -32,32 +33,47 @@ object SmileIdentity {
 
     internal var apiKey: String? = null
 
+    private var fingerprint = ""
+    private var deviceId = ""
+
     /**
      * Initialize the SDK. This must be called before any other SDK methods. API calls must first be
      * authenticated with a call to [SmileIdentityService.authenticate], since this initialization
      * method does not use an API Key, but rather the auth token from the Config to create a
      * signature
      *
-     * @param config The [Config] to use, from the Smile Identity Portal
+     * @param context A [Context] instance which will be used to load the config file from assets
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
      * Identity related crashes. This is powered by Sentry, and further details on inner workings
      * can be found in the source docs for [SmileIdentityCrashReporting]
-     * @param okHttpClient The [OkHttpClient] to use for the network requests
+     * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
      */
     @JvmStatic
     @JvmOverloads
     fun initialize(
-        config: Config,
+        context: Context,
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = false,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
-        SmileIdentity.config = config
+        SmileIdentity.config = Config.fromAssets(context)
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
             SmileIdentityCrashReporting.enable()
         }
+        // Start the async fingerprinting process as early as possible
+        val fingerprinter = FingerprinterFactory.create(context)
+        fingerprinter.getFingerprint(version = Fingerprinter.Version.V_5) { fingerprint ->
+            Timber.v("Fingerprint: $fingerprint")
+            this.fingerprint = fingerprint
+        }
+
+        fingerprinter.getDeviceId(version = Fingerprinter.Version.V_5) { result ->
+            Timber.v("Device ID: $result")
+            this.deviceId = result.deviceId
+        }
+
         SmileIdentity.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
 
@@ -77,7 +93,7 @@ object SmileIdentity {
      * authToken from [config] need not be used.
      *
      * @param apiKey The API Key to use
-     * @param config The [Config] to use
+     * @param context A [Context] instance which will be used to load the config file from assets
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
      * Identity related crashes. This is powered by Sentry, and further details on inner workings
@@ -88,62 +104,14 @@ object SmileIdentity {
     @JvmOverloads
     fun initialize(
         apiKey: String,
-        config: Config,
+        context: Context,
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = false,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         SmileIdentity.apiKey = apiKey
-        initialize(config, useSandbox, enableCrashReporting, okHttpClient)
+        initialize(context, useSandbox, enableCrashReporting, okHttpClient)
     }
-
-    /**
-     * Initialize the SDK. This must be called before any other SDK methods.
-     *
-     * @param context A [Context] instance which will be used to load the config file from assets
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
-     * Identity related crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIdentityCrashReporting]
-     * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun initialize(
-        context: Context,
-        useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = false,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) = initialize(Config.fromAssets(context), useSandbox, enableCrashReporting, okHttpClient)
-
-    /**
-     * Initialize the SDK with an API Key. This must be called before any other SDK methods. API
-     * keys are different from the auth token in the Config. If this initialization method is used,
-     * authToken from [config] need not be used.
-     *
-     * @param apiKey The API Key to use
-     * @param context A [Context] instance which will be used to load the config file from assets
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
-     * Identity related crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIdentityCrashReporting]
-     * @param okHttpClient The [OkHttpClient] to use for the network requests
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun initialize(
-        apiKey: String,
-        context: Context,
-        useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = false,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) = initialize(
-        apiKey,
-        Config.fromAssets(context),
-        useSandbox,
-        enableCrashReporting,
-        okHttpClient,
-    )
 
     /**
      * Switches the SDK between the sandbox and production API at runtime. Please note that if the
@@ -170,26 +138,32 @@ object SmileIdentity {
         connectTimeout(30, TimeUnit.SECONDS)
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)
-        addNetworkInterceptor(
-            Interceptor { chain: Interceptor.Chain ->
-                // Retry on exception (network error) and 5xx
-                val request = chain.request()
-                for (attempt in 1..3) {
-                    try {
-                        Timber.v("Smile Identity SDK network attempt #$attempt")
-                        val response = chain.proceed(request)
-                        if (response.code < 500) {
-                            return@Interceptor response
-                        }
-                    } catch (e: Exception) {
-                        Timber.w(e, "Smile Identity SDK network attempt #$attempt failed")
-                        // Network failures end up here. These will be retried
-                    }
-                }
-                return@Interceptor chain.proceed(request)
-            },
-        )
         addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+        addInterceptor {
+            // Add fingerprint and device ID as headers X-Fingerprint and X-Device-Id
+            val request = it.request().newBuilder()
+                .addHeader("X-Fingerprint", fingerprint)
+                .addHeader("X-Device-Id", deviceId)
+                .build()
+            it.proceed(request)
+        }
+        addInterceptor {
+            // Retry on exception (network error) and 5xx
+            val request = it.request()
+            for (attempt in 1..3) {
+                try {
+                    Timber.v("Smile Identity SDK network attempt #$attempt")
+                    val response = it.proceed(request)
+                    if (response.code < 500) {
+                        return@addInterceptor response
+                    }
+                } catch (e: Exception) {
+                    Timber.w(e, "Smile Identity SDK network attempt #$attempt failed")
+                    // Network failures end up here. These will be retried
+                }
+            }
+            it.proceed(request)
+        }
     }
 
     /**

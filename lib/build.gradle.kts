@@ -118,6 +118,9 @@ dependencies {
     // Logging
     implementation(libs.timber)
 
+    // Fingerprinting
+    implementation(libs.fingerprintjs)
+
     // Sentry (crash reporting, tracing, breadcrumbs)
     implementation(platform(libs.sentry.bom))
     implementation(libs.sentry)

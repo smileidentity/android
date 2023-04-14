@@ -16,6 +16,7 @@ androidx-test-rules = "1.5.0"
 camposer = "0.1.1"
 chucker = "3.5.2"
 coroutines = "1.6.4"
+fingerprintjs = "2.0.0"
 junit = "4.13.2"
 kotlin = "1.8.20"
 ksp = "1.8.20-1.0.10"
@@ -70,6 +71,7 @@ chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "ch
 chucker-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+fingerprintjs = { module = "com.github.fingerprintjs:fingerprint-android", version.ref = "fingerprintjs" }
 junit = { module = "junit:junit", version.ref = "junit" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 leakcanary-noop = { module = "com.squareup.leakcanary:leakcanary-android-release", version.ref = "leakcanary" }
