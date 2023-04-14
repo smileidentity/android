@@ -140,11 +140,15 @@ object SmileIdentity {
         writeTimeout(30, TimeUnit.SECONDS)
         addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
         addInterceptor {
-            // Add fingerprint and device ID as headers X-Fingerprint and X-Device-Id
-            val request = it.request().newBuilder()
-                .addHeader("X-Fingerprint", fingerprint)
-                .addHeader("X-Device-Id", deviceId)
-                .build()
+            val url = it.request().url.toString()
+            val request = it.request().newBuilder().apply {
+                if (url.contains(config.prodBaseUrl, ignoreCase = true) ||
+                    url.contains(config.sandboxBaseUrl, ignoreCase = true)
+                ) {
+                    addHeader("X-Fingerprint", fingerprint)
+                    addHeader("X-Device-Id", deviceId)
+                }
+            }.build()
             it.proceed(request)
         }
         addInterceptor {
