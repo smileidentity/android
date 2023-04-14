@@ -93,7 +93,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
                     BuildConfig.VERSION_NAME,
                 ),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.typography.labelMedium.color.copy(alpha = .7f),
+                color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
                 modifier = Modifier.padding(12.dp),
             )
         }
