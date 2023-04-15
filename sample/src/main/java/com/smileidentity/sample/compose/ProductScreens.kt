@@ -18,10 +18,12 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +34,6 @@ import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screens
 
-@Preview
 @Composable
 fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
     val products = listOf(
@@ -96,6 +97,17 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
                 color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
                 modifier = Modifier.padding(12.dp),
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewProductSelectionScreen() {
+    SmileIdentity.initialize(LocalContext.current)
+    SmileIdentityTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            ProductSelectionScreen()
         }
     }
 }

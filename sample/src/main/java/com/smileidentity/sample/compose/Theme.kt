@@ -1,3 +1,5 @@
+package com.smileidentity.sample.compose
+
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -23,3 +25,5 @@ fun SmileIdentityTheme(content: @Composable () -> Unit) {
         content = content,
     )
 }
+
+// TODO: Create a dummy preview screen with many elements to test/view/showcase the theme

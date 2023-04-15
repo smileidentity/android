@@ -1,6 +1,5 @@
 package com.smileidentity.sample.compose
 
-import SmileIdentityTheme
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -142,7 +141,7 @@ fun MainScreen() {
                     ) {
                         composable(Screens.Home.route) {
                             bottomNavSelection = Screens.Home
-                            // Display "Smile Identity" in the top bar instead of "Home" label
+                            // Display "Smile ID" in the top bar instead of "Home" label
                             currentScreenTitle = R.string.app_name
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }

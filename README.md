@@ -13,8 +13,8 @@ project consisting of the following modules:
 ## Setup
 
 - JDK 17+
-- Android Studio 2022.1.1 or higher
-- Android Gradle Plugin 7.4.2 or higher
+- Android Studio 2022.2.1 (Flamingo) or higher
+- Android Gradle Plugin 8.0.0 or higher
 - Android SDK 33
 - Add `SENTRY_DSN=<Android project Sentry DSN from Sentry Portal>` to `~/.gradle/gradle.properties`
 - Add `smile_config.json` to the Sample App's assets (`sample/src/main/assets`)
