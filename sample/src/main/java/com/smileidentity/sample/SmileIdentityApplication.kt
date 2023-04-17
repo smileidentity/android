@@ -13,8 +13,8 @@ class SmileIdentityApplication : Application() {
         val chucker = ChuckerInterceptor.Builder(this).build()
         SmileIdentity.initialize(
             context = this,
-            useSandbox = BuildConfig.DEBUG,
-            enableCrashReporting = false,
+            useSandbox = true,
+            enableCrashReporting = !BuildConfig.DEBUG,
             okHttpClient = getOkHttpClientBuilder().addInterceptor(chucker).build(),
         )
     }

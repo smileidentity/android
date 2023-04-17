@@ -12,7 +12,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
@@ -20,8 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +36,6 @@ import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileIdentity
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.compose.theme.SmileIdentityTheme
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.sample.R
@@ -63,16 +59,12 @@ fun MainScreen() {
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
     SmileIdentityTheme {
         Surface {
-            val appBarState = rememberTopAppBarState()
-            appBarState.heightOffset = appBarState.heightOffsetLimit
-            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = appBarState)
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
                 topBar = {
                     var isProduction by remember { mutableStateOf(false) }
-                    LargeTopAppBar(
+                    TopAppBar(
                         title = { Text(stringResource(currentScreenTitle)) },
-                        scrollBehavior = scrollBehavior,
                         navigationIcon = {
                             if (showUpButton) {
                                 IconButton(onClick = { navController.navigateUp() }) {
@@ -149,7 +141,7 @@ fun MainScreen() {
                     ) {
                         composable(Screens.Home.route) {
                             bottomNavSelection = Screens.Home
-                            // Display "Smile Identity" in the top bar instead of "Home" label
+                            // Display "Smile ID" in the top bar instead of "Home" label
                             currentScreenTitle = R.string.app_name
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }
@@ -255,7 +247,6 @@ fun MainScreen() {
                         }
                     }
                 },
-                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             )
         }
     }

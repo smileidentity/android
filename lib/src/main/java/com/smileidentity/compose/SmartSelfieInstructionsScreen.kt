@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,12 +38,12 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
-import com.smileidentity.compose.theme.SmileIdentityTheme
 import com.smileidentity.toast
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SmartSelfieInstructionsScreen(
+    showAttribution: Boolean = true,
     cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onInstructionsAcknowledged: () -> Unit = { },
 ) {
@@ -102,12 +101,13 @@ fun SmartSelfieInstructionsScreen(
                     Icon(
                         painter = painterResource(id = imageId),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
                             text = stringResource(title),
                             style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
                         )
                         Text(
                             text = stringResource(subtitle),
@@ -148,7 +148,9 @@ fun SmartSelfieInstructionsScreen(
             ) {
                 Text(stringResource(R.string.si_smart_selfie_instruction_ready_button))
             }
-            SmileIdentityAttribution()
+            if (showAttribution) {
+                SmileIdentityAttribution()
+            }
         }
     }
 }
@@ -157,9 +159,5 @@ fun SmartSelfieInstructionsScreen(
 @Preview
 @Composable
 fun SmartSelfieInstructionsScreenPreview() {
-    SmileIdentityTheme {
-        Surface {
-            SmartSelfieInstructionsScreen()
-        }
-    }
+    SmartSelfieInstructionsScreen()
 }

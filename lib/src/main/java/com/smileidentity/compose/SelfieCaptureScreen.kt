@@ -43,9 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.smileidentity.R
-import com.smileidentity.compose.theme.SmileIdentityAffirmationColor
-import com.smileidentity.compose.theme.SmileIdentityDarkerBlue
-import com.smileidentity.compose.theme.SmileIdentitySemiTransparentBackground
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -69,6 +66,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     userId: String = randomUserId(),
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
+    showAttribution: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
     ),
@@ -77,7 +75,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     val uiState = viewModel.uiState.collectAsState().value
     var acknowledgedInstructions by remember { mutableStateOf(false) }
     when {
-        !acknowledgedInstructions -> SmartSelfieInstructionsScreen {
+        !acknowledgedInstructions -> SmartSelfieInstructionsScreen(showAttribution) {
             acknowledgedInstructions = true
         }
         uiState.processingState != null -> ProcessingScreen(
@@ -162,7 +160,6 @@ internal fun SelfieCaptureScreen(
         FaceShapedProgressIndicator(
             progress = animatedProgress,
             faceHeight = viewfinderSize,
-            completeProgressStrokeColor = SmileIdentityAffirmationColor,
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
@@ -197,14 +194,14 @@ private fun AgentModeSwitch(
     if (allowAgentMode) {
         val isAgentModeEnabled = camSelector == CamSelector.Back
         val agentModeBackgroundColor = if (isAgentModeEnabled) {
-            SmileIdentityDarkerBlue
+            MaterialTheme.colorScheme.primary
         } else {
-            SmileIdentitySemiTransparentBackground
+            MaterialTheme.colorScheme.surfaceVariant
         }
         val agentModeTextColor = if (isAgentModeEnabled) {
-            MaterialTheme.colorScheme.onBackground
-        } else {
             MaterialTheme.colorScheme.onPrimary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -225,7 +222,7 @@ private fun AgentModeSwitch(
                 checked = isAgentModeEnabled,
                 onCheckedChange = onCamSelectorChange,
                 colors = SwitchDefaults.colors(
-                    checkedTrackColor = SmileIdentityAffirmationColor,
+                    checkedTrackColor = MaterialTheme.colorScheme.tertiary,
                 ),
                 modifier = Modifier.testTag("agentModeSwitch"),
             )

@@ -11,6 +11,7 @@
     <string name="cont">Continue</string>
     <string name="user_id_label">User ID</string>
     <string name="user_id_dialog_title">Enter User ID</string>
+    <string name="version_info">Partner %1$s • %2$s</string>
 
     <!--  Resources Screen  -->
     <string name="resources">Resources</string>

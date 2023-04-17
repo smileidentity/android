@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.smileidentity.sample.R
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun AboutUsScreen() {
     var shouldShowWhoWeAreDialog by remember { mutableStateOf(false) }
@@ -49,6 +49,8 @@ fun AboutUsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // .padding(16.dp)
+            // .clip(MaterialTheme.shapes.small)
             .verticalScroll(rememberScrollState()),
     ) {
         abouts.forEach {
@@ -67,7 +69,6 @@ fun AboutUsScreen() {
     }
 }
 
-@Preview
 @Composable
 fun WhoWeAreDialog(onDialogClose: () -> Unit = {}) {
     AlertDialog(
@@ -83,4 +84,22 @@ fun WhoWeAreDialog(onDialogClose: () -> Unit = {}) {
             )
         },
     )
+}
+
+@Preview
+@Composable
+private fun PreviewAboutUsScreen() {
+    SmileIdentityTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            AboutUsScreen()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewWhoWeAreDialog() {
+    SmileIdentityTheme {
+        WhoWeAreDialog()
+    }
 }

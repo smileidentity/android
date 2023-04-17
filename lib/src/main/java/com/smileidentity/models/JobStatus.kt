@@ -2,13 +2,16 @@
 
 package com.smileidentity.models
 
+import android.os.Parcelable
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.SmileIdentity
 import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class JobStatusRequest(
     @Json(name = "user_id") val userId: String,
@@ -18,8 +21,9 @@ data class JobStatusRequest(
     @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
-)
+) : Parcelable
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class JobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
@@ -29,16 +33,18 @@ data class JobStatusResponse(
     @Json(name = "result") val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.Entry>?,
     @Json(name = "image_links") val imageLinks: ImageLinks?,
-)
+) : Parcelable
 
 /**
  * The job result might sometimes be a freeform text field instead of an object (i.e. when the
  * zip upload has not finished processing on the backend, in which case "No zip uploaded" is
  * returned).
  */
-sealed interface JobResult {
+sealed interface JobResult : Parcelable {
+    @Parcelize
     data class Freeform(val result: String) : JobResult
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Source") val source: String,
@@ -58,6 +64,7 @@ sealed interface JobResult {
     ) : JobResult
 }
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class Actions(
     @Json(name = "Human_Review_Compare")
@@ -101,7 +108,7 @@ data class Actions(
 
     @Json(name = "Verify_ID_Number")
     val verifyIdNumber: ActionResult = ActionResult.NotApplicable,
-)
+) : Parcelable
 
 @FallbackEnum(name = "Unknown")
 enum class ActionResult {
@@ -157,8 +164,9 @@ enum class ActionResult {
     Unknown,
 }
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class ImageLinks(
     @Json(name = "selfie_image") val selfieImageUrl: String?,
     @Json(name = "error") val error: String?,
-)
+) : Parcelable

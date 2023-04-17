@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 11
+          java-version: 17
       - name: Write Smile Config
         id: write_smile_config
         # Mask the config so it doesn't show up in the logs
@@ -31,17 +31,25 @@ jobs:
           echo "partner_id=$PARTNER_ID" >> $GITHUB_OUTPUT
         env:
           SMILE_CONFIG_PARTNER_002: ${{ secrets.SMILE_CONFIG_PARTNER_002 }}
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'upload.jks'
+          fileDir: './sample'
+          encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Assemble
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleDebug
+          arguments: assembleRelease
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
       - name: Archive Sample App
         uses: actions/upload-artifact@v3
         with:
           name: Sample App APK (Partner ${{ steps.write_smile_config.outputs.partner_id }})
-          path: sample/build/outputs/apk/debug/sample-debug.apk
+          path: sample/build/outputs/apk/release/sample-release.apk
       - name: Create Internal App Sharing Link
         uses: r0adkll/upload-google-play@v1
         id: upload
@@ -49,7 +57,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.smileidentity.sample
           track: internalsharing
-          releaseFiles: sample/build/outputs/apk/debug/sample-debug.apk
+          releaseFiles: sample/build/outputs/apk/release/sample-release.apk
           releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
       - name: Send Slack
         uses: slackapi/slack-github-action@v1.23.0

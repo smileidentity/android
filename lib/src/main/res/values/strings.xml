@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="si_company_name">Smile Identity</string>
-    <string name="si_attribution_powered_by">Powered by</string>
+    <string name="si_company_name">Smile ID</string>
+    <string name="si_attribution_powered_by">Powered by |</string>
     <string name="si_camera_permission_rationale">The camera permission is required to complete the verification process</string>
     <string name="si_agent_mode">Agent Mode</string>
 
     <!--  Content Descriptions (for accessibility)  -->
-    <string name="si_cd_logo">Smile Identity logo</string>
+    <string name="si_cd_logo">Smile ID logo</string>
     <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
     <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
 
