@@ -1,3 +1,5 @@
+package com.smileidentity.sample.compose
+
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -13,7 +15,7 @@ fun SmileIdentityTheme(content: @Composable () -> Unit) {
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
 
@@ -23,3 +25,5 @@ fun SmileIdentityTheme(content: @Composable () -> Unit) {
         content = content,
     )
 }
+
+// TODO: Create a dummy preview screen with many elements to test/view/showcase the theme

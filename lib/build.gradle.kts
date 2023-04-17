@@ -1,13 +1,12 @@
-// TODO: Remove DSL_SCOPE_VIOLATION on release of Gradle 8.1
-//  https://github.com/gradle/gradle/issues/22797
-@file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
+@file:Suppress("UnstableApiUsage")
 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.moshix)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.moshix)
+    alias(libs.plugins.parcelize)
 }
 
 val groupId = "com.smileidentity"
@@ -44,12 +43,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
         moduleName = "${groupId}_$artifactId"
     }
 
@@ -114,6 +113,7 @@ dependencies {
     implementation(libs.moshi.adapters.lazy)
 
     implementation(libs.androidx.core)
+    implementation(libs.androidx.fragment)
 
     // Logging
     implementation(libs.timber)

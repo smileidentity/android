@@ -2,20 +2,24 @@
 
 package com.smileidentity.models
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
-class SmileIdentityException(val details: Details) : Exception(details.message) {
+@Parcelize
+class SmileIdentityException(val details: Details) : Exception(details.message), Parcelable {
 
     // This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
     // to have parent classes - i.e. Exception as a parent class)
+    @Parcelize
     @JsonClass(generateAdapter = true)
     data class Details(
         @Json(name = "code") val code: Int,
         @Json(name = "error") val message: String,
-    )
+    ) : Parcelable
 }
 
 /**
@@ -23,12 +27,13 @@ class SmileIdentityException(val details: Details) : Exception(details.message) 
  */
 // The class uses a custom adapter in order to support placing the key-value pairs in [extras] into
 // top level fields in the JSON
+@Parcelize
 data class PartnerParams(
     val jobType: JobType? = null,
     val jobId: String = UUID.randomUUID().toString(),
     val userId: String = UUID.randomUUID().toString(),
     val extras: Map<String, String> = mapOf(),
-)
+) : Parcelable
 
 enum class JobType(val value: Int) {
     SmartSelfieAuthentication(2),

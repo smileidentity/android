@@ -66,6 +66,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     userId: String = randomUserId(),
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
+    showAttribution: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
     ),
@@ -74,7 +75,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     val uiState = viewModel.uiState.collectAsState().value
     var acknowledgedInstructions by remember { mutableStateOf(false) }
     when {
-        !acknowledgedInstructions -> SmartSelfieInstructionsScreen {
+        !acknowledgedInstructions -> SmartSelfieInstructionsScreen(showAttribution) {
             acknowledgedInstructions = true
         }
         uiState.processingState != null -> ProcessingScreen(
@@ -193,14 +194,14 @@ private fun AgentModeSwitch(
     if (allowAgentMode) {
         val isAgentModeEnabled = camSelector == CamSelector.Back
         val agentModeBackgroundColor = if (isAgentModeEnabled) {
-            MaterialTheme.colorScheme.secondary
+            MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.scrim
+            MaterialTheme.colorScheme.surfaceVariant
         }
         val agentModeTextColor = if (isAgentModeEnabled) {
-            MaterialTheme.colorScheme.onBackground
-        } else {
             MaterialTheme.colorScheme.onPrimary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  Overarching Theme Colors  -->
+    <color name="si_color_on_dark">#FFF6EDE4</color>
+    <color name="si_color_on_light">#FF2D2B2A</color>
+    <color name="si_color_accent">#FF151F72</color>
+    <color name="si_color_success">#FF2CC05C</color>
+    <color name="si_color_error">#FF91180F</color>
+    <color name="si_color_background_dark">#FFC0C0A5</color>
+    <color name="si_color_background_main">#FFDBDBC4</color>
+    <color name="si_color_background_light">#FFE2DCD5</color>
+    <color name="si_color_background_lightest">#FFF9F0E7</color>
+
+    <!--  Mapped Material Theme Colors  -->
+    <color name="si_color_material_primary">@color/si_color_accent</color>
+    <color name="si_color_material_on_primary">@color/si_color_on_dark</color>
+    <color name="si_color_material_primary_container">@color/si_color_background_dark</color>
+    <color name="si_color_material_on_primary_container">@color/si_color_on_light</color>
+    <color name="si_color_material_inverse_primary">#FF08462F</color>
+    <color name="si_color_material_secondary">@color/si_color_accent</color>
+    <color name="si_color_material_on_secondary">@color/si_color_on_dark</color>
+    <color name="si_color_material_secondary_container">@color/si_color_accent</color>
+    <color name="si_color_material_on_secondary_container">@color/si_color_on_dark</color>
+    <color name="si_color_material_tertiary">@color/si_color_success</color>
+    <color name="si_color_material_on_tertiary">@color/si_color_on_dark</color>
+    <color name="si_color_material_tertiary_container">@color/si_color_background_lightest</color>
+    <color name="si_color_material_on_tertiary_container">@color/si_color_on_light</color>
+    <color name="si_color_material_background">@color/si_color_background_main</color>
+    <color name="si_color_material_on_background">@color/si_color_on_light</color>
+    <color name="si_color_material_surface">@color/si_color_background_dark</color>
+    <color name="si_color_material_on_surface">@color/si_color_on_light</color>
+    <color name="si_color_material_surface_variant">@color/si_color_background_light</color>
+    <color name="si_color_material_on_surface_variant">@color/si_color_on_light</color>
+    <color name="si_color_material_surface_tint">#FFFFFFFF</color>
+    <color name="si_color_material_inverse_surface">@color/si_color_on_light</color>
+    <color name="si_color_material_inverse_on_surface">@color/si_color_on_dark</color>
+    <color name="si_color_material_error">@color/si_color_error</color>
+    <color name="si_color_material_on_error">@color/si_color_on_dark</color>
+    <color name="si_color_material_error_container">#FFFF5804</color>
+    <color name="si_color_material_on_error_container">@color/si_color_on_dark</color>
+    <color name="si_color_material_outline">@color/si_color_on_light</color>
+    <color name="si_color_material_outline_variant">@color/si_color_on_light</color>
+    <color name="si_color_material_scrim">#CCE0E0E0</color>
+</resources>

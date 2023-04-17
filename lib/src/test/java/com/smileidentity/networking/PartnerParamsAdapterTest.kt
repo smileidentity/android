@@ -37,7 +37,7 @@ class PartnerParamsAdapterTest {
         // in case new ones get added later
         val nonExtras = PartnerParams::class.java.declaredFields
             // re: the $stable field - https://developer.android.com/reference/kotlin/androidx/compose/runtime/internal/StabilityInferred
-            .filterNot { setOf("extras", "\$stable").contains(it.name) }
+            .filterNot { setOf("extras", "\$stable", "CREATOR").contains(it.name) }
         for (it in nonExtras) {
             val expectedKey = kepMap[it.name]!!
             assertTrue(jsonString.contains(expectedKey))
