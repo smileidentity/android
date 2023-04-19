@@ -51,7 +51,7 @@ object SmileIdentity {
     fun initialize(
         config: Config,
         useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = false,
+        enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         SmileIdentity.config = config
@@ -91,7 +91,7 @@ object SmileIdentity {
         apiKey: String,
         config: Config,
         useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = false,
+        enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         SmileIdentity.apiKey = apiKey
@@ -113,7 +113,7 @@ object SmileIdentity {
     fun initialize(
         context: Context,
         useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = false,
+        enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) = initialize(Config.fromAssets(context), useSandbox, enableCrashReporting, okHttpClient)
 
@@ -136,7 +136,7 @@ object SmileIdentity {
         apiKey: String,
         context: Context,
         useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = false,
+        enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) = initialize(
         apiKey,
