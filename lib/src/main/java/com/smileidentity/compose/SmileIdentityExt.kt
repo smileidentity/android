@@ -20,7 +20,7 @@ import com.smileidentity.results.SmartSelfieResult
  * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often, this
  * will correspond to a unique User ID within your own system. If not provided, a random user ID
  * will be generated.
- * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be
+ * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
  * @param showAttribution Whether to show the Smile Identity attribution or not.
@@ -59,9 +59,9 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
- * an ID that was previously passed to a SmartSelfie™ Registration
+ * an ID that was previously registered via a SmartSelfie™ Registration
  * (see: [SmileIdentity.SmartSelfieRegistrationScreen])
- * @param allowAgentMode Whether to allow the agent mode or not. If allowed, a switch will be
+ * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
  * @param showAttribution Whether to show the Smile Identity attribution or not.

@@ -47,6 +47,9 @@ object SmileIdentityCrashReporting {
 
         hub = Hub(options).apply {
             setTag("brand", Build.BRAND)
+            // TODO: This is not the correct way to get the build type. This only returns whether
+            //  the SDK is debuggable or not. We need to figure out how to get the actual build type
+            //  for the app that is using the SDK.
             setTag("build_type", BuildConfig.BUILD_TYPE) // Distinguish between debug and release
             setTag("cpu_abi", Build.SUPPORTED_ABIS?.first() ?: "unknown")
             setTag("device", Build.DEVICE)

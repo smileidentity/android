@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -171,7 +172,7 @@ internal fun SelfieCaptureScreen(
             Text(
                 text = stringResource(uiState.currentDirective.displayText),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
@@ -194,14 +195,9 @@ private fun AgentModeSwitch(
     if (allowAgentMode) {
         val isAgentModeEnabled = camSelector == CamSelector.Back
         val agentModeBackgroundColor = if (isAgentModeEnabled) {
-            MaterialTheme.colorScheme.primary
+            MaterialTheme.colorScheme.secondary
         } else {
             MaterialTheme.colorScheme.surfaceVariant
-        }
-        val agentModeTextColor = if (isAgentModeEnabled) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -214,7 +210,7 @@ private fun AgentModeSwitch(
         ) {
             Text(
                 text = stringResource(R.string.si_agent_mode),
-                color = agentModeTextColor,
+                color = contentColorFor(agentModeBackgroundColor),
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.padding(4.dp, 0.dp),
             )

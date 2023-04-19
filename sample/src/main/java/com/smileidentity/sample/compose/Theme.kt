@@ -25,5 +25,3 @@ fun SmileIdentityTheme(content: @Composable () -> Unit) {
         content = content,
     )
 }
-
-// TODO: Create a dummy preview screen with many elements to test/view/showcase the theme

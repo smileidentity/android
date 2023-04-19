@@ -19,6 +19,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+// TODO: Rename to SmileID
 @Suppress("unused")
 object SmileIdentity {
     @JvmStatic
