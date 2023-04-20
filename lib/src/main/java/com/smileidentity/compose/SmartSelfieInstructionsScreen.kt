@@ -33,8 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
@@ -44,7 +42,6 @@ import com.smileidentity.toast
 @Composable
 fun SmartSelfieInstructionsScreen(
     showAttribution: Boolean = true,
-    cameraPermissionState: PermissionState = rememberPermissionState(Manifest.permission.CAMERA),
     onInstructionsAcknowledged: () -> Unit = { },
 ) {
     val columnWidth = 320.dp
@@ -125,21 +122,25 @@ fun SmartSelfieInstructionsScreen(
                 .padding(8.dp),
         ) {
             val context = LocalContext.current
+            val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
+                if (granted) {
+                    onInstructionsAcknowledged()
+                } else {
+                    // The user denied the permission which means Android won't show the permission
+                    // request dialog again. So, we need to direct the user to the app settings
+                    // screen to manually enable the permission.
+                    context.toast(R.string.si_camera_permission_rationale)
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    }
+                    context.startActivity(intent)
+                }
+            }
             Button(
                 onClick = {
-                    if (cameraPermissionState.status.isGranted) {
-                        onInstructionsAcknowledged()
-                    } else if (cameraPermissionState.status.shouldShowRationale) {
-                        // The user has permanently denied the permission, so we can't request it
-                        // again. We can, however, direct the user to the app settings screen to
-                        // manually enable the permission.
+                    permissionState.launchPermissionRequest()
+                    if (permissionState.status.shouldShowRationale) {
                         context.toast(R.string.si_camera_permission_rationale)
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", context.packageName, null)
-                        }
-                        context.startActivity(intent)
-                    } else {
-                        cameraPermissionState.launchPermissionRequest()
                     }
                 },
                 modifier = Modifier
