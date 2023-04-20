@@ -30,7 +30,6 @@ import com.smileidentity.results.SmartSelfieResult
  * branded UI by default, but allow the user to override it if they want.
  * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
-// TODO: Rename to SmileID
 @Composable
 fun SmileID.SmartSelfieRegistrationScreen(
     userId: String = randomUserId(),
@@ -72,7 +71,6 @@ fun SmileID.SmartSelfieRegistrationScreen(
  * branded UI by default, but allow the user to override it if they want.
  * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
-// TODO: Rename to SmileID
 @Composable
 fun SmileID.SmartSelfieAuthenticationScreen(
     userId: String,
