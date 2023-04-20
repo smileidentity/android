@@ -33,11 +33,11 @@ fun SmileIDAttribution() {
             color = Color(0xFF151F72),
         )
         Image(
-            painterResource(R.drawable.si_logo_with_text),
+            painter = painterResource(R.drawable.si_logo_with_text),
             contentDescription = stringResource(R.string.si_cd_logo),
             modifier = Modifier
                 .height(12.dp)
-                .padding(horizontal = 2.dp),
+                .padding(horizontal = 4.dp),
         )
     }
 }
