@@ -250,7 +250,7 @@ fun EnhancedKycScreen(
 @Preview
 @Composable
 private fun PreviewEnhancedKycScreen() {
-    SmileIdentityTheme {
+    SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             EnhancedKycScreen()
         }

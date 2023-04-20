@@ -63,7 +63,7 @@ fun ResourcesScreen() {
 @Preview
 @Composable
 fun PreviewResourcesScreen() {
-    SmileIdentityTheme {
+    SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ResourcesScreen()
         }

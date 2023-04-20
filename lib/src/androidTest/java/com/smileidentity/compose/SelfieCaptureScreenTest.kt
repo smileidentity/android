@@ -11,7 +11,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.viewmodel.SelfieViewModel
 import io.mockk.Runs
 import io.mockk.every
@@ -38,7 +38,7 @@ class SelfieCaptureScreenTest {
         val cameraPreviewTag = "cameraPreview"
 
         // when
-        composeTestRule.setContent { SmileIdentity.SmartSelfieRegistrationScreen() }
+        composeTestRule.setContent { SmileID.SmartSelfieRegistrationScreen() }
 
         // then
         verify(exactly = 0) { permissionState.launchPermissionRequest() }
@@ -48,7 +48,7 @@ class SelfieCaptureScreenTest {
     @Test
     fun attributionShouldBeDisplayed() {
         // given
-        val attributionTag = "smileIdentityAttribution"
+        val attributionTag = "SmileIDAttribution"
 
         // when
         composeTestRule.setContent { SelfieCaptureScreen() }

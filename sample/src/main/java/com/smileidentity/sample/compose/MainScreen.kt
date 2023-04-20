@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.results.EnhancedKycResult
@@ -57,7 +57,7 @@ fun MainScreen() {
     }
     var bottomNavSelection: Screens by remember { mutableStateOf(Screens.Home) }
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
-    SmileIdentityTheme {
+    SmileIDTheme {
         Surface {
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
@@ -80,7 +80,7 @@ fun MainScreen() {
                                 selected = isProduction,
                                 onClick = {
                                     isProduction = !isProduction
-                                    SmileIdentity.setEnvironment(useSandbox = !isProduction)
+                                    SmileID.setEnvironment(useSandbox = !isProduction)
                                 },
                                 leadingIcon = {
                                     if (isProduction) {
@@ -159,7 +159,7 @@ fun MainScreen() {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.SmartSelfieRegistration.label
                             val context = LocalContext.current
-                            SmileIdentity.SmartSelfieRegistrationScreen(
+                            SmileID.SmartSelfieRegistrationScreen(
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
@@ -210,7 +210,7 @@ fun MainScreen() {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.SmartSelfieAuthentication.label
                             val context = LocalContext.current
-                            SmileIdentity.SmartSelfieAuthenticationScreen(
+                            SmileID.SmartSelfieAuthenticationScreen(
                                 userId = it.arguments?.getString("userId")!!,
                                 allowAgentMode = true,
                             ) { result ->

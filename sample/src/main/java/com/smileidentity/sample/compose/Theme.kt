@@ -6,11 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.smileidentity.compose.theme.SmileIdentityColorScheme
-import com.smileidentity.compose.theme.SmileIdentityTypography
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.ColorScheme
+import com.smileidentity.compose.theme.Typography
 
 @Composable
-fun SmileIdentityTheme(content: @Composable () -> Unit) {
+fun SmileIDTheme(content: @Composable () -> Unit) {
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -20,8 +21,8 @@ fun SmileIdentityTheme(content: @Composable () -> Unit) {
     }
 
     MaterialTheme(
-        colorScheme = SmileIdentityColorScheme,
-        typography = SmileIdentityTypography,
+        colorScheme = SmileID.ColorScheme,
+        typography = SmileID.Typography,
         content = content,
     )
 }

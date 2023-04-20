@@ -1,12 +1,12 @@
 package com.smileidentity.networking
 
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.models.ActionResult
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ActionResultTest {
-    private val adapter = SmileIdentity.moshi.adapter(ActionResult::class.java)
+    private val adapter = SmileID.moshi.adapter(ActionResult::class.java)
 
     @Test
     fun `should default to Unknown`() {

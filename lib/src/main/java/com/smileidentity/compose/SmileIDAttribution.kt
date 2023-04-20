@@ -19,12 +19,12 @@ import com.smileidentity.R
 
 @Preview
 @Composable
-fun SmileIdentityAttribution() {
+fun SmileIDAttribution() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(4.dp)
-            .testTag("smileIdentityAttribution"),
+            .testTag("SmileIDAttribution"),
     ) {
         Text(
             text = stringResource(R.string.si_attribution_powered_by),

@@ -1,14 +1,14 @@
-# Smile Identity Android SDK
+# Smile ID Android SDK
 
 ## Overview
 
-This repo encompasses everything necessary for the Smile Identity Android SDK. It is a multi-module
+This repo encompasses everything necessary for the Smile ID Android SDK. It is a multi-module
 project consisting of the following modules:
 
 - [`lib`](https://github.com/smileidentity/android/tree/main/lib) -
   The SDK distributed to partners
 - [`sample`](https://github.com/smileidentity/android/tree/main/sample) - a sample app
-  that demonstrates SDK integration and showcases Smile Identity products
+  that demonstrates SDK integration and showcases Smile ID products
 
 ## Setup
 

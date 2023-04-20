@@ -89,7 +89,7 @@ fun WhoWeAreDialog(onDialogClose: () -> Unit = {}) {
 @Preview
 @Composable
 private fun PreviewAboutUsScreen() {
-    SmileIdentityTheme {
+    SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             AboutUsScreen()
         }
@@ -99,7 +99,7 @@ private fun PreviewAboutUsScreen() {
 @Preview
 @Composable
 private fun PreviewWhoWeAreDialog() {
-    SmileIdentityTheme {
+    SmileIDTheme {
         WhoWeAreDialog()
     }
 }

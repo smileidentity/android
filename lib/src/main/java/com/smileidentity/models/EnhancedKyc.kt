@@ -2,7 +2,7 @@ package com.smileidentity.models
 
 import android.os.Parcelable
 import com.smileidentity.BuildConfig
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
@@ -22,7 +22,7 @@ data class EnhancedKycRequest(
     @Json(name = "phone_number") val phoneNumber: String? = null,
     @Json(name = "bank_code") val bankCode: String? = null,
     @Json(name = "partner_params") val partnerParams: PartnerParams,
-    @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
+    @Json(name = "partner_id") val partnerId: String = SmileID.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),

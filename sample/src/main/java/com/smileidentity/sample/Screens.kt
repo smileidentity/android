@@ -27,7 +27,7 @@ sealed class Screens(
     object SmartSelfieRegistration : Screens(
         "smart_selfie_registration",
         com.smileidentity.R.string.si_smartselfie_registration_product_name,
-        // TODO: Replace icons with Smile Identity branded icons
+        // TODO: Replace icons with Smile ID branded icons
         Filled.Face,
         Outlined.Face,
     )
@@ -35,7 +35,7 @@ sealed class Screens(
     object SmartSelfieAuthentication : Screens(
         "smart_selfie_authentication",
         com.smileidentity.R.string.si_smartselfie_authentication_product_name,
-        // TODO: Replace icons with Smile Identity branded icons
+        // TODO: Replace icons with Smile ID branded icons
         Filled.Face,
         Outlined.Face,
     )

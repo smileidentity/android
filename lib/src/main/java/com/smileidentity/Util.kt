@@ -3,7 +3,6 @@ package com.smileidentity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -14,8 +13,8 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
-import com.smileidentity.SmileIdentity.moshi
-import com.smileidentity.models.SmileIdentityException
+import com.smileidentity.SmileID.moshi
+import com.smileidentity.models.SmileIDException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 import timber.log.Timber
@@ -70,25 +69,6 @@ internal fun postProcessImageBitmap(
 }
 
 /**
- * Post-processes the image stored in [file], in-place
- */
-internal fun postProcessImageFile(
-    file: File,
-    saveAsGrayscale: Boolean = false,
-    compressionQuality: Int = 100,
-    maxOutputSize: Size? = null,
-): File {
-    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-    return postProcessImageBitmap(
-        bitmap,
-        file,
-        saveAsGrayscale,
-        compressionQuality,
-        maxOutputSize,
-    )
-}
-
-/**
  * Save to temporary file, which does not require any storage permissions. It will be saved to the
  * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
  * format "si_${imageType}_<random number>.jpg"
@@ -105,8 +85,8 @@ internal fun createSelfieFile() = createSmileTempFile("selfie")
 
 /**
  * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
- * SmileIdentityServerError if it is an [HttpException] (this may not always be possible, i.e. if
- * we get an error during S3 upload, or if we get an unconventional 500 error from the API)
+ * [SmileIDException] if it is an [HttpException] (this may not always be possible, i.e. if we get
+ * an error during S3 upload, or if we get an unconventional 500 error from the API)
  *
  * @param proxy Callback to be invoked with the exception
  */
@@ -114,12 +94,12 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit): CoroutineExceptionHandler {
     return CoroutineExceptionHandler { _, throwable ->
         Timber.e(throwable, "Error during coroutine execution")
         val converted = if (throwable is HttpException) {
-            val adapter = moshi.adapter(SmileIdentityException.Details::class.java)
+            val adapter = moshi.adapter(SmileIDException.Details::class.java)
             try {
                 val details = adapter.fromJson(throwable.response()?.errorBody()?.source()!!)!!
-                SmileIdentityException(details)
+                SmileIDException(details)
             } catch (e: Exception) {
-                Timber.w(e, "Unable to convert HttpException to SmileIdentityServerError")
+                Timber.w(e, "Unable to convert HttpException to SmileIDException")
                 // More informative to pass back the original exception than the conversion error
                 throwable
             }

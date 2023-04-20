@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
 @Parcelize
-class SmileIdentityException(val details: Details) : Exception(details.message), Parcelable {
+class SmileIDException(val details: Details) : Exception(details.message), Parcelable {
 
     // This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
     // to have parent classes - i.e. Exception as a parent class)

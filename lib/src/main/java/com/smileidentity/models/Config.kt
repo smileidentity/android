@@ -2,7 +2,7 @@ package com.smileidentity.models
 
 import android.content.Context
 import android.os.Parcelable
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
@@ -10,7 +10,7 @@ import okio.buffer
 import okio.source
 
 /**
- * This represents the smile_config.json file that you can download from the Smile Identity portal
+ * This represents the smile_config.json file that you can download from the Smile ID portal
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -23,7 +23,7 @@ data class Config(
     companion object {
         fun fromAssets(context: Context): Config {
             context.assets.open("smile_config.json").source().buffer().use {
-                return SmileIdentity.moshi.adapter(Config::class.java).fromJson(it)!!
+                return SmileID.moshi.adapter(Config::class.java).fromJson(it)!!
             }
         }
     }

@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_RESULT
@@ -59,7 +59,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
 
         /**
          * Creates a new instance of [SmartSelfieAuthenticationFragment] which wraps the
-         * [SmileIdentity.SmartSelfieAuthenticationScreen] Composable under the hood
+         * [SmileID.SmartSelfieAuthenticationScreen] Composable under the hood
          *
          * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
@@ -67,7 +67,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
          * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
          * displayed allowing toggling between the back camera and front camera. If not allowed,
          * only the front camera will be used.
-         * @param showAttribution Whether to show the Smile Identity attribution or not.
+         * @param showAttribution Whether to show the Smile ID attribution or not.
          */
         @JvmStatic
         @JvmOverloads
@@ -100,7 +100,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val args = requireArguments()
-                SmileIdentity.SmartSelfieAuthenticationScreen(
+                SmileID.SmartSelfieAuthenticationScreen(
                     userId = args.userId,
                     allowAgentMode = args.allowAgentMode,
                     showAttribution = args.showAttribution,

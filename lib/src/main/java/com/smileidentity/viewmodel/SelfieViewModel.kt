@@ -13,7 +13,7 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.BitmapUtils
 import com.smileidentity.R
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.area
 import com.smileidentity.compose.ProcessingState
 import com.smileidentity.createLivenessFile
@@ -222,7 +222,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                 userId = userId,
             )
 
-            val authResponse = SmileIdentity.api.authenticate(authRequest)
+            val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
                 callbackUrl = "",
@@ -230,11 +230,11 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            val prepUploadResponse = SmileIdentity.api.prepUpload(prepUploadRequest)
+            val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()
             val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
-            SmileIdentity.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
+            SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             val jobStatusRequest = JobStatusRequest(
                 jobId = authResponse.partnerParams.jobId,
@@ -250,7 +250,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             for (i in 1..10) {
                 Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
                 delay(jobStatusPollDelay)
-                jobStatusResponse = SmileIdentity.api.getJobStatus(jobStatusRequest)
+                jobStatusResponse = SmileID.api.getJobStatus(jobStatusRequest)
                 Timber.v("Job Status Response: $jobStatusResponse")
                 if (jobStatusResponse.jobComplete) {
                     break

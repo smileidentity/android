@@ -21,8 +21,8 @@ import java.util.List;
 import timber.log.Timber;
 
 /**
- * This is an example of how to use the Smile Identity SDK in a Java Activity. It is not actively
- * used in the sample app, but is provided as a reference.
+ * This is an example of how to use the Smile ID SDK in a Java Activity. It is not actively used in
+ * the sample app, but is provided as a reference.
  */
 @SuppressLint("LogNotTimber") // Don't use Timber in Documentation or Examples
 public class JavaActivity extends FragmentActivity {

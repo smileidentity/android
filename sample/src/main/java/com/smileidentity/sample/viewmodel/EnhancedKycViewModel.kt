@@ -6,7 +6,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.compose.ProcessingState
 import com.smileidentity.getExceptionHandler
 import com.smileidentity.models.AuthenticationRequest
@@ -47,7 +47,7 @@ class EnhancedKycViewModel : ViewModel() {
                 enrollment = false,
                 userId = UUID.randomUUID().toString(),
             )
-            val authResponse = SmileIdentity.api.authenticate(authRequest)
+            val authResponse = SmileID.api.authenticate(authRequest)
             val enhancedKycRequest = EnhancedKycRequest(
                 partnerParams = authResponse.partnerParams,
                 signature = authResponse.signature,
@@ -60,7 +60,7 @@ class EnhancedKycViewModel : ViewModel() {
                 dob = _uiState.value.idInputFieldValues[IdType.InputField.Dob],
                 bankCode = _uiState.value.idInputFieldValues[IdType.InputField.BankCode],
             )
-            val response = SmileIdentity.api.doEnhancedKyc(enhancedKycRequest)
+            val response = SmileID.api.doEnhancedKyc(enhancedKycRequest)
             result = EnhancedKycResult.Success(enhancedKycRequest, response)
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }

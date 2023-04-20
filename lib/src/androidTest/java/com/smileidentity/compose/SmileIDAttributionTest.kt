@@ -9,18 +9,18 @@ import androidx.compose.ui.test.printToLog
 import org.junit.Rule
 import org.junit.Test
 
-class SmileIdentityAttributionTest {
+class SmileIDAttributionTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
-    fun testSmileIdentityAttribution() {
+    fun testSmileIDAttribution() {
         // given
-        val logoContentDescription = "Smile Identity logo"
-        val attributionText = "Powered by Smile Identity"
+        val logoContentDescription = "Smile ID logo"
+        val attributionText = "Powered by |"
 
         // when
-        composeTestRule.setContent { SmileIdentityAttribution() }
+        composeTestRule.setContent { SmileIDAttribution() }
         composeTestRule.onRoot().printToLog("TAG")
 
         // then

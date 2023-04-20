@@ -3,11 +3,16 @@ package com.smileidentity.compose.theme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.colorResource
 import com.smileidentity.R
+import com.smileidentity.SmileID
 
-val SmileIdentityColorScheme: ColorScheme
-    @Composable get() = lightColorScheme(
+@Suppress("UnusedReceiverParameter")
+val SmileID.ColorScheme: ColorScheme
+    @Composable
+    @ReadOnlyComposable
+    get() = lightColorScheme(
         primary = colorResource(R.color.si_color_material_primary),
         onPrimary = colorResource(R.color.si_color_material_on_primary),
         primaryContainer = colorResource(R.color.si_color_material_primary_container),

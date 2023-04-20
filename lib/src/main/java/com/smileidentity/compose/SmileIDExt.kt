@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "UnusedReceiverParameter")
 
 package com.smileidentity.compose
 
@@ -6,9 +6,9 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import com.smileidentity.SmileIdentity
-import com.smileidentity.compose.theme.SmileIdentityColorScheme
-import com.smileidentity.compose.theme.SmileIdentityTypography
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.ColorScheme
+import com.smileidentity.compose.theme.Typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 
@@ -23,20 +23,21 @@ import com.smileidentity.results.SmartSelfieResult
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
- * @param showAttribution Whether to show the Smile Identity attribution or not.
+ * @param showAttribution Whether to show the Smile ID attribution or not.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
- * Identity branded UI by default, but allow the user to override it if they want.
- * @param typography The typography to use for the UI. This is passed in so that we show a Smile
- * Identity branded UI by default, but allow the user to override it if they want.
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
  * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
+// TODO: Rename to SmileID
 @Composable
-fun SmileIdentity.SmartSelfieRegistrationScreen(
+fun SmileID.SmartSelfieRegistrationScreen(
     userId: String = randomUserId(),
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    colorScheme: ColorScheme = SmileIdentityColorScheme,
-    typography: Typography = SmileIdentityTypography,
+    colorScheme: ColorScheme = SmileID.ColorScheme,
+    typography: Typography = SmileID.Typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     MaterialTheme(
@@ -60,24 +61,25 @@ fun SmileIdentity.SmartSelfieRegistrationScreen(
  *
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
  * an ID that was previously registered via a SmartSelfie™ Registration
- * (see: [SmileIdentity.SmartSelfieRegistrationScreen])
+ * (see: [SmileID.SmartSelfieRegistrationScreen])
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
- * @param showAttribution Whether to show the Smile Identity attribution or not.
+ * @param showAttribution Whether to show the Smile ID attribution or not.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
- * Identity branded UI by default, but allow the user to override it if they want.
- * @param typography The typography to use for the UI. This is passed in so that we show a Smile
- * Identity branded UI by default, but allow the user to override it if they want.
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
  * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
  */
+// TODO: Rename to SmileID
 @Composable
-fun SmileIdentity.SmartSelfieAuthenticationScreen(
+fun SmileID.SmartSelfieAuthenticationScreen(
     userId: String,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    colorScheme: ColorScheme = SmileIdentityColorScheme,
-    typography: Typography = SmileIdentityTypography,
+    colorScheme: ColorScheme = SmileID.ColorScheme,
+    typography: Typography = SmileID.Typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     MaterialTheme(

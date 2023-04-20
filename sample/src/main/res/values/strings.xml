@@ -27,7 +27,7 @@
     <!--  About Us Screen  -->
     <string name="about_us">About Us</string>
     <string name="about_us_who_we_are">Who we are</string>
-    <string name="about_us_who_we_are_content">Smile Identity products are tools for developers to perform real-time digital KYC, identity verification, user onboarding, and user authentication across Africa</string>
+    <string name="about_us_who_we_are_content">Smile ID products are tools for developers to perform real-time digital KYC, identity verification, user onboarding, and user authentication across Africa</string>
     <string name="about_us_visit_our_website">Visit our website</string>
     <string name="about_us_contact_support">Contact support</string>
 </resources>

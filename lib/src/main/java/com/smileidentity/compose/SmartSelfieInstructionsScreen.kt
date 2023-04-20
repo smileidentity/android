@@ -148,7 +148,7 @@ fun SmartSelfieInstructionsScreen(
                 Text(stringResource(R.string.si_smart_selfie_instruction_ready_button))
             }
             if (showAttribution) {
-                SmileIdentityAttribution()
+                SmileIDAttribution()
             }
         }
     }

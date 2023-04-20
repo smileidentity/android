@@ -14,7 +14,7 @@ class UploadRequestConverterTest {
         .baseUrl(mockWebServer.url("/"))
         .addConverterFactory(UploadRequestConverterFactory)
         .build()
-        .create(SmileIdentityService::class.java)
+        .create(SmileIDService::class.java)
 
     @Test
     fun `UploadRequest should be sent as zip`() {

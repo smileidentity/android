@@ -66,12 +66,12 @@ mavenPublishing {
     signAllPublications()
     coordinates(groupId, artifactId, project.version.toString())
     pom {
-        name.set("Smile Identity Android SDK")
-        description.set("The Official Smile Identity Android SDK")
+        name.set("Smile ID Android SDK")
+        description.set("The Official Smile ID Android SDK")
         url.set("https://docs.smileidentity.com/mobile/android")
         licenses {
             license {
-                name.set("Smile Identity Terms of Use")
+                name.set("Smile ID Terms of Use")
                 url.set("https://smileidentity.com/terms-and-conditions")
                 distribution.set("repo")
             }
@@ -87,7 +87,7 @@ mavenPublishing {
                 name.set("Vansh Gandhi")
                 email.set("vansh@smileidentity.com")
                 url.set("https://github.com/vanshg")
-                organization.set("Smile Identity")
+                organization.set("Smile ID")
                 organizationUrl.set("https://smileidentity.com")
             }
             developer {
@@ -95,7 +95,7 @@ mavenPublishing {
                 name.set("Japhet Ndhlovu")
                 email.set("japhet@smileidentity.com")
                 url.set("https://github.com/jndhlovu")
-                organization.set("Smile Identity")
+                organization.set("Smile ID")
                 organizationUrl.set("https://smileidentity.com")
             }
         }
@@ -107,7 +107,7 @@ dependencies {
     implementation(libs.retrofit.converter.moshi)
     implementation(libs.okhttp.logging.interceptor)
 
-    // Moshi is exposed in public SmileIdentity interface, hence "api" vs "implementation"
+    // Moshi is exposed in public SmileID interface, hence "api" vs "implementation"
     api(libs.moshi)
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.adapters.lazy)

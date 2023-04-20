@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screens
@@ -90,7 +90,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
             Text(
                 text = stringResource(
                     R.string.version_info,
-                    SmileIdentity.config.partnerId,
+                    SmileID.config.partnerId,
                     BuildConfig.VERSION_NAME,
                 ),
                 style = MaterialTheme.typography.labelMedium,
@@ -104,8 +104,8 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
 @Preview
 @Composable
 fun PreviewProductSelectionScreen() {
-    SmileIdentity.initialize(LocalContext.current)
-    SmileIdentityTheme {
+    SmileID.initialize(LocalContext.current)
+    SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ProductSelectionScreen()
         }

@@ -7,7 +7,7 @@ import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
-import com.smileidentity.networking.SmileIdentityService
+import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
 import com.squareup.moshi.Moshi
@@ -19,11 +19,10 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-// TODO: Rename to SmileID
 @Suppress("unused")
-object SmileIdentity {
+object SmileID {
     @JvmStatic
-    lateinit var api: SmileIdentityService private set
+    lateinit var api: SmileIDService private set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
     lateinit var config: Config private set
     private lateinit var retrofit: Retrofit
@@ -34,78 +33,13 @@ object SmileIdentity {
     internal var apiKey: String? = null
 
     /**
-     * Initialize the SDK. This must be called before any other SDK methods. API calls must first be
-     * authenticated with a call to [SmileIdentityService.authenticate], since this initialization
-     * method does not use an API Key, but rather the auth token from the Config to create a
-     * signature
-     *
-     * @param config The [Config] to use, from the Smile Identity Portal
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
-     * Identity related crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIdentityCrashReporting]
-     * @param okHttpClient The [OkHttpClient] to use for the network requests
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun initialize(
-        config: Config,
-        useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) {
-        SmileIdentity.config = config
-        // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
-        if (enableCrashReporting) {
-            SmileIdentityCrashReporting.enable()
-        }
-        SmileIdentity.useSandbox = useSandbox
-        val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
-
-        retrofit = Retrofit.Builder()
-            .baseUrl(url)
-            .client(okHttpClient)
-            .addConverterFactory(UploadRequestConverterFactory)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        api = retrofit.create(SmileIdentityService::class.java)
-    }
-
-    /**
-     * Initialize the SDK with an API Key. This must be called before any other SDK methods. API
-     * keys are different from the auth token in the Config. If this initialization method is used,
-     * authToken from [config] need not be used.
-     *
-     * @param apiKey The API Key to use
-     * @param config The [Config] to use
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
-     * Identity related crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIdentityCrashReporting]
-     * @param okHttpClient The [OkHttpClient] to use for the network requests
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun initialize(
-        apiKey: String,
-        config: Config,
-        useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) {
-        SmileIdentity.apiKey = apiKey
-        initialize(config, useSandbox, enableCrashReporting, okHttpClient)
-    }
-
-    /**
      * Initialize the SDK. This must be called before any other SDK methods.
      *
      * @param context A [Context] instance which will be used to load the config file from assets
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
-     * Identity related crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIdentityCrashReporting]
+     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
+     * crashes. This is powered by Sentry, and further details on inner workings can be found in the
+     * source docs for [SmileIDCrashReporting]
      * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
      */
     @JvmStatic
@@ -118,6 +52,42 @@ object SmileIdentity {
     ) = initialize(Config.fromAssets(context), useSandbox, enableCrashReporting, okHttpClient)
 
     /**
+     * Initialize the SDK. This must be called before any other SDK methods. API calls must first be
+     * authenticated with a call to [SmileIDService.authenticate], since this initialization method
+     * does not use an API Key, but rather the auth token from the Config to create a signature
+     *
+     * @param config The [Config] to use, from the Smile ID Portal
+     * @param useSandbox Whether to use the sandbox environment. If false, uses production
+     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
+     * crashes. This is powered by Sentry, and further details on inner workings
+     * can be found in the source docs for [SmileIDCrashReporting]
+     * @param okHttpClient The [OkHttpClient] to use for the network requests
+     */
+    private fun initialize(
+        config: Config,
+        useSandbox: Boolean = false,
+        enableCrashReporting: Boolean = true,
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
+    ) {
+        SmileID.config = config
+        // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
+        if (enableCrashReporting) {
+            SmileIDCrashReporting.enable()
+        }
+        SmileID.useSandbox = useSandbox
+        val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
+
+        retrofit = Retrofit.Builder()
+            .baseUrl(url)
+            .client(okHttpClient)
+            .addConverterFactory(UploadRequestConverterFactory)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+
+        api = retrofit.create(SmileIDService::class.java)
+    }
+
+    /**
      * Initialize the SDK with an API Key. This must be called before any other SDK methods. API
      * keys are different from the auth token in the Config. If this initialization method is used,
      * authToken from [config] need not be used.
@@ -125,9 +95,9 @@ object SmileIdentity {
      * @param apiKey The API Key to use
      * @param context A [Context] instance which will be used to load the config file from assets
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile
-     * Identity related crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIdentityCrashReporting]
+     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
+     * crashes. This is powered by Sentry, and further details on inner workings can be found in the
+     * source docs for [SmileIDCrashReporting]
      * @param okHttpClient The [OkHttpClient] to use for the network requests
      */
     @JvmStatic
@@ -147,17 +117,42 @@ object SmileIdentity {
     )
 
     /**
+     * Initialize the SDK with an API Key. This must be called before any other SDK methods. API
+     * keys are different from the auth token in the Config. If this initialization method is used,
+     * authToken from [config] need not be used.
+     *
+     * @param apiKey The API Key to use
+     * @param config The [Config] to use
+     * @param useSandbox Whether to use the sandbox environment. If false, uses production
+     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
+     * crashes. This is powered by Sentry, and further details on inner workings can be found in the
+     * source docs for [SmileIDCrashReporting]
+     * @param okHttpClient The [OkHttpClient] to use for the network requests
+     */
+    private fun initialize(
+        apiKey: String,
+        config: Config,
+        useSandbox: Boolean = false,
+        enableCrashReporting: Boolean = true,
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
+    ) {
+        SmileID.apiKey = apiKey
+        initialize(config, useSandbox, enableCrashReporting, okHttpClient)
+    }
+
+    /**
      * Switches the SDK between the sandbox and production API at runtime. Please note that if the
      * environment is switched while you or the SDK is in the middle of a job (i.e. polling job
      * status), this may cause API errors.
      *
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      */
+    @JvmStatic
     fun setEnvironment(useSandbox: Boolean) {
-        SmileIdentity.useSandbox = useSandbox
+        SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
         retrofit = retrofit.newBuilder().baseUrl(url).build()
-        api = retrofit.create(SmileIdentityService::class.java)
+        api = retrofit.create(SmileIDService::class.java)
     }
 
     /**
@@ -177,13 +172,13 @@ object SmileIdentity {
                 val request = chain.request()
                 for (attempt in 1..3) {
                     try {
-                        Timber.v("Smile Identity SDK network attempt #$attempt")
+                        Timber.v("Smile ID SDK network attempt #$attempt")
                         val response = chain.proceed(request)
                         if (response.code < 500) {
                             return@Interceptor response
                         }
                     } catch (e: Exception) {
-                        Timber.w(e, "Smile Identity SDK network attempt #$attempt failed")
+                        Timber.w(e, "Smile ID SDK network attempt #$attempt failed")
                         // Network failures end up here. These will be retried
                     }
                 }

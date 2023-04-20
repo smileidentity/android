@@ -15,7 +15,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Url
 
 @Suppress("unused")
-interface SmileIdentityService {
+interface SmileIDService {
     /**
      * Returns a signature and timestamp that can be used to authenticate future requests. This is
      * necessary only when using the [com.smileidentity.models.Config.authToken] and
