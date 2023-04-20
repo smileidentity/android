@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -95,10 +94,9 @@ fun SmartSelfieInstructionsScreen(
             )
             instructions.forEach { (imageId, title, subtitle) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
+                    Image(
                         painter = painterResource(id = imageId),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
@@ -156,7 +154,6 @@ fun SmartSelfieInstructionsScreen(
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Preview
 @Composable
 fun SmartSelfieInstructionsScreenPreview() {

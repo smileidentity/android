@@ -36,8 +36,8 @@ fun SmileIdentityAttribution() {
             painterResource(R.drawable.si_logo_with_text),
             contentDescription = stringResource(R.string.si_cd_logo),
             modifier = Modifier
-                .height(24.dp)
-                .padding(2.dp),
+                .height(12.dp)
+                .padding(horizontal = 2.dp),
         )
     }
 }
