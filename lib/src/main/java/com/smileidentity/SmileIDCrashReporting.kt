@@ -35,7 +35,7 @@ object SmileIDCrashReporting {
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
                 try {
                     // Only report crashes from the SmileID SDK
-                    if (isCausedBySmileIDSDK(event.throwable)) {
+                    if (isCausedBySmileID(event.throwable)) {
                         return@BeforeSendCallback event
                     }
                 } catch (e: Exception) {
@@ -96,7 +96,7 @@ object SmileIDCrashReporting {
      * @param throwable The throwable to check.
      * @return True if the throwable was caused by a Smile ID SDK, false otherwise.
      */
-    private fun isCausedBySmileIDSDK(throwable: Throwable?): Boolean {
+    private fun isCausedBySmileID(throwable: Throwable?): Boolean {
         if (throwable == null) {
             return false
         }
@@ -115,6 +115,6 @@ object SmileIDCrashReporting {
 
         // If this throwable is the root cause, getCause will return null. In which case, the
         // recursive base case will be reached and false will be returned.
-        return isCausedBySmileIDSDK(throwable.cause)
+        return isCausedBySmileID(throwable.cause)
     }
 }
