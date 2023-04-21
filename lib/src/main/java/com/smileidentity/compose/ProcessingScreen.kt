@@ -176,7 +176,9 @@ internal fun ProcessingSuccessScreen(
         confirmButton = {
             Button(
                 onClick = onContinue,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("processing_screen_continue_button")
+                    .fillMaxWidth(),
             ) { Text(text = continueButtonText) }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
@@ -217,13 +219,17 @@ internal fun ProcessingErrorScreen(
         confirmButton = {
             Button(
                 onClick = onRetry,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("processing_screen_retry_button")
+                    .fillMaxWidth(),
             ) { Text(text = retryButtonText) }
         },
         dismissButton = {
             OutlinedButton(
                 onClick = onClose,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("processing_screen_close_button")
+                    .fillMaxWidth(),
             ) { Text(text = closeButtonText) }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },

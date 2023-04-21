@@ -143,7 +143,7 @@ fun SmartSelfieInstructionsScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("readyButton"),
+                    .testTag("smart_selfie_instructions_ready_button"),
             ) {
                 Text(stringResource(R.string.si_smart_selfie_instruction_ready_button))
             }

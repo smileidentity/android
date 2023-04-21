@@ -27,6 +27,9 @@ object SmileIDCrashReporting {
         val options = SentryOptions().apply {
             dsn = BuildConfig.SENTRY_DSN
             isEnableUncaughtExceptionHandler = true
+            enableTracing = true
+            tracesSampleRate = 1.0
+            profilesSampleRate = 1.0
             isEnableUserInteractionBreadcrumbs = true
             isEnableUserInteractionTracing = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
@@ -60,6 +63,7 @@ object SmileIDCrashReporting {
             setTag("sdk_version", BuildConfig.VERSION_NAME)
             try {
                 setTag("partner_id", SmileID.config.partnerId)
+                setTag("environment", if (SmileID.useSandbox) "sandbox" else "production")
             } catch (e: Exception) {
                 // Ignore
                 Timber.w(e, "Error while setting partner_id tag for Sentry")

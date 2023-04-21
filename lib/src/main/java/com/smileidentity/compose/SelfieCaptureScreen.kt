@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.smileidentity.R
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.ColorScheme
+import com.smileidentity.compose.theme.Typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -79,6 +82,7 @@ internal fun OrchestratedSelfieCaptureScreen(
         !acknowledgedInstructions -> SmartSelfieInstructionsScreen(showAttribution) {
             acknowledgedInstructions = true
         }
+
         uiState.processingState != null -> ProcessingScreen(
             processingState = uiState.processingState,
             inProgressTitle = stringResource(R.string.si_smart_selfie_processing_title),
@@ -98,6 +102,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
             onClose = { viewModel.onFinished(onResult) },
         )
+
         uiState.selfieToConfirm != null -> ImageCaptureConfirmationDialog(
             titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
             subtitleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_subtitle),
@@ -109,6 +114,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             retakeButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_retake_button),
             onRetake = { viewModel.onSelfieRejected() },
         )
+
         else -> SelfieCaptureScreen(
             userId = userId,
             isEnroll = isEnroll,
@@ -147,7 +153,7 @@ internal fun SelfieCaptureScreen(
             scaleType = ScaleType.FillCenter,
             zoomRatio = 1.0f,
             modifier = Modifier
-                .testTag("cameraPreview")
+                .testTag("selfie_camera_preview")
                 .fillMaxSize()
                 .clipToBounds()
                 // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
@@ -161,6 +167,7 @@ internal fun SelfieCaptureScreen(
         FaceShapedProgressIndicator(
             progress = animatedProgress,
             faceHeight = viewfinderSize,
+            modifier = Modifier.testTag("selfie_progress_indicator"),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
@@ -220,7 +227,7 @@ private fun AgentModeSwitch(
                 colors = SwitchDefaults.colors(
                     checkedTrackColor = MaterialTheme.colorScheme.tertiary,
                 ),
-                modifier = Modifier.testTag("agentModeSwitch"),
+                modifier = Modifier.testTag("agent_mode_switch"),
             )
         }
     }
@@ -229,7 +236,7 @@ private fun AgentModeSwitch(
 @Preview
 @Composable
 private fun SelfieCaptureScreenPreview() {
-    SelfieCaptureScreen(
-        allowAgentMode = true,
-    )
+    MaterialTheme(colorScheme = SmileID.ColorScheme, typography = SmileID.Typography) {
+        SelfieCaptureScreen(allowAgentMode = true)
+    }
 }

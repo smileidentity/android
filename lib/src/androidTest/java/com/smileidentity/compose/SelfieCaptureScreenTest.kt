@@ -35,7 +35,7 @@ class SelfieCaptureScreenTest {
         // given
         val permissionState = mockk<PermissionState>(relaxed = true)
         every { permissionState.status.isGranted } returns true
-        val cameraPreviewTag = "cameraPreview"
+        val cameraPreviewTag = "selfie_camera_preview"
 
         // when
         composeTestRule.setContent { SmileID.SmartSelfieRegistrationScreen() }
@@ -48,7 +48,7 @@ class SelfieCaptureScreenTest {
     @Test
     fun attributionShouldBeDisplayed() {
         // given
-        val attributionTag = "SmileIDAttribution"
+        val attributionTag = "smile_id_attribution"
 
         // when
         composeTestRule.setContent { SelfieCaptureScreen() }
@@ -61,7 +61,7 @@ class SelfieCaptureScreenTest {
     fun shouldShowAgentModeSwitchWhenEnabled() {
         // given
         val labelText = "Agent Mode"
-        val switchTag = "agentModeSwitch"
+        val switchTag = "agent_mode_switch"
 
         // when
         composeTestRule.setContent { SelfieCaptureScreen(allowAgentMode = true) }
@@ -75,7 +75,7 @@ class SelfieCaptureScreenTest {
     fun shouldNotShowAgentModeSwitchWhenDisabled() {
         // given
         val labelText = "Agent Mode"
-        val switchTag = "agentModeSwitch"
+        val switchTag = "agent_mode_switch"
 
         // when
         composeTestRule.setContent { SelfieCaptureScreen(allowAgentMode = false) }
@@ -88,7 +88,7 @@ class SelfieCaptureScreenTest {
     @Test
     fun shouldShowCameraPreview() {
         // given
-        val cameraPreviewTag = "cameraPreview"
+        val cameraPreviewTag = "selfie_camera_preview"
 
         // when
         composeTestRule.setContent { SelfieCaptureScreen() }

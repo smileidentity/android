@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,7 +55,13 @@ fun ImageCaptureConfirmationDialog(
     onRetake: () -> Unit,
 ) {
     AlertDialog(
-        title = { Text(titleText, textAlign = TextAlign.Center) },
+        title = {
+            Text(
+                text = titleText,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineLarge,
+            )
+        },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,16 +87,21 @@ fun ImageCaptureConfirmationDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("confirm_image_button")
+                    .fillMaxWidth(),
             ) { Text(confirmButtonText) }
         },
         dismissButton = {
             OutlinedButton(
                 onClick = onRetake,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("retake_image_button")
+                    .fillMaxWidth(),
             ) { Text(retakeButtonText) }
         },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        modifier = Modifier.testTag("image_capture_confirmation"),
     )
 }
 
