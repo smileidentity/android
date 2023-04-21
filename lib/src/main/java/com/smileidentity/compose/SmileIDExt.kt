@@ -7,13 +7,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
-import timber.log.Timber
 
 /**
  * Perform a SmartSelfie™ Registration
@@ -42,17 +42,24 @@ fun SmileID.SmartSelfieRegistrationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = typography,
-    ) {
-        OrchestratedSelfieCaptureScreen(
-            userId,
-            true,
-            allowAgentMode,
-            showAttribution,
-            onResult = onResult,
-        )
+    val transactionName = "SmartSelfieRegistrationScreen"
+    val transaction = remember {
+        SmileIDCrashReporting.hub.startTransaction(transactionName, "start")
+    }
+    DisposableEffect(Unit) { onDispose { transaction.finish() } }
+    SmileSentryTraced(tag = transactionName) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+        ) {
+            OrchestratedSelfieCaptureScreen(
+                userId,
+                true,
+                allowAgentMode,
+                showAttribution,
+                onResult = onResult,
+            )
+        }
     }
 }
 
@@ -83,16 +90,23 @@ fun SmileID.SmartSelfieAuthenticationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = typography,
-    ) {
-        OrchestratedSelfieCaptureScreen(
-            userId,
-            false,
-            allowAgentMode,
-            showAttribution,
-            onResult = onResult,
-        )
+    val transactionName = "SmartSelfieAuthenticationScreen"
+    val transaction = remember {
+        SmileIDCrashReporting.hub.startTransaction(transactionName, "start")
+    }
+    DisposableEffect(Unit) { onDispose { transaction.finish() } }
+    SmileSentryTraced(tag = transactionName) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+        ) {
+            OrchestratedSelfieCaptureScreen(
+                userId,
+                false,
+                allowAgentMode,
+                showAttribution,
+                onResult = onResult,
+            )
+        }
     }
 }

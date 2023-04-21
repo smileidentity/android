@@ -121,12 +121,7 @@ dependencies {
     // Sentry (crash reporting, tracing, breadcrumbs)
     implementation(platform(libs.sentry.bom))
     implementation(libs.sentry)
-    // TODO: Integrate these more directly so that we get automatic breadcrumbs
-    // implementation(libs.sentry.android.okhttp)
-    // implementation(libs.sentry.android.core)
-    // implementation(libs.sentry.compose.android)
-    // implementation(libs.sentry.android.fragment)
-    // implementation(libs.sentry.android.timber)
+    implementation(libs.sentry.compose.android)
 
     // ViewModel and utilities for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)

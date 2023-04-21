@@ -42,10 +42,10 @@ import androidx.compose.ui.text.input.KeyboardType.Companion.NumberPassword
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.R
 import com.smileidentity.compose.ProcessingScreen
 import com.smileidentity.models.IdType
 import com.smileidentity.results.EnhancedKycResult
+import com.smileidentity.sample.R
 import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
 import com.smileidentity.sample.viewmodel.SupportedCountry
 
@@ -59,21 +59,21 @@ fun EnhancedKycScreen(
     if (uiState.processingState != null) {
         ProcessingScreen(
             processingState = uiState.processingState,
-            inProgressTitle = stringResource(R.string.si_enhanced_kyc_processing_title),
-            inProgressSubtitle = stringResource(R.string.si_enhanced_kyc_processing_subtitle),
+            inProgressTitle = stringResource(R.string.enhanced_kyc_processing_title),
+            inProgressSubtitle = stringResource(R.string.enhanced_kyc_processing_subtitle),
             inProgressIcon = rememberVectorPainter(Icons.Default.MailOutline),
-            successTitle = stringResource(R.string.si_enhanced_kyc_processing_success_title),
-            successSubtitle = stringResource(R.string.si_enhanced_kyc_processing_success_subtitle),
+            successTitle = stringResource(R.string.enhanced_kyc_processing_success_title),
+            successSubtitle = stringResource(R.string.enhanced_kyc_processing_success_subtitle),
             successIcon = rememberVectorPainter(Icons.Default.Done),
-            errorTitle = stringResource(R.string.si_enhanced_kyc_processing_error_title),
+            errorTitle = stringResource(R.string.enhanced_kyc_processing_error_title),
             errorSubtitle = uiState.errorMessage
-                ?: stringResource(R.string.si_enhanced_kyc_processing_error_subtitle),
+                ?: stringResource(R.string.enhanced_kyc_processing_error_subtitle),
             errorIcon = rememberVectorPainter(Icons.Default.Warning),
-            continueButtonText = stringResource(R.string.si_enhanced_kyc_processing_continue_button),
+            continueButtonText = stringResource(R.string.enhanced_kyc_processing_continue_button),
             onContinue = { viewModel.onFinished(onResult) },
-            retryButtonText = stringResource(R.string.si_enhanced_kyc_processing_retry_button),
+            retryButtonText = stringResource(R.string.enhanced_kyc_processing_retry_button),
             onRetry = { viewModel.doEnhancedKyc() },
-            closeButtonText = stringResource(R.string.si_enhanced_kyc_processing_close_button),
+            closeButtonText = stringResource(R.string.enhanced_kyc_processing_close_button),
             onClose = { viewModel.onFinished(onResult) },
         )
         return
@@ -94,7 +94,7 @@ fun EnhancedKycScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                stringResource(R.string.si_enhanced_kyc_instructions),
+                stringResource(R.string.enhanced_kyc_instructions),
                 style = MaterialTheme.typography.titleLarge,
             )
             var isCountriesExpanded by remember { mutableStateOf(false) }
@@ -110,7 +110,7 @@ fun EnhancedKycScreen(
                     value = uiState.selectedCountry?.displayName?.let { stringResource(it) } ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text(stringResource(R.string.si_enhanced_kyc_country_picker_label)) },
+                    label = { Text(stringResource(R.string.enhanced_kyc_country_picker_label)) },
                     leadingIcon = { Text(uiState.selectedCountry?.flagEmoji ?: "🌍") },
                     trailingIcon = { TrailingIcon(isCountriesExpanded) },
                 )
@@ -149,7 +149,7 @@ fun EnhancedKycScreen(
                         onValueChange = {},
                         readOnly = true,
                         label = {
-                            Text(stringResource(R.string.si_enhanced_kyc_id_type_picker_label))
+                            Text(stringResource(R.string.enhanced_kyc_id_type_picker_label))
                         },
                         trailingIcon = { TrailingIcon(isIdTypesExpanded) },
                     )
@@ -243,7 +243,7 @@ fun EnhancedKycScreen(
                 .padding(8.dp),
             enabled = viewModel.allInputsSatisfied(),
             onClick = { viewModel.doEnhancedKyc() },
-        ) { Text(stringResource(R.string.si_enhanced_kyc_submit_button)) }
+        ) { Text(stringResource(R.string.enhanced_kyc_submit_button)) }
     }
 }
 

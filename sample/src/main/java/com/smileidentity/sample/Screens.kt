@@ -42,7 +42,7 @@ sealed class Screens(
 
     object EnhancedKyc : Screens(
         "enhanced_kyc",
-        com.smileidentity.R.string.si_enhanced_kyc_product_name,
+        R.string.enhanced_kyc_product_name,
         Filled.Person,
         Outlined.Person,
     )
