@@ -6,11 +6,14 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import com.smileidentity.SmileID
-import com.smileidentity.compose.theme.ColorScheme
-import com.smileidentity.compose.theme.Typography
+import com.smileidentity.SmileIDCrashReporting
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
+import timber.log.Timber
 
 /**
  * Perform a SmartSelfie™ Registration
@@ -35,8 +38,8 @@ fun SmileID.SmartSelfieRegistrationScreen(
     userId: String = randomUserId(),
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    colorScheme: ColorScheme = SmileID.ColorScheme,
-    typography: Typography = SmileID.Typography,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     MaterialTheme(
@@ -76,8 +79,8 @@ fun SmileID.SmartSelfieAuthenticationScreen(
     userId: String,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    colorScheme: ColorScheme = SmileID.ColorScheme,
-    typography: Typography = SmileID.Typography,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     MaterialTheme(

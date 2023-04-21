@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
 import com.smileidentity.SmileID
-import com.smileidentity.compose.theme.ColorScheme
-import com.smileidentity.compose.theme.Typography
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 
 /**
  * A dialog that shows a preview of the image captured by the camera and asks the user to confirm
@@ -108,7 +108,7 @@ fun ImageCaptureConfirmationDialog(
 @Preview
 @Composable
 private fun PreviewImageCaptureConfirmationDialog() {
-    MaterialTheme(colorScheme = SmileID.ColorScheme, typography = SmileID.Typography) {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         ImageCaptureConfirmationDialog(
             titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
             subtitleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_subtitle),

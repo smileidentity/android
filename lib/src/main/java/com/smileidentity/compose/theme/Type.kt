@@ -43,7 +43,7 @@ private val dmSans = FontFamily(
  * Define the typography by taking the default defined typographies and overriding the font family
  */
 @Suppress("UnusedReceiverParameter")
-val SmileID.Typography: Typography
+val SmileID.typography: Typography
     @Composable
     @ReadOnlyComposable
     get() = Typography(

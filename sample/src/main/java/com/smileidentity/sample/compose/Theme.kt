@@ -7,8 +7,8 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.smileidentity.SmileID
-import com.smileidentity.compose.theme.ColorScheme
-import com.smileidentity.compose.theme.Typography
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 
 @Composable
 fun SmileIDTheme(content: @Composable () -> Unit) {
@@ -21,8 +21,8 @@ fun SmileIDTheme(content: @Composable () -> Unit) {
     }
 
     MaterialTheme(
-        colorScheme = SmileID.ColorScheme,
-        typography = SmileID.Typography,
+        colorScheme = SmileID.colorScheme,
+        typography = SmileID.typography,
         content = content,
     )
 }

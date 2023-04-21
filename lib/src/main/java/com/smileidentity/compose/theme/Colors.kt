@@ -9,7 +9,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 
 @Suppress("UnusedReceiverParameter")
-val SmileID.ColorScheme: ColorScheme
+val SmileID.colorScheme: ColorScheme
     @Composable
     @ReadOnlyComposable
     get() = lightColorScheme(

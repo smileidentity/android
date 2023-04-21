@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
 import com.smileidentity.SmileID
-import com.smileidentity.compose.theme.ColorScheme
-import com.smileidentity.compose.theme.Typography
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 
 enum class ProcessingState {
     InProgress,
@@ -241,7 +241,7 @@ internal fun ProcessingErrorScreen(
 @Preview
 @Composable
 private fun PreviewProcessingInProgressScreen() {
-    MaterialTheme(colorScheme = SmileID.ColorScheme, typography = SmileID.Typography) {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         ProcessingInProgressScreen(
             icon = painterResource(R.drawable.si_smart_selfie_processing_hero),
             title = stringResource(R.string.si_smart_selfie_processing_title),
@@ -253,7 +253,7 @@ private fun PreviewProcessingInProgressScreen() {
 @Preview
 @Composable
 private fun PreviewProcessingSuccessScreen() {
-    MaterialTheme(colorScheme = SmileID.ColorScheme, typography = SmileID.Typography) {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         ProcessingSuccessScreen(
             icon = painterResource(R.drawable.si_processing_success),
             title = stringResource(R.string.si_smart_selfie_processing_success_title),
@@ -267,7 +267,7 @@ private fun PreviewProcessingSuccessScreen() {
 @Preview
 @Composable
 private fun PreviewProcessingErrorScreen() {
-    MaterialTheme(colorScheme = SmileID.ColorScheme, typography = SmileID.Typography) {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         ProcessingErrorScreen(
             icon = painterResource(R.drawable.si_processing_error),
             title = stringResource(R.string.si_smart_selfie_processing_error_title),

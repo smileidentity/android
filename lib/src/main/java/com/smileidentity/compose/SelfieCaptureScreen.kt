@@ -45,8 +45,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.smileidentity.R
 import com.smileidentity.SmileID
-import com.smileidentity.compose.theme.ColorScheme
-import com.smileidentity.compose.theme.Typography
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -236,7 +236,7 @@ private fun AgentModeSwitch(
 @Preview
 @Composable
 private fun SelfieCaptureScreenPreview() {
-    MaterialTheme(colorScheme = SmileID.ColorScheme, typography = SmileID.Typography) {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         SelfieCaptureScreen(allowAgentMode = true)
     }
 }
