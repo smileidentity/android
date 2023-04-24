@@ -1,6 +1,9 @@
 package com.smileidentity
 
 import android.content.Context
+import com.google.android.gms.common.moduleinstall.ModuleInstall
+import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.models.Config
 import com.smileidentity.networking.FileAdapter
@@ -49,32 +52,13 @@ object SmileID {
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) = initialize(Config.fromAssets(context), useSandbox, enableCrashReporting, okHttpClient)
-
-    /**
-     * Initialize the SDK. This must be called before any other SDK methods. API calls must first be
-     * authenticated with a call to [SmileIDService.authenticate], since this initialization method
-     * does not use an API Key, but rather the auth token from the Config to create a signature
-     *
-     * @param config The [Config] to use, from the Smile ID Portal
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
-     * crashes. This is powered by Sentry, and further details on inner workings
-     * can be found in the source docs for [SmileIDCrashReporting]
-     * @param okHttpClient The [OkHttpClient] to use for the network requests
-     */
-    private fun initialize(
-        config: Config,
-        useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
-        SmileID.config = config
+        SmileID.config = Config.fromAssets(context)
+        SmileID.useSandbox = useSandbox
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
             SmileIDCrashReporting.enable()
         }
-        SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
 
         retrofit = Retrofit.Builder()
@@ -85,6 +69,27 @@ object SmileID {
             .build()
 
         api = retrofit.create(SmileIDService::class.java)
+
+        val moduleInstallRequest = ModuleInstallRequest.newBuilder()
+            .addApi(FaceDetection.getClient())
+            .setListener {
+                Timber.d(
+                    "Face Detection install status: " +
+                        "errorCode=${it.errorCode}, " +
+                        "installState=${it.installState}, " +
+                        "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
+                        "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}",
+                )
+            }.build()
+
+        ModuleInstall.getClient(context)
+            .installModules(moduleInstallRequest)
+            .addOnSuccessListener {
+                Timber.d("Face Detection install success: ${it.areModulesAlreadyInstalled()}")
+            }
+            .addOnFailureListener {
+                Timber.w(it, "Face Detection install failed")
+            }
     }
 
     /**
@@ -108,36 +113,9 @@ object SmileID {
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) = initialize(
-        apiKey,
-        Config.fromAssets(context),
-        useSandbox,
-        enableCrashReporting,
-        okHttpClient,
-    )
-
-    /**
-     * Initialize the SDK with an API Key. This must be called before any other SDK methods. API
-     * keys are different from the auth token in the Config. If this initialization method is used,
-     * authToken from [config] need not be used.
-     *
-     * @param apiKey The API Key to use
-     * @param config The [Config] to use
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
-     * crashes. This is powered by Sentry, and further details on inner workings can be found in the
-     * source docs for [SmileIDCrashReporting]
-     * @param okHttpClient The [OkHttpClient] to use for the network requests
-     */
-    private fun initialize(
-        apiKey: String,
-        config: Config,
-        useSandbox: Boolean = false,
-        enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         SmileID.apiKey = apiKey
-        initialize(config, useSandbox, enableCrashReporting, okHttpClient)
+        initialize(context, useSandbox, enableCrashReporting, okHttpClient)
     }
 
     /**
