@@ -120,7 +120,7 @@ internal fun ProcessingInProgressScreen(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         text = {
@@ -162,7 +162,7 @@ internal fun ProcessingSuccessScreen(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         text = {
@@ -205,7 +205,7 @@ internal fun ProcessingErrorScreen(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         text = {
