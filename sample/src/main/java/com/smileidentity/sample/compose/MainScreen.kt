@@ -17,6 +17,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,9 +27,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
@@ -40,13 +42,14 @@ import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screens
-import com.smileidentity.sample.toast
+import com.smileidentity.sample.showSnackbar
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun MainScreen() {
+    val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
     val currentRoute = navController
         .currentBackStackEntryFlow
@@ -57,10 +60,12 @@ fun MainScreen() {
     }
     var bottomNavSelection: Screens by remember { mutableStateOf(Screens.Home) }
     val bottomNavItems = listOf(Screens.Home, Screens.Resources, Screens.AboutUs)
+    val snackbarHostState = remember { SnackbarHostState() }
     SmileIDTheme {
         Surface {
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 topBar = {
                     var isProduction by remember { mutableStateOf(false) }
                     TopAppBar(
@@ -158,19 +163,18 @@ fun MainScreen() {
                         composable(Screens.SmartSelfieRegistration.route) {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.SmartSelfieRegistration.label
-                            val context = LocalContext.current
                             SmileID.SmartSelfieRegistrationScreen(
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Registration success"
-                                    context.toast(message)
                                     Timber.d("$message: $result")
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 } else if (result is SmartSelfieResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Registration error: ${th.message}"
-                                    context.toast(message)
                                     Timber.e(th, message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 }
                                 navController.popBackStack()
                             }
@@ -209,20 +213,19 @@ fun MainScreen() {
                         composable(Screens.SmartSelfieAuthentication.route + "/{userId}") {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.SmartSelfieAuthentication.label
-                            val context = LocalContext.current
                             SmileID.SmartSelfieAuthenticationScreen(
                                 userId = it.arguments?.getString("userId")!!,
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
                                     val message = "SmartSelfie Authentication success"
-                                    context.toast(message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                     Timber.d("$message: $result")
                                 } else if (result is SmartSelfieResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Authentication error: ${th.message}"
-                                    context.toast(message)
                                     Timber.e(th, message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 }
                                 navController.popBackStack()
                             }
@@ -230,17 +233,16 @@ fun MainScreen() {
                         composable(Screens.EnhancedKyc.route) {
                             bottomNavSelection = Screens.Home
                             currentScreenTitle = Screens.EnhancedKyc.label
-                            val context = LocalContext.current
                             EnhancedKycScreen { result ->
                                 if (result is EnhancedKycResult.Success) {
                                     val message = "Enhanced KYC success"
-                                    context.toast(message)
                                     Timber.d("$message: $result")
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 } else if (result is EnhancedKycResult.Error) {
                                     val th = result.throwable
                                     val message = "Enhanced KYC error: ${th.message}"
-                                    context.toast(message)
                                     Timber.e(th, message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 }
                                 navController.popBackStack()
                             }
