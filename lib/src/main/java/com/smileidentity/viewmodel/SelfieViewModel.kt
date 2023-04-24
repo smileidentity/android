@@ -188,8 +188,12 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                     _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
                 }
             }
-        }.addOnFailureListener {
-            Timber.e(it, "Error detecting faces")
+        }.addOnFailureListener { exception ->
+            Timber.e(exception, "Error detecting faces")
+            result = SmartSelfieResult.Error(exception)
+            _uiState.update {
+                it.copy(processingState = ProcessingState.Error, errorMessage = exception.message)
+            }
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
@@ -275,6 +279,18 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
         selfieFile = null
         result = null
         shouldAnalyzeImages = true
+    }
+
+    fun onRetry() {
+        // If selfie file is present, all captures were completed, so we're retrying a network issue
+        if (selfieFile != null) {
+            submitJob(selfieFile!!, livenessFiles)
+        } else {
+            shouldAnalyzeImages = true
+            _uiState.update {
+                it.copy(processingState = null)
+            }
+        }
     }
 
     fun submitJob() {

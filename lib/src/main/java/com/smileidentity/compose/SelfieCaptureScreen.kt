@@ -42,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.theme.colorScheme
@@ -64,7 +63,6 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
  * Orchestrates the selfie capture flow - navigates between instructions, requesting permissions,
  * showing camera view, and displaying processing screen
  */
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
     userId: String = randomUserId(),
@@ -98,7 +96,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             continueButtonText = stringResource(R.string.si_smart_selfie_processing_continue_button),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-            onRetry = { viewModel.submitJob() },
+            onRetry = { viewModel.onRetry() },
             closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
             onClose = { viewModel.onFinished(onResult) },
         )
