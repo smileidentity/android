@@ -73,11 +73,9 @@ internal fun postProcessImageBitmap(
  * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
  * format "si_${imageType}_<random number>.jpg"
  */
-internal fun createSmileTempFile(imageType: String): File {
-    return File.createTempFile("si_${imageType}_${System.currentTimeMillis()}_", ".jpg").apply {
-        // Deletes file when the *VM* is exited (*not* when the app is closed)
-        deleteOnExit()
-    }
+internal fun createSmileTempFile(imageType: String, savePath: String = SmileID.fileSavePath): File {
+    // Create file with format si_${imageType}_${System.currentTimeMillis()} in savePath
+    return File(savePath, "si_${imageType}_${System.currentTimeMillis()}.jpg")
 }
 
 internal fun createLivenessFile() = createSmileTempFile("liveness")

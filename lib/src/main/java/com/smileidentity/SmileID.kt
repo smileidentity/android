@@ -1,6 +1,7 @@
 package com.smileidentity
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
@@ -23,7 +24,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-@Suppress("unused")
+@Suppress("unused", "RemoveRedundantQualifierName")
 object SmileID {
     @JvmStatic
     lateinit var api: SmileIDService private set
@@ -35,6 +36,8 @@ object SmileID {
     internal var useSandbox: Boolean = true
 
     internal var apiKey: String? = null
+
+    internal lateinit var fileSavePath: String
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
@@ -60,6 +63,7 @@ object SmileID {
             val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
             SmileIDCrashReporting.enable(isInDebugMode)
         }
+        requestFaceDetectionModuleInstallation(context)
 
         SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
@@ -73,27 +77,8 @@ object SmileID {
 
         api = retrofit.create(SmileIDService::class.java)
 
-        // Install Face Detection module by Google Play Services, if not already installed
-        val moduleInstallRequest = ModuleInstallRequest.newBuilder()
-            .addApi(FaceDetection.getClient())
-            .setListener {
-                Timber.d(
-                    "Face Detection install status: " +
-                        "errorCode=${it.errorCode}, " +
-                        "installState=${it.installState}, " +
-                        "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
-                        "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}",
-                )
-            }.build()
-
-        ModuleInstall.getClient(context)
-            .installModules(moduleInstallRequest)
-            .addOnSuccessListener {
-                Timber.d("Face Detection install success: ${it.areModulesAlreadyInstalled()}")
-            }
-            .addOnFailureListener {
-                Timber.w(it, "Face Detection install failed")
-            }
+        // Usually looks like: /data/user/0/<package name>/app_SmileID
+        fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
     }
 
     /**
@@ -185,5 +170,31 @@ object SmileID {
             .add(JobResultAdapter)
             .add(FallbackEnum.ADAPTER_FACTORY)
             .build()
+    }
+
+    /**
+     * Request Google Play Services to install the Face Detection Module, if not already installed.
+     */
+    private fun requestFaceDetectionModuleInstallation(context: Context) {
+        val moduleInstallRequest = ModuleInstallRequest.newBuilder()
+            .addApi(FaceDetection.getClient())
+            .setListener {
+                Timber.d(
+                    "Face Detection install status: " +
+                        "errorCode=${it.errorCode}, " +
+                        "installState=${it.installState}, " +
+                        "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
+                        "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}",
+                )
+            }.build()
+
+        ModuleInstall.getClient(context)
+            .installModules(moduleInstallRequest)
+            .addOnSuccessListener {
+                Timber.d("Face Detection install success: ${it.areModulesAlreadyInstalled()}")
+            }
+            .addOnFailureListener {
+                Timber.w(it, "Face Detection install failed")
+            }
     }
 }

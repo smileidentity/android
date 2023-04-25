@@ -46,6 +46,7 @@ private const val TOTAL_STEPS = NUM_LIVENESS_IMAGES + 1 // 7 B&W Liveness + 1 Co
 private val LIVENESS_IMAGE_SIZE = Size(256, 256)
 private val SELFIE_IMAGE_SIZE = Size(320, 320)
 private const val NO_FACE_RESET_DELAY_MS = 3000L
+private const val FACE_ROTATION_THRESHOLD = 0.75f
 
 data class SelfieUiState(
     val currentDirective: Directive = Directive.InitialInstruction,
@@ -201,13 +202,12 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     }
 
     private fun hasFaceRotatedEnough(face: Face): Boolean {
-        val rotationThreshold = 1.5f
         val rotationXDelta = (face.headEulerAngleX - previousHeadRotationX).absoluteValue
         val rotationYDelta = (face.headEulerAngleY - previousHeadRotationY).absoluteValue
         val rotationZDelta = (face.headEulerAngleZ - previousHeadRotationZ).absoluteValue
-        return rotationXDelta > rotationThreshold ||
-            rotationYDelta > rotationThreshold ||
-            rotationZDelta > rotationThreshold
+        return rotationXDelta > FACE_ROTATION_THRESHOLD ||
+            rotationYDelta > FACE_ROTATION_THRESHOLD ||
+            rotationZDelta > FACE_ROTATION_THRESHOLD
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
