@@ -6,10 +6,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import com.smileidentity.SmileID
-import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
@@ -42,24 +39,14 @@ fun SmileID.SmartSelfieRegistrationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
-    val transactionName = "SmartSelfieRegistrationScreen"
-    val transaction = remember {
-        SmileIDCrashReporting.hub.startTransaction(transactionName, "start")
-    }
-    DisposableEffect(Unit) { onDispose { transaction.finish() } }
-    SmileSentryTraced(tag = transactionName) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = typography,
-        ) {
-            OrchestratedSelfieCaptureScreen(
-                userId,
-                true,
-                allowAgentMode,
-                showAttribution,
-                onResult = onResult,
-            )
-        }
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedSelfieCaptureScreen(
+            userId,
+            true,
+            allowAgentMode,
+            showAttribution,
+            onResult = onResult,
+        )
     }
 }
 
@@ -90,23 +77,13 @@ fun SmileID.SmartSelfieAuthenticationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
-    val transactionName = "SmartSelfieAuthenticationScreen"
-    val transaction = remember {
-        SmileIDCrashReporting.hub.startTransaction(transactionName, "start")
-    }
-    DisposableEffect(Unit) { onDispose { transaction.finish() } }
-    SmileSentryTraced(tag = transactionName) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = typography,
-        ) {
-            OrchestratedSelfieCaptureScreen(
-                userId,
-                false,
-                allowAgentMode,
-                showAttribution,
-                onResult = onResult,
-            )
-        }
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedSelfieCaptureScreen(
+            userId,
+            false,
+            allowAgentMode,
+            showAttribution,
+            onResult = onResult,
+        )
     }
 }

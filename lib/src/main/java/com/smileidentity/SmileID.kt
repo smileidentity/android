@@ -1,6 +1,7 @@
 package com.smileidentity
 
 import android.content.Context
+import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
@@ -56,13 +57,11 @@ object SmileID {
         SmileID.config = Config.fromAssets(context)
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
-            SmileIDCrashReporting.enable()
+            val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
+            SmileIDCrashReporting.enable(isInDebugMode)
         }
+
         SmileID.useSandbox = useSandbox
-        // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
-        if (enableCrashReporting) {
-            SmileIDCrashReporting.enable()
-        }
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
 
         retrofit = Retrofit.Builder()

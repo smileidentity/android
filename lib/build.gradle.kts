@@ -121,7 +121,6 @@ dependencies {
     // Sentry (crash reporting, tracing, breadcrumbs)
     implementation(platform(libs.sentry.bom))
     implementation(libs.sentry)
-    implementation(libs.sentry.compose.android)
 
     // ViewModel and utilities for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)

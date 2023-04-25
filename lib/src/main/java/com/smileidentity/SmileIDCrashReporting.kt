@@ -23,15 +23,10 @@ object SmileIDCrashReporting {
     internal var hub: IHub = NoOpHub.getInstance()
 
     @JvmStatic
-    fun enable() {
+    fun enable(isInDebugMode: Boolean = false) {
         val options = SentryOptions().apply {
             dsn = BuildConfig.SENTRY_DSN
             isEnableUncaughtExceptionHandler = true
-            enableTracing = true
-            tracesSampleRate = 1.0
-            profilesSampleRate = 1.0
-            isEnableUserInteractionBreadcrumbs = true
-            isEnableUserInteractionTracing = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
                 try {
                     // Only report crashes from the SmileID SDK
@@ -49,10 +44,7 @@ object SmileIDCrashReporting {
 
         hub = Hub(options).apply {
             setTag("brand", Build.BRAND)
-            // TODO: This is not the correct way to get the build type. This only returns whether
-            //  the SDK is debuggable or not. We need to figure out how to get the actual build type
-            //  for the app that is using the SDK.
-            setTag("build_type", BuildConfig.BUILD_TYPE) // Distinguish between debug and release
+            setTag("debug_mode", isInDebugMode.toString())
             setTag("cpu_abi", Build.SUPPORTED_ABIS?.first() ?: "unknown")
             setTag("device", Build.DEVICE)
             setTag("manufacturer", Build.MANUFACTURER)
