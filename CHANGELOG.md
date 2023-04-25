@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Features
-- Initial v2 release 🎉
+- Initial v10 release 🎉
 
 ### Bug Fixes
 N/A

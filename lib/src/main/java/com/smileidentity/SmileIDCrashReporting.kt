@@ -63,7 +63,6 @@ object SmileIDCrashReporting {
             setTag("sdk_version", BuildConfig.VERSION_NAME)
             try {
                 setTag("partner_id", SmileID.config.partnerId)
-                setTag("environment", if (SmileID.useSandbox) "sandbox" else "production")
             } catch (e: Exception) {
                 // Ignore
                 Timber.w(e, "Error while setting partner_id tag for Sentry")

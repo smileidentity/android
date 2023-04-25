@@ -54,6 +54,10 @@ object SmileID {
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         SmileID.config = Config.fromAssets(context)
+        // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
+        if (enableCrashReporting) {
+            SmileIDCrashReporting.enable()
+        }
         SmileID.useSandbox = useSandbox
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
@@ -70,6 +74,7 @@ object SmileID {
 
         api = retrofit.create(SmileIDService::class.java)
 
+        // Install Face Detection module by Google Play Services, if not already installed
         val moduleInstallRequest = ModuleInstallRequest.newBuilder()
             .addApi(FaceDetection.getClient())
             .setListener {
