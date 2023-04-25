@@ -71,10 +71,9 @@ internal fun postProcessImageBitmap(
 /**
  * Save to temporary file, which does not require any storage permissions. It will be saved to the
  * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
- * format "si_${imageType}_<random number>.jpg"
+ * format `si_${imageType}_<timestamp>.jpg`
  */
 internal fun createSmileTempFile(imageType: String, savePath: String = SmileID.fileSavePath): File {
-    // Create file with format si_${imageType}_${System.currentTimeMillis()} in savePath
     return File(savePath, "si_${imageType}_${System.currentTimeMillis()}.jpg")
 }
 
