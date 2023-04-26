@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,16 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,15 +31,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
+import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.Screens
+import com.smileidentity.sample.Screen
 
 @Composable
-fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
+fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
     val products = listOf(
-        Screens.SmartSelfieRegistration,
-        Screens.SmartSelfieAuthentication,
-        Screens.EnhancedKyc,
+        ProductScreen.SmartSelfieRegistration,
+        ProductScreen.SmartSelfieAuthentication,
+        ProductScreen.EnhancedKyc,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,7 +66,7 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .height(96.dp)
+                            .height(128.dp)
                             .padding(4.dp),
                     ) {
                         Column(
@@ -73,12 +74,13 @@ fun ProductSelectionScreen(onProductSelected: (Screens) -> Unit = {}) {
                             verticalArrangement = Arrangement.SpaceAround,
                             modifier = Modifier.fillMaxSize(),
                         ) {
-                            Icon(
-                                Icons.Default.Face,
-                                stringResource(
+                            Image(
+                                painterResource(it.icon),
+                                contentDescription = stringResource(
                                     R.string.product_name_icon,
                                     stringResource(it.label),
                                 ),
+                                modifier = Modifier.size(64.dp),
                             )
                             Text(stringResource(it.label), textAlign = TextAlign.Center)
                         }
