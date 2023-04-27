@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  White label the brand-neutral SDK with Smile branding  -->
+    <color name="si_color_on_dark">#FFF6EDE4</color>
+    <color name="si_color_on_light">#FF2D2B2A</color>
+    <color name="si_color_accent">#FF151F72</color>
+    <color name="si_color_success">#FF2CC05C</color>
+    <color name="si_color_error">#FF91180F</color>
+    <color name="si_color_background_dark">#FFC0C0A5</color>
+    <color name="si_color_background_main">#FFDBDBC4</color>
+    <color name="si_color_background_light">#FFE2DCD5</color>
+    <color name="si_color_background_lightest">#FFF9F0E7</color>
+</resources>

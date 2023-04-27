@@ -3,7 +3,7 @@
 package com.smileidentity.models
 
 import com.smileidentity.BuildConfig
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -17,7 +17,7 @@ data class PrepUploadRequest(
     @Json(name = "model_parameters") val modelParameters: Map<String, Any> = mapOf(),
     // Callback URL *must* be defined either within your Partner Portal or here
     @Json(name = "callback_url") val callbackUrl: String? = null,
-    @Json(name = "smile_client_id") val partnerId: String = SmileIdentity.config.partnerId,
+    @Json(name = "smile_client_id") val partnerId: String = SmileID.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),

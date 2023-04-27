@@ -22,7 +22,7 @@
     <string name="si_smart_selfie_instruction_remove_obstructions_title">Remove Obstructions</string>
     <string name="si_smart_selfie_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such as glasses, masks, hats and scarves</string>
     <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
-    <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns blue</string>
+    <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns green</string>
     <string name="si_smartselfie_directive_smile">Smile for the camera!</string>
     <string name="si_smartselfie_directive_capturing">Capturing…</string>
     <string name="si_smartselfie_directive_unable_to_detect_face">Unable to detect face. Please ensure your face is in the oval</string>
@@ -71,20 +71,4 @@
     <string name="si_id_field_name_last_name">Last Name</string>
     <string name="si_id_field_name_dob">Date of Birth</string>
     <string name="si_id_field_name_bank_code">Bank Code</string>
-
-    <!--  Enhanced KYC  -->
-    <string name="si_enhanced_kyc_product_name">Enhanced KYC</string>
-    <string name="si_enhanced_kyc_instructions">Provide ID Information</string>
-    <string name="si_enhanced_kyc_country_picker_label">Country</string>
-    <string name="si_enhanced_kyc_id_type_picker_label">ID Type</string>
-    <string name="si_enhanced_kyc_submit_button">Submit</string>
-    <string name="si_enhanced_kyc_processing_title">Processing Enhanced KYC…</string>
-    <string name="si_enhanced_kyc_processing_subtitle">Just a few more seconds</string>
-    <string name="si_enhanced_kyc_processing_success_title">Enhanced KYC Complete</string>
-    <string name="si_enhanced_kyc_processing_success_subtitle">You can now proceed</string>
-    <string name="si_enhanced_kyc_processing_error_title">Enhanced KYC Failed</string>
-    <string name="si_enhanced_kyc_processing_error_subtitle">This could be because of internet connectivity</string>
-    <string name="si_enhanced_kyc_processing_continue_button">Continue</string>
-    <string name="si_enhanced_kyc_processing_retry_button">Retry</string>
-    <string name="si_enhanced_kyc_processing_close_button">Close</string>
 </resources>

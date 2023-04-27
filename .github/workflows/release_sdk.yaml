@@ -6,6 +6,11 @@ on:
         description: 'The version to release. If not specified, the version will be inferred'
         required: false
         default: ''
+      bump_version:
+        type: boolean
+        description: 'Whether to automatically bump and commit the version after the release'
+        required: true
+        default: true
 
 jobs:
   release:
@@ -32,16 +37,25 @@ jobs:
         id: read_version
         run: |
           if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            if [[ ${{ github.event.inputs.version_override }} == *-SNAPSHOT ]]; then
+              echo "Version cannot end in -SNAPSHOT (${{ github.event.inputs.version_override }})"
+              exit 1
+            fi
             echo "Using version override: ${{ github.event.inputs.version_override }}"
-            echo "version=${{ github.event.inputs.version_override }}" >> $GITHUB_OUTPUT
+            version=${{ github.event.inputs.version_override }}
           else
             version=$(cat ./lib/VERSION)
             if [[ $version != *-SNAPSHOT ]]; then
-              echo "Version $version does not end in -SNAPSHOT"
+              echo "Version $version from file does not end in -SNAPSHOT"
               exit 1
             fi
             version=${version%-SNAPSHOT}
-            echo "version=$version" >> $GITHUB_OUTPUT
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+          if [[ $version == *alpha* || $version == *beta* || $version == *rc* ]]; then
+              echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+              echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
       - name: Push Tag
         uses: actions-ecosystem/action-push-tag@v1
@@ -84,6 +98,7 @@ jobs:
         with:
           release_name: Release ${{ steps.read_version.outputs.version }}
           tag_name: v${{ steps.read_version.outputs.version }}
+          prerelease: ${{ steps.read_version.outputs.is_prerelease }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -112,13 +127,23 @@ jobs:
           releaseFiles: sample/build/outputs/apk/release/sample-release.apk
           releaseName: Smile ID (Partner 002)
       - name: Bump Version
+        if: ${{ github.event.inputs.bump_version == 'true' }}
         run: |
           version=${{ steps.read_version.outputs.version }}
+          is_prerelease=${{ steps.read_version.outputs.is_prerelease }}
           major=$(echo $version | cut -d. -f1)
           minor=$(echo $version | cut -d. -f2)
           patch=$(echo $version | cut -d. -f3)
-          patch=$((patch + 1))
-          new_version="$major.$minor.$patch-SNAPSHOT"
+          if [[ $is_prerelease == "true" ]]; then
+            prerelease=$(echo $version | cut -d- -f2)
+            prerelease_number=$(echo $prerelease | cut -d0 -f2)
+            new_prerelease_number=$((prerelease_number + 1))
+            new_prerelease=$(echo $prerelease | sed "s/$prerelease_number/$new_prerelease_number/")
+            new_version="$major.$minor.$patch-$new_prerelease"
+          else
+            patch=$((patch + 1))
+            new_version="$major.$minor.$patch-SNAPSHOT"
+          fi
           echo $new_version > ./lib/VERSION
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
           git config --local user.name "${{ github.actor }}"

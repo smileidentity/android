@@ -6,6 +6,7 @@ import android.content.ContextWrapper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
+import timber.log.Timber
 
 /**
  * Forces a Compose screen to be at a given brightness level and reverts after exiting screen
@@ -31,5 +32,6 @@ fun Context.getActivity(): Activity? {
         }
         context = context.baseContext
     }
+    Timber.e("Could not find Activity from context")
     return null
 }

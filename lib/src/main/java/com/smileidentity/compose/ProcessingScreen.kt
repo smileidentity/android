@@ -4,14 +4,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +25,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 
 enum class ProcessingState {
     InProgress,
@@ -82,6 +84,7 @@ fun ProcessingScreen(
             title = inProgressTitle,
             subtitle = inProgressSubtitle,
         )
+
         ProcessingState.Success -> ProcessingSuccessScreen(
             icon = successIcon,
             title = successTitle,
@@ -89,6 +92,7 @@ fun ProcessingScreen(
             continueButtonText = continueButtonText,
             onContinue = onContinue,
         )
+
         ProcessingState.Error -> ProcessingErrorScreen(
             icon = errorIcon,
             title = errorTitle,
@@ -116,7 +120,7 @@ internal fun ProcessingInProgressScreen(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         text = {
@@ -158,7 +162,7 @@ internal fun ProcessingSuccessScreen(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         text = {
@@ -172,8 +176,9 @@ internal fun ProcessingSuccessScreen(
         confirmButton = {
             Button(
                 onClick = onContinue,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("processing_screen_continue_button")
+                    .fillMaxWidth(),
             ) { Text(text = continueButtonText) }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
@@ -200,7 +205,7 @@ internal fun ProcessingErrorScreen(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
             )
         },
         text = {
@@ -214,14 +219,17 @@ internal fun ProcessingErrorScreen(
         confirmButton = {
             Button(
                 onClick = onRetry,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("processing_screen_retry_button")
+                    .fillMaxWidth(),
             ) { Text(text = retryButtonText) }
         },
         dismissButton = {
-            TextButton(
+            OutlinedButton(
                 onClick = onClose,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .testTag("processing_screen_close_button")
+                    .fillMaxWidth(),
             ) { Text(text = closeButtonText) }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
@@ -233,35 +241,41 @@ internal fun ProcessingErrorScreen(
 @Preview
 @Composable
 private fun PreviewProcessingInProgressScreen() {
-    ProcessingInProgressScreen(
-        icon = painterResource(R.drawable.si_smart_selfie_processing_hero),
-        title = stringResource(R.string.si_smart_selfie_processing_title),
-        subtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
-    )
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+        ProcessingInProgressScreen(
+            icon = painterResource(R.drawable.si_smart_selfie_processing_hero),
+            title = stringResource(R.string.si_smart_selfie_processing_title),
+            subtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewProcessingSuccessScreen() {
-    ProcessingSuccessScreen(
-        icon = painterResource(R.drawable.si_processing_success),
-        title = stringResource(R.string.si_smart_selfie_processing_success_title),
-        subtitle = stringResource(R.string.si_smart_selfie_processing_success_subtitle),
-        continueButtonText = stringResource(R.string.si_smart_selfie_processing_continue_button),
-        onContinue = {},
-    )
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+        ProcessingSuccessScreen(
+            icon = painterResource(R.drawable.si_processing_success),
+            title = stringResource(R.string.si_smart_selfie_processing_success_title),
+            subtitle = stringResource(R.string.si_smart_selfie_processing_success_subtitle),
+            continueButtonText = stringResource(R.string.si_smart_selfie_processing_continue_button),
+            onContinue = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewProcessingErrorScreen() {
-    ProcessingErrorScreen(
-        icon = painterResource(R.drawable.si_processing_error),
-        title = stringResource(R.string.si_smart_selfie_processing_error_title),
-        subtitle = stringResource(R.string.si_smart_selfie_processing_error_subtitle),
-        retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-        onRetry = {},
-        closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
-        onClose = {},
-    )
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+        ProcessingErrorScreen(
+            icon = painterResource(R.drawable.si_processing_error),
+            title = stringResource(R.string.si_smart_selfie_processing_error_title),
+            subtitle = stringResource(R.string.si_smart_selfie_processing_error_subtitle),
+            retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
+            onRetry = {},
+            closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
+            onClose = {},
+        )
+    }
 }

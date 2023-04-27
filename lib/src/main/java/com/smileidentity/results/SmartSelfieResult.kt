@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 import java.io.File
 
 /**
- * The result of a SmartSelfie capture and submission to the Smile Identity API.
+ * The result of a SmartSelfie capture and submission to the Smile ID API.
  */
 sealed interface SmartSelfieResult : Parcelable {
     /**

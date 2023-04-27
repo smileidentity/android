@@ -7,9 +7,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,12 +21,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 
 /**
  * A dialog that shows a preview of the image captured by the camera and asks the user to confirm
@@ -50,7 +56,14 @@ fun ImageCaptureConfirmationDialog(
     onRetake: () -> Unit,
 ) {
     AlertDialog(
-        title = { Text(titleText, textAlign = TextAlign.Center) },
+        title = {
+            Text(
+                text = titleText,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+            )
+        },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,29 +78,49 @@ fun ImageCaptureConfirmationDialog(
                     painter = painter,
                     contentDescription = null,
                     contentScale = ContentScale.FillHeight,
-                    modifier = Modifier.height(256.dp).clip(RoundedCornerShape(16.dp)).scale(1.25f),
+                    modifier = Modifier
+                        .height(256.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .scale(1.25f),
                 )
             }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
-        confirmButton = { TextButton(onClick = onConfirm) { Text(confirmButtonText) } },
-        dismissButton = { TextButton(onClick = onRetake) { Text(retakeButtonText) } },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier
+                    .testTag("confirm_image_button")
+                    .fillMaxWidth(),
+            ) { Text(confirmButtonText) }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onRetake,
+                modifier = Modifier
+                    .testTag("retake_image_button")
+                    .fillMaxWidth(),
+            ) { Text(retakeButtonText) }
+        },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        modifier = Modifier.testTag("image_capture_confirmation"),
     )
 }
 
 @Preview
 @Composable
 private fun PreviewImageCaptureConfirmationDialog() {
-    ImageCaptureConfirmationDialog(
-        titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
-        subtitleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_subtitle),
-        painter = BrushPainter(
-            brush = linearGradient(listOf(Color(0xFF11B33E), Color(0xFF1B73AD))),
-        ),
-        confirmButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_confirm_button),
-        onConfirm = {},
-        retakeButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_retake_button),
-        onRetake = {},
-    )
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+        ImageCaptureConfirmationDialog(
+            titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
+            subtitleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_subtitle),
+            painter = BrushPainter(
+                brush = linearGradient(listOf(Color(0xFF11B33E), Color(0xFF1B73AD))),
+            ),
+            confirmButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_confirm_button),
+            onConfirm = {},
+            retakeButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_retake_button),
+            onRetake = {},
+        )
+    }
 }

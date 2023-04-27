@@ -1,12 +1,16 @@
 package com.smileidentity.compose.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import com.smileidentity.R
+import com.smileidentity.SmileID
 
 private val fontProvider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
@@ -36,26 +40,26 @@ private val dmSans = FontFamily(
 )
 
 /**
- * Define the typography by taking the default typographies and overriding the font family. This has
- * been defined using .run {} to avoid this needing to be a @Composable getter (i.e. since it would
- * need to use MaterialTheme.typography otherwise as the base to copy from).
+ * Define the typography by taking the default defined typographies and overriding the font family
  */
-val SmileIdentityTypography = Typography().run {
-    Typography(
-        displayLarge = displayLarge.copy(fontFamily = epilogue),
-        displayMedium = displayMedium.copy(fontFamily = epilogue),
-        displaySmall = displaySmall.copy(fontFamily = epilogue),
-        headlineLarge = headlineLarge.copy(fontFamily = epilogue),
-        headlineMedium = headlineMedium.copy(fontFamily = epilogue),
-        headlineSmall = headlineSmall.copy(fontFamily = epilogue),
-        titleLarge = titleLarge.copy(fontFamily = epilogue),
-        titleMedium = titleMedium.copy(fontFamily = epilogue),
-        titleSmall = titleSmall.copy(fontFamily = epilogue),
-        bodyLarge = bodyLarge.copy(fontFamily = dmSans),
-        bodyMedium = bodyMedium.copy(fontFamily = dmSans),
-        bodySmall = bodySmall.copy(fontFamily = dmSans),
-        labelLarge = labelLarge.copy(fontFamily = dmSans),
-        labelMedium = labelMedium.copy(fontFamily = dmSans),
-        labelSmall = labelSmall.copy(fontFamily = dmSans),
+@Suppress("UnusedReceiverParameter")
+val SmileID.typography: Typography
+    @Composable
+    @ReadOnlyComposable
+    get() = Typography(
+        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = epilogue),
+        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = epilogue),
+        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = epilogue),
+        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = epilogue),
+        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = epilogue),
+        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = epilogue),
+        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = epilogue),
+        titleMedium = MaterialTheme.typography.titleMedium.copy(fontFamily = epilogue),
+        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = epilogue),
+        bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontFamily = dmSans),
+        bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontFamily = dmSans),
+        bodySmall = MaterialTheme.typography.bodySmall.copy(fontFamily = dmSans),
+        labelLarge = MaterialTheme.typography.labelLarge.copy(fontFamily = dmSans),
+        labelMedium = MaterialTheme.typography.labelMedium.copy(fontFamily = dmSans),
+        labelSmall = MaterialTheme.typography.labelSmall.copy(fontFamily = dmSans),
     )
-}

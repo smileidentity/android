@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <Button
+                android:id="@+id/button_smart_selfie_registration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/si_smartselfie_registration_product_name" />
+
+        <Button
+                android:id="@+id/button_smart_selfie_authentication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/si_smartselfie_authentication_product_name" />
+    </LinearLayout>
+
+    <FrameLayout
+            android:id="@+id/fragment_container"
+            android:background="@color/si_color_background_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+</FrameLayout>

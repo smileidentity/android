@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-rootProject.name = "SmileIdentity"
+rootProject.name = "SmileID"
 include("lib", "sample")
 
 pluginManagement {

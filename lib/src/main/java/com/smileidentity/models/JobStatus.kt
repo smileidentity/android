@@ -4,7 +4,7 @@ package com.smileidentity.models
 
 import android.os.Parcelable
 import com.serjltt.moshi.adapters.FallbackEnum
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
@@ -18,7 +18,7 @@ data class JobStatusRequest(
     @Json(name = "job_id") val jobId: String,
     @Json(name = "image_links") val includeImageLinks: Boolean,
     @Json(name = "history") val includeHistory: Boolean,
-    @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
+    @Json(name = "partner_id") val partnerId: String = SmileID.config.partnerId,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 ) : Parcelable

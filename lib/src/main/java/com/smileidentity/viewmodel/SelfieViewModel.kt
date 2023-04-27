@@ -13,7 +13,7 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.BitmapUtils
 import com.smileidentity.R
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.smileidentity.area
 import com.smileidentity.compose.ProcessingState
 import com.smileidentity.createLivenessFile
@@ -46,6 +46,7 @@ private const val TOTAL_STEPS = NUM_LIVENESS_IMAGES + 1 // 7 B&W Liveness + 1 Co
 private val LIVENESS_IMAGE_SIZE = Size(256, 256)
 private val SELFIE_IMAGE_SIZE = Size(320, 320)
 private const val NO_FACE_RESET_DELAY_MS = 3000L
+private const val FACE_ROTATION_THRESHOLD = 0.75f
 
 data class SelfieUiState(
     val currentDirective: Directive = Directive.InitialInstruction,
@@ -188,8 +189,12 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                     _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
                 }
             }
-        }.addOnFailureListener {
-            Timber.e(it, "Error detecting faces")
+        }.addOnFailureListener { exception ->
+            Timber.e(exception, "Error detecting faces")
+            result = SmartSelfieResult.Error(exception)
+            _uiState.update {
+                it.copy(processingState = ProcessingState.Error, errorMessage = exception.message)
+            }
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
@@ -197,13 +202,12 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     }
 
     private fun hasFaceRotatedEnough(face: Face): Boolean {
-        val rotationThreshold = 1.5f
         val rotationXDelta = (face.headEulerAngleX - previousHeadRotationX).absoluteValue
         val rotationYDelta = (face.headEulerAngleY - previousHeadRotationY).absoluteValue
         val rotationZDelta = (face.headEulerAngleZ - previousHeadRotationZ).absoluteValue
-        return rotationXDelta > rotationThreshold ||
-            rotationYDelta > rotationThreshold ||
-            rotationZDelta > rotationThreshold
+        return rotationXDelta > FACE_ROTATION_THRESHOLD ||
+            rotationYDelta > FACE_ROTATION_THRESHOLD ||
+            rotationZDelta > FACE_ROTATION_THRESHOLD
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
@@ -222,7 +226,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                 userId = userId,
             )
 
-            val authResponse = SmileIdentity.api.authenticate(authRequest)
+            val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
                 callbackUrl = "",
@@ -230,11 +234,11 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            val prepUploadResponse = SmileIdentity.api.prepUpload(prepUploadRequest)
+            val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()
             val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
-            SmileIdentity.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
+            SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             val jobStatusRequest = JobStatusRequest(
                 jobId = authResponse.partnerParams.jobId,
@@ -250,7 +254,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             for (i in 1..10) {
                 Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
                 delay(jobStatusPollDelay)
-                jobStatusResponse = SmileIdentity.api.getJobStatus(jobStatusRequest)
+                jobStatusResponse = SmileID.api.getJobStatus(jobStatusRequest)
                 Timber.v("Job Status Response: $jobStatusResponse")
                 if (jobStatusResponse.jobComplete) {
                     break
@@ -275,6 +279,18 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
         selfieFile = null
         result = null
         shouldAnalyzeImages = true
+    }
+
+    fun onRetry() {
+        // If selfie file is present, all captures were completed, so we're retrying a network issue
+        if (selfieFile != null) {
+            submitJob(selfieFile!!, livenessFiles)
+        } else {
+            shouldAnalyzeImages = true
+            _uiState.update {
+                it.copy(processingState = null)
+            }
+        }
     }
 
     fun submitJob() {

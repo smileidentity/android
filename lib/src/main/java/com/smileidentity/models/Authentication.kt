@@ -1,7 +1,7 @@
 package com.smileidentity.models
 
 import android.os.Parcelable
-import com.smileidentity.SmileIdentity
+import com.smileidentity.SmileID
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
@@ -15,9 +15,9 @@ data class AuthenticationRequest(
     @Json(name = "job_id") val jobId: String? = null,
     @Json(name = "user_id") val userId: String? = null,
     @Json(name = "signature") val signature: Boolean = true,
-    @Json(name = "production") val production: Boolean = !SmileIdentity.useSandbox,
-    @Json(name = "partner_id") val partnerId: String = SmileIdentity.config.partnerId,
-    @Json(name = "auth_token") val authToken: String = SmileIdentity.config.authToken,
+    @Json(name = "production") val production: Boolean = !SmileID.useSandbox,
+    @Json(name = "partner_id") val partnerId: String = SmileID.config.partnerId,
+    @Json(name = "auth_token") val authToken: String = SmileID.config.authToken,
 ) : Parcelable
 
 @Parcelize

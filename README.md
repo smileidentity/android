@@ -1,14 +1,19 @@
-# Smile Identity Android SDK
+# Smile ID Android SDK
+
+[![Build](https://github.com/smileidentity/android/actions/workflows/build.yaml/badge.svg)](https://github.com/smileidentity/android/actions/workflows/build.yaml)
+[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.smileidentity/android-sdk?server=https%3A%2F%2Foss.sonatype.org)](https://oss.sonatype.org/content/repositories/snapshots/com/smileidentity/android-sdk/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.smileidentity/android-sdk)](https://mvnrepository.com/artifact/com.smileidentity/android-sdk)
+[![Build Sample App](https://github.com/smileidentity/android/actions/workflows/build_app.yaml/badge.svg)](https://github.com/smileidentity/android/actions/workflows/build_app.yaml)
 
 ## Overview
 
-This repo encompasses everything necessary for the Smile Identity Android SDK. It is a multi-module
+This repo encompasses everything necessary for the Smile ID Android SDK. It is a multi-module
 project consisting of the following modules:
 
 - [`lib`](https://github.com/smileidentity/android/tree/main/lib) -
   The SDK distributed to partners
 - [`sample`](https://github.com/smileidentity/android/tree/main/sample) - a sample app
-  that demonstrates SDK integration and showcases Smile Identity products
+  that demonstrates SDK integration and showcases Smile ID products
 
 ## Setup
 
@@ -35,10 +40,13 @@ The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce
 
 ## Releasing
 
-Generally speaking, releases should be performed by pushing a tag. This will kick off a GitHub 
-Actions workflow which will perform the release. The SDK version is determined by the `version` 
+Generally speaking, releases should be performed by workflow dispatch. This will push a tag and 
+create a GitHub Release and publish to Maven Central. The SDK version is determined by the `version` 
 variable
 in [`lib/build.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/build.gradle.kts)
+
+That variable's value will be the `VERSION_NAME` Gradle Property, if defined, or the `lib/VERSION` 
+file otherwise.
 
 Versions ending in `-SNAPSHOT` will be published to Sonatype's snapshot
 [repository](https://oss.sonatype.org/content/repositories/snapshots/com/smileidentity/android-sdk/)

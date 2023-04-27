@@ -1,7 +1,7 @@
 package com.smileidentity.networking
 
-import com.smileidentity.SmileIdentity
-import com.smileidentity.SmileIdentity.moshi
+import com.smileidentity.SmileID
+import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.ImageType
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
@@ -13,8 +13,8 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 fun calculateSignature(timestamp: String): String {
-    val apiKey = SmileIdentity.apiKey ?: throw IllegalStateException("API key not set")
-    val hashContent = timestamp + SmileIdentity.config.partnerId + "sid_request"
+    val apiKey = SmileID.apiKey ?: throw IllegalStateException("API key not set")
+    val hashContent = timestamp + SmileID.config.partnerId + "sid_request"
     return hashContent.encode().hmacSha256(apiKey.encode()).base64()
 }
 
