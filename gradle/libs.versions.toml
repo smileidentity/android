@@ -30,7 +30,7 @@ moshi-lazy-adapters = "2.2"
 okhttp = "4.10.0"
 play-services-mlkit-face-detection = "17.1.0"
 retrofit = "2.9.0"
-sentry = "6.17.0"
+sentry = "6.18.0"
 timber = "5.0.1"
 
 [plugins]
