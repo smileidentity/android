@@ -40,13 +40,16 @@ import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-private const val INTRA_IMAGE_MIN_DELAY_MS = 350L
+private const val INTRA_IMAGE_MIN_DELAY_MS = 350
 private const val NUM_LIVENESS_IMAGES = 7
 private const val TOTAL_STEPS = NUM_LIVENESS_IMAGES + 1 // 7 B&W Liveness + 1 Color Selfie
 private val LIVENESS_IMAGE_SIZE = Size(256, 256)
 private val SELFIE_IMAGE_SIZE = Size(320, 320)
-private const val NO_FACE_RESET_DELAY_MS = 3000L
+private const val NO_FACE_RESET_DELAY_MS = 3000
 private const val FACE_ROTATION_THRESHOLD = 0.75f
+private const val MIN_FACE_AREA_THRESHOLD = 0.15f
+const val MAX_FACE_AREA_THRESHOLD = 0.25f
+private const val SMILE_THRESHOLD = 0.8f
 
 data class SelfieUiState(
     val currentDirective: Directive = Directive.InitialInstruction,
@@ -123,24 +126,31 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             val largestFace = faces.maxBy { it.boundingBox.area }
             val faceFillRatio = (largestFace.boundingBox.area / inputImage.area.toFloat())
 
+            // Check that the corners of the face bounding box are within the inputImage
+            val faceCornersInImage = largestFace.boundingBox.left >= 0 &&
+                largestFace.boundingBox.right <= inputImage.width &&
+                largestFace.boundingBox.top >= 0 &&
+                largestFace.boundingBox.bottom <= inputImage.height
+            if (!faceCornersInImage) {
+                _uiState.update { it.copy(currentDirective = Directive.EnsureFaceInFrame) }
+                return@addOnSuccessListener
+            }
+
             // Check that the face is close enough to the camera
-            val minFaceAreaThreshold = 0.15
-            if (faceFillRatio < minFaceAreaThreshold) {
+            if (faceFillRatio < MIN_FACE_AREA_THRESHOLD) {
                 _uiState.update { it.copy(currentDirective = Directive.MoveCloser) }
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
-            val maxFaceAreaThreshold = 0.25
-            if (faceFillRatio > maxFaceAreaThreshold) {
+            if (faceFillRatio > MAX_FACE_AREA_THRESHOLD) {
                 _uiState.update { it.copy(currentDirective = Directive.MoveAway) }
                 return@addOnSuccessListener
             }
 
-            // Ensure that the last image contains a smile
-            val smileThreshold = 0.8
-            val isSmiling = (largestFace.smilingProbability ?: 0f) > smileThreshold
-            if (livenessFiles.size == NUM_LIVENESS_IMAGES && !isSmiling) {
+            // Ask the user to start smiling partway through liveness images
+            val isSmiling = (largestFace.smilingProbability ?: 0f) > SMILE_THRESHOLD
+            if (livenessFiles.size > NUM_LIVENESS_IMAGES / 2 && !isSmiling) {
                 _uiState.update { it.copy(currentDirective = Directive.Smile) }
                 return@addOnSuccessListener
             }
@@ -157,7 +167,8 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             previousHeadRotationY = largestFace.headEulerAngleY
             previousHeadRotationZ = largestFace.headEulerAngleZ
 
-            // TODO: CameraX 1.3.0-alpha04 added built0n API to convert ImageProxy to Bitmap
+            // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap.
+            //  Incorporate once stable
             BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
                 // All conditions satisfied, capture the image
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
