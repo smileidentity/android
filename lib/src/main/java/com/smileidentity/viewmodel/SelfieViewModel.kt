@@ -56,7 +56,7 @@ data class SelfieUiState(
     val progress: Float = 0f,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
-    val errorMessage: String? = null,
+    @StringRes val errorMessage: Int? = null,
 )
 
 enum class Directive(@StringRes val displayText: Int) {
@@ -204,7 +204,10 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             Timber.e(exception, "Error detecting faces")
             result = SmartSelfieResult.Error(exception)
             _uiState.update {
-                it.copy(processingState = ProcessingState.Error, errorMessage = exception.message)
+                it.copy(
+                    processingState = ProcessingState.Error,
+                    errorMessage = R.string.si_smartselfie_error_message_image_analysis,
+                )
             }
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
@@ -226,7 +229,10 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
         val proxy = { e: Throwable ->
             result = SmartSelfieResult.Error(e)
             _uiState.update {
-                it.copy(processingState = ProcessingState.Error, errorMessage = e.message)
+                it.copy(
+                    processingState = ProcessingState.Error,
+                    errorMessage = R.string.si_smartselfie_error_message_network,
+                )
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
