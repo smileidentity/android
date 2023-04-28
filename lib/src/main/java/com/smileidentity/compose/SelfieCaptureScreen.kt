@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +47,7 @@ import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
@@ -134,7 +134,7 @@ internal fun SelfieCaptureScreen(
     val uiState = viewModel.uiState.collectAsState().value
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-    val viewfinderSize = LocalConfiguration.current.screenHeightDp.dp / 2.5.toFloat()
+    val viewfinderZoom = 1.1f
     // Force maximum brightness in order to light up the user's face
     ForceBrightness()
     Box(modifier = Modifier.fillMaxSize()) {
@@ -156,7 +156,7 @@ internal fun SelfieCaptureScreen(
                 .clipToBounds()
                 // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
                 // "out of bounds" content as a fraud prevention technique
-                .scale(1.1f),
+                .scale(viewfinderZoom),
         )
         val animatedProgress = animateFloatAsState(
             targetValue = uiState.progress,
@@ -164,8 +164,8 @@ internal fun SelfieCaptureScreen(
         ).value
         FaceShapedProgressIndicator(
             progress = animatedProgress,
-            faceHeight = viewfinderSize,
-            modifier = Modifier.testTag("selfie_progress_indicator"),
+            faceFillPercent = MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2,
+            modifier = Modifier.fillMaxSize().testTag("selfie_progress_indicator"),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
