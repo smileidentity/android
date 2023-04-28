@@ -1,5 +1,6 @@
 package com.smileidentity.compose
 
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.progressSemantics
@@ -17,14 +18,14 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import kotlin.math.sqrt
 
 /**
  * A progress indicator that is shaped like a face, has a semi-transparent background, and where the
  * progress fills up symmetrically on either side of the face.
  *
  * @param progress The progress of the indicator, from 0 to 1.
- * @param faceHeight The height of the face shape. The aspect ratio of the face shape is preserved.
+ * @param faceFillPercent The percent of the Canvas that should be filled by the face shape
  * @param modifier The modifier to be applied to the indicator.
  * @param strokeWidth The width of the progress indicator stroke.
  * @param completeProgressStrokeColor The color of the progress indicator stroke.
@@ -34,7 +35,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FaceShapedProgressIndicator(
     progress: Float,
-    faceHeight: Dp,
+    @FloatRange(from = 0.0, to = 1.0) faceFillPercent: Float,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
     completeProgressStrokeColor: Color = MaterialTheme.colorScheme.tertiary,
@@ -45,13 +46,16 @@ fun FaceShapedProgressIndicator(
     Canvas(modifier.progressSemantics(progress).fillMaxSize()) {
         val faceShapeBounds = FaceShape.path.getBounds()
         // Scale the face shape to the desired size
-        scale(faceHeight.toPx() / faceShapeBounds.height) {
-            // 1. Move the Face Shape to the center of the Canvas
-            val centeredFaceOffset = with((size.center - faceShapeBounds.center)) {
-                // 1.5. Offset a little bit above center
-                copy(y = y - faceShapeBounds.height / 5)
-            }
-            FaceShape.path.translate(centeredFaceOffset)
+        val faceArea = faceShapeBounds.width * faceShapeBounds.height
+        val canvasArea = size.width * size.height
+        val scaleFactor = sqrt(faceFillPercent * canvasArea / faceArea)
+        // 1. Move the Face Shape to the center of the Canvas
+        val centeredFaceOffset = with((size.center - faceShapeBounds.center)) {
+            // 1.5. Offset a little bit above center
+            copy(y = y - faceShapeBounds.height / (5 * scaleFactor))
+        }
+        FaceShape.path.translate(centeredFaceOffset)
+        scale(scaleFactor) {
             // 2. Draw the Face Shape, clipping it out of the background
             clipPath(FaceShape.path, clipOp = ClipOp.Difference) {
                 // 3. Set the background color using a rectangle
@@ -81,5 +85,5 @@ fun FaceShapedProgressIndicator(
 @Preview
 @Composable
 private fun FaceShapedProgressIndicatorPreview() {
-    FaceShapedProgressIndicator(progress = 0.5f, faceHeight = 400.dp)
+    FaceShapedProgressIndicator(progress = 0.5f, faceFillPercent = 0.25f)
 }
