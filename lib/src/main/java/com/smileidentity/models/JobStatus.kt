@@ -5,7 +5,6 @@ package com.smileidentity.models
 import android.os.Parcelable
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.SmileID
-import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -47,20 +46,12 @@ sealed interface JobResult : Parcelable {
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Entry(
-        @Json(name = "Source") val source: String,
         @Json(name = "Actions") val actions: Actions,
         @Json(name = "ResultCode") val resultCode: Int,
         @Json(name = "ResultText") val resultText: String,
-        @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") val smileJobId: String,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
-        @Json(name = "ConfidenceValue") val confidence: Double,
-
-        @Json(name = "IsFinalResult") @StringifiedBoolean
-        val isFinalResult: Boolean,
-
-        @Json(name = "IsMachineResult") @StringifiedBoolean
-        val isMachineResult: Boolean,
+        @Json(name = "ConfidenceValue") val confidence: Double?,
     ) : JobResult
 }
 

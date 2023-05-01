@@ -53,16 +53,12 @@ class JobResultAdapterTest {
         val jobResult: JobResult.Entry = adapter.fromJson(json) as JobResult.Entry
 
         // then
-        assertEquals("Source", jobResult.source)
         assertEquals(1, jobResult.resultCode)
         assertEquals("ResultText", jobResult.resultText)
-        assertEquals("ResultType", jobResult.resultType)
         assertEquals("SmileJobID", jobResult.smileJobId)
         assertEquals("jobId", jobResult.partnerParams.jobId)
         assertEquals("userId", jobResult.partnerParams.userId)
         assertEquals(JobType.SmartSelfieEnrollment, jobResult.partnerParams.jobType)
-        assertEquals(99.99, jobResult.confidence, 0.0)
-        assertEquals(true, jobResult.isFinalResult)
-        assertEquals(false, jobResult.isMachineResult)
+        assertEquals(99.99, jobResult.confidence!!, 0.0)
     }
 }
