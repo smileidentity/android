@@ -2,6 +2,7 @@
 
 rootProject.name = "SmileID"
 include("lib", "sample")
+rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
 
 pluginManagement {
     repositories {
