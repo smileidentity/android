@@ -43,7 +43,7 @@ The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce
 Generally speaking, releases should be performed by workflow dispatch. This will push a tag and 
 create a GitHub Release and publish to Maven Central. The SDK version is determined by the `version` 
 variable
-in [`lib/build.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/build.gradle.kts)
+in [`lib/lib.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/lib.gradle.kts)
 
 That variable's value will be the `VERSION_NAME` Gradle Property, if defined, or the `lib/VERSION` 
 file otherwise.
@@ -105,7 +105,7 @@ uploadKeystorePassword=<The password for the upload keystore>
 - When adding drawables, please compress them as much as possible (tinypng.com is a good resource
   for this) as well as `avocado` (`npm install -g avocado`) for compressing android vector drawables
 - Any new developer should add themselves to the the `developers` block in
-  [`lib/build.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/build.gradle.kts)
+  [`lib/lib.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/lib.gradle.kts)
 
 ## FAQs
 
