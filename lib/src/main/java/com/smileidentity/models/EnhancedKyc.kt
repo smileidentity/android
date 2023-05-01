@@ -3,7 +3,6 @@ package com.smileidentity.models
 import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
-import com.smileidentity.networking.StringifiedBoolean
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -34,7 +33,6 @@ data class EnhancedKycRequest(
 data class EnhancedKycResponse(
     @Json(name = "SmileJobID") val smileJobId: String,
     @Json(name = "PartnerParams") val partnerParams: PartnerParams,
-    @Json(name = "ResultType") val resultType: String,
     @Json(name = "ResultText") val resultText: String,
     @Json(name = "ResultCode") val resultCode: Int,
     @Json(name = "Actions") val actions: Actions,
@@ -45,9 +43,6 @@ data class EnhancedKycResponse(
     @Json(name = "ExpirationDate") val expirationDate: String?,
     @Json(name = "DOB") val dob: String?,
     @Json(name = "Photo") val base64Photo: String?,
-
-    @Json(name = "IsFinalResult") @StringifiedBoolean
-    val isFinalResult: Boolean,
 ) : Parcelable
 
 enum class IdType(
