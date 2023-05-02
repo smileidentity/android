@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,7 +65,7 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
  */
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
-    userId: String = remember { randomUserId() },
+    userId: String = rememberSaveable { randomUserId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
@@ -75,7 +75,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
 ) {
     val uiState = viewModel.uiState.collectAsState().value
-    var acknowledgedInstructions by remember { mutableStateOf(false) }
+    var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     when {
         !acknowledgedInstructions -> SmartSelfieInstructionsScreen(showAttribution) {
             acknowledgedInstructions = true
@@ -125,7 +125,7 @@ internal fun OrchestratedSelfieCaptureScreen(
 @VisibleForTesting
 @Composable
 internal fun SelfieCaptureScreen(
-    userId: String = remember { randomUserId() },
+    userId: String = rememberSaveable { randomUserId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
     viewModel: SelfieViewModel = viewModel(

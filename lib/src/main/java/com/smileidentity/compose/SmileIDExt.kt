@@ -6,7 +6,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.smileidentity.SmileID
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
@@ -33,7 +33,7 @@ import com.smileidentity.results.SmartSelfieResult
  */
 @Composable
 fun SmileID.SmartSelfieRegistrationScreen(
-    userId: String = remember { randomUserId() },
+    userId: String = rememberSaveable { randomUserId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     colorScheme: ColorScheme = SmileID.colorScheme,

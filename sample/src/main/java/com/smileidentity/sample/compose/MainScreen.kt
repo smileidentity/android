@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -87,7 +88,7 @@ fun MainScreen() {
                     }
                 },
                 topBar = {
-                    var isProduction by remember { mutableStateOf(false) }
+                    var isProduction by rememberSaveable { mutableStateOf(false) }
                     TopAppBar(
                         title = { Text(stringResource(currentScreenTitle)) },
                         navigationIcon = {
@@ -183,7 +184,7 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieRegistration.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieRegistration.label
-                            val userId = remember { randomUserId() }
+                            val userId = rememberSaveable { randomUserId() }
                             SmileID.SmartSelfieRegistrationScreen(
                                 userId = userId,
                                 allowAgentMode = true,
@@ -218,7 +219,7 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
-                            var userId by remember { mutableStateOf("") }
+                            var userId by rememberSaveable { mutableStateOf("") }
                             AlertDialog(
                                 title = { Text(stringResource(R.string.user_id_dialog_title)) },
                                 text = {
