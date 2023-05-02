@@ -183,22 +183,29 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieRegistration.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieRegistration.label
-                            val userId = randomUserId()
-                            val actionLabel = stringResource(R.string.copy_user_id_snackbar_action)
+                            val userId = remember { randomUserId() }
                             SmileID.SmartSelfieRegistrationScreen(
                                 userId = userId,
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
-                                    val message = "SmartSelfie Registration success"
+                                    val message = StringBuilder("SmartSelfie Registration ")
+                                    if (result.jobStatusResponse.jobComplete) {
+                                        if (result.jobStatusResponse.jobSuccess) {
+                                            message.append("completed successfully. ")
+                                        } else {
+                                            message.append("completed unsuccessfully. ")
+                                        }
+                                    } else {
+                                        message.append("still pending. ")
+                                    }
+                                    message.append("The User ID has been copied to your clipboard.")
                                     Timber.d("$message: $result")
+                                    clipboardManager.setText(AnnotatedString(userId))
                                     snackbarHostState.showSnackbar(
                                         coroutineScope,
-                                        message,
-                                        actionLabel,
-                                    ) {
-                                        clipboardManager.setText(AnnotatedString(userId))
-                                    }
+                                        message.toString(),
+                                    )
                                 } else if (result is SmartSelfieResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Registration error: ${th.message}"
@@ -260,8 +267,20 @@ fun MainScreen() {
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmartSelfieResult.Success) {
-                                    val message = "SmartSelfie Authentication success"
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                    val message = StringBuilder("SmartSelfie Authentication ")
+                                    if (result.jobStatusResponse.jobComplete) {
+                                        if (result.jobStatusResponse.jobSuccess) {
+                                            message.append("completed successfully. ")
+                                        } else {
+                                            message.append("completed unsuccessfully. ")
+                                        }
+                                    } else {
+                                        message.append("still pending. ")
+                                    }
+                                    snackbarHostState.showSnackbar(
+                                        coroutineScope,
+                                        message.toString(),
+                                    )
                                     Timber.d("$message: $result")
                                 } else if (result is SmartSelfieResult.Error) {
                                     val th = result.throwable

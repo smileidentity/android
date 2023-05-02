@@ -65,7 +65,7 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
  */
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
-    userId: String = randomUserId(),
+    userId: String = remember { randomUserId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
@@ -125,7 +125,7 @@ internal fun OrchestratedSelfieCaptureScreen(
 @VisibleForTesting
 @Composable
 internal fun SelfieCaptureScreen(
-    userId: String = randomUserId(),
+    userId: String = remember { randomUserId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
@@ -162,6 +162,7 @@ internal fun SelfieCaptureScreen(
         val animatedProgress = animateFloatAsState(
             targetValue = uiState.progress,
             animationSpec = tween(),
+            label = "selfie_progress",
         ).value
         FaceShapedProgressIndicator(
             progress = animatedProgress,
