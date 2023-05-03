@@ -81,6 +81,8 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
                             verticalArrangement = Arrangement.SpaceAround,
                             modifier = Modifier
                                 .onPlaced {
+                                    // Ensures all the buttons in the grid are the same height while
+                                    // still allowing the text to wrap to new lines as needed
                                     with(density) {
                                         if (desiredItemMinHeight < it.size.height.toDp()) {
                                             desiredItemMinHeight = it.size.height.toDp()
