@@ -98,6 +98,9 @@ dependencies {
     debugImplementation(libs.leakcanary)
     releaseImplementation(libs.leakcanary.noop)
 
+    // Utilities for Compose
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
     // Jetpack Compose version is defined by BOM ("Bill-of-Materials")
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
