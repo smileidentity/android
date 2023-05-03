@@ -124,6 +124,7 @@ dependencies {
 
     // ViewModel and utilities for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Jetpack Compose version is defined by BOM ("Bill-of-Materials")
     // Latest BOM version: https://developer.android.com/jetpack/compose/setup#bom-version-mapping
