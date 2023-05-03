@@ -8,11 +8,8 @@ import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -35,29 +32,11 @@ class SmartSelfieInstructionScreenTest {
 
         // when
         composeTestRule.setContent {
-            SmartSelfieInstructionsScreen(permissionState, onInstructionsAcknowledged)
+            SmartSelfieInstructionsScreen(onInstructionsAcknowledged = onInstructionsAcknowledged)
         }
         composeTestRule.onNodeWithTag("readyButton").performClick()
 
         // then
         assertTrue(callbackInvoked)
-    }
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    @Test
-    fun shouldRequestPermissionsWhenNotGranted() {
-        // given
-        val permissionState = mockk<PermissionState>()
-        every { permissionState.status } returns PermissionStatus.Denied(false)
-        every { permissionState.launchPermissionRequest() } just Runs
-
-        // when
-        composeTestRule.setContent {
-            SmartSelfieInstructionsScreen(cameraPermissionState = permissionState)
-        }
-        composeTestRule.onNodeWithTag("readyButton").performClick()
-
-        // then
-        verify(exactly = 1, timeout = 1000) { permissionState.launchPermissionRequest() }
     }
 }
