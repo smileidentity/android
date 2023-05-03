@@ -1,9 +1,9 @@
 package com.smileidentity.viewmodel
 
+import android.annotation.SuppressLint
 import android.util.Size
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -92,7 +92,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
-    @ExperimentalGetImage
+    @SuppressLint("UnsafeOptInUsageError")
     internal fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
