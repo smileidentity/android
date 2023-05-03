@@ -4,12 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -20,9 +20,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,10 +43,13 @@ import com.smileidentity.sample.Screen
 
 @Composable
 fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
+    val density = LocalDensity.current
+    var desiredItemMinHeight by remember { mutableStateOf(0.dp) }
     val products = listOf(
         ProductScreen.SmartSelfieRegistration,
         ProductScreen.SmartSelfieAuthentication,
         ProductScreen.EnhancedKyc,
+        ProductScreen.DocumentVerification,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,14 +74,20 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .wrapContentHeight()
-                            .height(128.dp)
                             .padding(4.dp),
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceAround,
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .onPlaced {
+                                    with(density) {
+                                        if (desiredItemMinHeight < it.size.height.toDp()) {
+                                            desiredItemMinHeight = it.size.height.toDp()
+                                        }
+                                    }
+                                }
+                                .defaultMinSize(minHeight = desiredItemMinHeight),
                         ) {
                             Image(
                                 painterResource(it.icon),
@@ -82,6 +97,7 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
                                 ),
                                 modifier = Modifier.size(64.dp),
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(stringResource(it.label), textAlign = TextAlign.Center)
                         }
                     }

@@ -11,14 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,11 +28,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 
 @Composable
-fun SmartSelfieInstructionsScreen(
+fun DocumentCaptureInstructionsScreen(
     showAttribution: Boolean = true,
-    onInstructionsAcknowledged: () -> Unit = { },
+    allowPhotoFromGallery: Boolean = false,
+    onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
+    onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
     val columnWidth = 320.dp
     Column(
@@ -42,23 +49,25 @@ fun SmartSelfieInstructionsScreen(
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .fillMaxHeight()
-                .width(columnWidth)
+                .widthIn(max = columnWidth)
                 .verticalScroll(rememberScrollState())
                 .weight(1f),
         ) {
             Image(
-                painter = painterResource(id = R.drawable.si_smart_selfie_instructions_hero),
-                modifier = Modifier.size(128.dp),
+                painter = painterResource(id = R.drawable.si_doc_v_instructions_hero),
                 contentDescription = null,
+                modifier = Modifier
+                    .size(128.dp)
+                    .padding(top = 8.dp),
             )
             Text(
-                text = stringResource(R.string.si_smart_selfie_instruction_title),
+                text = stringResource(R.string.si_doc_v_instruction_title),
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = stringResource(id = R.string.si_smart_selfie_instruction_subtitle),
+                text = stringResource(id = R.string.si_doc_v_instruction_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
@@ -74,11 +83,6 @@ fun SmartSelfieInstructionsScreen(
                     R.drawable.si_smart_selfie_instruction_clear_image,
                     R.string.si_smart_selfie_instruction_clear_image_title,
                     R.string.si_smart_selfie_instruction_clear_image_subtitle,
-                ),
-                Triple(
-                    R.drawable.si_smart_selfie_instruction_remove_obstructions,
-                    R.string.si_smart_selfie_instruction_remove_obstructions_title,
-                    R.string.si_smart_selfie_instruction_remove_obstructions_subtitle,
                 ),
             )
             instructions.forEach { (imageId, title, subtitle) ->
@@ -109,12 +113,18 @@ fun SmartSelfieInstructionsScreen(
                 .padding(8.dp),
         ) {
             CameraPermissionButton(
-                text = stringResource(R.string.si_smart_selfie_instruction_ready_button),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("smart_selfie_instructions_ready_button"),
-                onGranted = onInstructionsAcknowledged,
+                text = stringResource(R.string.si_doc_v_instruction_ready_button),
+                onGranted = onInstructionsAcknowledgedTakePhoto,
+                modifier = Modifier.fillMaxWidth(),
             )
+            if (allowPhotoFromGallery) {
+                OutlinedButton(
+                    onClick = onInstructionsAcknowledgedSelectFromGallery,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.si_doc_v_instruction_upload_button))
+                }
+            }
             if (showAttribution) {
                 SmileIDAttribution()
             }
@@ -124,6 +134,15 @@ fun SmartSelfieInstructionsScreen(
 
 @Preview
 @Composable
-fun SmartSelfieInstructionsScreenPreview() {
-    SmartSelfieInstructionsScreen()
+fun DocumentCaptureInstructionsScreenPreview() {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+        Surface {
+            DocumentCaptureInstructionsScreen(
+                showAttribution = true,
+                allowPhotoFromGallery = true,
+                onInstructionsAcknowledgedSelectFromGallery = {},
+                onInstructionsAcknowledgedTakePhoto = {},
+            )
+        }
+    }
 }

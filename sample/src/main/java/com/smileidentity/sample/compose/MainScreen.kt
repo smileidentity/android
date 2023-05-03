@@ -42,6 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
+import com.smileidentity.compose.DocumentCaptureInstructionsScreen
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.randomUserId
@@ -306,6 +307,13 @@ fun MainScreen() {
                                     Timber.e(th, message)
                                     snackbarHostState.showSnackbar(coroutineScope, message)
                                 }
+                                navController.popBackStack()
+                            }
+                        }
+                        composable(ProductScreen.DocumentVerification.route) {
+                            bottomNavSelection = BottomNavigationScreen.Home
+                            currentScreenTitle = ProductScreen.DocumentVerification.label
+                            DocumentCaptureInstructionsScreen(allowPhotoFromGallery = true) {
                                 navController.popBackStack()
                             }
                         }
