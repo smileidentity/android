@@ -3,6 +3,7 @@ package com.smileidentity
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
+import androidx.annotation.VisibleForTesting
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
@@ -29,7 +30,9 @@ object SmileID {
     @JvmStatic
     lateinit var api: SmileIDService private set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
-    lateinit var config: Config private set
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    lateinit var config: Config
     private lateinit var retrofit: Retrofit
 
     // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
