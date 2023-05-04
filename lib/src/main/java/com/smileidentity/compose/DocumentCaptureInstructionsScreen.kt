@@ -67,7 +67,7 @@ fun DocumentCaptureInstructionsScreen(
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = stringResource(id = R.string.si_doc_v_instruction_subtitle),
+                text = stringResource(id = R.string.si_verify_identity_instruction_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
@@ -75,14 +75,14 @@ fun DocumentCaptureInstructionsScreen(
             )
             val instructions = listOf(
                 Triple(
-                    R.drawable.si_smart_selfie_instruction_good_light,
-                    R.string.si_smart_selfie_instruction_good_light_title,
-                    R.string.si_smart_selfie_instruction_good_light_subtitle,
+                    R.drawable.si_photo_capture_instruction_good_light,
+                    R.string.si_photo_capture_instruction_good_light_title,
+                    R.string.si_photo_capture_instruction_good_light_subtitle,
                 ),
                 Triple(
-                    R.drawable.si_smart_selfie_instruction_clear_image,
-                    R.string.si_smart_selfie_instruction_clear_image_title,
-                    R.string.si_smart_selfie_instruction_clear_image_subtitle,
+                    R.drawable.si_photo_capture_instruction_clear_image,
+                    R.string.si_photo_capture_instruction_clear_image_title,
+                    R.string.si_photo_capture_instruction_clear_image_subtitle,
                 ),
             )
             instructions.forEach { (imageId, title, subtitle) ->

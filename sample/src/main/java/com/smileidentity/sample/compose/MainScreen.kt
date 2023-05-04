@@ -313,6 +313,7 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
+                            // TODO: Replace with Orchestrated Screen once ready
                             DocumentCaptureInstructionsScreen(allowPhotoFromGallery = true) {
                                 navController.popBackStack()
                             }

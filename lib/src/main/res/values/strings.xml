@@ -10,17 +10,19 @@
     <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
     <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
 
+    <!--  Generic Instructions  -->
+    <string name="si_photo_capture_instruction_good_light_title">Good Light</string>
+    <string name="si_photo_capture_instruction_good_light_subtitle">Make sure you are in a well-lit environment where your face is clear and visible</string>
+    <string name="si_photo_capture_instruction_clear_image_title">Clear Image</string>
+    <string name="si_photo_capture_instruction_clear_image_subtitle">Hold your phone steady so the selfie is clear and sharp. Don’t take blurry images</string>
+    <string name="si_photo_capture_instruction_remove_obstructions_title">Remove Obstructions</string>
+    <string name="si_photo_capture_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such as glasses, masks, hats and scarves</string>
+    <string name="si_verify_identity_instruction_subtitle">We\'ll use it to verify your identity.\nPlease follow the instructions below.</string>
+
     <!--  SmartSelfie  -->
     <string name="si_smart_selfie_registration_product_name">SmartSelfie™ Registration</string>
     <string name="si_smart_selfie_authentication_product_name">SmartSelfie™ Authentication</string>
     <string name="si_smart_selfie_instruction_title">Next, we\'ll take a quick selfie</string>
-    <string name="si_smart_selfie_instruction_subtitle">We\'ll use it to verify your identity.\nPlease follow the instructions below.</string>
-    <string name="si_smart_selfie_instruction_good_light_title">Good Light</string>
-    <string name="si_smart_selfie_instruction_good_light_subtitle">Make sure you are in a well-lit environment where your face is clear and visible</string>
-    <string name="si_smart_selfie_instruction_clear_image_title">Clear Image</string>
-    <string name="si_smart_selfie_instruction_clear_image_subtitle">Hold your phone steady so the selfie is clear and sharp. Don’t take blurry images</string>
-    <string name="si_smart_selfie_instruction_remove_obstructions_title">Remove Obstructions</string>
-    <string name="si_smart_selfie_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such as glasses, masks, hats and scarves</string>
     <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
     <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns green</string>
     <string name="si_smart_selfie_directive_smile">Smile for the camera!</string>
@@ -45,7 +47,6 @@
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
     <string name="si_doc_v_instruction_title">Submit your ID</string>
-    <string name="si_doc_v_instruction_subtitle">We\'ll use it to verify your identity.\nPlease follow the instructions below.</string>
     <string name="si_doc_v_instruction_ready_button">Take Photo</string>
     <string name="si_doc_v_instruction_upload_button">Upload Photo</string>
 
