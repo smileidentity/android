@@ -70,6 +70,8 @@ class DocumentCaptureInstructionScreenTest {
                 onInstructionsAcknowledgedTakePhoto = { },
             )
         }
+
+        // then
         composeTestRule.onNodeWithText("Take Photo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Upload Photo").assertDoesNotExist()
     }
