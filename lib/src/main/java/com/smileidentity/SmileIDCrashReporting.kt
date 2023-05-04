@@ -10,6 +10,7 @@ import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.SentryOptions.BeforeSendCallback
 import io.sentry.UncaughtExceptionHandlerIntegration
+import io.sentry.protocol.User
 import timber.log.Timber
 
 /**
@@ -55,6 +56,7 @@ object SmileIDCrashReporting {
             setTag("sdk_version", BuildConfig.VERSION_NAME)
             try {
                 setTag("partner_id", SmileID.config.partnerId)
+                setUser(User().apply { id = SmileID.config.partnerId })
             } catch (e: Exception) {
                 // Ignore
                 Timber.w(e, "Error while setting partner_id tag for Sentry")

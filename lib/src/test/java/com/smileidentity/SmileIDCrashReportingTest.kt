@@ -1,7 +1,9 @@
 package com.smileidentity
 
+import com.smileidentity.models.Config
 import io.sentry.Hub
 import io.sentry.NoOpHub
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -32,5 +34,22 @@ class SmileIDCrashReportingTest {
         SmileIDCrashReporting.disable()
         assertTrue(SmileIDCrashReporting.hub is NoOpHub)
         assertFalse(SmileIDCrashReporting.hub.options.isEnableUncaughtExceptionHandler)
+    }
+
+    @Test
+    fun shouldSetUser() {
+        // given
+        val expectedPartnerId = "000"
+        SmileID.config = Config(expectedPartnerId, "", "", "")
+
+        // when
+        var actualPartnerId: String? = null
+        SmileIDCrashReporting.enable()
+        SmileIDCrashReporting.hub.withScope {
+            actualPartnerId = it.user?.id
+        }
+
+        // then
+        assertEquals(expectedPartnerId, actualPartnerId)
     }
 }
