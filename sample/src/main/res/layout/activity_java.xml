@@ -12,13 +12,13 @@
                 android:id="@+id/button_smart_selfie_registration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/si_smartselfie_registration_product_name" />
+                android:text="@string/si_smart_selfie_registration_product_name" />
 
         <Button
                 android:id="@+id/button_smart_selfie_authentication"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/si_smartselfie_authentication_product_name" />
+                android:text="@string/si_smart_selfie_authentication_product_name" />
     </LinearLayout>
 
     <FrameLayout

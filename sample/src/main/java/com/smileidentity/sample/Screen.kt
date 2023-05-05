@@ -24,13 +24,13 @@ sealed class ProductScreen(
 ) : Screen {
     object SmartSelfieRegistration : ProductScreen(
         "smart_selfie_registration",
-        com.smileidentity.R.string.si_smartselfie_registration_product_name,
+        com.smileidentity.R.string.si_smart_selfie_registration_product_name,
         com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
     )
 
     object SmartSelfieAuthentication : ProductScreen(
         "smart_selfie_authentication",
-        com.smileidentity.R.string.si_smartselfie_authentication_product_name,
+        com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
         com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
     )
 
@@ -38,6 +38,12 @@ sealed class ProductScreen(
         "enhanced_kyc",
         R.string.enhanced_kyc_product_name,
         R.drawable.enhanced_kyc,
+    )
+
+    object DocumentVerification : ProductScreen(
+        "document_verification",
+        com.smileidentity.R.string.si_doc_v_product_name,
+        com.smileidentity.R.drawable.si_doc_v_instructions_hero,
     )
 }
 
