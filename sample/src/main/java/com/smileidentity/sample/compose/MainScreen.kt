@@ -42,9 +42,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
-import com.smileidentity.compose.DocumentCaptureInstructionsScreen
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.compose.document.DocumentCaptureInstructionsScreen
 import com.smileidentity.randomUserId
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
