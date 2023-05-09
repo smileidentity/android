@@ -13,7 +13,7 @@ import timber.log.Timber
  */
 @Composable
 fun ForceBrightness(brightness: Float = 1f) {
-    val activity = LocalContext.current.getActivity()!!
+    val activity = LocalContext.current.getActivity() ?: return
     DisposableEffect(Unit) {
         val attributes = activity.window.attributes
         val originalBrightness = attributes.screenBrightness
