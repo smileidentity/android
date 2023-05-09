@@ -23,9 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreview
 
 @Composable
 fun SmartSelfieInstructionsScreen(
@@ -122,8 +123,10 @@ fun SmartSelfieInstructionsScreen(
     }
 }
 
-@Preview
+@SmilePreview
 @Composable
-fun SmartSelfieInstructionsScreenPreview() {
-    SmartSelfieInstructionsScreen()
+private fun SmartSelfieInstructionsScreenPreview() {
+    Preview {
+        SmartSelfieInstructionsScreen()
+    }
 }

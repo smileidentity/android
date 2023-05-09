@@ -16,8 +16,9 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreview
 import kotlin.math.sqrt
 
 /**
@@ -43,7 +44,11 @@ fun FaceShapedProgressIndicator(
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
 ) {
     val stroke = with(LocalDensity.current) { Stroke(strokeWidth.toPx()) }
-    Canvas(modifier.progressSemantics(progress).fillMaxSize()) {
+    Canvas(
+        modifier
+            .progressSemantics(progress)
+            .fillMaxSize(),
+    ) {
         val faceShapeBounds = FaceShape.path.getBounds()
         // Scale the face shape to the desired size
         val faceArea = faceShapeBounds.width * faceShapeBounds.height
@@ -82,8 +87,10 @@ fun FaceShapedProgressIndicator(
     }
 }
 
-@Preview
+@SmilePreview
 @Composable
 private fun FaceShapedProgressIndicatorPreview() {
-    FaceShapedProgressIndicator(progress = 0.5f, faceFillPercent = 0.25f)
+    Preview {
+        FaceShapedProgressIndicator(progress = 0.5f, faceFillPercent = 0.25f)
+    }
 }
