@@ -47,6 +47,7 @@ import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -72,7 +73,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
     ),
-    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
+    onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
@@ -167,7 +168,9 @@ internal fun SelfieCaptureScreen(
         FaceShapedProgressIndicator(
             progress = animatedProgress,
             faceFillPercent = MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2,
-            modifier = Modifier.fillMaxSize().testTag("selfie_progress_indicator"),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("selfie_progress_indicator"),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),

@@ -30,6 +30,8 @@ import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.postProcessImageBitmap
 import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.results.SmileIDResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,7 +73,7 @@ enum class Directive(@StringRes val displayText: Int) {
 class SelfieViewModel(private val isEnroll: Boolean, private val userId: String) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
     val uiState = _uiState.asStateFlow()
-    var result: SmartSelfieResult? = null
+    var result: SmileIDResult<SmartSelfieResult>? = null
 
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
@@ -86,9 +88,8 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
-        // TODO: Test if we get better performance on low-end devices if this is disabled until we
-        //  actually need to detect the smile for the last image
         setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+        // TODO: setMinFaceSize(MIN_FACE_AREA_THRESHOLD)
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
@@ -202,7 +203,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
-            result = SmartSelfieResult.Error(exception)
+            result = SmileIDResult.Error(exception)
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
@@ -227,7 +228,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
-            result = SmartSelfieResult.Error(e)
+            result = SmileIDResult.Error(e)
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
@@ -277,7 +278,13 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                     break
                 }
             }
-            result = SmartSelfieResult.Success(selfieFile, livenessFiles, jobStatusResponse)
+            result = SmileIDResult.Success(
+                SmartSelfieResult(
+                    selfieFile,
+                    livenessFiles,
+                    jobStatusResponse,
+                ),
+            )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
     }
@@ -314,7 +321,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
         submitJob(selfieFile!!, livenessFiles)
     }
 
-    fun onFinished(callback: SmartSelfieResult.Callback) {
-        callback.onResult(result!!)
+    fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
+        callback(result!!)
     }
 }

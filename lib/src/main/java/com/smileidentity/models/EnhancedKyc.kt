@@ -45,43 +45,40 @@ data class EnhancedKycResponse(
     @Json(name = "Photo") val base64Photo: String?,
 ) : Parcelable
 
+// TODO: consolidate with Document?
 enum class IdType(
     val countryCode: String,
     val idType: String,
-    val idNumberRegex: String,
     val requiredFields: List<InputField> = listOf(InputField.IdNumber),
     val supportsBasicKyc: Boolean = true,
     val supportsEnhancedKyc: Boolean = true,
     val supportsBiometricKyc: Boolean = true,
 ) {
-    GhanaDriversLicense("GH", "DRIVERS_LICENSE", "(?i)^[a-zA-Z0-9!-]{6,18}$"),
-    GhanaPassport("GH", "PASSPORT", "(?i)^[A-Z][0-9]{7,9}$"),
-    GhanaSSNIT("GH", "SSNIT", "(?i)^[a-zA-Z]{1}[a-zA-Z0-9]{12,14}$"),
-    GhanaVoterId("GH", "VOTER_ID", "(?i)^[0-9]{10,12}$"),
-    GhanaNewVoterId("GH", "NEW_VOTER_ID", "^[0-9]{10,12}$"),
+    GhanaDriversLicense("GH", "DRIVERS_LICENSE"),
+    GhanaPassport("GH", "PASSPORT"),
+    GhanaSSNIT("GH", "SSNIT"),
+    GhanaVoterId("GH", "VOTER_ID"),
+    GhanaNewVoterId("GH", "NEW_VOTER_ID"),
 
-    KenyaAlienCard("KE", "ALIEN_CARD", "^[0-9]{6,9}$"),
-    KenyaNationalId("KE", "NATIONAL_ID", "^[0-9]{1,9}$"),
+    KenyaAlienCard("KE", "ALIEN_CARD"),
+    KenyaNationalId("KE", "NATIONAL_ID"),
     KenyaNationalIdNoPhoto(
         "KE",
         "NATIONAL_ID_NO_PHOTO",
-        "^[0-9]{1,9}$",
         supportsBiometricKyc = false,
     ),
-    KenyaPassport("KE", "PASSPORT", "^[A-Z0-9]{7,9}$"),
+    KenyaPassport("KE", "PASSPORT"),
 
     NigeriaBankAccount(
         "NG",
         "BANK_ACCOUNT",
-        "^[0-9]{10}$",
         requiredFields = listOf(InputField.IdNumber, InputField.BankCode),
         supportsBiometricKyc = false,
     ),
-    NigeriaBVN("NG", "BVN", "/^[0-9]{11}$/"),
+    NigeriaBVN("NG", "BVN"),
     NigeriaDriversLicense(
         "NG",
         "DRIVERS_LICENSE",
-        "(?i)^[a-zA-Z]{3}([ -]{1})?[A-Z0-9]{6,12}$",
         requiredFields = listOf(
             InputField.IdNumber,
             InputField.FirstName,
@@ -89,38 +86,31 @@ enum class IdType(
             InputField.Dob,
         ),
     ),
-    NigeriaNINV2("NG", "NIN_V2", "^[0-9]{11}$"),
-    NigeriaNINSlip("NG", "NIN_SLIP", "^[0-9]{11}$"),
-    NigeriaVNIN("NG", "V_NIN", "(?i)^[A-Z0-9]{16}$"),
+    NigeriaNINV2("NG", "NIN_V2"),
+    NigeriaNINSlip("NG", "NIN_SLIP"),
+    NigeriaVNIN("NG", "V_NIN"),
     NigeriaPhoneNumber(
         "NG",
         "PHONE_NUMBER",
-        "/^[0-9]{11}$/",
         supportsEnhancedKyc = false,
         supportsBiometricKyc = false,
         // TODO: Check if phone_number field is explicitly required,
         //  or if ID Number *is* the phone number
     ),
-    NigeriaVoterId("NG", "VOTER_ID", "(?i)^[A-Z0-9 ]{9,20}$"),
+    NigeriaVoterId("NG", "VOTER_ID"),
 
     SouthAfricaNationalId(
         "ZA",
         "NATIONAL_ID",
-        "^[0-9]{13}$",
         supportsBasicKyc = false,
     ),
     SouthAfricaNationalIdNoPhoto(
         "ZA",
         "NATIONAL_ID_NO_PHOTO",
-        "^[0-9]{13}$",
         supportsBiometricKyc = false,
     ),
 
-    UgandaNationalIdNoPhoto(
-        "UG",
-        "NATIONAL_ID_NO_PHOTO",
-        "(?i)^[A-Z0-9]{14}$",
-    ),
+    UgandaNationalIdNoPhoto("UG", "NATIONAL_ID_NO_PHOTO"),
     ;
 
     enum class InputField {
@@ -130,6 +120,4 @@ enum class IdType(
         Dob,
         BankCode,
     }
-
-    fun isValidIdNumber(idNumber: String) = idNumber matches idNumberRegex.toRegex()
 }

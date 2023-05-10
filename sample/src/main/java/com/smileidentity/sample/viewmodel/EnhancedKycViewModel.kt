@@ -14,6 +14,8 @@ import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdType
 import com.smileidentity.models.JobType
 import com.smileidentity.results.EnhancedKycResult
+import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.results.SmileIDResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -31,12 +33,12 @@ data class EnhancedKycUiState(
 class EnhancedKycViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(EnhancedKycUiState())
     val uiState = _uiState.asStateFlow()
-    var result: EnhancedKycResult? = null
+    var result: SmileIDResult<EnhancedKycResult>? = null
 
     fun doEnhancedKyc() {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
-            result = EnhancedKycResult.Error(e)
+            result = SmileIDResult.Error(e)
             _uiState.update {
                 it.copy(processingState = ProcessingState.Error, errorMessage = e.message)
             }
@@ -61,13 +63,13 @@ class EnhancedKycViewModel : ViewModel() {
                 bankCode = _uiState.value.idInputFieldValues[IdType.InputField.BankCode],
             )
             val response = SmileID.api.doEnhancedKyc(enhancedKycRequest)
-            result = EnhancedKycResult.Success(enhancedKycRequest, response)
+            result = SmileIDResult.Success(EnhancedKycResult(enhancedKycRequest, response))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
     }
 
-    fun onFinished(callback: EnhancedKycResult.Callback) {
-        callback.onResult(result!!)
+    fun onFinished(callback: SmileIDCallback<EnhancedKycResult>) {
+        callback(result!!)
     }
 
     fun onCountrySelected(selectedCountry: SupportedCountry) {
@@ -88,9 +90,6 @@ class EnhancedKycViewModel : ViewModel() {
     fun allInputsSatisfied(): Boolean {
         val state = _uiState.value
         return state.selectedCountry != null && state.selectedIdType != null &&
-            state.selectedIdType.isValidIdNumber(
-                state.idInputFieldValues[IdType.InputField.IdNumber] ?: "",
-            ) &&
             state.selectedIdType.requiredFields.all {
                 (state.idInputFieldValues[it] ?: "").isNotBlank()
             }

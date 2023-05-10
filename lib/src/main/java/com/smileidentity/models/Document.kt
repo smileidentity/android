@@ -1,10 +1,11 @@
 package com.smileidentity.models
 
 import android.os.Parcelable
+import androidx.annotation.FloatRange
 import kotlinx.parcelize.Parcelize
 
 /**
- * Represents a document type that can be used for Document Verification
+ * Represents a document type that can be used for Document Verification.
  */
 // TODO: Should this be consolidated with IdType (used for Enhanced KYC)? This would entail not
 //  applying orientation to certain types (i.e. BVN, Phone number). It would also entail adding
@@ -14,7 +15,7 @@ import kotlinx.parcelize.Parcelize
 data class Document(
     val countryCode: String,
     val documentType: String,
-    val orientation: Orientation = Orientation.Landscape,
+    @FloatRange(from = 0.0) val aspectRatio: Float = 0f,
 ) : Parcelable {
     // TODO: go through each document and ensure orientation is correct
     enum class Orientation {
@@ -219,7 +220,7 @@ data class Document(
         val HealthInsuranceID = Document(countryCode, "HEALTH_INSURANCE_ID")
 
         @JvmField
-        val NationalID = Document(countryCode, "NATIONAL_ID", orientation = Orientation.Portrait)
+        val NationalID = Document(countryCode, "NATIONAL_ID")
 
         @JvmField
         val Passport = Document(countryCode, "PASSPORT")
@@ -707,7 +708,7 @@ data class Document(
         val DriverLicense = Document(countryCode, "DRIVERS_LICENSE")
 
         @JvmField
-        val GreenBook = Document(countryCode, "GREEN_BOOK", orientation = Orientation.Portrait)
+        val GreenBook = Document(countryCode, "GREEN_BOOK")
 
         @JvmField
         val NationalID = Document(countryCode, "NATIONAL_ID")

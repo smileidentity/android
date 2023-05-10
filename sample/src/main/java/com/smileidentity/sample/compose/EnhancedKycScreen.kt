@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.compose.ProcessingScreen
 import com.smileidentity.models.IdType
 import com.smileidentity.results.EnhancedKycResult
+import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.sample.R
 import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
 import com.smileidentity.sample.viewmodel.SupportedCountry
@@ -53,7 +54,7 @@ import com.smileidentity.sample.viewmodel.SupportedCountry
 @Composable
 fun EnhancedKycScreen(
     viewModel: EnhancedKycViewModel = viewModel(),
-    onResult: EnhancedKycResult.Callback = EnhancedKycResult.Callback {},
+    onResult: SmileIDCallback<EnhancedKycResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     if (uiState.processingState != null) {
@@ -191,9 +192,7 @@ fun EnhancedKycScreen(
                         label = { Text(label) },
                         value = value,
                         onValueChange = onValueChange,
-                        isError = value.isNotBlank() && !uiState.selectedIdType.isValidIdNumber(
-                            value,
-                        ),
+                        isError = value.isBlank(),
                         singleLine = true,
                         keyboardActions = keyboardActions,
                         keyboardOptions = keyboardOpts,

@@ -46,8 +46,7 @@ import com.smileidentity.compose.DocumentCaptureInstructionsScreen
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.randomUserId
-import com.smileidentity.results.EnhancedKycResult
-import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
@@ -190,10 +189,11 @@ fun MainScreen() {
                                 userId = userId,
                                 allowAgentMode = true,
                             ) { result ->
-                                if (result is SmartSelfieResult.Success) {
+                                if (result is SmileIDResult.Success) {
+                                    val resultData = result.data
                                     val message = StringBuilder("SmartSelfie Registration ")
-                                    if (result.jobStatusResponse.jobComplete) {
-                                        if (result.jobStatusResponse.jobSuccess) {
+                                    if (resultData.jobStatusResponse.jobComplete) {
+                                        if (resultData.jobStatusResponse.jobSuccess) {
                                             message.append("completed successfully. ")
                                         } else {
                                             message.append("completed unsuccessfully. ")
@@ -208,7 +208,7 @@ fun MainScreen() {
                                         coroutineScope,
                                         message.toString(),
                                     )
-                                } else if (result is SmartSelfieResult.Error) {
+                                } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Registration error: ${th.message}"
                                     Timber.e(th, message)
@@ -268,10 +268,11 @@ fun MainScreen() {
                                 userId = it.arguments?.getString("userId")!!,
                                 allowAgentMode = true,
                             ) { result ->
-                                if (result is SmartSelfieResult.Success) {
+                                if (result is SmileIDResult.Success) {
+                                    val resultData = result.data
                                     val message = StringBuilder("SmartSelfie Authentication ")
-                                    if (result.jobStatusResponse.jobComplete) {
-                                        if (result.jobStatusResponse.jobSuccess) {
+                                    if (resultData.jobStatusResponse.jobComplete) {
+                                        if (resultData.jobStatusResponse.jobSuccess) {
                                             message.append("completed successfully. ")
                                         } else {
                                             message.append("completed unsuccessfully. ")
@@ -284,7 +285,7 @@ fun MainScreen() {
                                         message.toString(),
                                     )
                                     Timber.d("$message: $result")
-                                } else if (result is SmartSelfieResult.Error) {
+                                } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Authentication error: ${th.message}"
                                     Timber.e(th, message)
@@ -297,11 +298,11 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.EnhancedKyc.label
                             EnhancedKycScreen { result ->
-                                if (result is EnhancedKycResult.Success) {
+                                if (result is SmileIDResult.Success) {
                                     val message = "Enhanced KYC success"
                                     Timber.d("$message: $result")
                                     snackbarHostState.showSnackbar(coroutineScope, message)
-                                } else if (result is EnhancedKycResult.Error) {
+                                } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "Enhanced KYC error: ${th.message}"
                                     Timber.e(th, message)
