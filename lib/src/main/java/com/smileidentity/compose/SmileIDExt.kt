@@ -8,6 +8,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.smileidentity.SmileID
+import com.smileidentity.compose.document.OrchestratedDocumentCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomUserId
@@ -42,10 +43,10 @@ fun SmileID.SmartSelfieRegistrationScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
-            userId,
-            true,
-            allowAgentMode,
-            showAttribution,
+            userId = userId,
+            isEnroll = true,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
             onResult = onResult,
         )
     }
@@ -80,10 +81,27 @@ fun SmileID.SmartSelfieAuthenticationScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
-            userId,
-            false,
-            allowAgentMode,
-            showAttribution,
+            userId = userId,
+            isEnroll = false,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
+            onResult = onResult,
+        )
+    }
+}
+
+@Composable
+fun SmileID.DocumentCaptureScreen(
+    userId: String,
+    showAttribution: Boolean = true,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedDocumentCaptureScreen(
+            userId = userId,
+            showAttribution = showAttribution,
             onResult = onResult,
         )
     }

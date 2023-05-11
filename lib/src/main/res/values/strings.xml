@@ -49,6 +49,7 @@
     <string name="si_doc_v_instruction_title">Submit your ID</string>
     <string name="si_doc_v_instruction_ready_button">Take Photo</string>
     <string name="si_doc_v_instruction_upload_button">Upload Photo</string>
+    <string name="si_doc_v_capture_error_subtitle">Some error message here</string>
 
     <!--  Country Names  -->
     <string name="si_country_name_ghana">Ghana</string>
