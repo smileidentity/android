@@ -10,7 +10,6 @@ import kotlinx.parcelize.Parcelize
 // TODO: Should this be consolidated with IdType (used for Enhanced KYC)? This would entail not
 //  applying orientation to certain types (i.e. BVN, Phone number). It would also entail adding
 //  supportsBasicKyc, supportsEnhancedKyc, supportsBiometricKyc, and supportsDocV as properties
-@Suppress("MemberVisibilityCanBePrivate", "unused")
 @Parcelize
 data class Document(
     val countryCode: String,
