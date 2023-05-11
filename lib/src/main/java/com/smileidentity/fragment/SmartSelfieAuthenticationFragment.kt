@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.smileidentity.SmileID
@@ -17,6 +16,7 @@ import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.ne
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.resultFromBundle
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.SmileIDResult
 
 /**
  * Perform a SmartSelfie™ Authentication
@@ -28,7 +28,7 @@ import com.smileidentity.results.SmartSelfieResult
  * caller via [setFragmentResult]. Therefore, the caller must use
  * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result. If
  * using parent/child fragments, the caller must use the appropriate child/parent FragmentManager.
- * The result key is [KEY_REQUEST] and the result is a [SmartSelfieResult] in the bundle under the
+ * The result key is [KEY_REQUEST] and the result is a [SmileIDResult] in the bundle under the
  * key [KEY_RESULT]. A convenience method [resultFromBundle] is provided to extract the result from
  * the bundle.
  *
@@ -61,7 +61,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
          * Creates a new instance of [SmartSelfieAuthenticationFragment] which wraps the
          * [SmileID.SmartSelfieAuthenticationScreen] Composable under the hood
          *
-         * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often,
+         * @param userId The user ID to associate with the SmartSelfie™ Authentication. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
          * random user ID will be generated.
          * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
@@ -84,9 +84,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
         }
 
         @JvmStatic
-        fun resultFromBundle(bundle: Bundle): SmartSelfieResult {
-            return bundle.getParcelable(KEY_RESULT)!!
-        }
+        fun resultFromBundle(bundle: Bundle) = bundle.smileIdResult
     }
 
     override fun onCreateView(
@@ -105,7 +103,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
                     allowAgentMode = args.allowAgentMode,
                     showAttribution = args.showAttribution,
                     onResult = {
-                        setFragmentResult(KEY_REQUEST, bundleOf(KEY_RESULT to it))
+                        setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
                     },
                 )
             }
@@ -127,3 +125,7 @@ private const val KEY_SHOW_ATTRIBUTION = "showAttribution"
 private var Bundle.showAttribution: Boolean
     get() = getBoolean(KEY_SHOW_ATTRIBUTION)
     set(value) = putBoolean(KEY_SHOW_ATTRIBUTION, value)
+
+private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
+    get() = getParcelable(KEY_RESULT)!!
+    set(value) = putParcelable(KEY_RESULT, value)

@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.smileidentity.sample.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutUsScreen() {
     var shouldShowWhoWeAreDialog by rememberSaveable { mutableStateOf(false) }
@@ -53,7 +51,7 @@ fun AboutUsScreen() {
     ) {
         abouts.forEach {
             ListItem(
-                headlineText = { Text(stringResource(it.first)) },
+                headlineContent = { Text(stringResource(it.first)) },
                 leadingContent = { Icon(it.second, null) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
                 modifier = Modifier.clickable { it.third() },

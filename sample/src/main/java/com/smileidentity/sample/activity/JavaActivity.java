@@ -13,6 +13,7 @@ import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieRegistrationFragment;
 import com.smileidentity.models.JobStatusResponse;
 import com.smileidentity.results.SmartSelfieResult;
+import com.smileidentity.results.SmileIDResult;
 import com.smileidentity.sample.R;
 
 import java.io.File;
@@ -47,13 +48,13 @@ public class JavaActivity extends FragmentActivity {
             SmartSelfieRegistrationFragment.KEY_REQUEST,
             this,
             (requestKey, result) -> {
-                SmartSelfieResult smartSelfieResult = SmartSelfieRegistrationFragment
-                    .resultFromBundle(result);
+                SmileIDResult<SmartSelfieResult> smartSelfieResult =
+                    SmartSelfieRegistrationFragment.resultFromBundle(result);
                 Timber.v("SmartSelfieRegistration Result: %s", smartSelfieResult);
-                if (smartSelfieResult instanceof SmartSelfieResult.Success successResult) {
-                    File selfieFile = successResult.getSelfieFile();
-                    List<File> livenessFiles = successResult.getLivenessFiles();
-                    JobStatusResponse jobStatusResponse = successResult.getJobStatusResponse();
+                if (smartSelfieResult instanceof SmileIDResult.Success<SmartSelfieResult> successResult) {
+                    File selfieFile = successResult.getData().getSelfieFile();
+                    List<File> livenessFiles = successResult.getData().getLivenessFiles();
+                    JobStatusResponse jobStatusResponse = successResult.getData().getJobStatusResponse();
                     // Note: Although the API submission is successful, the job status response
                     // may indicate that the job is still in progress or failed. You should
                     // check the job status response to determine the final status of the job.
@@ -64,7 +65,7 @@ public class JavaActivity extends FragmentActivity {
                     } else {
                         Timber.v("SmartSelfieRegistration Job Failed");
                     }
-                } else if (smartSelfieResult instanceof SmartSelfieResult.Error error) {
+                } else if (smartSelfieResult instanceof SmileIDResult.Error error) {
                     Throwable throwable = error.getThrowable();
                     Timber.v("SmartSelfieRegistration Error: %s", throwable.getMessage());
                 }
@@ -92,7 +93,8 @@ public class JavaActivity extends FragmentActivity {
             SmartSelfieRegistrationFragment.KEY_REQUEST,
             this,
             (requestKey, result) -> {
-                SmartSelfieResult smartSelfieResult = SmartSelfieAuthenticationFragment.resultFromBundle(result);
+                SmileIDResult<SmartSelfieResult> smartSelfieResult =
+                    SmartSelfieAuthenticationFragment.resultFromBundle(result);
                 Timber.v("SmartSelfieAuthentication Result: %s", smartSelfieResult);
                 getSupportFragmentManager()
                     .beginTransaction()

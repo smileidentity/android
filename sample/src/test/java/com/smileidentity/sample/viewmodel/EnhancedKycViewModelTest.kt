@@ -2,6 +2,7 @@ package com.smileidentity.sample.viewmodel
 
 import com.smileidentity.models.IdType
 import com.smileidentity.results.EnhancedKycResult
+import com.smileidentity.results.SmileIDCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -179,7 +180,7 @@ class EnhancedKycViewModelTest {
         subject.onIdTypeSelected(IdType.GhanaPassport)
         subject.onIdInputFieldChanged(IdType.InputField.IdNumber, "1234567890")
         var callbackInvoked = false
-        val callback = EnhancedKycResult.Callback { callbackInvoked = true }
+        val callback: SmileIDCallback<EnhancedKycResult> = { callbackInvoked = true }
 
         // when
         subject.doEnhancedKyc()

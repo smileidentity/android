@@ -34,14 +34,27 @@ data class JobStatusResponse(
     @Json(name = "image_links") val imageLinks: ImageLinks?,
 ) : Parcelable
 
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class DocVJobStatusResponse(
+    @Json(name = "timestamp") val timestamp: String,
+    @Json(name = "job_complete") val jobComplete: Boolean,
+    @Json(name = "job_success") val jobSuccess: Boolean,
+    @Json(name = "code") val code: Int,
+    @Json(name = "result") val result: JobResult?,
+    @Json(name = "history") val history: List<JobResult.DocVEntry>?,
+    @Json(name = "image_links") val imageLinks: ImageLinks?,
+) : Parcelable
+
 /**
  * The job result might sometimes be a freeform text field instead of an object (i.e. when the
  * zip upload has not finished processing on the backend, in which case "No zip uploaded" is
  * returned).
  */
 sealed interface JobResult : Parcelable {
+    @JvmInline
     @Parcelize
-    data class Freeform(val result: String) : JobResult
+    value class Freeform(val result: String) : JobResult
 
     @Parcelize
     @JsonClass(generateAdapter = true)
@@ -52,6 +65,27 @@ sealed interface JobResult : Parcelable {
         @Json(name = "SmileJobID") val smileJobId: String,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
         @Json(name = "ConfidenceValue") val confidence: Double?,
+    ) : JobResult
+
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    data class DocVEntry(
+        @Json(name = "Actions") val actions: Actions,
+        @Json(name = "ResultCode") val resultCode: Int,
+        @Json(name = "ResultText") val resultText: String,
+        @Json(name = "SmileJobID") val smileJobId: String,
+        @Json(name = "PartnerParams") val partnerParams: PartnerParams,
+        @Json(name = "Country") val country: String?,
+        @Json(name = "IDType") val idType: String?,
+        @Json(name = "IDNumber") val idNumber: String?,
+        @Json(name = "FullName") val fullName: String?,
+        @Json(name = "DOB") val dob: String?,
+        @Json(name = "Gender") val gender: String?,
+        @Json(name = "ExpirationDate") val expirationDate: String?,
+        @Json(name = "Document") val documentImageBase64: String?,
+        @Json(name = "PhoneNumber") val phoneNumber: String?,
+        @Json(name = "PhoneNumber2") val phoneNumber2: String?,
+        @Json(name = "Address") val address: String?,
     ) : JobResult
 }
 
@@ -96,6 +130,9 @@ data class Actions(
 
     @Json(name = "Update_Registered_Selfie_On_File")
     val updateRegisteredSelfieOnFile: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Verify_Document")
+    val verifyDocument: ActionResult = ActionResult.NotApplicable,
 
     @Json(name = "Verify_ID_Number")
     val verifyIdNumber: ActionResult = ActionResult.NotApplicable,
