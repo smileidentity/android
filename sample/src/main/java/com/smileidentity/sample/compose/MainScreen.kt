@@ -42,9 +42,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
+import com.smileidentity.compose.DocumentCaptureScreen
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.compose.document.DocumentCaptureInstructionsScreen
 import com.smileidentity.randomUserId
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
@@ -313,10 +313,8 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
-                            // TODO: Replace with Orchestrated Screen once ready
-                            DocumentCaptureInstructionsScreen(allowPhotoFromGallery = true) {
-                                navController.popBackStack()
-                            }
+                            val userId = rememberSaveable { randomUserId() }
+                            SmileID.DocumentCaptureScreen(userId = userId)
                         }
                     }
                 },
