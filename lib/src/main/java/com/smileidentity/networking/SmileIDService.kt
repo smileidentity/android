@@ -2,6 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
+import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
@@ -49,4 +50,7 @@ interface SmileIDService {
 
     @POST("/v1/job_status")
     suspend fun getJobStatus(@Body request: JobStatusRequest): JobStatusResponse
+
+    @POST("/v1/job_status")
+    suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
 }

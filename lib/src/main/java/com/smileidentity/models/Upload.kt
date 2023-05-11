@@ -9,14 +9,21 @@ import java.io.File
 
 @JsonClass(generateAdapter = true)
 data class UploadRequest(
-    @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "package_information") val packageInfo: UploadPackageInfo = UploadPackageInfo(),
+    @Json(name = "images") val images: List<UploadImageInfo>,
+    @Json(name = "id_info") val idInfo: IdInfo? = null,
 )
 
 @JsonClass(generateAdapter = true)
 data class UploadImageInfo(
     @Json(name = "image_type_id") val imageTypeId: ImageType,
     @Json(name = "file_name") val image: File,
+)
+
+@JsonClass(generateAdapter = true)
+data class IdInfo(
+    @Json(name = "country") val country: String,
+    @Json(name = "id_type") val idType: String,
 )
 
 enum class ImageType {
