@@ -9,9 +9,9 @@ import java.io.File
 
 @JsonClass(generateAdapter = true)
 data class UploadRequest(
-    @Json(name = "package_information") val packageInfo: UploadPackageInfo = UploadPackageInfo(),
     @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "id_info") val idInfo: IdInfo? = null,
+    @Json(name = "package_information") val packageInfo: UploadPackageInfo = UploadPackageInfo(),
 )
 
 @JsonClass(generateAdapter = true)
