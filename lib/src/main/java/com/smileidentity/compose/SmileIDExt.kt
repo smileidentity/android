@@ -109,13 +109,18 @@ fun SmileID.SmartSelfieAuthenticationScreen(
  * generated
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
- * @param idAspectRatio The aspect ratio of the ID to be captured
+ * @param enforcedIdType The type of ID to be captured. If not specified, it will be automatically
+ * classified on the backend. Use this to restrict which ID type can be captured.
+ * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, it will be
+ * inferred from the enforced ID type (if provided). If neither are provided, the aspect ratio will
+ * attempt to be inferred from the device's camera. If that fails, it will default to 1.6.
  * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
  * and instead the provided file will be used as the selfie image
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
  * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Document Verification is complete.
  */
 @Composable
 fun SmileID.DocumentVerification(
@@ -124,7 +129,7 @@ fun SmileID.DocumentVerification(
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
     enforcedIdType: Document? = null,
-    idAspectRatio: Float = enforcedIdType?.aspectRatio ?: 0f,
+    idAspectRatio: Float? = enforcedIdType?.aspectRatio,
     bypassSelfieCaptureWithFile: File? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
