@@ -123,7 +123,7 @@ fun SmileID.DocumentVerification(
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
-    enforcedIdType: Document? = Document.Algeria.DriverLicense,
+    enforcedIdType: Document? = null,
     idAspectRatio: Float = enforcedIdType?.aspectRatio ?: 0f,
     bypassSelfieCaptureWithFile: File? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,
