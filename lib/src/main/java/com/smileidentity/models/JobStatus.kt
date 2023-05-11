@@ -56,34 +56,6 @@ sealed interface JobResult : Parcelable {
     @Parcelize
     value class Freeform(val result: String) : JobResult
 
-    // sealed interface Entrya : JobResult {
-    //     val actions: Actions
-    //     val resultCode: Int
-    //     val resultText: String
-    //     val smileJobId: String
-    //     val partnerParams: PartnerParams
-    //
-    //     @Parcelize
-    //     data class DocV(
-    //         @Json(name = "Actions") override val actions: Actions,
-    //         @Json(name = "ResultCode") override val resultCode: Int,
-    //         @Json(name = "ResultText") override val resultText: String,
-    //         @Json(name = "SmileJobID") override val smileJobId: String,
-    //         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
-    //         @Json(name = "Country") val country: String?,
-    //         @Json(name = "IDType") val idType: String?,
-    //         @Json(name = "IDNumber") val idNumber: String?,
-    //         @Json(name = "FullName") val fullName: String?,
-    //         @Json(name = "DOB") val dob: String?,
-    //         @Json(name = "Gender") val gender: String?,
-    //         @Json(name = "ExpirationDate") val expirationDate: String?,
-    //         @Json(name = "Document") val documentImageBase64: String?,
-    //         @Json(name = "PhoneNumber") val phoneNumber: String?,
-    //         @Json(name = "PhoneNumber2") val phoneNumber2: String?,
-    //         @Json(name = "Address") val address: String?,
-    //     ): Entrya
-    // }
-
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Entry(

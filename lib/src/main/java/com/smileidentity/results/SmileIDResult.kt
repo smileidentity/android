@@ -31,7 +31,6 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
      * checked with [com.smileidentity.models.JobStatusResponse.jobSuccess]
      */
     @Parcelize
-    // @JvmInline
     data class Success<T : Parcelable>(val data: T) : SmileIDResult<T>
 
     /**
@@ -39,7 +38,6 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
      * permissions, file errors, network errors, API errors, and unexpected errors.
      */
     @Parcelize
-    // @JvmInline
     data class Error(val throwable: Throwable) : SmileIDResult<Nothing>
 }
 
