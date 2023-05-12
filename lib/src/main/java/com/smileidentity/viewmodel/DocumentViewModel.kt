@@ -1,11 +1,12 @@
 package com.smileidentity.viewmodel
 
-import android.os.Build
+import android.util.Size
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
-import com.smileidentity.datasource.FileDataSource
+import com.smileidentity.createDocumentFile
+import com.smileidentity.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,54 +15,57 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
+private val ID_DOCUMENT_IMAGE_SIZE = Size(320, 320)
+private val PASSPORT_DOCUMENT_IMAGE_SIZE = Size(320, 320)
 
 data class DocumentUiState(
-    val progress: Float = 0f,
-    val documentImage: File? = null,
+    val documentImageToConfirm: File? = null,
     @StringRes val errorMessage: Int? = null,
 )
 
-class DocumentViewModel(
-    private val fileDataSource: FileDataSource = FileDataSource(),
-) : ViewModel() {
+class DocumentViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(DocumentUiState())
     val uiState = _uiState.asStateFlow()
 
-    // Captures a document image using the camera and saves it to the device's external storage.
-    internal fun captureDocument(cameraState: CameraState) = with(cameraState) {
+    internal fun takeButtonCaptureDocument(
+        cameraState: CameraState,
+    ) {
         viewModelScope.launch {
-            when {
-                // If the device is running Android 10 (API level 29) or higher, use the new CameraX API
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> takePicture(
-                    fileDataSource.imageContentValues,
-                    onResult = ::onImageResult,
-                )
-                // Otherwise, use the deprecated Camera API
-                else -> takePicture(
-                    fileDataSource.getFile("jpg"),
-                    ::onImageResult,
-                )
+            try {
+                val documentFile = captureDocument(cameraState)
+                Timber.v("Capturing document image to $documentFile")
+                _uiState.update { it.copy(documentImageToConfirm = documentFile) }
+            } catch (e: Exception) {
+                Timber.e("Error capturing document", e)
+                _uiState.update { it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle) }
             }
         }
     }
 
-    // Callback function that is called when the camera captures an image.
-    private fun onImageResult(imageResult: ImageCaptureResult) {
-        when (imageResult) {
-            is ImageCaptureResult.Error -> onError(imageResult.throwable)
-            is ImageCaptureResult.Success -> captureSuccess()
+    /**
+     * Captures a document image using the given [cameraState] and returns the processed image as a [Bitmap].
+     * If an error occurs during capture or processing, the coroutine will be resumed with an exception.
+     * The [documentFile] variable will be updated with the captured image file, and the UI state will be updated accordingly.
+     */
+    private suspend fun captureDocument(cameraState: CameraState) = suspendCoroutine {
+        val documentFile = createDocumentFile()
+        cameraState.takePicture(documentFile) { result ->
+            when (result) {
+                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
+                is ImageCaptureResult.Success -> it.resume(
+                    postProcessImage(
+                        file = documentFile,
+                        saveAsGrayscale = false,
+                        compressionQuality = 80,
+                        desiredOutputSize = ID_DOCUMENT_IMAGE_SIZE,
+                    ),
+                )
+            }
         }
-    }
-
-    // Handles an error that occurred during the image capture operation.
-    private fun onError(throwable: Throwable?) {
-        Timber.e(throwable, "Error capturing document")
-        _uiState.update { it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle) }
-    }
-
-    // Handles the case where the image capture was successful.
-    private fun captureSuccess() {
-        _uiState.update { it.copy(documentImage = fileDataSource.lastPicture) }
     }
 }

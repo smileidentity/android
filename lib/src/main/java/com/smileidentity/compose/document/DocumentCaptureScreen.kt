@@ -1,8 +1,6 @@
 package com.smileidentity.compose.document
 
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -79,13 +77,7 @@ internal fun DocumentCaptureScreen(
                 // "out of bounds" content as a fraud prevention technique
                 .scale(viewfinderZoom),
         )
-        val animatedProgress = animateFloatAsState(
-            targetValue = uiState.progress,
-            animationSpec = tween(),
-            label = "document_progress",
-        ).value
         DocumentShapedProgressIndicator(
-            progress = animatedProgress,
             documentFillPercent = MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2,
             modifier = Modifier
                 .fillMaxSize()
@@ -97,7 +89,7 @@ internal fun DocumentCaptureScreen(
             modifier = Modifier
                 .size(60.dp)
                 .align(Alignment.Center)
-                .clickable { viewModel.captureDocument(cameraState = cameraState) },
+                .clickable { viewModel.takeButtonCaptureDocument(cameraState = cameraState) },
         )
     }
 }
