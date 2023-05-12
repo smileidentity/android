@@ -97,23 +97,6 @@ fun SmileID.SmartSelfieAuthenticationScreen(
     }
 }
 
-@Composable
-fun SmileID.DocumentCaptureScreen(
-    userId: String,
-    showAttribution: Boolean = true,
-    colorScheme: ColorScheme = SmileID.colorScheme,
-    typography: Typography = SmileID.typography,
-    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
-) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedDocumentCaptureScreen(
-            userId = userId,
-            showAttribution = showAttribution,
-            onResult = onResult,
-        )
-    }
-}
-
 /**
  * Perform a Document Verification.
  *
@@ -154,10 +137,15 @@ fun SmileID.DocumentVerification(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        // OrchestratedDocumentCaptureScreen(
-        //     userId,
-        //     showAttribution,
-        //     onResult = onResult,
-        // )
+        OrchestratedDocumentCaptureScreen(
+            userId = userId,
+            jobId = jobId,
+            showAttribution = showAttribution,
+            allowGalleryUpload = allowGalleryUpload,
+            enforcedIdType = enforcedIdType,
+            idAspectRatio = idAspectRatio,
+            bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
+            onResult = onResult,
+        )
     }
 }

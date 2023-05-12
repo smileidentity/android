@@ -12,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -21,8 +20,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.models.Document
+import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
-import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.viewmodel.DocumentViewModel
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.viewModelFactory
@@ -31,6 +33,7 @@ import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
+import java.io.File
 
 /**
  * Orchestrates the document capture flow - navigates between instructions, requesting permissions,
@@ -39,11 +42,16 @@ import com.ujizin.camposer.state.rememberCameraState
 @Composable
 internal fun OrchestratedDocumentCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
+    allowGalleryUpload: Boolean = false,
+    enforcedIdType: Document? = null,
+    idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+    bypassSelfieCaptureWithFile: File? = null,
     viewModel: DocumentViewModel = viewModel(
         factory = viewModelFactory { DocumentViewModel() },
     ),
-    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {}, // TODO - Fix me
+    onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     DocumentCaptureScreen()
@@ -72,10 +80,7 @@ internal fun DocumentCaptureScreen(
             modifier = Modifier
                 .testTag("document_camera_preview")
                 .fillMaxSize()
-                .clipToBounds()
-                // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
-                // "out of bounds" content as a fraud prevention technique
-                .scale(viewfinderZoom),
+                .clipToBounds(),
         )
         DocumentShapedProgressIndicator(
             documentFillPercent = MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2,
