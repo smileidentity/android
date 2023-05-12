@@ -45,6 +45,7 @@ data class EnhancedKycResponse(
     @Json(name = "Photo") val base64Photo: String?,
 ) : Parcelable
 
+// TODO: consolidate with Document?
 enum class IdType(
     val countryCode: String,
     val idType: String,

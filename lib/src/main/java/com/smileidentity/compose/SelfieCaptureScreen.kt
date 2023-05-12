@@ -45,6 +45,7 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -70,7 +71,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
     ),
-    onResult: SmartSelfieResult.Callback = SmartSelfieResult.Callback {},
+    onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }

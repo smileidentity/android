@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.smileidentity.sample.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResourcesScreen() {
     val uriHandler = LocalUriHandler.current
@@ -50,8 +48,8 @@ fun ResourcesScreen() {
     ) {
         resources.forEach {
             ListItem(
-                headlineText = { Text(it.first) },
-                supportingText = { Text(it.second) },
+                headlineContent = { Text(it.first) },
+                supportingContent = { Text(it.second) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
                 modifier = Modifier.clickable { it.third() },
             )

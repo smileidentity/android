@@ -102,6 +102,14 @@ mavenPublishing {
                 organization.set("Smile ID")
                 organizationUrl.set("https://smileidentity.com")
             }
+            developer {
+                id.set("jumaallan")
+                name.set("Juma Allan")
+                email.set("juma@smileidentity.com")
+                url.set("https://github.com/jumaallan")
+                organization.set("Smile ID")
+                organizationUrl.set("https://smileidentity.com")
+            }
         }
     }
 }

@@ -128,4 +128,6 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit): CoroutineExceptionHandler {
     }
 }
 
-fun randomUserId() = "user-" + java.util.UUID.randomUUID().toString()
+fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
+fun randomUserId() = randomId("user")
+fun randomJobId() = randomId("job")
