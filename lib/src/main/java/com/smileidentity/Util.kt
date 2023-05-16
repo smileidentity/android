@@ -3,11 +3,13 @@ package com.smileidentity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
+import android.net.Uri
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -26,6 +28,25 @@ internal fun Context.toast(@StringRes message: Int) {
 
 internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
+
+/**
+ * Check if image is at least 1920×1080. Assumes URI is a content URI, which means it needs to be
+ * parsed as an input stream and can't be used directly.
+ *
+ * @param context Android context
+ * @param uri Content Uri of the image
+ */
+fun isImageBigEnough(context: Context, uri: Uri?): Boolean {
+    if (uri == null) return false
+    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    context.contentResolver.openInputStream(uri).use {
+        BitmapFactory.decodeStream(it, null, options)
+    }
+    val imageHeight = options.outHeight
+    val imageWidth = options.outWidth
+    Timber.v("imageHeight: $imageHeight, imageWidth: $imageWidth")
+    return imageHeight >= 1080 && imageWidth >= 1920
+}
 
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to

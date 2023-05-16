@@ -48,10 +48,10 @@ fun SmileID.SmartSelfieRegistrationScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
-            userId,
-            true,
-            allowAgentMode,
-            showAttribution,
+            userId = userId,
+            isEnroll = true,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
             onResult = onResult,
         )
     }
@@ -87,10 +87,10 @@ fun SmileID.SmartSelfieAuthenticationScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
-            userId,
-            false,
-            allowAgentMode,
-            showAttribution,
+            userId = userId,
+            isEnroll = false,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
             onResult = onResult,
         )
     }
@@ -130,16 +130,23 @@ fun SmileID.DocumentVerification(
     allowGalleryUpload: Boolean = false,
     enforcedIdType: Document? = null,
     idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        // OrchestratedDocumentCaptureScreen(
-        //     userId,
-        //     showAttribution,
-        //     onResult = onResult,
-        // )
+        OrchestratedDocumentVerificationScreen(
+            userId = userId,
+            jobId = jobId,
+            showAttribution = showAttribution,
+            allowGalleryUpload = allowGalleryUpload,
+            enforcedIdType = enforcedIdType,
+            idAspectRatio = idAspectRatio,
+            captureBothSides = captureBothSides,
+            bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
+            onResult = onResult,
+        )
     }
 }
