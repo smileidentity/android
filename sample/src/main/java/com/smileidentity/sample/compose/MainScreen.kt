@@ -314,8 +314,21 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
-                            // TODO: Replace with Orchestrated Screen once ready
-                            DocumentCaptureInstructionsScreen(allowPhotoFromGallery = true) {
+                            SmileID.DocumentVerification(
+                                allowGalleryUpload = true,
+                                captureBothSides = true,
+                            ) { result ->
+                                if (result is SmileIDResult.Success) {
+                                    val resultData = result.data
+                                    val message = "Document Verification success"
+                                    Timber.d("$message: $resultData")
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                } else if (result is SmileIDResult.Error) {
+                                    val th = result.throwable
+                                    val message = "Document Verification error: ${th.message}"
+                                    Timber.e(th, message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                }
                                 navController.popBackStack()
                             }
                         }
