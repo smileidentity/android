@@ -145,7 +145,7 @@ internal fun DocumentCaptureScreen(
                 .clipToBounds(),
         )
         DocumentShapedProgressIndicator(
-            documentFillPercent = 0.25f,
+            documentFillPercent = 0.5f,
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("selfie_progress_indicator"),
@@ -186,7 +186,7 @@ private fun CaptureDocumentButton(
         painter = painterResource(id = R.drawable.si_camera_capture),
         contentDescription = "smile_camera_capture",
         modifier = Modifier
-            .size(60.dp)
+            .size(70.dp)
             .clickable { onCaptureClicked.invoke() },
     )
 }
