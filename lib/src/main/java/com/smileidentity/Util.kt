@@ -30,13 +30,20 @@ internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
 
 /**
- * Check if image is at least 1920×1080. Assumes URI is a content URI, which means it needs to be
- * parsed as an input stream and can't be used directly.
+ * Check if image is at least width x height. Assumes URI is a content URI, which means it needs to
+ * be parsed as an input stream and can't be used directly.
  *
  * @param context Android context
  * @param uri Content Uri of the image
+ * @param width Minimum width of the image
+ * @param height Minimum height of the image
  */
-fun isImageBigEnough(context: Context, uri: Uri?): Boolean {
+fun isImageAtLeast(
+    context: Context,
+    uri: Uri?,
+    width: Int? = 1920,
+    height: Int? = 1080,
+): Boolean {
     if (uri == null) return false
     val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     context.contentResolver.openInputStream(uri).use {
@@ -44,8 +51,7 @@ fun isImageBigEnough(context: Context, uri: Uri?): Boolean {
     }
     val imageHeight = options.outHeight
     val imageWidth = options.outWidth
-    Timber.v("imageHeight: $imageHeight, imageWidth: $imageWidth")
-    return imageHeight >= 1080 && imageWidth >= 1920
+    return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
 }
 
 /**

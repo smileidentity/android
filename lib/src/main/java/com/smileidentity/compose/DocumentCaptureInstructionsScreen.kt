@@ -34,6 +34,8 @@ import com.smileidentity.compose.theme.typography
 
 @Composable
 fun DocumentCaptureInstructionsScreen(
+    title: String,
+    subtitle: String,
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
@@ -61,13 +63,13 @@ fun DocumentCaptureInstructionsScreen(
                     .padding(top = 8.dp),
             )
             Text(
-                text = stringResource(R.string.si_doc_v_instruction_title),
+                text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = stringResource(id = R.string.si_verify_identity_instruction_subtitle),
+                text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
@@ -138,6 +140,8 @@ fun DocumentCaptureInstructionsScreenPreview() {
     MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         Surface {
             DocumentCaptureInstructionsScreen(
+                title = stringResource(R.string.si_doc_v_instruction_title),
+                subtitle = stringResource(R.string.si_verify_identity_instruction_subtitle),
                 showAttribution = true,
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedSelectFromGallery = {},

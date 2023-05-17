@@ -42,15 +42,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
-import com.smileidentity.compose.DocumentCaptureInstructionsScreen
+import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
+import com.smileidentity.sample.BottomNavigationScreenSaver
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.Screen
 import com.smileidentity.sample.showSnackbar
 import timber.log.Timber
 
@@ -67,7 +67,9 @@ fun MainScreen() {
         BottomNavigationScreen.Home.route -> false
         else -> true
     }
-    var bottomNavSelection: Screen by remember { mutableStateOf(BottomNavigationScreen.Home) }
+    var bottomNavSelection: BottomNavigationScreen by rememberSaveable(
+        stateSaver = BottomNavigationScreenSaver,
+    ) { mutableStateOf(BottomNavigationScreen.Home) }
     val bottomNavItems = listOf(
         BottomNavigationScreen.Home,
         BottomNavigationScreen.Resources,
@@ -159,9 +161,9 @@ fun MainScreen() {
                 },
                 content = {
                     NavHost(
-                        navController,
-                        BottomNavigationScreen.Home.route,
-                        Modifier
+                        navController = navController,
+                        startDestination = BottomNavigationScreen.Home.route,
+                        modifier = Modifier
                             .padding(it)
                             .consumeWindowInsets(it),
                     ) {
@@ -169,7 +171,15 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             // Display "Smile ID" in the top bar instead of "Home" label
                             currentScreenTitle = R.string.app_name
-                            ProductSelectionScreen { navController.navigate(it.route) }
+                            ProductSelectionScreen {
+                                navController.navigate(it.route) {
+                                    popUpTo(BottomNavigationScreen.Home.route) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
                         }
                         composable(BottomNavigationScreen.Resources.route) {
                             bottomNavSelection = BottomNavigationScreen.Resources

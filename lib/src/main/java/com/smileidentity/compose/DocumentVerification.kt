@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import coil.compose.rememberAsyncImagePainter
 import com.smileidentity.R
-import com.smileidentity.isImageBigEnough
+import com.smileidentity.isImageAtLeast
 import com.smileidentity.models.Document
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
@@ -47,6 +47,8 @@ fun OrchestratedDocumentVerificationScreen(
     when {
         !acknowledgedInstructions -> {
             DocumentCaptureInstructionsScreen(
+                title = stringResource(R.string.si_doc_v_instruction_title),
+                subtitle = stringResource(id = R.string.si_verify_identity_instruction_subtitle),
                 showAttribution = showAttribution,
                 allowPhotoFromGallery = allowGalleryUpload,
                 onInstructionsAcknowledgedTakePhoto = {
@@ -93,7 +95,7 @@ fun PhotoPickerScreen(onPhotoSelected: (documentPhoto: Uri) -> Unit) {
         onResult = { uri ->
             Timber.v("selectedUri: $uri")
             uri?.let {
-                if (isImageBigEnough(context, uri)) {
+                if (isImageAtLeast(context, uri, width = 1920, height = 1080)) {
                     onPhotoSelected(uri)
                 } else {
                     context.toast(R.string.si_doc_v_validation_image_too_small)
