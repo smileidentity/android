@@ -45,6 +45,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -67,11 +68,12 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
     ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
@@ -117,6 +119,7 @@ internal fun OrchestratedSelfieCaptureScreen(
 
         else -> SelfieCaptureScreen(
             userId = userId,
+            jobId = jobId,
             isEnroll = isEnroll,
             allowAgentMode = allowAgentMode,
         )
@@ -127,10 +130,11 @@ internal fun OrchestratedSelfieCaptureScreen(
 @Composable
 internal fun SelfieCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value

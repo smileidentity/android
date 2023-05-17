@@ -26,6 +26,9 @@ import java.io.File
  * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often, this
  * will correspond to a unique User ID within your own system. If not provided, a random user ID
  * will be generated.
+ * @param jobId The job ID to associate with the SmartSelfie™ Registration. Most often, this
+ * will correspond to a unique Job ID within your own system. If not provided, a random job ID
+ * will be generated.
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
@@ -39,7 +42,7 @@ import java.io.File
 @Composable
 fun SmileID.SmartSelfieRegistrationScreen(
     userId: String = rememberSaveable { randomUserId() },
-    // TODO: add jobId as well?
+    jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     colorScheme: ColorScheme = SmileID.colorScheme,
@@ -48,10 +51,11 @@ fun SmileID.SmartSelfieRegistrationScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
-            userId,
-            true,
-            allowAgentMode,
-            showAttribution,
+            userId = userId,
+            jobId = jobId,
+            isEnroll = true,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
             onResult = onResult,
         )
     }
@@ -65,6 +69,9 @@ fun SmileID.SmartSelfieRegistrationScreen(
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
  * an ID that was previously registered via a SmartSelfie™ Registration
  * (see: [SmileID.SmartSelfieRegistrationScreen])
+ * @param jobId The job ID to associate with the SmartSelfie™ Authentication. Most often, this
+ * will correspond to a unique Job ID within your own system. If not provided, a random job ID
+ * will be generated.
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
@@ -78,7 +85,7 @@ fun SmileID.SmartSelfieRegistrationScreen(
 @Composable
 fun SmileID.SmartSelfieAuthenticationScreen(
     userId: String,
-    // TODO: add jobId as well?
+    jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     colorScheme: ColorScheme = SmileID.colorScheme,
@@ -87,10 +94,11 @@ fun SmileID.SmartSelfieAuthenticationScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
-            userId,
-            false,
-            allowAgentMode,
-            showAttribution,
+            userId = userId,
+            jobId = jobId,
+            isEnroll = false,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
             onResult = onResult,
         )
     }
