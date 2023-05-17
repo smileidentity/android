@@ -42,9 +42,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
-import com.smileidentity.compose.DocumentCaptureScreen
+import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
@@ -315,7 +316,9 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
                             val userId = rememberSaveable { randomUserId() }
-                            SmileID.DocumentCaptureScreen(userId = userId)
+                            val jobId = rememberSaveable { randomJobId() }
+                            SmileID.DocumentVerification(userId = userId, jobId = jobId) {
+                            }
                         }
                     }
                 },
