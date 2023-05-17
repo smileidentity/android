@@ -6,7 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
 import com.smileidentity.createDocumentFile
+import com.smileidentity.models.Document
 import com.smileidentity.postProcessImage
+import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.SmileIDResult
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,18 +22,21 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-private val ID_DOCUMENT_IMAGE_SIZE = Size(320, 320)
-private val PASSPORT_DOCUMENT_IMAGE_SIZE = Size(320, 320)
-
 data class DocumentUiState(
     val documentImageToConfirm: File? = null,
     @StringRes val errorMessage: Int? = null,
 )
 
-class DocumentViewModel : ViewModel() {
-
+class DocumentViewModel(
+    private val userId: String,
+    private val jobId: String,
+    private val enforcedIdType: Document? = null,
+    private val idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentUiState())
     val uiState = _uiState.asStateFlow()
+    var result: SmileIDResult<DocumentVerificationResult>? = null
+    private var documentFile: File? = null
 
     internal fun takeButtonCaptureDocument(
         cameraState: CameraState,
@@ -53,19 +59,39 @@ class DocumentViewModel : ViewModel() {
      * The [documentFile] variable will be updated with the captured image file, and the UI state will be updated accordingly.
      */
     private suspend fun captureDocument(cameraState: CameraState) = suspendCoroutine {
-        val documentFile = createDocumentFile()
-        cameraState.takePicture(documentFile) { result ->
+        documentFile = createDocumentFile()
+        cameraState.takePicture(documentFile!!) { result ->
             when (result) {
                 is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                 is ImageCaptureResult.Success -> it.resume(
                     postProcessImage(
-                        file = documentFile,
+                        file = documentFile!!,
                         saveAsGrayscale = false,
                         compressionQuality = 80,
-                        desiredOutputSize = ID_DOCUMENT_IMAGE_SIZE,
+                        desiredOutputSize = Size(200, 100),
                     ),
                 )
             }
         }
+    }
+
+    private fun submitJob(documentFile: File) {
+    }
+
+    fun submitJob() {
+        submitJob(documentFile = documentFile!!)
+    }
+
+    fun onDocumentRejected() {
+        _uiState.update {
+            it.copy(
+                documentImageToConfirm = null,
+            )
+        }
+        documentFile?.delete()?.also { deleted ->
+            if (!deleted) Timber.w("Failed to delete $documentFile")
+        }
+        documentFile = null
+        result = null
     }
 }
