@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.document
 
 import android.Manifest
 import androidx.compose.ui.test.assertIsDisplayed
@@ -7,7 +7,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.smileidentity.compose.document.DocumentCaptureInstructionsScreen
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
