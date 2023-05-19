@@ -59,7 +59,16 @@ val SmileID.typography: Typography
         bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontFamily = dmSans),
         bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontFamily = dmSans),
         bodySmall = MaterialTheme.typography.bodySmall.copy(fontFamily = dmSans),
-        labelLarge = MaterialTheme.typography.labelLarge.copy(fontFamily = dmSans),
-        labelMedium = MaterialTheme.typography.labelMedium.copy(fontFamily = dmSans),
-        labelSmall = MaterialTheme.typography.labelSmall.copy(fontFamily = dmSans),
+        labelLarge = MaterialTheme.typography.labelLarge.copy(
+            fontFamily = dmSans,
+            fontWeight = FontWeight.Bold,
+        ),
+        labelMedium = MaterialTheme.typography.labelMedium.copy(
+            fontFamily = dmSans,
+            fontWeight = FontWeight.Bold,
+        ),
+        labelSmall = MaterialTheme.typography.labelSmall.copy(
+            fontFamily = dmSans,
+            fontWeight = FontWeight.Bold,
+        ),
     )
