@@ -5,7 +5,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.center
@@ -18,6 +17,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
 /**
@@ -37,13 +37,13 @@ fun FaceShapedProgressIndicator(
     progress: Float,
     @FloatRange(from = 0.0, to = 1.0) faceFillPercent: Float,
     modifier: Modifier = Modifier,
-    strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
+    strokeWidth: Dp = 2.dp,
     completeProgressStrokeColor: Color = MaterialTheme.colorScheme.tertiary,
-    incompleteProgressStrokeColor: Color = Color.Gray,
+    incompleteProgressStrokeColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
 ) {
-    val stroke = with(LocalDensity.current) { Stroke(strokeWidth.toPx()) }
-    Canvas(modifier.progressSemantics(progress).fillMaxSize()) {
+    val stroke = with(LocalDensity.current) { Stroke(width = strokeWidth.toPx()) }
+    Canvas(modifier = modifier.progressSemantics(progress).fillMaxSize()) {
         val faceShapeBounds = FaceShape.path.getBounds()
         // Scale the face shape to the desired size
         val faceArea = faceShapeBounds.width * faceShapeBounds.height
