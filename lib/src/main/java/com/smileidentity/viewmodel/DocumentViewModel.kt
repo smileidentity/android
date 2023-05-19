@@ -1,9 +1,14 @@
 package com.smileidentity.viewmodel
 
-import android.util.Size
+import android.annotation.SuppressLint
+import android.graphics.Rect
 import androidx.annotation.StringRes
+import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.createDocumentFile
 import com.smileidentity.models.Document
@@ -25,7 +30,12 @@ import kotlin.coroutines.suspendCoroutine
 data class DocumentUiState(
     val documentImageToConfirm: File? = null,
     @StringRes val errorMessage: Int? = null,
-)
+    val currentBoundingBox: Rect? = null,
+    val fullImageWidth: Int = 0,
+    val fullImageHeight: Int = 0,
+) {
+    val isDocumentDetected: Boolean get() = currentBoundingBox != null
+}
 
 class DocumentViewModel(
     private val userId: String,
@@ -37,6 +47,12 @@ class DocumentViewModel(
     val uiState = _uiState.asStateFlow()
     var result: SmileIDResult<DocumentVerificationResult>? = null
     private var documentFile: File? = null
+
+    private val objectDetector = ObjectDetection.getClient(
+        ObjectDetectorOptions.Builder()
+            .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
+            .build(),
+    )
 
     internal fun takeButtonCaptureDocument(
         cameraState: CameraState,
@@ -66,9 +82,6 @@ class DocumentViewModel(
                 is ImageCaptureResult.Success -> it.resume(
                     postProcessImage(
                         file = documentFile!!,
-                        saveAsGrayscale = false,
-                        compressionQuality = 80,
-                        desiredOutputSize = Size(200, 100),
                     ),
                 )
             }
@@ -93,5 +106,41 @@ class DocumentViewModel(
         }
         documentFile = null
         result = null
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    fun analyzeImage(imageProxy: ImageProxy) {
+        val image = imageProxy.image
+        if (image == null) {
+            Timber.w("DocV Image is null. Aborting image analysis")
+            imageProxy.close()
+            return
+        }
+        val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
+        objectDetector.process(inputImage)
+            .addOnSuccessListener { detectedObjects ->
+                Timber.v("DocV Detected ${detectedObjects.size} objects")
+                detectedObjects.forEach { obj ->
+                    Timber.v("DocV Detected object: ${obj.trackingId}")
+                    Timber.v("DocV Detected object bounding box: ${obj.boundingBox}")
+                    _uiState.update {
+                        it.copy(
+                            currentBoundingBox = obj.boundingBox,
+                            fullImageWidth = imageProxy.width,
+                            fullImageHeight = imageProxy.height,
+                        )
+                    }
+                    obj.labels.forEach { label ->
+                        Timber.v("DocV Detected object label: ${label.text}")
+                        Timber.v("DocV Detected object label confidence: ${label.confidence}")
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Timber.e(e, "DocV Error detecting objects")
+            }
+            .addOnCompleteListener {
+                imageProxy.close()
+            }
     }
 }

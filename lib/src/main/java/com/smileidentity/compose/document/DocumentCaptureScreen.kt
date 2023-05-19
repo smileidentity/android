@@ -2,6 +2,7 @@ package com.smileidentity.compose.document
 
 import android.graphics.BitmapFactory
 import androidx.annotation.VisibleForTesting
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.toComposeRect
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,9 +54,11 @@ import com.smileidentity.viewmodel.DocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
+import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
+import com.ujizin.camposer.state.rememberImageAnalyzer
 import java.io.File
 
 /**
@@ -131,21 +142,59 @@ internal fun DocumentCaptureScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .drawWithContent {
+                drawContent()
+                uiState.currentBoundingBox?.let {
+                    val scaleFactor = size.width / uiState.fullImageWidth
+                    val composeRect = Rect(
+                        left = it.left * scaleFactor,
+                        top = it.top * scaleFactor,
+                        right = it.right * scaleFactor,
+                        bottom = it.bottom * scaleFactor,
+                    )
+                    it.toComposeRect()
+                    drawRect(
+                        color = Color.Red,
+                        topLeft = composeRect.topLeft,
+                        size = composeRect.size,
+                    )
+                }
+            },
     ) {
         CameraPreview(
             cameraState = cameraState,
             camSelector = camSelector,
             scaleType = ScaleType.FillCenter,
             zoomRatio = 1.0f,
+            imageAnalyzer = cameraState.rememberImageAnalyzer(
+                analyze = viewModel::analyzeImage,
+                // Guarantees only one image will be delivered for analysis at a time
+                imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
+            ),
             modifier = Modifier
                 .testTag("document_camera_preview")
                 .fillMaxSize()
                 .clipToBounds(),
         )
+        uiState.currentBoundingBox?.let {
+            val topLeft = Offset(it.left.toFloat(), it.top.toFloat())
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawRect(
+                    color = Color.Green,
+                    style = Stroke(width = 4f),
+                    topLeft = topLeft,
+                    size = Size(it.width().toFloat(), it.height().toFloat()),
+                )
+            }
+        }
         DocumentShapedProgressIndicator(
-            documentFillPercent = 0.5f,
+            isDocumentDetected = uiState.isDocumentDetected,
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("selfie_progress_indicator"),
