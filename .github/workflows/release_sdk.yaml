@@ -37,7 +37,7 @@ jobs:
         id: read_version
         run: |
           if [ -n "${{ github.event.inputs.version_override }}" ]; then
-            if [[ ${{ github.event.inputs.version_override }} == *-SNAPSHOT ]]; then
+            if [[ "${{ github.event.inputs.version_override }}" == *-SNAPSHOT ]]; then
               echo "Version cannot end in -SNAPSHOT (${{ github.event.inputs.version_override }})"
               exit 1
             fi
