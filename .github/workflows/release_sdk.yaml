@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      # https://github.com/actions/checkout/issues/766
+      - name: Mark Git directory as Safe
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
