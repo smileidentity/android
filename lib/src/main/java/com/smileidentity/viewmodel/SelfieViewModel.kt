@@ -322,11 +322,7 @@ class SelfieViewModel(
         }
     }
 
-    fun submitJob() {
-        submitJob(selfieFile!!, livenessFiles)
-    }
+    fun submitJob() = submitJob(selfieFile!!, livenessFiles)
 
-    fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
-        callback(result!!)
-    }
+    fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) = callback(result!!)
 }
