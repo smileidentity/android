@@ -144,11 +144,11 @@ internal fun DocumentCaptureScreen(
                 .fillMaxSize()
                 .clipToBounds(),
         )
-        DocumentShapedProgressIndicator(
-            documentFillPercent = 0.5f,
+        DocumentShapedBoundingBox(
+            aspectRatio = idAspectRatio,
             modifier = Modifier
                 .fillMaxSize()
-                .testTag("selfie_progress_indicator"),
+                .testTag("document_progress_indicator"),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
