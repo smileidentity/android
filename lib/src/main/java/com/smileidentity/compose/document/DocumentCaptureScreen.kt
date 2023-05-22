@@ -3,12 +3,9 @@ package com.smileidentity.compose.document
 import android.graphics.BitmapFactory
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -47,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.ProcessingScreen
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
 import com.smileidentity.models.Document
@@ -63,7 +61,6 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import com.ujizin.camposer.state.rememberTorch
 import kotlinx.coroutines.delay
 import java.io.File
 
@@ -100,6 +97,27 @@ internal fun OrchestratedDocumentCaptureScreen(
         !acknowledgedInstructions -> DocumentCaptureInstructionsScreen(showAttribution) {
             acknowledgedInstructions = true
         }
+
+        uiState.processingState != null -> ProcessingScreen(
+            processingState = uiState.processingState,
+            inProgressTitle = stringResource(R.string.si_doc_v_processing_title),
+            inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
+            inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
+            successTitle = stringResource(R.string.si_doc_v_processing_success_title),
+            successSubtitle = stringResource(R.string.si_doc_v_processing_success_subtitle),
+            successIcon = painterResource(R.drawable.si_processing_success),
+            errorTitle = stringResource(R.string.si_doc_v_processing_error_title),
+            errorSubtitle = stringResource(
+                uiState.errorMessage ?: R.string.si_doc_v_processing_error_subtitle,
+            ),
+            errorIcon = painterResource(R.drawable.si_processing_error),
+            continueButtonText = stringResource(R.string.si_doc_v_processing_continue_button),
+            onContinue = { TODO() },
+            retryButtonText = stringResource(R.string.si_doc_v_processing_retry_button),
+            onRetry = { TODO() },
+            closeButtonText = stringResource(R.string.si_doc_v_processing_close_button),
+            onClose = { TODO() },
+        )
 
         uiState.documentImageToConfirm != null -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
@@ -148,7 +166,6 @@ internal fun DocumentCaptureScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
-    var torchEnabled by cameraState.rememberTorch(initialTorch = true)
     var isFocusing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -180,7 +197,6 @@ internal fun DocumentCaptureScreen(
             camSelector = camSelector,
             scaleType = ScaleType.FillCenter,
             zoomRatio = 1.0f,
-            enableTorch = torchEnabled,
             onFocus = { onComplete ->
                 isFocusing = true
                 delay(1000L)
@@ -237,20 +253,8 @@ internal fun DocumentCaptureScreen(
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row {
-                CaptureDocumentButton(enabled = !isFocusing) {
-                    viewModel.takeButtonCaptureDocument(cameraState = cameraState)
-                }
-                // todo: flash icon
-                Image(
-                    painter = painterResource(id = R.drawable.si_camera_capture),
-                    contentDescription = "smile_camera_torch",
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clickable {
-                            torchEnabled = !torchEnabled
-                        },
-                )
+            CaptureDocumentButton(enabled = !isFocusing) {
+                viewModel.takeButtonCaptureDocument(cameraState = cameraState)
             }
         }
     }

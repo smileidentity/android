@@ -10,6 +10,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
+import com.smileidentity.compose.ProcessingState
 import com.smileidentity.createDocumentFile
 import com.smileidentity.models.Document
 import com.smileidentity.postProcessImage
@@ -28,6 +29,8 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 data class DocumentUiState(
+    val allowCapture: Boolean = true,
+    val processingState: ProcessingState? = null,
     val documentImageToConfirm: File? = null,
     @StringRes val errorMessage: Int? = null,
     val currentBoundingBox: Rect? = null,
@@ -57,22 +60,39 @@ class DocumentViewModel(
     internal fun takeButtonCaptureDocument(
         cameraState: CameraState,
     ) {
+        _uiState.update {
+            it.copy(
+                allowCapture = false,
+                errorMessage = null,
+            )
+        }
         viewModelScope.launch {
             try {
                 val documentFile = captureDocument(cameraState)
                 Timber.v("Capturing document image to $documentFile")
-                _uiState.update { it.copy(documentImageToConfirm = documentFile) }
+                _uiState.update {
+                    it.copy(
+                        documentImageToConfirm = documentFile,
+                        errorMessage = null,
+                    )
+                }
             } catch (e: Exception) {
                 Timber.e("Error capturing document", e)
-                _uiState.update { it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle) }
+                _uiState.update {
+                    it.copy(
+                        allowCapture = true,
+                        errorMessage = R.string.si_doc_v_capture_error_subtitle,
+                    )
+                }
             }
         }
     }
 
     /**
-     * Captures a document image using the given [cameraState] and returns the processed image as a [Bitmap].
-     * If an error occurs during capture or processing, the coroutine will be resumed with an exception.
-     * The [documentFile] variable will be updated with the captured image file, and the UI state will be updated accordingly.
+     * Captures a document image using the given [cameraState] and returns the processed image as a
+     * [android.graphics.Bitmap]. If an error occurs during capture or processing, the coroutine
+     * will be resumed with an exception. The [documentFile] variable will be updated with the
+     * captured image file, and the UI state will be updated accordingly.
      */
     private suspend fun captureDocument(cameraState: CameraState) = suspendCoroutine {
         documentFile = createDocumentFile()
@@ -89,11 +109,10 @@ class DocumentViewModel(
     }
 
     private fun submitJob(documentFile: File) {
+        _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
     }
 
-    fun submitJob() {
-        submitJob(documentFile = documentFile!!)
-    }
+    fun submitJob() = submitJob(documentFile = documentFile!!)
 
     fun onDocumentRejected() {
         _uiState.update {
