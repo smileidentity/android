@@ -16,9 +16,9 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
-import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
 /**
