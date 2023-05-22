@@ -84,21 +84,31 @@ fun ImageCaptureConfirmationDialog(
             }
         },
         onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
+        // The confirmButton is actually the retake button and the dismissButton is the confirm
+        // button. This is to make the button order lines up with the Figma designs. Also, the
+        // Material 3 guidelines indicate that the confirm button should be on top when buttons are
+        // stacked, but the Compose component doesn't follow that.
+        // https://m3.material.io/components/dialogs/guidelines#07aca156-a2ce-43aa-af73-fc5cc3a1ef0c
+        //
+        // TODO: Once the below changed is merged (likely in material3 1.2.0) swap the confirmButton
+        //  and dismissButton
+        //  https://android-review.googlesource.com/c/platform/frameworks/support/+/2576871
+        //
         confirmButton = {
-            Button(
-                onClick = onConfirm,
-                modifier = Modifier
-                    .testTag("confirm_image_button")
-                    .fillMaxWidth(),
-            ) { Text(confirmButtonText) }
-        },
-        dismissButton = {
             OutlinedButton(
                 onClick = onRetake,
                 modifier = Modifier
                     .testTag("retake_image_button")
                     .fillMaxWidth(),
             ) { Text(retakeButtonText) }
+        },
+        dismissButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier
+                    .testTag("confirm_image_button")
+                    .fillMaxWidth(),
+            ) { Text(confirmButtonText) }
         },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
         modifier = Modifier.testTag("image_capture_confirmation"),

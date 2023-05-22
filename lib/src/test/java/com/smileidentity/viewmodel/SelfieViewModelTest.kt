@@ -1,6 +1,7 @@
 package com.smileidentity.viewmodel
 
 import androidx.camera.core.ImageProxy
+import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -22,7 +23,7 @@ class SelfieViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = SelfieViewModel(true, randomUserId())
+        subject = SelfieViewModel(true, randomUserId(), randomJobId())
     }
 
     @After

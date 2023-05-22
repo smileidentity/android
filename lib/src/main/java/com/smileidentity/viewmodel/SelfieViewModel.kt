@@ -70,7 +70,11 @@ enum class Directive(@StringRes val displayText: Int) {
     Smile(R.string.si_smart_selfie_directive_smile),
 }
 
-class SelfieViewModel(private val isEnroll: Boolean, private val userId: String) : ViewModel() {
+class SelfieViewModel(
+    private val isEnroll: Boolean,
+    private val userId: String,
+    private val jobId: String,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
     val uiState = _uiState.asStateFlow()
     var result: SmileIDResult<SmartSelfieResult>? = null
@@ -242,6 +246,7 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
                 jobType = jobType,
                 enrollment = isEnroll,
                 userId = userId,
+                jobId = jobId,
             )
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -294,12 +299,13 @@ class SelfieViewModel(private val isEnroll: Boolean, private val userId: String)
             it.copy(
                 processingState = null,
                 selfieToConfirm = null,
-                progress = (TOTAL_STEPS - 1) / TOTAL_STEPS.toFloat(),
+                progress = 0f,
             )
         }
         selfieFile?.delete()?.also { deleted ->
             if (!deleted) Timber.w("Failed to delete $selfieFile")
         }
+        livenessFiles.removeAll { it.delete() }
         selfieFile = null
         result = null
         shouldAnalyzeImages = true

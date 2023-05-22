@@ -20,6 +20,9 @@ import com.smileidentity.compose.preview.SmilePreview
 
 @Composable
 fun SmileIDAttribution() {
+    // TODO: Re-enable once rebrand is officially launched. (Marketing team doesn't want the new
+    //  logo displayed until then.)
+    return
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
