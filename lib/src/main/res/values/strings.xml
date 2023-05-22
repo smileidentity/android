@@ -57,6 +57,16 @@
     <string name="si_doc_v_confirmation_dialog_subtitle">Make sure all the corners of the document are visible and there is no glare</string>
     <string name="si_doc_v_confirmation_dialog_confirm_button">Yes, my ID is readable</string>
     <string name="si_doc_v_confirmation_dialog_retake_button">No, retake photo</string>
+    <string name="si_doc_v_processing_title">Uploading Document</string>
+    <string name="si_doc_v_processing_subtitle">Just a few more seconds</string>
+    <string name="si_doc_v_processing_success_title">Document Submitted</string>
+    <string name="si_doc_v_processing_success_subtitle">We are verifying your information. You can now proceed</string>
+    <string name="si_doc_v_processing_error_title">Your document failed to upload</string>
+    <string name="si_doc_v_processing_error_subtitle">This could be because of internet connectivity</string>
+    <string name="si_doc_v_processing_continue_button">Continue</string>
+    <string name="si_doc_v_processing_retry_button">Retry</string>
+    <string name="si_doc_v_processing_close_button">Close</string>
+
 
     <!--  Country Names  -->
     <string name="si_country_name_ghana">Ghana</string>
