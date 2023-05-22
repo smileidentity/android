@@ -106,7 +106,11 @@ fun SmileID.SmartSelfieAuthenticationScreen(
 }
 
 /**
- * Perform a Document Verification.
+ * Perform a Document Verification. It first captures a document image (either from the camera
+ * or from the user's gallery as specied by [allowGalleryUpload]). Then it performs a selfie
+ * capture. The selfie capture can be bypassed if a previously captured selfie is provided via
+ * [bypassSelfieCaptureWithFile]. Finally, it performs a document verification using the captured
+ * document image and the selfie image.
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/document-verification)
  *
