@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -65,11 +64,12 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
     ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
@@ -115,6 +115,7 @@ internal fun OrchestratedSelfieCaptureScreen(
 
         else -> SelfieCaptureScreen(
             userId = userId,
+            jobId = jobId,
             isEnroll = isEnroll,
             allowAgentMode = allowAgentMode,
         )
@@ -125,10 +126,11 @@ internal fun OrchestratedSelfieCaptureScreen(
 @Composable
 internal fun SelfieCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -184,53 +186,50 @@ internal fun SelfieCaptureScreen(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            AgentModeSwitch(
-                allowAgentMode = allowAgentMode,
-                camSelector = camSelector,
-                onCamSelectorChange = { camSelector = camSelector.inverse },
-            )
+            if (allowAgentMode) {
+                AgentModeSwitch(
+                    camSelector = camSelector,
+                    onCamSelectorChange = { camSelector = camSelector.inverse },
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun AgentModeSwitch(
-    allowAgentMode: Boolean,
     camSelector: CamSelector,
     onCamSelectorChange: (Boolean) -> Unit,
 ) {
-    if (allowAgentMode) {
-        val isAgentModeEnabled = camSelector == CamSelector.Back
-        val agentModeBackgroundColor = if (isAgentModeEnabled) {
-            MaterialTheme.colorScheme.secondary
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
-            modifier = Modifier
-                .wrapContentSize()
-                .clip(RoundedCornerShape(32.dp))
-                .background(agentModeBackgroundColor)
-                .padding(8.dp, 0.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.si_agent_mode),
-                color = contentColorFor(agentModeBackgroundColor),
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(4.dp, 0.dp),
-            )
-            Switch(
-                checked = isAgentModeEnabled,
-                onCheckedChange = onCamSelectorChange,
-                colors = SwitchDefaults.colors(
-                    checkedTrackColor = MaterialTheme.colorScheme.tertiary,
-                ),
-                modifier = Modifier.testTag("agent_mode_switch"),
-            )
-        }
+    val isAgentModeEnabled = camSelector == CamSelector.Back
+    val agentModeBackgroundColor = if (isAgentModeEnabled) {
+        MaterialTheme.colorScheme.secondary
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+        modifier = Modifier
+            .wrapContentSize()
+            .clip(RoundedCornerShape(32.dp))
+            .background(agentModeBackgroundColor)
+            .padding(8.dp, 0.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.si_agent_mode),
+            color = contentColorFor(agentModeBackgroundColor),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(4.dp, 0.dp),
+        )
+        Switch(
+            checked = isAgentModeEnabled,
+            onCheckedChange = onCamSelectorChange,
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = MaterialTheme.colorScheme.tertiary,
+            ),
+            modifier = Modifier.testTag("agent_mode_switch"),
+        )
     }
 }
 
