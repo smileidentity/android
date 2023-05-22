@@ -45,7 +45,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
@@ -315,9 +314,20 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
-                            val userId = rememberSaveable { randomUserId() }
-                            val jobId = rememberSaveable { randomJobId() }
-                            SmileID.DocumentVerification(userId = userId, jobId = jobId) {
+                            SmileID.DocumentVerification(
+                                allowGalleryUpload = true,
+                            ) {
+                                if (it is SmileIDResult.Success) {
+                                    val message = "Document Verification success"
+                                    Timber.d("$message: $it")
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                } else if (it is SmileIDResult.Error) {
+                                    val th = it.throwable
+                                    val message = "Document Verification error: ${th.message}"
+                                    Timber.e(th, message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                }
+                                navController.popBackStack()
                             }
                         }
                     }
