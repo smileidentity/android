@@ -10,7 +10,6 @@
     <color name="si_color_background_main">#FFFFFFFF</color>
     <color name="si_color_background_light">#FFFFFFFF</color>
     <color name="si_color_background_lightest">#FFFFFFFF</color>
-    <color name="si_color_camera_capture">#001096</color>
 
     <!--  Mapped Material Theme Colors  -->
     <color name="si_color_material_primary">@color/si_color_accent</color>

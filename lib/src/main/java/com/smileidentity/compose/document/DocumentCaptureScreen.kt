@@ -8,16 +8,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -59,6 +63,8 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
+import com.ujizin.camposer.state.rememberTorch
+import kotlinx.coroutines.delay
 import java.io.File
 
 /**
@@ -142,6 +148,8 @@ internal fun DocumentCaptureScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
+    var torchEnabled by cameraState.rememberTorch(initialTorch = true)
+    var isFocusing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
@@ -172,6 +180,13 @@ internal fun DocumentCaptureScreen(
             camSelector = camSelector,
             scaleType = ScaleType.FillCenter,
             zoomRatio = 1.0f,
+            enableTorch = torchEnabled,
+            onFocus = { onComplete ->
+                isFocusing = true
+                delay(1000L)
+                isFocusing = false
+                onComplete()
+            },
             imageAnalyzer = cameraState.rememberImageAnalyzer(
                 analyze = viewModel::analyzeImage,
                 // Guarantees only one image will be delivered for analysis at a time
@@ -222,22 +237,50 @@ internal fun DocumentCaptureScreen(
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CaptureDocumentButton { viewModel.takeButtonCaptureDocument(cameraState = cameraState) }
+            Row {
+                CaptureDocumentButton(enabled = !isFocusing) {
+                    viewModel.takeButtonCaptureDocument(cameraState = cameraState)
+                }
+                // todo: flash icon
+                Image(
+                    painter = painterResource(id = R.drawable.si_camera_capture),
+                    contentDescription = "smile_camera_torch",
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clickable {
+                            torchEnabled = !torchEnabled
+                        },
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun CaptureDocumentButton(
+    enabled: Boolean,
     onCaptureClicked: () -> Unit,
 ) {
-    Image(
-        painter = painterResource(id = R.drawable.si_camera_capture),
-        contentDescription = "smile_camera_capture",
-        modifier = Modifier
-            .size(70.dp)
-            .clickable { onCaptureClicked.invoke() },
-    )
+    IconButton(
+        onClick = onCaptureClicked,
+        enabled = enabled,
+        modifier = Modifier.size(70.dp),
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.si_camera_capture),
+            contentDescription = "Document Capture Button",
+            // tint = if (enabled) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+        )
+    }
+
+    // Image(
+    //     painter = painterResource(id = R.drawable.si_camera_capture),
+    //     contentDescription = "Document Capture Button",
+    //     alpha = if (enabled) 1f else 0.5f,
+    //     modifier = Modifier
+    //         .size(70.dp)
+    //         .clickable(enabled) { onCaptureClicked.invoke() }
+    // )
 }
 
 @SmilePreview
