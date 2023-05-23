@@ -66,7 +66,7 @@ android {
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
     coordinates(groupId, artifactId, project.version.toString())
     pom {
