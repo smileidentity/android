@@ -12,6 +12,9 @@ on:
         required: true
         default: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
 jobs:
   release:
     runs-on: ubuntu-latest
