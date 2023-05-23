@@ -79,6 +79,7 @@ jobs:
           arguments: build
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
       - name: Assemble and Publish
         uses: gradle/gradle-build-action@v2
         with:
