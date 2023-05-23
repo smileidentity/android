@@ -6,9 +6,12 @@ import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.smileidentity.R
 import com.smileidentity.compose.ProcessingState
 import com.smileidentity.createDocumentFile
@@ -56,6 +59,8 @@ class DocumentViewModel(
             .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
             .build(),
     )
+
+    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     internal fun takeButtonCaptureDocument(
         cameraState: CameraState,
@@ -136,30 +141,42 @@ class DocumentViewModel(
             return
         }
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
-        objectDetector.process(inputImage)
-            .addOnSuccessListener { detectedObjects ->
-                Timber.v("DocV Detected ${detectedObjects.size} objects")
-                detectedObjects.forEach { obj ->
-                    Timber.v("DocV Detected object: ${obj.trackingId}")
-                    Timber.v("DocV Detected object bounding box: ${obj.boundingBox}")
-                    _uiState.update {
-                        it.copy(
-                            currentBoundingBox = obj.boundingBox,
-                            fullImageWidth = imageProxy.width,
-                            fullImageHeight = imageProxy.height,
-                        )
-                    }
-                    obj.labels.forEach { label ->
-                        Timber.v("DocV Detected object label: ${label.text}")
-                        Timber.v("DocV Detected object label confidence: ${label.confidence}")
-                    }
+
+        recognizer.process(inputImage)
+            .addOnSuccessListener { visionText ->
+                if (visionText.text.isNotEmpty()) {
+                    Timber.v("DocV Detected ${visionText.text}")
                 }
             }
-            .addOnFailureListener { e ->
-                Timber.e(e, "DocV Error detecting objects")
+            .addOnFailureListener { Timber.w(it, "DocV Error detecting text") }
+            .continueWithTask {
+                if (it.isSuccessful && it.result.text.isNotEmpty()) {
+                    return@continueWithTask objectDetector.process(inputImage)
+                        .addOnSuccessListener { detectedObjects ->
+                            Timber.v("DocV Detected ${detectedObjects.size} objects")
+                            detectedObjects.forEach { obj ->
+                                Timber.v("DocV Detected object: ${obj.trackingId}")
+                                Timber.v("DocV Detected object bounding box: ${obj.boundingBox}")
+                                _uiState.update {
+                                    it.copy(
+                                        currentBoundingBox = obj.boundingBox,
+                                        fullImageWidth = imageProxy.width,
+                                        fullImageHeight = imageProxy.height,
+                                    )
+                                }
+                                obj.labels.forEach { label ->
+                                    Timber.v("DocV Detected object label: ${label.text}")
+                                    Timber.v("DocV Detected object label confidence: ${label.confidence}")
+                                }
+                            }
+                        }
+                        .addOnFailureListener { Timber.e(it, "DocV Error detecting objects") }
+                        .continueWithTask { Tasks.forResult(Unit) }
+                } else {
+                    Timber.v("Didn't find any text, not performing object recognition")
+                    return@continueWithTask Tasks.forResult(Unit)
+                }
             }
-            .addOnCompleteListener {
-                imageProxy.close()
-            }
+            .addOnCompleteListener { imageProxy.close() }
     }
 }

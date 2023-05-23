@@ -162,8 +162,9 @@ dependencies {
     // CameraX Compose component
     implementation(libs.camposer)
 
-    // Unbundled model -- will be dynamically downloaded via Google Play Services
-    implementation(libs.play.services.mlkit.face.detection)
+    // Unbundled models -- will be dynamically downloaded via Google Play Services
+    implementation(libs.mlkit.face.detection.unbundled)
+    implementation(libs.mlkit.text.recognition.unbundled)
 
     // Bundled model
     implementation(libs.mlkit.`object`.detection)

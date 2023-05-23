@@ -6,7 +6,7 @@
     <application>
         <meta-data
                 android:name="com.google.mlkit.vision.DEPENDENCIES"
-                android:value="face" />
+                android:value="face,ocr" />
     </application>
 
 </manifest>
