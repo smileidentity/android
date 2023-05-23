@@ -12,11 +12,18 @@ on:
         required: true
         default: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      # https://github.com/actions/checkout/issues/766
+      - name: Mark Git directory as Safe
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
@@ -37,7 +44,7 @@ jobs:
         id: read_version
         run: |
           if [ -n "${{ github.event.inputs.version_override }}" ]; then
-            if [[ ${{ github.event.inputs.version_override }} == *-SNAPSHOT ]]; then
+            if [[ "${{ github.event.inputs.version_override }}" == *-SNAPSHOT ]]; then
               echo "Version cannot end in -SNAPSHOT (${{ github.event.inputs.version_override }})"
               exit 1
             fi
@@ -58,16 +65,21 @@ jobs:
               echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
       - name: Push Tag
-        uses: actions-ecosystem/action-push-tag@v1
-        with:
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${tag}" -m "${message}"
+          git push origin "${tag}"
+        env:
           tag: v${{ steps.read_version.outputs.version }}
-          message: "Release ${{ steps.read_version.outputs.version }}"
+          message: Release v${{ steps.read_version.outputs.version }}
       - name: Build, Test, and Lint
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
       - name: Assemble and Publish
         uses: gradle/gradle-build-action@v2
         with:

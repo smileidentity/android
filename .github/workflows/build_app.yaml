@@ -8,6 +8,10 @@ on:
         description: 'The contents of the smile_config.json file (default: Partner 002)'
         required: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

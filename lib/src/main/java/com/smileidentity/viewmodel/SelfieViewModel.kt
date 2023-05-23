@@ -299,12 +299,13 @@ class SelfieViewModel(
             it.copy(
                 processingState = null,
                 selfieToConfirm = null,
-                progress = (TOTAL_STEPS - 1) / TOTAL_STEPS.toFloat(),
+                progress = 0f,
             )
         }
         selfieFile?.delete()?.also { deleted ->
             if (!deleted) Timber.w("Failed to delete $selfieFile")
         }
+        livenessFiles.removeAll { it.delete() }
         selfieFile = null
         result = null
         shouldAnalyzeImages = true
