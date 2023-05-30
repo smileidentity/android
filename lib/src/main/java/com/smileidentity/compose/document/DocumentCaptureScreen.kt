@@ -225,7 +225,7 @@ internal fun DocumentCaptureScreen(
             }
         }
         DocumentShapedBoundingBox(
-            isDocumentDetected = uiState.isDocumentDetected,
+            areEdgesDetected = uiState.isDocumentDetected,
             aspectRatio = idAspectRatio,
             modifier = Modifier
                 .fillMaxSize()
