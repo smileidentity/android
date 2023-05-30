@@ -2,8 +2,6 @@ package com.smileidentity.viewmodel
 
 import android.util.Size
 import androidx.annotation.StringRes
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
@@ -23,11 +21,6 @@ import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-
-const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.56f
-const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
-val DOCUMENT_BOUNDING_BOX_OFFSET = 150.dp
-val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
 
 data class DocumentUiState(
     val documentImageToConfirm: File? = null,

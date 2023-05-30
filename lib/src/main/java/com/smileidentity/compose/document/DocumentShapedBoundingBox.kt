@@ -6,18 +6,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
-import com.smileidentity.viewmodel.DEFAULT_DOCUMENT_ASPECT_RATIO
-import com.smileidentity.viewmodel.DOCUMENT_BOUNDING_BOX_MARGINS
-import com.smileidentity.viewmodel.DOCUMENT_BOUNDING_BOX_OFFSET
-import com.smileidentity.viewmodel.DOCUMENT_BOUNDING_BOX_RADIUS
+
+const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.56f
+const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
+val DOCUMENT_BOUNDING_BOX_OFFSET = 150.dp
+val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
 
 /**
  * A simple bounding box that takes the shape of a document, has a semi-transparent background, and
@@ -48,7 +51,7 @@ fun DocumentShapedBoundingBox(
 
         // 2. Draw the outline of the bounding box and add a stroke that shows different edge detection states
         val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
-        val outlineBoundingBoxHeight = size.width / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
+        val outlineBoundingBoxHeight = outlineBoundingBoxWidth / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
         drawRoundRect(
             color = strokeColor,
             topLeft = Offset(

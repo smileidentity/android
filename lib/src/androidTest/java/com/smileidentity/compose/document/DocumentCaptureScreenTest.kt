@@ -42,10 +42,9 @@ class DocumentCaptureScreenTest {
 
     @Test
     fun shouldShowCameraPreview() {
-        val titleText = "Front of National ID Card"
-        val subtitleText = "Make sure all the corners are visible and there is no glare"
-
         // given
+        val titleText = "Front of ID"
+        val subtitleText = "Make sure all the corners are visible and there is no glare"
         val cameraPreviewTag = "document_camera_preview"
 
         // when
@@ -63,7 +62,7 @@ class DocumentCaptureScreenTest {
     @Test
     fun shouldShowDocumentInstructions() {
         // given
-        val titleText = "Front of National ID Card"
+        val titleText = "Front of ID"
         val subtitleText = "Make sure all the corners are visible and there is no glare"
 
         // when

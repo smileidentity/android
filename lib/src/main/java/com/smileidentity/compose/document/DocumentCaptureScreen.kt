@@ -138,7 +138,6 @@ internal fun DocumentCaptureScreen(
             cameraState = cameraState,
             camSelector = camSelector,
             scaleType = ScaleType.FillCenter,
-            zoomRatio = 1.0f,
             modifier = Modifier
                 .testTag("document_camera_preview")
                 .fillMaxSize()
