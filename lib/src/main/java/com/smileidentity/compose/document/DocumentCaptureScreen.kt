@@ -224,11 +224,12 @@ internal fun DocumentCaptureScreen(
                 )
             }
         }
-        DocumentShapedProgressIndicator(
+        DocumentShapedBoundingBox(
             isDocumentDetected = uiState.isDocumentDetected,
+            aspectRatio = idAspectRatio,
             modifier = Modifier
                 .fillMaxSize()
-                .testTag("selfie_progress_indicator"),
+                .testTag("document_progress_indicator"),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),

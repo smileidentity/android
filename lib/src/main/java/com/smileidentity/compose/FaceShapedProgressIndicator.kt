@@ -45,7 +45,7 @@ fun FaceShapedProgressIndicator(
 ) {
     val stroke = with(LocalDensity.current) { Stroke(width = strokeWidth.toPx()) }
     Canvas(
-        modifier = modifier
+        modifier
             .progressSemantics(progress)
             .fillMaxSize(),
     ) {
