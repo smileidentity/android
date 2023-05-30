@@ -7,6 +7,8 @@ import androidx.annotation.VisibleForTesting
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.models.Config
 import com.smileidentity.networking.FileAdapter
@@ -66,7 +68,7 @@ object SmileID {
             val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
             SmileIDCrashReporting.enable(isInDebugMode)
         }
-        requestFaceDetectionModuleInstallation(context)
+        requestMLKitModulesInstallation(context)
 
         SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
@@ -176,14 +178,15 @@ object SmileID {
     }
 
     /**
-     * Request Google Play Services to install the Face Detection Module, if not already installed.
+     * Request Google Play Services to install the MLKit Modules, if not already installed.
      */
-    private fun requestFaceDetectionModuleInstallation(context: Context) {
+    private fun requestMLKitModulesInstallation(context: Context) {
         val moduleInstallRequest = ModuleInstallRequest.newBuilder()
             .addApi(FaceDetection.getClient())
+            .addApi(TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS))
             .setListener {
                 Timber.d(
-                    "Face Detection install status: " +
+                    "MLKit Modules install status: " +
                         "errorCode=${it.errorCode}, " +
                         "installState=${it.installState}, " +
                         "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
@@ -194,10 +197,10 @@ object SmileID {
         ModuleInstall.getClient(context)
             .installModules(moduleInstallRequest)
             .addOnSuccessListener {
-                Timber.d("Face Detection install success: ${it.areModulesAlreadyInstalled()}")
+                Timber.d("MLKit Modules install success: ${it.areModulesAlreadyInstalled()}")
             }
             .addOnFailureListener {
-                Timber.w(it, "Face Detection install failed")
+                Timber.w(it, "MLKit Modules install failed")
             }
     }
 }
