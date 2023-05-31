@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreview
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 
@@ -238,10 +240,10 @@ internal fun ProcessingErrorScreen(
     )
 }
 
-@Preview
+@SmilePreview
 @Composable
 private fun PreviewProcessingInProgressScreen() {
-    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+    Preview {
         ProcessingInProgressScreen(
             icon = painterResource(R.drawable.si_smart_selfie_processing_hero),
             title = stringResource(R.string.si_smart_selfie_processing_title),
@@ -250,10 +252,10 @@ private fun PreviewProcessingInProgressScreen() {
     }
 }
 
-@Preview
+@SmilePreview
 @Composable
 private fun PreviewProcessingSuccessScreen() {
-    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+    Preview {
         ProcessingSuccessScreen(
             icon = painterResource(R.drawable.si_processing_success),
             title = stringResource(R.string.si_smart_selfie_processing_success_title),

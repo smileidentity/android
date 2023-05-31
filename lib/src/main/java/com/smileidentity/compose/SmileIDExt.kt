@@ -8,6 +8,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.smileidentity.SmileID
+import com.smileidentity.compose.document.OrchestratedDocumentCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.Document
@@ -144,10 +145,15 @@ fun SmileID.DocumentVerification(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        // OrchestratedDocumentCaptureScreen(
-        //     userId,
-        //     showAttribution,
-        //     onResult = onResult,
-        // )
+        OrchestratedDocumentCaptureScreen(
+            userId = userId,
+            jobId = jobId,
+            showAttribution = showAttribution,
+            allowGalleryUpload = allowGalleryUpload,
+            enforcedIdType = enforcedIdType,
+            idAspectRatio = idAspectRatio,
+            bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
+            onResult = onResult,
+        )
     }
 }

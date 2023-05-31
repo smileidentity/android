@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.document
 
 import android.Manifest
 import androidx.compose.ui.test.assertIsDisplayed

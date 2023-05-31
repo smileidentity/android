@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.document
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.compose.CameraPermissionButton
+import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 

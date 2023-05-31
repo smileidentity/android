@@ -3,6 +3,7 @@ package com.smileidentity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -69,6 +70,25 @@ internal fun postProcessImageBitmap(
 }
 
 /**
+ * Post-processes the image stored in `file`, in-place
+ */
+internal fun postProcessImage(
+    file: File,
+    saveAsGrayscale: Boolean = false,
+    compressionQuality: Int = 100,
+    desiredOutputSize: Size? = null,
+): File {
+    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+    return postProcessImageBitmap(
+        bitmap,
+        file,
+        saveAsGrayscale,
+        compressionQuality,
+        desiredOutputSize,
+    )
+}
+
+/**
  * Save to temporary file, which does not require any storage permissions. It will be saved to the
  * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
  * format `si_${imageType}_<timestamp>.jpg`
@@ -79,6 +99,7 @@ internal fun createSmileTempFile(imageType: String, savePath: String = SmileID.f
 
 internal fun createLivenessFile() = createSmileTempFile("liveness")
 internal fun createSelfieFile() = createSmileTempFile("selfie")
+internal fun createDocumentFile() = createSmileTempFile("document")
 
 /**
  * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
