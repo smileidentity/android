@@ -54,13 +54,15 @@ class DocumentViewModel(
     var result: SmileIDResult<DocumentVerificationResult>? = null
     private var documentFile: File? = null
 
-    private val objectDetector = ObjectDetection.getClient(
-        ObjectDetectorOptions.Builder()
-            .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
-            .build(),
-    )
+    private val objectDetector by lazy {
+        ObjectDetection.getClient(
+            ObjectDetectorOptions.Builder()
+                .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
+                .build(),
+        )
+    }
 
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    private val recognizer by lazy { TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) }
 
     internal fun takeButtonCaptureDocument(
         cameraState: CameraState,
