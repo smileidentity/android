@@ -9,6 +9,7 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
+import android.net.Uri
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -27,6 +28,31 @@ internal fun Context.toast(@StringRes message: Int) {
 
 internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
+
+/**
+ * Check if image is at least width x height. Assumes URI is a content URI, which means it needs to
+ * be parsed as an input stream and can't be used directly.
+ *
+ * @param context Android context
+ * @param uri Content Uri of the image
+ * @param width Minimum width of the image
+ * @param height Minimum height of the image
+ */
+fun isImageAtLeast(
+    context: Context,
+    uri: Uri?,
+    width: Int? = 1920,
+    height: Int? = 1080,
+): Boolean {
+    if (uri == null) return false
+    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    context.contentResolver.openInputStream(uri).use {
+        BitmapFactory.decodeStream(it, null, options)
+    }
+    val imageHeight = options.outHeight
+    val imageWidth = options.outWidth
+    return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
+}
 
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to

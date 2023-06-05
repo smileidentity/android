@@ -23,7 +23,8 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 data class DocumentUiState(
-    val documentImageToConfirm: File? = null,
+    val frontDocumentImageToConfirm: File? = null,
+    val backDocumentImageToConfirm: File? = null,
     @StringRes val errorMessage: Int? = null,
 )
 
@@ -40,12 +41,13 @@ class DocumentViewModel(
 
     internal fun takeButtonCaptureDocument(
         cameraState: CameraState,
+        isBackSide: Boolean,
     ) {
         viewModelScope.launch {
             try {
                 val documentFile = captureDocument(cameraState)
                 Timber.v("Capturing document image to $documentFile")
-                _uiState.update { it.copy(documentImageToConfirm = documentFile) }
+                _uiState.update { if (isBackSide) it.copy(backDocumentImageToConfirm = documentFile) else it.copy(frontDocumentImageToConfirm = documentFile) }
             } catch (e: Exception) {
                 Timber.e("Error capturing document", e)
                 _uiState.update { it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle) }
@@ -82,11 +84,9 @@ class DocumentViewModel(
         submitJob(documentFile = documentFile!!)
     }
 
-    fun onDocumentRejected() {
+    fun onDocumentRejected(isBackSide: Boolean) {
         _uiState.update {
-            it.copy(
-                documentImageToConfirm = null,
-            )
+            if (isBackSide) it.copy(backDocumentImageToConfirm = null) else it.copy(frontDocumentImageToConfirm = null)
         }
         documentFile?.delete()?.also { deleted ->
             if (!deleted) Timber.w("Failed to delete $documentFile")

@@ -46,13 +46,16 @@
 
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
-    <string name="si_doc_v_instruction_title">Submit your ID</string>
     <string name="si_doc_v_instruction_ready_button">Take Photo</string>
     <string name="si_doc_v_instruction_upload_button">Upload Photo</string>
+    <string name="si_doc_v_instruction_title">Submit Front of ID</string>
+    <string name="si_doc_v_instruction_back_title">Submit Back of ID</string>
+    <string name="si_doc_v_instruction_back_subtitle">For this ID type, we require that you submit the back of the ID</string>
     <string name="si_doc_v_capture_instructions_front_title">Front of ID</string>
     <string name="si_doc_v_capture_instructions_back_title">Back of ID</string>
     <string name="si_doc_v_capture_instructions_subtitle">Make sure all the corners are visible and there is no glare</string>
     <string name="si_doc_v_capture_error_subtitle">Your document capture failed to process</string>
+    <string name="si_doc_v_validation_image_too_small">Selected image is too small. Please select a larger resolution image.</string>
     <string name="si_doc_v_confirmation_dialog_title">Is the document clear and readable?</string>
     <string name="si_doc_v_confirmation_dialog_subtitle">Make sure all the corners of the document are visible and there is no glare</string>
     <string name="si_doc_v_confirmation_dialog_confirm_button">Yes, my ID is readable</string>

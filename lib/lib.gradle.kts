@@ -126,6 +126,9 @@ dependencies {
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
+    implementation(libs.androidx.activity.compose)
+
+    implementation(libs.coil)
 
     // Logging
     implementation(libs.timber)

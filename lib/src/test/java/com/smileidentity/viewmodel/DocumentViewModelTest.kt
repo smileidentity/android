@@ -29,7 +29,7 @@ class DocumentViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(null, uiState.documentImageToConfirm)
+        assertEquals(null, uiState.frontDocumentImageToConfirm)
         assertEquals(null, uiState.errorMessage)
     }
 }
