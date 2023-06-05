@@ -28,6 +28,7 @@
     <string name="si_smart_selfie_directive_smile">Smile for the camera!</string>
     <string name="si_smart_selfie_directive_capturing">Capturing…</string>
     <string name="si_smart_selfie_directive_unable_to_detect_face">Unable to detect face. Please ensure your face is in the oval</string>
+    <string name="si_smart_selfie_directive_multiple_faces">Multiple faces detected. Please ensure only one face is present</string>
     <string name="si_smart_selfie_directive_face_too_far">Face is too far. Please move closer</string>
     <string name="si_smart_selfie_directive_face_too_close">Face is too close. Please move farther away</string>
     <string name="si_smart_selfie_confirmation_dialog_title">Is this a good quality selfie?</string>
