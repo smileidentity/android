@@ -91,9 +91,13 @@ internal fun OrchestratedDocumentCaptureScreen(
                 BitmapFactory.decodeFile(uiState.documentImageToConfirm.absolutePath)
                     .asImageBitmap(),
             ),
-            confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            ),
             onConfirm = { viewModel.submitJob() },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_retake_button,
+            ),
             onRetake = { viewModel.onDocumentRejected() },
         )
 

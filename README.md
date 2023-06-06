@@ -40,12 +40,12 @@ The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce
 
 ## Releasing
 
-Generally speaking, releases should be performed by workflow dispatch. This will push a tag and 
-create a GitHub Release and publish to Maven Central. The SDK version is determined by the `version` 
+Generally speaking, releases should be performed by workflow dispatch. This will push a tag and
+create a GitHub Release and publish to Maven Central. The SDK version is determined by the `version`
 variable
 in [`lib/lib.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/lib.gradle.kts)
 
-That variable's value will be the `VERSION_NAME` Gradle Property, if defined, or the `lib/VERSION` 
+That variable's value will be the `VERSION_NAME` Gradle Property, if defined, or the `lib/VERSION`
 file otherwise.
 
 Versions ending in `-SNAPSHOT` will be published to Sonatype's snapshot
@@ -80,7 +80,7 @@ The summary is:
 ### Configure Play Store Upload Keystore
 
 The upload keystore lives in 1Password. It is named `Play Store Upload Keystore`. Download this file
-and save it to `sample/upload.jks`. 
+and save it to `sample/upload.jks`.
 
 It is also stored in this project as a Base64 encoded secret for use by GitHub Actions.
 
@@ -106,6 +106,9 @@ uploadKeystorePassword=<The password for the upload keystore>
   for this) as well as `avocado` (`npm install -g avocado`) for compressing android vector drawables
 - Any new developer should add themselves to the the `developers` block in
   [`lib/lib.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/lib.gradle.kts)
+- The linter enforces a maximum line length of 100 characters. Please try to keep lines under this
+  length. However, if it is not possible (i.e. a long resource name), you can disable the check for
+  the line by adding `// ktlint-disable max-line-length` to the end of the line
 
 ## FAQs
 
