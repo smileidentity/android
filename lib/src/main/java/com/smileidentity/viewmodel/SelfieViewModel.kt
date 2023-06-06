@@ -65,6 +65,7 @@ enum class Directive(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),
     Capturing(R.string.si_smart_selfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smart_selfie_directive_unable_to_detect_face),
+    EnsureOnlyOneFace(R.string.si_smart_selfie_directive_multiple_faces),
     MoveCloser(R.string.si_smart_selfie_directive_face_too_far),
     MoveAway(R.string.si_smart_selfie_directive_face_too_close),
     Smile(R.string.si_smart_selfie_directive_smile),
@@ -127,21 +128,26 @@ class SelfieViewModel(
                 return@addOnSuccessListener
             }
 
-            // Pick the largest face
-            val largestFace = faces.maxBy { it.boundingBox.area }
-            val faceFillRatio = (largestFace.boundingBox.area / inputImage.area.toFloat())
+            // Ensure only 1 face is in frame
+            if (faces.size > 1) {
+                _uiState.update { it.copy(currentDirective = Directive.EnsureOnlyOneFace) }
+                return@addOnSuccessListener
+            }
+
+            val face = faces.first()
 
             // Check that the corners of the face bounding box are within the inputImage
-            val faceCornersInImage = largestFace.boundingBox.left >= 0 &&
-                largestFace.boundingBox.right <= inputImage.width &&
-                largestFace.boundingBox.top >= 0 &&
-                largestFace.boundingBox.bottom <= inputImage.height
+            val faceCornersInImage = face.boundingBox.left >= 0 &&
+                face.boundingBox.right <= inputImage.width &&
+                face.boundingBox.top >= 0 &&
+                face.boundingBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
                 _uiState.update { it.copy(currentDirective = Directive.EnsureFaceInFrame) }
                 return@addOnSuccessListener
             }
 
             // Check that the face is close enough to the camera
+            val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
             if (faceFillRatio < MIN_FACE_AREA_THRESHOLD) {
                 _uiState.update { it.copy(currentDirective = Directive.MoveCloser) }
                 return@addOnSuccessListener
@@ -154,7 +160,7 @@ class SelfieViewModel(
             }
 
             // Ask the user to start smiling partway through liveness images
-            val isSmiling = (largestFace.smilingProbability ?: 0f) > SMILE_THRESHOLD
+            val isSmiling = (face.smilingProbability ?: 0f) > SMILE_THRESHOLD
             if (livenessFiles.size > NUM_LIVENESS_IMAGES / 2 && !isSmiling) {
                 _uiState.update { it.copy(currentDirective = Directive.Smile) }
                 return@addOnSuccessListener
@@ -164,13 +170,13 @@ class SelfieViewModel(
 
             // Perform the rotation checks *after* changing directive to Capturing -- we don't want
             // to explicitly tell the user to move their head
-            if (!hasFaceRotatedEnough(largestFace)) {
+            if (!hasFaceRotatedEnough(face)) {
                 Timber.v("Not enough face rotation between captures. Waiting...")
                 return@addOnSuccessListener
             }
-            previousHeadRotationX = largestFace.headEulerAngleX
-            previousHeadRotationY = largestFace.headEulerAngleY
-            previousHeadRotationZ = largestFace.headEulerAngleZ
+            previousHeadRotationX = face.headEulerAngleX
+            previousHeadRotationY = face.headEulerAngleY
+            previousHeadRotationZ = face.headEulerAngleZ
 
             // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap.
             //  Incorporate once stable
