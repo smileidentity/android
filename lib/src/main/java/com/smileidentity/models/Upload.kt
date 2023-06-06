@@ -20,10 +20,27 @@ data class UploadImageInfo(
     @Json(name = "file_name") val image: File,
 )
 
+/**
+ * @param country The 2 letter country code of the user's ID (ISO 3166-1 alpha-2 format)
+ * @param idType The ID type from the list [here](https://docs.smileidentity.com/supported-id-types/for-individuals-kyc/backed-by-id-authority)
+ * @param idNumber The ID number of the user's ID
+ * @param firstName The first name of the user
+ * @param middleName The middle name of the user
+ * @param lastName The last name of the user
+ * @param dob The date of birth of the user in the **ID type specific format**
+ * @param entered Whether to submit the verification to the ID authority or not. For Biometric KYC
+ * jobs, this should be set to true
+ */
 @JsonClass(generateAdapter = true)
 data class IdInfo(
     @Json(name = "country") val country: String,
     @Json(name = "id_type") val idType: String,
+    @Json(name = "id_number") val idNumber: String? = null,
+    @Json(name = "first_name") val firstName: String? = null,
+    @Json(name = "middle_name") val middleName: String? = null,
+    @Json(name = "last_name") val lastName: String? = null,
+    @Json(name = "dob") val dob: String? = null,
+    @Json(name = "entered") val entered: Boolean? = null,
 )
 
 enum class ImageType {
