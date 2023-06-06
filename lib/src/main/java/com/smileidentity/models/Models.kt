@@ -36,6 +36,7 @@ data class PartnerParams(
 ) : Parcelable
 
 enum class JobType(val value: Int) {
+    BiometricKyc(1),
     SmartSelfieAuthentication(2),
     SmartSelfieEnrollment(4),
     EnhancedKyc(5),
