@@ -113,7 +113,9 @@ fun MainScreen() {
                                     if (isProduction) {
                                         Icon(
                                             imageVector = Icons.Filled.Warning,
-                                            contentDescription = stringResource(R.string.production),
+                                            contentDescription = stringResource(
+                                                R.string.production,
+                                            ),
                                         )
                                     }
                                 },
@@ -252,7 +254,7 @@ fun MainScreen() {
                                         enabled = userId.isNotBlank(),
                                         onClick = {
                                             navController.navigate(
-                                                "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
+                                                "${ProductScreen.SmartSelfieAuthentication.route}/$userId", // ktlint-disable max-line-length
                                             ) { popUpTo(BottomNavigationScreen.Home.route) }
                                         },
                                     ) { Text(stringResource(R.string.cont)) }
