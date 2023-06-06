@@ -12,7 +12,7 @@ import java.io.File
  * This callback is only consumed from Kotlin code, so typealias is fine. Java code will use the
  * Fragment compatibility layer (e.g. [com.smileidentity.fragment.SmartSelfieRegistrationFragment]),
  * in which the result is delivered via the Fragment Result API. Our Fragment compatibility layer
- * is written in Kotlin
+ * is written in Kotlin.
  */
 typealias SmileIDCallback<T> = (SmileIDResult<T>) -> Unit
 
@@ -29,7 +29,7 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
      * NB! The Job itself may or may not be complete yet. This can be checked with
      * [com.smileidentity.models.JobStatusResponse.jobComplete]. If not yet complete, the job status
      * will need to be fetched again later. If the job is complete, the final job success can be
-     * checked with [com.smileidentity.models.JobStatusResponse.jobSuccess]
+     * checked with [com.smileidentity.models.JobStatusResponse.jobSuccess].
      */
     @Parcelize
     data class Success<T : Parcelable>(val data: T) : SmileIDResult<T>
@@ -47,7 +47,7 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
  * capture and network requests were successful. The Job itself may or may not be complete yet. This
  * can be checked with [JobStatusResponse.jobComplete]. If not yet complete, the job status will
  * need to be fetched again later. If the job is complete, the final job success can be checked with
- * [JobStatusResponse.jobSuccess]
+ * [JobStatusResponse.jobSuccess].
  */
 @Parcelize
 data class SmartSelfieResult(
@@ -70,7 +70,7 @@ data class EnhancedKycResult(
  * the capture and network requests were successful. The Job itself may or may not be complete yet.
  * This can be checked with [DocVJobStatusResponse.jobComplete]. If not yet complete, the job status
  * will need to be fetched again later. If the job is complete, the final job success can be checked
- * with [DocVJobStatusResponse.jobSuccess]
+ * with [DocVJobStatusResponse.jobSuccess].
  */
 @Parcelize
 data class DocumentVerificationResult(
@@ -78,4 +78,18 @@ data class DocumentVerificationResult(
     val documentFrontFile: File,
     val documentBackFile: File? = null,
     val jobStatusResponse: DocVJobStatusResponse,
+) : Parcelable
+
+/**
+ * The result of a Biometric KYC capture and submission to the Smile ID API. Indicates that the
+ * capture and network requests were successful. The Job itself may or may not be complete yet. This
+ * can be checked with [JobStatusResponse.jobComplete]. If not yet complete, the job status will
+ * need to be fetched again later. If the job is complete, the final job success can be checked with
+ * [JobStatusResponse.jobSuccess].
+ */
+@Parcelize
+data class BiometricKycResult(
+    val selfieFile: File,
+    val livenessFiles: List<File>,
+    val jobStatusResponse: JobStatusResponse,
 ) : Parcelable

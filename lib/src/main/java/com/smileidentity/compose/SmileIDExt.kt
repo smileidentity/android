@@ -12,8 +12,10 @@ import com.smileidentity.compose.document.OrchestratedDocumentCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.Document
+import com.smileidentity.models.IdInfo
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
+import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -155,5 +157,43 @@ fun SmileID.DocumentVerification(
             bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
             onResult = onResult,
         )
+    }
+}
+
+/**
+ * Perform a Biometric KYC: Verify the ID information of your user and confirm that the ID actually
+ * belongs to the user. This is achieved by comparing the user's SmartSelfie™ to the user's photo in
+ * an ID authority database
+ *
+ * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-kyc)
+ *
+ * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond
+ * to a unique User ID within your own system. If not provided, a random user ID will be generated
+ * @param jobId The job ID to associate with the Biometric KYC. Most often, this will correspond
+ * to a unique Job ID within your own system. If not provided, a random job ID will be generated
+ * @param idInfo The ID information to look up in the ID Authority
+ * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be displayed
+ * allowing toggling between the back camera and front camera. If not allowed, only the front
+ * camera will be used.
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Biometric KYC is complete.
+ */
+@Composable
+fun SmileID.BiometricKYC(
+    userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
+    idInfo: IdInfo,
+    allowAgentMode: Boolean = false,
+    showAttribution: Boolean = true,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<BiometricKycResult> = {},
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        TODO("Orchestrated Biometric KYC Screen")
     }
 }

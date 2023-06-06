@@ -21,14 +21,15 @@ data class UploadImageInfo(
 )
 
 /**
- * @param[country] The 2 letter country code of the user's ID (ISO 3166-1 alpha-2 format)
- * @param[idType] The ID type from the list [here](https://docs.smileidentity.com/supported-id-types/for-individuals-kyc/backed-by-id-authority)
- * @param[idNumber] The ID number of the user's ID
- * @param[firstName] The first name of the user
- * @param[middleName] The middle name of the user
- * @param[lastName] The last name of the user
- * @param[dob] The date of birth of the user in the **ID type specific format**
- * @param[entered] Whether the user entered the ID information themselves (??)
+ * @param country The 2 letter country code of the user's ID (ISO 3166-1 alpha-2 format)
+ * @param idType The ID type from the list [here](https://docs.smileidentity.com/supported-id-types/for-individuals-kyc/backed-by-id-authority)
+ * @param idNumber The ID number of the user's ID
+ * @param firstName The first name of the user
+ * @param middleName The middle name of the user
+ * @param lastName The last name of the user
+ * @param dob The date of birth of the user in the **ID type specific format**
+ * @param entered Whether to submit the verification to the ID authority or not. For Biometric KYC
+ * jobs, this should be set to true
  */
 @JsonClass(generateAdapter = true)
 data class IdInfo(
