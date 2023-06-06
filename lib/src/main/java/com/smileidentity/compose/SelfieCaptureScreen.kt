@@ -41,8 +41,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
-import com.smileidentity.compose.theme.colorScheme
-import com.smileidentity.compose.theme.typography
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
@@ -95,7 +93,9 @@ internal fun OrchestratedSelfieCaptureScreen(
                 uiState.errorMessage ?: R.string.si_smart_selfie_processing_error_subtitle,
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
-            continueButtonText = stringResource(R.string.si_smart_selfie_processing_continue_button),
+            continueButtonText = stringResource(
+                R.string.si_smart_selfie_processing_continue_button,
+            ),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
             onRetry = { viewModel.onRetry() },
@@ -109,9 +109,13 @@ internal fun OrchestratedSelfieCaptureScreen(
             painter = BitmapPainter(
                 BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath).asImageBitmap(),
             ),
-            confirmButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                R.string.si_smart_selfie_confirmation_dialog_confirm_button,
+            ),
             onConfirm = { viewModel.submitJob() },
-            retakeButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                R.string.si_smart_selfie_confirmation_dialog_retake_button,
+            ),
             onRetake = { viewModel.onSelfieRejected() },
         )
 
