@@ -157,6 +157,11 @@ jobs:
             new_version="$major.$minor.$patch-SNAPSHOT"
           fi
           echo $new_version > ./lib/VERSION
+          
+          version_code=$(grep versionCode sample/sample.gradle.kts | cut -d "=" -f 2 | awk '{$1=$1};1')
+          version_code=$((version_code+1))
+          sed -i '' "s/versionCode.*/versionCode = $version_code/g" sample/sample.gradle.kts
+          
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
           git config --local user.name "${{ github.actor }}"
           git add VERSION
