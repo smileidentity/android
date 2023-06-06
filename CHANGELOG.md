@@ -1,9 +1,25 @@
 # Changelog
 
-## Unreleased
+## 10.0.0-beta02
 
 ### Features
-- Initial v10 release 🎉
+- Add Biometric KYC data models
+- Initial Document Verification screens
+
+### Bug Fixes
+- Only allow a single face to be in frame for a SmartSelfie™ capture
+
+### Dependencies
+- Bump Sentry to 6.21.0
+
+## 10.0.0-beta01
+
+### Features
+- Initial release 🎉
+- SmartSelfie™ Authentication and Registration
+- Enhanced KYC
+- Theming
+- Networking
 
 ### Bug Fixes
 N/A
