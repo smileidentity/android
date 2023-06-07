@@ -46,7 +46,7 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
     val density = LocalDensity.current
     var desiredItemMinHeight by remember { mutableStateOf(0.dp) }
     val products = listOf(
-        ProductScreen.SmartSelfieRegistration,
+        ProductScreen.SmartSelfieEnrollment,
         ProductScreen.SmartSelfieAuthentication,
         ProductScreen.EnhancedKyc,
         ProductScreen.DocumentVerification,

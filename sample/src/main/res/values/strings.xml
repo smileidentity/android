@@ -14,7 +14,7 @@
     <!--  SmartSelfie Auth  -->
     <string name="user_id_label">User ID</string>
     <string name="user_id_dialog_title">Enter User ID</string>
-    <string name="user_id_dialog_supporting_text">From a previous successful SmartSelfie™ Registration</string>
+    <string name="user_id_dialog_supporting_text">From a previous successful SmartSelfie™ Enrollment</string>
 
     <!--  Resources Screen  -->
     <string name="resources">Resources</string>

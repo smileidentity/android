@@ -22,9 +22,9 @@ sealed class ProductScreen(
     @StringRes override val label: Int,
     @DrawableRes val icon: Int,
 ) : Screen {
-    object SmartSelfieRegistration : ProductScreen(
-        "smart_selfie_registration",
-        com.smileidentity.R.string.si_smart_selfie_registration_product_name,
+    object SmartSelfieEnrollment : ProductScreen(
+        "smart_selfie_enrollment",
+        com.smileidentity.R.string.si_smart_selfie_enrollment_product_name,
         com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
     )
 

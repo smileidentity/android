@@ -44,7 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
-import com.smileidentity.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.compose.SmartSelfieEnrollmentScreen
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
@@ -184,17 +184,17 @@ fun MainScreen() {
                             currentScreenTitle = BottomNavigationScreen.AboutUs.label
                             AboutUsScreen()
                         }
-                        composable(ProductScreen.SmartSelfieRegistration.route) {
+                        composable(ProductScreen.SmartSelfieEnrollment.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieRegistration.label
+                            currentScreenTitle = ProductScreen.SmartSelfieEnrollment.label
                             val userId = rememberSaveable { randomUserId() }
-                            SmileID.SmartSelfieRegistrationScreen(
+                            SmileID.SmartSelfieEnrollmentScreen(
                                 userId = userId,
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data
-                                    val message = StringBuilder("SmartSelfie Registration ")
+                                    val message = StringBuilder("SmartSelfie Enrollment ")
                                     if (resultData.jobStatusResponse.jobComplete) {
                                         if (resultData.jobStatusResponse.jobSuccess) {
                                             message.append("completed successfully. ")
@@ -213,7 +213,7 @@ fun MainScreen() {
                                     )
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
-                                    val message = "SmartSelfie Registration error: ${th.message}"
+                                    val message = "SmartSelfie Enrollment error: ${th.message}"
                                     Timber.e(th, message)
                                     snackbarHostState.showSnackbar(coroutineScope, message)
                                 }

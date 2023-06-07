@@ -22,14 +22,14 @@ import com.smileidentity.results.SmileIDCallback
 import java.io.File
 
 /**
- * Perform a SmartSelfie™ Registration
+ * Perform a SmartSelfie™ Enrollment
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
- * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often, this
+ * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often, this
  * will correspond to a unique User ID within your own system. If not provided, a random user ID
  * will be generated.
- * @param jobId The job ID to associate with the SmartSelfie™ Registration. Most often, this
+ * @param jobId The job ID to associate with the SmartSelfie™ Enrollment. Most often, this
  * will correspond to a unique Job ID within your own system. If not provided, a random job ID
  * will be generated.
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
@@ -40,10 +40,10 @@ import java.io.File
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
  * branded UI by default, but allow the user to override it if they want.
- * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
+ * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
-fun SmileID.SmartSelfieRegistrationScreen(
+fun SmileID.SmartSelfieEnrollmentScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
@@ -70,8 +70,8 @@ fun SmileID.SmartSelfieRegistrationScreen(
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
- * an ID that was previously registered via a SmartSelfie™ Registration
- * (see: [SmileID.SmartSelfieRegistrationScreen])
+ * an ID that was previously registered via a SmartSelfie™ Enrollment
+ * (see: [SmileID.SmartSelfieEnrollmentScreen])
  * @param jobId The job ID to associate with the SmartSelfie™ Authentication. Most often, this
  * will correspond to a unique Job ID within your own system. If not provided, a random job ID
  * will be generated.
@@ -83,7 +83,7 @@ fun SmileID.SmartSelfieRegistrationScreen(
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
  * branded UI by default, but allow the user to override it if they want.
- * @param onResult Callback to be invoked when the SmartSelfie™ Registration is complete.
+ * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
 fun SmileID.SmartSelfieAuthenticationScreen(

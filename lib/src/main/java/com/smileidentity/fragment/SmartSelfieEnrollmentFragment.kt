@@ -9,21 +9,21 @@ import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLif
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.smileidentity.SmileID
-import com.smileidentity.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.fragment.SmartSelfieRegistrationFragment.Companion.KEY_REQUEST
-import com.smileidentity.fragment.SmartSelfieRegistrationFragment.Companion.KEY_RESULT
-import com.smileidentity.fragment.SmartSelfieRegistrationFragment.Companion.newInstance
-import com.smileidentity.fragment.SmartSelfieRegistrationFragment.Companion.resultFromBundle
+import com.smileidentity.compose.SmartSelfieEnrollmentScreen
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_RESULT
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.newInstance
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 
 /**
- * Perform a SmartSelfie™ Registration
+ * Perform a SmartSelfie™ Enrollment
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
- * A [Fragment] wrapper for the [SmartSelfieRegistrationScreen] to be used if not using Jetpack
+ * A [Fragment] wrapper for the [SmartSelfieEnrollmentScreen] to be used if not using Jetpack
  * Compose. New instances *must* be created via [newInstance]. Results are communicated back to the
  * caller via [setFragmentResult]. Therefore, the caller must use
  * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result. If
@@ -36,13 +36,13 @@ import com.smileidentity.results.SmileIDResult
  *
  * Usage example:
  * ```java
- * SmartSelfieRegistrationFragment smartSelfieFragment = SmartSelfieRegistrationFragment
+ * SmartSelfieEnrollmentFragment smartSelfieFragment = SmartSelfieEnrollmentFragment
  *  .newInstance();
  * getSupportFragmentManager().setFragmentResultListener(
- *   SmartSelfieRegistrationFragment.KEY_REQUEST,
+ *   SmartSelfieEnrollmentFragment.KEY_REQUEST,
  *   this,
  *   (requestKey, result) -> {
- *     SmartSelfieResult smartSelfieResult = SmartSelfieRegistrationFragment
+ *     SmartSelfieResult smartSelfieResult = SmartSelfieEnrollmentFragment
  *       .resultFromBundle(result);
  *     getSupportFragmentManager()
  *       .beginTransaction()
@@ -52,16 +52,16 @@ import com.smileidentity.results.SmileIDResult
  *   );
  * ```
  */
-class SmartSelfieRegistrationFragment : Fragment() {
+class SmartSelfieEnrollmentFragment : Fragment() {
     companion object {
-        const val KEY_REQUEST = "SmartSelfieRegistrationRequest"
-        const val KEY_RESULT = "SmartSelfieRegistrationResult"
+        const val KEY_REQUEST = "SmartSelfieEnrollmentRequest"
+        const val KEY_RESULT = "SmartSelfieEnrollmentResult"
 
         /**
-         * Creates a new instance of [SmartSelfieRegistrationFragment] which wraps the
-         * [SmileID.SmartSelfieRegistrationScreen] Composable under the hood
+         * Creates a new instance of [SmartSelfieEnrollmentFragment] which wraps the
+         * [SmileID.SmartSelfieEnrollmentScreen] Composable under the hood
          *
-         * @param userId The user ID to associate with the SmartSelfie™ Registration. Most often,
+         * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
          * random user ID will be generated.
          * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
@@ -75,7 +75,7 @@ class SmartSelfieRegistrationFragment : Fragment() {
             userId: String = randomUserId(),
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
-        ) = SmartSelfieRegistrationFragment().apply {
+        ) = SmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
                 this.allowAgentMode = allowAgentMode
@@ -98,7 +98,7 @@ class SmartSelfieRegistrationFragment : Fragment() {
             setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val args = requireArguments()
-                SmileID.SmartSelfieRegistrationScreen(
+                SmileID.SmartSelfieEnrollmentScreen(
                     userId = args.userId,
                     allowAgentMode = args.allowAgentMode,
                     showAttribution = args.showAttribution,

@@ -10,7 +10,7 @@ import java.io.File
 
 /**
  * This callback is only consumed from Kotlin code, so typealias is fine. Java code will use the
- * Fragment compatibility layer (e.g. [com.smileidentity.fragment.SmartSelfieRegistrationFragment]),
+ * Fragment compatibility layer (e.g. [com.smileidentity.fragment.SmartSelfieEnrollmentFragment]),
  * in which the result is delivered via the Fragment Result API. Our Fragment compatibility layer
  * is written in Kotlin.
  */
