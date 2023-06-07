@@ -83,7 +83,9 @@ jobs:
       - name: Assemble and Publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleRelease publish
+          # We create both an APK and AAB so that the AAB can be uploaded to the Play Store and the
+          # APK can be uploaded to GitHub (for easy ad-hoc installation, if desired)
+          arguments: assembleRelease bundleRelease publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.read_version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -136,7 +138,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.smileidentity.sample
           track: internal
-          releaseFiles: sample/build/outputs/apk/release/sample-release.apk
+          releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
           releaseName: Smile ID (Partner 002)
       - name: Bump Version
         if: ${{ github.event.inputs.bump_version == 'true' }}
