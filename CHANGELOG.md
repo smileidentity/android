@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Features
+- Breaking: renamed SmartSelfie Registration to SmartSelfie Enrollment
+
+### Bug Fixes
+
+### Dependencies
+
 ## 10.0.0-beta02
 
 ### Features
