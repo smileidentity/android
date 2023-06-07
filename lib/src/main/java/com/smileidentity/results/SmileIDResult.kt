@@ -74,7 +74,7 @@ data class EnhancedKycResult(
  */
 @Parcelize
 data class DocumentVerificationResult(
-    val selfieFile: File,
+    val selfieFile: File? = null,
     val documentFrontFile: File,
     val documentBackFile: File? = null,
     val jobStatusResponse: DocVJobStatusResponse,

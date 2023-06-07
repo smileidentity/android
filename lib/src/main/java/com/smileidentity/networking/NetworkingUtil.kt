@@ -48,3 +48,8 @@ fun File.asLivenessImage() = UploadImageInfo(
     imageTypeId = ImageType.LivenessPngOrJpgFile,
     image = this,
 )
+
+fun File.asDocumentImage() = UploadImageInfo(
+    imageTypeId = ImageType.IdCardPngOrJpgFile,
+    image = this,
+)
