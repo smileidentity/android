@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.smileidentity.sample"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.smileidentity.sample"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 2
         // Include the SDK version in the app version name
         versionName = "1.0.0_sdk-" + project(":lib").version.toString()
@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.fragment)
     implementation(libs.timber)
 
     // Debug Helpers
@@ -112,7 +113,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest) // UI Tests
 
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.material.components)
 
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
