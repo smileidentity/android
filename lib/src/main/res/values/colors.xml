@@ -6,7 +6,7 @@
     <color name="si_color_accent">#FF151F72</color>
     <color name="si_color_success">#FF2CC05C</color>
     <color name="si_color_error">#FF91180F</color>
-    <color name="si_color_background_dark">#FFFFFFFF</color>
+    <color name="si_color_background_dark">#FFF8F8F8</color>
     <color name="si_color_background_main">#FFFFFFFF</color>
     <color name="si_color_background_light">#FFFFFFFF</color>
     <color name="si_color_background_lightest">#FFFFFFFF</color>
