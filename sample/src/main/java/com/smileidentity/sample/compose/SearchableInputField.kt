@@ -37,7 +37,8 @@ import timber.log.Timber
 
 @Parcelize
 data class SearchableInputFieldItem(
-    val item: String,
+    val key: String,
+    val displayName: String,
     val leadingEmoji: String = "",
 ) : Parcelable
 
@@ -53,7 +54,9 @@ fun SearchableInputField(
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val filteredItems by remember(unfilteredItems) {
-        derivedStateOf { unfilteredItems.filter { it.item.contains(query, ignoreCase = true) } }
+        derivedStateOf {
+            unfilteredItems.filter { it.displayName.contains(query, ignoreCase = true) }
+        }
     }
     val keyboardController = LocalSoftwareKeyboardController.current
     val shape = RoundedCornerShape(8.dp)
@@ -70,7 +73,7 @@ fun SearchableInputField(
         active = active,
         onActiveChange = { active = it },
         // The field label when nothing is selected, otherwise the selected value
-        placeholder = { Text(selectedItem?.item ?: fieldLabel) },
+        placeholder = { Text(selectedItem?.displayName ?: fieldLabel) },
         leadingIcon = {
             if (selectedItem == null) {
                 Icon(Icons.Default.Search, contentDescription = null)
@@ -88,7 +91,7 @@ fun SearchableInputField(
             items(filteredItems) {
                 ListItem(
                     leadingContent = { Text(it.leadingEmoji) },
-                    headlineContent = { Text(it.item) },
+                    headlineContent = { Text(it.displayName) },
                     trailingContent = {
                         Icon(
                             Icons.Outlined.CheckCircle,
@@ -115,7 +118,7 @@ private fun SearchableInputFieldPreview() {
         SearchableInputField(
             fieldLabel = "Country of Issue",
             selectedItem = null,
-            unfilteredItems = countries,
+            unfilteredItems = countryDetails.values.toList(),
             onItemSelected = { },
         )
     }
