@@ -6,8 +6,12 @@
 - Breaking: renamed SmartSelfie Registration to SmartSelfie Enrollment
 - Compile against API level 34
 - Minor change in default colors to add contrast
+- Debounce Selfie Capture directive changes to allow user time to read the directions
+- Tweak selfie progress indicator animation
+- Set Release property on Sentry for release tracking
 
 ### Bug Fixes
+- Fix crash on network retries
 
 ### Dependencies
 - Bump AndroidX Activity to 1.7.2

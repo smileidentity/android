@@ -2,6 +2,7 @@ package com.smileidentity.compose
 
 import android.graphics.BitmapFactory
 import androidx.annotation.VisibleForTesting
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -168,7 +169,7 @@ internal fun SelfieCaptureScreen(
         )
         val animatedProgress = animateFloatAsState(
             targetValue = uiState.progress,
-            animationSpec = tween(),
+            animationSpec = tween(easing = LinearEasing),
             label = "selfie_progress",
         ).value
         FaceShapedProgressIndicator(
