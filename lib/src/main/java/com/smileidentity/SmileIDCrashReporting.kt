@@ -27,6 +27,7 @@ object SmileIDCrashReporting {
     fun enable(isInDebugMode: Boolean = false) {
         val options = SentryOptions().apply {
             dsn = BuildConfig.SENTRY_DSN
+            release = BuildConfig.VERSION_NAME
             isEnableUncaughtExceptionHandler = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
                 try {
@@ -41,7 +42,6 @@ object SmileIDCrashReporting {
                 }
                 return@BeforeSendCallback null
             }
-            release = BuildConfig.VERSION_NAME
         }
 
         hub = Hub(options).apply {
