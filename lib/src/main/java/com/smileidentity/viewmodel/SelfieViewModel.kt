@@ -20,10 +20,10 @@ import com.smileidentity.createLivenessFile
 import com.smileidentity.createSelfieFile
 import com.smileidentity.getExceptionHandler
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
-import com.smileidentity.models.JobType.SmartSelfieAuthentication
-import com.smileidentity.models.JobType.SmartSelfieEnrollment
+import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -34,14 +34,19 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+private val UI_DEBOUNCE_DURATION = 250.milliseconds
 private const val INTRA_IMAGE_MIN_DELAY_MS = 350
 private const val NUM_LIVENESS_IMAGES = 7
 private const val TOTAL_STEPS = NUM_LIVENESS_IMAGES + 1 // 7 B&W Liveness + 1 Color Selfie
@@ -77,7 +82,13 @@ class SelfieViewModel(
     private val jobId: String,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
-    val uiState = _uiState.asStateFlow()
+
+    // Debounce to avoid spamming Directive updates so that they can be read by the user
+    val uiState = _uiState.asStateFlow().debounce(UI_DEBOUNCE_DURATION).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        SelfieUiState(),
+    )
     var result: SmileIDResult<SmartSelfieResult>? = null
 
     private val livenessFiles = mutableListOf<File>()
