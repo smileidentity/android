@@ -10,6 +10,7 @@
 - Tweak selfie progress indicator animation
 
 ### Bug Fixes
+- Fix crash on network retries
 
 ### Dependencies
 - Bump AndroidX Activity to 1.7.2
