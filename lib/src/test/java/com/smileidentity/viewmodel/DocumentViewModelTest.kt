@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel
 
+import com.smileidentity.models.Document
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,7 @@ class DocumentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = DocumentViewModel(randomUserId(), randomJobId())
+        subject = DocumentViewModel(randomUserId(), randomJobId(), Document("KE", "ID Card"))
     }
 
     @After
