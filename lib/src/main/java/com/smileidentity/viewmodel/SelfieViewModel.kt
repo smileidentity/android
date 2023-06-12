@@ -20,8 +20,10 @@ import com.smileidentity.createLivenessFile
 import com.smileidentity.createSelfieFile
 import com.smileidentity.getExceptionHandler
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
+import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -256,21 +258,18 @@ class SelfieViewModel(
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
-            // val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
-            val jobType = JobType.BiometricKyc
+            val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
             val authRequest = AuthenticationRequest(
                 jobType = jobType,
                 enrollment = isEnroll,
                 userId = userId,
                 jobId = jobId,
-                country = "ZA",
-                idType = "NATIONAL_ID",
             )
 
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                callbackUrl = "https://webhook.site/98a6c591-fcae-49c8-b41f-d0adfb0a9bad",
+                callbackUrl = "",
                 partnerParams = authResponse.partnerParams,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
@@ -278,17 +277,7 @@ class SelfieViewModel(
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()
-            val uploadRequest = UploadRequest(
-                images = livenessImagesInfo + selfieImageInfo,
-                idInfo = IdInfo(
-                    country = "ZA",
-                    idType = "NATIONAL_ID",
-                    idNumber = "0000000000000",
-                    firstName = "Vansh",
-                    lastName = "Gandhi",
-                    entered = true,
-                ),
-            )
+            val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             val jobStatusRequest = JobStatusRequest(
@@ -302,7 +291,7 @@ class SelfieViewModel(
 
             lateinit var jobStatusResponse: JobStatusResponse
             val jobStatusPollDelay = 1.seconds
-            for (i in 1..100) {
+            for (i in 1..10) {
                 Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
                 delay(jobStatusPollDelay)
                 jobStatusResponse = SmileID.api.getJobStatus(jobStatusRequest)
