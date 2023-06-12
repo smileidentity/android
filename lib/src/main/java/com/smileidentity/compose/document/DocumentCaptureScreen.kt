@@ -44,8 +44,8 @@ import com.ujizin.camposer.state.rememberCameraState
 internal fun DocumentCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
-    enforcedIdType: Document? = null,
-    idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+    idType: Document,
+    idAspectRatio: Float? = idType.aspectRatio,
     titleText: String,
     subtitleText: String,
     isBackSide: Boolean = false,
@@ -54,7 +54,7 @@ internal fun DocumentCaptureScreen(
             DocumentViewModel(
                 userId = userId,
                 jobId = jobId,
-                enforcedIdType = enforcedIdType,
+                idType = idType,
                 idAspectRatio = idAspectRatio,
             )
         },
@@ -128,6 +128,7 @@ private fun DocumentCaptureScreenPreview() {
         DocumentCaptureScreen(
             titleText = "Front of National ID Card",
             subtitleText = "Make sure all corners are visible and there is no glare",
+            idType = Document("KE", "ID Card"),
         )
     }
 }

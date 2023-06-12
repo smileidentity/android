@@ -46,8 +46,8 @@ internal fun OrchestratedDocumentVerificationScreen(
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
-    enforcedIdType: Document? = null,
-    idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+    idType: Document,
+    idAspectRatio: Float? = idType?.aspectRatio,
     captureBothSides: Boolean = false, // TODO - Can we make this an enum, or sealed interface?
     bypassSelfieCaptureWithFile: File? = null,
     viewModel: DocumentViewModel = viewModel(
@@ -55,7 +55,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             DocumentViewModel(
                 userId = userId,
                 jobId = jobId,
-                enforcedIdType = enforcedIdType,
+                idType = idType,
                 idAspectRatio = idAspectRatio,
             )
         },
@@ -116,7 +116,7 @@ internal fun OrchestratedDocumentVerificationScreen(
         DocumentCaptureFlow.CameraBothSides -> DocumentCaptureScreen(
             userId = userId,
             jobId = jobId,
-            enforcedIdType = enforcedIdType,
+            idType = idType,
             idAspectRatio = idAspectRatio,
             titleText = stringResource(id = R.string.si_doc_v_capture_instructions_front_title),
             subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
@@ -143,7 +143,7 @@ internal fun OrchestratedDocumentVerificationScreen(
         DocumentCaptureFlow.CameraBothSidesBack -> DocumentCaptureScreen(
             userId = userId,
             jobId = jobId,
-            enforcedIdType = enforcedIdType,
+            idType = idType,
             idAspectRatio = idAspectRatio,
             titleText = stringResource(id = R.string.si_doc_v_capture_instructions_back_title),
             subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
@@ -171,7 +171,7 @@ internal fun OrchestratedDocumentVerificationScreen(
         DocumentCaptureFlow.CameraOneSide -> DocumentCaptureScreen(
             userId = userId,
             jobId = jobId,
-            enforcedIdType = enforcedIdType,
+            idType = idType,
             idAspectRatio = idAspectRatio,
             titleText = stringResource(id = R.string.si_doc_v_capture_instructions_front_title),
             subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),

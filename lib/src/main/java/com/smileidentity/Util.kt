@@ -1,5 +1,6 @@
 package com.smileidentity
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
@@ -20,7 +22,9 @@ import android.text.TextUtils
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.camera.core.impl.utils.Exif
 import androidx.core.graphics.scale
+import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.SmileIDException
@@ -65,6 +69,7 @@ fun isImageAtLeast(
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
  * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
  */
+@SuppressLint("RestrictedApi")
 internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
@@ -82,8 +87,26 @@ internal fun postProcessImageBitmap(
     }
 
     if (isDocumentVerification) {
+        val exif = Exif.createFromFile(file)
+        val degrees = when (exif.rotation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90F
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180F
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270F
+            else -> 90F
+        }
+
+        val matrix = Matrix().apply { postRotate(degrees) }
+        val bitmap = Bitmap.createBitmap(
+            mutableBitmap,
+            0,
+            0,
+            mutableBitmap.width,
+            mutableBitmap.height,
+            matrix,
+            true,
+        )
         file.outputStream().use {
-            mutableBitmap
+            bitmap
                 .compress(JPEG, compressionQuality, it)
         }
         return file
@@ -117,7 +140,7 @@ internal fun postProcessImageBitmap(
 internal fun postProcessImage(
     file: File,
     saveAsGrayscale: Boolean = false,
-    isDocumentVerification: Boolean = false,
+    isDocumentVerification: Boolean = true,
     compressionQuality: Int = 100,
     desiredOutputSize: Size? = null,
 ): File {

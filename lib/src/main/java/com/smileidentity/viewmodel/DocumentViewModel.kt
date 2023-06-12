@@ -45,8 +45,8 @@ data class DocumentUiState(
 class DocumentViewModel(
     private val userId: String,
     private val jobId: String,
-    private val enforcedIdType: Document? = null,
-    private val idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+    private val idType: Document,
+    private val idAspectRatio: Float? = idType.aspectRatio,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentUiState())
     val uiState = _uiState.asStateFlow()
