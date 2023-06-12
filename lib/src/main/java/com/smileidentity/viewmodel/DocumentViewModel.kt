@@ -1,6 +1,6 @@
 package com.smileidentity.viewmodel
 
-import android.util.Size
+import android.graphics.Bitmap
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -60,9 +60,18 @@ class DocumentViewModel(
     ) {
         viewModelScope.launch {
             try {
-                val documentFile = captureDocument(cameraState = cameraState, hasBackSide = hasBackSide)
+                val documentFile =
+                    captureDocument(cameraState = cameraState, hasBackSide = hasBackSide)
                 Timber.v("Capturing document image to $documentFile and is $hasBackSide")
-                _uiState.update { if (hasBackSide) it.copy(backDocumentImageToConfirm = documentFile) else it.copy(frontDocumentImageToConfirm = documentFile) }
+                _uiState.update {
+                    if (hasBackSide) {
+                        it.copy(backDocumentImageToConfirm = documentFile)
+                    } else {
+                        it.copy(
+                            frontDocumentImageToConfirm = documentFile,
+                        )
+                    }
+                }
             } catch (e: Exception) {
                 Timber.e("Error capturing document", e)
                 _uiState.update { it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle) }
@@ -76,17 +85,36 @@ class DocumentViewModel(
      * The [documentFrontFile] or [documentBackFile] variable will be updated with the captured image file,
      * and the UI state will be updated accordingly.`
      */
-    private suspend fun captureDocument(cameraState: CameraState, hasBackSide: Boolean) = suspendCoroutine {
-        if (hasBackSide) documentBackFile = createDocumentFile() else documentFrontFile = createDocumentFile()
-        cameraState.takePicture(if (hasBackSide) documentBackFile!! else documentFrontFile!!) { result ->
-            when (result) {
-                is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
-                is ImageCaptureResult.Success -> it.resume(
-                    postProcessImage(
-                        file = if (hasBackSide) documentBackFile!! else documentFrontFile!!,
-                        saveAsGrayscale = false,
-                        desiredOutputSize = Size(200, 100),
-                    ),
+    private suspend fun captureDocument(cameraState: CameraState, hasBackSide: Boolean) =
+        suspendCoroutine {
+            if (hasBackSide) {
+                documentBackFile = createDocumentFile()
+            } else {
+                documentFrontFile =
+                    createDocumentFile()
+            }
+            cameraState.takePicture(if (hasBackSide) documentBackFile!! else documentFrontFile!!) { result ->
+                when (result) {
+                    is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
+                    is ImageCaptureResult.Success -> it.resume(
+                        postProcessImage(
+                            file = if (hasBackSide) documentBackFile!! else documentFrontFile!!,
+                        ),
+                    )
+                }
+            }
+        }
+
+    fun saveFileFromGallerySelection(
+        documentFile: File?,
+        isBackSide: Boolean = false,
+    ) {
+        _uiState.update {
+            if (isBackSide) {
+                it.copy(backDocumentImageToConfirm = documentFile)
+            } else {
+                it.copy(
+                    frontDocumentImageToConfirm = documentFile,
                 )
             }
         }
@@ -156,9 +184,17 @@ class DocumentViewModel(
         }
     }
 
-    fun onDocumentRejected(isBackSide: Boolean) {
+    fun onDocumentRejected(
+        isBackSide: Boolean = false,
+    ) {
         _uiState.update {
-            if (isBackSide) it.copy(backDocumentImageToConfirm = null) else it.copy(frontDocumentImageToConfirm = null)
+            if (isBackSide) {
+                it.copy(backDocumentImageToConfirm = null)
+            } else {
+                it.copy(
+                    frontDocumentImageToConfirm = null,
+                )
+            }
         }
         if (isBackSide) {
             documentBackFile?.delete()?.also { deleted ->
@@ -184,6 +220,7 @@ class DocumentViewModel(
                     it.copy(processingState = null)
                 }
             }
+
             else -> {
                 if (documentFrontFile != null) {
                     submitJob(documentFrontFile!!)

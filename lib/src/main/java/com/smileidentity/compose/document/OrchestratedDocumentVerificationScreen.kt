@@ -19,10 +19,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
 import com.smileidentity.R
 import com.smileidentity.compose.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.ProcessingScreen
+import com.smileidentity.generateFileFromUri
 import com.smileidentity.isImageAtLeast
 import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
@@ -62,13 +62,11 @@ internal fun OrchestratedDocumentVerificationScreen(
     ),
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
+    val context = LocalContext.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     var shouldSelectFromGallery by rememberSaveable { mutableStateOf(false) }
-    var frontDocumentPhoto by rememberSaveable { mutableStateOf<Uri?>(null) }
     var isFrontDocumentPhotoValid by rememberSaveable { mutableStateOf(false) }
-    var backDocumentPhoto by rememberSaveable { mutableStateOf<Uri?>(null) }
-    var isBackDocumentPhotoValid by rememberSaveable { mutableStateOf(false) }
 
     when (
         val state = DocumentCaptureFlow.documentCaptureType(
@@ -77,7 +75,6 @@ internal fun OrchestratedDocumentVerificationScreen(
             shouldSelectFromGallery = shouldSelectFromGallery,
             captureBothSides = captureBothSides,
             isFrontDocumentPhotoValid = isFrontDocumentPhotoValid,
-            isBackDocumentPhotoValid = isBackDocumentPhotoValid,
             uiState = uiState,
         )
     ) {
@@ -137,7 +134,10 @@ internal fun OrchestratedDocumentVerificationScreen(
                 isFrontDocumentPhotoValid = true
             },
             retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
-            onRetake = { viewModel.onDocumentRejected(isBackSide = true) },
+            onRetake = {
+                viewModel.onDocumentRejected(isBackSide = true)
+                isFrontDocumentPhotoValid = false
+            },
         )
 
         DocumentCaptureFlow.CameraBothSidesBack -> DocumentCaptureScreen(
@@ -198,60 +198,73 @@ internal fun OrchestratedDocumentVerificationScreen(
         }
 
         DocumentCaptureFlow.GalleryBothSides -> PhotoPickerScreen {
-            frontDocumentPhoto = it
-            isFrontDocumentPhotoValid = true
+            viewModel.saveFileFromGallerySelection(generateFileFromUri(uri = it, context = context))
         }
 
         DocumentCaptureFlow.GalleryBothSidesConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-            painter = rememberAsyncImagePainter(backDocumentPhoto),
+            painter = BitmapPainter(
+                BitmapFactory.decodeFile(uiState.frontDocumentImageToConfirm!!.absolutePath)
+                    .asImageBitmap(),
+            ),
             confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
             onConfirm = {
                 isFrontDocumentPhotoValid = true
-                isBackDocumentPhotoValid = false
             },
             retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
             onRetake = {
-                frontDocumentPhoto = null
+                viewModel.onDocumentRejected()
                 isFrontDocumentPhotoValid = false
             },
         )
 
         DocumentCaptureFlow.GalleryBothSidesBack -> PhotoPickerScreen {
-            backDocumentPhoto = it
-            isBackDocumentPhotoValid = true
+            viewModel.saveFileFromGallerySelection(
+                generateFileFromUri(uri = it, context = context),
+                isBackSide = true,
+            )
         }
 
         DocumentCaptureFlow.GalleryBothSidesBackConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-            painter = rememberAsyncImagePainter(backDocumentPhoto),
+            painter = BitmapPainter(
+                BitmapFactory.decodeFile(uiState.backDocumentImageToConfirm!!.absolutePath)
+                    .asImageBitmap(),
+            ),
             confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
-            onConfirm = { },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
-            onRetake = {
-                backDocumentPhoto = null
-                isBackDocumentPhotoValid = false
+            onConfirm = {
+                viewModel.submitDocVJob(
+                    uiState.frontDocumentImageToConfirm!!,
+                    uiState.backDocumentImageToConfirm,
+                )
             },
+            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            onRetake = { viewModel.onDocumentRejected(true) },
         )
 
         DocumentCaptureFlow.GalleryOneSide -> PhotoPickerScreen {
-            frontDocumentPhoto = it
+            viewModel.saveFileFromGallerySelection(generateFileFromUri(uri = it, context = context))
             isFrontDocumentPhotoValid = true
         }
 
         DocumentCaptureFlow.GalleryOneSideConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-            painter = rememberAsyncImagePainter(frontDocumentPhoto),
+            painter = BitmapPainter(
+                BitmapFactory.decodeFile(uiState.frontDocumentImageToConfirm!!.absolutePath)
+                    .asImageBitmap(),
+            ),
             confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
-            onConfirm = { },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
-            onRetake = {
-                frontDocumentPhoto = null
-                isFrontDocumentPhotoValid = false
+            onConfirm = {
+                viewModel.submitDocVJob(
+                    uiState.frontDocumentImageToConfirm!!,
+                    uiState.backDocumentImageToConfirm,
+                )
             },
+            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            onRetake = { viewModel.onDocumentRejected() },
         )
 
         DocumentCaptureFlow.UnknownDocumentCaptureFlowOption -> Timber.d("Document Verification option not available") // TODO - Should we throw an error or just log?

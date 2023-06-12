@@ -49,28 +49,33 @@ internal sealed class DocumentCaptureFlow {
             shouldSelectFromGallery: Boolean,
             captureBothSides: Boolean,
             isFrontDocumentPhotoValid: Boolean,
-            isBackDocumentPhotoValid: Boolean,
         ): DocumentCaptureFlow {
             val selectGalleryOneSide =
-                shouldSelectFromGallery && !captureBothSides && !isFrontDocumentPhotoValid
+                shouldSelectFromGallery && !captureBothSides && uiState?.frontDocumentImageToConfirm == null
             val selectGalleryOneSideConfirmation =
-                shouldSelectFromGallery && !captureBothSides && isFrontDocumentPhotoValid
+                shouldSelectFromGallery && !captureBothSides && uiState?.frontDocumentImageToConfirm != null
+
             val selectGalleryTwoSides =
-                shouldSelectFromGallery && captureBothSides && !isFrontDocumentPhotoValid
+                shouldSelectFromGallery && captureBothSides && uiState?.frontDocumentImageToConfirm == null
             val selectGalleryTwoSidesConfirmation =
-                shouldSelectFromGallery && captureBothSides && isFrontDocumentPhotoValid
+                shouldSelectFromGallery && captureBothSides && !isFrontDocumentPhotoValid && uiState?.frontDocumentImageToConfirm != null
+
             val selectGalleryTwoSidesBack =
-                shouldSelectFromGallery && captureBothSides && isFrontDocumentPhotoValid && !isBackDocumentPhotoValid
+                shouldSelectFromGallery && captureBothSides && isFrontDocumentPhotoValid && uiState?.backDocumentImageToConfirm == null
+
             val selectGalleryTwoSidesBackConfirmation =
-                shouldSelectFromGallery && captureBothSides && isFrontDocumentPhotoValid && isBackDocumentPhotoValid
+                shouldSelectFromGallery && captureBothSides && isFrontDocumentPhotoValid && uiState?.backDocumentImageToConfirm != null
+
             val captureOneSideCamera =
                 !shouldSelectFromGallery && !captureBothSides && uiState?.frontDocumentImageToConfirm == null
             val captureOneSideCameraConfirmation =
                 !shouldSelectFromGallery && !captureBothSides && uiState?.frontDocumentImageToConfirm != null
+
             val captureTwoSidesCamera =
                 !shouldSelectFromGallery && captureBothSides && uiState?.frontDocumentImageToConfirm == null
             val captureTwoSidesCameraConfirmation =
                 !shouldSelectFromGallery && captureBothSides && !isFrontDocumentPhotoValid && uiState?.frontDocumentImageToConfirm != null
+
             val captureTwoSidesCameraBack =
                 !shouldSelectFromGallery && captureBothSides && isFrontDocumentPhotoValid && uiState?.backDocumentImageToConfirm == null
             val captureTwoSidesCameraBackConfirmation =

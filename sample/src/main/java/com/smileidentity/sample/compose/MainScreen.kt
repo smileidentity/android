@@ -325,7 +325,7 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
                             SmileID.DocumentVerification(
-                                allowGalleryUpload = true,
+                                allowGalleryUpload = false,
                                 captureBothSides = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
