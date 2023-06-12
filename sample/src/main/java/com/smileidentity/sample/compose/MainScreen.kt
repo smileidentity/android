@@ -45,6 +45,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieEnrollmentScreen
+import com.smileidentity.models.Document
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
@@ -317,9 +318,57 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
+                            // TODO: fetch this from
+                            //  https://api.smileidentity.com/v1/products_config once it supports
+                            //  signature auth (there should be a story for this for Platform)
+                            DocumentVerificationIdTypeSelector(docVTestData) { country, idType ->
+                                Timber.v("Selected country: $country, idType: $idType")
+                                navController.navigate(
+                                    "${ProductScreen.DocumentVerification.route}/$country/$idType",
+                                ) { popUpTo(ProductScreen.DocumentVerification.route) }
+                            }
+                        }
+                        composable(
+                            ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
+                        ) {
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
-                            SmileID.DocumentVerification(userId = userId, jobId = jobId) {
+                            val documentType = Document(
+                                it.arguments?.getString("countryCode")!!,
+                                it.arguments?.getString("idType")!!,
+                            )
+                            SmileID.DocumentVerification(
+                                userId = userId,
+                                jobId = jobId,
+                                enforcedIdType = documentType,
+                            ) { result ->
+                                if (result is SmileIDResult.Success) {
+                                    val resultData = result.data
+                                    val message = StringBuilder("Document Verification ")
+                                    if (resultData.jobStatusResponse.jobComplete) {
+                                        if (resultData.jobStatusResponse.jobSuccess) {
+                                            message.append("completed successfully.")
+                                        } else {
+                                            message.append("completed unsuccessfully.")
+                                        }
+                                    } else {
+                                        message.append("still pending.")
+                                    }
+                                    Timber.d("$message: $result")
+                                    snackbarHostState.showSnackbar(
+                                        coroutineScope,
+                                        message.toString(),
+                                    )
+                                } else if (result is SmileIDResult.Error) {
+                                    val th = result.throwable
+                                    val message = "Document Verification error: ${th.message}"
+                                    Timber.e(th, message)
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                }
+                                navController.popBackStack(
+                                    route = BottomNavigationScreen.Home.route,
+                                    inclusive = false,
+                                )
                             }
                         }
                     }

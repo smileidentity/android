@@ -4,10 +4,14 @@
 
 ### Features
 - Breaking: renamed SmartSelfie Registration to SmartSelfie Enrollment
+- Compile against API level 34
+- Minor change in default colors to add contrast
 
 ### Bug Fixes
 
 ### Dependencies
+- Bump AndroidX Activity to 1.7.2
+- Bump Gradle to 8.0.2
 
 ## 10.0.0-beta02
 
