@@ -41,6 +41,7 @@ object SmileIDCrashReporting {
                 }
                 return@BeforeSendCallback null
             }
+            release = BuildConfig.VERSION_NAME
         }
 
         hub = Hub(options).apply {
