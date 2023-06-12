@@ -107,9 +107,13 @@ internal fun OrchestratedSelfieCaptureScreen(
             painter = BitmapPainter(
                 BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath).asImageBitmap(),
             ),
-            confirmButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                R.string.si_smart_selfie_confirmation_dialog_confirm_button,
+            ),
             onConfirm = { viewModel.submitJob() },
-            retakeButtonText = stringResource(R.string.si_smart_selfie_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                R.string.si_smart_selfie_confirmation_dialog_retake_button,
+            ),
             onRetake = { viewModel.onSelfieRejected() },
         )
 

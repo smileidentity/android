@@ -129,11 +129,15 @@ internal fun OrchestratedDocumentVerificationScreen(
                 BitmapFactory.decodeFile(uiState.frontDocumentImageToConfirm!!.absolutePath)
                     .asImageBitmap(),
             ),
-            confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            ),
             onConfirm = {
                 isFrontDocumentPhotoValid = true
             },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_retake_button,
+            ),
             onRetake = {
                 viewModel.onDocumentRejected(isBackSide = true)
                 isFrontDocumentPhotoValid = false
@@ -157,14 +161,18 @@ internal fun OrchestratedDocumentVerificationScreen(
                 BitmapFactory.decodeFile(uiState.backDocumentImageToConfirm!!.absolutePath)
                     .asImageBitmap(),
             ),
-            confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            ),
             onConfirm = {
                 viewModel.submitDocVJob(
                     uiState.frontDocumentImageToConfirm!!,
                     uiState.backDocumentImageToConfirm,
                 )
             },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_retake_button,
+            ),
             onRetake = { viewModel.onDocumentRejected(isBackSide = true) },
         )
 
@@ -185,14 +193,18 @@ internal fun OrchestratedDocumentVerificationScreen(
                     BitmapFactory.decodeFile(uiState.frontDocumentImageToConfirm!!.absolutePath)
                         .asImageBitmap(),
                 ),
-                confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+                confirmButtonText = stringResource(
+                    id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+                ),
                 onConfirm = {
                     viewModel.submitDocVJob(
                         uiState.frontDocumentImageToConfirm,
                         uiState.backDocumentImageToConfirm,
                     )
                 },
-                retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+                retakeButtonText = stringResource(
+                    id = R.string.si_doc_v_confirmation_dialog_retake_button,
+                ),
                 onRetake = { viewModel.onDocumentRejected(isBackSide = false) },
             )
         }
@@ -208,11 +220,15 @@ internal fun OrchestratedDocumentVerificationScreen(
                 BitmapFactory.decodeFile(uiState.frontDocumentImageToConfirm!!.absolutePath)
                     .asImageBitmap(),
             ),
-            confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            ),
             onConfirm = {
                 isFrontDocumentPhotoValid = true
             },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_retake_button,
+            ),
             onRetake = {
                 viewModel.onDocumentRejected()
                 isFrontDocumentPhotoValid = false
@@ -233,14 +249,18 @@ internal fun OrchestratedDocumentVerificationScreen(
                 BitmapFactory.decodeFile(uiState.backDocumentImageToConfirm!!.absolutePath)
                     .asImageBitmap(),
             ),
-            confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            ),
             onConfirm = {
                 viewModel.submitDocVJob(
                     uiState.frontDocumentImageToConfirm!!,
                     uiState.backDocumentImageToConfirm,
                 )
             },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_retake_button,
+            ),
             onRetake = { viewModel.onDocumentRejected(true) },
         )
 
@@ -256,18 +276,24 @@ internal fun OrchestratedDocumentVerificationScreen(
                 BitmapFactory.decodeFile(uiState.frontDocumentImageToConfirm!!.absolutePath)
                     .asImageBitmap(),
             ),
-            confirmButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_confirm_button),
+            confirmButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            ),
             onConfirm = {
                 viewModel.submitDocVJob(
                     uiState.frontDocumentImageToConfirm!!,
                     uiState.backDocumentImageToConfirm,
                 )
             },
-            retakeButtonText = stringResource(id = R.string.si_doc_v_confirmation_dialog_retake_button),
+            retakeButtonText = stringResource(
+                id = R.string.si_doc_v_confirmation_dialog_retake_button,
+            ),
             onRetake = { viewModel.onDocumentRejected() },
         )
 
-        DocumentCaptureFlow.UnknownDocumentCaptureFlowOption -> Timber.d("Document Verification option not available") // TODO - Should we throw an error or just log?
+        DocumentCaptureFlow.UnknownDocumentCaptureFlowOption -> Timber.d(
+            "Document Verification option not available",
+        ) // TODO - Should we throw an error or just log?
     }
 }
 

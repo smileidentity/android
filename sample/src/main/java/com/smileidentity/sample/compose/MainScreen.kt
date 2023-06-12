@@ -45,6 +45,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieRegistrationScreen
+import com.smileidentity.models.Document
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
@@ -327,6 +328,7 @@ fun MainScreen() {
                             SmileID.DocumentVerification(
                                 allowGalleryUpload = false,
                                 captureBothSides = true,
+                                idType = Document("KE", "ID Card"),
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data

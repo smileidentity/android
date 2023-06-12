@@ -103,7 +103,12 @@ internal fun DocumentCaptureScreen(
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CaptureDocumentButton { viewModel.takeButtonCaptureDocument(cameraState = cameraState, hasBackSide = isBackSide) }
+            CaptureDocumentButton {
+                viewModel.takeButtonCaptureDocument(
+                    cameraState = cameraState,
+                    hasBackSide = isBackSide,
+                )
+            }
         }
     }
 }
