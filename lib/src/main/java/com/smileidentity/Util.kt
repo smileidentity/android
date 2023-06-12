@@ -171,7 +171,8 @@ internal fun createDocumentFile() = createSmileTempFile("document")
 /**
  * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
  * [SmileIDException] if it is an [HttpException] (this may not always be possible, i.e. if we get
- * an error during S3 upload, or if we get an unconventional 500 error from the API)
+ * an error during S3 upload, or if we get an unconventional 500 error from the API). Otherwise, the
+ * exception is reported back as-is and is also reported to Sentry.
  *
  * @param proxy Callback to be invoked with the exception
  */
@@ -185,10 +186,16 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit): CoroutineExceptionHandler {
                 SmileIDException(details)
             } catch (e: Exception) {
                 Timber.w(e, "Unable to convert HttpException to SmileIDException")
+
+                // Report the *conversion* error to Sentry, rather than the original error
+                SmileIDCrashReporting.hub.captureException(e)
+
                 // More informative to pass back the original exception than the conversion error
                 throwable
             }
         } else {
+            // Unexpected error, report to Sentry
+            SmileIDCrashReporting.hub.captureException(throwable)
             throwable
         }
         proxy(converted)

@@ -11,10 +11,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class SmartSelfieRegistrationFragmentTest {
+class SmartSelfieEnrollmentFragmentTest {
     @Test
     fun onCreateView_should_return_a_ComposeView() {
-        val scenario = launchFragment { SmartSelfieRegistrationFragment.newInstance() }
+        val scenario = launchFragment { SmartSelfieEnrollmentFragment.newInstance() }
 
         scenario.onFragment { assertTrue(it.view is ComposeView) }
 

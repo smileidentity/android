@@ -2,6 +2,7 @@ package com.smileidentity.compose
 
 import android.graphics.BitmapFactory
 import androidx.annotation.VisibleForTesting
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -93,7 +94,9 @@ internal fun OrchestratedSelfieCaptureScreen(
                 uiState.errorMessage ?: R.string.si_processing_error_subtitle,
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
-            continueButtonText = stringResource(R.string.si_smart_selfie_processing_continue_button),
+            continueButtonText = stringResource(
+                R.string.si_smart_selfie_processing_continue_button,
+            ),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
             onRetry = { viewModel.onRetry() },
@@ -166,7 +169,7 @@ internal fun SelfieCaptureScreen(
         )
         val animatedProgress = animateFloatAsState(
             targetValue = uiState.progress,
-            animationSpec = tween(),
+            animationSpec = tween(easing = LinearEasing),
             label = "selfie_progress",
         ).value
         FaceShapedProgressIndicator(

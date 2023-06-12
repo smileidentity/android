@@ -136,7 +136,7 @@ object SmileID {
         connectTimeout(30, TimeUnit.SECONDS)
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)
-        addNetworkInterceptor(
+        addInterceptor(
             Interceptor { chain: Interceptor.Chain ->
                 // Retry on exception (network error) and 5xx
                 val request = chain.request()

@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
-import com.smileidentity.fragment.SmartSelfieRegistrationFragment;
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
 import com.smileidentity.models.JobStatusResponse;
 import com.smileidentity.results.SmartSelfieResult;
 import com.smileidentity.results.SmileIDResult;
@@ -37,20 +37,20 @@ public class JavaActivity extends FragmentActivity {
         hideProductFragment();
         findViewById(R.id.button_smart_selfie_authentication)
             .setOnClickListener(v -> doSmartSelfieAuthentication());
-        findViewById(R.id.button_smart_selfie_registration)
-            .setOnClickListener(v -> doSmartSelfieRegistration());
+        findViewById(R.id.button_smart_selfie_enrollment)
+            .setOnClickListener(v -> doSmartSelfieEnrollment());
     }
 
-    private void doSmartSelfieRegistration() {
-        SmartSelfieRegistrationFragment smartSelfieFragment = SmartSelfieRegistrationFragment
+    private void doSmartSelfieEnrollment() {
+        SmartSelfieEnrollmentFragment smartSelfieFragment = SmartSelfieEnrollmentFragment
             .newInstance();
         getSupportFragmentManager().setFragmentResultListener(
-            SmartSelfieRegistrationFragment.KEY_REQUEST,
+            SmartSelfieEnrollmentFragment.KEY_REQUEST,
             this,
             (requestKey, result) -> {
                 SmileIDResult<SmartSelfieResult> smartSelfieResult =
-                    SmartSelfieRegistrationFragment.resultFromBundle(result);
-                Timber.v("SmartSelfieRegistration Result: %s", smartSelfieResult);
+                    SmartSelfieEnrollmentFragment.resultFromBundle(result);
+                Timber.v("SmartSelfieEnrollment Result: %s", smartSelfieResult);
                 if (smartSelfieResult instanceof SmileIDResult.Success<SmartSelfieResult> successResult) {
                     File selfieFile = successResult.getData().getSelfieFile();
                     List<File> livenessFiles = successResult.getData().getLivenessFiles();
@@ -59,15 +59,15 @@ public class JavaActivity extends FragmentActivity {
                     // may indicate that the job is still in progress or failed. You should
                     // check the job status response to determine the final status of the job.
                     if (jobStatusResponse.getJobSuccess()) {
-                        Timber.v("SmartSelfieRegistration Job Success");
+                        Timber.v("SmartSelfieEnrollment Job Success");
                     } else if (!jobStatusResponse.getJobComplete()) {
-                        Timber.v("SmartSelfieRegistration Job Not Complete");
+                        Timber.v("SmartSelfieEnrollment Job Not Complete");
                     } else {
-                        Timber.v("SmartSelfieRegistration Job Failed");
+                        Timber.v("SmartSelfieEnrollment Job Failed");
                     }
                 } else if (smartSelfieResult instanceof SmileIDResult.Error error) {
                     Throwable throwable = error.getThrowable();
-                    Timber.v("SmartSelfieRegistration Error: %s", throwable.getMessage());
+                    Timber.v("SmartSelfieEnrollment Error: %s", throwable.getMessage());
                 }
                 getSupportFragmentManager()
                     .beginTransaction()
@@ -90,7 +90,7 @@ public class JavaActivity extends FragmentActivity {
         SmartSelfieAuthenticationFragment smartSelfieFragment = SmartSelfieAuthenticationFragment
             .newInstance(userId, allowAgentMode);
         getSupportFragmentManager().setFragmentResultListener(
-            SmartSelfieRegistrationFragment.KEY_REQUEST,
+            SmartSelfieEnrollmentFragment.KEY_REQUEST,
             this,
             (requestKey, result) -> {
                 SmileIDResult<SmartSelfieResult> smartSelfieResult =

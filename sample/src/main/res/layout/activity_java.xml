@@ -9,10 +9,10 @@
             android:orientation="vertical">
 
         <Button
-                android:id="@+id/button_smart_selfie_registration"
+                android:id="@+id/button_smart_selfie_enrollment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/si_smart_selfie_registration_product_name" />
+                android:text="@string/si_smart_selfie_enrollment_product_name" />
 
         <Button
                 android:id="@+id/button_smart_selfie_authentication"

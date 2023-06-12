@@ -29,7 +29,8 @@ val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
  * @param modifier The modifier to be applied to the indicator.
  * @param aspectRatio The aspect ratio of the document, used to calculate the height of the view.
  * @param strokeWidth The width of the progress indicator stroke.
- * @param areEdgesDetected A boolean flag that is updated when document edges are within bounding box edges
+ * @param areEdgesDetected A boolean flag that is updated when document edges are within bounding
+ * box edges
  * @param backgroundColor The color of the background that is drawn around the document shape.
  */
 @Composable
@@ -49,9 +50,11 @@ fun DocumentShapedBoundingBox(
         // 1. Set the background color using a rectangle
         drawRect(backgroundColor)
 
-        // 2. Draw the outline of the bounding box and add a stroke that shows different edge detection states
+        // 2. Draw the outline of the bounding box and add a stroke that shows different edge
+        // detection states
         val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
-        val outlineBoundingBoxHeight = outlineBoundingBoxWidth / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
+        val outlineBoundingBoxHeight =
+            outlineBoundingBoxWidth / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
         drawRoundRect(
             color = strokeColor,
             topLeft = Offset(
