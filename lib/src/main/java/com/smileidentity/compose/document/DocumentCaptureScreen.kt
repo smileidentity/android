@@ -39,68 +39,6 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 
-/**
- * Orchestrates the document capture flow - navigates between instructions, requesting permissions,
- * showing camera view, and displaying processing screen
- */
-@Composable
-internal fun OrchestratedDocumentCaptureScreen(
-    userId: String = rememberSaveable { randomUserId() },
-    jobId: String = rememberSaveable { randomJobId() },
-    showAttribution: Boolean = true,
-    allowGalleryUpload: Boolean = false,
-    enforcedIdType: Document? = null,
-    idAspectRatio: Float? = enforcedIdType?.aspectRatio,
-    bypassSelfieCaptureWithFile: File? = null,
-    titleText: String = "", // TODO - We need to pass this based on logic needed to capture 2 sides
-    subtitleText: String = "",
-    viewModel: DocumentViewModel = viewModel(
-        factory = viewModelFactory {
-            DocumentViewModel(
-                userId = userId,
-                jobId = jobId,
-                enforcedIdType = enforcedIdType,
-                idAspectRatio = idAspectRatio,
-            )
-        },
-    ),
-    onResult: SmileIDCallback<DocumentVerificationResult> = {},
-) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    when {
-        !acknowledgedInstructions -> DocumentCaptureInstructionsScreen(showAttribution) {
-            acknowledgedInstructions = true
-        }
-
-        uiState.documentImageToConfirm != null -> ImageCaptureConfirmationDialog(
-            titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
-            subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-            painter = BitmapPainter(
-                BitmapFactory.decodeFile(uiState.documentImageToConfirm.absolutePath)
-                    .asImageBitmap(),
-            ),
-            confirmButtonText = stringResource(
-                id = R.string.si_doc_v_confirmation_dialog_confirm_button,
-            ),
-            onConfirm = { viewModel.submitJob() },
-            retakeButtonText = stringResource(
-                id = R.string.si_doc_v_confirmation_dialog_retake_button,
-            ),
-            onRetake = { viewModel.onDocumentRejected() },
-        )
-
-        else -> DocumentCaptureScreen(
-            userId = userId,
-            jobId = jobId,
-            enforcedIdType = enforcedIdType,
-            idAspectRatio = idAspectRatio,
-            titleText = stringResource(id = R.string.si_doc_v_capture_instructions_front_title),
-            subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
-        )
-    }
-}
-
 @VisibleForTesting
 @Composable
 internal fun DocumentCaptureScreen(

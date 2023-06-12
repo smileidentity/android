@@ -93,7 +93,8 @@ class DocumentViewModel(
                 documentFrontFile =
                     createDocumentFile()
             }
-            cameraState.takePicture(if (hasBackSide) documentBackFile!! else documentFrontFile!!) { result ->
+            cameraState.takePicture(if (hasBackSide) documentBackFile!! else documentFrontFile!!) {
+                    result ->
                 when (result) {
                     is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                     is ImageCaptureResult.Success -> it.resume(

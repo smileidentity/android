@@ -44,17 +44,15 @@ import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
-import com.smileidentity.compose.SmartSelfieRegistrationScreen
-import com.smileidentity.models.Document
 import com.smileidentity.compose.SmartSelfieEnrollmentScreen
 import com.smileidentity.models.Document
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
-import com.smileidentity.sample.BottomNavigationScreenSaver
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
+import com.smileidentity.sample.Screen
 import com.smileidentity.sample.showSnackbar
 import timber.log.Timber
 
@@ -71,9 +69,7 @@ fun MainScreen() {
         BottomNavigationScreen.Home.route -> false
         else -> true
     }
-    var bottomNavSelection: BottomNavigationScreen by rememberSaveable(
-        stateSaver = BottomNavigationScreenSaver,
-    ) { mutableStateOf(BottomNavigationScreen.Home) }
+    var bottomNavSelection: Screen by remember { mutableStateOf(BottomNavigationScreen.Home) }
     val bottomNavItems = listOf(
         BottomNavigationScreen.Home,
         BottomNavigationScreen.Resources,
@@ -167,9 +163,9 @@ fun MainScreen() {
                 },
                 content = {
                     NavHost(
-                        navController = navController,
-                        startDestination = BottomNavigationScreen.Home.route,
-                        modifier = Modifier
+                        navController,
+                        BottomNavigationScreen.Home.route,
+                        Modifier
                             .padding(it)
                             .consumeWindowInsets(it),
                     ) {
@@ -177,15 +173,7 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             // Display "Smile ID" in the top bar instead of "Home" label
                             currentScreenTitle = R.string.app_name
-                            ProductSelectionScreen {
-                                navController.navigate(it.route) {
-                                    popUpTo(BottomNavigationScreen.Home.route) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
+                            ProductSelectionScreen { navController.navigate(it.route) }
                         }
                         composable(BottomNavigationScreen.Resources.route) {
                             bottomNavSelection = BottomNavigationScreen.Resources
@@ -330,18 +318,6 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
-
-                            SmileID.DocumentVerification(
-                                allowGalleryUpload = false,
-                                captureBothSides = true,
-                                idType = Document("KE", "ID Card"),
-                            ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val resultData = result.data
-                                    val message = "Document Verification success"
-                                    Timber.d("$message: $resultData")
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-
                             // TODO: fetch this from
                             //  https://api.smileidentity.com/v1/products_config once it supports
                             //  signature auth (there should be a story for this for Platform)
@@ -364,7 +340,7 @@ fun MainScreen() {
                             SmileID.DocumentVerification(
                                 userId = userId,
                                 jobId = jobId,
-                                enforcedIdType = documentType,
+                                idType = documentType,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data
@@ -383,21 +359,16 @@ fun MainScreen() {
                                         coroutineScope,
                                         message.toString(),
                                     )
-
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "Document Verification error: ${th.message}"
                                     Timber.e(th, message)
                                     snackbarHostState.showSnackbar(coroutineScope, message)
                                 }
-
-                                navController.popBackStack()
-
                                 navController.popBackStack(
                                     route = BottomNavigationScreen.Home.route,
                                     inclusive = false,
                                 )
-
                             }
                         }
                     }
