@@ -20,10 +20,10 @@ import com.smileidentity.createLivenessFile
 import com.smileidentity.createSelfieFile
 import com.smileidentity.getExceptionHandler
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
-import com.smileidentity.models.JobType
+import com.smileidentity.models.JobType.SmartSelfieAuthentication
+import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
