@@ -1,7 +1,6 @@
 package com.smileidentity
 
 import android.annotation.SuppressLint
-import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -14,10 +13,6 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
-import android.os.Environment
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.text.TextUtils
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -233,61 +228,7 @@ private fun Uri.getFilePath(context: Context): String? =
  * Borrowed here - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
  */
 private fun getImagePath(context: Context, uri: Uri): String? {
-    if (DocumentsContract.isDocumentUri(context, uri)) {
-        if (isExternalStorageDocument(uri)) {
-            val docId = DocumentsContract.getDocumentId(uri)
-            val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val type = split[0]
-
-            if ("primary".equals(type, ignoreCase = true)) {
-                return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
-            }
-        } else if (isDownloadsDocument(uri)) {
-            var cursor: Cursor? = null
-            try {
-                cursor = context.contentResolver.query(
-                    uri,
-                    arrayOf(MediaStore.MediaColumns.DISPLAY_NAME),
-                    null,
-                    null,
-                    null,
-                )
-                cursor!!.moveToNext()
-                val fileName = cursor.getString(0)
-                val path =
-                    Environment.getExternalStorageDirectory().toString() + "/Download/" + fileName
-                if (!TextUtils.isEmpty(path)) {
-                    return path
-                }
-            } finally {
-                cursor?.close()
-            }
-            val id = DocumentsContract.getDocumentId(uri)
-            if (id.startsWith("raw:")) {
-                return id.replaceFirst("raw:".toRegex(), "")
-            }
-            val contentUri = ContentUris.withAppendedId(
-                Uri.parse("content://downloads"),
-                java.lang.Long.valueOf(id),
-            )
-
-            return getDataColumn(context, contentUri, null, null)
-        } else if (isMediaDocument(uri)) {
-            val docId = DocumentsContract.getDocumentId(uri)
-            val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val type = split[0]
-
-            var contentUri: Uri? = null
-            when (type) {
-                "image" -> contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            }
-
-            val selection = "_id=?"
-            val selectionArgs = arrayOf(split[1])
-
-            return getDataColumn(context, contentUri, selection, selectionArgs)
-        }
-    } else if ("content".equals(uri.scheme!!, ignoreCase = true)) {
+    if ("content".equals(uri.scheme!!, ignoreCase = true)) {
         return if (isGooglePhotosUri(uri)) {
             uri.lastPathSegment
         } else {
@@ -336,27 +277,6 @@ private fun getDataColumn(
     }
     return null
 }
-
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is ExternalStorageProvider.
- */
-private fun isExternalStorageDocument(uri: Uri): Boolean =
-    "com.android.externalstorage.documents" == uri.authority
-
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is DownloadsProvider.
- */
-private fun isDownloadsDocument(uri: Uri): Boolean =
-    "com.android.providers.downloads.documents" == uri.authority
-
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is MediaProvider.
- */
-private fun isMediaDocument(uri: Uri): Boolean =
-    "com.android.providers.media.documents" == uri.authority
 
 /**
  * @param uri The Uri to check.

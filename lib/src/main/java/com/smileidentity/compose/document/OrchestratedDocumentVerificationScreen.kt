@@ -20,13 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.ProcessingScreen
 import com.smileidentity.generateFileFromUri
 import com.smileidentity.isImageAtLeast
 import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
-import com.smileidentity.models.SmileIDException
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.DocumentVerificationResult
@@ -34,7 +34,6 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.toast
 import com.smileidentity.viewmodel.DocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
-import io.sentry.Sentry
 import timber.log.Timber
 import java.io.File
 
@@ -295,12 +294,16 @@ internal fun OrchestratedDocumentVerificationScreen(
         )
 
         DocumentCaptureFlow.Unknown -> {
-            Sentry.captureException(
-                SmileIDException(
-                    details = SmileIDException.Details(
-                        code = 0,
-                        message = "Document Verification option not available",
-                    ),
+            SmileIDCrashReporting.hub.captureException(
+                IllegalStateException(
+                    "Document Verification option not available \n" +
+                        " values passed are : " +
+                        " acknowledgedInstructions $acknowledgedInstructions " +
+                        " processingState $uiState.processingState " +
+                        " uiState $uiState " +
+                        " shouldSelectFromGallery $shouldSelectFromGallery " +
+                        " captureBothSides $captureBothSides " +
+                        " isFrontDocumentPhotoValid $isFrontDocumentPhotoValid ",
                 ),
             )
         }

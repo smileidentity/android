@@ -4,6 +4,7 @@
     <color name="si_color_on_dark">#FFFFFFFF</color>
     <color name="si_color_on_light">#FF2D2B2A</color>
     <color name="si_color_accent">#FF151F72</color>
+    <color name="si_color_accent_light">#001096</color>
     <color name="si_color_success">#FF2CC05C</color>
     <color name="si_color_error">#FF91180F</color>
     <color name="si_color_background_dark">#FFF8F8F8</color>
