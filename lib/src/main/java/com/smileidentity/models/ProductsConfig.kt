@@ -12,7 +12,9 @@ data class ProductsConfigRequest(
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 )
 
-// Country Code to ID Type (e.g. {"ZA": ["NATIONAL_ID_NO_PHOTO"]}
+/**
+ * Country Code to ID Type (e.g. {"ZA": ["NATIONAL_ID_NO_PHOTO"]}
+ */
 typealias IdTypes = Map<String, List<String>>
 
 @JsonClass(generateAdapter = true)
