@@ -14,7 +14,6 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
@@ -206,6 +205,17 @@ fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toStri
 fun randomUserId() = randomId("user")
 fun randomJobId() = randomId("job")
 
+/**
+ * This code gets the real path/ sd card path from intent data, and handles every possible scenario
+ * and edge cases, on multiple devices.
+ *
+ * This replaces uri.toFile() in normal scenarios
+ *
+ * Gist - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
+ *
+ *  @param uri a URI
+ *  @param context Android Context
+ */
 internal fun generateFileFromUri(
     uri: Uri,
     context: Context,
@@ -223,9 +233,7 @@ private fun Uri.getFilePath(context: Context): String? =
  * Borrowed here - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
  */
 private fun getImagePath(context: Context, uri: Uri): String? {
-    val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-
-    if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+    if (DocumentsContract.isDocumentUri(context, uri)) {
         if (isExternalStorageDocument(uri)) {
             val docId = DocumentsContract.getDocumentId(uri)
             val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
