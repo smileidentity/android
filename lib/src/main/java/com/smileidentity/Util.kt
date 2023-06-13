@@ -103,7 +103,6 @@ internal fun postProcessImageBitmap(
             bitmap
                 .compress(JPEG, compressionQuality, it)
         }
-        return file
     }
 
     // If size is the original Bitmap size, then no scaling will be performed by the underlying call
@@ -134,7 +133,7 @@ internal fun postProcessImageBitmap(
 internal fun postProcessImage(
     file: File,
     saveAsGrayscale: Boolean = false,
-    isDocumentVerification: Boolean = true,
+    processRotation: Boolean = true,
     compressionQuality: Int = 100,
     desiredOutputSize: Size? = null,
 ): File {
@@ -143,7 +142,7 @@ internal fun postProcessImage(
         bitmap = bitmap,
         file = file,
         saveAsGrayscale = saveAsGrayscale,
-        processRotation = isDocumentVerification,
+        processRotation = processRotation,
         compressionQuality = compressionQuality,
         maxOutputSize = desiredOutputSize,
     )
