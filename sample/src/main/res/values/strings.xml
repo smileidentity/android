@@ -9,6 +9,7 @@
     <string name="okay">Okay</string>
     <string name="cancel">Cancel</string>
     <string name="cont">Continue</string>
+    <string name="loading">Loading…</string>
     <string name="version_info">Partner %1$s • %2$s</string>
 
     <!--  SmartSelfie Auth  -->
