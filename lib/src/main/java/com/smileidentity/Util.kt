@@ -72,7 +72,7 @@ internal fun postProcessImageBitmap(
     compressionQuality: Int = 100,
     maxOutputSize: Size? = null,
 ): File {
-    val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
         val canvas = Canvas(mutableBitmap)
         val colorMatrix = ColorMatrix().apply { setSaturation(0f) }
@@ -90,7 +90,7 @@ internal fun postProcessImageBitmap(
         }
 
         val matrix = Matrix().apply { postRotate(degrees) }
-        val bitmap = Bitmap.createBitmap(
+        mutableBitmap = Bitmap.createBitmap(
             mutableBitmap,
             0,
             0,
@@ -99,10 +99,6 @@ internal fun postProcessImageBitmap(
             matrix,
             true,
         )
-        file.outputStream().use {
-            bitmap
-                .compress(JPEG, compressionQuality, it)
-        }
     }
 
     // If size is the original Bitmap size, then no scaling will be performed by the underlying call
