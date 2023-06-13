@@ -14,7 +14,6 @@ data class PrepUploadRequest(
     // with the file name on the device's filesystem.
     @Json(name = "file_name") val filename: String = "upload.zip",
     @Json(name = "partner_params") val partnerParams: PartnerParams,
-    @Json(name = "model_parameters") val modelParameters: Map<String, Any> = mapOf(),
     // Callback URL *must* be defined either within your Partner Portal or here
     @Json(name = "callback_url") val callbackUrl: String? = null,
     @Json(name = "smile_client_id") val partnerId: String = SmileID.config.partnerId,
