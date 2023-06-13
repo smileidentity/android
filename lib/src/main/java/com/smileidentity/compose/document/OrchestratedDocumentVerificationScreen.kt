@@ -26,6 +26,7 @@ import com.smileidentity.generateFileFromUri
 import com.smileidentity.isImageAtLeast
 import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.DocumentVerificationResult
@@ -33,6 +34,7 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.toast
 import com.smileidentity.viewmodel.DocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import io.sentry.Sentry
 import timber.log.Timber
 import java.io.File
 
@@ -47,8 +49,8 @@ internal fun OrchestratedDocumentVerificationScreen(
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
     idType: Document,
-    idAspectRatio: Float? = idType?.aspectRatio,
-    captureBothSides: Boolean = false, // TODO - Can we make this an enum, or sealed interface?
+    idAspectRatio: Float? = idType.aspectRatio,
+    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     viewModel: DocumentViewModel = viewModel(
         factory = viewModelFactory {
@@ -69,7 +71,7 @@ internal fun OrchestratedDocumentVerificationScreen(
     var isFrontDocumentPhotoValid by rememberSaveable { mutableStateOf(false) }
 
     when (
-        val state = DocumentCaptureFlow.documentCaptureType(
+        val state = DocumentCaptureFlow.stateFrom(
             acknowledgedInstructions = acknowledgedInstructions,
             processingState = uiState.processingState,
             shouldSelectFromGallery = shouldSelectFromGallery,
@@ -78,7 +80,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             uiState = uiState,
         )
     ) {
-        DocumentCaptureFlow.AcknowledgedInstructions -> DocumentCaptureInstructionsScreen(
+        DocumentCaptureFlow.ShowInstructions -> DocumentCaptureInstructionsScreen(
             title = stringResource(R.string.si_doc_v_instruction_title),
             subtitle = stringResource(id = R.string.si_verify_identity_instruction_subtitle),
             showAttribution = showAttribution,
@@ -114,7 +116,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             onClose = { viewModel.onFinished(onResult) },
         )
 
-        DocumentCaptureFlow.CameraBothSides -> DocumentCaptureScreen(
+        DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
             userId = userId,
             jobId = jobId,
             idType = idType,
@@ -123,7 +125,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
         )
 
-        DocumentCaptureFlow.CameraBothSidesConfirmation -> ImageCaptureConfirmationDialog(
+        DocumentCaptureFlow.FrontDocumentCaptureConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
             painter = BitmapPainter(
@@ -145,7 +147,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             },
         )
 
-        DocumentCaptureFlow.CameraBothSidesBack -> DocumentCaptureScreen(
+        DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
             userId = userId,
             jobId = jobId,
             idType = idType,
@@ -155,7 +157,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             isBackSide = true,
         )
 
-        DocumentCaptureFlow.CameraBothSidesBackConfirmation -> ImageCaptureConfirmationDialog(
+        DocumentCaptureFlow.BackDocumentCaptureConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
             painter = BitmapPainter(
@@ -210,11 +212,11 @@ internal fun OrchestratedDocumentVerificationScreen(
             )
         }
 
-        DocumentCaptureFlow.GalleryBothSides -> PhotoPickerScreen {
+        DocumentCaptureFlow.FrontDocumentGallerySelection -> PhotoPickerScreen {
             viewModel.saveFileFromGallerySelection(generateFileFromUri(uri = it, context = context))
         }
 
-        DocumentCaptureFlow.GalleryBothSidesConfirmation -> ImageCaptureConfirmationDialog(
+        DocumentCaptureFlow.FrontDocumentGalleryConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
             painter = BitmapPainter(
@@ -236,14 +238,14 @@ internal fun OrchestratedDocumentVerificationScreen(
             },
         )
 
-        DocumentCaptureFlow.GalleryBothSidesBack -> PhotoPickerScreen {
+        DocumentCaptureFlow.BackDocumentGallerySelection -> PhotoPickerScreen {
             viewModel.saveFileFromGallerySelection(
                 generateFileFromUri(uri = it, context = context),
                 isBackSide = true,
             )
         }
 
-        DocumentCaptureFlow.GalleryBothSidesBackConfirmation -> ImageCaptureConfirmationDialog(
+        DocumentCaptureFlow.BackDocumentGalleryConfirmation -> ImageCaptureConfirmationDialog(
             titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
             subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
             painter = BitmapPainter(
@@ -292,9 +294,16 @@ internal fun OrchestratedDocumentVerificationScreen(
             onRetake = { viewModel.onDocumentRejected() },
         )
 
-        DocumentCaptureFlow.UnknownDocumentCaptureFlowOption -> Timber.d(
-            "Document Verification option not available",
-        ) // TODO - Should we throw an error or just log?
+        DocumentCaptureFlow.Unknown -> {
+            Sentry.captureException(
+                SmileIDException(
+                    details = SmileIDException.Details(
+                        code = 0,
+                        message = "Document Verification option not available",
+                    ),
+                ),
+            )
+        }
     }
 }
 

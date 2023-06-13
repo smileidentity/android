@@ -74,7 +74,7 @@ data class EnhancedKycResult(
  */
 @Parcelize
 data class DocumentVerificationResult(
-    val selfieFile: File? = null,
+    val selfieFile: File? = null, // TODO Unmark as optional when selfie capture will be implemented
     val documentFrontFile: File,
     val documentBackFile: File? = null,
     val jobStatusResponse: DocVJobStatusResponse,

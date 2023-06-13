@@ -19,7 +19,7 @@ class DocumentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = DocumentViewModel(randomUserId(), randomJobId(), Document("KE", "ID Card"))
+        subject = DocumentViewModel(randomUserId(), randomJobId(), Document("KE", "ID_CARD"))
     }
 
     @After

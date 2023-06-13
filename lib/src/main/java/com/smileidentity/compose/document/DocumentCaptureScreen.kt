@@ -133,7 +133,7 @@ private fun DocumentCaptureScreenPreview() {
         DocumentCaptureScreen(
             titleText = "Front of National ID Card",
             subtitleText = "Make sure all corners are visible and there is no glare",
-            idType = Document("KE", "ID Card"),
+            idType = Document("KE", "ID_CARD"),
         )
     }
 }

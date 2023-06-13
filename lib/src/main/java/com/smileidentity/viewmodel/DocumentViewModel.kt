@@ -61,7 +61,7 @@ class DocumentViewModel(
         viewModelScope.launch {
             try {
                 val documentFile =
-                    captureDocument(cameraState = cameraState, hasBackSide = hasBackSide)
+                    captureDocument(cameraState = cameraState, forBackSide = hasBackSide)
                 Timber.v("Capturing document image to $documentFile and is $hasBackSide")
                 _uiState.update {
                     if (hasBackSide) {
@@ -85,22 +85,19 @@ class DocumentViewModel(
      * The [documentFrontFile] or [documentBackFile] variable will be updated with the captured image file,
      * and the UI state will be updated accordingly.`
      */
-    private suspend fun captureDocument(cameraState: CameraState, hasBackSide: Boolean) =
+    private suspend fun captureDocument(cameraState: CameraState, forBackSide: Boolean) =
         suspendCoroutine {
-            if (hasBackSide) {
+            if (forBackSide) {
                 documentBackFile = createDocumentFile()
             } else {
-                documentFrontFile =
-                    createDocumentFile()
+                documentFrontFile = createDocumentFile()
             }
-            cameraState.takePicture(if (hasBackSide) documentBackFile!! else documentFrontFile!!) {
-                    result ->
+            val documentFile = if (forBackSide) documentBackFile!! else documentFrontFile!!
+            cameraState.takePicture(documentFile) { result ->
                 when (result) {
                     is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                     is ImageCaptureResult.Success -> it.resume(
-                        postProcessImage(
-                            file = if (hasBackSide) documentBackFile!! else documentFrontFile!!,
-                        ),
+                        postProcessImage(file = documentFile),
                     )
                 }
             }

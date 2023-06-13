@@ -74,7 +74,7 @@ internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
     saveAsGrayscale: Boolean = false,
-    isDocumentVerification: Boolean = false,
+    processRotation: Boolean = false,
     compressionQuality: Int = 100,
     maxOutputSize: Size? = null,
 ): File {
@@ -86,7 +86,7 @@ internal fun postProcessImageBitmap(
         canvas.drawBitmap(mutableBitmap, 0f, 0f, paint)
     }
 
-    if (isDocumentVerification) {
+    if (processRotation) {
         val exif = Exif.createFromFile(file)
         val degrees = when (exif.rotation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> 90F
@@ -149,7 +149,7 @@ internal fun postProcessImage(
         bitmap = bitmap,
         file = file,
         saveAsGrayscale = saveAsGrayscale,
-        isDocumentVerification = isDocumentVerification,
+        processRotation = isDocumentVerification,
         compressionQuality = compressionQuality,
         maxOutputSize = desiredOutputSize,
     )

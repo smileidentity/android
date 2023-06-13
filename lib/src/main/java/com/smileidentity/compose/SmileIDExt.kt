@@ -99,7 +99,7 @@ fun SmileID.SmartSelfieAuthenticationScreen(
         OrchestratedSelfieCaptureScreen(
             userId = userId,
             jobId = jobId,
-            isEnroll = true,
+            isEnroll = false,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             onResult = onResult,
@@ -140,7 +140,7 @@ fun SmileID.DocumentVerification(
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
     idType: Document,
-    idAspectRatio: Float? = idType?.aspectRatio,
+    idAspectRatio: Float? = idType.aspectRatio,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,

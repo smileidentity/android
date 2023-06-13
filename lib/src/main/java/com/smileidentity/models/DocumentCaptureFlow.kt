@@ -9,7 +9,7 @@ import com.smileidentity.viewmodel.DocumentUiState
  */
 internal sealed class DocumentCaptureFlow {
 
-    object AcknowledgedInstructions : DocumentCaptureFlow()
+    object ShowInstructions : DocumentCaptureFlow()
 
     data class ProcessingScreen(
         val processingState: ProcessingState,
@@ -19,30 +19,30 @@ internal sealed class DocumentCaptureFlow {
 
     object GalleryOneSideConfirmation : DocumentCaptureFlow()
 
-    object GalleryBothSides : DocumentCaptureFlow()
+    object FrontDocumentGallerySelection : DocumentCaptureFlow()
 
-    object GalleryBothSidesConfirmation : DocumentCaptureFlow()
+    object FrontDocumentGalleryConfirmation : DocumentCaptureFlow()
 
-    object GalleryBothSidesBack : DocumentCaptureFlow()
+    object BackDocumentGallerySelection : DocumentCaptureFlow()
 
-    object GalleryBothSidesBackConfirmation : DocumentCaptureFlow()
+    object BackDocumentGalleryConfirmation : DocumentCaptureFlow()
 
     object CameraOneSide : DocumentCaptureFlow()
 
     object CameraOneSideConfirmation : DocumentCaptureFlow()
 
-    object CameraBothSides : DocumentCaptureFlow()
+    object FrontDocumentCapture : DocumentCaptureFlow()
 
-    object CameraBothSidesBack : DocumentCaptureFlow()
+    object BackDocumentCapture : DocumentCaptureFlow()
 
-    object CameraBothSidesConfirmation : DocumentCaptureFlow()
+    object FrontDocumentCaptureConfirmation : DocumentCaptureFlow()
 
-    object CameraBothSidesBackConfirmation : DocumentCaptureFlow()
+    object BackDocumentCaptureConfirmation : DocumentCaptureFlow()
 
-    object UnknownDocumentCaptureFlowOption : DocumentCaptureFlow()
+    object Unknown : DocumentCaptureFlow()
 
     companion object {
-        fun documentCaptureType(
+        fun stateFrom(
             acknowledgedInstructions: Boolean,
             processingState: ProcessingState?,
             uiState: DocumentUiState?,
@@ -94,21 +94,21 @@ internal sealed class DocumentCaptureFlow {
                     isFrontDocumentPhotoValid && uiState?.backDocumentImageToConfirm != null
 
             return when {
-                !acknowledgedInstructions -> AcknowledgedInstructions
+                !acknowledgedInstructions -> ShowInstructions
                 processingState != null -> ProcessingScreen(processingState = processingState)
                 selectGalleryOneSide -> GalleryOneSide
                 selectGalleryOneSideConfirmation -> GalleryOneSideConfirmation
-                selectGalleryTwoSides -> GalleryBothSides
-                selectGalleryTwoSidesBack -> GalleryBothSidesBack
-                selectGalleryTwoSidesConfirmation -> GalleryBothSidesConfirmation
-                selectGalleryTwoSidesBackConfirmation -> GalleryBothSidesBackConfirmation
+                selectGalleryTwoSides -> FrontDocumentGallerySelection
+                selectGalleryTwoSidesBack -> BackDocumentGallerySelection
+                selectGalleryTwoSidesConfirmation -> FrontDocumentGalleryConfirmation
+                selectGalleryTwoSidesBackConfirmation -> BackDocumentGalleryConfirmation
                 captureOneSideCamera -> CameraOneSide
                 captureOneSideCameraConfirmation -> CameraOneSideConfirmation
-                captureTwoSidesCamera -> CameraBothSides
-                captureTwoSidesCameraConfirmation -> CameraBothSidesConfirmation
-                captureTwoSidesCameraBack -> CameraBothSidesBack
-                captureTwoSidesCameraBackConfirmation -> CameraBothSidesBackConfirmation
-                else -> UnknownDocumentCaptureFlowOption
+                captureTwoSidesCamera -> FrontDocumentCapture
+                captureTwoSidesCameraConfirmation -> FrontDocumentCaptureConfirmation
+                captureTwoSidesCameraBack -> BackDocumentCapture
+                captureTwoSidesCameraBackConfirmation -> BackDocumentCaptureConfirmation
+                else -> Unknown
             }
         }
     }
