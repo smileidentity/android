@@ -9,6 +9,8 @@ import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
+import com.smileidentity.models.ProductsConfigRequest
+import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -63,4 +65,11 @@ interface SmileIDService {
      */
     @POST("/v1/job_status")
     suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
+
+    /**
+     * Returns the ID types that are enabled for authenticated partner and which of those require
+     * consent
+     */
+    @POST("/v1/products_config")
+    suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
 }

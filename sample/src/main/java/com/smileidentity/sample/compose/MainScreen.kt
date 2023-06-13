@@ -224,7 +224,11 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
-                            var userId by rememberSaveable { mutableStateOf("") }
+                            var userId by rememberSaveable {
+                                val clipboardText = clipboardManager.getText()?.text
+                                // Autofill the value of User ID as it was likely just copied
+                                mutableStateOf(clipboardText?.takeIf { "user-" in it } ?: "")
+                            }
                             AlertDialog(
                                 title = { Text(stringResource(R.string.user_id_dialog_title)) },
                                 text = {
