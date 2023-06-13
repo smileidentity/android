@@ -344,7 +344,7 @@ fun MainScreen() {
                             SmileID.DocumentVerification(
                                 userId = userId,
                                 jobId = jobId,
-                                enforcedIdType = documentType,
+                                idType = documentType,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data

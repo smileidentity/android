@@ -275,7 +275,7 @@ private fun PreviewProcessingErrorScreen() {
         ProcessingErrorScreen(
             icon = painterResource(R.drawable.si_processing_error),
             title = stringResource(R.string.si_smart_selfie_processing_error_title),
-            subtitle = stringResource(R.string.si_smart_selfie_processing_error_subtitle),
+            subtitle = stringResource(R.string.si_processing_error_subtitle),
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
             onRetry = {},
             closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),

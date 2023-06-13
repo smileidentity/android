@@ -40,24 +40,31 @@
     <string name="si_smart_selfie_processing_success_title">Selfie Capture Complete</string>
     <string name="si_smart_selfie_processing_success_subtitle">Your selfie was successfully taken. You can now proceed</string>
     <string name="si_smart_selfie_processing_error_title">Your selfie failed to process</string>
-    <string name="si_smart_selfie_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
     <string name="si_smart_selfie_processing_continue_button">Continue</string>
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
-    <string name="si_doc_v_instruction_title">Submit your ID</string>
     <string name="si_doc_v_instruction_ready_button">Take Photo</string>
     <string name="si_doc_v_instruction_upload_button">Upload Photo</string>
+    <string name="si_doc_v_instruction_title">Submit Front of ID</string>
+    <string name="si_doc_v_instruction_back_title">Submit Back of ID</string>
+    <string name="si_doc_v_instruction_back_subtitle">For this ID type, we require that you submit the back of the ID</string>
     <string name="si_doc_v_capture_instructions_front_title">Front of ID</string>
     <string name="si_doc_v_capture_instructions_back_title">Back of ID</string>
     <string name="si_doc_v_capture_instructions_subtitle">Make sure all the corners are visible and there is no glare</string>
     <string name="si_doc_v_capture_error_subtitle">Your document capture failed to process</string>
+    <string name="si_doc_v_validation_image_too_small">Selected image is too small. Please select a larger resolution image.</string>
     <string name="si_doc_v_confirmation_dialog_title">Is the document clear and readable?</string>
     <string name="si_doc_v_confirmation_dialog_subtitle">Make sure all the corners of the document are visible and there is no glare</string>
     <string name="si_doc_v_confirmation_dialog_confirm_button">Yes, my ID is readable</string>
     <string name="si_doc_v_confirmation_dialog_retake_button">No, retake photo</string>
+    <string name="si_doc_v_processing_title">Processing Document</string>
+    <string name="si_doc_v_processing_subtitle">Just a few more seconds</string>
+    <string name="si_doc_v_processing_success_title">Document Verification Complete</string>
+    <string name="si_doc_v_processing_success_subtitle">Your document was successfully taken. You can now proceed</string>
+    <string name="si_doc_v_processing_error_title">Your document verification failed to process</string>
 
     <!--  Country Names  -->
     <string name="si_country_name_ghana">Ghana</string>
@@ -88,4 +95,7 @@
     <string name="si_id_field_name_last_name">Last Name</string>
     <string name="si_id_field_name_dob">Date of Birth</string>
     <string name="si_id_field_name_bank_code">Bank Code</string>
+
+    <!--  Generic Errors  -->
+    <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
 </resources>

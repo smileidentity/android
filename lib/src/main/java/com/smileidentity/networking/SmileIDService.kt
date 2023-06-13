@@ -50,9 +50,19 @@ interface SmileIDService {
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
 
+    /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be a
+     * SmartSelfie Authentication/Registration.
+     */
     @POST("/v1/job_status")
     suspend fun getJobStatus(@Body request: JobStatusRequest): JobStatusResponse
 
+    /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be a
+     * Document Verification.
+     */
     @POST("/v1/job_status")
     suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
 

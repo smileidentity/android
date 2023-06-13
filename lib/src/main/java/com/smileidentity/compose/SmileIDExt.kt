@@ -8,7 +8,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.smileidentity.SmileID
-import com.smileidentity.compose.document.OrchestratedDocumentCaptureScreen
+import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.Document
@@ -139,21 +139,23 @@ fun SmileID.DocumentVerification(
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
-    enforcedIdType: Document? = null,
-    idAspectRatio: Float? = enforcedIdType?.aspectRatio,
+    idType: Document,
+    idAspectRatio: Float? = idType.aspectRatio,
+    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedDocumentCaptureScreen(
+        OrchestratedDocumentVerificationScreen(
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
             allowGalleryUpload = allowGalleryUpload,
-            enforcedIdType = enforcedIdType,
+            idType = idType,
             idAspectRatio = idAspectRatio,
+            captureBothSides = captureBothSides,
             bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
             onResult = onResult,
         )
