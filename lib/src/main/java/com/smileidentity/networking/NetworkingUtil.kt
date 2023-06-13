@@ -2,6 +2,8 @@ package com.smileidentity.networking
 
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
+import com.smileidentity.models.CaptureMode
+import com.smileidentity.models.CaptureMode.Capture
 import com.smileidentity.models.ImageType
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
@@ -39,12 +41,14 @@ fun UploadRequest.zip(): File {
     return zipFile
 }
 
-fun File.asSelfieImage() = UploadImageInfo(
+fun File.asSelfieImage(captureMode: CaptureMode = Capture) = UploadImageInfo(
     imageTypeId = ImageType.SelfiePngOrJpgFile,
     image = this,
+    captureMode = captureMode,
 )
 
-fun File.asLivenessImage() = UploadImageInfo(
+fun File.asLivenessImage(captureMode: CaptureMode = Capture) = UploadImageInfo(
     imageTypeId = ImageType.LivenessPngOrJpgFile,
     image = this,
+    captureMode = captureMode,
 )
