@@ -37,7 +37,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
+import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
 import timber.log.Timber
 
 val countryDetails = mapOf(
@@ -98,75 +101,42 @@ val countryDetails = mapOf(
 )
 
 private val idTypeFriendlyNames = mapOf(
+    "ALIEN_CARD" to "Alien Card",
+    "BANK_ACCOUNT" to "Bank Account",
+    "BVN" to "BVN",
+    "CAC" to "CAC",
+    "DRIVERS_LICENSE" to "Driver's License",
+    "KRA_PIN" to "KRA PIN",
     "NATIONAL_ID" to "National ID",
     "NATIONAL_ID_NO_PHOTO" to "National ID (No Photo)",
-    "PASSPORT" to "Passport",
-    "VOTER_ID" to "Voter ID",
-    "SSNIT" to "SSNIT",
     "NEW_VOTER_ID" to "New Voter ID",
-    "DRIVERS_LICENSE" to "Driver's License",
-    "V_NIN" to "Virtual NIN",
-    "CAC" to "CAC",
-    "NIN_V2" to "NIN v2",
     "NIN_SLIP" to "NIN Slip",
-    "BANK_ACCOUNT" to "Bank Account",
-    "TIN" to "TIN",
-    "BVN" to "BVN",
+    "NIN_V2" to "NIN v2",
+    "PASSPORT" to "Passport",
     "PHONE_NUMBER" to "Phone Number",
-    "ALIEN_CARD" to "Alien Card",
-)
-
-val docVTestData = mapOf(
-    "ZA" to listOf(
-        "NATIONAL_ID",
-        "NATIONAL_ID_NO_PHOTO",
-    ),
-    "UG" to listOf(
-        "NATIONAL_ID_NO_PHOTO",
-    ),
-    "GH" to listOf(
-        "SSNIT",
-        "VOTER_ID",
-        "NEW_VOTER_ID",
-        "DRIVERS_LICENSE",
-        "PASSPORT",
-    ),
-    "KE" to listOf(
-        "NATIONAL_ID",
-        "ALIEN_CARD",
-        "PASSPORT",
-        "NATIONAL_ID_NO_PHOTO",
-    ),
-    "NG" to listOf(
-        "V_NIN",
-        "CAC",
-        "VOTER_ID",
-        "NIN_V2",
-        "DRIVERS_LICENSE",
-        "NIN",
-        "NIN_SLIP",
-        "BANK_ACCOUNT",
-        "NATIONAL_ID",
-        "TIN",
-        "PASSPORT",
-    ),
+    "SSNIT" to "SSNIT",
+    "TIN" to "TIN",
+    "VOTER_ID" to "Voter ID",
+    "V_NIN" to "Virtual NIN",
 )
 
 /**
  * A composable that allows the user to select a country and ID type for Document Verification.
  *
- * @param idTypes A map of country codes to a list of ID types for that country.
  * @param onIdTypeSelected A callback that is invoked when the user selects a country and ID type.
  */
 @Composable
 fun DocumentVerificationIdTypeSelector(
-    idTypes: Map<String, List<String>>,
+    viewModel: DocumentSelectorViewModel = viewModel(),
     onIdTypeSelected: (String, String) -> Unit,
 ) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val idTypes = uiState.idTypes
+
     // If an unsupported country code is passed in, it will display the country code with no emoji
-    val countries by remember {
+    val countries by remember(idTypes) {
         derivedStateOf {
-            idTypes.keys.map {
+            idTypes?.keys?.map {
                 countryDetails[it] ?: SearchableInputFieldItem(
                     it,
                     it,
@@ -272,7 +242,7 @@ fun DocumentVerificationIdTypeSelector(
                     text = stringResource(R.string.doc_v_select_id_type),
                     fontWeight = FontWeight.Bold,
                 )
-                val idTypesForCountry = idTypes[selectedCountry]
+                val idTypesForCountry = idTypes!![selectedCountry]
                 idTypesForCountry?.forEach { idType ->
                     val selected = selectedIdType == idType
                     val onClick = {
