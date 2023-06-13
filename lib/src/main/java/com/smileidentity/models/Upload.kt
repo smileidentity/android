@@ -2,7 +2,6 @@
 
 package com.smileidentity.models
 
-import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.BuildConfig
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -22,19 +21,12 @@ data class UploadImageInfo(
     @Json(name = "capture_mode") val captureMode: CaptureMode,
 )
 
-@FallbackEnum(name = "Unknown")
 enum class CaptureMode {
     @Json(name = "capture")
     Capture,
 
     @Json(name = "upload")
     Upload,
-
-    /**
-     * Special value used to indicate that the value returned from the server is not yet supported
-     * by the SDK.
-     */
-    Unknown,
 }
 
 /**
