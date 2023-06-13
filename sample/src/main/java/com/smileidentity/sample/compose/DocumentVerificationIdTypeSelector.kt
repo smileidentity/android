@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
+import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
 import com.smileidentity.sample.viewmodel.countryDetails
 import com.smileidentity.sample.viewmodel.idTypeFriendlyNames
@@ -56,6 +59,12 @@ fun DocumentVerificationIdTypeSelector(
     onIdTypeSelected: (String, String) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    uiState.errorMessage?.let {
+        val context = LocalContext.current
+        LaunchedEffect(it) { context.toast("Error loading ID types: $it") }
+    }
+
     val idTypes = uiState.idTypes
 
     // If an unsupported country code is passed in, it will display the country code with no emoji

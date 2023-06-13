@@ -3,6 +3,7 @@ package com.smileidentity.sample.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
+import com.smileidentity.getExceptionHandler
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.ProductsConfigRequest
@@ -12,9 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 data class DocumentSelectorUiState(
     val idTypes: Map<String, List<String>>? = null,
+    val errorMessage: String? = null,
 )
 
 class DocumentSelectorViewModel : ViewModel() {
@@ -22,7 +25,15 @@ class DocumentSelectorViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        loadData()
+    }
+
+    private fun loadData() {
+        val proxy = { e: Throwable ->
+            Timber.e(e)
+            _uiState.update { it.copy(errorMessage = e.message) }
+        }
+        viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 userId = randomUserId(),
                 jobType = JobType.DocumentVerification,
