@@ -38,6 +38,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.sample.R
+import com.smileidentity.sample.viewmodel.countryDetails
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
