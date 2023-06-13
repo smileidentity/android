@@ -2,13 +2,11 @@ package com.smileidentity.networking
 
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
-import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.UploadRequest
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
@@ -25,39 +23,6 @@ object JobTypeAdapter {
 
     @FromJson
     fun fromJson(value: Int) = JobType.fromValue(value)
-}
-
-@Suppress("unused")
-object PartnerParamsAdapter {
-    @ToJson
-    fun toJson(
-        writer: JsonWriter,
-        partnerParams: PartnerParams,
-        mapDelegate: JsonAdapter<Map<String, Any>>,
-        jobTypeDelegate: JsonAdapter<JobType>,
-    ) {
-        val map = partnerParams.extras + mapOf(
-            "job_id" to partnerParams.jobId,
-            "user_id" to partnerParams.userId,
-            "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
-        )
-        mapDelegate.toJson(writer, map)
-    }
-
-    @FromJson
-    fun fromJson(
-        jsonReader: JsonReader,
-        mapDelegate: JsonAdapter<Map<String, String>>,
-        jobTypeDelegate: JsonAdapter<JobType>,
-    ): PartnerParams {
-        val paramsJson = mapDelegate.fromJson(jsonReader) ?: mapOf()
-        return PartnerParams(
-            jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"]),
-            jobId = paramsJson["job_id"]!!,
-            userId = paramsJson["user_id"]!!,
-            extras = paramsJson - listOf("job_id", "user_id", "job_type"),
-        )
-    }
 }
 
 object UploadRequestConverterFactory : Converter.Factory() {

@@ -9,7 +9,6 @@ import org.junit.Test
 class JobResultAdapterTest {
     private val adapter = Moshi.Builder()
         .add(JobTypeAdapter)
-        .add(PartnerParamsAdapter)
         .add(JobResultAdapter)
         .add(StringifiedBooleanAdapter)
         .build()

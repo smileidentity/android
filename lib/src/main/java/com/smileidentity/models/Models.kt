@@ -22,17 +22,12 @@ class SmileIDException(val details: Details) : Exception(details.message), Parce
     ) : Parcelable
 }
 
-/**
- * Custom values specific to partners can be placed in [extras]
- */
-// The class uses a custom adapter in order to support placing the key-value pairs in [extras] into
-// top level fields in the JSON
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class PartnerParams(
     val jobType: JobType? = null,
     val jobId: String = UUID.randomUUID().toString(),
     val userId: String = UUID.randomUUID().toString(),
-    val extras: Map<String, String> = mapOf(),
 ) : Parcelable
 
 enum class JobType(val value: Int) {

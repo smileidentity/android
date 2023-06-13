@@ -12,7 +12,6 @@ import com.smileidentity.models.Config
 import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
-import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -167,7 +166,6 @@ object SmileID {
     private fun initMoshi(): Moshi {
         return Moshi.Builder()
             .add(JobTypeAdapter)
-            .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
             .add(FileAdapter)
             .add(JobResultAdapter)
