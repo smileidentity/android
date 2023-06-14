@@ -14,7 +14,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
+import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Size
@@ -276,30 +276,36 @@ private fun isGooglePhotosUri(uri: Uri): Boolean =
     "com.google.android.apps.photos.content" == uri.authority
 
 /**
- * The old getParcelable method is deprecated in API 31 -- use the new one if supported, otherwise
+ * The old getParcelable method is deprecated in API 33 -- use the new one if supported, otherwise
  * fall back to the old one.
  *
- * Tracker for incorporating into AndroidX: https://issuetracker.google.com/issues/242048899
+ * NB! There is a bug in API 33's implementation (sigh), so actually only use the new API on *34*
+ * and beyond (see: https://issuetracker.google.com/issues/242048899)
+ *
+ * TODO: AndroidX support should be coming for this
  *
  * Implementation from https://stackoverflow.com/a/73311814/3831060
  */
 @Suppress("DEPRECATION")
 inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? = when {
-    SDK_INT >= TIRAMISU -> getParcelable(key, T::class.java)
+    SDK_INT >= UPSIDE_DOWN_CAKE -> getParcelable(key, T::class.java)
     else -> getParcelable(key) as? T
 }
 
 /**
- * The old getSerializable() method is deprecated in API 31 -- use the new one if supported, otherwise
+ * The old getSerializable method is deprecated in API 33 -- use the new one if supported, otherwise
  * fall back to the old one.
  *
- * Tracker for incorporating into AndroidX: https://issuetracker.google.com/issues/242048899
+ * NB! There is a bug in API 33's implementation (sigh), so actually only use the new API on *34*
+ * and beyond (see: https://issuetracker.google.com/issues/242048899)
+ *
+ * TODO: AndroidX support should be coming for this
  *
  * Implementation from https://stackoverflow.com/a/73311814/3831060
  */
 
 @Suppress("DEPRECATION")
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
-    SDK_INT >= TIRAMISU -> getSerializable(key, T::class.java)
+    SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
 }
