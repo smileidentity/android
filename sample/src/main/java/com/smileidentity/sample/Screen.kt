@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed interface Screen {
@@ -59,4 +61,15 @@ sealed class BottomNavigationScreen(
 
     object AboutUs :
         BottomNavigationScreen("about_us", R.string.about_us, Filled.Settings, Outlined.Settings)
+}
+
+object BottomNavigationScreenSaver : Saver<BottomNavigationScreen, String> {
+    override fun restore(value: String): BottomNavigationScreen = when (value) {
+        BottomNavigationScreen.Home.route -> BottomNavigationScreen.Home
+        BottomNavigationScreen.Resources.route -> BottomNavigationScreen.Resources
+        BottomNavigationScreen.AboutUs.route -> BottomNavigationScreen.AboutUs
+        else -> throw IllegalArgumentException("Unknown route: $value")
+    }
+
+    override fun SaverScope.save(value: BottomNavigationScreen): String = value.route
 }

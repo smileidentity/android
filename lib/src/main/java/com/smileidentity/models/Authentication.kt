@@ -46,6 +46,11 @@ data class AuthenticationRequest(
     @Json(name = "auth_token") val authToken: String = SmileID.config.authToken,
 ) : Parcelable
 
+/**
+ * [consentInfo] is only populated when a country and ID type are provided in the
+ * [AuthenticationRequest]. To get information about *all* countries and ID types instead, use
+ * [com.smileidentity.networking.SmileIDService.getProductsConfig]
+ */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class AuthenticationResponse(
@@ -56,11 +61,13 @@ data class AuthenticationResponse(
     @Json(name = "consent_info") val consentInfo: ConsentInfo? = null,
 ) : Parcelable
 
+/**
+ * @param canAccess Whether or not the ID type is enabled for the partner
+ * @param consentRequired Whether or not consent is required for the ID type
+ */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class ConsentInfo(
     @Json(name = "can_access") val canAccess: Boolean,
     @Json(name = "consent_required") val consentRequired: Boolean,
-) : Parcelable {
-    fun isRequired(): Boolean = canAccess && consentRequired
-}
+) : Parcelable
