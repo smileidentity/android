@@ -53,7 +53,8 @@ fun File.asLivenessImage(captureMode: CaptureMode = Capture) = UploadImageInfo(
     captureMode = captureMode,
 )
 
-fun File.asDocumentImage() = UploadImageInfo(
+fun File.asDocumentImage(captureMode: CaptureMode = Capture) = UploadImageInfo(
     imageTypeId = ImageType.IdCardPngOrJpgFile,
     image = this,
+    captureMode = captureMode,
 )
