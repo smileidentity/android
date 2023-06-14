@@ -13,6 +13,10 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.TIRAMISU
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -26,6 +30,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
+import java.io.Serializable
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -222,24 +227,18 @@ private fun Uri.getFilePath(context: Context): String? =
 /**
  * Borrowed here - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
  */
-private fun getImagePath(context: Context, uri: Uri): String? {
+private fun getImagePath(context: Context, uri: Uri): String? =
     if ("content".equals(uri.scheme!!, ignoreCase = true)) {
-        return if (isGooglePhotosUri(uri)) {
+        if (isGooglePhotosUri(uri)) {
             uri.lastPathSegment
         } else {
-            getDataColumn(
-                context,
-                uri,
-                null,
-                null,
-            )
+            getDataColumn(context, uri)
         }
     } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
-        return uri.path
+        uri.path
+    } else {
+        null
     }
-
-    return null
-}
 
 /**
  * Get the value of the data column for this Uri. This is useful for
@@ -247,22 +246,18 @@ private fun getImagePath(context: Context, uri: Uri): String? {
  *
  * @param context       The context.
  * @param uri           The Uri to query.
- * @param selection     (Optional) Filter used in the query.
- * @param selectionArgs (Optional) Selection arguments used in the query.
  * @return The value of the _data column, which is typically a file path.
  */
 private fun getDataColumn(
     context: Context,
     uri: Uri?,
-    selection: String?,
-    selectionArgs: Array<String>?,
 ): String? {
     var cursor: Cursor? = null
     val column = "_data"
     val projection = arrayOf(column)
 
     try {
-        cursor = context.contentResolver.query(uri!!, projection, selection, selectionArgs, null)
+        cursor = context.contentResolver.query(uri!!, projection, null, null, null)
         if (cursor != null && cursor.moveToFirst()) {
             val index = cursor.getColumnIndexOrThrow(column)
             return cursor.getString(index)
@@ -279,3 +274,32 @@ private fun getDataColumn(
  */
 private fun isGooglePhotosUri(uri: Uri): Boolean =
     "com.google.android.apps.photos.content" == uri.authority
+
+/**
+ * The old getParcelable method is deprecated in API 31 -- use the new one if supported, otherwise
+ * fall back to the old one.
+ *
+ * Tracker for incorporating into AndroidX: https://issuetracker.google.com/issues/242048899
+ *
+ * Implementation from https://stackoverflow.com/a/73311814/3831060
+ */
+@Suppress("DEPRECATION")
+inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? = when {
+    SDK_INT >= TIRAMISU -> getParcelable(key, T::class.java)
+    else -> getParcelable(key) as? T
+}
+
+/**
+ * The old getSerializable() method is deprecated in API 31 -- use the new one if supported, otherwise
+ * fall back to the old one.
+ *
+ * Tracker for incorporating into AndroidX: https://issuetracker.google.com/issues/242048899
+ *
+ * Implementation from https://stackoverflow.com/a/73311814/3831060
+ */
+
+@Suppress("DEPRECATION")
+inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
+    SDK_INT >= TIRAMISU -> getSerializable(key, T::class.java)
+    else -> getSerializable(key) as? T
+}

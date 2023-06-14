@@ -19,6 +19,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/si_smart_selfie_authentication_product_name" />
+
+        <Button
+                android:id="@+id/button_document_verification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/si_doc_v_product_name" />
     </LinearLayout>
 
     <FrameLayout

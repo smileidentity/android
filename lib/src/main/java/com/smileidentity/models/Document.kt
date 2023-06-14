@@ -6,6 +6,10 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * Represents a document type that can be used for Document Verification.
+ * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ * @param documentType The document type
+ * @param aspectRatio The aspect ratio of the document. Defaults to 3.375f / 2.125f (1.59), which is
+ * the standard ID Card and Credit Card size
  */
 // TODO: Should this be consolidated with IdType (used for Enhanced KYC)? This would entail not
 //  applying orientation to certain types (i.e. BVN, Phone number). It would also entail adding
@@ -14,5 +18,5 @@ import kotlinx.parcelize.Parcelize
 data class Document(
     val countryCode: String,
     val documentType: String,
-    @FloatRange(from = 0.0) val aspectRatio: Float = 0f,
+    @FloatRange(from = 0.0) val aspectRatio: Float = 3.375f / 2.125f,
 ) : Parcelable
