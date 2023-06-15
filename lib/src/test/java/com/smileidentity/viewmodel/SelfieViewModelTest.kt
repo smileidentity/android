@@ -23,7 +23,7 @@ class SelfieViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = SelfieViewModel(true, randomUserId(), randomJobId())
+        subject = SelfieViewModel(true, randomUserId(), randomJobId(), false)
     }
 
     @After
