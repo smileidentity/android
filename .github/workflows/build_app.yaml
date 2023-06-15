@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       smile_config:
-        description: 'The contents of the smile_config.json file (default: Partner 002)'
+        description: 'The contents of the smile_config.json file (default: Partner 2423)'
         required: false
 
 concurrency:
@@ -15,6 +15,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -29,14 +30,12 @@ jobs:
           echo "::add-mask::$INPUT_SMILE_CONFIG"
           if [ -n "$INPUT_SMILE_CONFIG" ]; then
             SMILE_CONFIG="$INPUT_SMILE_CONFIG"
-          else
-            SMILE_CONFIG="$SMILE_CONFIG_PARTNER_002"
           fi
           echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
           PARTNER_ID=$(jq -r '.partner_id' sample/src/main/assets/smile_config.json)
           echo "partner_id=$PARTNER_ID" >> $GITHUB_OUTPUT
         env:
-          SMILE_CONFIG_PARTNER_002: ${{ secrets.SMILE_CONFIG_PARTNER_002 }}
+          SMILE_CONFIG: ${{ secrets.SMILE_CONFIG_PARTNER_2423 }}
       - name: Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1

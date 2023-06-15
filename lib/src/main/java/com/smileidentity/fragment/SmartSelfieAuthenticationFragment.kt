@@ -2,7 +2,6 @@ package com.smileidentity.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -14,6 +13,7 @@ import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KE
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.newInstance
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.resultFromBundle
+import com.smileidentity.getParcelableCompat
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
@@ -91,22 +91,20 @@ class SmartSelfieAuthenticationFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(requireContext()).apply {
-            // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
-            // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                val args = requireArguments()
-                SmileID.SmartSelfieAuthenticationScreen(
-                    userId = args.userId,
-                    allowAgentMode = args.allowAgentMode,
-                    showAttribution = args.showAttribution,
-                    onResult = {
-                        setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
-                    },
-                )
-            }
+    ) = ComposeView(requireContext()).apply {
+        // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
+        // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        val args = requireArguments()
+        setContent {
+            SmileID.SmartSelfieAuthenticationScreen(
+                userId = args.userId,
+                allowAgentMode = args.allowAgentMode,
+                showAttribution = args.showAttribution,
+                onResult = {
+                    setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
+                },
+            )
         }
     }
 }
@@ -127,5 +125,5 @@ private var Bundle.showAttribution: Boolean
     set(value) = putBoolean(KEY_SHOW_ATTRIBUTION, value)
 
 private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
-    get() = getParcelable(KEY_RESULT)!!
+    get() = getParcelableCompat(KEY_RESULT)!!
     set(value) = putParcelable(KEY_RESULT, value)

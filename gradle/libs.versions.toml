@@ -15,13 +15,14 @@ androidx-test-espresso = "3.5.1"
 androidx-test-fragment = "1.5.7"
 androidx-test-junit = "1.1.5"
 androidx-test-rules = "1.5.0"
-camposer = "0.2.1"
+camposer = "0.2.2"
 chucker = "3.5.2"
+coil = "2.4.0"
 coroutines = "1.7.1"
 junit = "4.13.2"
 kotlin = "1.8.21"
 ksp = "1.8.21-1.0.11"
-ktlint-plugin = "11.3.2"
+ktlint-plugin = "11.4.0"
 leakcanary = "2.11"
 maven-publish = "0.25.2"
 mockk = "1.13.5"
@@ -31,7 +32,7 @@ moshi-lazy-adapters = "2.2"
 okhttp = "4.11.0"
 play-services-mlkit-face-detection = "17.1.0"
 retrofit = "2.9.0"
-sentry = "6.21.0"
+sentry = "6.22.0"
 timber = "5.0.1"
 
 [plugins]
@@ -70,6 +71,7 @@ androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-
 camposer = { module = "io.github.ujizin:camposer", version.ref = "camposer" }
 chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
+coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 junit = { module = "junit:junit", version.ref = "junit" }

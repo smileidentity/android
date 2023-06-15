@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,142 +32,45 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
+import com.smileidentity.sample.toast
+import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
+import com.smileidentity.sample.viewmodel.countryDetails
+import com.smileidentity.sample.viewmodel.idTypeFriendlyNames
 import timber.log.Timber
-
-val countryDetails = mapOf(
-    "AO" to SearchableInputFieldItem("AO", "Angola", "🇦🇴"),
-    "BF" to SearchableInputFieldItem("BF", "Burkina Faso", "🇧🇫"),
-    "BI" to SearchableInputFieldItem("BI", "Burundi", "🇧🇮"),
-    "BJ" to SearchableInputFieldItem("BJ", "Benin", "🇧🇯"),
-    "BW" to SearchableInputFieldItem("BW", "Botswana", "🇧🇼"),
-    "CD" to SearchableInputFieldItem("CD", "Congo (DRC)", "🇨🇩"),
-    "CF" to SearchableInputFieldItem("CF", "Central African Republic", "🇨🇫"),
-    "CG" to SearchableInputFieldItem("CG", "Congo", "🇨🇬"),
-    "CI" to SearchableInputFieldItem("CI", "Côte d'Ivoire", "🇨🇮"),
-    "CM" to SearchableInputFieldItem("CM", "Cameroon", "🇨🇲"),
-    "CV" to SearchableInputFieldItem("CV", "Cabo Verde", "🇨🇻"),
-    "DJ" to SearchableInputFieldItem("DJ", "Djibouti", "🇩🇯"),
-    "EG" to SearchableInputFieldItem("EG", "Egypt", "🇪🇬"),
-    "EH" to SearchableInputFieldItem("EH", "Western Sahara", "🇪🇭"),
-    "ER" to SearchableInputFieldItem("ER", "Eritrea", "🇪🇷"),
-    "ET" to SearchableInputFieldItem("ET", "Ethiopia", "🇪🇹"),
-    "GA" to SearchableInputFieldItem("GA", "Gabon", "🇬🇦"),
-    "GH" to SearchableInputFieldItem("GH", "Ghana", "🇬🇭"),
-    "GM" to SearchableInputFieldItem("GM", "Gambia", "🇬🇲"),
-    "GN" to SearchableInputFieldItem("GN", "Guinea", "🇬🇳"),
-    "GQ" to SearchableInputFieldItem("GQ", "Equatorial Guinea", "🇬🇶"),
-    "GW" to SearchableInputFieldItem("GW", "Guinea-Bissau", "🇬🇼"),
-    "KE" to SearchableInputFieldItem("KE", "Kenya", "🇰🇪"),
-    "KM" to SearchableInputFieldItem("KM", "Comoros", "🇰🇲"),
-    "LR" to SearchableInputFieldItem("LR", "Liberia", "🇱🇷"),
-    "LS" to SearchableInputFieldItem("LS", "Lesotho", "🇱🇸"),
-    "LY" to SearchableInputFieldItem("LY", "Libya", "🇱🇾"),
-    "MA" to SearchableInputFieldItem("MA", "Morocco", "🇲🇦"),
-    "MG" to SearchableInputFieldItem("MG", "Madagascar", "🇲🇬"),
-    "ML" to SearchableInputFieldItem("ML", "Mali", "🇲🇱"),
-    "MR" to SearchableInputFieldItem("MR", "Mauritania", "🇲🇷"),
-    "MU" to SearchableInputFieldItem("MU", "Mauritius", "🇲🇺"),
-    "MW" to SearchableInputFieldItem("MW", "Malawi", "🇲🇼"),
-    "MZ" to SearchableInputFieldItem("MZ", "Mozambique", "🇲🇿"),
-    "NA" to SearchableInputFieldItem("NA", "Namibia", "🇳🇦"),
-    "NE" to SearchableInputFieldItem("NE", "Niger", "🇳🇪"),
-    "NG" to SearchableInputFieldItem("NG", "Nigeria", "🇳🇬"),
-    "RW" to SearchableInputFieldItem("RW", "Rwanda", "🇷🇼"),
-    "SC" to SearchableInputFieldItem("SC", "Seychelles", "🇸🇨"),
-    "SD" to SearchableInputFieldItem("SD", "Sudan", "🇸🇩"),
-    "SL" to SearchableInputFieldItem("SL", "Sierra Leone", "🇸🇱"),
-    "SN" to SearchableInputFieldItem("SN", "Senegal", "🇸🇳"),
-    "SO" to SearchableInputFieldItem("SO", "Somalia", "🇸🇴"),
-    "SS" to SearchableInputFieldItem("SS", "South Sudan", "🇸🇸"),
-    "ST" to SearchableInputFieldItem("ST", "São Tomé and Príncipe", "🇸🇹"),
-    "SZ" to SearchableInputFieldItem("SZ", "Eswatini", "🇸🇿"),
-    "TD" to SearchableInputFieldItem("TD", "Chad", "🇹🇩"),
-    "TG" to SearchableInputFieldItem("TG", "Togo", "🇹🇬"),
-    "TN" to SearchableInputFieldItem("TN", "Tunisia", "🇹🇳"),
-    "TZ" to SearchableInputFieldItem("TZ", "Tanzania", "🇹🇿"),
-    "UG" to SearchableInputFieldItem("UG", "Uganda", "🇺🇬"),
-    "ZA" to SearchableInputFieldItem("ZA", "South Africa", "🇿🇦"),
-    "ZM" to SearchableInputFieldItem("ZM", "Zambia", "🇿🇲"),
-    "ZW" to SearchableInputFieldItem("ZW", "Zimbabwe", "🇿🇼"),
-)
-
-private val idTypeFriendlyNames = mapOf(
-    "NATIONAL_ID" to "National ID",
-    "NATIONAL_ID_NO_PHOTO" to "National ID (No Photo)",
-    "PASSPORT" to "Passport",
-    "VOTER_ID" to "Voter ID",
-    "SSNIT" to "SSNIT",
-    "NEW_VOTER_ID" to "New Voter ID",
-    "DRIVERS_LICENSE" to "Driver's License",
-    "V_NIN" to "Virtual NIN",
-    "CAC" to "CAC",
-    "NIN_V2" to "NIN v2",
-    "NIN_SLIP" to "NIN Slip",
-    "BANK_ACCOUNT" to "Bank Account",
-    "TIN" to "TIN",
-    "BVN" to "BVN",
-    "PHONE_NUMBER" to "Phone Number",
-    "ALIEN_CARD" to "Alien Card",
-)
-
-val docVTestData = mapOf(
-    "ZA" to listOf(
-        "NATIONAL_ID",
-        "NATIONAL_ID_NO_PHOTO",
-    ),
-    "UG" to listOf(
-        "NATIONAL_ID_NO_PHOTO",
-    ),
-    "GH" to listOf(
-        "SSNIT",
-        "VOTER_ID",
-        "NEW_VOTER_ID",
-        "DRIVERS_LICENSE",
-        "PASSPORT",
-    ),
-    "KE" to listOf(
-        "NATIONAL_ID",
-        "ALIEN_CARD",
-        "PASSPORT",
-        "NATIONAL_ID_NO_PHOTO",
-    ),
-    "NG" to listOf(
-        "V_NIN",
-        "CAC",
-        "VOTER_ID",
-        "NIN_V2",
-        "DRIVERS_LICENSE",
-        "NIN",
-        "NIN_SLIP",
-        "BANK_ACCOUNT",
-        "NATIONAL_ID",
-        "TIN",
-        "PASSPORT",
-    ),
-)
 
 /**
  * A composable that allows the user to select a country and ID type for Document Verification.
  *
- * @param idTypes A map of country codes to a list of ID types for that country.
  * @param onIdTypeSelected A callback that is invoked when the user selects a country and ID type.
  */
 @Composable
 fun DocumentVerificationIdTypeSelector(
-    idTypes: Map<String, List<String>>,
+    viewModel: DocumentSelectorViewModel = viewModel(),
     onIdTypeSelected: (String, String) -> Unit,
 ) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    uiState.errorMessage?.let {
+        val context = LocalContext.current
+        LaunchedEffect(it) { context.toast("Error loading ID types: $it") }
+    }
+
+    val idTypes = uiState.idTypes
+
     // If an unsupported country code is passed in, it will display the country code with no emoji
-    val countries by remember {
+    val countries by remember(idTypes) {
         derivedStateOf {
-            idTypes.keys.map {
+            idTypes?.keys?.map {
                 countryDetails[it] ?: SearchableInputFieldItem(
                     it,
                     it,
@@ -272,7 +176,7 @@ fun DocumentVerificationIdTypeSelector(
                     text = stringResource(R.string.doc_v_select_id_type),
                     fontWeight = FontWeight.Bold,
                 )
-                val idTypesForCountry = idTypes[selectedCountry]
+                val idTypesForCountry = idTypes!![selectedCountry]
                 idTypesForCountry?.forEach { idType ->
                     val selected = selectedIdType == idType
                     val onClick = {

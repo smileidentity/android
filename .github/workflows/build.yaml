@@ -12,6 +12,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -20,9 +21,9 @@ jobs:
           java-version: 17
       - name: Write Smile Config
         run: |
-          echo "$SMILE_CONFIG_PARTNER_002" > sample/src/main/assets/smile_config.json
+          echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
         env:
-          SMILE_CONFIG_PARTNER_002: ${{ secrets.SMILE_CONFIG_PARTNER_002 }}
+          SMILE_CONFIG: ${{ secrets.SMILE_CONFIG_PARTNER_2423 }}
       - name: Calculate Snapshot Version
         id: version
         # Read version number from the VERSION file and append -SNAPSHOT if not already present
@@ -59,6 +60,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - uses: actions/checkout@v3
       - uses: musichin/ktlint-check@v2

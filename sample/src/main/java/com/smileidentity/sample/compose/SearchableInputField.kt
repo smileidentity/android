@@ -3,6 +3,8 @@ package com.smileidentity.sample.compose
 import android.os.Parcelable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,14 +27,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.SmileID
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.sample.R
+import com.smileidentity.sample.viewmodel.countryDetails
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
@@ -42,12 +49,22 @@ data class SearchableInputFieldItem(
     val leadingEmoji: String = "",
 ) : Parcelable
 
+/**
+ * A searchable input field that displays a list of items in a dropdown menu.
+ *
+ * @param fieldLabel The label to display when no item is selected
+ * @param selectedItem The currently selected item
+ * @param unfilteredItems The list of items to display in the dropdown menu. If null, a loading
+ * indicator is displayed.
+ * @param onItemSelected The callback to invoke when an item is selected
+ * @param modifier The modifier to apply to the [DockedSearchBar]
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchableInputField(
     fieldLabel: String,
     selectedItem: SearchableInputFieldItem?,
-    unfilteredItems: List<SearchableInputFieldItem>,
+    unfilteredItems: List<SearchableInputFieldItem>?,
     onItemSelected: (SearchableInputFieldItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,7 +72,7 @@ fun SearchableInputField(
     var active by rememberSaveable { mutableStateOf(false) }
     val filteredItems by remember(unfilteredItems) {
         derivedStateOf {
-            unfilteredItems.filter { it.displayName.contains(query, ignoreCase = true) }
+            unfilteredItems?.filter { it.displayName.contains(query, ignoreCase = true) }
         }
     }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -87,25 +104,36 @@ fun SearchableInputField(
             .imePadding()
             .border(1.dp, MaterialTheme.colorScheme.onSurface, shape),
     ) {
+        if (filteredItems == null) {
+            Text(
+                text = stringResource(R.string.loading),
+                modifier = Modifier.align(alignment = CenterHorizontally),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            CircularProgressIndicator(modifier = Modifier.align(alignment = CenterHorizontally))
+            return@DockedSearchBar
+        }
         LazyColumn {
-            items(filteredItems) {
-                ListItem(
-                    leadingContent = { Text(it.leadingEmoji) },
-                    headlineContent = { Text(it.displayName) },
-                    trailingContent = {
-                        Icon(
-                            Icons.Outlined.CheckCircle,
-                            contentDescription = null,
-                        )
-                    },
-                    modifier = Modifier.clickable {
-                        // Set query to empty so that the search bar shows the placeholder, which we
-                        // use to display the selected value
-                        query = ""
-                        active = false
-                        onItemSelected(it)
-                    },
-                )
+            filteredItems?.let { filteredItems ->
+                items(filteredItems) {
+                    ListItem(
+                        leadingContent = { Text(it.leadingEmoji) },
+                        headlineContent = { Text(it.displayName) },
+                        trailingContent = {
+                            Icon(
+                                Icons.Outlined.CheckCircle,
+                                contentDescription = null,
+                            )
+                        },
+                        modifier = Modifier.clickable {
+                            // Set query to empty so that the search bar shows the placeholder,
+                            // which we use to display the selected value
+                            query = ""
+                            active = false
+                            onItemSelected(it)
+                        },
+                    )
+                }
             }
         }
     }

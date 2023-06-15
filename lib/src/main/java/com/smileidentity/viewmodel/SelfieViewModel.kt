@@ -228,7 +228,7 @@ class SelfieViewModel(
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_smart_selfie_processing_error_subtitle,
+                    errorMessage = R.string.si_processing_error_subtitle,
                 )
             }
         }.addOnCompleteListener {
@@ -253,7 +253,7 @@ class SelfieViewModel(
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_smart_selfie_processing_error_subtitle,
+                    errorMessage = R.string.si_processing_error_subtitle,
                 )
             }
         }

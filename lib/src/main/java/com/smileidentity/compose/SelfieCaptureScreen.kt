@@ -91,7 +91,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             successIcon = painterResource(R.drawable.si_processing_success),
             errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),
             errorSubtitle = stringResource(
-                uiState.errorMessage ?: R.string.si_smart_selfie_processing_error_subtitle,
+                uiState.errorMessage ?: R.string.si_processing_error_subtitle,
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
             continueButtonText = stringResource(

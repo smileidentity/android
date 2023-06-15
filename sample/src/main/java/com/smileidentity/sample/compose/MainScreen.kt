@@ -224,7 +224,11 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
-                            var userId by rememberSaveable { mutableStateOf("") }
+                            var userId by rememberSaveable {
+                                val clipboardText = clipboardManager.getText()?.text
+                                // Autofill the value of User ID as it was likely just copied
+                                mutableStateOf(clipboardText?.takeIf { "user-" in it } ?: "")
+                            }
                             AlertDialog(
                                 title = { Text(stringResource(R.string.user_id_dialog_title)) },
                                 text = {
@@ -325,7 +329,7 @@ fun MainScreen() {
                             // TODO: fetch this from
                             //  https://api.smileidentity.com/v1/products_config once it supports
                             //  signature auth (there should be a story for this for Platform)
-                            DocumentVerificationIdTypeSelector(docVTestData) { country, idType ->
+                            DocumentVerificationIdTypeSelector { country, idType ->
                                 Timber.v("Selected country: $country, idType: $idType")
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
@@ -344,7 +348,7 @@ fun MainScreen() {
                             SmileID.DocumentVerification(
                                 userId = userId,
                                 jobId = jobId,
-                                enforcedIdType = documentType,
+                                idType = documentType,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data

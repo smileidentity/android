@@ -9,9 +9,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
+import com.smileidentity.models.Document;
 import com.smileidentity.models.JobStatusResponse;
+import com.smileidentity.results.DocumentVerificationResult;
 import com.smileidentity.results.SmartSelfieResult;
 import com.smileidentity.results.SmileIDResult;
 import com.smileidentity.sample.R;
@@ -39,6 +42,8 @@ public class JavaActivity extends FragmentActivity {
             .setOnClickListener(v -> doSmartSelfieAuthentication());
         findViewById(R.id.button_smart_selfie_enrollment)
             .setOnClickListener(v -> doSmartSelfieEnrollment());
+        findViewById(R.id.button_document_verification)
+            .setOnClickListener(v -> doDocumentVerification());
     }
 
     private void doSmartSelfieEnrollment() {
@@ -109,6 +114,26 @@ public class JavaActivity extends FragmentActivity {
             .replace(R.id.fragment_container, smartSelfieFragment)
             .commit();
         showProductFragment();
+    }
+
+    private void doDocumentVerification() {
+        Document document = new Document("GH", "DRIVERS_LICENSE", 1.6f);
+        DocumentVerificationFragment documentVerificationFragment = DocumentVerificationFragment
+            .newInstance(document);
+        getSupportFragmentManager().setFragmentResultListener(
+            DocumentVerificationFragment.KEY_REQUEST,
+            this,
+            (requestKey, result) -> {
+                SmileIDResult<DocumentVerificationResult> documentVerificationResult =
+                    DocumentVerificationFragment.resultFromBundle(result);
+                Timber.v("DocumentVerification Result: %s", documentVerificationResult);
+                getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(documentVerificationFragment)
+                    .commit();
+                hideProductFragment();
+            }
+        );
     }
 
     private void showProductFragment() {

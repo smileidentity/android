@@ -9,6 +9,8 @@ import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
+import com.smileidentity.models.ProductsConfigRequest
+import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -48,9 +50,26 @@ interface SmileIDService {
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
 
+    /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be a
+     * SmartSelfie Authentication/Registration.
+     */
     @POST("/v1/job_status")
     suspend fun getJobStatus(@Body request: JobStatusRequest): JobStatusResponse
 
+    /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be a
+     * Document Verification.
+     */
     @POST("/v1/job_status")
     suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
+
+    /**
+     * Returns the ID types that are enabled for authenticated partner and which of those require
+     * consent
+     */
+    @POST("/v1/products_config")
+    suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
 }

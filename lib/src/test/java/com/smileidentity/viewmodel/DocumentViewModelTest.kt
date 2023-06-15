@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel
 
+import com.smileidentity.models.Document
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,7 @@ class DocumentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = DocumentViewModel(randomUserId(), randomJobId())
+        subject = DocumentViewModel(randomUserId(), randomJobId(), Document("KE", "ID_CARD"))
     }
 
     @After
@@ -29,7 +30,7 @@ class DocumentViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(null, uiState.documentImageToConfirm)
+        assertEquals(null, uiState.frontDocumentImageToConfirm)
         assertEquals(null, uiState.errorMessage)
     }
 }
