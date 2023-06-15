@@ -38,6 +38,7 @@ import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
+import java.io.File
 
 @VisibleForTesting
 @Composable
@@ -49,6 +50,7 @@ internal fun DocumentCaptureScreen(
     titleText: String,
     subtitleText: String,
     isBackSide: Boolean = false,
+    bypassSelfieCaptureWithFile: File? = null,
     viewModel: DocumentViewModel = viewModel(
         factory = viewModelFactory {
             DocumentViewModel(
@@ -56,6 +58,7 @@ internal fun DocumentCaptureScreen(
                 jobId = jobId,
                 idType = idType,
                 idAspectRatio = idAspectRatio,
+                selfieFile = bypassSelfieCaptureWithFile,
             )
         },
     ),

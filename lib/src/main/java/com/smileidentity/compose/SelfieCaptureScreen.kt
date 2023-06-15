@@ -68,9 +68,10 @@ internal fun OrchestratedSelfieCaptureScreen(
     jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
+    skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
     ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
@@ -125,6 +126,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             jobId = jobId,
             isEnroll = isEnroll,
             allowAgentMode = allowAgentMode,
+            skipApiSubmission = skipApiSubmission,
         )
     }
 }
@@ -136,8 +138,9 @@ internal fun SelfieCaptureScreen(
     jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
+    skipApiSubmission: Boolean = false,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
