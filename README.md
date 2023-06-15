@@ -104,6 +104,8 @@ uploadKeystorePassword=<The password for the upload keystore>
   applications
 - When adding drawables, please compress them as much as possible (tinypng.com is a good resource
   for this) as well as `avocado` (`npm install -g avocado`) for compressing android vector drawables
+- When adding vector drawables, please check that evenOdd fillType is not used unnecessarily. Using 
+  evenOdd causes build time png generation, because evenOdd requires API 24 (our minSdk is 21)
 - Any new developer should add themselves to the the `developers` block in
   [`lib/lib.gradle.kts`](https://github.com/smileidentity/android/blob/main/lib/lib.gradle.kts)
 - The linter enforces a maximum line length of 100 characters. Please try to keep lines under this
