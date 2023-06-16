@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.ProcessingScreen
 import com.smileidentity.generateFileFromUri
 import com.smileidentity.isImageAtLeast
@@ -31,6 +32,7 @@ import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.results.SmileIDResult
 import com.smileidentity.toast
 import com.smileidentity.viewmodel.DocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -122,6 +124,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             idAspectRatio = idAspectRatio,
             titleText = stringResource(id = R.string.si_doc_v_capture_instructions_front_title),
             subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
+            bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
         )
 
         DocumentCaptureFlow.FrontDocumentCaptureConfirmation -> ImageCaptureConfirmationDialog(
@@ -154,6 +157,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             titleText = stringResource(id = R.string.si_doc_v_capture_instructions_back_title),
             subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
             isBackSide = true,
+            bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
         )
 
         DocumentCaptureFlow.BackDocumentCaptureConfirmation -> ImageCaptureConfirmationDialog(
@@ -166,12 +170,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             confirmButtonText = stringResource(
                 id = R.string.si_doc_v_confirmation_dialog_confirm_button,
             ),
-            onConfirm = {
-                viewModel.submitDocVJob(
-                    uiState.frontDocumentImageToConfirm!!,
-                    uiState.backDocumentImageToConfirm,
-                )
-            },
+            onConfirm = { viewModel.onDocumentConfirmed() },
             retakeButtonText = stringResource(
                 id = R.string.si_doc_v_confirmation_dialog_retake_button,
             ),
@@ -198,12 +197,7 @@ internal fun OrchestratedDocumentVerificationScreen(
                 confirmButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_confirm_button,
                 ),
-                onConfirm = {
-                    viewModel.submitDocVJob(
-                        uiState.frontDocumentImageToConfirm,
-                        uiState.backDocumentImageToConfirm,
-                    )
-                },
+                onConfirm = { viewModel.onDocumentConfirmed() },
                 retakeButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_retake_button,
                 ),
@@ -255,7 +249,7 @@ internal fun OrchestratedDocumentVerificationScreen(
                 id = R.string.si_doc_v_confirmation_dialog_confirm_button,
             ),
             onConfirm = {
-                viewModel.submitDocVJob(
+                viewModel.submitJob(
                     uiState.frontDocumentImageToConfirm!!,
                     uiState.backDocumentImageToConfirm,
                 )
@@ -282,8 +276,8 @@ internal fun OrchestratedDocumentVerificationScreen(
                 id = R.string.si_doc_v_confirmation_dialog_confirm_button,
             ),
             onConfirm = {
-                viewModel.submitDocVJob(
-                    uiState.frontDocumentImageToConfirm!!,
+                viewModel.submitJob(
+                    uiState.frontDocumentImageToConfirm,
                     uiState.backDocumentImageToConfirm,
                 )
             },
@@ -292,6 +286,20 @@ internal fun OrchestratedDocumentVerificationScreen(
             ),
             onRetake = { viewModel.onDocumentRejected() },
         )
+
+        DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
+            userId = userId,
+            jobId = jobId,
+            isEnroll = false,
+            allowAgentMode = false,
+            showAttribution = showAttribution,
+            skipApiSubmission = true,
+        ) {
+            when (it) {
+                is SmileIDResult.Error -> viewModel.onSelfieCaptureError(it)
+                is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
+            }
+        }
 
         DocumentCaptureFlow.Unknown -> {
             SmileIDCrashReporting.hub.captureException(

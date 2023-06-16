@@ -3,9 +3,8 @@ package com.smileidentity.sample.compose
 import android.os.Parcelable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -107,9 +106,10 @@ fun SearchableInputField(
         if (filteredItems == null) {
             Text(
                 text = stringResource(R.string.loading),
-                modifier = Modifier.align(alignment = CenterHorizontally),
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .align(alignment = CenterHorizontally),
             )
-            Spacer(modifier = Modifier.height(16.dp))
             CircularProgressIndicator(modifier = Modifier.align(alignment = CenterHorizontally))
             return@DockedSearchBar
         }
