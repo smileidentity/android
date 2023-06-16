@@ -5,6 +5,10 @@
     <string name="si_camera_permission_rationale">The camera permission is required to complete the verification process</string>
     <string name="si_agent_mode">Agent Mode</string>
 
+    <!--  Common Resources -->
+    <string name="si_allow">Allow</string>
+    <string name="si_cancel">Cancel</string>
+
     <!--  Content Descriptions (for accessibility)  -->
     <string name="si_cd_logo">Smile ID logo</string>
     <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
@@ -95,6 +99,23 @@
     <string name="si_id_field_name_last_name">Last Name</string>
     <string name="si_id_field_name_dob">Date of Birth</string>
     <string name="si_id_field_name_bank_code">Bank Code</string>
+
+    <!--  Consent Screen  -->
+    <string name="si_consent_title">wants to access your information</string>
+    <string name="si_consent_sub_title">This will allow to:</string>
+    <string name="si_consent_info_one_title">Process your personal details</string>
+    <string name="si_consent_info_one_description">Partner can provide your names, DoB and gender</string>
+    <string name="si_consent_info_two_title">Process your contact information</string>
+    <string name="si_consent_info_two_description">Partner can process your phone numbers and address</string>
+    <string name="si_consent_info_three_title">Process your document information</string>
+    <string name="si_consent_info_three_description">Partner can process your photo, ID expiration date, country of issuance and document number</string>
+    <string name="si_consent_privacy_policy">You can view Privacy Policy here</string>
+    <string name="si_consent_privacy_policy_description">By choosing \'Allow\' you grant consent to process your personal data to offer you this service</string>
+    <string name="si_consent_consent_denied">Consent Denied</string>
+    <string name="si_consent_consent_denied_title">We cannot verify you without your consent</string>
+    <string name="si_consent_consent_denied_description">Do you wish to go back and correct that?</string>
+    <string name="si_consent_go_back">Yes, go back</string>
+    <string name="si_consent_cancel_verification">No, cancel verification</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
