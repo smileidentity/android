@@ -1,5 +1,5 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="20dp" android:height="18dp" android:viewportWidth="20" android:viewportHeight="18">
-    <path android:pathData="M4 2h11a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" android:strokeAlpha="0.4" android:fillColor="@color/si_color_background_dark" android:fillAlpha="0.4"/>
+    <path android:pathData="M4 2h11a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" android:strokeAlpha="0.4" android:fillColor="@color/si_color_dark_grey" android:fillAlpha="0.4"/>
     <path android:pathData="M0 8h19v6c0 2.209-1.791 4-4 4H4c-2.209 0-4-1.791-4-4V8z" android:fillColor="@color/si_color_accent"/>
     <path android:pathData="M4.667 9c1.104 0 2 0.895 2 2s-0.896 2-2 2c-1.105 0-2-0.895-2-2s0.895-2 2-2z" android:fillColor="@color/si_color_success"/>
     <path android:pathData="M2.413 15h4.506c0.143 0 0.283-0.023 0.414-0.065-0.185-1.47-1.307-2.602-2.666-2.602S2.185 13.465 2 14.935C2.132 14.977 2.27 15 2.414 15m8.086-5h6a0.5 0.5 0 0 1 0.5 0.5 0.5 0.5 0 0 1-0.5 0.5h-6a0.5 0.5 0 0 1-0.5-0.5 0.5 0.5 0 0 1 0.5-0.5zm0 2h4.25a0.5 0.5 0 0 1 0.5 0.5 0.5 0.5 0 0 1-0.5 0.5H10.5a0.5 0.5 0 0 1-0.5-0.5 0.5 0.5 0 0 1 0.5-0.5zm0 2H13a0.5 0.5 0 0 1 0.5 0.5A0.5 0.5 0 0 1 13 15h-2.5a0.5 0.5 0 0 1-0.5-0.5 0.5 0.5 0 0 1 0.5-0.5z" android:fillColor="@color/si_color_success"/>

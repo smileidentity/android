@@ -57,7 +57,7 @@ fun ConsentDeniedScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(id = R.string.si_consent_consent_denied),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(id = R.color.si_color_material_error_container),
@@ -65,14 +65,15 @@ fun ConsentDeniedScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(id = R.string.si_consent_consent_denied_title),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(46.dp))
                     Text(
                         text = stringResource(id = R.string.si_consent_consent_denied_description),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
+                        color = colorResource(id = R.color.si_color_accent),
                     )
                 }
             },
@@ -80,7 +81,7 @@ fun ConsentDeniedScreen(
                 Column(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(24.dp)
+                        .padding(16.dp)
                         .verticalScroll(rememberScrollState(), true),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {

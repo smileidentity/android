@@ -76,33 +76,35 @@ fun ConsentScreen(
                             partnerName,
                             productName,
                         ),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(id = R.string.si_consent_sub_title, partnerName),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                     getConsentScreenInformation().forEach {
-                        Row(modifier = Modifier.padding(vertical = 12.dp)) {
+                        Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)) {
                             Image(
                                 painter = painterResource(id = it.third),
                                 contentDescription = null,
-                                modifier = Modifier.size(40.dp),
+                                modifier = Modifier.size(35.dp),
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
                                 Text(
                                     text = it.first,
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
+                                    color = colorResource(id = R.color.si_color_accent),
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = it.second,
-                                    style = MaterialTheme.typography.titleSmall,
+                                    style = MaterialTheme.typography.bodySmall,
                                 )
                             }
                         }
@@ -113,7 +115,7 @@ fun ConsentScreen(
                 Column(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(24.dp)
+                        .padding(16.dp)
                         .verticalScroll(rememberScrollState(), true),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -133,7 +135,7 @@ fun ConsentScreen(
                     }
                     ClickableText(
                         text = annotatedText,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         onClick = { offset ->
                             // We check if there is an *URL* annotation attached to the text
                             // at the clicked position
@@ -152,9 +154,9 @@ fun ConsentScreen(
                             id = R.string.si_consent_privacy_policy_description,
                             partnerName,
                         ),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
-                        modifier = modifier.padding(bottom = 32.dp),
+                        modifier = modifier.padding(bottom = 24.dp),
                     )
                     Button(
                         onClick = onContinue,
