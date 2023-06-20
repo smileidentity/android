@@ -334,6 +334,10 @@ fun MainScreen() {
                                 navController.popBackStack()
                             }
                         }
+                        composable(ProductScreen.BiometricKyc.route) {
+                            bottomNavSelection = BottomNavigationScreen.Home
+                            currentScreenTitle = ProductScreen.BiometricKyc.label
+                        }
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label

@@ -42,6 +42,12 @@ sealed class ProductScreen(
         R.drawable.enhanced_kyc,
     )
 
+    object BiometricKyc : ProductScreen(
+        "biometric_kyc",
+        R.string.biometric_kyc_product_name,
+        R.drawable.biometric_kyc,
+    )
+
     object DocumentVerification : ProductScreen(
         "document_verification",
         com.smileidentity.R.string.si_doc_v_product_name,

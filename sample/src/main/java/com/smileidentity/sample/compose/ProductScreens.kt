@@ -49,6 +49,7 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
         ProductScreen.SmartSelfieEnrollment,
         ProductScreen.SmartSelfieAuthentication,
         ProductScreen.EnhancedKyc,
+        ProductScreen.BiometricKyc,
         ProductScreen.DocumentVerification,
     )
     Column(

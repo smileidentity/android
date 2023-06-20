@@ -1,6 +1,7 @@
 package com.smileidentity.results
 
 import android.os.Parcelable
+import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
@@ -85,13 +86,13 @@ data class DocumentVerificationResult(
 /**
  * The result of a Biometric KYC capture and submission to the Smile ID API. Indicates that the
  * capture and network requests were successful. The Job itself may or may not be complete yet. This
- * can be checked with [JobStatusResponse.jobComplete]. If not yet complete, the job status will
- * need to be fetched again later. If the job is complete, the final job success can be checked with
- * [JobStatusResponse.jobSuccess].
+ * can be checked with [BiometricKycJobStatusResponse.jobComplete]. If not yet complete, the job
+ * status will need to be fetched again later. If the job is complete, the final job success can be
+ * checked with [BiometricKycJobStatusResponse.jobSuccess].
  */
 @Parcelize
 data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: JobStatusResponse,
+    val jobStatusResponse: BiometricKycJobStatusResponse,
 ) : Parcelable

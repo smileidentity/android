@@ -51,6 +51,9 @@
     <string name="enhanced_kyc_processing_retry_button">Retry</string>
     <string name="enhanced_kyc_processing_close_button">Close</string>
 
+    <!--  Biometric KYC  -->
+    <string name="biometric_kyc_product_name">Biometric KYC</string>
+
     <!--  Document Verification  -->
     <string name="doc_v_select_country">Country of Issue</string>
     <string name="doc_v_country_search_field_hint">Select Country</string>
