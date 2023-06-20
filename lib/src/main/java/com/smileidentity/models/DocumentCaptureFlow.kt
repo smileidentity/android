@@ -39,6 +39,8 @@ internal sealed class DocumentCaptureFlow {
 
     object BackDocumentCaptureConfirmation : DocumentCaptureFlow()
 
+    object SelfieCapture : DocumentCaptureFlow()
+
     object Unknown : DocumentCaptureFlow()
 
     companion object {
@@ -93,9 +95,12 @@ internal sealed class DocumentCaptureFlow {
                 !shouldSelectFromGallery && captureBothSides &&
                     isFrontDocumentPhotoValid && uiState?.backDocumentImageToConfirm != null
 
+            val showSelfieCapture = uiState?.showSelfieCapture ?: false
+
             return when {
                 !acknowledgedInstructions -> ShowInstructions
                 processingState != null -> ProcessingScreen(processingState = processingState)
+                showSelfieCapture -> SelfieCapture
                 selectGalleryOneSide -> GalleryOneSide
                 selectGalleryOneSideConfirmation -> GalleryOneSideConfirmation
                 selectGalleryTwoSides -> FrontDocumentGallerySelection

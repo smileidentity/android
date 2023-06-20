@@ -17,8 +17,10 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentImage
+import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.postProcessImage
 import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.ujizin.camposer.state.CameraState
@@ -38,15 +40,21 @@ import kotlin.time.Duration.Companion.seconds
 data class DocumentUiState(
     val frontDocumentImageToConfirm: File? = null,
     val backDocumentImageToConfirm: File? = null,
+    val showSelfieCapture: Boolean = false,
     val processingState: ProcessingState? = null,
     @StringRes val errorMessage: Int? = null,
 )
 
+/**
+ * @param selfieFile The selfie image file to use for authentication. If null, selfie capture will
+ * be performed
+ */
 class DocumentViewModel(
     private val userId: String,
     private val jobId: String,
     private val idType: Document,
     private val idAspectRatio: Float? = idType.aspectRatio,
+    private var selfieFile: File? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -118,7 +126,7 @@ class DocumentViewModel(
         }
     }
 
-    private fun submitJob(documentFrontFile: File, documentBackFile: File? = null) {
+    fun submitJob(documentFrontFile: File, documentBackFile: File? = null) {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
             result = SmileIDResult.Error(e)
@@ -148,7 +156,10 @@ class DocumentViewModel(
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val frontImageInfo = documentFrontFile.asDocumentImage()
             val backImageInfo = documentBackFile?.asDocumentImage()
-            val uploadRequest = UploadRequest(listOfNotNull(frontImageInfo, backImageInfo))
+            val selfieImageInfo = selfieFile?.asSelfieImage()
+            val uploadRequest = UploadRequest(
+                images = listOfNotNull(frontImageInfo, backImageInfo, selfieImageInfo),
+            )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             val jobStatusRequest = JobStatusRequest(
@@ -180,6 +191,10 @@ class DocumentViewModel(
             )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
+    }
+
+    fun onDocumentConfirmed() {
+        _uiState.update { it.copy(showSelfieCapture = true) }
     }
 
     fun onDocumentRejected(
@@ -231,11 +246,17 @@ class DocumentViewModel(
         }
     }
 
-    fun submitDocVJob(frontDocumentFile: File, backDocumentFile: File?) {
-        submitJob(documentFrontFile = frontDocumentFile, documentBackFile = backDocumentFile)
-    }
-
     fun onFinished(callback: SmileIDCallback<DocumentVerificationResult>) {
         callback(result!!)
+    }
+
+    fun onSelfieCaptureError(error: SmileIDResult.Error) {
+        Timber.w("Selfie capture error: $error")
+        _uiState.update { it.copy(processingState = ProcessingState.Error) }
+    }
+
+    fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
+        selfieFile = it.data.selfieFile
+        submitJob(documentFrontFile!!, documentBackFile)
     }
 }

@@ -80,6 +80,7 @@ class SelfieViewModel(
     private val isEnroll: Boolean,
     private val userId: String,
     private val jobId: String,
+    private val skipApiSubmission: Boolean,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
 
@@ -247,6 +248,11 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
+        if (skipApiSubmission) {
+            result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
+            _uiState.update { it.copy(processingState = ProcessingState.Success) }
+            return
+        }
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
             result = SmileIDResult.Error(e)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -86,10 +85,7 @@ fun DocumentVerificationIdTypeSelector(
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
@@ -97,6 +93,7 @@ fun DocumentVerificationIdTypeSelector(
                 .fillMaxHeight()
                 .width(320.dp)
                 .verticalScroll(rememberScrollState())
+                .padding(16.dp)
                 .weight(1f),
         ) {
             Text(
@@ -113,7 +110,7 @@ fun DocumentVerificationIdTypeSelector(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 32.dp),
+                    .padding(top = 8.dp, bottom = 32.dp),
             )
             Text(text = stringResource(R.string.doc_v_select_country), fontWeight = FontWeight.Bold)
             SearchableInputField(
@@ -142,13 +139,12 @@ fun DocumentVerificationIdTypeSelector(
                         R.string.doc_v_info_encrypted_subtitle,
                     ),
                 )
-                Spacer(modifier = Modifier.height(64.dp))
                 instructions.forEach { (imageId, title, subtitle) ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                            .padding(top = 32.dp),
                     ) {
                         Image(
                             painter = painterResource(id = imageId),
@@ -166,7 +162,6 @@ fun DocumentVerificationIdTypeSelector(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.size(24.dp))
                 }
             }
 
@@ -210,7 +205,7 @@ fun DocumentVerificationIdTypeSelector(
         Button(
             onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType!!) },
             enabled = isContinueEnabled,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.cont))
         }

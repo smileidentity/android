@@ -49,12 +49,14 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
  * can be checked with [JobStatusResponse.jobComplete]. If not yet complete, the job status will
  * need to be fetched again later. If the job is complete, the final job success can be checked with
  * [JobStatusResponse.jobSuccess].
+ *
+ * If [jobStatusResponse] is null, that means submission to the API was skipped
  */
 @Parcelize
 data class SmartSelfieResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: JobStatusResponse,
+    val jobStatusResponse: JobStatusResponse?,
 ) : Parcelable
 
 /**

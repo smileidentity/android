@@ -46,6 +46,7 @@ import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieEnrollmentScreen
 import com.smileidentity.models.Document
+import com.smileidentity.models.JobResult
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
@@ -194,13 +195,20 @@ fun MainScreen() {
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val resultData = result.data
+                                    val response = result.data.jobStatusResponse
                                     val message = StringBuilder("SmartSelfie Enrollment ")
-                                    if (resultData.jobStatusResponse.jobComplete) {
-                                        if (resultData.jobStatusResponse.jobSuccess) {
+                                    if (response?.jobComplete == true) {
+                                        if (response.jobSuccess) {
                                             message.append("completed successfully. ")
                                         } else {
-                                            message.append("completed unsuccessfully. ")
+                                            val code = response.code
+                                            val actualResult = response.result
+                                                as? JobResult.Entry
+                                            val resultCode = actualResult?.resultCode
+                                            val resultText = actualResult?.resultText
+                                            message.append("completed unsuccessfully ")
+                                            message.append("(code=$code, resultCode=$resultCode): ")
+                                            message.append("$resultText. ")
                                         }
                                     } else {
                                         message.append("still pending. ")
@@ -277,13 +285,20 @@ fun MainScreen() {
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val resultData = result.data
+                                    val response = result.data.jobStatusResponse
                                     val message = StringBuilder("SmartSelfie Authentication ")
-                                    if (resultData.jobStatusResponse.jobComplete) {
-                                        if (resultData.jobStatusResponse.jobSuccess) {
+                                    if (response?.jobComplete == true) {
+                                        if (response.jobSuccess) {
                                             message.append("completed successfully. ")
                                         } else {
-                                            message.append("completed unsuccessfully. ")
+                                            val code = response.code
+                                            val actualResult = response.result
+                                                as? JobResult.Entry
+                                            val resultCode = actualResult?.resultCode
+                                            val resultText = actualResult?.resultText
+                                            message.append("completed unsuccessfully ")
+                                            message.append("(code=$code, resultCode=$resultCode): ")
+                                            message.append("$resultText. ")
                                         }
                                     } else {
                                         message.append("still pending. ")
