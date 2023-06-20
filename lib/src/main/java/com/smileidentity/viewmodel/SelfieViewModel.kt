@@ -201,7 +201,7 @@ class SelfieViewModel(
                     postProcessImageBitmap(
                         bitmap = bitmap,
                         file = livenessFile,
-                        saveAsGrayscale = true,
+                        saveAsGrayscale = false,
                         compressionQuality = 80,
                         maxOutputSize = LIVENESS_IMAGE_SIZE,
                     )
