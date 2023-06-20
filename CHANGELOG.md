@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 10.0.0-beta03 (Unreleased)
 
 ### Features
 - Breaking: renamed SmartSelfie Registration to SmartSelfie Enrollment
@@ -10,36 +10,34 @@
 - Tweak selfie progress indicator animation
 - Set Release property on Sentry for release tracking
 
-### Bug Fixes
+### Fixed
 - Fix crash on network retries
 
-### Dependencies
+### Changed
 - Bump AndroidX Activity to 1.7.2
 - Bump Gradle to 8.0.2
+- Submit color liveness images instead of grayscale 
 
 ## 10.0.0-beta02
 
-### Features
+### Added
 - Add Biometric KYC data models
 - Initial Document Verification screens
 
-### Bug Fixes
+### Fixed
 - Only allow a single face to be in frame for a SmartSelfie™ capture
 
-### Dependencies
+### Changed
 - Bump Sentry to 6.21.0
 
 ## 10.0.0-beta01
 
-### Features
+### Added
 - Initial release 🎉
 - SmartSelfie™ Authentication and Registration
 - Enhanced KYC
 - Theming
 - Networking
-
-### Bug Fixes
-N/A
 
 ### Dependencies
 - Retrofit
