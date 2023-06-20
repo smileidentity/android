@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smileidentity.R
 import com.smileidentity.consent.ConsentScreen
-import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -35,7 +35,7 @@ class ConsentScreenTest {
         composeTestRule.onNodeWithText(continueButtonText).performClick()
 
         // then
-        Assert.assertTrue(callbackInvoked)
+        assertTrue(callbackInvoked)
     }
 
     @Test
@@ -59,6 +59,6 @@ class ConsentScreenTest {
         composeTestRule.onNodeWithText(cancelButtonText).performClick()
 
         // then
-        Assert.assertTrue(callbackInvoked)
+        assertTrue(callbackInvoked)
     }
 }
