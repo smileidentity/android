@@ -46,7 +46,7 @@ fun ConsentDeniedScreen(
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(innerPadding)
-                        .verticalScroll(rememberScrollState(), true),
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(

@@ -61,7 +61,7 @@ fun ConsentScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(innerPadding)
-                        .verticalScroll(rememberScrollState(), true),
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(
@@ -96,14 +96,14 @@ fun ConsentScreen(
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
                                 Text(
-                                    text = it.first,
+                                    text = stringResource(id = it.first),
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = colorResource(id = R.color.si_color_accent),
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = it.second,
+                                    text = stringResource(id = it.second),
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
@@ -184,21 +184,20 @@ fun ConsentScreen(
     }
 }
 
-@Composable
 private fun getConsentScreenInformation() = listOf(
     Triple(
-        stringResource(id = R.string.si_consent_info_one_title),
-        stringResource(id = R.string.si_consent_info_one_description),
+        R.string.si_consent_info_one_title,
+        R.string.si_consent_info_one_description,
         R.drawable.si_consent_personal_information,
     ),
     Triple(
-        stringResource(id = R.string.si_consent_info_two_title),
-        stringResource(id = R.string.si_consent_info_two_description),
+        R.string.si_consent_info_two_title,
+        R.string.si_consent_info_two_description,
         R.drawable.si_consent_contact_information,
     ),
     Triple(
-        stringResource(id = R.string.si_consent_info_three_title),
-        stringResource(id = R.string.si_consent_info_three_description),
+        R.string.si_consent_info_three_title,
+        R.string.si_consent_info_three_description,
         R.drawable.si_consent_document_information,
     ),
 )
