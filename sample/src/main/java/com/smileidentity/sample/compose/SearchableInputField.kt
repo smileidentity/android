@@ -33,11 +33,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smileidentity.SmileID
-import com.smileidentity.compose.theme.colorScheme
-import com.smileidentity.compose.theme.typography
 import com.smileidentity.sample.R
 import com.smileidentity.sample.viewmodel.countryDetails
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
@@ -63,9 +62,9 @@ data class SearchableInputFieldItem(
 fun SearchableInputField(
     fieldLabel: String,
     selectedItem: SearchableInputFieldItem?,
-    unfilteredItems: List<SearchableInputFieldItem>?,
-    onItemSelected: (SearchableInputFieldItem) -> Unit,
+    unfilteredItems: ImmutableList<SearchableInputFieldItem>?,
     modifier: Modifier = Modifier,
+    onItemSelected: (SearchableInputFieldItem) -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
@@ -142,11 +141,11 @@ fun SearchableInputField(
 @Preview
 @Composable
 private fun SearchableInputFieldPreview() {
-    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+    SmileIDTheme {
         SearchableInputField(
             fieldLabel = "Country of Issue",
             selectedItem = null,
-            unfilteredItems = countryDetails.values.toList(),
+            unfilteredItems = countryDetails.values.toImmutableList(),
             onItemSelected = { },
         )
     }

@@ -53,6 +53,7 @@ import com.smileidentity.sample.viewmodel.SupportedCountry
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun EnhancedKycScreen(
+    modifier: Modifier = Modifier,
     viewModel: EnhancedKycViewModel = viewModel(),
     onResult: SmileIDCallback<EnhancedKycResult> = {},
 ) {
@@ -80,7 +81,7 @@ fun EnhancedKycScreen(
         return
     }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .imePadding()
             .imeNestedScroll()
             .fillMaxSize(),
@@ -185,10 +186,10 @@ fun EnhancedKycScreen(
                     onNext = { focusManager.moveFocus(Down) },
                     onDone = { focusManager.clearFocus() },
                 )
-                val modifier = Modifier.fillMaxWidth()
+                val maxWidthModifier = Modifier.fillMaxWidth()
                 when (field) {
                     IdType.InputField.IdNumber -> OutlinedTextField(
-                        modifier = modifier,
+                        modifier = maxWidthModifier,
                         label = { Text(label) },
                         value = value,
                         onValueChange = onValueChange,
@@ -198,7 +199,7 @@ fun EnhancedKycScreen(
                         keyboardOptions = keyboardOpts,
                     )
                     IdType.InputField.FirstName -> OutlinedTextField(
-                        modifier = modifier,
+                        modifier = maxWidthModifier,
                         label = { Text(label) },
                         value = value,
                         onValueChange = onValueChange,
@@ -207,7 +208,7 @@ fun EnhancedKycScreen(
                         keyboardOptions = keyboardOpts,
                     )
                     IdType.InputField.LastName -> OutlinedTextField(
-                        modifier = modifier,
+                        modifier = maxWidthModifier,
                         label = { Text(label) },
                         value = value,
                         onValueChange = onValueChange,
@@ -216,7 +217,7 @@ fun EnhancedKycScreen(
                         keyboardOptions = keyboardOpts,
                     )
                     IdType.InputField.Dob -> OutlinedTextField(
-                        modifier = modifier,
+                        modifier = maxWidthModifier,
                         label = { Text(label) },
                         value = value,
                         onValueChange = onValueChange,
@@ -225,7 +226,7 @@ fun EnhancedKycScreen(
                         keyboardOptions = keyboardOpts,
                     )
                     IdType.InputField.BankCode -> OutlinedTextField(
-                        modifier = modifier,
+                        modifier = maxWidthModifier,
                         label = { Text(label) },
                         value = value,
                         onValueChange = onValueChange,

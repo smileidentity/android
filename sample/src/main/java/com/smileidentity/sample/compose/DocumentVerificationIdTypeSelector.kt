@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,6 +47,7 @@ import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
 import com.smileidentity.sample.viewmodel.countryDetails
 import com.smileidentity.sample.viewmodel.idTypeFriendlyNames
+import kotlinx.collections.immutable.toImmutableList
 import timber.log.Timber
 
 /**
@@ -54,6 +57,7 @@ import timber.log.Timber
  */
 @Composable
 fun DocumentVerificationIdTypeSelector(
+    modifier: Modifier = Modifier,
     viewModel: DocumentSelectorViewModel = viewModel(),
     onIdTypeSelected: (String, String) -> Unit,
 ) {
@@ -74,7 +78,7 @@ fun DocumentVerificationIdTypeSelector(
                     it,
                     it,
                 )
-            }
+            }?.toImmutableList()
         }
     }
 
@@ -85,7 +89,7 @@ fun DocumentVerificationIdTypeSelector(
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
@@ -117,14 +121,13 @@ fun DocumentVerificationIdTypeSelector(
                 fieldLabel = stringResource(R.string.doc_v_country_search_field_hint),
                 selectedItem = countryDetails[selectedCountry],
                 unfilteredItems = countries,
-                onItemSelected = {
-                    Timber.v("Selected: ${it.displayName}")
-                    selectedCountry = it.key
-                    selectedIdType = null
-                },
                 modifier = Modifier
                     .fillMaxWidth(),
-            )
+            ) {
+                Timber.v("Selected: ${it.displayName}")
+                selectedCountry = it.key
+                selectedIdType = null
+            }
 
             if (selectedCountry == null) {
                 val instructions = listOf(
@@ -205,9 +208,23 @@ fun DocumentVerificationIdTypeSelector(
         Button(
             onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType!!) },
             enabled = isContinueEnabled,
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.cont))
+        }
+    }
+}
+
+@Preview
+@Composable
+fun DocumentVerificationIdTypeSelectorPreview() {
+    SmileIDTheme {
+        Surface {
+            DocumentVerificationIdTypeSelector(
+                onIdTypeSelected = { _, _ -> },
+            )
         }
     }
 }

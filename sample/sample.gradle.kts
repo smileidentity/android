@@ -68,6 +68,11 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+
+    lint {
+        enable += "ComposeM2Api"
+        error += "ComposeM2Api"
+    }
 }
 
 val checkSmileConfigFileTaskName = "checkSmileConfigFile"
@@ -86,6 +91,7 @@ tasks.named("assemble") {
 
 dependencies {
     implementation(project(":lib"))
+    implementation(libs.kotlin.immutable.collections)
     implementation(libs.androidx.core)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.activity.compose)
@@ -105,6 +111,7 @@ dependencies {
     // Jetpack Compose version is defined by BOM ("Bill-of-Materials")
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
+    lintChecks(libs.compose.lint.checks)
 
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
