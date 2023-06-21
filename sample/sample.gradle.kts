@@ -68,6 +68,11 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+
+    lint {
+        enable += "ComposeM2Api"
+        error += "ComposeM2Api"
+    }
 }
 
 val checkSmileConfigFileTaskName = "checkSmileConfigFile"
