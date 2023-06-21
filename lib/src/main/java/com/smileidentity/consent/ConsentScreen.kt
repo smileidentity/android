@@ -206,7 +206,7 @@ private val getConsentScreenInformation get() = listOf(
 
 @SmilePreview
 @Composable
-fun ConsentScreenPreview() {
+private fun ConsentScreenPreview() {
     Preview {
         ConsentScreen(
             partnerIcon = painterResource(id = R.drawable.si_logo_with_text),

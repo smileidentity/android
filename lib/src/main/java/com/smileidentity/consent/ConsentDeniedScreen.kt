@@ -114,7 +114,7 @@ fun ConsentDeniedScreen(
 
 @SmilePreview
 @Composable
-fun ConsentDeniedScreenPreview() {
+private fun ConsentDeniedScreenPreview() {
     Preview {
         ConsentDeniedScreen(
             onGoBack = {},
