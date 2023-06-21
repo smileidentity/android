@@ -4,23 +4,25 @@ android-gradle-plugin = "8.0.2"
 androidx-activity = "1.7.2"
 # TODO: Check if https://android-review.googlesource.com/c/platform/frameworks/support/+/2576871 has
 #  been merged and if so, swap the buttons in ImageCaptureConfirmationDialog
-androidx-compose-bom = "2023.05.01"
+androidx-compose-bom = "2023.06.00"
 androidx-compose-compiler = "1.4.7"
 androidx-core = "1.10.1"
-androidx-fragment = "1.5.7"
+androidx-fragment = "1.6.0"
 androidx-lifecycle = "2.6.1"
-androidx-navigation = "2.5.3"
+androidx-navigation = "2.6.0"
 androidx-test-core = "1.5.0"
 androidx-test-espresso = "3.5.1"
-androidx-test-fragment = "1.5.7"
+androidx-test-fragment = "1.6.0"
 androidx-test-junit = "1.1.5"
 androidx-test-rules = "1.5.0"
 camposer = "0.2.2"
 chucker = "3.5.2"
 coil = "2.4.0"
+compose-lint-checks = "1.2.0"
 coroutines = "1.7.1"
 junit = "4.13.2"
 kotlin = "1.8.21"
+kotlin-immutable-collections = "0.3.5"
 ksp = "1.8.21-1.0.11"
 ktlint-plugin = "11.4.0"
 leakcanary = "2.11"
@@ -72,9 +74,11 @@ camposer = { module = "io.github.ujizin:camposer", version.ref = "camposer" }
 chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "compose-lint-checks" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-immutable-collections" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 leakcanary-noop = { module = "com.squareup.leakcanary:leakcanary-android-release", version.ref = "leakcanary" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

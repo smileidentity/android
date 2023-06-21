@@ -15,6 +15,7 @@
 
 ### Changed
 - Bump AndroidX Activity to 1.7.2
+- Bump AndroidX Fragment to 1.6.0
 - Bump Gradle to 8.0.2
 - Submit color liveness images instead of grayscale 
 

@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.smileidentity.sample.R
 
 @Composable
-fun ResourcesScreen() {
+fun ResourcesScreen(
+    modifier: Modifier = Modifier,
+) {
     val uriHandler = LocalUriHandler.current
     val resources = listOf(
         Triple(
@@ -42,7 +43,7 @@ fun ResourcesScreen() {
         ) { uriHandler.openUri("https://docs.smileidentity.com/supported-id-types") },
     )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
@@ -60,9 +61,9 @@ fun ResourcesScreen() {
 
 @Preview
 @Composable
-fun PreviewResourcesScreen() {
+private fun ResourcesScreenPreview() {
     SmileIDTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
+        Surface {
             ResourcesScreen()
         }
     }
