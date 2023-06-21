@@ -1,6 +1,5 @@
 package com.smileidentity.compose.document
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Document
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
@@ -40,15 +39,15 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import java.io.File
 
-@VisibleForTesting
 @Composable
 internal fun DocumentCaptureScreen(
-    userId: String = rememberSaveable { randomUserId() },
-    jobId: String = rememberSaveable { randomJobId() },
     idType: Document,
-    idAspectRatio: Float? = idType.aspectRatio,
     titleText: String,
     subtitleText: String,
+    modifier: Modifier = Modifier,
+    idAspectRatio: Float? = idType.aspectRatio,
+    userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     isBackSide: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     viewModel: DocumentViewModel = viewModel(
@@ -66,7 +65,7 @@ internal fun DocumentCaptureScreen(
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         CameraPreview(
             cameraState = cameraState,
@@ -129,7 +128,7 @@ private fun CaptureDocumentButton(
     )
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun DocumentCaptureScreenPreview() {
     Preview {

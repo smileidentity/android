@@ -11,6 +11,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
+import com.smileidentity.models.Document
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -33,7 +34,7 @@ class DocumentCaptureScreenTest {
         val cameraPreviewTag = "document_camera_preview"
 
         // when
-        composeTestRule.setContent { SmileID.DocumentVerification() }
+        composeTestRule.setContent { SmileID.DocumentVerification(idType = Document("", "")) }
 
         // then
         verify(exactly = 0) { permissionState.launchPermissionRequest() }
@@ -50,6 +51,7 @@ class DocumentCaptureScreenTest {
         // when
         composeTestRule.setContent {
             DocumentCaptureScreen(
+                idType = Document("", ""),
                 titleText = titleText,
                 subtitleText = subtitleText,
             )
@@ -68,6 +70,7 @@ class DocumentCaptureScreenTest {
         // when
         composeTestRule.setContent {
             DocumentCaptureScreen(
+                idType = Document("", ""),
                 titleText = titleText,
                 subtitleText = subtitleText,
             )

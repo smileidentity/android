@@ -25,19 +25,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
-import com.smileidentity.SmileID
 import com.smileidentity.compose.CameraPermissionButton
 import com.smileidentity.compose.SmileIDAttribution
-import com.smileidentity.compose.theme.colorScheme
-import com.smileidentity.compose.theme.typography
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
 fun DocumentCaptureInstructionsScreen(
     title: String,
     subtitle: String,
+    modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
@@ -46,7 +45,7 @@ fun DocumentCaptureInstructionsScreen(
     val columnWidth = 320.dp
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,10 +135,10 @@ fun DocumentCaptureInstructionsScreen(
     }
 }
 
-@Preview
+@SmilePreviews
 @Composable
 fun DocumentCaptureInstructionsScreenPreview() {
-    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+    Preview {
         Surface {
             DocumentCaptureInstructionsScreen(
                 title = stringResource(R.string.si_doc_v_instruction_title),

@@ -16,16 +16,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
-fun SmileIDAttribution() {
+fun SmileIDAttribution(modifier: Modifier = Modifier) {
     // TODO: Re-enable once rebrand is officially launched. (Marketing team doesn't want the new
     //  logo displayed until then.)
     return
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
             .testTag("smile_id_attribution"),
     ) {
@@ -45,7 +45,7 @@ fun SmileIDAttribution() {
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun SmileIDAttributionPreview() {
     Preview {

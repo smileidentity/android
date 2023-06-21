@@ -341,9 +341,6 @@ fun MainScreen() {
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
-                            // TODO: fetch this from
-                            //  https://api.smileidentity.com/v1/products_config once it supports
-                            //  signature auth (there should be a story for this for Platform)
                             DocumentVerificationIdTypeSelector { country, idType ->
                                 Timber.v("Selected country: $country, idType: $idType")
                                 navController.navigate(

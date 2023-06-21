@@ -26,10 +26,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
 fun SmartSelfieInstructionsScreen(
+    modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },
 ) {
@@ -41,7 +42,7 @@ fun SmartSelfieInstructionsScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxHeight()
                 .width(columnWidth)
                 .verticalScroll(rememberScrollState())
@@ -123,7 +124,7 @@ fun SmartSelfieInstructionsScreen(
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun SmartSelfieInstructionsScreenPreview() {
     Preview {
