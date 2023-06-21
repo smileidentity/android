@@ -63,6 +63,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
+
+    lint {
+        enable += "ComposeM2Api"
+        error += "ComposeM2Api"
+    }
 }
 
 mavenPublishing {
