@@ -125,7 +125,7 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
 @Preview
 @Composable
 fun PreviewProductSelectionScreen() {
-    SmileID.initialize(LocalContext.current)
+    SmileID.initialize(LocalContext.current, enableCrashReporting = false)
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ProductSelectionScreen()
