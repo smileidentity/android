@@ -19,6 +19,8 @@
 - Bump AndroidX Fragment to 1.6.0
 - Bump Gradle to 8.0.2
 - Submit color liveness images instead of grayscale 
+- Changed the order of arguments in Composables to ensure required arguments come first and so that
+  Modifier is the first optional argument
 
 ## 10.0.0-beta02
 
