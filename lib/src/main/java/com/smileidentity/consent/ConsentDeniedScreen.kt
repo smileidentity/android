@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +33,7 @@ import com.smileidentity.compose.preview.SmilePreview
 @Composable
 fun ConsentDeniedScreen(
     modifier: Modifier = Modifier,
+    showAttribution: Boolean = true,
     onGoBack: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -52,9 +52,9 @@ fun ConsentDeniedScreen(
                     Image(
                         painter = painterResource(id = R.drawable.si_consent_denied),
                         contentDescription = null,
-                        modifier = modifier.padding(top = 48.dp, bottom = 48.dp),
+                        modifier = modifier.padding(vertical = 48.dp),
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(id = R.string.si_consent_consent_denied),
                         style = MaterialTheme.typography.bodyMedium,
@@ -103,8 +103,9 @@ fun ConsentDeniedScreen(
                             color = colorResource(id = R.color.si_color_material_error_container),
                         )
                     }
-
-                    SmileIDAttribution()
+                    if (showAttribution) {
+                        SmileIDAttribution()
+                    }
                 }
             },
         )

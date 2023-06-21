@@ -47,6 +47,7 @@ fun ConsentScreen(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: String,
+    showAttribution: Boolean = true,
     onContinue: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -69,7 +70,6 @@ fun ConsentScreen(
                         contentDescription = null,
                         modifier = modifier.padding(top = 48.dp, bottom = 48.dp),
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(
                             id = R.string.si_consent_title,
@@ -86,7 +86,7 @@ fun ConsentScreen(
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    getConsentScreenInformation().forEach {
+                    getConsentScreenInformation.forEach {
                         Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)) {
                             Image(
                                 painter = painterResource(id = it.third),
@@ -177,14 +177,16 @@ fun ConsentScreen(
                             color = colorResource(id = R.color.si_color_material_error_container),
                         )
                     }
-                    SmileIDAttribution()
+                    if (showAttribution) {
+                        SmileIDAttribution()
+                    }
                 }
             },
         )
     }
 }
 
-private fun getConsentScreenInformation() = listOf(
+private val getConsentScreenInformation get() = listOf(
     Triple(
         R.string.si_consent_info_one_title,
         R.string.si_consent_info_one_description,
