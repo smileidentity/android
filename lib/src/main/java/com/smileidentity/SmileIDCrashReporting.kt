@@ -13,6 +13,17 @@ import io.sentry.UncaughtExceptionHandlerIntegration
 import io.sentry.protocol.User
 import timber.log.Timber
 
+private const val TAG_BRAND = "brand"
+private const val TAG_DEBUG_MODE = "debug_mode"
+private const val TAG_CPU_ABI = "cpu_abi"
+private const val TAG_DEVICE = "device"
+private const val TAG_MANUFACTURER = "manufacturer"
+private const val TAG_MODEL = "model"
+private const val TAG_OS_API_LEVEL = "os_api_level"
+private const val TAG_OS_VERSION = "os_version"
+private const val TAG_PRODUCT = "product"
+private const val TAG_SDK_VERSION = "sdk_version"
+
 /**
  * This class is used to power crash reporting for the Smile ID SDKs. If you would like to opt-out
  * of crash reporting, you can call [disable]. The crash reporting is powered by Sentry. However,
@@ -31,6 +42,11 @@ object SmileIDCrashReporting {
             isEnableUncaughtExceptionHandler = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
                 try {
+                    if (isEventFromIDE(event)) {
+                        // Ignore crashes from IDEs (possible if the SDK is initialized in a Jetpack
+                        // Compose preview)
+                        return@BeforeSendCallback null
+                    }
                     // Only report crashes from the SmileID SDK
                     if (isCausedBySmileID(event.throwable)) {
                         return@BeforeSendCallback event
@@ -45,16 +61,16 @@ object SmileIDCrashReporting {
         }
 
         hub = Hub(options).apply {
-            setTag("brand", Build.BRAND)
-            setTag("debug_mode", isInDebugMode.toString())
-            setTag("cpu_abi", Build.SUPPORTED_ABIS?.first() ?: "unknown")
-            setTag("device", Build.DEVICE)
-            setTag("manufacturer", Build.MANUFACTURER)
-            setTag("model", Build.MODEL)
-            setTag("os_api_level", Build.VERSION.SDK_INT.toString())
-            setTag("os_version", Build.VERSION.RELEASE)
-            setTag("product", Build.PRODUCT)
-            setTag("sdk_version", BuildConfig.VERSION_NAME)
+            setTag(TAG_BRAND, Build.BRAND)
+            setTag(TAG_DEBUG_MODE, isInDebugMode.toString())
+            setTag(TAG_CPU_ABI, Build.SUPPORTED_ABIS?.first() ?: "unknown")
+            setTag(TAG_DEVICE, Build.DEVICE)
+            setTag(TAG_MANUFACTURER, Build.MANUFACTURER)
+            setTag(TAG_MODEL, Build.MODEL)
+            setTag(TAG_OS_API_LEVEL, Build.VERSION.SDK_INT.toString())
+            setTag(TAG_OS_VERSION, Build.VERSION.RELEASE)
+            setTag(TAG_PRODUCT, Build.PRODUCT)
+            setTag(TAG_SDK_VERSION, BuildConfig.VERSION_NAME)
             try {
                 setTag("partner_id", SmileID.config.partnerId)
                 setUser(User().apply { id = SmileID.config.partnerId })
@@ -110,5 +126,18 @@ object SmileIDCrashReporting {
         // If this throwable is the root cause, getCause will return null. In which case, the
         // recursive base case will be reached and false will be returned.
         return isCausedBySmileID(throwable.cause)
+    }
+
+    /**
+     * Determine whether the event was caused by an IDE. This is done heuristically by checking the
+     * JVM runtime tag (which is likely "JetBrains s.r.o. 17.0.6", but it is possible for the
+     * developer to change the runtime. We also check the brand and device. If there happens to be
+     * an actual brand called "studio" or an actual device called "layoutlib" then we would
+     * ignore exceptions from those devices
+     */
+    private fun isEventFromIDE(event: SentryEvent): Boolean {
+        return "JetBrains" in (event.getTag("runtime") ?: "") ||
+            event.getTag(TAG_BRAND) == "studio" ||
+            event.getTag(TAG_DEVICE) == "layoutlib"
     }
 }

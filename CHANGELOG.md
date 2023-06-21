@@ -12,6 +12,7 @@
 
 ### Fixed
 - Fix crash on network retries
+- Don't report IDE Jetpack Compose Preview crashes to Sentry
 
 ### Changed
 - Bump AndroidX Activity to 1.7.2
