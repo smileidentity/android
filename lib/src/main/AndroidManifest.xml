@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <!--
     android:required set to false because this will be merged with the partner's manifest and they
-    may not need camera for all cases (i.e. they're only using API or its an international app
+    may not need camera for all cases (i.e. they're only using API or its an international app)
     -->
     <uses-feature
             android:name="android.hardware.camera"
