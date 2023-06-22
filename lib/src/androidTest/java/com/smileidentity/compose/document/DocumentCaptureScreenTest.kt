@@ -11,6 +11,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.smileidentity.SmileID
 import com.smileidentity.compose.DocumentVerification
+import com.smileidentity.models.Document
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -24,6 +25,8 @@ class DocumentCaptureScreenTest {
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
+    private val testDocument = Document("KE", "ID_CARD")
+
     @OptIn(ExperimentalPermissionsApi::class)
     @Test
     fun shouldShowPreviewWhenPermissionsGranted() {
@@ -33,7 +36,7 @@ class DocumentCaptureScreenTest {
         val cameraPreviewTag = "document_camera_preview"
 
         // when
-        composeTestRule.setContent { SmileID.DocumentVerification() }
+        composeTestRule.setContent { SmileID.DocumentVerification(idType = testDocument) }
 
         // then
         verify(exactly = 0) { permissionState.launchPermissionRequest() }
@@ -52,6 +55,7 @@ class DocumentCaptureScreenTest {
             DocumentCaptureScreen(
                 titleText = titleText,
                 subtitleText = subtitleText,
+                idType = testDocument,
             )
         }
 
@@ -70,6 +74,7 @@ class DocumentCaptureScreenTest {
             DocumentCaptureScreen(
                 titleText = titleText,
                 subtitleText = subtitleText,
+                idType = testDocument,
             )
         }
 

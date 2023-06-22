@@ -17,11 +17,18 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.Annotation
+import android.text.SpannedString
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.camera.core.impl.utils.Exif
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.core.graphics.scale
+import androidx.core.text.getSpans
 import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.SmileID.moshi
@@ -31,6 +38,30 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.io.Serializable
+
+@Composable
+internal fun annotatedStringResource(
+    @StringRes id: Int,
+    vararg formatArgs: Any,
+    spanStyles: (Annotation) -> SpanStyle? = { null },
+): AnnotatedString {
+    val spannedString = SpannedString(stringResource(id = id, formatArgs = formatArgs))
+
+    val resultBuilder = AnnotatedString.Builder()
+    resultBuilder.append(spannedString.toString())
+    spannedString.getSpans<Annotation>(0, spannedString.length).forEach { annotation ->
+        val spanStart = spannedString.getSpanStart(annotation)
+        val spanEnd = spannedString.getSpanEnd(annotation)
+        resultBuilder.addStringAnnotation(
+            tag = annotation.key,
+            annotation = annotation.value,
+            start = spanStart,
+            end = spanEnd,
+        )
+        spanStyles(annotation)?.let { resultBuilder.addStyle(it, spanStart, spanEnd) }
+    }
+    return resultBuilder.toAnnotatedString()
+}
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
