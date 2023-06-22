@@ -109,7 +109,7 @@
     <string name="si_consent_info_two_description">Partner can process your phone numbers and address</string>
     <string name="si_consent_info_three_title">Process your document information</string>
     <string name="si_consent_info_three_description">Partner can process your photo, ID expiration date, country of issuance and document number</string>
-    <string name="si_consent_privacy_policy">You can view Privacy Policy <annotation is_url="true">here</annotation></string>
+    <string name="si_consent_privacy_policy">You can view %1$s\'s Privacy Policy <annotation is_url="true">here</annotation></string>
     <string name="si_consent_privacy_policy_description">By choosing \'Allow\' you grant %1$s consent to process your personal data to offer you this service</string>
     <string name="si_consent_consent_denied">Consent Denied</string>
     <string name="si_consent_consent_denied_title">We cannot verify you without your consent</string>
