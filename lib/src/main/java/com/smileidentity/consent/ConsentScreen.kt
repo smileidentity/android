@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.annotatedStringResource
@@ -69,7 +70,7 @@ fun ConsentScreen(
                     Image(
                         painter = partnerIcon,
                         contentDescription = null,
-                        modifier = Modifier.padding(top = 24.dp, bottom = 24.dp),
+                        modifier = Modifier.padding(vertical = 24.dp),
                     )
                     Text(
                         text = stringResource(
@@ -124,7 +125,7 @@ fun ConsentScreen(
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Divider(thickness = 1.dp)
+                    Divider(thickness = Dp.Hairline)
                     val annotatedText = annotatedStringResource(
                         id = R.string.si_consent_privacy_policy,
                         spanStyles = { annotation ->
