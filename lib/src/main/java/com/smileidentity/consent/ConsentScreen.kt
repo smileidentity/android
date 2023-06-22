@@ -128,6 +128,7 @@ fun ConsentScreen(
                     Divider(thickness = Dp.Hairline)
                     val annotatedText = annotatedStringResource(
                         id = R.string.si_consent_privacy_policy,
+                        partnerName,
                         spanStyles = { annotation ->
                             when (annotation.key) {
                                 "is_url" -> SpanStyle(color = Color.Blue)
