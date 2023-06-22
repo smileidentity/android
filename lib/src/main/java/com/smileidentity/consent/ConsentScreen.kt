@@ -87,7 +87,7 @@ fun ConsentScreen(
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    getConsentScreenInformation.forEach {
+                    consentScreenInformation.forEach {
                         Row(
                             modifier = Modifier
                                 .padding(vertical = 12.dp, horizontal = 16.dp)
@@ -186,24 +186,23 @@ fun ConsentScreen(
     }
 }
 
-private val getConsentScreenInformation
-    get() = listOf(
-        Triple(
-            R.string.si_consent_info_one_title,
-            R.string.si_consent_info_one_description,
-            R.drawable.si_consent_personal_information,
-        ),
-        Triple(
-            R.string.si_consent_info_two_title,
-            R.string.si_consent_info_two_description,
-            R.drawable.si_consent_contact_information,
-        ),
-        Triple(
-            R.string.si_consent_info_three_title,
-            R.string.si_consent_info_three_description,
-            R.drawable.si_consent_document_information,
-        ),
-    )
+private val consentScreenInformation = listOf(
+    Triple(
+        R.string.si_consent_info_one_title,
+        R.string.si_consent_info_one_description,
+        R.drawable.si_consent_personal_information,
+    ),
+    Triple(
+        R.string.si_consent_info_two_title,
+        R.string.si_consent_info_two_description,
+        R.drawable.si_consent_contact_information,
+    ),
+    Triple(
+        R.string.si_consent_info_three_title,
+        R.string.si_consent_info_three_description,
+        R.drawable.si_consent_document_information,
+    ),
+)
 
 @SmilePreview
 @Composable
