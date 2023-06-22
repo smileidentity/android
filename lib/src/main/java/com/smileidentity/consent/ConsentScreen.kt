@@ -124,7 +124,7 @@ fun ConsentScreen(
                         .verticalScroll(rememberScrollState(), true),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Divider(thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
+                    Divider(thickness = 1.dp)
                     val annotatedText = annotatedStringResource(
                         id = R.string.si_consent_privacy_policy,
                         spanStyles = { annotation ->
