@@ -121,7 +121,7 @@ fun ConsentScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .verticalScroll(rememberScrollState(), true),
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Divider(thickness = 1.dp)

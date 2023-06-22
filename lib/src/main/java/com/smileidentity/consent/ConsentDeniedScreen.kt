@@ -82,7 +82,7 @@ fun ConsentDeniedScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .verticalScroll(rememberScrollState(), true),
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Button(
