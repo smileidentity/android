@@ -105,7 +105,10 @@ class DocumentViewModel(
                 when (result) {
                     is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                     is ImageCaptureResult.Success -> it.resume(
-                        postProcessImage(file = documentFile),
+                        postProcessImage(
+                            file = documentFile,
+                            desiredAspectRatio = idAspectRatio,
+                        ),
                     )
                 }
             }
@@ -156,7 +159,9 @@ class DocumentViewModel(
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val frontImageInfo = documentFrontFile.asDocumentImage()
             val backImageInfo = documentBackFile?.asDocumentImage()
-            val selfieImageInfo = selfieFile?.asSelfieImage()
+            val selfieImageInfo = selfieFile?.asSelfieImage() ?: throw IllegalStateException(
+                "Selfie file is null",
+            )
             val uploadRequest = UploadRequest(
                 images = listOfNotNull(frontImageInfo, backImageInfo, selfieImageInfo),
             )
@@ -184,6 +189,7 @@ class DocumentViewModel(
             }
             result = SmileIDResult.Success(
                 DocumentVerificationResult(
+                    selfieFile = selfieImageInfo.image,
                     documentFrontFile = documentFrontFile,
                     documentBackFile = documentBackFile,
                     jobStatusResponse = jobStatusResponse,
