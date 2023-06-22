@@ -43,9 +43,10 @@ import java.io.Serializable
 internal fun annotatedStringResource(
     @StringRes id: Int,
     spanStyles: (Annotation) -> SpanStyle? = { null },
+    vararg formatArgs: Any
 ): AnnotatedString {
-    val resources = LocalContext.current.resources
-    val spannedString = SpannedString(resources.getText(id))
+    val spannedString = SpannedString(stringResource(id = id, formatArgs = formatArgs))
+
     val resultBuilder = AnnotatedString.Builder()
     resultBuilder.append(spannedString.toString())
     spannedString.getSpans<Annotation>(0, spannedString.length).forEach { annotation ->
