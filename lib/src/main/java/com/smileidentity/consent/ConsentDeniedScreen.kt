@@ -3,10 +3,10 @@ package com.smileidentity.consent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -28,22 +28,22 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
 fun ConsentDeniedScreen(
-    modifier: Modifier = Modifier,
-    showAttribution: Boolean = true,
     onGoBack: () -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+    showAttribution: Boolean = true,
 ) {
     Surface(
-        modifier = modifier.wrapContentWidth(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Scaffold(
             content = { innerPadding ->
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(innerPadding)
                         .verticalScroll(rememberScrollState()),
@@ -52,7 +52,7 @@ fun ConsentDeniedScreen(
                     Image(
                         painter = painterResource(id = R.drawable.si_consent_denied),
                         contentDescription = null,
-                        modifier = modifier.padding(vertical = 48.dp),
+                        modifier = Modifier.padding(vertical = 48.dp),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
@@ -79,7 +79,7 @@ fun ConsentDeniedScreen(
             },
             bottomBar = {
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                         .verticalScroll(rememberScrollState(), true),
@@ -112,7 +112,7 @@ fun ConsentDeniedScreen(
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun ConsentDeniedScreenPreview() {
     Preview {

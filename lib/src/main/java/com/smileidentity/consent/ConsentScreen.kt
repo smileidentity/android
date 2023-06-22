@@ -4,12 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
@@ -38,7 +38,7 @@ import com.smileidentity.R
 import com.smileidentity.annotatedStringResource
 import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 import java.net.URL
 
 @Composable
@@ -47,15 +47,15 @@ fun ConsentScreen(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
-    modifier: Modifier = Modifier,
-    showAttribution: Boolean = true,
     onContinue: () -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+    showAttribution: Boolean = true,
 ) {
     val uriHandler = LocalUriHandler.current
 
     Surface(
-        modifier = modifier.wrapContentWidth(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Scaffold(
             content = { innerPadding ->
@@ -69,7 +69,7 @@ fun ConsentScreen(
                     Image(
                         painter = partnerIcon,
                         contentDescription = null,
-                        modifier = modifier.padding(top = 24.dp, bottom = 24.dp),
+                        modifier = Modifier.padding(top = 24.dp, bottom = 24.dp),
                     )
                     Text(
                         text = stringResource(
@@ -118,13 +118,13 @@ fun ConsentScreen(
             },
             bottomBar = {
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                         .verticalScroll(rememberScrollState(), true),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Divider(thickness = 1.dp, modifier = modifier.padding(horizontal = 16.dp))
+                    Divider(thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
                     val annotatedText = annotatedStringResource(
                         id = R.string.si_consent_privacy_policy,
                         spanStyles = { annotation ->
@@ -146,7 +146,7 @@ fun ConsentScreen(
                                 uriHandler.openUri(partnerPrivacyPolicy.toString())
                             }
                         },
-                        modifier = modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -156,7 +156,7 @@ fun ConsentScreen(
                         ),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
-                        modifier = modifier.padding(bottom = 24.dp),
+                        modifier = Modifier.padding(bottom = 24.dp),
                     )
                     Button(
                         onClick = onContinue,
@@ -204,7 +204,7 @@ private val consentScreenInformation = listOf(
     ),
 )
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun ConsentScreenPreview() {
     Preview {
