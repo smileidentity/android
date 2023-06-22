@@ -11,10 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,7 +92,7 @@ fun ConsentDeniedScreen(
                             .fillMaxWidth(),
                     ) { Text(text = stringResource(id = R.string.si_consent_go_back)) }
 
-                    TextButton(
+                    OutlinedButton(
                         onClick = onCancel,
                         modifier = Modifier
                             .testTag("consent_screen_denied_cancel_button")

@@ -14,11 +14,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,23 +31,23 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.annotatedStringResource
 import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreview
+import java.net.URL
 
 @Composable
 fun ConsentScreen(
-    modifier: Modifier = Modifier,
     partnerIcon: Painter,
     partnerName: String,
     productName: String,
-    partnerPrivacyPolicy: String,
+    partnerPrivacyPolicy: URL,
+    modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onContinue: () -> Unit,
     onCancel: () -> Unit,
@@ -68,7 +69,7 @@ fun ConsentScreen(
                     Image(
                         painter = partnerIcon,
                         contentDescription = null,
-                        modifier = modifier.padding(top = 48.dp, bottom = 48.dp),
+                        modifier = modifier.padding(top = 24.dp, bottom = 24.dp),
                     )
                     Text(
                         text = stringResource(
@@ -87,7 +88,11 @@ fun ConsentScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     getConsentScreenInformation.forEach {
-                        Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 12.dp, horizontal = 16.dp)
+                                .align(alignment = Alignment.Start),
+                        ) {
                             Image(
                                 painter = painterResource(id = it.third),
                                 contentDescription = null,
@@ -119,34 +124,29 @@ fun ConsentScreen(
                         .verticalScroll(rememberScrollState(), true),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    // https://developer.android.com/jetpack/compose/text/user-interactions
-                    val annotatedText = buildAnnotatedString {
-                        append(stringResource(id = R.string.si_consent_privacy_policy))
-                        // We attach this *URL* annotation to the following content
-                        // until `pop()` is called
-                        pushStringAnnotation(
-                            tag = "URL",
-                            annotation = partnerPrivacyPolicy,
-                        )
-                        withStyle(style = SpanStyle(color = Color.Blue)) {
-                            append(stringResource(id = R.string.si_consent_privacy_policy_here))
-                        }
-                        pop()
-                    }
+                    Divider(thickness = 1.dp, modifier = modifier.padding(horizontal = 16.dp))
+                    val annotatedText = annotatedStringResource(
+                        id = R.string.si_consent_privacy_policy,
+                        spanStyles = { annotation ->
+                            when (annotation.key) {
+                                "is_url" -> SpanStyle(color = Color.Blue)
+                                else -> null
+                            }
+                        },
+                    )
                     ClickableText(
                         text = annotatedText,
                         style = MaterialTheme.typography.bodySmall,
                         onClick = { offset ->
-                            // We check if there is an *URL* annotation attached to the text
-                            // at the clicked position
                             annotatedText.getStringAnnotations(
-                                tag = "URL",
+                                tag = "is_url",
                                 start = offset,
                                 end = offset,
-                            ).firstOrNull()?.let { annotation ->
-                                uriHandler.openUri(annotation.item)
+                            ).firstOrNull()?.let {
+                                uriHandler.openUri(partnerPrivacyPolicy.toString())
                             }
                         },
+                        modifier = modifier.padding(top = 16.dp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -166,7 +166,7 @@ fun ConsentScreen(
                     ) {
                         Text(text = stringResource(id = R.string.si_allow))
                     }
-                    TextButton(
+                    OutlinedButton(
                         onClick = onCancel,
                         modifier = Modifier
                             .testTag("consent_screen_cancel_button")
@@ -186,23 +186,24 @@ fun ConsentScreen(
     }
 }
 
-private val getConsentScreenInformation get() = listOf(
-    Triple(
-        R.string.si_consent_info_one_title,
-        R.string.si_consent_info_one_description,
-        R.drawable.si_consent_personal_information,
-    ),
-    Triple(
-        R.string.si_consent_info_two_title,
-        R.string.si_consent_info_two_description,
-        R.drawable.si_consent_contact_information,
-    ),
-    Triple(
-        R.string.si_consent_info_three_title,
-        R.string.si_consent_info_three_description,
-        R.drawable.si_consent_document_information,
-    ),
-)
+private val getConsentScreenInformation
+    get() = listOf(
+        Triple(
+            R.string.si_consent_info_one_title,
+            R.string.si_consent_info_one_description,
+            R.drawable.si_consent_personal_information,
+        ),
+        Triple(
+            R.string.si_consent_info_two_title,
+            R.string.si_consent_info_two_description,
+            R.drawable.si_consent_contact_information,
+        ),
+        Triple(
+            R.string.si_consent_info_three_title,
+            R.string.si_consent_info_three_description,
+            R.drawable.si_consent_document_information,
+        ),
+    )
 
 @SmilePreview
 @Composable
@@ -212,7 +213,7 @@ private fun ConsentScreenPreview() {
             partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
             partnerName = "Smile ID",
             productName = "BVN",
-            partnerPrivacyPolicy = "https://smileidentity.com/privacy",
+            partnerPrivacyPolicy = URL("https://smileidentity.com/privacy"),
             onContinue = {},
             onCancel = {},
         )
