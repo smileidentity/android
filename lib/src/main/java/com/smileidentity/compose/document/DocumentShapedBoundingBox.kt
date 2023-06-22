@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 
 const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.56f
 const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
@@ -26,8 +26,8 @@ val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
  * A simple bounding box that takes the shape of a document, has a semi-transparent background, and
  * has an outline which changes color depending on edge detection algorithm
  *
- * @param modifier The modifier to be applied to the indicator.
  * @param aspectRatio The aspect ratio of the document, used to calculate the height of the view.
+ * @param modifier The modifier to be applied to the indicator.
  * @param strokeWidth The width of the progress indicator stroke.
  * @param areEdgesDetected A boolean flag that is updated when document edges are within bounding
  * box edges
@@ -35,8 +35,8 @@ val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
  */
 @Composable
 fun DocumentShapedBoundingBox(
-    modifier: Modifier = Modifier,
     aspectRatio: Float?,
+    modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
     areEdgesDetected: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
@@ -84,7 +84,7 @@ fun DocumentShapedBoundingBox(
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun DocumentShapedProgressIndicatorPreview() {
     Preview {

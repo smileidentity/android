@@ -70,6 +70,8 @@ android {
     }
 
     lint {
+        // Required for lib lints to be enforced
+        checkDependencies = true
         enable += "ComposeM2Api"
         error += "ComposeM2Api"
     }

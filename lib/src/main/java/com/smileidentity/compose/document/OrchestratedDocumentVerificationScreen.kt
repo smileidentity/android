@@ -45,14 +45,14 @@ import java.io.File
  */
 @Composable
 internal fun OrchestratedDocumentVerificationScreen(
-    userId: String = rememberSaveable { randomUserId() },
-    jobId: String = rememberSaveable { randomJobId() },
-    showAttribution: Boolean = true,
-    allowGalleryUpload: Boolean = false,
     idType: Document,
     idAspectRatio: Float? = idType.aspectRatio,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
+    userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
+    showAttribution: Boolean = true,
+    allowGalleryUpload: Boolean = false,
     viewModel: DocumentViewModel = viewModel(
         factory = viewModelFactory {
             DocumentViewModel(

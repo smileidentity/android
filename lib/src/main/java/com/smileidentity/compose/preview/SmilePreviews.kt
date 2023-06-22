@@ -32,4 +32,4 @@ import androidx.compose.ui.tooling.preview.Preview
     group = "dark-mode",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
-internal annotation class SmilePreview
+internal annotation class SmilePreviews

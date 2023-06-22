@@ -63,6 +63,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
+
+    lint {
+        enable += "ComposeM2Api"
+        error += "ComposeM2Api"
+    }
 }
 
 mavenPublishing {
@@ -146,6 +151,7 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
+    lintChecks(libs.compose.lint.checks)
 
     // Material Design 3 components
     implementation(libs.androidx.compose.material3)

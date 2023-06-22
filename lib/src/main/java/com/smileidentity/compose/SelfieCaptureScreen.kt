@@ -41,7 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
@@ -78,7 +78,9 @@ internal fun OrchestratedSelfieCaptureScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     when {
-        !acknowledgedInstructions -> SmartSelfieInstructionsScreen(showAttribution) {
+        !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
+            showAttribution = showAttribution,
+        ) {
             acknowledgedInstructions = true
         }
 
@@ -243,7 +245,7 @@ private fun AgentModeSwitch(
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun SelfieCaptureScreenPreview() {
     Preview {

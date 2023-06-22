@@ -39,7 +39,8 @@ jobs:
       - name: Build, Test, Lint, Assemble, Publish Snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build assembleDebug publish
+          # NB! The "lint" gradle action here is different than ktLint
+          arguments: lint build assembleDebug publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
