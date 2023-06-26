@@ -1,19 +1,12 @@
 package com.smileidentity.compose.document
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -27,8 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
-import com.smileidentity.compose.CameraPermissionButton
 import com.smileidentity.compose.SmileIDAttribution
+import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.compose.components.CameraPermissionButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
@@ -42,20 +36,8 @@ fun DocumentCaptureInstructionsScreen(
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
     onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
-    val columnWidth = 320.dp
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxHeight()
-                .widthIn(max = columnWidth)
-                .verticalScroll(rememberScrollState())
-                .weight(1f),
-        ) {
+    BottomPinnedColumn(
+        scrollableContent = {
             Image(
                 painter = painterResource(id = R.drawable.si_doc_v_instructions_hero),
                 contentDescription = null,
@@ -108,13 +90,8 @@ fun DocumentCaptureInstructionsScreen(
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .width(columnWidth)
-                .padding(8.dp),
-        ) {
+        },
+        pinnedContent = {
             CameraPermissionButton(
                 text = stringResource(R.string.si_doc_v_instruction_ready_button),
                 onGranted = onInstructionsAcknowledgedTakePhoto,
@@ -131,8 +108,10 @@ fun DocumentCaptureInstructionsScreen(
             if (showAttribution) {
                 SmileIDAttribution()
             }
-        }
-    }
+        },
+        columnWidth = 320.dp,
+        modifier = modifier,
+    )
 }
 
 @SmilePreviews

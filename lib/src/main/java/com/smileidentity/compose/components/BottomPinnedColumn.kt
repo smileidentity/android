@@ -3,6 +3,7 @@ package com.smileidentity.compose.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -29,7 +30,7 @@ internal fun BottomPinnedColumn(
 ) {
     Column(
         horizontalAlignment = horizontalAlignment,
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = horizontalAlignment,
