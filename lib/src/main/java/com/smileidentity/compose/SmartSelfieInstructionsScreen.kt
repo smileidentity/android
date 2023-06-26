@@ -1,18 +1,12 @@
 package com.smileidentity.compose
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.compose.components.CameraPermissionButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
@@ -34,20 +30,8 @@ fun SmartSelfieInstructionsScreen(
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },
 ) {
-    val columnWidth = 320.dp
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = modifier
-                .fillMaxHeight()
-                .width(columnWidth)
-                .verticalScroll(rememberScrollState())
-                .weight(1f),
-        ) {
+    BottomPinnedColumn(
+        scrollableContent = {
             Image(
                 painter = painterResource(id = R.drawable.si_smart_selfie_instructions_hero),
                 modifier = Modifier.size(128.dp),
@@ -103,13 +87,8 @@ fun SmartSelfieInstructionsScreen(
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .width(columnWidth)
-                .padding(8.dp),
-        ) {
+        },
+        pinnedContent = {
             CameraPermissionButton(
                 text = stringResource(R.string.si_smart_selfie_instruction_ready_button),
                 modifier = Modifier
@@ -120,8 +99,10 @@ fun SmartSelfieInstructionsScreen(
             if (showAttribution) {
                 SmileIDAttribution()
             }
-        }
-    }
+        },
+        modifier = modifier,
+        columnWidth = 320.dp,
+    )
 }
 
 @SmilePreviews
