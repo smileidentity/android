@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -27,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.annotatedStringResource
@@ -102,7 +100,6 @@ fun ConsentScreen(
             }
         },
         pinnedContent = {
-            Divider(thickness = Dp.Hairline)
             val annotatedText = annotatedStringResource(
                 id = R.string.si_consent_privacy_policy,
                 partnerName,
@@ -161,6 +158,7 @@ fun ConsentScreen(
             }
         },
         modifier = modifier,
+        showDivider = true,
     )
 }
 

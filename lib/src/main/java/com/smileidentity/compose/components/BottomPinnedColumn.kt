@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +26,8 @@ internal fun BottomPinnedColumn(
     scrollableContent: @Composable () -> Unit,
     pinnedContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    columnWidth: Dp = 0.dp,
+    columnWidth: Dp? = null,
+    showDivider: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
 ) {
     Column(
@@ -38,7 +40,7 @@ internal fun BottomPinnedColumn(
             modifier = Modifier
                 .fillMaxHeight()
                 .then(
-                    if (columnWidth != 0.dp) {
+                    if (columnWidth != null) {
                         Modifier.width(columnWidth)
                     } else {
                         Modifier.fillMaxWidth()
@@ -49,11 +51,14 @@ internal fun BottomPinnedColumn(
         ) {
             scrollableContent()
         }
+        if (showDivider) {
+            Divider(thickness = Dp.Hairline)
+        }
         Column(
             horizontalAlignment = horizontalAlignment,
             modifier = Modifier
                 .then(
-                    if (columnWidth != 0.dp) {
+                    if (columnWidth != null) {
                         Modifier.width(columnWidth)
                     } else {
                         Modifier.fillMaxWidth()
@@ -73,6 +78,7 @@ private fun BottomPinnedColumnPreview() {
         BottomPinnedColumn(
             scrollableContent = { Text(text = stringResource(id = R.string.si_allow)) },
             pinnedContent = { Text(text = stringResource(id = R.string.si_cancel)) },
+            showDivider = true,
         )
     }
 }
