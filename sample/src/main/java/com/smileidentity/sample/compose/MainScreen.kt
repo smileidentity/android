@@ -42,10 +42,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
+import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthenticationScreen
 import com.smileidentity.compose.SmartSelfieEnrollmentScreen
 import com.smileidentity.models.Document
+import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobResult
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
@@ -337,12 +339,14 @@ fun MainScreen() {
                         composable(ProductScreen.BiometricKyc.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.BiometricKyc.label
+                            var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                            if (idInfo == null) { BiometricKycInputScreen { idInfo = it } }
+                            idInfo?.let { SmileID.BiometricKYC(idInfo = it) }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
                             DocumentVerificationIdTypeSelector { country, idType ->
-                                Timber.v("Selected country: $country, idType: $idType")
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
                                 ) { popUpTo(ProductScreen.DocumentVerification.route) }

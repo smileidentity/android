@@ -56,7 +56,7 @@ jobs:
       - name: Archive Sample App
         uses: actions/upload-artifact@v3
         with:
-          name: Sample App APK (Partner 002)
+          name: Sample App APK
           path: sample/build/outputs/apk/debug/sample-debug.apk
 
   lint:

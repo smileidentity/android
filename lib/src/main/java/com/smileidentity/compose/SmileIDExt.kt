@@ -198,6 +198,6 @@ fun SmileID.BiometricKYC(
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        TODO("Orchestrated Biometric KYC Screen")
+        // TODO
     }
 }

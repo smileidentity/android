@@ -103,7 +103,7 @@ jobs:
       - name: Archive Sample App
         uses: actions/upload-artifact@v3
         with:
-          name: Sample App APK (Partner 002)
+          name: Sample App APK
           path: sample/build/outputs/apk/release/sample-release.apk
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -140,7 +140,7 @@ jobs:
           packageName: com.smileidentity.sample
           track: internal
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
-          releaseName: Smile ID (Partner 002)
+          releaseName: Smile ID
       - name: Bump Version
         if: ${{ github.event.inputs.bump_version == 'true' }}
         run: |
