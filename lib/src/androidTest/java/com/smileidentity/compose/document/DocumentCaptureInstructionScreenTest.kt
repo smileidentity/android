@@ -1,12 +1,10 @@
 package com.smileidentity.compose.document
 
-import android.Manifest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.GrantPermissionRule
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -17,18 +15,21 @@ class DocumentCaptureInstructionScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    @get:Rule
-    val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
-
     @Test
     fun shouldInvokeTakePhotoCallbackOnButtonClick() {
         // given
+        val titleText = "Front of ID"
+        val subtitleText = "Make sure all the corners are visible and there is no glare"
         var callbackInvoked = false
         val onTakePhoto = { callbackInvoked = true }
 
         // when
         composeTestRule.setContent {
-            DocumentCaptureInstructionsScreen(onInstructionsAcknowledgedTakePhoto = onTakePhoto)
+            DocumentCaptureInstructionsScreen(
+                onInstructionsAcknowledgedTakePhoto = onTakePhoto,
+                title = titleText,
+                subtitle = subtitleText,
+            )
         }
         composeTestRule.onNodeWithText("Take Photo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Take Photo").performClick()
@@ -41,6 +42,8 @@ class DocumentCaptureInstructionScreenTest {
     @Test
     fun shouldInvokeUploadPhotoCallbackOnButtonClick() {
         // given
+        val titleText = "Front of ID"
+        val subtitleText = "Make sure all the corners are visible and there is no glare"
         var callbackInvoked = false
         val onUploadPhoto = { callbackInvoked = true }
 
@@ -50,6 +53,8 @@ class DocumentCaptureInstructionScreenTest {
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedSelectFromGallery = onUploadPhoto,
                 onInstructionsAcknowledgedTakePhoto = { },
+                title = titleText,
+                subtitle = subtitleText,
             )
         }
         composeTestRule.onNodeWithText("Take Photo").assertIsDisplayed()
@@ -63,16 +68,43 @@ class DocumentCaptureInstructionScreenTest {
 
     @Test
     fun shouldNotShowUploadPhotoButtonWhenGalleryIsNotAllowed() {
+        // given
+        val titleText = "Front of ID"
+        val subtitleText = "Make sure all the corners are visible and there is no glare"
+
         // when
         composeTestRule.setContent {
             DocumentCaptureInstructionsScreen(
                 allowPhotoFromGallery = false,
                 onInstructionsAcknowledgedTakePhoto = { },
+                title = titleText,
+                subtitle = subtitleText,
             )
         }
 
         // then
         composeTestRule.onNodeWithText("Take Photo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Upload Photo").assertDoesNotExist()
+    }
+
+    @Test
+    fun shouldShowUploadPhotoButtonWhenGalleryIsNotAllowed() {
+        // given
+        val titleText = "Front of ID"
+        val subtitleText = "Make sure all the corners are visible and there is no glare"
+
+        // when
+        composeTestRule.setContent {
+            DocumentCaptureInstructionsScreen(
+                allowPhotoFromGallery = true,
+                onInstructionsAcknowledgedTakePhoto = { },
+                title = titleText,
+                subtitle = subtitleText,
+            )
+        }
+
+        // then
+        composeTestRule.onNodeWithText("Take Photo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Upload Photo").assertExists()
     }
 }

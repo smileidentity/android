@@ -5,6 +5,10 @@
     <string name="si_camera_permission_rationale">The camera permission is required to complete the verification process</string>
     <string name="si_agent_mode">Agent Mode</string>
 
+    <!--  Common Resources -->
+    <string name="si_allow">Allow</string>
+    <string name="si_cancel">Cancel</string>
+
     <!--  Content Descriptions (for accessibility)  -->
     <string name="si_cd_logo">Smile ID logo</string>
     <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
@@ -25,12 +29,12 @@
     <string name="si_smart_selfie_instruction_title">Next, we\'ll take a quick selfie</string>
     <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
     <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns green</string>
-    <string name="si_smart_selfie_directive_smile">Smile for the camera!</string>
+    <string name="si_smart_selfie_directive_smile">Smile!</string>
     <string name="si_smart_selfie_directive_capturing">Capturing…</string>
-    <string name="si_smart_selfie_directive_unable_to_detect_face">Unable to detect face. Please ensure your face is in the oval</string>
-    <string name="si_smart_selfie_directive_multiple_faces">Multiple faces detected. Please ensure only one face is present</string>
-    <string name="si_smart_selfie_directive_face_too_far">Face is too far. Please move closer</string>
-    <string name="si_smart_selfie_directive_face_too_close">Face is too close. Please move farther away</string>
+    <string name="si_smart_selfie_directive_unable_to_detect_face">Position your face in the oval</string>
+    <string name="si_smart_selfie_directive_multiple_faces">Ensure only one face is visible</string>
+    <string name="si_smart_selfie_directive_face_too_far">Move closer</string>
+    <string name="si_smart_selfie_directive_face_too_close">Move farther away</string>
     <string name="si_smart_selfie_confirmation_dialog_title">Is this a good quality selfie?</string>
     <string name="si_smart_selfie_confirmation_dialog_subtitle">Make sure your whole face is visible and clear</string>
     <string name="si_smart_selfie_confirmation_dialog_confirm_button">Yes, use this</string>
@@ -40,24 +44,31 @@
     <string name="si_smart_selfie_processing_success_title">Selfie Capture Complete</string>
     <string name="si_smart_selfie_processing_success_subtitle">Your selfie was successfully taken. You can now proceed</string>
     <string name="si_smart_selfie_processing_error_title">Your selfie failed to process</string>
-    <string name="si_smart_selfie_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
     <string name="si_smart_selfie_processing_continue_button">Continue</string>
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
-    <string name="si_doc_v_instruction_title">Submit your ID</string>
     <string name="si_doc_v_instruction_ready_button">Take Photo</string>
     <string name="si_doc_v_instruction_upload_button">Upload Photo</string>
+    <string name="si_doc_v_instruction_title">Submit Front of ID</string>
+    <string name="si_doc_v_instruction_back_title">Submit Back of ID</string>
+    <string name="si_doc_v_instruction_back_subtitle">For this ID type, we require that you submit the back of the ID</string>
     <string name="si_doc_v_capture_instructions_front_title">Front of ID</string>
     <string name="si_doc_v_capture_instructions_back_title">Back of ID</string>
     <string name="si_doc_v_capture_instructions_subtitle">Make sure all the corners are visible and there is no glare</string>
     <string name="si_doc_v_capture_error_subtitle">Your document capture failed to process</string>
+    <string name="si_doc_v_validation_image_too_small">Selected image is too small. Please select a larger resolution image.</string>
     <string name="si_doc_v_confirmation_dialog_title">Is the document clear and readable?</string>
     <string name="si_doc_v_confirmation_dialog_subtitle">Make sure all the corners of the document are visible and there is no glare</string>
     <string name="si_doc_v_confirmation_dialog_confirm_button">Yes, my ID is readable</string>
     <string name="si_doc_v_confirmation_dialog_retake_button">No, retake photo</string>
+    <string name="si_doc_v_processing_title">Processing Document</string>
+    <string name="si_doc_v_processing_subtitle">Just a few more seconds</string>
+    <string name="si_doc_v_processing_success_title">Document Verification Complete</string>
+    <string name="si_doc_v_processing_success_subtitle">Your document was successfully taken. You can now proceed</string>
+    <string name="si_doc_v_processing_error_title">Your document verification failed to process</string>
 
     <!--  Country Names  -->
     <string name="si_country_name_ghana">Ghana</string>
@@ -88,4 +99,24 @@
     <string name="si_id_field_name_last_name">Last Name</string>
     <string name="si_id_field_name_dob">Date of Birth</string>
     <string name="si_id_field_name_bank_code">Bank Code</string>
+
+    <!--  Consent Screen  -->
+    <string name="si_consent_title">%1$s wants to access your %2$s information</string>
+    <string name="si_consent_sub_title">This will allow %1$s to:</string>
+    <string name="si_consent_info_one_title">Process your personal details</string>
+    <string name="si_consent_info_one_description">Partner can provide your names, DoB and gender</string>
+    <string name="si_consent_info_two_title">Process your contact information</string>
+    <string name="si_consent_info_two_description">Partner can process your phone numbers and address</string>
+    <string name="si_consent_info_three_title">Process your document information</string>
+    <string name="si_consent_info_three_description">Partner can process your photo, ID expiration date, country of issuance and document number</string>
+    <string name="si_consent_privacy_policy">You can view %1$s\'s Privacy Policy <annotation is_url="true">here</annotation></string>
+    <string name="si_consent_privacy_policy_description">By choosing \'Allow\' you grant %1$s consent to process your personal data to offer you this service</string>
+    <string name="si_consent_consent_denied">Consent Denied</string>
+    <string name="si_consent_consent_denied_title">We cannot verify you without your consent</string>
+    <string name="si_consent_consent_denied_description">Do you wish to go back and correct that?</string>
+    <string name="si_consent_go_back">Yes, go back</string>
+    <string name="si_consent_cancel_verification">No, cancel verification</string>
+
+    <!--  Generic Errors  -->
+    <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
 </resources>

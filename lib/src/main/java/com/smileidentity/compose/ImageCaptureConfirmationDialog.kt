@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 
 /**
  * A dialog that shows a preview of the image captured by the camera and asks the user to confirm
@@ -115,9 +115,9 @@ fun ImageCaptureConfirmationDialog(
     )
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
-private fun PreviewImageCaptureConfirmationDialog() {
+private fun ImageCaptureConfirmationDialogPreview() {
     Preview {
         ImageCaptureConfirmationDialog(
             titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),

@@ -24,7 +24,7 @@ fun ForceBrightness(brightness: Float = 1f) {
     }
 }
 
-fun Context.getActivity(): Activity? {
+private fun Context.getActivity(): Activity? {
     var context = this
     while (context is ContextWrapper) {
         if (context is Activity) {

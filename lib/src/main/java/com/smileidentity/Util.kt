@@ -1,18 +1,35 @@
 package com.smileidentity
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
+import android.net.Uri
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+import android.os.Bundle
+import android.os.Parcelable
+import android.text.Annotation
+import android.text.SpannedString
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.camera.core.impl.utils.Exif
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.core.graphics.scale
+import androidx.core.text.getSpans
+import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.SmileIDException
@@ -20,6 +37,31 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
+import java.io.Serializable
+
+@Composable
+internal fun annotatedStringResource(
+    @StringRes id: Int,
+    vararg formatArgs: Any,
+    spanStyles: (Annotation) -> SpanStyle? = { null },
+): AnnotatedString {
+    val spannedString = SpannedString(stringResource(id = id, formatArgs = formatArgs))
+
+    val resultBuilder = AnnotatedString.Builder()
+    resultBuilder.append(spannedString.toString())
+    spannedString.getSpans<Annotation>(0, spannedString.length).forEach { annotation ->
+        val spanStart = spannedString.getSpanStart(annotation)
+        val spanEnd = spannedString.getSpanEnd(annotation)
+        resultBuilder.addStringAnnotation(
+            tag = annotation.key,
+            annotation = annotation.value,
+            start = spanStart,
+            end = spanEnd,
+        )
+        spanStyles(annotation)?.let { resultBuilder.addStyle(it, spanStart, spanEnd) }
+    }
+    return resultBuilder.toAnnotatedString()
+}
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -29,22 +71,70 @@ internal val Rect.area get() = height() * width()
 internal val InputImage.area get() = height * width
 
 /**
+ * Check if image is at least width x height. Assumes URI is a content URI, which means it needs to
+ * be parsed as an input stream and can't be used directly.
+ *
+ * @param context Android context
+ * @param uri Content Uri of the image
+ * @param width Minimum width of the image
+ * @param height Minimum height of the image
+ */
+fun isImageAtLeast(
+    context: Context,
+    uri: Uri?,
+    width: Int? = 1920,
+    height: Int? = 1080,
+): Boolean {
+    if (uri == null) return false
+    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    context.contentResolver.openInputStream(uri).use {
+        BitmapFactory.decodeStream(it, null, options)
+    }
+    val imageHeight = options.outHeight
+    val imageWidth = options.outWidth
+    return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
+}
+
+/**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
  * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
  */
+@SuppressLint("RestrictedApi")
 internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
     saveAsGrayscale: Boolean = false,
+    processRotation: Boolean = false,
     compressionQuality: Int = 100,
     maxOutputSize: Size? = null,
 ): File {
-    val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
         val canvas = Canvas(mutableBitmap)
         val colorMatrix = ColorMatrix().apply { setSaturation(0f) }
         val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(colorMatrix) }
         canvas.drawBitmap(mutableBitmap, 0f, 0f, paint)
+    }
+
+    if (processRotation) {
+        val exif = Exif.createFromFile(file)
+        val degrees = when (exif.rotation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90F
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180F
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270F
+            else -> 90F
+        }
+
+        val matrix = Matrix().apply { postRotate(degrees) }
+        mutableBitmap = Bitmap.createBitmap(
+            mutableBitmap,
+            0,
+            0,
+            mutableBitmap.width,
+            mutableBitmap.height,
+            matrix,
+            true,
+        )
     }
 
     // If size is the original Bitmap size, then no scaling will be performed by the underlying call
@@ -75,16 +165,18 @@ internal fun postProcessImageBitmap(
 internal fun postProcessImage(
     file: File,
     saveAsGrayscale: Boolean = false,
+    processRotation: Boolean = true,
     compressionQuality: Int = 100,
     desiredOutputSize: Size? = null,
 ): File {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
     return postProcessImageBitmap(
-        bitmap,
-        file,
-        saveAsGrayscale,
-        compressionQuality,
-        desiredOutputSize,
+        bitmap = bitmap,
+        file = file,
+        saveAsGrayscale = saveAsGrayscale,
+        processRotation = processRotation,
+        compressionQuality = compressionQuality,
+        maxOutputSize = desiredOutputSize,
     )
 }
 
@@ -138,3 +230,113 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit): CoroutineExceptionHandler {
 fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
 fun randomUserId() = randomId("user")
 fun randomJobId() = randomId("job")
+
+/**
+ * This code gets the real path/ sd card path from intent data, and handles every possible scenario
+ * and edge cases, on multiple devices.
+ *
+ * This replaces uri.toFile() in normal scenarios
+ *
+ * Gist - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
+ *
+ *  @param uri a URI
+ *  @param context Android Context
+ */
+internal fun generateFileFromUri(
+    uri: Uri,
+    context: Context,
+): File? = uri.getFilePath(context = context)?.let { File(it) }
+
+/**
+ * Get path from a URI
+ *
+ * @param context Android context
+ */
+private fun Uri.getFilePath(context: Context): String? =
+    getImagePath(context, this)
+
+/**
+ * Borrowed here - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
+ */
+private fun getImagePath(context: Context, uri: Uri): String? =
+    if ("content".equals(uri.scheme!!, ignoreCase = true)) {
+        if (isGooglePhotosUri(uri)) {
+            uri.lastPathSegment
+        } else {
+            getDataColumn(context, uri)
+        }
+    } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
+        uri.path
+    } else {
+        null
+    }
+
+/**
+ * Get the value of the data column for this Uri. This is useful for
+ * MediaStore Uris, and other file-based ContentProviders.
+ *
+ * @param context       The context.
+ * @param uri           The Uri to query.
+ * @return The value of the _data column, which is typically a file path.
+ */
+private fun getDataColumn(
+    context: Context,
+    uri: Uri?,
+): String? {
+    var cursor: Cursor? = null
+    val column = "_data"
+    val projection = arrayOf(column)
+
+    try {
+        cursor = context.contentResolver.query(uri!!, projection, null, null, null)
+        if (cursor != null && cursor.moveToFirst()) {
+            val index = cursor.getColumnIndexOrThrow(column)
+            return cursor.getString(index)
+        }
+    } finally {
+        cursor?.close()
+    }
+    return null
+}
+
+/**
+ * @param uri The Uri to check.
+ * @return Whether the Uri authority is Google Photos.
+ */
+private fun isGooglePhotosUri(uri: Uri): Boolean =
+    "com.google.android.apps.photos.content" == uri.authority
+
+/**
+ * The old getParcelable method is deprecated in API 33 -- use the new one if supported, otherwise
+ * fall back to the old one.
+ *
+ * NB! There is a bug in API 33's implementation (sigh), so actually only use the new API on *34*
+ * and beyond (see: https://issuetracker.google.com/issues/242048899)
+ *
+ * TODO: AndroidX support should be coming for this
+ *
+ * Implementation from https://stackoverflow.com/a/73311814/3831060
+ */
+@Suppress("DEPRECATION")
+inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? = when {
+    SDK_INT >= UPSIDE_DOWN_CAKE -> getParcelable(key, T::class.java)
+    else -> getParcelable(key) as? T
+}
+
+/**
+ * The old getSerializable method is deprecated in API 33 -- use the new one if supported, otherwise
+ * fall back to the old one.
+ *
+ * NB! There is a bug in API 33's implementation (sigh), so actually only use the new API on *34*
+ * and beyond (see: https://issuetracker.google.com/issues/242048899)
+ *
+ * TODO: AndroidX support should be coming for this
+ *
+ * Implementation from https://stackoverflow.com/a/73311814/3831060
+ */
+
+@Suppress("DEPRECATION")
+inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
+    SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
+    else -> getSerializable(key) as? T
+}

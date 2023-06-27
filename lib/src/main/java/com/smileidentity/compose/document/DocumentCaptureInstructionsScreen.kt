@@ -1,19 +1,12 @@
 package com.smileidentity.compose.document
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -25,36 +18,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
-import com.smileidentity.SmileID
-import com.smileidentity.compose.CameraPermissionButton
 import com.smileidentity.compose.SmileIDAttribution
-import com.smileidentity.compose.theme.colorScheme
-import com.smileidentity.compose.theme.typography
+import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.compose.components.CameraPermissionButton
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
 fun DocumentCaptureInstructionsScreen(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
     onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
-    val columnWidth = 320.dp
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxHeight()
-                .widthIn(max = columnWidth)
-                .verticalScroll(rememberScrollState())
-                .weight(1f),
-        ) {
+    BottomPinnedColumn(
+        scrollableContent = {
             Image(
                 painter = painterResource(id = R.drawable.si_doc_v_instructions_hero),
                 contentDescription = null,
@@ -63,13 +46,13 @@ fun DocumentCaptureInstructionsScreen(
                     .padding(top = 8.dp),
             )
             Text(
-                text = stringResource(R.string.si_doc_v_instruction_title),
+                text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = stringResource(id = R.string.si_verify_identity_instruction_subtitle),
+                text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
@@ -107,13 +90,8 @@ fun DocumentCaptureInstructionsScreen(
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .width(columnWidth)
-                .padding(8.dp),
-        ) {
+        },
+        pinnedContent = {
             CameraPermissionButton(
                 text = stringResource(R.string.si_doc_v_instruction_ready_button),
                 onGranted = onInstructionsAcknowledgedTakePhoto,
@@ -130,16 +108,20 @@ fun DocumentCaptureInstructionsScreen(
             if (showAttribution) {
                 SmileIDAttribution()
             }
-        }
-    }
+        },
+        columnWidth = 320.dp,
+        modifier = modifier,
+    )
 }
 
-@Preview
+@SmilePreviews
 @Composable
 fun DocumentCaptureInstructionsScreenPreview() {
-    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+    Preview {
         Surface {
             DocumentCaptureInstructionsScreen(
+                title = stringResource(R.string.si_doc_v_instruction_title),
+                subtitle = stringResource(R.string.si_verify_identity_instruction_subtitle),
                 showAttribution = true,
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedSelectFromGallery = {},

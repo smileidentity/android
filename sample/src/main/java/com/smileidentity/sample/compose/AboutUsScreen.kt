@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.smileidentity.sample.R
 
 @Composable
-fun AboutUsScreen() {
+fun AboutUsScreen(modifier: Modifier = Modifier) {
     var shouldShowWhoWeAreDialog by rememberSaveable { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val abouts = listOf(
@@ -45,7 +45,7 @@ fun AboutUsScreen() {
         },
     )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {

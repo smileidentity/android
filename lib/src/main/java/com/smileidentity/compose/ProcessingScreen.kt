@@ -27,7 +27,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 
@@ -240,9 +240,9 @@ internal fun ProcessingErrorScreen(
     )
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
-private fun PreviewProcessingInProgressScreen() {
+private fun ProcessingInProgressScreenPreview() {
     Preview {
         ProcessingInProgressScreen(
             icon = painterResource(R.drawable.si_smart_selfie_processing_hero),
@@ -252,9 +252,9 @@ private fun PreviewProcessingInProgressScreen() {
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
-private fun PreviewProcessingSuccessScreen() {
+private fun ProcessingSuccessScreenPreview() {
     Preview {
         ProcessingSuccessScreen(
             icon = painterResource(R.drawable.si_processing_success),
@@ -270,12 +270,12 @@ private fun PreviewProcessingSuccessScreen() {
 
 @Preview
 @Composable
-private fun PreviewProcessingErrorScreen() {
+private fun ProcessingErrorScreenPreview() {
     MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         ProcessingErrorScreen(
             icon = painterResource(R.drawable.si_processing_error),
             title = stringResource(R.string.si_smart_selfie_processing_error_title),
-            subtitle = stringResource(R.string.si_smart_selfie_processing_error_subtitle),
+            subtitle = stringResource(R.string.si_processing_error_subtitle),
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
             onRetry = {},
             closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),

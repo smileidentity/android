@@ -80,6 +80,7 @@ class SelfieViewModel(
     private val isEnroll: Boolean,
     private val userId: String,
     private val jobId: String,
+    private val skipApiSubmission: Boolean,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
 
@@ -200,7 +201,7 @@ class SelfieViewModel(
                     postProcessImageBitmap(
                         bitmap = bitmap,
                         file = livenessFile,
-                        saveAsGrayscale = true,
+                        saveAsGrayscale = false,
                         compressionQuality = 80,
                         maxOutputSize = LIVENESS_IMAGE_SIZE,
                     )
@@ -228,7 +229,7 @@ class SelfieViewModel(
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_smart_selfie_processing_error_subtitle,
+                    errorMessage = R.string.si_processing_error_subtitle,
                 )
             }
         }.addOnCompleteListener {
@@ -247,13 +248,18 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
+        if (skipApiSubmission) {
+            result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
+            _uiState.update { it.copy(processingState = ProcessingState.Success) }
+            return
+        }
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
             result = SmileIDResult.Error(e)
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_smart_selfie_processing_error_subtitle,
+                    errorMessage = R.string.si_processing_error_subtitle,
                 )
             }
         }

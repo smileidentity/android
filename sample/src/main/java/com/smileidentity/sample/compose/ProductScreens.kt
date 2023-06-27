@@ -42,18 +42,22 @@ import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
 
 @Composable
-fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
+fun ProductSelectionScreen(
+    modifier: Modifier = Modifier,
+    onProductSelected: (Screen) -> Unit,
+) {
     val density = LocalDensity.current
     var desiredItemMinHeight by remember { mutableStateOf(0.dp) }
     val products = listOf(
         ProductScreen.SmartSelfieEnrollment,
         ProductScreen.SmartSelfieAuthentication,
         ProductScreen.EnhancedKyc,
+        ProductScreen.BiometricKyc,
         ProductScreen.DocumentVerification,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -123,11 +127,11 @@ fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit = {}) {
 
 @Preview
 @Composable
-fun PreviewProductSelectionScreen() {
-    SmileID.initialize(LocalContext.current)
+private fun ProductSelectionScreenPreview() {
+    SmileID.initialize(LocalContext.current, enableCrashReporting = false)
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            ProductSelectionScreen()
+            ProductSelectionScreen { }
         }
     }
 }

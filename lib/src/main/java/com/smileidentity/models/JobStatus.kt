@@ -46,6 +46,18 @@ data class DocVJobStatusResponse(
     @Json(name = "image_links") val imageLinks: ImageLinks?,
 ) : Parcelable
 
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class BiometricKycJobStatusResponse(
+    @Json(name = "timestamp") val timestamp: String,
+    @Json(name = "job_complete") val jobComplete: Boolean,
+    @Json(name = "job_success") val jobSuccess: Boolean,
+    @Json(name = "code") val code: Int,
+    @Json(name = "result") val result: JobResult?,
+    @Json(name = "history") val history: List<JobResult.BiometricKycEntry>?,
+    @Json(name = "image_links") val imageLinks: ImageLinks?,
+) : Parcelable
+
 /**
  * The job result might sometimes be a freeform text field instead of an object (i.e. when the
  * zip upload has not finished processing on the backend, in which case "No zip uploaded" is
@@ -87,7 +99,48 @@ sealed interface JobResult : Parcelable {
         @Json(name = "PhoneNumber2") val phoneNumber2: String?,
         @Json(name = "Address") val address: String?,
     ) : JobResult
+
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    data class BiometricKycEntry(
+        @Json(name = "Actions") val actions: Actions,
+        @Json(name = "ResultCode") val resultCode: Int,
+        @Json(name = "ResultText") val resultText: String,
+        @Json(name = "ResultType") val resultType: String,
+        @Json(name = "SmileJobID") val smileJobId: String,
+        @Json(name = "PartnerParams") val partnerParams: PartnerParams,
+        @Json(name = "Antifraud") val antifraud: Antifraud?,
+        @Json(name = "DOB") val dob: String?,
+        @Json(name = "Photo") val photoBase64: String?,
+        @Json(name = "Gender") val gender: String?,
+        @Json(name = "IDType") val idType: String?,
+        @Json(name = "Address") val address: String?,
+        @Json(name = "Country") val country: String?,
+        @Json(name = "Document") val documentImageBase64: String?,
+        @Json(name = "FullData") val fullData: Map<String, String>?,
+        @Json(name = "FullName") val fullName: String?,
+        @Json(name = "IDNumber") val idNumber: String?,
+        @Json(name = "PhoneNumber") val phoneNumber: String?,
+        @Json(name = "PhoneNumber2") val phoneNumber2: String?,
+        @Json(name = "ExpirationDate") val expirationDate: String?,
+        @Json(name = "Secondary_ID_Number") val secondaryIdNumber: String?,
+        @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
+        @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
+    ) : JobResult
 }
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class Antifraud(
+    @Json(name = "SuspectUsers") val suspectUsers: List<SuspectUser>,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class SuspectUser(
+    @Json(name = "reason") val reason: String,
+    @Json(name = "user_id") val userId: String,
+) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)

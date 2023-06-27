@@ -41,7 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
-import com.smileidentity.compose.preview.SmilePreview
+import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.randomJobId
 import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
@@ -68,16 +68,19 @@ internal fun OrchestratedSelfieCaptureScreen(
     jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
+    skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
     ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     when {
-        !acknowledgedInstructions -> SmartSelfieInstructionsScreen(showAttribution) {
+        !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
+            showAttribution = showAttribution,
+        ) {
             acknowledgedInstructions = true
         }
 
@@ -91,7 +94,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             successIcon = painterResource(R.drawable.si_processing_success),
             errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),
             errorSubtitle = stringResource(
-                uiState.errorMessage ?: R.string.si_smart_selfie_processing_error_subtitle,
+                uiState.errorMessage ?: R.string.si_processing_error_subtitle,
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
             continueButtonText = stringResource(
@@ -125,6 +128,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             jobId = jobId,
             isEnroll = isEnroll,
             allowAgentMode = allowAgentMode,
+            skipApiSubmission = skipApiSubmission,
         )
     }
 }
@@ -136,8 +140,9 @@ internal fun SelfieCaptureScreen(
     jobId: String = rememberSaveable { randomJobId() },
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
+    skipApiSubmission: Boolean = false,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId) },
+        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -240,7 +245,7 @@ private fun AgentModeSwitch(
     }
 }
 
-@SmilePreview
+@SmilePreviews
 @Composable
 private fun SelfieCaptureScreenPreview() {
     Preview {
