@@ -86,6 +86,7 @@ class SelfieViewModel(
     private val _uiState = MutableStateFlow(SelfieUiState())
 
     // Debounce to avoid spamming Directive updates so that they can be read by the user
+    @OptIn(FlowPreview::class)
     val uiState = _uiState.asStateFlow().debounce(UI_DEBOUNCE_DURATION).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
