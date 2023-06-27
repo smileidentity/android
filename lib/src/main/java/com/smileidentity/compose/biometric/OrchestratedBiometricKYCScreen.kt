@@ -1,4 +1,4 @@
-package com.smileidentity
+package com.smileidentity.compose.biometric
 
 import android.os.OperationCanceledException
 import androidx.compose.foundation.layout.Box
@@ -13,14 +13,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.compose.OrchestratedSelfieCaptureScreen
-import com.smileidentity.compose.ProcessingScreen
-import com.smileidentity.consent.ConsentDeniedScreen
-import com.smileidentity.consent.ConsentScreen
+import com.smileidentity.R
+import com.smileidentity.compose.components.ProcessingScreen
+import com.smileidentity.compose.consent.ConsentDeniedScreen
+import com.smileidentity.compose.consent.ConsentScreen
+import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import java.net.URL

@@ -20,9 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
-import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.CameraPermissionButton
+import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 

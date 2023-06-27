@@ -1,4 +1,4 @@
-package com.smileidentity
+package com.smileidentity.util
 
 import android.text.SpannableStringBuilder
 import android.text.Spanned

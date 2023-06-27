@@ -3,8 +3,7 @@ package com.smileidentity.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
-import com.smileidentity.compose.ProcessingState
-import com.smileidentity.getExceptionHandler
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.IdInfo
@@ -17,6 +16,7 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.getExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

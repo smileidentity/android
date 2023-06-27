@@ -42,7 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.compose.ProcessingScreen
+import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.models.IdType
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback

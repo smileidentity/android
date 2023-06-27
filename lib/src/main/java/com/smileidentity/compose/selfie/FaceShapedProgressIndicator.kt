@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.selfie
 
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.Canvas

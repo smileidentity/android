@@ -8,6 +8,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
+import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertTrue

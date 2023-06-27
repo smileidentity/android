@@ -18,9 +18,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+@SmileIDOptIn
 @Composable
 fun BottomPinnedColumn(
     scrollableContent: @Composable () -> Unit,

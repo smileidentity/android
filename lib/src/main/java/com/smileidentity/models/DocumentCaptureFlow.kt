@@ -1,6 +1,6 @@
 package com.smileidentity.models
 
-import com.smileidentity.compose.ProcessingState
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.viewmodel.DocumentUiState
 
 /**

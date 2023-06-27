@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.components
 
 import android.app.Activity
 import android.content.Context

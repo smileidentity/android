@@ -5,10 +5,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smileidentity.R
-import com.smileidentity.consent.ConsentScreen
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.net.URL
 
 class ConsentScreenTest {
     @get:Rule
@@ -27,7 +27,7 @@ class ConsentScreenTest {
                 partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
                 partnerName = "Smile ID",
                 productName = "BVN",
-                partnerPrivacyPolicy = "https://smileidentity.com/privacy",
+                partnerPrivacyPolicy = URL("https://smileidentity.com/privacy"),
                 onContinue = onContinueClicked,
                 onCancel = {},
             )
@@ -51,7 +51,7 @@ class ConsentScreenTest {
                 partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
                 partnerName = "Smile ID",
                 productName = "BVN",
-                partnerPrivacyPolicy = "https://smileidentity.com/privacy",
+                partnerPrivacyPolicy = URL("https://smileidentity.com/privacy"),
                 onContinue = {},
                 onCancel = onCancelClicked,
             )

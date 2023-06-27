@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -15,9 +15,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+@SmileIDOptIn
 @Composable
 fun SmileIDAttribution(modifier: Modifier = Modifier) {
     // TODO: Re-enable once rebrand is officially launched. (Marketing team doesn't want the new

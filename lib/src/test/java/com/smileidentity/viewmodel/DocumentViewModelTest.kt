@@ -1,8 +1,8 @@
 package com.smileidentity.viewmodel
 
 import com.smileidentity.models.Document
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain

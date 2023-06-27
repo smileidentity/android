@@ -50,14 +50,14 @@ import com.smileidentity.compose.SmartSelfieEnrollmentScreen
 import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobResult
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
 import com.smileidentity.sample.showSnackbar
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import timber.log.Timber
 import java.net.URL
 

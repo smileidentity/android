@@ -13,10 +13,10 @@ import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KE
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.newInstance
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.resultFromBundle
-import com.smileidentity.getParcelableCompat
-import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.getParcelableCompat
+import com.smileidentity.util.randomUserId
 
 /**
  * Perform a SmartSelfie™ Authentication

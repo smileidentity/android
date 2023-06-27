@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -44,7 +44,7 @@ import com.smileidentity.compose.preview.SmilePreviews
  * @param onRetake The callback to invoke when the user wants to retake the image
  */
 @Composable
-fun ImageCaptureConfirmationDialog(
+internal fun ImageCaptureConfirmationDialog(
     titleText: String,
     subtitleText: String,
     painter: Painter,

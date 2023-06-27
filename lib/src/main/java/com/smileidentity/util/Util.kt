@@ -1,4 +1,4 @@
-package com.smileidentity
+package com.smileidentity.util
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -31,7 +31,9 @@ import androidx.core.graphics.scale
 import androidx.core.text.getSpans
 import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
+import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.models.SmileIDException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
