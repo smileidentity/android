@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -118,12 +117,6 @@ fun SearchableInputField(
                     ListItem(
                         leadingContent = { Text(it.leadingEmoji) },
                         headlineContent = { Text(it.displayName) },
-                        trailingContent = {
-                            Icon(
-                                Icons.Outlined.CheckCircle,
-                                contentDescription = null,
-                            )
-                        },
                         modifier = Modifier.clickable {
                             // Set query to empty so that the search bar shows the placeholder,
                             // which we use to display the selected value
