@@ -12,7 +12,6 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdType
 import com.smileidentity.models.JobType
-import com.smileidentity.randomUserId
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
