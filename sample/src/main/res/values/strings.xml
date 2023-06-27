@@ -53,6 +53,8 @@
 
     <!--  Biometric KYC  -->
     <string name="biometric_kyc_product_name">Biometric KYC</string>
+    <string name="biometric_kyc_instructions">Provide ID Information</string>
+    <string name="biometric_kyc_enter_id_info">Enter ID Information</string>
 
     <!--  Document Verification  -->
     <string name="doc_v_select_country">Country of Issue</string>

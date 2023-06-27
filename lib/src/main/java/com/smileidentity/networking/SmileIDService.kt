@@ -11,8 +11,10 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
+import com.smileidentity.models.ServicesResponse
 import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Url
@@ -72,4 +74,7 @@ interface SmileIDService {
      */
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
+
+    @GET("/v1/services")
+    suspend fun getServices(): ServicesResponse
 }

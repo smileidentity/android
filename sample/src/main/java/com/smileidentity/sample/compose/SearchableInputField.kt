@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.sample.R
-import com.smileidentity.sample.viewmodel.countryDetails
+import com.smileidentity.sample.countryDetails
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.parcelize.Parcelize
@@ -118,12 +117,6 @@ fun SearchableInputField(
                     ListItem(
                         leadingContent = { Text(it.leadingEmoji) },
                         headlineContent = { Text(it.displayName) },
-                        trailingContent = {
-                            Icon(
-                                Icons.Outlined.CheckCircle,
-                                contentDescription = null,
-                            )
-                        },
                         modifier = Modifier.clickable {
                             // Set query to empty so that the search bar shows the placeholder,
                             // which we use to display the selected value

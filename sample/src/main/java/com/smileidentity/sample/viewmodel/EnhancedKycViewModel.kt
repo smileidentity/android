@@ -13,6 +13,7 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdType
 import com.smileidentity.models.JobType
+import com.smileidentity.randomUserId
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 data class EnhancedKycUiState(
     val selectedCountry: SupportedCountry? = null,
@@ -47,7 +47,7 @@ class EnhancedKycViewModel : ViewModel() {
             val authRequest = AuthenticationRequest(
                 jobType = JobType.EnhancedKyc,
                 enrollment = false,
-                userId = UUID.randomUUID().toString(),
+                userId = randomUserId(),
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val enhancedKycRequest = EnhancedKycRequest(

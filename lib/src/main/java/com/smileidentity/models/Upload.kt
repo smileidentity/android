@@ -40,6 +40,7 @@ data class IdInfo(
     @Json(name = "middle_name") val middleName: String? = null,
     @Json(name = "last_name") val lastName: String? = null,
     @Json(name = "dob") val dob: String? = null,
+    @Json(name = "bank_code") val bankCode: String? = null,
     @Json(name = "entered") val entered: Boolean? = null,
 )
 
