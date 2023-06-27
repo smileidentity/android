@@ -26,6 +26,11 @@ Javadocs are available at https://javadoc.io/doc/com.smileidentity/android-sdk/l
 The [sample app](sample/src/main/java/com/smileidentity/sample/compose/MainScreen.kt) included in 
 this repo is a good reference implementation
 
+### 0. Requirements
+
+- Android 5.0 (API level 21) and above
+- Google Play Services
+
 ### 1. Dependency
 
 The SDK is available on Maven Central. To use it, add the following to your `build.gradle`:
