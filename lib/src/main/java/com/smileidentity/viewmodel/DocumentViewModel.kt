@@ -105,10 +105,7 @@ class DocumentViewModel(
                 when (result) {
                     is ImageCaptureResult.Error -> it.resumeWithException(result.throwable)
                     is ImageCaptureResult.Success -> it.resume(
-                        postProcessImage(
-                            file = documentFile,
-                            desiredAspectRatio = idAspectRatio,
-                        ),
+                        postProcessImage(file = documentFile),
                     )
                 }
             }
