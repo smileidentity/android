@@ -24,7 +24,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.camera.core.impl.utils.Exif
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.core.graphics.scale
@@ -45,11 +45,12 @@ internal fun annotatedStringResource(
     vararg formatArgs: Any,
     spanStyles: (Annotation) -> SpanStyle? = { null },
 ): AnnotatedString {
-    val spannedString = SpannedString(stringResource(id = id, formatArgs = formatArgs))
-
+    // Using resources.getText() instead of stringResource() in order to preserve Spans
+    val resources = LocalContext.current.resources
+    val spannedString = SpanFormatter.format(SpannedString(resources.getText(id)), *formatArgs)
     val resultBuilder = AnnotatedString.Builder()
     resultBuilder.append(spannedString.toString())
-    spannedString.getSpans<Annotation>(0, spannedString.length).forEach { annotation ->
+    spannedString.getSpans<Annotation>().forEach { annotation ->
         val spanStart = spannedString.getSpanStart(annotation)
         val spanEnd = spannedString.getSpanEnd(annotation)
         resultBuilder.addStringAnnotation(

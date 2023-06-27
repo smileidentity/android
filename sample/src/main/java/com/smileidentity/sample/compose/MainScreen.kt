@@ -34,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +59,7 @@ import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
 import com.smileidentity.sample.showSnackbar
 import timber.log.Timber
+import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Preview
@@ -340,8 +342,56 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.BiometricKyc.label
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
-                            if (idInfo == null) { BiometricKycInputScreen { idInfo = it } }
-                            idInfo?.let { SmileID.BiometricKYC(idInfo = it) }
+                            if (idInfo == null) {
+                                BiometricKycInputScreen { idInfo = it }
+                            }
+                            idInfo?.let { idInfo ->
+                                val url = URL("https://smileidentity.com/privacy-policy")
+                                SmileID.BiometricKYC(
+                                    idInfo = idInfo,
+                                    partnerIcon = painterResource(
+                                        id = com.smileidentity.R.drawable.si_logo_with_text,
+                                    ),
+                                    partnerName = "Smile Identity",
+                                    productName = idInfo.idType,
+                                    partnerPrivacyPolicy = url,
+                                ) { result ->
+                                    if (result is SmileIDResult.Success) {
+                                        val resultData = result.data
+                                        Timber.d("Biometric KYC Result: $result")
+                                        val message = StringBuilder("Biometric KYC ")
+                                        if (resultData.jobStatusResponse.jobComplete) {
+                                            if (resultData.jobStatusResponse.jobSuccess) {
+                                                message.append("completed successfully. ")
+                                            } else {
+                                                val code = resultData.jobStatusResponse.code
+                                                val actualResult =
+                                                    resultData.jobStatusResponse.result
+                                                        as? JobResult.Entry
+                                                val resultCode = actualResult?.resultCode
+                                                val resultText = actualResult?.resultText
+                                                message.append("completed unsuccessfully ")
+                                                message.append(
+                                                    "(code=$code, resultCode=$resultCode): ",
+                                                )
+                                                message.append("$resultText.")
+                                            }
+                                        } else {
+                                            message.append("still pending. ")
+                                        }
+                                        snackbarHostState.showSnackbar(
+                                            coroutineScope,
+                                            message.toString(),
+                                        )
+                                    } else if (result is SmileIDResult.Error) {
+                                        val th = result.throwable
+                                        val message = "Biometric KYC error: ${th.message}"
+                                        Timber.e(th, message)
+                                        snackbarHostState.showSnackbar(coroutineScope, message)
+                                    }
+                                    navController.popBackStack()
+                                }
+                            }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
