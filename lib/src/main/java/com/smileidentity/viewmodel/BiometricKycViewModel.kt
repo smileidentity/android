@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 
 data class BiometricKycUiState(
     val showLoading: Boolean = true,
-    val showConsent: Boolean = true,
+    val showConsent: Boolean = false,
     val consentDenied: Boolean = false,
     val processingState: ProcessingState? = null,
 )
