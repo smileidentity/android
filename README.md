@@ -5,12 +5,12 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.smileidentity/android-sdk)](https://mvnrepository.com/artifact/com.smileidentity/android-sdk)
 [![Build Sample App](https://github.com/smileidentity/android/actions/workflows/build_app.yaml/badge.svg)](https://github.com/smileidentity/android/actions/workflows/build_app.yaml)
 
-Smile Identity provides the best solutions for real time Digital KYC, identity verification, user
-onboarding, and user authentication across Africa.
+Smile ID provides the best solutions for Real Time Digital KYC, Identity Verification, User
+Onboarding, and User Authentication across Africa.
 
 If you haven’t already, 
-[sign up for a free Smile Identity account](https://www.smileidentity.com/schedule-a-demo/), which 
-comes with Sandbox access.
+[sign up](https://www.smileidentity.com/schedule-a-demo/) for a free Smile ID account, which comes
+with Sandbox access.
 
 Please see [CHANGELOG.md](CHANGELOG.md) or 
 [Releases](https://github.com/smileidentity/android/releases) for the most recent version and 
@@ -72,6 +72,7 @@ SmileID.BiometricKYC()
 #### Fragment
 
 All Fragments are available under the `com.smileidentity.fragment` package.
+(e.g. `SmartSelfieEnrollmentFragment`)
 
 #### Theming
 
@@ -82,9 +83,13 @@ override [the color resources defined in the SDK](lib/src/main/res/values/colors
 
 To make raw API requests, you can use `SmileID.api` (requires coroutines)
 
-## Docs
+## Getting Help
 
-Please visit https://docs.smileidentity.com/integration-options/mobile for full documentation
+For detailed documentation, please visit https://docs.smileidentity.com/integration-options/mobile
+
+If you require further assistance, you can 
+[file a support ticket](https://portal.smileidentity.com/partner/support/tickets) or 
+[contact us](https://www.smileidentity.com/contact-us/)
 
 ## Contributing
 
