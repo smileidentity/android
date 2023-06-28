@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import java.io.ByteArrayOutputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,7 +17,7 @@ android {
         applicationId = "com.smileidentity.sample"
         minSdk = 21
         targetSdk = 34
-        versionCode = 2
+        versionCode = numberOfCommitsOnMain
         // Include the SDK version in the app version name
         versionName = "1.2.0_sdk-" + project(":lib").version.toString()
 
@@ -82,6 +84,18 @@ android {
         enable += "ComposeM2Api"
         error += "ComposeM2Api"
     }
+}
+
+/**
+ * The versionCode is calculated by the number of commits on the main branch
+ */
+val numberOfCommitsOnMain: Int get() {
+    val stdout = ByteArrayOutputStream()
+    project.exec {
+        commandLine("git", "rev-list", "--count", "main")
+        standardOutput = stdout
+    }
+    return stdout.toString().trim().toInt()
 }
 
 val checkSmileConfigFileTaskName = "checkSmileConfigFile"

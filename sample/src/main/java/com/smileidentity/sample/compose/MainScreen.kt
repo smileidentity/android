@@ -50,6 +50,7 @@ import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobResult
+import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
@@ -326,9 +327,14 @@ fun MainScreen() {
                             currentScreenTitle = ProductScreen.EnhancedKyc.label
                             EnhancedKycScreen { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val message = "Enhanced KYC success"
-                                    Timber.d("$message: $result")
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
+                                    val resultData = result.data.response
+                                    val message = StringBuilder("Enhanced KYC response: ")
+                                    message.append(resultData.resultText)
+                                    message.append(" (resultCode=${resultData.resultCode})")
+                                    snackbarHostState.showSnackbar(
+                                        coroutineScope,
+                                        message.toString(),
+                                    )
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "Enhanced KYC error: ${th.message}"
@@ -343,7 +349,10 @@ fun MainScreen() {
                             currentScreenTitle = ProductScreen.BiometricKyc.label
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
                             if (idInfo == null) {
-                                BiometricKycInputScreen { idInfo = it }
+                                IdTypeSelectorAndFieldInputScreen(
+                                    jobType = JobType.BiometricKyc,
+                                    onResult = { idInfo = it },
+                                )
                             }
                             idInfo?.let { idInfo ->
                                 val url = URL("https://smileidentity.com/privacy-policy")

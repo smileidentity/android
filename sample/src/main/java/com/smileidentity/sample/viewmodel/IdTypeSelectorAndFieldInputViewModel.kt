@@ -7,11 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AvailableIdType
+import com.smileidentity.models.CountryInfo
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.IdTypes
 import com.smileidentity.models.JobType
+import com.smileidentity.models.JobType.BiometricKyc
+import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.ProductsConfigRequest
-import com.smileidentity.models.ServicesResponse
 import com.smileidentity.sample.compose.SearchableInputFieldItem
 import com.smileidentity.sample.countryDetails
 import com.smileidentity.util.getExceptionHandler
@@ -24,7 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-data class BiometricKycInputUiState(
+data class IdTypeSelectorAndFieldInputUiState(
     val countries: ImmutableList<SearchableInputFieldItem>? = null,
     val selectedCountry: SearchableInputFieldItem? = null,
     val idTypesForCountry: List<AvailableIdType>? = null,
@@ -45,11 +47,13 @@ data class BiometricKycInputUiState(
         get() = isIdTypeContinueEnabled && idInputFieldValues.values.all { it.isNotBlank() }
 }
 
-class BiometricKycInputViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(BiometricKycInputUiState())
+class IdTypeSelectorAndFieldInputViewModel(
+    private val jobType: JobType,
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(IdTypeSelectorAndFieldInputUiState())
     val uiState = _uiState.asStateFlow()
 
-    private lateinit var servicesResponse: ServicesResponse
+    private lateinit var servicesResponseForJobType: List<CountryInfo>
     private lateinit var supportedCountriesAndIdTypes: IdTypes
 
     init {
@@ -61,7 +65,7 @@ class BiometricKycInputViewModel : ViewModel() {
             // Use Products Config to get only ID types enabled for the Partner
             val authRequest = AuthenticationRequest(
                 userId = randomUserId(),
-                jobType = JobType.BiometricKyc,
+                jobType = jobType,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val productsConfigRequest = ProductsConfigRequest(
@@ -70,12 +74,21 @@ class BiometricKycInputViewModel : ViewModel() {
                 signature = authResponse.signature,
             )
             val productsConfigResponse = SmileID.api.getProductsConfig(productsConfigRequest)
+            supportedCountriesAndIdTypes = when (jobType) {
+                BiometricKyc -> productsConfigResponse.idSelection.biometricKyc
+                EnhancedKyc -> productsConfigResponse.idSelection.enhancedKyc
+                else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
+            }
+
             // Use Services endpoint to get the required input fields for each ID Type as well as
             // the display names
-            servicesResponse = SmileID.api.getServices()
-
-            supportedCountriesAndIdTypes = productsConfigResponse.idSelection.biometricKyc
-            val countryList = servicesResponse.hostedWeb.biometricKyc
+            val servicesResponse = SmileID.api.getServices()
+            servicesResponseForJobType = when (jobType) {
+                BiometricKyc -> servicesResponse.hostedWeb.biometricKyc
+                EnhancedKyc -> servicesResponse.hostedWeb.enhancedKyc
+                else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
+            }
+            val countryList = servicesResponseForJobType
                 .filter { it.countryCode in supportedCountriesAndIdTypes }
                 .map {
                     // If we fall back, we will not have emoji
@@ -92,7 +105,7 @@ class BiometricKycInputViewModel : ViewModel() {
     }
 
     fun onCountrySelected(selectedCountry: SearchableInputFieldItem) {
-        val availableIdTypes = servicesResponse.hostedWeb.biometricKyc
+        val availableIdTypes = servicesResponseForJobType
             .first { it.countryCode == selectedCountry.key }
             .availableIdTypes
         _uiState.update {
