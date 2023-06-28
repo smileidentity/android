@@ -125,13 +125,19 @@
     <string name="si_consent_cancel_verification">No, cancel verification</string>
 
     <!--  BVN Consent Screen  -->
+    <string name="si_bvn_enter_id_title">Enter ID Information</string>
+    <string name="si_bvn_enter_id_bank_verification">Bank Verification</string>
+    <string name="si_bvn_enter_id_wrong_bvn">You have entered an invalid BVN. Please try again</string>
     <string name="si_bvn_consent_title">OTP Verification</string>
-    <string name="si_bvn_consent_nibss">For added security, NIBSS will send a One Time Password (OTP) to contact detail tied to your BVN</string>
+    <string name="si_bvn_consent_nibss">For added security, "NIBSS" will send a One Time Password (OTP) to contact detail tied to your BVN</string>
     <string name="si_bvn_consent_bvn_delivery_method">Choose where you want the BVN sent:</string>
+    <string name="si_bvn_consent_bvn_delivery_method_email">An OTP will be sent to your mailbox to verify your identity</string>
+    <string name="si_bvn_consent_bvn_delivery_method_sms">An OTP will be sent as an SMS to your phone to verify your identity</string>
     <string name="si_bvn_consent_otp_sent">Enter the OTP sent to %1$s :</string>
     <string name="si_bvn_consent_receive_otp">Didn\'t receive the OTP?</string>
+    <string name="si_bvn_consent_if_didnt_receive_otp">If you didn\'t receive the OTP, you can</string>
     <string name="si_bvn_consent_different_delivery_option">Choose a different delivery option</string>
-    <string name="si_bvn_consent_error_otp_timer">OTP will expire in %1$s</string>
+    <string name="si_bvn_consent_otp_timer">OTP will expire in %1$s</string>
     <string name="si_bvn_consent_error_wrong_otp">You entered a wrong OTP. Please try again</string>
     <string name="si_bvn_consent_error_subtitle">OTP has expired</string>
     <string name="si_bvn_consent_nibss_bvn">NIBSS is the data custodian of BVN</string>

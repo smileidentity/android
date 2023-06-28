@@ -1,31 +1,46 @@
 package com.smileidentity.consent.bvn
 
+import android.os.CountDownTimer
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +56,7 @@ import com.smileidentity.viewmodel.viewModelFactory
 fun BvnConsentScreen(
     partnerIcon: Painter,
     modifier: Modifier = Modifier,
+    bvnDeliveryOptionsList: List<BvnDeliveryOptions> = listOf(), // TODO remove this later (easy to run without passing any list)
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel()
@@ -49,6 +65,26 @@ fun BvnConsentScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var otp by rememberSaveable { mutableStateOf("") }
+    val otpExpiresIn: Long = 10 * 1000 // TODO: get actual value
+    var countdown by remember { mutableStateOf(otpExpiresIn) }
+
+    val countDownTimer =
+        object : CountDownTimer(otpExpiresIn, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                countdown = otpExpiresIn / 1000
+            }
+
+            override fun onFinish() {
+
+            }
+        }
+
+    DisposableEffect(key1 = "key") {
+        countDownTimer.start()
+        onDispose {
+            countDownTimer.cancel()
+        }
+    }
 
     val focusRequester = remember { FocusRequester() }
 
@@ -57,7 +93,9 @@ fun BvnConsentScreen(
             Image(
                 painter = partnerIcon,
                 contentDescription = null,
-                modifier = Modifier.padding(vertical = 24.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(vertical = 24.dp),
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
@@ -68,97 +106,228 @@ fun BvnConsentScreen(
             )
             Spacer(modifier = Modifier.height(24.dp))
             AnimatedVisibility(visible = uiState.showDeliveryMode) {
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_nibss),
-                    style = MaterialTheme.typography.titleSmall,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_otp_sent),
-                    style = MaterialTheme.typography.titleSmall,
-                    textAlign = TextAlign.Center,
-                )
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_nibss),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Start,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_bvn_delivery_method),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Start,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    bvnDeliveryOptionsList.forEach { bvnDeliveryOption ->
+                        OtpDeliveryModeCard(
+                            icon = painterResource(id = bvnDeliveryOption.icon),
+                            otpDelivery = bvnDeliveryOption.otpDelivery,
+                            deliveryDescription = stringResource(id = bvnDeliveryOption.deliveryDescription),
+                            onClick = {
+                                viewModel.handleEvent(
+                                    BvnConsentEvent.SelectOTPDeliveryMode(
+                                        otpDeliveryMode = it,
+                                    ),
+                                )
+                            },
+                        )
+                    }
+                }
             }
             AnimatedVisibility(visible = uiState.showOtpScreen) {
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_otp_sent),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                )
-                OutlinedTextField(
-                    value = otp,
-                    onValueChange = { otp = it },
-                    singleLine = true,
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .focusRequester(focusRequester),
-                )
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_nibss),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                )
-            }
-            AnimatedVisibility(visible = uiState.showWrongOtpScreen) {
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_otp_sent),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                )
-            }
-            AnimatedVisibility(visible = uiState.showExpiredOtpScreen) {
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_error_subtitle),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                )
-            }
-        },
-        pinnedContent = {
-            AnimatedVisibility(
-                visible = uiState.showDeliveryMode,
-            ) {
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_nibss_bvn),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Start,
-                )
-            }
-            AnimatedVisibility(
-                visible = uiState.showOtpScreen || uiState.showWrongOtpScreen,
-            ) {
-                Button(
-                    onClick = {
-                        viewModel.handleEvent(BvnConsentEvent.SubmitOTPMode(otp = otp))
-                    },
-                    modifier = Modifier
-                        .testTag("bvn_consent_continue_button")
-                        .fillMaxWidth(),
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(text = stringResource(id = R.string.si_continue))
+                    Text(
+                        text = stringResource(
+                            id = R.string.si_bvn_consent_otp_sent,
+                            uiState.otpSentTo,
+                        ),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = otp,
+                        onValueChange = { otp = it },
+                        isError = uiState.showWrongOtp,
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AnimatedVisibility(visible = uiState.showWrongOtp) {
+                        Text(
+                            text = stringResource(id = R.string.si_bvn_consent_error_wrong_otp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = colorResource(id = R.color.si_color_error),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_otp_timer, ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
                 }
             }
             AnimatedVisibility(
-                visible = uiState.showOtpScreen || uiState.showWrongOtpScreen ||
-                    uiState.showExpiredOtpScreen,
+                visible = uiState.showExpiredOtpScreen,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_receive_otp),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = stringResource(id = R.string.si_bvn_consent_different_delivery_option),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    color = colorResource(id = R.color.si_color_accent),
-                    modifier = Modifier.clickable {
-                        viewModel.handleEvent(BvnConsentEvent.GoToSelectOTPDeliveryMode)
-                    },
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(modifier = Modifier.height(34.dp))
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_error_subtitle),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_if_didnt_receive_otp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_different_delivery_option),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = Color.Blue,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                            viewModel.handleEvent(BvnConsentEvent.GoToSelectOTPDeliveryMode)
+                        },
+                    )
+                }
             }
         },
+        pinnedContent = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                AnimatedVisibility(
+                    visible = uiState.showDeliveryMode,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.si_bvn_consent_nibss_bvn),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                    )
+                }
+                AnimatedVisibility(
+                    visible = uiState.showOtpScreen || uiState.showWrongOtp,
+                ) {
+                    Button(
+                        onClick = {
+                            viewModel.handleEvent(BvnConsentEvent.SubmitOTPMode(otp = otp))
+                        },
+                        modifier = Modifier
+                            .testTag("bvn_consent_continue_button")
+                            .fillMaxWidth(),
+                    ) {
+                        Text(text = stringResource(id = R.string.si_continue))
+                    }
+                }
+                AnimatedVisibility(
+                    visible = uiState.showOtpScreen || uiState.showWrongOtp,
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(id = R.string.si_bvn_consent_receive_otp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.si_bvn_consent_different_delivery_option),
+                            color = Color.Blue, // color = colorResource(id = R.color.si_color_accent) doesn't work (wierd)
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable {
+                                viewModel.handleEvent(BvnConsentEvent.GoToSelectOTPDeliveryMode)
+                            },
+                        )
+                    }
+                }
+            }
+        },
+        modifier = modifier,
     )
+}
+
+data class BvnDeliveryOptions(
+    @DrawableRes val icon: Int,
+    val otpDelivery: String,
+    @StringRes val deliveryDescription: Int,
+)
+
+@Composable
+fun OtpDeliveryModeCard(
+    icon: Painter,
+    otpDelivery: String,
+    deliveryDescription: String,
+    modifier: Modifier = Modifier,
+    onClick: (OtpDeliveryMode) -> Unit,
+) {
+    // TODO - Logic to determine which enum to return "onClick" after API is implemented
+    Column(modifier = modifier.padding(bottom = 16.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable {
+                onClick(OtpDeliveryMode.EMAIL)
+            },
+        ) {
+            Image(
+                painter = icon,
+                contentDescription = "OTP Delivery Mode Icon",
+                modifier = Modifier
+                    .size(40.dp),
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp),
+            ) {
+                Text(
+                    text = otpDelivery,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Start,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = deliveryDescription,
+                    style = MaterialTheme.typography.titleSmall,
+                    textAlign = TextAlign.Start,
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "OTP Delivery Mode Click",
+            )
+        }
+    }
 }
 
 @SmilePreviews
@@ -167,6 +336,18 @@ private fun BvnConsentScreenPreview() {
     Preview {
         BvnConsentScreen(
             partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
+            bvnDeliveryOptionsList = listOf(
+                BvnDeliveryOptions(
+                    icon = R.drawable.si_logo_with_text,
+                    otpDelivery = "email@example.com",
+                    deliveryDescription = R.string.si_continue,
+                ),
+                BvnDeliveryOptions(
+                    icon = R.drawable.si_camera_capture,
+                    otpDelivery = "+254789564875",
+                    deliveryDescription = R.string.si_continue,
+                ),
+            ),
         )
     }
 }
