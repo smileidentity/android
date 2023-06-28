@@ -39,8 +39,8 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.sample.R
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.BiometricKycInputViewModel
+import timber.log.Timber
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BiometricKycInputScreen(
     modifier: Modifier = Modifier,
@@ -48,12 +48,33 @@ fun BiometricKycInputScreen(
     onResult: (IdInfo) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    when {
+        uiState.errorMessage != null -> {
+            val context = LocalContext.current
+            LaunchedEffect(uiState.errorMessage) {
+                context.toast("Error loading ID Types: ${uiState.errorMessage}")
+            }
+        }
 
-    uiState.errorMessage?.let {
-        val context = LocalContext.current
-        LaunchedEffect(it) { context.toast("Error loading ID Types: $it") }
+        !uiState.hasIdTypeSelectionBeenConfirmed -> IdSelectorScreen(
+            modifier = modifier,
+            onNext = { viewModel.onIdTypeConfirmed() },
+        )
+
+        else -> IdInputScreen(
+            modifier = modifier,
+            onNext = { onResult(viewModel.currentIdInfo) },
+        )
     }
+}
 
+@Composable
+private fun IdSelectorScreen(
+    modifier: Modifier = Modifier,
+    viewModel: BiometricKycInputViewModel = viewModel(),
+    onNext: () -> Unit,
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     BottomPinnedColumn(
         scrollableContent = {
             Text(
@@ -96,18 +117,45 @@ fun BiometricKycInputScreen(
                     }
                 }
             }
-
-            uiState.idInputFields?.let {
-                Text(
-                    text = stringResource(R.string.biometric_kyc_enter_id_info),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 16.dp),
-                )
+        },
+        pinnedContent = {
+            Button(
+                onClick = onNext,
+                enabled = uiState.isIdTypeContinueEnabled,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = stringResource(R.string.cont))
             }
+        },
+        columnWidth = 320.dp,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun IdInputScreen(
+    modifier: Modifier = Modifier,
+    viewModel: BiometricKycInputViewModel = viewModel(),
+    onNext: () -> Unit,
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    if (uiState.idInputFields.isNullOrEmpty()) {
+        Timber.e("ID Input Fields are unexpectedly null or empty")
+        return
+    }
+
+    BottomPinnedColumn(
+        scrollableContent = {
+            Text(
+                text = stringResource(R.string.biometric_kyc_enter_id_info),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 16.dp),
+            )
 
             val focusManager = LocalFocusManager.current
             val focusRequester = remember { FocusRequester() }
-            uiState.idInputFields?.forEachIndexed { index, fieldUi ->
+            uiState.idInputFields.forEachIndexed { index, fieldUi ->
                 val value = uiState.idInputFieldValues[fieldUi.key] ?: ""
                 val keyboardOpts = if (index == uiState.idInputFields.lastIndex) {
                     KeyboardOptions(imeAction = ImeAction.Done)
@@ -122,12 +170,14 @@ fun BiometricKycInputScreen(
                     label = { Text(fieldUi.label) },
                     value = value,
                     onValueChange = { viewModel.onInputFieldChange(fieldUi.key, it) },
-                    isError = value.isBlank(),
+                    isError = !viewModel.isInputValid(value, fieldUi),
                     singleLine = true,
                     keyboardActions = keyboardActions,
                     keyboardOptions = keyboardOpts,
                     modifier = if (index == 0) {
-                        Modifier.fillMaxWidth().focusRequester(focusRequester)
+                        Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
                     } else {
                         Modifier.fillMaxWidth()
                     },
@@ -140,12 +190,10 @@ fun BiometricKycInputScreen(
         },
         pinnedContent = {
             Button(
-                onClick = { onResult(viewModel.currentIdInfo) },
-                enabled = uiState.isContinueEnabled,
+                onClick = onNext,
+                enabled = uiState.isFinalContinueEnabled,
                 modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(text = stringResource(R.string.cont))
-            }
+            ) { Text(text = stringResource(R.string.cont)) }
         },
         columnWidth = 320.dp,
         modifier = modifier

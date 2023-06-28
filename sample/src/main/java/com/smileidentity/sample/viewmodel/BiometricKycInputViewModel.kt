@@ -29,14 +29,20 @@ data class BiometricKycInputUiState(
     val selectedCountry: SearchableInputFieldItem? = null,
     val idTypesForCountry: List<AvailableIdType>? = null,
     val selectedIdType: AvailableIdType? = null,
+    val hasIdTypeSelectionBeenConfirmed: Boolean = false,
     val idInputFields: List<InputFieldUi>? = null,
     val idInputFieldValues: SnapshotStateMap<String, String> = mutableStateMapOf(),
     val errorMessage: String? = null,
 ) {
-    val isContinueEnabled
-        get() = selectedCountry != null &&
-            selectedIdType != null &&
-            idInputFieldValues.values.all { it.isNotBlank() }
+    val isIdTypeContinueEnabled
+        get() = selectedCountry != null && selectedIdType != null
+
+    /**
+     * NB! This is *not* guarded on whether the Regex validations have been satisfied -- this is
+     * in case the Regex is incorrect/invalid/out-of-date, so that the user can still proceed.
+     */
+    val isFinalContinueEnabled
+        get() = isIdTypeContinueEnabled && idInputFieldValues.values.all { it.isNotBlank() }
 }
 
 class BiometricKycInputViewModel : ViewModel() {
@@ -104,11 +110,18 @@ class BiometricKycInputViewModel : ViewModel() {
         // Remove all the default fields
         val ignoredFields = listOf("country", "id_type", "user_id", "job_id")
         val idInputFields = (idType.requiredFields - ignoredFields).map {
-            inputFieldDetails[it] ?: InputFieldUi(
+            var inputFieldDetail = inputFieldDetails[it] ?: InputFieldUi(
                 key = it,
                 label = it,
                 type = InputFieldUi.Type.Text,
             )
+            idType.idNumberRegex?.let { regex ->
+                if (it == "id_number") {
+                    Timber.v("Regex is $regex for $it")
+                    inputFieldDetail = inputFieldDetail.copy(regex = Regex(regex))
+                }
+            }
+            return@map inputFieldDetail
         }
 
         _uiState.update {
@@ -122,9 +135,15 @@ class BiometricKycInputViewModel : ViewModel() {
         }
     }
 
+    fun onIdTypeConfirmed() {
+        _uiState.update { it.copy(hasIdTypeSelectionBeenConfirmed = true) }
+    }
+
     fun onInputFieldChange(key: String, newValue: String) {
         _uiState.value.idInputFieldValues[key] = newValue.trim()
     }
+
+    fun isInputValid(input: String, inputField: InputFieldUi) = inputField.regex.matches(input)
 
     val currentIdInfo
         get() = IdInfo(
@@ -143,6 +162,8 @@ data class InputFieldUi(
     val key: String,
     val label: String,
     val type: Type,
+    // "is not blank"
+    val regex: Regex = Regex("(.|\\s)*\\S(.|\\s)*"),
 ) {
     enum class Type {
         Text,
