@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.smileidentity.SmileID
-import com.smileidentity.compose.SmartSelfieAuthenticationScreen
+import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.newInstance
@@ -23,7 +23,7 @@ import com.smileidentity.util.randomUserId
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
- * A [Fragment] wrapper for the [SmartSelfieAuthenticationScreen] to be used if not using Jetpack
+ * A [Fragment] wrapper for the [SmartSelfieAuthentication] to be used if not using Jetpack
  * Compose. New instances *must* be created via [newInstance]. Results are communicated back to the
  * caller via [setFragmentResult]. Therefore, the caller must use
  * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result. If
@@ -59,7 +59,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
 
         /**
          * Creates a new instance of [SmartSelfieAuthenticationFragment] which wraps the
-         * [SmileID.SmartSelfieAuthenticationScreen] Composable under the hood
+         * [SmileID.SmartSelfieAuthentication] Composable under the hood
          *
          * @param userId The user ID to associate with the SmartSelfie™ Authentication. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
@@ -97,7 +97,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         val args = requireArguments()
         setContent {
-            SmileID.SmartSelfieAuthenticationScreen(
+            SmileID.SmartSelfieAuthentication(
                 userId = args.userId,
                 allowAgentMode = args.allowAgentMode,
                 showAttribution = args.showAttribution,

@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLif
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.smileidentity.SmileID
-import com.smileidentity.compose.SmartSelfieEnrollmentScreen
+import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.newInstance
@@ -23,7 +23,7 @@ import com.smileidentity.util.randomUserId
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
  *
- * A [Fragment] wrapper for the [SmartSelfieEnrollmentScreen] to be used if not using Jetpack
+ * A [Fragment] wrapper for the [SmartSelfieEnrollment] to be used if not using Jetpack
  * Compose. New instances *must* be created via [newInstance]. Results are communicated back to the
  * caller via [setFragmentResult]. Therefore, the caller must use
  * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result. If
@@ -59,7 +59,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
 
         /**
          * Creates a new instance of [SmartSelfieEnrollmentFragment] which wraps the
-         * [SmileID.SmartSelfieEnrollmentScreen] Composable under the hood
+         * [SmileID.SmartSelfieEnrollment] Composable under the hood
          *
          * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
@@ -97,7 +97,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
         setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
         val args = requireArguments()
         setContent {
-            SmileID.SmartSelfieEnrollmentScreen(
+            SmileID.SmartSelfieEnrollment(
                 userId = args.userId,
                 allowAgentMode = args.allowAgentMode,
                 showAttribution = args.showAttribution,
