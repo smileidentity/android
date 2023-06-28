@@ -2,16 +2,17 @@
 
 package com.smileidentity.models
 
-import com.smileidentity.BuildConfig
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.io.File
 
+/**
+ * This class represents info.json
+ */
 @JsonClass(generateAdapter = true)
 data class UploadRequest(
     @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "id_info") val idInfo: IdInfo? = null,
-    @Json(name = "package_information") val packageInfo: UploadPackageInfo = UploadPackageInfo(),
 )
 
 @JsonClass(generateAdapter = true)
@@ -69,23 +70,3 @@ enum class ImageType {
     @Json(name = "7")
     IdCardRearPngOrJpgBase64,
 }
-
-@JsonClass(generateAdapter = true)
-data class UploadPackageInfo(
-    @Json(name = "apiVersion") val apiVersion: ApiVersion = ApiVersion(),
-    @Json(name = "version_names") val versionNames: VersionNames = VersionNames(),
-)
-
-@JsonClass(generateAdapter = true)
-data class ApiVersion(
-    @Json(name = "buildNumber") val buildNumber: Int = 2,
-    @Json(name = "majorVersion") val majorVersion: Int = 2,
-    @Json(name = "minorVersion") val minorVersion: Int = 1,
-)
-
-@JsonClass(generateAdapter = true)
-data class VersionNames(
-    @Json(name = "sid_sdk_version") val version: String = BuildConfig.VERSION_NAME,
-    @Json(name = "sid_sdk_type") val type: String = "Android",
-    @Json(name = "sid_sdk_ux_version") val uxVersion: String = "1.0",
-)
