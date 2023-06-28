@@ -39,7 +39,7 @@ class SelfieCaptureScreenTest {
         val cameraPreviewTag = "selfie_camera_preview"
 
         // when
-        composeTestRule.setContent { SmileID.SmartSelfieEnrollmentScreen() }
+        composeTestRule.setContent { SmileID.SmartSelfieEnrollment() }
 
         // then
         verify(exactly = 0) { permissionState.launchPermissionRequest() }

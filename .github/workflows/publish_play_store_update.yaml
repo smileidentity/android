@@ -1,10 +1,7 @@
-name: Build Ad-Hoc Sample App
+name: Publish Play Store Update
 on:
-  workflow_dispatch:
-    inputs:
-      smile_config:
-        description: 'The contents of the smile_config.json file (default: Partner 2423)'
-        required: false
+  push:
+    branches: [ main ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,14 +18,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Write Smile Config
-        id: write_smile_config
+        id: write_config
         # Mask the config so it doesn't show up in the logs
         run: |
-          INPUT_SMILE_CONFIG=$(jq -r '.inputs.smile_config // empty' $GITHUB_EVENT_PATH)
-          echo "::add-mask::$INPUT_SMILE_CONFIG"
-          if [ -n "$INPUT_SMILE_CONFIG" ]; then
-            SMILE_CONFIG="$INPUT_SMILE_CONFIG"
-          fi
           echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
           PARTNER_ID=$(jq -r '.partner_id' sample/src/main/assets/smile_config.json)
           echo "partner_id=$PARTNER_ID" >> $GITHUB_OUTPUT
@@ -41,6 +33,16 @@ jobs:
           fileName: 'upload.jks'
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
+        # Release Notes consisting of the 10 most recent commits in the format "- [date] message"
+        # The file name format is dictated by the r0adkll/upload-google-play@v1 action
+      - name: Generate Release notes
+        run: |
+          mkdir release_notes
+          git log --pretty=format:'- [%ad] %s' --date=short -n 10 > release_notes/whatsnew-en-US
+      - name: Short SHA
+        id: short_sha
+        run: |
+          echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Assemble
         uses: gradle/gradle-build-action@v2
         with:
@@ -48,24 +50,13 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
-      - name: Create Internal App Sharing Link
+      - name: Deploy Sample App to Play Store Internal Testing Track
         uses: r0adkll/upload-google-play@v1
-        id: upload
+        id: upload_to_play_store
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.smileidentity.sample
-          track: internalsharing
+          track: internal
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
-          releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
-      - name: Send Slack
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}",
-              "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}",
-              "branch": "${{ github.ref }}",
-              "commit_sha": "${{ github.sha }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_SAMPLE_APP_DOWNLOAD }}
+          releaseName: ${{ steps.short_sha.outputs.short_sha }} (Partner ${{ steps.write_config.outputs.partner_id }})
+          whatsNewDirectory: release_notes

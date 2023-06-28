@@ -47,7 +47,7 @@ import java.net.URL
  * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
-fun SmileID.SmartSelfieEnrollmentScreen(
+fun SmileID.SmartSelfieEnrollment(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
@@ -75,7 +75,7 @@ fun SmileID.SmartSelfieEnrollmentScreen(
  *
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
  * an ID that was previously registered via a SmartSelfie™ Enrollment
- * (see: [SmileID.SmartSelfieEnrollmentScreen])
+ * (see: [SmileID.SmartSelfieEnrollment])
  * @param jobId The job ID to associate with the SmartSelfie™ Authentication. Most often, this
  * will correspond to a unique Job ID within your own system. If not provided, a random job ID
  * will be generated.
@@ -90,7 +90,7 @@ fun SmileID.SmartSelfieEnrollmentScreen(
  * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
-fun SmileID.SmartSelfieAuthenticationScreen(
+fun SmileID.SmartSelfieAuthentication(
     userId: String,
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
