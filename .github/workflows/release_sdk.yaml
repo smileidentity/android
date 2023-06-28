@@ -74,19 +74,10 @@ jobs:
         env:
           tag: v${{ steps.read_version.outputs.version }}
           message: Release v${{ steps.read_version.outputs.version }}
-      - name: Build, Test, and Lint
+      - name: Build, Test, Lint, and Publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
-        env:
-          ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
-      - name: Assemble and Publish
-        uses: gradle/gradle-build-action@v2
-        with:
-          # We create both an APK and AAB so that the AAB can be uploaded to the Play Store and the
-          # APK can be uploaded to GitHub (for easy ad-hoc installation, if desired)
-          arguments: assembleRelease bundleRelease publish
+          arguments: lint build assembleRelease publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.read_version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -100,11 +91,6 @@ jobs:
         with:
           name: SDK AAR
           path: lib/build/outputs/aar/lib-release.aar
-      - name: Archive Sample App
-        uses: actions/upload-artifact@v3
-        with:
-          name: Sample App APK
-          path: sample/build/outputs/apk/release/sample-release.apk
       - name: Create GitHub Release
         uses: actions/create-release@v1
         id: create_release
@@ -123,24 +109,6 @@ jobs:
           asset_path: lib/build/outputs/aar/lib-release.aar
           asset_name: com.smileidentity_android-sdk_${{ steps.read_version.outputs.version }}.aar
           asset_content_type: application/octet-stream
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: sample/build/outputs/apk/release/sample-release.apk
-          asset_name: sample_partner002_${{ steps.read_version.outputs.version }}.apk
-          asset_content_type: application/vnd.android.package-archive
-      - name: Deploy Sample App to Play Store Internal Testing Track
-        uses: r0adkll/upload-google-play@v1
-        id: upload_to_play_store
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
-          packageName: com.smileidentity.sample
-          track: internal
-          releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
-          releaseName: Smile ID
       - name: Bump Version
         if: ${{ github.event.inputs.bump_version == 'true' }}
         run: |
