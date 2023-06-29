@@ -1,4 +1,6 @@
-name: Lint, Build, and Test
+# Fails because of this issue below (add comma's back when we get a fix for this)
+# https://github.com/gradle/gradle-build-action/issues/758
+name: Lint Build and Test
 on:
   pull_request:
   push:
@@ -36,9 +38,7 @@ jobs:
             echo "Version $VERSION does not contain -SNAPSHOT"
             echo "version=$VERSION-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
-        # Fails because of this issue below (add comma's back when we get a fix for this)
-        # https://github.com/gradle/gradle-build-action/issues/758
-      - name: Build Test Lint Assemble Publish Snapshot
+      - name: Build, Test, Lint, Assemble, Publish Snapshot
         uses: gradle/gradle-build-action@v2
         with:
           # NB! The "lint" gradle action here is different than ktLint
