@@ -36,10 +36,11 @@ jobs:
             echo "Version $VERSION does not contain -SNAPSHOT"
             echo "version=$VERSION-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
-      - name: Build, Test, Lint, Assemble, Publish Snapshot
+        # Fails because of this issue below (add comma's back when we get a fix for this)
+        # https://github.com/gradle/gradle-build-action/issues/758
+      - name: Build Test Lint Assemble Publish Snapshot
         uses: gradle/gradle-build-action@v2
         with:
-          cache-disabled: true
           # NB! The "lint" gradle action here is different than ktLint
           arguments: lint build assembleDebug publish
         env:
