@@ -43,9 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
+import com.smileidentity.sample.countryDetails
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
-import com.smileidentity.sample.viewmodel.countryDetails
 import com.smileidentity.sample.viewmodel.idTypeFriendlyNames
 import kotlinx.collections.immutable.toImmutableList
 import timber.log.Timber
@@ -65,7 +65,7 @@ fun DocumentVerificationIdTypeSelector(
 
     uiState.errorMessage?.let {
         val context = LocalContext.current
-        LaunchedEffect(it) { context.toast("Error loading ID types: $it") }
+        LaunchedEffect(it) { context.toast("Error loading ID Types: $it") }
     }
 
     val idTypes = uiState.idTypes
@@ -78,7 +78,7 @@ fun DocumentVerificationIdTypeSelector(
                     it,
                     it,
                 )
-            }?.toImmutableList()
+            }?.sortedBy { it.displayName }?.toImmutableList()
         }
     }
 
@@ -177,10 +177,7 @@ fun DocumentVerificationIdTypeSelector(
                 val idTypesForCountry = idTypes!![selectedCountry]
                 idTypesForCountry?.forEach { idType ->
                     val selected = selectedIdType == idType
-                    val onClick = {
-                        Timber.v("Selected: $idType")
-                        selectedIdType = idType
-                    }
+                    val onClick = { selectedIdType = idType }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier

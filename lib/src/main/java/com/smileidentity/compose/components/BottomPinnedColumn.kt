@@ -22,7 +22,7 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
-internal fun BottomPinnedColumn(
+fun BottomPinnedColumn(
     scrollableContent: @Composable () -> Unit,
     pinnedContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,

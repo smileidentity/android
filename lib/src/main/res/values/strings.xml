@@ -18,7 +18,7 @@
     <string name="si_photo_capture_instruction_good_light_title">Good Light</string>
     <string name="si_photo_capture_instruction_good_light_subtitle">Make sure you are in a well-lit environment where your face is clear and visible</string>
     <string name="si_photo_capture_instruction_clear_image_title">Clear Image</string>
-    <string name="si_photo_capture_instruction_clear_image_subtitle">Hold your phone steady so the selfie is clear and sharp. Don’t take blurry images</string>
+    <string name="si_photo_capture_instruction_clear_image_subtitle">Hold your phone steady so that the image is clear and sharp. Don’t take blurry images</string>
     <string name="si_photo_capture_instruction_remove_obstructions_title">Remove Obstructions</string>
     <string name="si_photo_capture_instruction_remove_obstructions_subtitle">Remove anything that covers your face, such as glasses, masks, hats and scarves</string>
     <string name="si_verify_identity_instruction_subtitle">We\'ll use it to verify your identity.\nPlease follow the instructions below.</string>
