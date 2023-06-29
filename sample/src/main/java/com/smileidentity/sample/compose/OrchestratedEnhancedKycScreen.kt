@@ -21,7 +21,7 @@ import com.smileidentity.sample.R
 import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
 
 @Composable
-fun EnhancedKycScreen(
+fun OrchestratedEnhancedKycScreen(
     modifier: Modifier = Modifier,
     viewModel: EnhancedKycViewModel = viewModel(),
     onResult: SmileIDCallback<EnhancedKycResult> = {},
@@ -58,10 +58,10 @@ fun EnhancedKycScreen(
 
 @Preview
 @Composable
-private fun PreviewEnhancedKycScreen() {
+private fun PreviewOrchestratedEnhancedKycScreen() {
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            EnhancedKycScreen()
+            OrchestratedEnhancedKycScreen()
         }
     }
 }

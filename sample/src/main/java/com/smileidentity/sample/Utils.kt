@@ -31,6 +31,35 @@ fun SnackbarHostState.showSnackbar(
     }
 }
 
+/**
+ * Builds a display message for a job result. Since each job type has a different response type,
+ * we need the individual fields rather than the overarching response type. Not all job types return
+ * all fields, hence their nullability
+ */
+fun jobResultMessageBuilder(
+    jobName: String,
+    jobComplete: Boolean?,
+    jobSuccess: Boolean?,
+    code: Int?,
+    resultCode: Int?,
+    resultText: String?,
+    suffix: String? = null,
+): String {
+    val message = StringBuilder("$jobName ")
+    if (jobComplete == true) {
+        if (jobSuccess == true) {
+            message.append("completed successfully")
+        } else {
+            message.append("completed unsuccessfully")
+        }
+        message.append(" (resultText=$resultText, code=$code, resultCode=$resultCode)")
+    } else {
+        message.append("still pending")
+    }
+    suffix?.let { message.append(" $it") }
+    return message.toString()
+}
+
 val countryDetails = mapOf(
     "AO" to SearchableInputFieldItem("AO", "Angola", "🇦🇴"),
     "BF" to SearchableInputFieldItem("BF", "Burkina Faso", "🇧🇫"),
