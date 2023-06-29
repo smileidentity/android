@@ -36,15 +36,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.models.IdInfo
+import com.smileidentity.models.JobType
 import com.smileidentity.sample.R
 import com.smileidentity.sample.toast
-import com.smileidentity.sample.viewmodel.BiometricKycInputViewModel
+import com.smileidentity.sample.viewmodel.IdTypeSelectorAndFieldInputViewModel
+import com.smileidentity.viewmodel.viewModelFactory
 import timber.log.Timber
 
 @Composable
-fun BiometricKycInputScreen(
+fun IdTypeSelectorAndFieldInputScreen(
+    jobType: JobType,
     modifier: Modifier = Modifier,
-    viewModel: BiometricKycInputViewModel = viewModel(),
+    viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
+        factory = viewModelFactory { IdTypeSelectorAndFieldInputViewModel(jobType) },
+    ),
     onResult: (IdInfo) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -71,7 +76,7 @@ fun BiometricKycInputScreen(
 @Composable
 private fun IdSelectorScreen(
     modifier: Modifier = Modifier,
-    viewModel: BiometricKycInputViewModel = viewModel(),
+    viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(),
     onNext: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -136,7 +141,7 @@ private fun IdSelectorScreen(
 @Composable
 private fun IdInputScreen(
     modifier: Modifier = Modifier,
-    viewModel: BiometricKycInputViewModel = viewModel(),
+    viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(),
     onNext: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value

@@ -1,5 +1,6 @@
 package com.smileidentity.models
 
+import com.serjltt.moshi.adapters.FallbackEnum
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -80,9 +81,53 @@ data class CountryInfo(
 data class AvailableIdType(
     @Transient val idTypeKey: String = "",
     @Json(name = "label") val label: String,
-    @Json(name = "required_fields") val requiredFields: List<String> = emptyList(),
+    @Json(name = "required_fields") val requiredFields: List<RequiredField> = emptyList(),
     @Json(name = "test_data") val testData: String?,
     // Don't use a Regex object here directly as that requires us to compile the pattern, which is a
     // heavy operation
     @Json(name = "id_number_regex") val idNumberRegex: String?,
 )
+
+@FallbackEnum(name = "Unknown")
+enum class RequiredField {
+    @Json(name = "id_number")
+    IdNumber,
+
+    @Json(name = "first_name")
+    FirstName,
+
+    @Json(name = "last_name")
+    LastName,
+
+    @Json(name = "dob")
+    DateOfBirth,
+
+    @Json(name = "day")
+    Day,
+
+    @Json(name = "month")
+    Month,
+
+    @Json(name = "year")
+    Year,
+
+    @Json(name = "bank_code")
+    BankCode,
+
+    @Json(name = "citizenship")
+    Citizenship,
+
+    @Json(name = "country")
+    Country,
+
+    @Json(name = "id_type")
+    IdType,
+
+    @Json(name = "user_id")
+    UserId,
+
+    @Json(name = "job_id")
+    JobId,
+
+    Unknown,
+}
