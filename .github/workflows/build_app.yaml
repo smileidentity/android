@@ -43,8 +43,8 @@ jobs:
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Assemble
         uses: gradle/gradle-build-action@v2
-        cache-disabled: true
         with:
+          cache-disabled: true
           arguments: bundleRelease
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

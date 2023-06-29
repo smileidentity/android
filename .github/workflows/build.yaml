@@ -38,8 +38,8 @@ jobs:
           fi
       - name: Build, Test, Lint, Assemble, Publish Snapshot
         uses: gradle/gradle-build-action@v2
-        cache-disabled: true
         with:
+          cache-disabled: true
           # NB! The "lint" gradle action here is different than ktLint
           arguments: lint build assembleDebug publish
         env:
