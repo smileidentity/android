@@ -88,7 +88,7 @@ android {
 
 /**
  * The versionCode is calculated by the number of commits on the main branch. This fails on PRs,
- * but the versionCode is only relevant on main anyways, so return a default value of 0.
+ * but the versionCode is only relevant on main anyways, so return a default value of 1.
  */
 val numberOfCommitsOnMain: Int
     get() = try {
@@ -100,7 +100,7 @@ val numberOfCommitsOnMain: Int
         stdout.toString().trim().toInt()
     } catch (e: Exception) {
         println(e.message)
-        0
+        1
     }
 
 val checkSmileConfigFileTaskName = "checkSmileConfigFile"
