@@ -1,5 +1,6 @@
-package com.smileidentity
+package com.smileidentity.util
 
+import com.smileidentity.SmileID
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

@@ -16,7 +16,7 @@
 
 @file:Suppress("SameParameterValue", "BooleanLiteralArgument", "MemberVisibilityCanBePrivate")
 
-package com.smileidentity
+package com.smileidentity.util
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap

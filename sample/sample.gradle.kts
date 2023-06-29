@@ -55,6 +55,13 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
+        compileOptions {
+            // https://kotlinlang.org/docs/opt-in-requirements.html#module-wide-opt-in
+            // This is to provide us a blanket-allow us to use APIs annotated with @SmileIDOptIn
+            // without having to add the opt-in annotation to every usage. The annotation's purpose
+            // is primarily for consumers of the SDK to use, not for us.
+            freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
+        }
     }
 
     buildFeatures {
@@ -83,6 +90,9 @@ tasks.register(checkSmileConfigFileTaskName) {
         val configFile = file("src/main/assets/smile_config.json")
         if (!configFile.exists()) {
             throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
+        }
+        if (configFile.readText().isBlank()) {
+            throw IllegalArgumentException("Empty smile_config.json file in src/main/assets!")
         }
     }
 }

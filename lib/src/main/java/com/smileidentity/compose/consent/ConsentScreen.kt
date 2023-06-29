@@ -1,4 +1,4 @@
-package com.smileidentity.consent
+package com.smileidentity.compose.consent
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -28,15 +28,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
-import com.smileidentity.annotatedStringResource
-import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.util.annotatedStringResource
 import java.net.URL
 
 @Composable
-fun ConsentScreen(
+internal fun ConsentScreen(
     partnerIcon: Painter,
     partnerName: String,
     productName: String,

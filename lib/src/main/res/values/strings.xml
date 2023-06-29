@@ -70,6 +70,13 @@
     <string name="si_doc_v_processing_success_subtitle">Your document was successfully taken. You can now proceed</string>
     <string name="si_doc_v_processing_error_title">Your document verification failed to process</string>
 
+    <!--  Biometric KYC  -->
+    <string name="si_biometric_kyc_product_name">Biometric KYC</string>
+    <string name="si_biometric_kyc_processing_title">Processing Your Selfie and ID</string>
+    <string name="si_biometric_kyc_processing_success_title">Submission Complete</string>
+    <string name="si_biometric_kyc_processing_success_subtitle">You may now proceed</string>
+    <string name="si_biometric_kyc_processing_error_subtitle">Your submission failed to process</string>
+
     <!--  Country Names  -->
     <string name="si_country_name_ghana">Ghana</string>
     <string name="si_country_name_kenya">Kenya</string>

@@ -13,8 +13,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
-import com.smileidentity.toast
+import com.smileidentity.SmileIDOptIn
+import com.smileidentity.util.toast
 
+@SmileIDOptIn
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraPermissionButton(

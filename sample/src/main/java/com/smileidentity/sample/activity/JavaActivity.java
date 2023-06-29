@@ -1,6 +1,6 @@
 package com.smileidentity.sample.activity;
 
-import static com.smileidentity.UtilKt.randomUserId;
+import static com.smileidentity.util.UtilKt.randomUserId;
 
 import android.os.Bundle;
 import android.view.View;

@@ -11,14 +11,9 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.smileidentity.BitmapUtils
 import com.smileidentity.R
 import com.smileidentity.SmileID
-import com.smileidentity.area
-import com.smileidentity.compose.ProcessingState
-import com.smileidentity.createLivenessFile
-import com.smileidentity.createSelfieFile
-import com.smileidentity.getExceptionHandler
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
@@ -28,10 +23,16 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
-import com.smileidentity.postProcessImageBitmap
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.BitmapUtils
+import com.smileidentity.util.area
+import com.smileidentity.util.createLivenessFile
+import com.smileidentity.util.createSelfieFile
+import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.postProcessImageBitmap
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -85,6 +86,7 @@ class SelfieViewModel(
     private val _uiState = MutableStateFlow(SelfieUiState())
 
     // Debounce to avoid spamming Directive updates so that they can be read by the user
+    @OptIn(FlowPreview::class)
     val uiState = _uiState.asStateFlow().debounce(UI_DEBOUNCE_DURATION).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),

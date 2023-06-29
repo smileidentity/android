@@ -132,6 +132,7 @@ fun BiometricKycInputScreen(
                         Modifier.fillMaxWidth()
                     },
                 )
+                // Focus the first input field when the ID type is selected
                 LaunchedEffect(key1 = uiState.selectedIdType) {
                     focusRequester.requestFocus()
                 }

@@ -2,6 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
+import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
@@ -67,6 +68,15 @@ interface SmileIDService {
      */
     @POST("/v1/job_status")
     suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
+
+    /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be a Biometric KYC.
+     */
+    @POST("/v1/job_status")
+    suspend fun getBiometricKycJobStatus(
+        @Body request: JobStatusRequest,
+    ): BiometricKycJobStatusResponse
 
     /**
      * Returns the ID types that are enabled for authenticated partner and which of those require

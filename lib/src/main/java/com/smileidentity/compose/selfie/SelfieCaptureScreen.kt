@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.selfie
 
 import android.graphics.BitmapFactory
 import androidx.annotation.VisibleForTesting
@@ -40,12 +40,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.compose.components.ForceBrightness
+import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory

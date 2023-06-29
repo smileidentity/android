@@ -1,8 +1,8 @@
 package com.smileidentity.viewmodel
 
 import androidx.camera.core.ImageProxy
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk

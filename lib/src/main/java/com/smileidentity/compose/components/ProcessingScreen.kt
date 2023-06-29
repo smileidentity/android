@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.components
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Column
@@ -26,11 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 
+@SmileIDOptIn
 enum class ProcessingState {
     InProgress,
     Success,
@@ -61,6 +63,7 @@ enum class ProcessingState {
  * unsuccessful.
  * @param onClose The callback to invoke when the close button is clicked.
  */
+@SmileIDOptIn
 @Composable
 fun ProcessingScreen(
     processingState: ProcessingState,

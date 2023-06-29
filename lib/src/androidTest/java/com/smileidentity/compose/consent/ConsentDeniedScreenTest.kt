@@ -3,7 +3,6 @@ package com.smileidentity.compose.consent
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.smileidentity.consent.ConsentDeniedScreen
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test

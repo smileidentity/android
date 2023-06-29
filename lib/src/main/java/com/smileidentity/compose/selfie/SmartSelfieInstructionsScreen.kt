@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.selfie
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -21,11 +21,12 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.CameraPermissionButton
+import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
-fun SmartSelfieInstructionsScreen(
+internal fun SmartSelfieInstructionsScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },

@@ -12,6 +12,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.smileidentity.SmileID
+import com.smileidentity.compose.selfie.SelfieCaptureScreen
 import com.smileidentity.viewmodel.SelfieViewModel
 import io.mockk.Runs
 import io.mockk.every

@@ -7,19 +7,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.painter.Painter
 import com.smileidentity.SmileID
+import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
+import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import java.io.File
+import java.net.URL
 
 /**
  * Perform a SmartSelfie™ Enrollment
@@ -189,6 +193,10 @@ fun SmileID.DocumentVerification(
 @Composable
 fun SmileID.BiometricKYC(
     idInfo: IdInfo,
+    partnerIcon: Painter,
+    partnerName: String,
+    productName: String,
+    partnerPrivacyPolicy: URL,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
@@ -198,6 +206,17 @@ fun SmileID.BiometricKYC(
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        // TODO
+        OrchestratedBiometricKYCScreen(
+            idInfo = idInfo,
+            partnerIcon = partnerIcon,
+            partnerName = partnerName,
+            productName = productName,
+            partnerPrivacyPolicy = partnerPrivacyPolicy,
+            userId = userId,
+            jobId = jobId,
+            allowAgentMode = allowAgentMode,
+            showAttribution = showAttribution,
+            onResult = onResult,
+        )
     }
 }

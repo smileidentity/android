@@ -5,7 +5,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
-import com.smileidentity.getExceptionHandler
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AvailableIdType
 import com.smileidentity.models.IdInfo
@@ -13,9 +12,10 @@ import com.smileidentity.models.IdTypes
 import com.smileidentity.models.JobType
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ServicesResponse
-import com.smileidentity.randomUserId
 import com.smileidentity.sample.compose.SearchableInputFieldItem
 import com.smileidentity.sample.countryDetails
+import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.randomUserId
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow

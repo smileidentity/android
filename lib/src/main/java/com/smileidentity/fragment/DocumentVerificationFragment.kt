@@ -13,13 +13,13 @@ import com.smileidentity.fragment.DocumentVerificationFragment.Companion.KEY_REQ
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.newInstance
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.resultFromBundle
-import com.smileidentity.getParcelableCompat
-import com.smileidentity.getSerializableCompat
 import com.smileidentity.models.Document
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.getParcelableCompat
+import com.smileidentity.util.getSerializableCompat
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import java.io.File
 
 /**
