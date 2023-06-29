@@ -87,16 +87,21 @@ android {
 }
 
 /**
- * The versionCode is calculated by the number of commits on the main branch
+ * The versionCode is calculated by the number of commits on the main branch. This fails on PRs,
+ * but the versionCode is only relevant on main anyways, so return a default value of 0.
  */
-val numberOfCommitsOnMain: Int get() {
-    val stdout = ByteArrayOutputStream()
-    project.exec {
-        commandLine("git", "rev-list", "--count", "main")
-        standardOutput = stdout
+val numberOfCommitsOnMain: Int
+    get() = try {
+        val stdout = ByteArrayOutputStream()
+        project.exec {
+            commandLine("git", "rev-list", "--count", "main")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().toInt()
+    } catch (e: Exception) {
+        println(e.message)
+        0
     }
-    return stdout.toString().trim().toInt()
-}
 
 val checkSmileConfigFileTaskName = "checkSmileConfigFile"
 tasks.register(checkSmileConfigFileTaskName) {
