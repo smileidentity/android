@@ -3,16 +3,19 @@
 ## 10.0.0-beta03 (Unreleased)
 
 ### Added
-- Breaking: renamed SmartSelfie Registration to SmartSelfie Enrollment
+- Biometric KYC
+- Document Verification
 - Debounce Selfie Capture directive changes to allow user time to read the directions
 - Set Release property on Sentry for release tracking
 - Products Config API call
+- Services API call
 
 ### Fixed
 - Fix crash on network retries
 - Don't report IDE Jetpack Compose Preview crashes to Sentry
 
 ### Changed
+- Breaking: renamed SmartSelfie Registration to SmartSelfie Enrollment
 - Compile against API level 34
 - Bump AndroidX Activity to 1.7.2
 - Bump AndroidX Fragment to 1.6.0
