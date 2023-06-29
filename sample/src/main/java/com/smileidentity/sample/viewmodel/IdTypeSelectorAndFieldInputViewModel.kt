@@ -14,6 +14,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.ProductsConfigRequest
+import com.smileidentity.models.RequiredField
 import com.smileidentity.sample.compose.SearchableInputFieldItem
 import com.smileidentity.sample.countryDetails
 import com.smileidentity.util.getExceptionHandler
@@ -33,7 +34,7 @@ data class IdTypeSelectorAndFieldInputUiState(
     val selectedIdType: AvailableIdType? = null,
     val hasIdTypeSelectionBeenConfirmed: Boolean = false,
     val idInputFields: List<InputFieldUi>? = null,
-    val idInputFieldValues: SnapshotStateMap<String, String> = mutableStateMapOf(),
+    val idInputFieldValues: SnapshotStateMap<RequiredField, String> = mutableStateMapOf(),
     val errorMessage: String? = null,
 ) {
     val isIdTypeContinueEnabled
@@ -121,15 +122,17 @@ class IdTypeSelectorAndFieldInputViewModel(
 
     fun onIdTypeSelected(idType: AvailableIdType) {
         // Remove all the default fields
-        val ignoredFields = listOf("country", "id_type", "user_id", "job_id")
+        val ignoredFields = listOf(
+            RequiredField.Country,
+            RequiredField.IdType,
+            RequiredField.UserId,
+            RequiredField.JobId,
+            RequiredField.Unknown,
+        )
         val idInputFields = (idType.requiredFields - ignoredFields).map {
-            var inputFieldDetail = inputFieldDetails[it] ?: InputFieldUi(
-                key = it,
-                label = it,
-                type = InputFieldUi.Type.Text,
-            )
+            var inputFieldDetail = getInputFieldUi(it)
             idType.idNumberRegex?.let { regex ->
-                if (it == "id_number") {
+                if (it == RequiredField.IdNumber) {
                     Timber.v("Regex is $regex for $it")
                     inputFieldDetail = inputFieldDetail.copy(regex = Regex(regex))
                 }
@@ -141,7 +144,7 @@ class IdTypeSelectorAndFieldInputViewModel(
             it.copy(
                 selectedIdType = idType,
                 idInputFields = idInputFields,
-                idInputFieldValues = mutableStateMapOf<String, String>().apply {
+                idInputFieldValues = mutableStateMapOf<RequiredField, String>().apply {
                     idInputFields.forEach { field -> set(key = field.key, value = "") }
                 },
             )
@@ -152,7 +155,7 @@ class IdTypeSelectorAndFieldInputViewModel(
         _uiState.update { it.copy(hasIdTypeSelectionBeenConfirmed = true) }
     }
 
-    fun onInputFieldChange(key: String, newValue: String) {
+    fun onInputFieldChange(key: RequiredField, newValue: String) {
         _uiState.value.idInputFieldValues[key] = newValue.trim()
     }
 
@@ -162,17 +165,75 @@ class IdTypeSelectorAndFieldInputViewModel(
         get() = IdInfo(
             country = _uiState.value.selectedCountry!!.key,
             idType = _uiState.value.selectedIdType!!.idTypeKey,
-            idNumber = _uiState.value.idInputFieldValues["id_number"],
-            firstName = _uiState.value.idInputFieldValues["first_name"],
-            lastName = _uiState.value.idInputFieldValues["last_name"],
-            dob = _uiState.value.idInputFieldValues["dob"],
-            bankCode = _uiState.value.idInputFieldValues["bank_code"],
+            idNumber = _uiState.value.idInputFieldValues[RequiredField.IdNumber],
+            firstName = _uiState.value.idInputFieldValues[RequiredField.FirstName],
+            lastName = _uiState.value.idInputFieldValues[RequiredField.LastName],
+            dob = _uiState.value.idInputFieldValues[RequiredField.DateOfBirth],
+            bankCode = _uiState.value.idInputFieldValues[RequiredField.BankCode],
             entered = true,
         )
+
+    fun getInputFieldUi(requiredField: RequiredField) = when (requiredField) {
+        RequiredField.IdNumber -> InputFieldUi(
+            key = requiredField,
+            label = "ID Number",
+            type = InputFieldUi.Type.Text,
+        )
+
+        RequiredField.FirstName -> InputFieldUi(
+            key = requiredField,
+            label = "First Name",
+            type = InputFieldUi.Type.Text,
+        )
+
+        RequiredField.LastName -> InputFieldUi(
+            key = requiredField,
+            label = "Last Name",
+            type = InputFieldUi.Type.Text,
+        )
+
+        RequiredField.DateOfBirth -> InputFieldUi(
+            key = requiredField,
+            label = "Date of Birth",
+            type = InputFieldUi.Type.Date,
+        )
+
+        RequiredField.Day -> InputFieldUi(
+            key = requiredField,
+            label = "Day",
+            type = InputFieldUi.Type.Number,
+        )
+
+        RequiredField.Month -> InputFieldUi(
+            key = requiredField,
+            label = "Month",
+            type = InputFieldUi.Type.Number,
+        )
+
+        RequiredField.Year -> InputFieldUi(
+            key = requiredField,
+            label = "Year",
+            type = InputFieldUi.Type.Number,
+        )
+
+        RequiredField.BankCode -> InputFieldUi(
+            key = requiredField,
+            label = "Bank Code",
+            type = InputFieldUi.Type.Number,
+        )
+
+        RequiredField.Citizenship -> InputFieldUi(
+            key = requiredField,
+            label = "Citizenship",
+            type = InputFieldUi.Type.Text,
+        )
+
+        else -> throw IllegalArgumentException("Unsupported RequiredField: $requiredField")
+    }
 }
 
 data class InputFieldUi(
-    val key: String,
+    val key: RequiredField,
     val label: String,
     val type: Type,
     // "is not blank"
@@ -184,51 +245,3 @@ data class InputFieldUi(
         Number,
     }
 }
-
-private val inputFieldDetails: Map<String, InputFieldUi> = mapOf(
-    "first_name" to InputFieldUi(
-        key = "first_name",
-        label = "First Name",
-        type = InputFieldUi.Type.Text,
-    ),
-    "last_name" to InputFieldUi(
-        key = "last_name",
-        label = "Last Name",
-        type = InputFieldUi.Type.Text,
-    ),
-    "id_number" to InputFieldUi(
-        key = "id_number",
-        label = "ID Number",
-        type = InputFieldUi.Type.Text,
-    ),
-    "dob" to InputFieldUi(
-        key = "dob",
-        label = "Date of Birth",
-        type = InputFieldUi.Type.Date,
-    ),
-    "day" to InputFieldUi(
-        key = "day",
-        label = "Day",
-        type = InputFieldUi.Type.Number,
-    ),
-    "month" to InputFieldUi(
-        key = "month",
-        label = "Month",
-        type = InputFieldUi.Type.Number,
-    ),
-    "year" to InputFieldUi(
-        key = "year",
-        label = "Year",
-        type = InputFieldUi.Type.Number,
-    ),
-    "citizenship" to InputFieldUi(
-        key = "citizenship",
-        label = "Citizenship",
-        type = InputFieldUi.Type.Text,
-    ),
-    "bank_code" to InputFieldUi(
-        key = "bank_code",
-        label = "Bank Code",
-        type = InputFieldUi.Type.Number,
-    ),
-)
