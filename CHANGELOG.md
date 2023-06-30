@@ -3,10 +3,13 @@
 ## 10.0.0-beta04 (unreleased)
 
 ### Added
+- Biometric KYC Fragment
+- Made IdInfo Parcelable
 
 ### Fixed
 
 ### Changed
+- Updated docs
 
 ### Removed
 

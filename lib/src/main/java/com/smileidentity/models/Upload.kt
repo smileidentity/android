@@ -2,8 +2,10 @@
 
 package com.smileidentity.models
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 import java.io.File
 
 /**
@@ -32,6 +34,7 @@ data class UploadImageInfo(
  * @param entered Whether to submit the verification to the ID authority or not. For Biometric KYC
  * jobs, this should be set to true
  */
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class IdInfo(
     @Json(name = "country") val country: String,
@@ -43,7 +46,7 @@ data class IdInfo(
     @Json(name = "dob") val dob: String? = null,
     @Json(name = "bank_code") val bankCode: String? = null,
     @Json(name = "entered") val entered: Boolean? = null,
-)
+) : Parcelable
 
 enum class ImageType {
     @Json(name = "0")
