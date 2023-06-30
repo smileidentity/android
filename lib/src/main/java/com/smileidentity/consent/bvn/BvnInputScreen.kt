@@ -21,9 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -35,7 +32,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
-import com.smileidentity.compose.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
@@ -44,7 +40,8 @@ import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 fun BvnInputScreen(
-    cancelBvnVerification: () -> Unit, // TODO - Do we make this a screen and not a AlertDialog? then we can add the x icon?
+    cancelBvnVerification: () -> Unit, // TODO - Do we make this a screen and not a AlertDialog?
+    // then we can add the x icon?
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     viewModel: BvnConsentViewModel = viewModel(
@@ -124,7 +121,7 @@ fun BvnInputScreen(
 private fun BvnInputScreenPreview() {
     Preview {
         BvnInputScreen(
-            cancelBvnVerification = {}
+            cancelBvnVerification = {},
         )
     }
 }

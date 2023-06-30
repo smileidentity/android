@@ -56,7 +56,8 @@ import com.smileidentity.viewmodel.viewModelFactory
 fun BvnConsentScreen(
     partnerIcon: Painter,
     modifier: Modifier = Modifier,
-    bvnDeliveryOptionsList: List<BvnDeliveryOptions> = listOf(), // TODO remove this later (easy to run without passing any list)
+    bvnDeliveryOptionsList: List<BvnDeliveryOptions> = listOf(), // TODO remove this later (easy to
+    // run without passing any list)
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel()
@@ -75,7 +76,6 @@ fun BvnConsentScreen(
             }
 
             override fun onFinish() {
-
             }
         }
 
@@ -126,7 +126,9 @@ fun BvnConsentScreen(
                         OtpDeliveryModeCard(
                             icon = painterResource(id = bvnDeliveryOption.icon),
                             otpDelivery = bvnDeliveryOption.otpDelivery,
-                            deliveryDescription = stringResource(id = bvnDeliveryOption.deliveryDescription),
+                            deliveryDescription = stringResource(
+                                id = bvnDeliveryOption.deliveryDescription,
+                            ),
                             onClick = {
                                 viewModel.handleEvent(
                                     BvnConsentEvent.SelectOTPDeliveryMode(
@@ -175,7 +177,7 @@ fun BvnConsentScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(id = R.string.si_bvn_consent_otp_timer, ),
+                        text = stringResource(id = R.string.si_bvn_consent_otp_timer),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
@@ -203,7 +205,9 @@ fun BvnConsentScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = stringResource(id = R.string.si_bvn_consent_different_delivery_option),
+                        text = stringResource(
+                            id = R.string.si_bvn_consent_different_delivery_option,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         color = Color.Blue,
@@ -259,8 +263,11 @@ fun BvnConsentScreen(
                             textAlign = TextAlign.Center,
                         )
                         Text(
-                            text = stringResource(id = R.string.si_bvn_consent_different_delivery_option),
-                            color = Color.Blue, // color = colorResource(id = R.color.si_color_accent) doesn't work (wierd)
+                            text = stringResource(
+                                id = R.string.si_bvn_consent_different_delivery_option,
+                            ),
+                            color = Color.Blue, // color = colorResource(id =
+                            // R.color.si_color_accent) doesn't work (wierd)
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,

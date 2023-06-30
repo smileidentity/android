@@ -57,7 +57,7 @@ class BvnConsentViewModel : ViewModel() {
         // Disable the show delivery page
         _uiState.update { it.copy(showDeliveryMode = false) }
 
-        //Show OTP Verification page
+        // Show OTP Verification page
         _uiState.update { it.copy(showOtpScreen = true) }
 
         // Set value of where the OTP was sent
@@ -74,16 +74,19 @@ class BvnConsentViewModel : ViewModel() {
 
         // mocked to test ui
         _uiState.getAndUpdate {
-            if (it.showWrongOtp) it.copy(
-                showOtpScreen = false,
-                showExpiredOtpScreen = true,
-                showWrongOtp = false,
-            )
-            else it.copy(
-                showOtpScreen = true,
-                showWrongOtp = true,
-                showExpiredOtpScreen = false,
-            )
+            if (it.showWrongOtp) {
+                it.copy(
+                    showOtpScreen = false,
+                    showExpiredOtpScreen = true,
+                    showWrongOtp = false,
+                )
+            } else {
+                it.copy(
+                    showOtpScreen = true,
+                    showWrongOtp = true,
+                    showExpiredOtpScreen = false,
+                )
+            }
         }
     }
 }

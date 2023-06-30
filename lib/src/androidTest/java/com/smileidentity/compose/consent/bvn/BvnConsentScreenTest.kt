@@ -15,7 +15,6 @@ class BvnConsentScreenTest {
 
     @Test
     fun shouldDisplayBvnConsentScreen() {
-
         // when
         composeTestRule.setContent {
             BvnConsentScreen(partnerIcon = painterResource(id = R.drawable.si_logo_with_text))
