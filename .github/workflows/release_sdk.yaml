@@ -97,7 +97,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_name: Release ${{ steps.read_version.outputs.version }}
+          release_name: v${{ steps.read_version.outputs.version }}
           tag_name: v${{ steps.read_version.outputs.version }}
           prerelease: ${{ steps.read_version.outputs.is_prerelease }}
       - name: Upload Release Asset
