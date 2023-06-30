@@ -15,7 +15,7 @@ android {
         applicationId = "com.smileidentity.sample"
         minSdk = 21
         targetSdk = 34
-        versionCode = findProperty("VERSION_CODE") as? Int ?: 1
+        versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
         versionName = "1.2.0_sdk-" + project(":lib").version.toString()
 
