@@ -53,6 +53,7 @@ internal fun OrchestratedDocumentVerificationScreen(
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
+    showCaptureWithInstructions: Boolean = true,
     viewModel: DocumentViewModel = viewModel(
         factory = viewModelFactory {
             DocumentViewModel(
@@ -73,11 +74,11 @@ internal fun OrchestratedDocumentVerificationScreen(
 
     when (
         val state = DocumentCaptureFlow.stateFrom(
-            acknowledgedInstructions = acknowledgedInstructions,
             processingState = uiState.processingState,
             shouldSelectFromGallery = shouldSelectFromGallery,
             captureBothSides = captureBothSides,
             isFrontDocumentPhotoValid = isFrontDocumentPhotoValid,
+            showCaptureWithInstructions = showCaptureWithInstructions,
             uiState = uiState,
         )
     ) {
@@ -87,9 +88,11 @@ internal fun OrchestratedDocumentVerificationScreen(
             showAttribution = showAttribution,
             allowPhotoFromGallery = allowGalleryUpload,
             onInstructionsAcknowledgedTakePhoto = {
+                // TODO - Do we really use this anywhere? Or we can just delete the callback?
                 acknowledgedInstructions = true
             },
             onInstructionsAcknowledgedSelectFromGallery = {
+                // TODO - Do we really use this anywhere? Or we can just delete the callback?
                 acknowledgedInstructions = true
                 shouldSelectFromGallery = true
             },

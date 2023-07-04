@@ -45,12 +45,12 @@ internal sealed class DocumentCaptureFlow {
 
     companion object {
         fun stateFrom(
-            acknowledgedInstructions: Boolean,
             processingState: ProcessingState?,
             uiState: DocumentUiState?,
             shouldSelectFromGallery: Boolean,
             captureBothSides: Boolean,
             isFrontDocumentPhotoValid: Boolean,
+            showCaptureWithInstructions: Boolean,
         ): DocumentCaptureFlow {
             val selectGalleryOneSide =
                 shouldSelectFromGallery && !captureBothSides &&
@@ -98,7 +98,7 @@ internal sealed class DocumentCaptureFlow {
             val showSelfieCapture = uiState?.showSelfieCapture ?: false
 
             return when {
-                !acknowledgedInstructions -> ShowInstructions
+                showCaptureWithInstructions -> ShowInstructions
                 processingState != null -> ProcessingScreen(processingState = processingState)
                 showSelfieCapture -> SelfieCapture
                 selectGalleryOneSide -> GalleryOneSide

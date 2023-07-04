@@ -199,6 +199,7 @@ fun MainScreen() {
                             SmileID.SmartSelfieEnrollment(
                                 userId = userId,
                                 allowAgentMode = true,
+                                showCaptureWithInstructions = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val response = result.data.jobStatusResponse
@@ -392,6 +393,7 @@ fun MainScreen() {
                                 userId = userId,
                                 jobId = jobId,
                                 idType = documentType,
+                                showCaptureWithInstructions = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data
