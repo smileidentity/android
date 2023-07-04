@@ -1,7 +1,6 @@
 package com.smileidentity.compose.selfie
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import org.junit.Rule
@@ -37,6 +36,6 @@ class OrchestratedSelfieCaptureScreenTest {
 
         // then
         composeTestRule.onNodeWithText(instructionsSubstring, substring = true)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 }
