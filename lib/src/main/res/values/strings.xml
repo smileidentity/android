@@ -8,6 +8,7 @@
     <!--  Common Resources -->
     <string name="si_allow">Allow</string>
     <string name="si_cancel">Cancel</string>
+    <string name="si_continue">Continue</string>
 
     <!--  Content Descriptions (for accessibility)  -->
     <string name="si_cd_logo">Smile ID logo</string>
@@ -44,7 +45,6 @@
     <string name="si_smart_selfie_processing_success_title">Selfie Capture Complete</string>
     <string name="si_smart_selfie_processing_success_subtitle">Your selfie was successfully taken. You can now proceed</string>
     <string name="si_smart_selfie_processing_error_title">Your selfie failed to process</string>
-    <string name="si_smart_selfie_processing_continue_button">Continue</string>
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
@@ -123,6 +123,18 @@
     <string name="si_consent_consent_denied_description">Do you wish to go back and correct that?</string>
     <string name="si_consent_go_back">Yes, go back</string>
     <string name="si_consent_cancel_verification">No, cancel verification</string>
+
+    <!--  BVN Consent Screen  -->
+    <string name="si_bvn_consent_title">OTP Verification</string>
+    <string name="si_bvn_consent_nibss">For added security, NIBSS will send a One Time Password (OTP) to contact detail tied to your BVN</string>
+    <string name="si_bvn_consent_bvn_delivery_method">Choose where you want the BVN sent:</string>
+    <string name="si_bvn_consent_otp_sent">Enter the OTP sent to %1$s :</string>
+    <string name="si_bvn_consent_receive_otp">Didn\'t receive the OTP?</string>
+    <string name="si_bvn_consent_different_delivery_option">Choose a different delivery option</string>
+    <string name="si_bvn_consent_error_otp_timer">OTP will expire in %1$s</string>
+    <string name="si_bvn_consent_error_wrong_otp">You entered a wrong OTP. Please try again</string>
+    <string name="si_bvn_consent_error_subtitle">OTP has expired</string>
+    <string name="si_bvn_consent_nibss_bvn">NIBSS is the data custodian of BVN</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>

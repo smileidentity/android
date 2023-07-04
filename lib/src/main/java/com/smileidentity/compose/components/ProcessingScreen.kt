@@ -264,7 +264,7 @@ private fun ProcessingSuccessScreenPreview() {
             title = stringResource(R.string.si_smart_selfie_processing_success_title),
             subtitle = stringResource(R.string.si_smart_selfie_processing_success_subtitle),
             continueButtonText = stringResource(
-                R.string.si_smart_selfie_processing_continue_button,
+                R.string.si_continue,
             ),
             onContinue = {},
         )

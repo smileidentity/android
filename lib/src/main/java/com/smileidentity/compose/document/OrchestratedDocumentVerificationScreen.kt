@@ -111,7 +111,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
             continueButtonText =
-            stringResource(R.string.si_smart_selfie_processing_continue_button),
+            stringResource(R.string.si_continue),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
             onRetry = { viewModel.onRetry(captureBothSides) },
