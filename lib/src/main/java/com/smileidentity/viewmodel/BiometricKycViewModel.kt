@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
@@ -17,14 +16,12 @@ import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getExceptionHandler
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import kotlin.time.Duration.Companion.seconds
 
 data class BiometricKycUiState(
     val showLoading: Boolean = true,
@@ -127,17 +124,7 @@ class BiometricKycViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            lateinit var jobStatusResponse: BiometricKycJobStatusResponse
-            val jobStatusPollDelay = 1.seconds
-            for (i in 1..10) {
-                Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
-                delay(jobStatusPollDelay)
-                jobStatusResponse = SmileID.api.getBiometricKycJobStatus(jobStatusRequest)
-                Timber.v("Job Status Response: $jobStatusResponse")
-                if (jobStatusResponse.jobComplete) {
-                    break
-                }
-            }
+            val jobStatusResponse = SmileID.api.getBiometricKycJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
                 BiometricKycResult(
                     selfieFile,
@@ -145,7 +132,6 @@ class BiometricKycViewModel(
                     jobStatusResponse,
                 ),
             )
-
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
     }

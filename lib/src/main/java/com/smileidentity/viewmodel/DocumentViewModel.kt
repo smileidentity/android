@@ -8,7 +8,6 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.Document
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
@@ -25,7 +24,6 @@ import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -35,7 +33,6 @@ import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.time.Duration.Companion.seconds
 
 data class DocumentUiState(
     val frontDocumentImageToConfirm: File? = null,
@@ -171,17 +168,7 @@ class DocumentViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            lateinit var jobStatusResponse: DocVJobStatusResponse
-            val jobStatusPollDelay = 1.seconds
-            for (i in 1..10) {
-                Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
-                delay(jobStatusPollDelay)
-                jobStatusResponse = SmileID.api.getDocVJobStatus(jobStatusRequest)
-                Timber.v("Job Status Response: $jobStatusResponse")
-                if (jobStatusResponse.jobComplete) {
-                    break
-                }
-            }
+            val jobStatusResponse = SmileID.api.getDocVJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
                 DocumentVerificationResult(
                     documentFrontFile = documentFrontFile,

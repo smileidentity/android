@@ -13,6 +13,9 @@
 - Bump Gradle to 8.2
 
 ### Removed
+- Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The 
+  returned `SmileIDResult`s will now contain only the immediate result of job status without waiting
+  for job completion
 
 ## 10.0.0-beta03
 
