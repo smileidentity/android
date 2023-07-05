@@ -37,7 +37,7 @@ retrofit = "2.9.0"
 sentry = "6.24.0"
 timber = "5.0.1"
 truth = "1.1.4"
-uiautomator = "2.3.0-alpha03" # Can we use alpha version on test libs?
+uiautomator = "2.3.0-alpha03"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
