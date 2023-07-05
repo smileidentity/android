@@ -36,12 +36,13 @@ jobs:
           fileName: 'upload.jks'
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
-        # Release Notes consisting of the 10 most recent commits in the format "- [date] message"
+        # Release Notes consisting of the 5 most recent commits in the format "- [date] message"
         # The file name format is dictated by the r0adkll/upload-google-play@v1 action
+        # Max length of 500 characters
       - name: Generate Release notes
         run: |
           mkdir release_notes
-          git log --pretty=format:'- [%ad] %s' --date=short -n 10 > release_notes/whatsnew-en-US
+          git log --pretty=format:'- [%ad] %s' --date=short -n 5 > release_notes/whatsnew-en-US
       - name: Short SHA
         id: short_sha
         run: |
