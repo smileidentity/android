@@ -9,7 +9,8 @@
 ### Fixed
 
 ### Changed
-- Updated docs
+- Updated KDocs
+- Bump Gradle to 8.2
 
 ### Removed
 

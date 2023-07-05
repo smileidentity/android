@@ -82,45 +82,50 @@ mavenPublishing {
     signAllPublications()
     coordinates(groupId, artifactId, project.version.toString())
     pom {
-        name.set("Smile ID Android SDK")
-        description.set("The Official Smile ID Android SDK")
-        url.set("https://docs.smileidentity.com/mobile/android")
+        name = "Smile ID Android SDK"
+        description = "The Official Smile ID Android SDK"
+        url = "https://docs.smileidentity.com/mobile/android"
         licenses {
             license {
-                name.set("Smile ID Terms of Use")
-                url.set("https://smileidentity.com/terms-and-conditions")
-                distribution.set("repo")
+                name = "Smile ID Terms of Use"
+                url = "https://smileidentity.com/terms-and-conditions"
+                distribution = "repo"
+            }
+            license {
+                name = "The MIT License"
+                url = "https://opensource.org/licenses/MIT"
+                distribution = "repo"
             }
         }
         scm {
-            url.set("https://github.com/smileidentity/android")
-            connection.set("scm:git:git://github.com/smileidentity/android.git")
-            developerConnection.set("scm:git:ssh://github.com/smileidentity/android.git")
+            url = "https://github.com/smileidentity/android"
+            connection = "scm:git:git://github.com/smileidentity/android.git"
+            developerConnection = "scm:git:ssh://github.com/smileidentity/android.git"
         }
         developers {
             developer {
-                id.set("vanshg")
-                name.set("Vansh Gandhi")
-                email.set("vansh@smileidentity.com")
-                url.set("https://github.com/vanshg")
-                organization.set("Smile ID")
-                organizationUrl.set("https://smileidentity.com")
+                id = "vanshg"
+                name = "Vansh Gandhi"
+                email = "vansh@smileidentity.com"
+                url = "https://github.com/vanshg"
+                organization = "Smile ID"
+                organizationUrl = "https://smileidentity.com"
             }
             developer {
-                id.set("JNdhlovu")
-                name.set("Japhet Ndhlovu")
-                email.set("japhet@smileidentity.com")
-                url.set("https://github.com/jndhlovu")
-                organization.set("Smile ID")
-                organizationUrl.set("https://smileidentity.com")
+                id = "JNdhlovu"
+                name = "Japhet Ndhlovu"
+                email = "japhet@smileidentity.com"
+                url = "https://github.com/jndhlovu"
+                organization = "Smile ID"
+                organizationUrl = "https://smileidentity.com"
             }
             developer {
-                id.set("jumaallan")
-                name.set("Juma Allan")
-                email.set("juma@smileidentity.com")
-                url.set("https://github.com/jumaallan")
-                organization.set("Smile ID")
-                organizationUrl.set("https://smileidentity.com")
+                id = "jumaallan"
+                name = "Juma Allan"
+                email = "juma@smileidentity.com"
+                url = "https://github.com/jumaallan"
+                organization = "Smile ID"
+                organizationUrl = "https://smileidentity.com"
             }
         }
     }
