@@ -7,6 +7,7 @@
 ### Fixed
 
 ### Changed
+- Bump Gradle to 8.2
 
 ### Removed
 
