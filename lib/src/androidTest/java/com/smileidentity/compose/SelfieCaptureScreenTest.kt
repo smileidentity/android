@@ -11,15 +11,17 @@ import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import com.smileidentity.SmileID
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import com.google.common.truth.Truth.assertThat
 import com.smileidentity.compose.selfie.SelfieCaptureScreen
 import com.smileidentity.viewmodel.SelfieViewModel
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
-import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -31,21 +33,27 @@ class SelfieCaptureScreenTest {
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @OptIn(ExperimentalPermissionsApi::class)
+    private lateinit var permissionState: PermissionState
+
+    @OptIn(ExperimentalPermissionsApi::class)
     @Test
     fun shouldShowPreviewWhenPermissionsGranted() {
         // given
-        val permissionState = mockk<PermissionState>(relaxed = true)
-        every { permissionState.status.isGranted } returns true
         val cameraPreviewTag = "selfie_camera_preview"
 
         // when
-        composeTestRule.setContent { SmileID.SmartSelfieEnrollment() }
+        composeTestRule.setContent {
+            permissionState = rememberPermissionState(Manifest.permission.CAMERA)
+            SelfieCaptureScreen()
+        }
 
         // then
-        verify(exactly = 0) { permissionState.launchPermissionRequest() }
+        assertThat(permissionState.status.isGranted).isTrue()
+        assertThat(permissionState.status.shouldShowRationale).isFalse()
         composeTestRule.onNodeWithTag(cameraPreviewTag).assertIsDisplayed()
     }
 
+    @Ignore("Ignored because we have attribution disabled")
     @Test
     fun attributionShouldBeDisplayed() {
         // given
@@ -113,7 +121,7 @@ class SelfieCaptureScreenTest {
     @Test
     fun shouldShowDirective() {
         // given
-        val directiveSubstring = "Smile for the camera"
+        val directiveSubstring = "Put your face inside the oval frame and wait until it turns green"
 
         // when
         composeTestRule.setContent { SelfieCaptureScreen() }
