@@ -18,5 +18,5 @@ tasks.create("clean", Delete::class.java) {
 }
 
 ktlint {
-    android.set(true)
+    android = true
 }
