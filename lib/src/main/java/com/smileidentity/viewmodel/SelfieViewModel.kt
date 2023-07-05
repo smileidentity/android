@@ -108,7 +108,6 @@ class SelfieViewModel(
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
         setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-        // TODO: setMinFaceSize(MIN_FACE_AREA_THRESHOLD)
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 

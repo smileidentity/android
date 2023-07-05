@@ -116,8 +116,7 @@ fun SmileID.SmartSelfieAuthentication(
  *
  * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/document-verification)
  *
- * @param idType The type of ID to be captured. If not specified, it will be automatically
- * classified on the backend. Use this to restrict which ID type can be captured.
+ * @param idType The type of ID to be captured
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, it will be
  * inferred from the enforced ID type (if provided). If neither are provided, the aspect ratio will
  * attempt to be inferred from the device's camera. If that fails, it will default to 1.6.

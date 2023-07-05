@@ -11,9 +11,6 @@ import kotlinx.parcelize.Parcelize
  * @param aspectRatio The aspect ratio of the document. Defaults to 3.375f / 2.125f (1.59), which is
  * the standard ID Card and Credit Card size
  */
-// TODO: Should this be consolidated with IdType (used for Enhanced KYC)? This would entail not
-//  applying orientation to certain types (i.e. BVN, Phone number). It would also entail adding
-//  supportsBasicKyc, supportsEnhancedKyc, supportsBiometricKyc, and supportsDocV as properties
 @Parcelize
 data class Document(
     val countryCode: String,

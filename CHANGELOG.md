@@ -3,10 +3,13 @@
 ## 10.0.0-beta04 (unreleased)
 
 ### Added
+- Biometric KYC Fragment
+- Made IdInfo Parcelable
 
 ### Fixed
 
 ### Changed
+- Updated KDocs
 - Bump Gradle to 8.2
 
 ### Removed
