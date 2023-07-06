@@ -43,10 +43,9 @@ internal fun OrchestratedSelfieCaptureScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     when {
-        showInstructions -> SmartSelfieInstructionsScreen(
+        showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
             showAttribution = showAttribution,
         ) {
-            // TODO - Do we really use this anywhere? Or we can just delete the callback?
             acknowledgedInstructions = true
         }
 
