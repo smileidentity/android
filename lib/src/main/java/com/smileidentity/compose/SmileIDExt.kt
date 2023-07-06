@@ -40,7 +40,7 @@ import java.net.URL
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
- * @param showCaptureWithInstructions Whether to deactivate capture screen's instructions for
+ * @param showInstructions Whether to deactivate capture screen's instructions for
  * SmartSelfie.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
@@ -54,7 +54,7 @@ fun SmileID.SmartSelfieEnrollment(
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    showCaptureWithInstructions: Boolean = true,
+    showInstructions: Boolean = true,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
@@ -66,7 +66,7 @@ fun SmileID.SmartSelfieEnrollment(
             isEnroll = true,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
-            showCaptureWithInstructions = showCaptureWithInstructions,
+            showInstructions = showInstructions,
             onResult = onResult,
         )
     }
@@ -136,7 +136,7 @@ fun SmileID.SmartSelfieAuthentication(
  * generated
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
- * @param showCaptureWithInstructions Whether to deactivate capture screen's instructions for
+ * @param showInstructions Whether to deactivate capture screen's instructions for
  * Document Verification.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
@@ -154,7 +154,7 @@ fun SmileID.DocumentVerification(
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
-    showCaptureWithInstructions: Boolean = false,
+    showInstructions: Boolean = false,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
@@ -166,7 +166,7 @@ fun SmileID.DocumentVerification(
             jobId = jobId,
             showAttribution = showAttribution,
             allowGalleryUpload = allowGalleryUpload,
-            showCaptureWithInstructions = showCaptureWithInstructions,
+            showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
             captureBothSides = captureBothSides,
             bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,

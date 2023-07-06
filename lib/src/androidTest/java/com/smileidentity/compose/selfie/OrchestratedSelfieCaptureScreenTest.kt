@@ -30,7 +30,7 @@ class OrchestratedSelfieCaptureScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedSelfieCaptureScreen(
-                showCaptureWithInstructions = false,
+                showInstructions = false,
             )
         }
 

@@ -34,7 +34,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     allowAgentMode: Boolean = false,
     skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
-    showCaptureWithInstructions: Boolean = true,
+    showInstructions: Boolean = true,
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
     ),
@@ -43,7 +43,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     when {
-        showCaptureWithInstructions -> SmartSelfieInstructionsScreen(
+        showInstructions -> SmartSelfieInstructionsScreen(
             showAttribution = showAttribution,
         ) {
             // TODO - Do we really use this anywhere? Or we can just delete the callback?

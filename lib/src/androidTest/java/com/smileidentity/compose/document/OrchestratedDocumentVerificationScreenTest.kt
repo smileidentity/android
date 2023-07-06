@@ -38,7 +38,7 @@ class OrchestratedDocumentVerificationScreenTest {
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
                 idType = document,
-                showCaptureWithInstructions = false,
+                showInstructions = false,
             )
         }
 
