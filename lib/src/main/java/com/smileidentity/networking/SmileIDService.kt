@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.smileidentity.networking
 
 import com.smileidentity.models.AuthenticationRequest
@@ -7,6 +9,7 @@ import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
+import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
@@ -14,13 +17,16 @@ import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.ServicesResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.UploadRequest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Url
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-@Suppress("unused")
 interface SmileIDService {
     /**
      * Returns a signature and timestamp that can be used to authenticate future requests. This is
@@ -89,4 +95,84 @@ interface SmileIDService {
 
     @GET("/v1/services")
     suspend fun getServices(): ServicesResponse
+}
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+suspend fun SmileIDService.pollSmartSelfieJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getSmartSelfieJobStatus(request) }
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+suspend fun SmileIDService.pollDocVJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getDocVJobStatus(request) }
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+suspend fun SmileIDService.pollBiometricKycJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getBiometricKycJobStatus(request) }
+
+/**
+ * This uses a generics (as compared to the interface as the return type of [action] directly) so
+ * that the higher level callers (defined above) have a concrete return type
+ */
+private suspend fun <T : JobStatusResponse> poll(
+    interval: Duration,
+    numAttempts: Int,
+    action: suspend () -> T,
+) = flow {
+    var latestError: Exception? = null
+    for (i in 1 until numAttempts) {
+        try {
+            val response = action()
+            emit(response)
+
+            // Reset the error if the API response was successful
+            latestError = null
+
+            if (response.jobComplete) {
+                break
+            }
+        } catch (e: Exception) {
+            latestError = e
+        }
+        delay(interval)
+    }
+    latestError?.let { throw it }
 }

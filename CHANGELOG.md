@@ -6,12 +6,14 @@
 - Biometric KYC Fragment
 - Made IdInfo Parcelable
 - Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
+- Add a `JobStatusResponse` interface
 
 ### Fixed
 
 ### Changed
 - Updated KDocs
 - Bump Gradle to 8.2
+- Updated API key exception error message to be actionable
 
 ### Removed
 - Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The 
