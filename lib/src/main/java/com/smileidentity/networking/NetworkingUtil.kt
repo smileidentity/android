@@ -40,16 +40,16 @@ fun UploadRequest.zip(): File {
 }
 
 fun File.asSelfieImage() = UploadImageInfo(
-    imageTypeId = ImageType.SelfiePngOrJpgFile,
+    imageTypeId = ImageType.SelfieJpgFile,
     image = this,
 )
 
 fun File.asLivenessImage() = UploadImageInfo(
-    imageTypeId = ImageType.LivenessPngOrJpgFile,
+    imageTypeId = ImageType.LivenessJpgFile,
     image = this,
 )
 
 fun File.asDocumentImage() = UploadImageInfo(
-    imageTypeId = ImageType.IdCardPngOrJpgFile,
+    imageTypeId = ImageType.IdCardJpgFile,
     image = this,
 )
