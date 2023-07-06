@@ -293,7 +293,7 @@ class SelfieViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getJobStatus(jobStatusRequest)
+            val jobStatusResponse = SmileID.api.getSmartSelfieJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
                 SmartSelfieResult(
                     selfieFile,

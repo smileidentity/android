@@ -7,12 +7,12 @@ import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
-import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.ServicesResponse
+import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -59,7 +59,9 @@ interface SmileIDService {
      * SmartSelfie Authentication/Registration.
      */
     @POST("/v1/job_status")
-    suspend fun getJobStatus(@Body request: JobStatusRequest): JobStatusResponse
+    suspend fun getSmartSelfieJobStatus(
+        @Body request: JobStatusRequest,
+    ): SmartSelfieJobStatusResponse
 
     /**
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,

@@ -5,7 +5,7 @@ import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
-import com.smileidentity.models.JobStatusResponse
+import com.smileidentity.models.SmartSelfieJobStatusResponse
 import kotlinx.parcelize.Parcelize
 import java.io.File
 
@@ -28,9 +28,9 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
      * The flow was successful. The result is the value of type [T].
      *
      * NB! The Job itself may or may not be complete yet. This can be checked with
-     * [com.smileidentity.models.JobStatusResponse.jobComplete]. If not yet complete, the job status
-     * will need to be fetched again later. If the job is complete, the final job success can be
-     * checked with [com.smileidentity.models.JobStatusResponse.jobSuccess].
+     * [com.smileidentity.models.SmartSelfieJobStatusResponse.jobComplete]. If not yet complete, the
+     * job status will need to be fetched again later. If the job is complete, the final job success
+     * can be checked with [com.smileidentity.models.SmartSelfieJobStatusResponse.jobSuccess].
      */
     @Parcelize
     data class Success<T : Parcelable>(val data: T) : SmileIDResult<T>
@@ -46,9 +46,9 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
 /**
  * The result of a SmartSelfie capture and submission to the Smile ID API. Indicates that the selfie
  * capture and network requests were successful. The Job itself may or may not be complete yet. This
- * can be checked with [JobStatusResponse.jobComplete]. If not yet complete, the job status will
- * need to be fetched again later. If the job is complete, the final job success can be checked with
- * [JobStatusResponse.jobSuccess].
+ * can be checked with [SmartSelfieJobStatusResponse.jobComplete]. If not yet complete, the job
+ * status will need to be fetched again later. If the job is complete, the final job success can be
+ * checked with [SmartSelfieJobStatusResponse.jobSuccess].
  *
  * If [jobStatusResponse] is null, that means submission to the API was skipped
  */
@@ -56,7 +56,7 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
 data class SmartSelfieResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: JobStatusResponse?,
+    val jobStatusResponse: SmartSelfieJobStatusResponse?,
 ) : Parcelable
 
 /**

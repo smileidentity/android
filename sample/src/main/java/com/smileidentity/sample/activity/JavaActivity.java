@@ -13,7 +13,7 @@ import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
 import com.smileidentity.models.Document;
-import com.smileidentity.models.JobStatusResponse;
+import com.smileidentity.models.SmartSelfieJobStatusResponse;
 import com.smileidentity.results.DocumentVerificationResult;
 import com.smileidentity.results.SmartSelfieResult;
 import com.smileidentity.results.SmileIDResult;
@@ -59,7 +59,7 @@ public class JavaActivity extends FragmentActivity {
                 if (smartSelfieResult instanceof SmileIDResult.Success<SmartSelfieResult> successResult) {
                     File selfieFile = successResult.getData().getSelfieFile();
                     List<File> livenessFiles = successResult.getData().getLivenessFiles();
-                    JobStatusResponse jobStatusResponse = successResult.getData().getJobStatusResponse();
+                    SmartSelfieJobStatusResponse jobStatusResponse = successResult.getData().getJobStatusResponse();
                     // Note: Although the API submission is successful, the job status response
                     // may indicate that the job is still in progress or failed. You should
                     // check the job status response to determine the final status of the job.

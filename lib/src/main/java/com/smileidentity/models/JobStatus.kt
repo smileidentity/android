@@ -24,7 +24,7 @@ data class JobStatusRequest(
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class JobStatusResponse(
+data class SmartSelfieJobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
     @Json(name = "job_complete") val jobComplete: Boolean,
     @Json(name = "job_success") val jobSuccess: Boolean,
