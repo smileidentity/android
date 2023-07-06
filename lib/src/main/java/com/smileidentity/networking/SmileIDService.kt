@@ -158,7 +158,7 @@ private suspend fun <T : JobStatusResponse> poll(
     action: suspend () -> T,
 ) = flow {
     var latestError: Exception? = null
-    for (i in 1 until numAttempts) {
+    for (i in 1..numAttempts) {
         try {
             val response = action()
             emit(response)
