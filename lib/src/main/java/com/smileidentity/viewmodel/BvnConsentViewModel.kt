@@ -3,8 +3,8 @@ package com.smileidentity.viewmodel
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import com.smileidentity.R
-import com.smileidentity.consent.bvn.BvnConsentEvent
-import com.smileidentity.consent.bvn.OtpDeliveryMode
+import com.smileidentity.compose.consent.bvn.BvnConsentEvent
+import com.smileidentity.compose.consent.bvn.OtpDeliveryMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
@@ -48,7 +48,11 @@ class BvnConsentViewModel : ViewModel() {
     }
 
     private fun setBvn(bvn: String) {
-        _uiState.update { it.copy(bvn = bvn) }
+        // Do network call here
+        _uiState.update { it.copy(
+            bvn = bvn,
+            showDeliveryMode = true
+        ) }
     }
 
     private fun requestBvnConsentOtp(otpDeliveryMode: OtpDeliveryMode) {

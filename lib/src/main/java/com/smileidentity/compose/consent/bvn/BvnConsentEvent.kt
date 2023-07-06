@@ -1,4 +1,4 @@
-package com.smileidentity.consent.bvn
+package com.smileidentity.compose.consent.bvn
 
 sealed class BvnConsentEvent {
     class SubmitBVNMode(val bvn: String) : BvnConsentEvent()

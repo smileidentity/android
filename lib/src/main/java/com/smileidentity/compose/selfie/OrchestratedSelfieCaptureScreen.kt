@@ -63,7 +63,7 @@ internal fun OrchestratedSelfieCaptureScreen(
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
             continueButtonText = stringResource(
-                R.string.si_smart_selfie_processing_continue_button,
+                R.string.si_continue,
             ),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),

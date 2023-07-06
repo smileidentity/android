@@ -1,4 +1,4 @@
-package com.smileidentity.consent.bvn
+package com.smileidentity.compose.consent.bvn
 
 import android.os.CountDownTimer
 import androidx.annotation.DrawableRes
@@ -55,9 +55,8 @@ import com.smileidentity.viewmodel.viewModelFactory
 @Composable
 fun BvnConsentScreen(
     partnerIcon: Painter,
+    bvnDeliveryOptionsList: List<BvnDeliveryOptions>,
     modifier: Modifier = Modifier,
-    bvnDeliveryOptionsList: List<BvnDeliveryOptions> = listOf(), // TODO remove this later (easy to
-    // run without passing any list)
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel()
@@ -75,8 +74,7 @@ fun BvnConsentScreen(
                 countdown = otpExpiresIn / 1000
             }
 
-            override fun onFinish() {
-            }
+            override fun onFinish() {}
         }
 
     DisposableEffect(key1 = "key") {
@@ -177,7 +175,7 @@ fun BvnConsentScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(id = R.string.si_bvn_consent_otp_timer),
+                        text = stringResource(id = R.string.si_bvn_consent_otp_timer, countdown),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
@@ -347,12 +345,12 @@ private fun BvnConsentScreenPreview() {
                 BvnDeliveryOptions(
                     icon = R.drawable.si_logo_with_text,
                     otpDelivery = "email@example.com",
-                    deliveryDescription = R.string.si_continue,
+                    deliveryDescription = R.string.si_bvn_consent_bvn_delivery_method_email,
                 ),
                 BvnDeliveryOptions(
                     icon = R.drawable.si_camera_capture,
                     otpDelivery = "+254789564875",
-                    deliveryDescription = R.string.si_continue,
+                    deliveryDescription = R.string.si_bvn_consent_bvn_delivery_method_sms,
                 ),
             ),
         )
