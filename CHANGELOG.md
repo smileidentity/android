@@ -5,6 +5,7 @@
 ### Added
 - Biometric KYC Fragment
 - Made IdInfo Parcelable
+- Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
 
 ### Fixed
 
