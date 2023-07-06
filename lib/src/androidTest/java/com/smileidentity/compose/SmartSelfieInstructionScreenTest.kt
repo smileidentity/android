@@ -7,11 +7,10 @@ import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import com.google.common.truth.Truth.assertThat
 import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
-import io.mockk.every
-import io.mockk.mockk
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,21 +22,45 @@ class SmartSelfieInstructionScreenTest {
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @OptIn(ExperimentalPermissionsApi::class)
+    private lateinit var permissionState: PermissionState
+
+    @OptIn(ExperimentalPermissionsApi::class)
     @Test
-    fun shouldInvokeCallbackOnButtonClick() {
+    fun shouldInvokeCallbackOnButtonClickAndPermissionGranted() {
         // given
-        val permissionState = mockk<PermissionState>(relaxed = true)
-        every { permissionState.status } returns PermissionStatus.Granted
         var callbackInvoked = false
         val onInstructionsAcknowledged = { callbackInvoked = true }
 
         // when
         composeTestRule.setContent {
+            permissionState = rememberPermissionState(Manifest.permission.CAMERA)
             SmartSelfieInstructionsScreen(onInstructionsAcknowledged = onInstructionsAcknowledged)
         }
-        composeTestRule.onNodeWithTag("readyButton").performClick()
+        composeTestRule.onNodeWithTag("smart_selfie_instructions_ready_button").performClick()
+        grantPermissionInDialog()
 
         // then
-        assertTrue(callbackInvoked)
+        assertThat(permissionState.status.shouldShowRationale).isFalse()
+        assertThat(callbackInvoked).isTrue()
+    }
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    @Test
+    fun shouldInvokeCallbackOnButtonClickAndPermissionDenied() {
+        // given
+        var callbackInvoked = false
+        val onInstructionsAcknowledged = { callbackInvoked = true }
+
+        // when
+        composeTestRule.setContent {
+            permissionState = rememberPermissionState(Manifest.permission.CAMERA)
+            SmartSelfieInstructionsScreen(onInstructionsAcknowledged = onInstructionsAcknowledged)
+        }
+        composeTestRule.onNodeWithTag("smart_selfie_instructions_ready_button").performClick()
+        denyPermissionInDialog()
+
+        // then
+        assertThat(permissionState.status.shouldShowRationale).isFalse()
+        assertThat(callbackInvoked).isTrue()
     }
 }
