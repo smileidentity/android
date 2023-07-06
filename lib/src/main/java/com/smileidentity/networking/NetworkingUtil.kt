@@ -13,7 +13,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 fun calculateSignature(timestamp: String): String {
-    val apiKey = SmileID.apiKey ?: throw IllegalStateException("API key not set")
+    val apiKey = SmileID.apiKey ?: throw IllegalStateException(
+        """API key not set. If using the authToken from smile_config.json, ensure you have set the 
+        |signature/timestamp properties on the request from the values returned by 
+        |SmileID.authenticate.signature/timestamp
+        """.trimMargin().replace("\n", ""),
+    )
     val hashContent = timestamp + SmileID.config.partnerId + "sid_request"
     return hashContent.encode().hmacSha256(apiKey.encode()).base64()
 }
