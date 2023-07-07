@@ -5,14 +5,21 @@
 ### Added
 - Biometric KYC Fragment
 - Made IdInfo Parcelable
+- Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
+- Add a `JobStatusResponse` interface
 
 ### Fixed
 
 ### Changed
 - Updated KDocs
 - Bump Gradle to 8.2
+- Updated API key exception error message to be actionable
+- Rename `ImageType` enums to indicate PNGs are no longer supported 
 
 ### Removed
+- Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The 
+  returned `SmileIDResult`s will now contain only the immediate result of job status without waiting
+  for job completion
 
 ## 10.0.0-beta03
 

@@ -22,41 +22,46 @@ data class JobStatusRequest(
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 ) : Parcelable
 
+// TODO: Add other fields once Moshi is confirmed to be working
+interface JobStatusResponse {
+    val jobComplete: Boolean
+}
+
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class JobStatusResponse(
+data class SmartSelfieJobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "job_complete") val jobComplete: Boolean,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") val jobSuccess: Boolean,
     @Json(name = "code") val code: Int,
     @Json(name = "result") val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.Entry>?,
     @Json(name = "image_links") val imageLinks: ImageLinks?,
-) : Parcelable
+) : JobStatusResponse, Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class DocVJobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "job_complete") val jobComplete: Boolean,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") val jobSuccess: Boolean,
     @Json(name = "code") val code: Int,
     @Json(name = "result") val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.DocVEntry>?,
     @Json(name = "image_links") val imageLinks: ImageLinks?,
-) : Parcelable
+) : JobStatusResponse, Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class BiometricKycJobStatusResponse(
     @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "job_complete") val jobComplete: Boolean,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") val jobSuccess: Boolean,
     @Json(name = "code") val code: Int,
     @Json(name = "result") val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.BiometricKycEntry>?,
     @Json(name = "image_links") val imageLinks: ImageLinks?,
-) : Parcelable
+) : JobStatusResponse, Parcelable
 
 /**
  * The job result might sometimes be a freeform text field instead of an object (i.e. when the

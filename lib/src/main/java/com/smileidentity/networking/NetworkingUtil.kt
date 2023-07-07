@@ -13,7 +13,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 fun calculateSignature(timestamp: String): String {
-    val apiKey = SmileID.apiKey ?: throw IllegalStateException("API key not set")
+    val apiKey = SmileID.apiKey ?: throw IllegalStateException(
+        """API key not set. If using the authToken from smile_config.json, ensure you have set the 
+        |signature/timestamp properties on the request from the values returned by 
+        |SmileID.authenticate.signature/timestamp
+        """.trimMargin().replace("\n", ""),
+    )
     val hashContent = timestamp + SmileID.config.partnerId + "sid_request"
     return hashContent.encode().hmacSha256(apiKey.encode()).base64()
 }
@@ -40,16 +45,16 @@ fun UploadRequest.zip(): File {
 }
 
 fun File.asSelfieImage() = UploadImageInfo(
-    imageTypeId = ImageType.SelfiePngOrJpgFile,
+    imageTypeId = ImageType.SelfieJpgFile,
     image = this,
 )
 
 fun File.asLivenessImage() = UploadImageInfo(
-    imageTypeId = ImageType.LivenessPngOrJpgFile,
+    imageTypeId = ImageType.LivenessJpgFile,
     image = this,
 )
 
 fun File.asDocumentImage() = UploadImageInfo(
-    imageTypeId = ImageType.IdCardPngOrJpgFile,
+    imageTypeId = ImageType.IdCardJpgFile,
     image = this,
 )
