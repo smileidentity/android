@@ -108,7 +108,7 @@ interface SmileIDService {
  * @param interval The interval between each poll
  * @param numAttempts The number of times to poll before giving up
  */
-suspend fun SmileIDService.pollSmartSelfieJobStatus(
+fun SmileIDService.pollSmartSelfieJobStatus(
     request: JobStatusRequest,
     interval: Duration = 1.seconds,
     numAttempts: Int = 30,
@@ -125,7 +125,7 @@ suspend fun SmileIDService.pollSmartSelfieJobStatus(
  * @param interval The interval between each poll
  * @param numAttempts The number of times to poll before giving up
  */
-suspend fun SmileIDService.pollDocVJobStatus(
+fun SmileIDService.pollDocVJobStatus(
     request: JobStatusRequest,
     interval: Duration = 1.seconds,
     numAttempts: Int = 30,
@@ -142,7 +142,7 @@ suspend fun SmileIDService.pollDocVJobStatus(
  * @param interval The interval between each poll
  * @param numAttempts The number of times to poll before giving up
  */
-suspend fun SmileIDService.pollBiometricKycJobStatus(
+fun SmileIDService.pollBiometricKycJobStatus(
     request: JobStatusRequest,
     interval: Duration = 1.seconds,
     numAttempts: Int = 30,
@@ -152,15 +152,15 @@ suspend fun SmileIDService.pollBiometricKycJobStatus(
  * This uses a generics (as compared to the interface as the return type of [action] directly) so
  * that the higher level callers (defined above) have a concrete return type
  */
-private suspend fun <T : JobStatusResponse> poll(
+internal fun <T : JobStatusResponse> poll(
     interval: Duration,
     numAttempts: Int,
-    action: suspend () -> T,
+    action: suspend (attempt: Int) -> T,
 ) = flow {
     var latestError: Exception? = null
-    for (i in 1..numAttempts) {
+    for (attempt in 0 until numAttempts) {
         try {
-            val response = action()
+            val response = action(attempt)
             emit(response)
 
             // Reset the error if the API response was successful
