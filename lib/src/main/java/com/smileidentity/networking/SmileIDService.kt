@@ -158,6 +158,10 @@ fun SmileIDService.pollBiometricKycJobStatus(
  * It is recommended to collect this flow with [kotlinx.coroutines.flow.collectLatest] (note: if
  * consuming slower than this is producing, the consumer coroutine will continue getting cancelled
  * until the last value) since the flow will complete when the job is complete
+ *
+ * Alternatively, [kotlinx.coroutines.flow.collect] can be used along with
+ * [kotlinx.coroutines.flow.conflate] to drop older, non-consumed values when newer values are
+ * present
  */
 internal fun <T : JobStatusResponse> poll(
     interval: Duration,
