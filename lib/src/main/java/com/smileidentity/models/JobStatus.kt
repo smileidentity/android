@@ -189,6 +189,12 @@ data class Actions(
 
     @Json(name = "Verify_ID_Number")
     val verifyIdNumber: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Human_Review_Document_Check")
+    val humanReviewDocumentCheck: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Document_Check")
+    val documentCheck: ActionResult = ActionResult.NotApplicable,
 ) : Parcelable
 
 @FallbackEnum(name = "Unknown")
