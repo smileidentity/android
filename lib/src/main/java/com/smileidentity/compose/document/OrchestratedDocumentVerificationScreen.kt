@@ -295,6 +295,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             isEnroll = false,
             allowAgentMode = false,
             showAttribution = showAttribution,
+            showInstructions = showInstructions,
             skipApiSubmission = true,
         ) {
             when (it) {
