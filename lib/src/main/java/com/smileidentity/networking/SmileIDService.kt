@@ -18,7 +18,7 @@ import com.smileidentity.models.ServicesResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.UploadRequest
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -151,19 +151,26 @@ fun SmileIDService.pollBiometricKycJobStatus(
 /**
  * This uses a generics (as compared to the interface as the return type of [action] directly) so
  * that the higher level callers (defined above) have a concrete return type
+ *
+ * [channelFlow] is used instead of [kotlinx.coroutines.flow.flow] so that API calls continue to be
+ * made when the consumer processes slower than the producer
+ *
+ * It is recommended to collect this flow with [kotlinx.coroutines.flow.collectLatest] (note: if
+ * consuming slower than this is producing, the consumer coroutine will continue getting cancelled
+ * until the last value) since the flow will complete when the job is complete
  */
 internal fun <T : JobStatusResponse> poll(
     interval: Duration,
     numAttempts: Int,
     action: suspend (attempt: Int) -> T,
-) = flow {
+) = channelFlow {
     var latestError: Exception? = null
     // TODO: Replace `until` with `..<` once ktlint-gradle plugin stops throwing an exception for it
     //  see: https://github.com/JLLeitschuh/ktlint-gradle/issues/692
     for (attempt in 0 until numAttempts) {
         try {
             val response = action(attempt)
-            emit(response)
+            send(response)
 
             // Reset the error if the API response was successful
             latestError = null

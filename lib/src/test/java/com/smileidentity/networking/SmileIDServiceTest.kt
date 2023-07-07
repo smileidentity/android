@@ -78,6 +78,6 @@ class SmileIDServiceTest {
         }
 
         // then
-        assertEquals(expectedException, error)
+        assertEquals(expectedException.message, error?.message)
     }
 }
