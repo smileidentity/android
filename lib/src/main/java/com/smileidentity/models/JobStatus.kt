@@ -145,8 +145,14 @@ data class SuspectUser(
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class Actions(
+    @Json(name = "Document_Check")
+    val documentCheck: ActionResult = ActionResult.NotApplicable,
+
     @Json(name = "Human_Review_Compare")
     val humanReviewCompare: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Human_Review_Document_Check")
+    val humanReviewDocumentCheck: ActionResult = ActionResult.NotApplicable,
 
     @Json(name = "Human_Review_Liveness_Check")
     val humanReviewLivenessCheck: ActionResult = ActionResult.NotApplicable,
@@ -160,14 +166,14 @@ data class Actions(
     @Json(name = "Liveness_Check")
     val livenessCheck: ActionResult = ActionResult.NotApplicable,
 
-    @Json(name = "Selfie_Check")
-    val selfieCheck: ActionResult = ActionResult.NotApplicable,
-
     @Json(name = "Register_Selfie")
     val registerSelfie: ActionResult = ActionResult.NotApplicable,
 
     @Json(name = "Return_Personal_Info")
     val returnPersonalInfo: ActionResult = ActionResult.NotApplicable,
+
+    @Json(name = "Selfie_Check")
+    val selfieCheck: ActionResult = ActionResult.NotApplicable,
 
     @Json(name = "Selfie_Provided")
     val selfieProvided: ActionResult = ActionResult.NotApplicable,
@@ -189,12 +195,6 @@ data class Actions(
 
     @Json(name = "Verify_ID_Number")
     val verifyIdNumber: ActionResult = ActionResult.NotApplicable,
-
-    @Json(name = "Human_Review_Document_Check")
-    val humanReviewDocumentCheck: ActionResult = ActionResult.NotApplicable,
-
-    @Json(name = "Document_Check")
-    val documentCheck: ActionResult = ActionResult.NotApplicable,
 ) : Parcelable
 
 @FallbackEnum(name = "Unknown")
