@@ -5,6 +5,7 @@
 ### Added
 - Biometric KYC Fragment
 - Made IdInfo Parcelable
+- Option to disable Instructions Screen on Document Verification and SmartSelfie™
 
 ### Fixed
 
