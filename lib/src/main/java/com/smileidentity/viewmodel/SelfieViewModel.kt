@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,10 +53,13 @@ private const val TOTAL_STEPS = NUM_LIVENESS_IMAGES + 1 // 7 B&W Liveness + 1 Co
 private val LIVENESS_IMAGE_SIZE = Size(256, 256)
 private val SELFIE_IMAGE_SIZE = Size(320, 320)
 private const val NO_FACE_RESET_DELAY_MS = 3000
-private const val FACE_ROTATION_THRESHOLD = 0.75f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
 const val MAX_FACE_AREA_THRESHOLD = 0.25f
-private const val SMILE_THRESHOLD = 0.8f
+const val LOOKING_LEFT_THRESHOLD = 15
+const val LOOKING_RIGHT_THRESHOLD = -15
+const val LOOKING_UP_THRESHOLD = 15
+const val LOOKING_DOWN_THRESHOLD = -15
+const val LOOKING_STRAIGHT_AHEAD_THRESHOLD = 10
 
 data class SelfieUiState(
     val currentDirective: Directive = Directive.InitialInstruction,
@@ -69,12 +71,48 @@ data class SelfieUiState(
 
 enum class Directive(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),
-    Capturing(R.string.si_smart_selfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smart_selfie_directive_unable_to_detect_face),
     EnsureOnlyOneFace(R.string.si_smart_selfie_directive_multiple_faces),
     MoveCloser(R.string.si_smart_selfie_directive_face_too_far),
     MoveAway(R.string.si_smart_selfie_directive_face_too_close),
-    Smile(R.string.si_smart_selfie_directive_smile),
+    LookLeft(R.string.si_smart_selfie_directive_look_left),
+    LookRight(R.string.si_smart_selfie_directive_look_right),
+    LookUp(R.string.si_smart_selfie_directive_look_up),
+    LookDown(R.string.si_smart_selfie_directive_look_down),
+    LookStraightAhead(R.string.si_smart_selfie_directive_look_straight_ahead),
+}
+
+enum class LivenessState(val nextState: LivenessState?, val directive: Directive) {
+    // If we put StraightAhead as the nextState, it will silently result in a null, even though the
+    // type is declared as non-null -- and no warnings would be shown. This is one of the few,
+    // sneaky ways that nullable references can show up in Kotlin.
+    // see: https://stackoverflow.com/a/68867288
+    StraightAhead(null, Directive.LookStraightAhead) {
+        override fun isLookingInTheCorrectDirection(face: Face) =
+            face.headEulerAngleX < LOOKING_STRAIGHT_AHEAD_THRESHOLD &&
+                face.headEulerAngleX > -LOOKING_STRAIGHT_AHEAD_THRESHOLD &&
+                face.headEulerAngleY < LOOKING_STRAIGHT_AHEAD_THRESHOLD &&
+                face.headEulerAngleY > -LOOKING_STRAIGHT_AHEAD_THRESHOLD
+    },
+    Down(StraightAhead, Directive.LookDown) {
+        override fun isLookingInTheCorrectDirection(face: Face) =
+            face.headEulerAngleX < LOOKING_DOWN_THRESHOLD
+    },
+    Up(Down, Directive.LookUp) {
+        override fun isLookingInTheCorrectDirection(face: Face) =
+            face.headEulerAngleX > LOOKING_UP_THRESHOLD
+    },
+    Right(Up, Directive.LookRight) {
+        override fun isLookingInTheCorrectDirection(face: Face) =
+            face.headEulerAngleY > LOOKING_RIGHT_THRESHOLD
+    },
+    Left(Right, Directive.LookLeft) {
+        override fun isLookingInTheCorrectDirection(face: Face) =
+            face.headEulerAngleY < LOOKING_LEFT_THRESHOLD
+    },
+    ;
+
+    abstract fun isLookingInTheCorrectDirection(face: Face): Boolean
 }
 
 class SelfieViewModel(
@@ -97,9 +135,9 @@ class SelfieViewModel(
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
-    private var previousHeadRotationX = Float.POSITIVE_INFINITY
-    private var previousHeadRotationY = Float.POSITIVE_INFINITY
-    private var previousHeadRotationZ = Float.POSITIVE_INFINITY
+
+    @Volatile
+    private var currentLivenessState = LivenessState.Left
 
     @VisibleForTesting
     internal var shouldAnalyzeImages = true
@@ -107,7 +145,7 @@ class SelfieViewModel(
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
-        setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+        setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
@@ -172,24 +210,11 @@ class SelfieViewModel(
                 return@addOnSuccessListener
             }
 
-            // Ask the user to start smiling partway through liveness images
-            val isSmiling = (face.smilingProbability ?: 0f) > SMILE_THRESHOLD
-            if (livenessFiles.size > NUM_LIVENESS_IMAGES / 2 && !isSmiling) {
-                _uiState.update { it.copy(currentDirective = Directive.Smile) }
+            _uiState.update { it.copy(currentDirective = currentLivenessState.directive) }
+
+            if (!currentLivenessState.isLookingInTheCorrectDirection(face)) {
                 return@addOnSuccessListener
             }
-
-            _uiState.update { it.copy(currentDirective = Directive.Capturing) }
-
-            // Perform the rotation checks *after* changing directive to Capturing -- we don't want
-            // to explicitly tell the user to move their head
-            if (!hasFaceRotatedEnough(face)) {
-                Timber.v("Not enough face rotation between captures. Waiting...")
-                return@addOnSuccessListener
-            }
-            previousHeadRotationX = face.headEulerAngleX
-            previousHeadRotationY = face.headEulerAngleY
-            previousHeadRotationZ = face.headEulerAngleZ
 
             // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap.
             //  Incorporate once stable
@@ -207,6 +232,9 @@ class SelfieViewModel(
                         maxOutputSize = LIVENESS_IMAGE_SIZE,
                     )
                     livenessFiles.add(livenessFile)
+                    currentLivenessState.nextState?.let {
+                        currentLivenessState = it
+                    }
                     _uiState.update {
                         it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat())
                     }
@@ -237,15 +265,6 @@ class SelfieViewModel(
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
         }
-    }
-
-    private fun hasFaceRotatedEnough(face: Face): Boolean {
-        val rotationXDelta = (face.headEulerAngleX - previousHeadRotationX).absoluteValue
-        val rotationYDelta = (face.headEulerAngleY - previousHeadRotationY).absoluteValue
-        val rotationZDelta = (face.headEulerAngleZ - previousHeadRotationZ).absoluteValue
-        return rotationXDelta > FACE_ROTATION_THRESHOLD ||
-            rotationYDelta > FACE_ROTATION_THRESHOLD ||
-            rotationZDelta > FACE_ROTATION_THRESHOLD
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {

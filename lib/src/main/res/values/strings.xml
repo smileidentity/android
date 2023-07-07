@@ -30,11 +30,15 @@
     <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
     <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns green</string>
     <string name="si_smart_selfie_directive_smile">Smile!</string>
-    <string name="si_smart_selfie_directive_capturing">Capturing…</string>
     <string name="si_smart_selfie_directive_unable_to_detect_face">Position your face in the oval</string>
     <string name="si_smart_selfie_directive_multiple_faces">Ensure only one face is visible</string>
     <string name="si_smart_selfie_directive_face_too_far">Move closer</string>
     <string name="si_smart_selfie_directive_face_too_close">Move farther away</string>
+    <string name="si_smart_selfie_directive_look_left">Turn your head to the left</string>
+    <string name="si_smart_selfie_directive_look_right">Turn your head to the right</string>
+    <string name="si_smart_selfie_directive_look_up">Point your head up</string>
+    <string name="si_smart_selfie_directive_look_down">Point your head down</string>
+    <string name="si_smart_selfie_directive_look_straight_ahead">Look straight ahead</string>
     <string name="si_smart_selfie_confirmation_dialog_title">Is this a good quality selfie?</string>
     <string name="si_smart_selfie_confirmation_dialog_subtitle">Make sure your whole face is visible and clear</string>
     <string name="si_smart_selfie_confirmation_dialog_confirm_button">Yes, use this</string>
