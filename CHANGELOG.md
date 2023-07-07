@@ -14,6 +14,7 @@
 - Updated KDocs
 - Bump Gradle to 8.2
 - Updated API key exception error message to be actionable
+- Rename `ImageType` enums to indicate PNGs are no longer supported 
 
 ### Removed
 - Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The 
