@@ -12,10 +12,8 @@
     <string name="loading">Loading…</string>
     <string name="version_info">Partner %1$s • %2$s</string>
 
-    <!--  SmartSelfie Auth  -->
-    <string name="user_id_label">User ID</string>
-    <string name="user_id_dialog_title">Enter User ID</string>
-    <string name="user_id_dialog_supporting_text">From a previous successful SmartSelfie™ Enrollment</string>
+    <!--  Jobs Screen  -->
+    <string name="jobs">Jobs</string>
 
     <!--  Resources Screen  -->
     <string name="resources">Resources</string>
@@ -34,6 +32,11 @@
     <string name="about_us_who_we_are_content">Smile ID products are tools for developers to perform real-time digital KYC, identity verification, user onboarding, and user authentication across Africa</string>
     <string name="about_us_visit_our_website">Visit our website</string>
     <string name="about_us_contact_support">Contact support</string>
+
+    <!--  SmartSelfie Auth  -->
+    <string name="user_id_label">User ID</string>
+    <string name="user_id_dialog_title">Enter User ID</string>
+    <string name="user_id_dialog_supporting_text">From a previous successful SmartSelfie™ Enrollment</string>
 
     <!--  Enhanced KYC  -->
     <string name="enhanced_kyc_product_name">Enhanced KYC</string>

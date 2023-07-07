@@ -8,6 +8,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -69,21 +71,22 @@ import java.net.URL
 fun MainScreen() {
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val clipboardManager = LocalClipboardManager.current
+    val startScreen = BottomNavigationScreen.Home
     val currentRoute = navController
         .currentBackStackEntryFlow
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
-    val showUpButton = when (currentRoute.value?.destination?.route) {
-        BottomNavigationScreen.Home.route -> false
-        else -> true
-    }
-    var bottomNavSelection: Screen by remember { mutableStateOf(BottomNavigationScreen.Home) }
-    val bottomNavItems = listOf(
-        BottomNavigationScreen.Home,
-        BottomNavigationScreen.Resources,
-        BottomNavigationScreen.AboutUs,
-    )
-    val snackbarHostState = remember { SnackbarHostState() }
-    val clipboardManager = LocalClipboardManager.current
+
+    // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
+    val bottomNavItems = remember { BottomNavigationScreen.values() }
+    var bottomNavSelection: Screen by remember { mutableStateOf(startScreen) }
+
+    // Show up button when not on a BottomNavigationScreen
+    val showUpButton = currentRoute.value?.destination?.route?.let { route ->
+        bottomNavItems.none { it.route.contains(route) }
+    } ?: false
+
     SmileIDTheme {
         Surface {
             var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
@@ -150,12 +153,20 @@ fun MainScreen() {
                             NavigationBarItem(
                                 selected = it == bottomNavSelection,
                                 icon = {
-                                    val imageVector = if (it == bottomNavSelection) {
-                                        it.selectedIcon
-                                    } else {
-                                        it.unselectedIcon
+                                    BadgedBox(
+                                        badge = {
+                                            if (it == BottomNavigationScreen.Jobs) {
+                                                Badge { Text("1") }
+                                            }
+                                        },
+                                    ) {
+                                        val imageVector = if (it == bottomNavSelection) {
+                                            it.selectedIcon
+                                        } else {
+                                            it.unselectedIcon
+                                        }
+                                        Icon(imageVector, stringResource(it.label))
                                     }
-                                    Icon(imageVector, stringResource(it.label))
                                 },
                                 label = { Text(stringResource(it.label)) },
                                 onClick = {
@@ -171,7 +182,7 @@ fun MainScreen() {
                 content = {
                     NavHost(
                         navController,
-                        BottomNavigationScreen.Home.route,
+                        startScreen.route,
                         Modifier
                             .padding(it)
                             .consumeWindowInsets(it),
@@ -181,6 +192,11 @@ fun MainScreen() {
                             // Display "Smile ID" in the top bar instead of "Home" label
                             currentScreenTitle = R.string.app_name
                             ProductSelectionScreen { navController.navigate(it.route) }
+                        }
+                        composable(BottomNavigationScreen.Jobs.route) {
+                            bottomNavSelection = BottomNavigationScreen.Jobs
+                            currentScreenTitle = BottomNavigationScreen.Jobs.label
+                            JobsScreen()
                         }
                         composable(BottomNavigationScreen.Resources.route) {
                             bottomNavSelection = BottomNavigationScreen.Resources
@@ -335,15 +351,15 @@ fun MainScreen() {
                                     onResult = { idInfo = it },
                                 )
                             }
-                            idInfo?.let { idInfo ->
+                            idInfo?.let {
                                 val url = URL("https://smileidentity.com/privacy-policy")
                                 SmileID.BiometricKYC(
-                                    idInfo = idInfo,
+                                    idInfo = it,
                                     partnerIcon = painterResource(
                                         id = com.smileidentity.R.drawable.si_logo_with_text,
                                     ),
                                     partnerName = "Smile Identity",
-                                    productName = idInfo.idType,
+                                    productName = it.idType,
                                     partnerPrivacyPolicy = url,
                                 ) { result ->
                                     if (result is SmileIDResult.Success) {
