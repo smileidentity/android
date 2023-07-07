@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -37,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap.Companion.Round
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Actions
 import com.smileidentity.sample.R
@@ -157,7 +160,9 @@ private fun JobListItem(
             },
             trailingContent = {
                 Column(
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .requiredWidthIn(max = 64.dp),
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
@@ -179,7 +184,9 @@ private fun JobListItem(
                             ),
                     )
                     Text(
-                        jobStatus ?: "Processing",
+                        text = jobStatus ?: "Processing",
+                        fontWeight = FontWeight.Thin,
+                        fontSize = 8.sp,
                         modifier = Modifier
                             .border(
                                 1.dp,
