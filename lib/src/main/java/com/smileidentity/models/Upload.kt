@@ -50,26 +50,26 @@ data class IdInfo(
 
 enum class ImageType {
     @Json(name = "0")
-    SelfiePngOrJpgFile,
+    SelfieJpgFile,
 
     @Json(name = "1")
-    IdCardPngOrJpgFile,
+    IdCardJpgFile,
 
     @Json(name = "2")
-    SelfiePngOrJpgBase64,
+    SelfieJpgBase64,
 
     @Json(name = "3")
-    IdCardPngOrJpgBase64,
+    IdCardJpgBase64,
 
     @Json(name = "4")
-    LivenessPngOrJpgFile,
+    LivenessJpgFile,
 
     @Json(name = "5")
-    IdCardRearPngOrJpgFile,
+    IdCardRearJpgFile,
 
     @Json(name = "6")
-    LivenessPngOrJpgBase64,
+    LivenessJpgBase64,
 
     @Json(name = "7")
-    IdCardRearPngOrJpgBase64,
+    IdCardRearJpgBase64,
 }

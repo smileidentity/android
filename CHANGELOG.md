@@ -12,6 +12,7 @@
 ### Changed
 - Updated KDocs
 - Bump Gradle to 8.2
+- Rename `ImageType` enums to indicate PNGs are no longer supported 
 
 ### Removed
 
