@@ -158,6 +158,8 @@ internal fun <T : JobStatusResponse> poll(
     action: suspend (attempt: Int) -> T,
 ) = flow {
     var latestError: Exception? = null
+    // TODO: Replace `until` with `..<` once ktlint-gradle plugin stops throwing an exception for it
+    //  see: https://github.com/JLLeitschuh/ktlint-gradle/issues/692
     for (attempt in 0 until numAttempts) {
         try {
             val response = action(attempt)
