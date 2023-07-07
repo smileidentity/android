@@ -36,6 +36,8 @@ play-services-mlkit-face-detection = "17.1.0"
 retrofit = "2.9.0"
 sentry = "6.24.0"
 timber = "5.0.1"
+truth = "1.1.4"
+uiautomator = "2.3.0-alpha03"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
@@ -101,3 +103,5 @@ sentry-android-timber = { module = "io.sentry:sentry-android-timber" }
 sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
+uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }

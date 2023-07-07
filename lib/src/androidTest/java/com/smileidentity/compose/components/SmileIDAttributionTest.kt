@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -13,6 +14,7 @@ class SmileIDAttributionTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    @Ignore("We ignore this test until we enable attribution")
     @Test
     fun testSmileIDAttribution() {
         // given
