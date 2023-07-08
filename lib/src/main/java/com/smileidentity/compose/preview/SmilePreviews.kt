@@ -2,6 +2,7 @@ package com.smileidentity.compose.preview
 
 import android.content.res.Configuration
 import androidx.compose.ui.tooling.preview.Preview
+import com.smileidentity.SmileIDOptIn
 
 /**
  * Multi preview annotation that represents various device sizes, and dark mode. Add this annotation to a composable
@@ -32,4 +33,5 @@ import androidx.compose.ui.tooling.preview.Preview
     group = "dark-mode",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
-internal annotation class SmilePreviews
+@SmileIDOptIn
+annotation class SmilePreviews

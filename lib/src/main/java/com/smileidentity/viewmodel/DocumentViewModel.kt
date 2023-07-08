@@ -6,9 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
 import com.smileidentity.SmileID
-import com.smileidentity.compose.ProcessingState
-import com.smileidentity.createDocumentFile
-import com.smileidentity.getExceptionHandler
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.Document
@@ -18,11 +16,13 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentImage
 import com.smileidentity.networking.asSelfieImage
-import com.smileidentity.postProcessImage
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.createDocumentFile
+import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import kotlinx.coroutines.delay

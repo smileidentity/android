@@ -2,16 +2,19 @@
 
 package com.smileidentity.models
 
-import com.smileidentity.BuildConfig
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 import java.io.File
 
+/**
+ * This class represents info.json
+ */
 @JsonClass(generateAdapter = true)
 data class UploadRequest(
     @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "id_info") val idInfo: IdInfo? = null,
-    @Json(name = "package_information") val packageInfo: UploadPackageInfo = UploadPackageInfo(),
 )
 
 @JsonClass(generateAdapter = true)
@@ -31,6 +34,7 @@ data class UploadImageInfo(
  * @param entered Whether to submit the verification to the ID authority or not. For Biometric KYC
  * jobs, this should be set to true
  */
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class IdInfo(
     @Json(name = "country") val country: String,
@@ -40,51 +44,32 @@ data class IdInfo(
     @Json(name = "middle_name") val middleName: String? = null,
     @Json(name = "last_name") val lastName: String? = null,
     @Json(name = "dob") val dob: String? = null,
+    @Json(name = "bank_code") val bankCode: String? = null,
     @Json(name = "entered") val entered: Boolean? = null,
-)
+) : Parcelable
 
 enum class ImageType {
     @Json(name = "0")
-    SelfiePngOrJpgFile,
+    SelfieJpgFile,
 
     @Json(name = "1")
-    IdCardPngOrJpgFile,
+    IdCardJpgFile,
 
     @Json(name = "2")
-    SelfiePngOrJpgBase64,
+    SelfieJpgBase64,
 
     @Json(name = "3")
-    IdCardPngOrJpgBase64,
+    IdCardJpgBase64,
 
     @Json(name = "4")
-    LivenessPngOrJpgFile,
+    LivenessJpgFile,
 
     @Json(name = "5")
-    IdCardRearPngOrJpgFile,
+    IdCardRearJpgFile,
 
     @Json(name = "6")
-    LivenessPngOrJpgBase64,
+    LivenessJpgBase64,
 
     @Json(name = "7")
-    IdCardRearPngOrJpgBase64,
+    IdCardRearJpgBase64,
 }
-
-@JsonClass(generateAdapter = true)
-data class UploadPackageInfo(
-    @Json(name = "apiVersion") val apiVersion: ApiVersion = ApiVersion(),
-    @Json(name = "version_names") val versionNames: VersionNames = VersionNames(),
-)
-
-@JsonClass(generateAdapter = true)
-data class ApiVersion(
-    @Json(name = "buildNumber") val buildNumber: Int = 2,
-    @Json(name = "majorVersion") val majorVersion: Int = 2,
-    @Json(name = "minorVersion") val minorVersion: Int = 1,
-)
-
-@JsonClass(generateAdapter = true)
-data class VersionNames(
-    @Json(name = "sid_sdk_version") val version: String = BuildConfig.VERSION_NAME,
-    @Json(name = "sid_sdk_type") val type: String = "Android",
-    @Json(name = "sid_sdk_ux_version") val uxVersion: String = "1.0",
-)

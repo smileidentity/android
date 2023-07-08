@@ -44,7 +44,7 @@ sealed class ProductScreen(
 
     object BiometricKyc : ProductScreen(
         "biometric_kyc",
-        R.string.biometric_kyc_product_name,
+        com.smileidentity.R.string.si_biometric_kyc_product_name,
         R.drawable.biometric_kyc,
     )
 

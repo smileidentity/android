@@ -15,9 +15,9 @@ android {
         applicationId = "com.smileidentity.sample"
         minSdk = 21
         targetSdk = 34
-        versionCode = 2
+        versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
-        versionName = "1.1.0_sdk-" + project(":lib").version.toString()
+        versionName = "1.2.0_sdk-" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -55,6 +55,13 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
+        compileOptions {
+            // https://kotlinlang.org/docs/opt-in-requirements.html#module-wide-opt-in
+            // This is to provide us a blanket-allow us to use APIs annotated with @SmileIDOptIn
+            // without having to add the opt-in annotation to every usage. The annotation's purpose
+            // is primarily for consumers of the SDK to use, not for us.
+            freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
+        }
     }
 
     buildFeatures {
@@ -83,6 +90,9 @@ tasks.register(checkSmileConfigFileTaskName) {
         val configFile = file("src/main/assets/smile_config.json")
         if (!configFile.exists()) {
             throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
+        }
+        if (configFile.readText().isBlank()) {
+            throw IllegalArgumentException("Empty smile_config.json file in src/main/assets!")
         }
     }
 }

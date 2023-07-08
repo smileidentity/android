@@ -34,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,20 +43,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
+import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.DocumentVerification
-import com.smileidentity.compose.SmartSelfieAuthenticationScreen
-import com.smileidentity.compose.SmartSelfieEnrollmentScreen
+import com.smileidentity.compose.SmartSelfieAuthentication
+import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.Document
+import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobResult
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
+import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
+import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.showSnackbar
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import timber.log.Timber
+import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Preview
@@ -190,36 +196,25 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieEnrollment.label
                             val userId = rememberSaveable { randomUserId() }
-                            SmileID.SmartSelfieEnrollmentScreen(
+                            SmileID.SmartSelfieEnrollment(
                                 userId = userId,
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val response = result.data.jobStatusResponse
-                                    val message = StringBuilder("SmartSelfie Enrollment ")
-                                    if (response?.jobComplete == true) {
-                                        if (response.jobSuccess) {
-                                            message.append("completed successfully. ")
-                                        } else {
-                                            val code = response.code
-                                            val actualResult = response.result
-                                                as? JobResult.Entry
-                                            val resultCode = actualResult?.resultCode
-                                            val resultText = actualResult?.resultText
-                                            message.append("completed unsuccessfully ")
-                                            message.append("(code=$code, resultCode=$resultCode): ")
-                                            message.append("$resultText. ")
-                                        }
-                                    } else {
-                                        message.append("still pending. ")
-                                    }
-                                    message.append("The User ID has been copied to your clipboard.")
+                                    val actualResult = response?.result as? JobResult.Entry
+                                    val message = jobResultMessageBuilder(
+                                        jobName = "SmartSelfie Enrollment",
+                                        jobComplete = response?.jobComplete,
+                                        jobSuccess = response?.jobSuccess,
+                                        code = response?.code,
+                                        resultCode = actualResult?.resultCode,
+                                        resultText = actualResult?.resultText,
+                                        suffix = "The User ID has been copied to your clipboard",
+                                    )
                                     Timber.d("$message: $result")
                                     clipboardManager.setText(AnnotatedString(userId))
-                                    snackbarHostState.showSnackbar(
-                                        coroutineScope,
-                                        message.toString(),
-                                    )
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Enrollment error: ${th.message}"
@@ -280,33 +275,22 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
-                            SmileID.SmartSelfieAuthenticationScreen(
+                            SmileID.SmartSelfieAuthentication(
                                 userId = it.arguments?.getString("userId")!!,
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val response = result.data.jobStatusResponse
-                                    val message = StringBuilder("SmartSelfie Authentication ")
-                                    if (response?.jobComplete == true) {
-                                        if (response.jobSuccess) {
-                                            message.append("completed successfully. ")
-                                        } else {
-                                            val code = response.code
-                                            val actualResult = response.result
-                                                as? JobResult.Entry
-                                            val resultCode = actualResult?.resultCode
-                                            val resultText = actualResult?.resultText
-                                            message.append("completed unsuccessfully ")
-                                            message.append("(code=$code, resultCode=$resultCode): ")
-                                            message.append("$resultText. ")
-                                        }
-                                    } else {
-                                        message.append("still pending. ")
-                                    }
-                                    snackbarHostState.showSnackbar(
-                                        coroutineScope,
-                                        message.toString(),
+                                    val actualResult = response?.result as? JobResult.Entry
+                                    val message = jobResultMessageBuilder(
+                                        jobName = "SmartSelfie Authentication",
+                                        jobComplete = response?.jobComplete,
+                                        jobSuccess = response?.jobSuccess,
+                                        code = response?.code,
+                                        resultCode = actualResult?.resultCode,
+                                        resultText = actualResult?.resultText,
                                     )
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                     Timber.d("$message: $result")
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
@@ -320,10 +304,17 @@ fun MainScreen() {
                         composable(ProductScreen.EnhancedKyc.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.EnhancedKyc.label
-                            EnhancedKycScreen { result ->
+                            OrchestratedEnhancedKycScreen { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val message = "Enhanced KYC success"
-                                    Timber.d("$message: $result")
+                                    val resultData = result.data.response
+                                    val message = jobResultMessageBuilder(
+                                        jobName = "Enhanced KYC",
+                                        jobComplete = true,
+                                        jobSuccess = true,
+                                        code = null,
+                                        resultCode = resultData.resultCode,
+                                        resultText = resultData.resultText,
+                                    )
                                     snackbarHostState.showSnackbar(coroutineScope, message)
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
@@ -337,12 +328,52 @@ fun MainScreen() {
                         composable(ProductScreen.BiometricKyc.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.BiometricKyc.label
+                            var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                            if (idInfo == null) {
+                                IdTypeSelectorAndFieldInputScreen(
+                                    jobType = JobType.BiometricKyc,
+                                    onResult = { idInfo = it },
+                                )
+                            }
+                            idInfo?.let { idInfo ->
+                                val url = URL("https://smileidentity.com/privacy-policy")
+                                SmileID.BiometricKYC(
+                                    idInfo = idInfo,
+                                    partnerIcon = painterResource(
+                                        id = com.smileidentity.R.drawable.si_logo_with_text,
+                                    ),
+                                    partnerName = "Smile Identity",
+                                    productName = idInfo.idType,
+                                    partnerPrivacyPolicy = url,
+                                ) { result ->
+                                    if (result is SmileIDResult.Success) {
+                                        val resultData = result.data
+                                        val actualResult = resultData.jobStatusResponse.result
+                                            as? JobResult.Entry
+                                        Timber.d("Biometric KYC Result: $result")
+                                        val message = jobResultMessageBuilder(
+                                            jobName = "Biometric KYC",
+                                            jobComplete = resultData.jobStatusResponse.jobComplete,
+                                            jobSuccess = resultData.jobStatusResponse.jobSuccess,
+                                            code = resultData.jobStatusResponse.code,
+                                            resultCode = actualResult?.resultCode,
+                                            resultText = actualResult?.resultText,
+                                        )
+                                        snackbarHostState.showSnackbar(coroutineScope, message)
+                                    } else if (result is SmileIDResult.Error) {
+                                        val th = result.throwable
+                                        val message = "Biometric KYC error: ${th.message}"
+                                        Timber.e(th, message)
+                                        snackbarHostState.showSnackbar(coroutineScope, message)
+                                    }
+                                    navController.popBackStack()
+                                }
+                            }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.DocumentVerification.label
                             DocumentVerificationIdTypeSelector { country, idType ->
-                                Timber.v("Selected country: $country, idType: $idType")
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
                                 ) { popUpTo(ProductScreen.DocumentVerification.route) }
@@ -364,21 +395,18 @@ fun MainScreen() {
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data
-                                    val message = StringBuilder("Document Verification ")
-                                    if (resultData.jobStatusResponse.jobComplete) {
-                                        if (resultData.jobStatusResponse.jobSuccess) {
-                                            message.append("completed successfully.")
-                                        } else {
-                                            message.append("completed unsuccessfully.")
-                                        }
-                                    } else {
-                                        message.append("still pending.")
-                                    }
-                                    Timber.d("$message: $result")
-                                    snackbarHostState.showSnackbar(
-                                        coroutineScope,
-                                        message.toString(),
+                                    val actualResult = resultData.jobStatusResponse.result
+                                        as? JobResult.Entry
+                                    val message = jobResultMessageBuilder(
+                                        jobName = "Document Verification",
+                                        jobComplete = resultData.jobStatusResponse.jobComplete,
+                                        jobSuccess = resultData.jobStatusResponse.jobSuccess,
+                                        code = resultData.jobStatusResponse.code,
+                                        resultCode = actualResult?.resultCode,
+                                        resultText = actualResult?.resultText,
                                     )
+                                    Timber.d("$message: $result")
+                                    snackbarHostState.showSnackbar(coroutineScope, message)
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "Document Verification error: ${th.message}"

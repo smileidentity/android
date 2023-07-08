@@ -2,6 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
+import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
@@ -11,8 +12,10 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
+import com.smileidentity.models.ServicesResponse
 import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Url
@@ -67,9 +70,21 @@ interface SmileIDService {
     suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
 
     /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be a Biometric KYC.
+     */
+    @POST("/v1/job_status")
+    suspend fun getBiometricKycJobStatus(
+        @Body request: JobStatusRequest,
+    ): BiometricKycJobStatusResponse
+
+    /**
      * Returns the ID types that are enabled for authenticated partner and which of those require
      * consent
      */
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
+
+    @GET("/v1/services")
+    suspend fun getServices(): ServicesResponse
 }

@@ -1,6 +1,7 @@
 package com.smileidentity.compose.document
 
 import android.Manifest
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -9,11 +10,11 @@ import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import com.smileidentity.SmileID
-import com.smileidentity.compose.DocumentVerification
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import com.google.common.truth.Truth.assertThat
+import com.smileidentity.R
+import com.smileidentity.models.Document
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,18 +26,29 @@ class DocumentCaptureScreenTest {
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @OptIn(ExperimentalPermissionsApi::class)
+    private lateinit var permissionState: PermissionState
+
+    private val testDocument = Document("KE", "ID_CARD")
+
+    @OptIn(ExperimentalPermissionsApi::class)
     @Test
     fun shouldShowPreviewWhenPermissionsGranted() {
         // given
-        val permissionState = mockk<PermissionState>(relaxed = true)
-        every { permissionState.status.isGranted } returns true
         val cameraPreviewTag = "document_camera_preview"
 
         // when
-        composeTestRule.setContent { SmileID.DocumentVerification() }
+        composeTestRule.setContent {
+            permissionState = rememberPermissionState(Manifest.permission.CAMERA)
+            DocumentCaptureScreen(
+                titleText = stringResource(id = R.string.si_doc_v_capture_instructions_front_title),
+                subtitleText = stringResource(id = R.string.si_doc_v_capture_instructions_subtitle),
+                idType = testDocument,
+            )
+        }
 
         // then
-        verify(exactly = 0) { permissionState.launchPermissionRequest() }
+        assertThat(permissionState.status.isGranted).isTrue()
+        assertThat(permissionState.status.shouldShowRationale).isFalse()
         composeTestRule.onNodeWithTag(cameraPreviewTag).assertIsDisplayed()
     }
 
@@ -52,6 +64,7 @@ class DocumentCaptureScreenTest {
             DocumentCaptureScreen(
                 titleText = titleText,
                 subtitleText = subtitleText,
+                idType = testDocument,
             )
         }
 
@@ -70,6 +83,7 @@ class DocumentCaptureScreenTest {
             DocumentCaptureScreen(
                 titleText = titleText,
                 subtitleText = subtitleText,
+                idType = testDocument,
             )
         }
 

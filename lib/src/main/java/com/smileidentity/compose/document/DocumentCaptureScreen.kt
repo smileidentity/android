@@ -28,8 +28,8 @@ import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Document
-import com.smileidentity.randomJobId
-import com.smileidentity.randomUserId
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.DocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
