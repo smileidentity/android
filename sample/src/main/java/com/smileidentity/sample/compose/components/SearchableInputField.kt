@@ -19,7 +19,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,9 +67,9 @@ fun SearchableInputField(
     modifier: Modifier = Modifier,
     onItemSelected: (SearchableInputFieldItem) -> Unit,
 ) {
-    // var firstLaunch by remember { mutableStateOf(true) }
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    var firstLaunch by rememberSaveable { mutableStateOf(true) }
     val filteredItems by remember(unfilteredItems) {
         derivedStateOf {
             unfilteredItems?.filter { it.displayName.contains(query, ignoreCase = true) }
@@ -102,6 +101,13 @@ fun SearchableInputField(
         trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
         shape = shape,
         modifier = modifier
+            // Dismiss the keyboard when first made active, to prevent covering the list items
+            .onFocusChanged {
+                if (firstLaunch && it.isFocused) {
+                    keyboardController?.hide()
+                    firstLaunch = false
+                }
+            }
             .imePadding()
             .border(1.dp, MaterialTheme.colorScheme.onSurface, shape),
     ) {
@@ -132,12 +138,6 @@ fun SearchableInputField(
                 }
             }
         }
-    }
-
-    // Immediately dismiss the keyboard when first made active, to prevent covering the list items
-    val focusManager = LocalFocusManager.current
-    LaunchedEffect(active) {
-        focusManager.clearFocus()
     }
 }
 
