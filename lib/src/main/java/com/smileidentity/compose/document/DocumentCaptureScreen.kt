@@ -6,10 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,30 +69,34 @@ internal fun DocumentCaptureScreen(
 ) {
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
-    Box(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        CameraPreview(
-            cameraState = cameraState,
-            camSelector = camSelector,
-            scaleType = ScaleType.FillCenter,
-            modifier = Modifier
-                .testTag("document_camera_preview")
-                .fillMaxSize()
-                .clipToBounds(),
-        )
-        DocumentShapedBoundingBox(
-            aspectRatio = idAspectRatio,
-            modifier = Modifier
-                .fillMaxSize()
-                .testTag("document_progress_indicator"),
-        )
+    Column(modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier.fillMaxSize().weight(1f),
+        ) {
+            CameraPreview(
+                cameraState = cameraState,
+                camSelector = camSelector,
+                scaleType = ScaleType.FillCenter,
+                modifier = Modifier
+                    .testTag("document_camera_preview")
+                    .fillMaxSize()
+                    .clipToBounds(),
+            )
+            DocumentShapedBoundingBox(
+                aspectRatio = idAspectRatio,
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+                    .consumeWindowInsets(WindowInsets.safeDrawing)
+                    .fillMaxSize()
+                    .testTag("document_progress_indicator"),
+            )
+        }
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxSize(),
+                .wrapContentSize(),
         ) {
             Text(
                 text = titleText,

@@ -3,8 +3,8 @@ package com.smileidentity.compose.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -76,9 +76,10 @@ internal fun ImageCaptureConfirmationDialog(
                 Image(
                     painter = painter,
                     contentDescription = null,
-                    contentScale = ContentScale.FillHeight,
+                    contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .height(256.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
                         .scale(scaleFactor),
                 )
