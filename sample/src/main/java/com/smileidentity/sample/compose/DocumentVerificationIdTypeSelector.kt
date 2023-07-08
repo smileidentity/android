@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
+import com.smileidentity.sample.compose.components.SearchableInputField
+import com.smileidentity.sample.compose.components.SearchableInputFieldItem
 import com.smileidentity.sample.countryDetails
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
