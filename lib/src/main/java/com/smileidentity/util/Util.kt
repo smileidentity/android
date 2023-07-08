@@ -186,11 +186,11 @@ internal fun postProcessImageBitmap(
         desiredAspectRatio?.let {
             // Center crop the bitmap to the specified croppedHeight
             mutableBitmap = Bitmap.createBitmap(
-                /* source = */ mutableBitmap,
-                /* x = */ 0,
-                /* y = */ (mutableBitmap.height - croppedHeight) / 2,
-                /* width = */ mutableBitmap.width,
-                /* height = */ croppedHeight,
+                mutableBitmap,
+                0,
+                (mutableBitmap.height - croppedHeight) / 2,
+                mutableBitmap.width,
+                croppedHeight,
             )
         }
 
