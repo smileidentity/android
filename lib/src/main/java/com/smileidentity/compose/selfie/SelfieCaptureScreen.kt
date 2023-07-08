@@ -124,6 +124,7 @@ internal fun OrchestratedSelfieCaptureScreen(
                 R.string.si_smart_selfie_confirmation_dialog_retake_button,
             ),
             onRetake = { viewModel.onSelfieRejected() },
+            scaleFactor = 1.25f,
         )
 
         else -> SelfieCaptureScreen(

@@ -52,6 +52,7 @@ internal fun ImageCaptureConfirmationDialog(
     onConfirm: () -> Unit,
     retakeButtonText: String,
     onRetake: () -> Unit,
+    scaleFactor: Float = 1f,
 ) {
     AlertDialog(
         title = {
@@ -79,7 +80,7 @@ internal fun ImageCaptureConfirmationDialog(
                     modifier = Modifier
                         .height(256.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .scale(1.25f),
+                        .scale(scaleFactor),
                 )
             }
         },
