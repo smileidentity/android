@@ -166,8 +166,9 @@ private fun JobListItem(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+                    val halfCircleRotationDegrees = 180f
                     val animatedProgress = animateFloatAsState(
-                        targetValue = if (expanded) 180f else 0f,
+                        targetValue = if (expanded) halfCircleRotationDegrees else 0f,
                         animationSpec = spring(),
                         label = "Dropdown Icon Rotation",
                     ).value
