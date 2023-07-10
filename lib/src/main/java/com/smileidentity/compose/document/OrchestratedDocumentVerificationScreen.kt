@@ -53,6 +53,7 @@ internal fun OrchestratedDocumentVerificationScreen(
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
+    showInstructions: Boolean = true,
     viewModel: DocumentViewModel = viewModel(
         factory = viewModelFactory {
             DocumentViewModel(
@@ -78,6 +79,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             shouldSelectFromGallery = shouldSelectFromGallery,
             captureBothSides = captureBothSides,
             isFrontDocumentPhotoValid = isFrontDocumentPhotoValid,
+            showInstructions = showInstructions,
             uiState = uiState,
         )
     ) {
@@ -293,6 +295,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             isEnroll = false,
             allowAgentMode = false,
             showAttribution = showAttribution,
+            showInstructions = showInstructions,
             skipApiSubmission = true,
         ) {
             when (it) {
