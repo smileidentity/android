@@ -102,6 +102,9 @@ fun isImageAtLeast(
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
  * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
+ *
+ * Only one of [maxOutputSize] or [desiredAspectRatio] can be set. Setting both is not supported,
+ * and will throw an [IllegalArgumentException].
  */
 @SuppressLint("RestrictedApi")
 internal fun postProcessImageBitmap(
