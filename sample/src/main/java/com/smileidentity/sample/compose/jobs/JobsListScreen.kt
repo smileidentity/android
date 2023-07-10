@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose
+package com.smileidentity.sample.compose.jobs
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -36,17 +36,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.StrokeCap.Companion.Round
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Actions
-import com.smileidentity.sample.R
+import com.smileidentity.sample.compose.SmileIDTheme
 
 @Composable
-fun JobsScreen(
+fun JobsListScreen(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -55,7 +56,7 @@ fun JobsScreen(
                 sourceIcon = {
                     Image(
                         painter = painterResource(
-                            id = com.smileidentity.R.drawable.si_doc_v_instructions_hero,
+                            id = R.drawable.si_doc_v_instructions_hero,
                         ),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
@@ -73,7 +74,7 @@ fun JobsScreen(
                 sourceIcon = {
                     Image(
                         painter = painterResource(
-                            id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+                            id = R.drawable.si_smart_selfie_instructions_hero,
                         ),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
@@ -90,7 +91,9 @@ fun JobsScreen(
             JobListItem(
                 sourceIcon = {
                     Image(
-                        painter = painterResource(id = R.drawable.biometric_kyc),
+                        painter = painterResource(
+                            id = com.smileidentity.sample.R.drawable.biometric_kyc,
+                        ),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                     )
@@ -107,7 +110,7 @@ fun JobsScreen(
                 sourceIcon = {
                     Image(
                         painter = painterResource(
-                            id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+                            id = R.drawable.si_smart_selfie_instructions_hero,
                         ),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
@@ -156,7 +159,7 @@ private fun JobListItem(
                 }
                 if (jobStatus == null) {
                     Spacer(modifier = Modifier.size(4.dp))
-                    LinearProgressIndicator(strokeCap = Round)
+                    LinearProgressIndicator(strokeCap = StrokeCap.Round)
                 }
             },
             trailingContent = {
@@ -232,7 +235,7 @@ fun JobListItemPreview() {
             sourceIcon = {
                 Image(
                     painter = painterResource(
-                        id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+                        id = R.drawable.si_smart_selfie_instructions_hero,
                     ),
                     contentDescription = null,
                     modifier = Modifier.size(64.dp),
@@ -255,7 +258,7 @@ private fun JobListItemExpandedPreview() {
             sourceIcon = {
                 Image(
                     painter = painterResource(
-                        id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+                        id = R.drawable.si_smart_selfie_instructions_hero,
                     ),
                     contentDescription = null,
                     modifier = Modifier.size(64.dp),

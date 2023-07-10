@@ -59,6 +59,7 @@ import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
+import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
 import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.showSnackbar
 import com.smileidentity.util.randomJobId
@@ -197,7 +198,7 @@ fun MainScreen() {
                         composable(BottomNavigationScreen.Jobs.route) {
                             bottomNavSelection = BottomNavigationScreen.Jobs
                             currentScreenTitle = BottomNavigationScreen.Jobs.label
-                            JobsScreen()
+                            OrchestratedJobsScreen()
                         }
                         composable(BottomNavigationScreen.Resources.route) {
                             bottomNavSelection = BottomNavigationScreen.Resources
