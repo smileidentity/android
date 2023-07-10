@@ -1,6 +1,5 @@
 package com.smileidentity.compose.selfie
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -52,7 +51,6 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 
-@VisibleForTesting
 @Composable
 internal fun SelfieCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
