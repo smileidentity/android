@@ -36,7 +36,7 @@ play-services-mlkit-face-detection = "17.1.0"
 retrofit = "2.9.0"
 sentry = "6.25.0"
 timber = "5.0.1"
-truth = "1.1.4"
+truth = "1.1.5"
 uiautomator = "2.3.0-alpha03"
 
 [plugins]
