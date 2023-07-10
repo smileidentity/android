@@ -15,7 +15,7 @@ import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.RequiredField
-import com.smileidentity.sample.compose.SearchableInputFieldItem
+import com.smileidentity.sample.compose.components.SearchableInputFieldItem
 import com.smileidentity.sample.countryDetails
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId

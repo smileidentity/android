@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose
+package com.smileidentity.sample.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ExperimentalLayoutApi

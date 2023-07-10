@@ -13,13 +13,11 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
 const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.56f
 const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
-val DOCUMENT_BOUNDING_BOX_OFFSET = 150.dp
 val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
 
 /**
@@ -44,7 +42,7 @@ fun DocumentShapedBoundingBox(
     val strokeColor = if (areEdgesDetected) MaterialTheme.colorScheme.tertiary else Color.Gray
 
     Canvas(
-        modifier
+        modifier = modifier
             .fillMaxSize(),
     ) {
         // 1. Set the background color using a rectangle
@@ -55,11 +53,13 @@ fun DocumentShapedBoundingBox(
         val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
         val outlineBoundingBoxHeight =
             outlineBoundingBoxWidth / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
+        val outlineBoundingBoxX = (size.width - outlineBoundingBoxWidth) / 2
+        val outlineBoundingBoxY = (size.height - outlineBoundingBoxHeight) / 2
         drawRoundRect(
             color = strokeColor,
             topLeft = Offset(
-                x = (size.width - outlineBoundingBoxWidth) / 2,
-                y = DOCUMENT_BOUNDING_BOX_OFFSET.toPx(),
+                x = outlineBoundingBoxX,
+                y = outlineBoundingBoxY,
             ),
             size = Size(width = outlineBoundingBoxWidth, height = outlineBoundingBoxHeight),
             cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS,
@@ -67,13 +67,12 @@ fun DocumentShapedBoundingBox(
         )
 
         // 3. Draw the transparent bounding box, and make it slightly smaller than the outline box
-        val boundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS - strokeWidth.toPx()
         drawRoundRect(
             color = Color.Transparent,
             blendMode = BlendMode.Clear,
             topLeft = Offset(
-                x = (size.width - boundingBoxWidth) / 2,
-                y = DOCUMENT_BOUNDING_BOX_OFFSET.toPx() + (strokeWidth.toPx() / 2),
+                x = outlineBoundingBoxX,
+                y = outlineBoundingBoxY + (strokeWidth.toPx() / 2),
             ),
             size = Size(
                 width = (outlineBoundingBoxWidth - strokeWidth.toPx()),
@@ -86,7 +85,7 @@ fun DocumentShapedBoundingBox(
 
 @SmilePreviews
 @Composable
-private fun DocumentShapedProgressIndicatorPreview() {
+private fun DocumentShapedBoundingBoxPreview() {
     Preview {
         DocumentShapedBoundingBox(aspectRatio = 16f / 9f)
     }

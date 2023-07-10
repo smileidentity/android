@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import com.smileidentity.sample.compose.SearchableInputFieldItem
+import com.smileidentity.sample.compose.components.SearchableInputFieldItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
