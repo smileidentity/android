@@ -133,8 +133,9 @@ private fun JobListItem(
     jobStatus: String?,
     jobMessage: String?,
     modifier: Modifier = Modifier,
+    initiallyExpanded: Boolean = false,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
     Card(
         onClick = { expanded = !expanded },
         modifier = modifier
@@ -226,20 +227,46 @@ private fun ColumnScope.JobListItemAdditionalDetails(
 @Composable
 @SmilePreviews
 fun JobListItemPreview() {
-    JobListItem(
-        sourceIcon = {
-            Image(
-                painter = painterResource(
-                    id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
-                ),
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-            )
-        },
-        timestamp = "7/6/23 12:04 PM",
-        jobElapsedTime = "1m 52s",
-        jobType = "SmartSelfie™ Enrollment",
-        jobStatus = null,
-        jobMessage = "Enroll User",
-    )
+    SmileIDTheme {
+        JobListItem(
+            sourceIcon = {
+                Image(
+                    painter = painterResource(
+                        id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                )
+            },
+            timestamp = "7/6/23 12:04 PM",
+            jobElapsedTime = "1m 52s",
+            jobType = "SmartSelfie™ Enrollment",
+            jobStatus = null,
+            jobMessage = "Enroll User",
+        )
+    }
+}
+
+@Composable
+@SmilePreviews
+private fun JobListItemExpandedPreview() {
+    SmileIDTheme {
+        JobListItem(
+            sourceIcon = {
+                Image(
+                    painter = painterResource(
+                        id = com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                )
+            },
+            timestamp = "7/6/23 12:04 PM",
+            jobElapsedTime = "1m 52s",
+            jobType = "SmartSelfie™ Enrollment 2",
+            jobStatus = null,
+            jobMessage = "Enroll User",
+            initiallyExpanded = true,
+        )
+    }
 }
