@@ -18,6 +18,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.sample.R
+import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
 
 @Composable

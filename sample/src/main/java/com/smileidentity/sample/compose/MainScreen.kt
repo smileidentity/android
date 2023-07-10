@@ -58,6 +58,7 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
+import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.showSnackbar
 import com.smileidentity.util.randomJobId
@@ -215,6 +216,7 @@ fun MainScreen() {
                             SmileID.SmartSelfieEnrollment(
                                 userId = userId,
                                 allowAgentMode = true,
+                                showInstructions = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val response = result.data.jobStatusResponse
@@ -408,6 +410,7 @@ fun MainScreen() {
                                 userId = userId,
                                 jobId = jobId,
                                 idType = documentType,
+                                showInstructions = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
                                     val resultData = result.data

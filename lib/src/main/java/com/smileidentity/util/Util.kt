@@ -21,6 +21,7 @@ import android.text.Annotation
 import android.text.SpannedString
 import android.util.Size
 import android.widget.Toast
+import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.impl.utils.Exif
 import androidx.compose.runtime.Composable
@@ -101,6 +102,9 @@ fun isImageAtLeast(
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
  * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
+ *
+ * Only one of [maxOutputSize] or [desiredAspectRatio] can be set. Setting both is not supported,
+ * and will throw an [IllegalArgumentException].
  */
 @SuppressLint("RestrictedApi")
 internal fun postProcessImageBitmap(
@@ -108,9 +112,16 @@ internal fun postProcessImageBitmap(
     file: File,
     saveAsGrayscale: Boolean = false,
     processRotation: Boolean = false,
-    compressionQuality: Int = 100,
+    @IntRange(from = 0, to = 100) compressionQuality: Int = 100,
     maxOutputSize: Size? = null,
+    desiredAspectRatio: Float? = null,
 ): File {
+    if (maxOutputSize != null && desiredAspectRatio != null) {
+        throw IllegalArgumentException("Only one of maxOutputSize or desiredAspectRatio can be set")
+    }
+    if (compressionQuality < 0 || compressionQuality > 100) {
+        throw IllegalArgumentException("Compression quality must be between 0 and 100")
+    }
     var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
         val canvas = Canvas(mutableBitmap)
@@ -121,11 +132,11 @@ internal fun postProcessImageBitmap(
 
     if (processRotation) {
         val exif = Exif.createFromFile(file)
-        val degrees = when (exif.rotation) {
+        val degrees = when (exif.orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> 90F
             ExifInterface.ORIENTATION_ROTATE_180 -> 180F
             ExifInterface.ORIENTATION_ROTATE_270 -> 270F
-            else -> 90F
+            else -> 0f
         }
 
         val matrix = Matrix().apply { postRotate(degrees) }
@@ -142,22 +153,51 @@ internal fun postProcessImageBitmap(
 
     // If size is the original Bitmap size, then no scaling will be performed by the underlying call
     // Aspect ratio will be maintained by retaining the larger dimension
-    val size = maxOutputSize ?: Size(mutableBitmap.width, mutableBitmap.height)
-    val aspectRatioInput = mutableBitmap.width.toFloat() / mutableBitmap.height
-    val aspectRatioMax = size.width.toFloat() / size.height
-    var outputWidth = size.width
-    var outputHeight = size.height
-    if (aspectRatioInput > aspectRatioMax) {
-        outputHeight = (outputWidth / aspectRatioInput).toInt()
-    } else {
-        outputWidth = (outputHeight * aspectRatioInput).toInt()
+    val outputSize = maxOutputSize?.let { size ->
+        val aspectRatioInput = mutableBitmap.width.toFloat() / mutableBitmap.height
+        val aspectRatioMax = size.width.toFloat() / size.height
+        var outputWidth = size.width
+        var outputHeight = size.height
+        if (aspectRatioInput > aspectRatioMax) {
+            outputHeight = (outputWidth / aspectRatioInput).toInt()
+        } else {
+            outputWidth = (outputHeight * aspectRatioInput).toInt()
+        }
+        Size(outputWidth, outputHeight)
     }
 
+    // Crop height to match desired aspect ratio. This specific behavior is because we force
+    // portrait mode when doing document captures, so the image should always be taller than it is
+    // wide. If the image is wider than it is tall, then we return as-is
+    // For reference, the default aspect ratio of an ID card is around ~1.6
+    // NB! This assumes that the portrait mode pic will be taller than it is wide
+    val croppedHeight = desiredAspectRatio?.let {
+        return@let if (mutableBitmap.width > mutableBitmap.height) {
+            Timber.w("Image is wider than it is tall, so not cropping the height")
+            mutableBitmap.height
+        } else {
+            (mutableBitmap.width / it).toInt()
+        }
+    } ?: mutableBitmap.height
+
     file.outputStream().use {
-        mutableBitmap
+        outputSize?.let { outputSize ->
             // Filter is set to false for improved performance at the expense of image quality
-            .scale(outputWidth, outputHeight, filter = false)
-            .compress(JPEG, compressionQuality, it)
+            mutableBitmap = mutableBitmap.scale(outputSize.width, outputSize.height, filter = false)
+        }
+
+        desiredAspectRatio?.let {
+            // Center crop the bitmap to the specified croppedHeight
+            mutableBitmap = Bitmap.createBitmap(
+                mutableBitmap,
+                0,
+                (mutableBitmap.height - croppedHeight) / 2,
+                mutableBitmap.width,
+                croppedHeight,
+            )
+        }
+
+        mutableBitmap.compress(JPEG, compressionQuality, it)
     }
     return file
 }
@@ -170,7 +210,7 @@ internal fun postProcessImage(
     saveAsGrayscale: Boolean = false,
     processRotation: Boolean = true,
     compressionQuality: Int = 100,
-    desiredOutputSize: Size? = null,
+    desiredAspectRatio: Float? = null,
 ): File {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
     return postProcessImageBitmap(
@@ -179,7 +219,7 @@ internal fun postProcessImage(
         saveAsGrayscale = saveAsGrayscale,
         processRotation = processRotation,
         compressionQuality = compressionQuality,
-        maxOutputSize = desiredOutputSize,
+        desiredAspectRatio = desiredAspectRatio,
     )
 }
 

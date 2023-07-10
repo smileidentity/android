@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose
+package com.smileidentity.sample.compose.components
 
 import android.os.Parcelable
 import androidx.compose.foundation.border
@@ -28,11 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.sample.R
+import com.smileidentity.sample.compose.SmileIDTheme
 import com.smileidentity.sample.countryDetails
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -67,6 +69,7 @@ fun SearchableInputField(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+    var firstLaunch by rememberSaveable { mutableStateOf(true) }
     val filteredItems by remember(unfilteredItems) {
         derivedStateOf {
             unfilteredItems?.filter { it.displayName.contains(query, ignoreCase = true) }
@@ -98,6 +101,13 @@ fun SearchableInputField(
         trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
         shape = shape,
         modifier = modifier
+            // Dismiss the keyboard when first made active, to prevent covering the list items
+            .onFocusChanged {
+                if (firstLaunch && it.isFocused) {
+                    keyboardController?.hide()
+                    firstLaunch = false
+                }
+            }
             .imePadding()
             .border(1.dp, MaterialTheme.colorScheme.onSurface, shape),
     ) {
