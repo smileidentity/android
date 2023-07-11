@@ -31,7 +31,7 @@ fun OrchestratedJobsScreen(
         when (uiState.processingState) {
             ProcessingState.InProgress -> CircularProgressIndicator()
             ProcessingState.Error -> ErrorScreen { viewModel.onRetry() }
-            ProcessingState.Success -> JobsListScreen()
+            ProcessingState.Success -> JobsListScreen(uiState.jobs)
         }
     }
 }

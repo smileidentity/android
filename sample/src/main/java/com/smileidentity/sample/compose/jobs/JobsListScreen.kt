@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,78 +47,28 @@ import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Actions
 import com.smileidentity.sample.compose.SmileIDTheme
+import com.smileidentity.sample.viewmodel.Job
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun JobsListScreen(
+    jobs: ImmutableList<Job>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        item {
+        items(jobs) {
             JobListItem(
                 sourceIcon = {
                     Image(
-                        painter = painterResource(
-                            id = R.drawable.si_doc_v_instructions_hero,
-                        ),
+                        painter = painterResource(it.icon),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                     )
                 },
-                timestamp = "7/7/23 09:15 AM",
-                jobType = "Document Verification",
-                jobStatus = null,
-                jobMessage = null,
-            )
-        }
-        item {
-            JobListItem(
-                sourceIcon = {
-                    Image(
-                        painter = painterResource(
-                            id = R.drawable.si_smart_selfie_instructions_hero,
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                    )
-                },
-                timestamp = "7/6/23 12:08 PM",
-                jobType = "SmartSelfie™ Authentication",
-                jobStatus = "Rejected",
-                jobMessage = "Failed Authentication - Spoof Detected",
-            )
-        }
-        item {
-            JobListItem(
-                sourceIcon = {
-                    Image(
-                        painter = painterResource(
-                            id = com.smileidentity.sample.R.drawable.biometric_kyc,
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                    )
-                },
-                timestamp = "7/7/23 12:06 PM",
-                jobType = "Biometric KYC",
-                jobStatus = "Provisional Approval",
-                jobMessage = "Provisional Enroll - Under Review",
-            )
-        }
-        item {
-            JobListItem(
-                sourceIcon = {
-                    Image(
-                        painter = painterResource(
-                            id = R.drawable.si_smart_selfie_instructions_hero,
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                    )
-                },
-                timestamp = "7/6/23 12:04 PM",
-                jobType = "SmartSelfie™ Enrollment",
-                jobStatus = "Approved",
-                jobMessage = "Enroll User",
+                timestamp = it.timestamp,
+                jobType = stringResource(it.jobType),
+                jobStatus = it.jobStatus,
+                jobMessage = it.jobMessage,
             )
         }
     }
