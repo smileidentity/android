@@ -13,7 +13,7 @@ data class JobsUiState(
     val jobs: List<Unit> = persistentListOf(),
 )
 
-class JobsViewModel : ViewModel() {
+class JobsViewModel(private val isProduction: Boolean) : ViewModel() {
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState = _uiState.asStateFlow()
 

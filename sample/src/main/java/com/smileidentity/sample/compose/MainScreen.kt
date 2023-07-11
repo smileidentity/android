@@ -80,6 +80,7 @@ fun MainScreen() {
         .currentBackStackEntryFlow
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
 
+
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
     val bottomNavItems = remember { BottomNavigationScreen.values() }
     var bottomNavSelection: Screen by remember { mutableStateOf(startScreen) }
@@ -88,6 +89,7 @@ fun MainScreen() {
     val showUpButton = currentRoute.value?.destination?.route?.let { route ->
         bottomNavItems.none { it.route.contains(route) }
     } ?: false
+    var isProduction by rememberSaveable { mutableStateOf(false) }
 
     SmileIDTheme {
         Surface {
@@ -102,7 +104,6 @@ fun MainScreen() {
                     }
                 },
                 topBar = {
-                    var isProduction by rememberSaveable { mutableStateOf(false) }
                     TopAppBar(
                         title = { Text(stringResource(currentScreenTitle)) },
                         navigationIcon = {
@@ -198,7 +199,7 @@ fun MainScreen() {
                         composable(BottomNavigationScreen.Jobs.route) {
                             bottomNavSelection = BottomNavigationScreen.Jobs
                             currentScreenTitle = BottomNavigationScreen.Jobs.label
-                            OrchestratedJobsScreen()
+                            OrchestratedJobsScreen(isProduction)
                         }
                         composable(BottomNavigationScreen.Resources.route) {
                             bottomNavSelection = BottomNavigationScreen.Resources
@@ -214,19 +215,27 @@ fun MainScreen() {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieEnrollment.label
                             val userId = rememberSaveable { randomUserId() }
+                            val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieEnrollment(
                                 userId = userId,
+                                jobId = jobId,
                                 allowAgentMode = true,
                                 showInstructions = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse
-                                    val actualResult = response?.result as? JobResult.Entry
+                                    val response = result.data.jobStatusResponse ?: run {
+                                        val errorMessage =
+                                            "SmartSelfie Enrollment jobStatusResponse is null"
+                                        Timber.e(errorMessage)
+                                        snackbarHostState.showSnackbar(coroutineScope, errorMessage)
+                                        return@SmartSelfieEnrollment
+                                    }
+                                    val actualResult = response.result as? JobResult.Entry
                                     val message = jobResultMessageBuilder(
                                         jobName = "SmartSelfie Enrollment",
-                                        jobComplete = response?.jobComplete,
-                                        jobSuccess = response?.jobSuccess,
-                                        code = response?.code,
+                                        jobComplete = response.jobComplete,
+                                        jobSuccess = response.jobSuccess,
+                                        code = response.code,
                                         resultCode = actualResult?.resultCode,
                                         resultText = actualResult?.resultText,
                                         suffix = "The User ID has been copied to your clipboard",
@@ -294,18 +303,26 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
+                            val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
                                 userId = it.arguments?.getString("userId")!!,
+                                jobId = jobId,
                                 allowAgentMode = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse
-                                    val actualResult = response?.result as? JobResult.Entry
+                                    val response = result.data.jobStatusResponse ?: run {
+                                        val errorMessage =
+                                            "SmartSelfie Authentication jobStatusResponse is null"
+                                        Timber.e(errorMessage)
+                                        snackbarHostState.showSnackbar(coroutineScope, errorMessage)
+                                        return@SmartSelfieAuthentication
+                                    }
+                                    val actualResult = response.result as? JobResult.Entry
                                     val message = jobResultMessageBuilder(
                                         jobName = "SmartSelfie Authentication",
-                                        jobComplete = response?.jobComplete,
-                                        jobSuccess = response?.jobSuccess,
-                                        code = response?.code,
+                                        jobComplete = response.jobComplete,
+                                        jobSuccess = response.jobSuccess,
+                                        code = response.code,
                                         resultCode = actualResult?.resultCode,
                                         resultText = actualResult?.resultText,
                                     )
@@ -356,8 +373,12 @@ fun MainScreen() {
                             }
                             idInfo?.let {
                                 val url = URL("https://smileidentity.com/privacy-policy")
+                                val userId = rememberSaveable { randomUserId() }
+                                val jobId = rememberSaveable { randomJobId() }
                                 SmileID.BiometricKYC(
                                     idInfo = it,
+                                    userId = userId,
+                                    jobId = jobId,
                                     partnerIcon = painterResource(
                                         id = com.smileidentity.R.drawable.si_logo_with_text,
                                     ),

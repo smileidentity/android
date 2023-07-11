@@ -11,11 +11,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.sample.compose.components.ErrorScreen
 import com.smileidentity.sample.viewmodel.JobsViewModel
+import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 fun OrchestratedJobsScreen(
+    isProduction: Boolean,
     modifier: Modifier = Modifier,
-    viewModel: JobsViewModel = viewModel(),
+    viewModel: JobsViewModel = viewModel(
+        key = isProduction.toString(),
+        factory = viewModelFactory { JobsViewModel(isProduction) },
+    ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     Box(

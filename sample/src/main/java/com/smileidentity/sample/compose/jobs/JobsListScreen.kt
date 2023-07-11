@@ -63,7 +63,6 @@ fun JobsListScreen(
                     )
                 },
                 timestamp = "7/7/23 09:15 AM",
-                jobElapsedTime = "5m 17s",
                 jobType = "Document Verification",
                 jobStatus = null,
                 jobMessage = null,
@@ -81,7 +80,6 @@ fun JobsListScreen(
                     )
                 },
                 timestamp = "7/6/23 12:08 PM",
-                jobElapsedTime = "7s",
                 jobType = "SmartSelfie™ Authentication",
                 jobStatus = "Rejected",
                 jobMessage = "Failed Authentication - Spoof Detected",
@@ -99,7 +97,6 @@ fun JobsListScreen(
                     )
                 },
                 timestamp = "7/7/23 12:06 PM",
-                jobElapsedTime = "9s",
                 jobType = "Biometric KYC",
                 jobStatus = "Provisional Approval",
                 jobMessage = "Provisional Enroll - Under Review",
@@ -117,7 +114,6 @@ fun JobsListScreen(
                     )
                 },
                 timestamp = "7/6/23 12:04 PM",
-                jobElapsedTime = "1m 52s",
                 jobType = "SmartSelfie™ Enrollment",
                 jobStatus = "Approved",
                 jobMessage = "Enroll User",
@@ -131,7 +127,6 @@ fun JobsListScreen(
 private fun JobListItem(
     sourceIcon: @Composable () -> Unit,
     timestamp: String,
-    jobElapsedTime: String,
     jobType: String,
     jobStatus: String?,
     jobMessage: String?,
@@ -148,7 +143,7 @@ private fun JobListItem(
     ) {
         ListItem(
             leadingContent = sourceIcon,
-            overlineContent = { Text("$timestamp • $jobElapsedTime") },
+            overlineContent = { Text(timestamp) },
             headlineContent = { Text(jobType) },
             supportingContent = {
                 if (jobMessage != null) {
@@ -242,7 +237,6 @@ fun JobListItemPreview() {
                 )
             },
             timestamp = "7/6/23 12:04 PM",
-            jobElapsedTime = "1m 52s",
             jobType = "SmartSelfie™ Enrollment",
             jobStatus = null,
             jobMessage = "Enroll User",
@@ -265,7 +259,6 @@ private fun JobListItemExpandedPreview() {
                 )
             },
             timestamp = "7/6/23 12:04 PM",
-            jobElapsedTime = "1m 52s",
             jobType = "SmartSelfie™ Enrollment 2",
             jobStatus = null,
             jobMessage = "Enroll User",
