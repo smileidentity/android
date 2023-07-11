@@ -49,10 +49,12 @@ class BvnConsentViewModel : ViewModel() {
 
     private fun setBvn(bvn: String) {
         // Do network call here
-        _uiState.update { it.copy(
-            bvn = bvn,
-            showDeliveryMode = true
-        ) }
+        _uiState.update {
+            it.copy(
+                bvn = bvn,
+                showDeliveryMode = true,
+            )
+        }
     }
 
     private fun requestBvnConsentOtp(otpDeliveryMode: OtpDeliveryMode) {

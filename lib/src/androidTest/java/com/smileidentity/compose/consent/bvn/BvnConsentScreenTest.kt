@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.smileidentity.R
-import com.smileidentity.compose.consent.bvn.BvnConsentScreen
 import org.junit.Rule
 import org.junit.Test
 
@@ -17,7 +16,10 @@ class BvnConsentScreenTest {
     fun shouldDisplayBvnConsentScreen() {
         // when
         composeTestRule.setContent {
-            BvnConsentScreen(partnerIcon = painterResource(id = R.drawable.si_logo_with_text))
+            BvnConsentScreen(
+                partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
+                listOf(),
+            )
         }
 
         // then
