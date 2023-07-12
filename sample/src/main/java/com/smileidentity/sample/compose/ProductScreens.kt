@@ -35,25 +35,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
+import com.smileidentity.sample.viewmodel.MainScreenViewModel
+import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 fun ProductSelectionScreen(
     modifier: Modifier = Modifier,
+    viewModel: MainScreenViewModel = viewModel(
+        factory = viewModelFactory { MainScreenViewModel() },
+    ),
     onProductSelected: (Screen) -> Unit,
 ) {
     val density = LocalDensity.current
     var desiredItemMinHeight by remember { mutableStateOf(0.dp) }
     val products = listOf(
-        ProductScreen.SmartSelfieEnrollment,
-        ProductScreen.SmartSelfieAuthentication,
-        ProductScreen.EnhancedKyc,
-        ProductScreen.BiometricKyc,
-        ProductScreen.DocumentVerification,
+        ProductScreen.SmartSelfieEnrollment to viewModel::onSmartSelfieEnrollmentSelected,
+        ProductScreen.SmartSelfieAuthentication to viewModel::onSmartSelfieAuthenticationSelected,
+        ProductScreen.EnhancedKyc to viewModel::onEnhancedKycSelected,
+        ProductScreen.BiometricKyc to viewModel::onBiometricKycSelected,
+        ProductScreen.DocumentVerification to viewModel::onDocumentVerificationSelected,
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,9 +78,12 @@ fun ProductSelectionScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                items(products) {
+                items(products) { (screen, vmAction) ->
                     FilledTonalButton(
-                        onClick = { onProductSelected(it) },
+                        onClick = {
+                            vmAction()
+                            onProductSelected(screen)
+                        },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -96,15 +105,15 @@ fun ProductSelectionScreen(
                                 .defaultMinSize(minHeight = desiredItemMinHeight),
                         ) {
                             Image(
-                                painterResource(it.icon),
+                                painterResource(screen.icon),
                                 contentDescription = stringResource(
                                     R.string.product_name_icon,
-                                    stringResource(it.label),
+                                    stringResource(screen.label),
                                 ),
                                 modifier = Modifier.size(64.dp),
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(stringResource(it.label), textAlign = TextAlign.Center)
+                            Text(stringResource(screen.label), textAlign = TextAlign.Center)
                         }
                     }
                 }

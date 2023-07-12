@@ -59,8 +59,7 @@ class MainScreenViewModel : ViewModel() {
         _uiState.update { it.copy(isProduction = !SmileID.useSandbox) }
     }
 
-    fun onHomeSelected() {
-        Timber.v("onHomeSelected")
+    private fun onHomeSelected() {
         _uiState.update {
             it.copy(
                 appBarTitle = R.string.app_name,
@@ -69,7 +68,7 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onJobsSelected() {
+    private fun onJobsSelected() {
         _uiState.update {
             it.copy(
                 appBarTitle = BottomNavigationScreen.Jobs.label,
@@ -78,7 +77,7 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onResourcesSelected() {
+    private fun onResourcesSelected() {
         _uiState.update {
             it.copy(
                 appBarTitle = BottomNavigationScreen.Resources.label,
@@ -87,7 +86,7 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onAboutUsSelected() {
+    private fun onAboutUsSelected() {
         _uiState.update {
             it.copy(
                 appBarTitle = BottomNavigationScreen.AboutUs.label,
@@ -318,6 +317,15 @@ class MainScreenViewModel : ViewModel() {
     fun clearJobs() {
         viewModelScope.launch {
             DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)
+        }
+    }
+
+    fun onNewBottomNavSelection(it: BottomNavigationScreen) {
+        when (it) {
+            BottomNavigationScreen.Home -> onHomeSelected()
+            BottomNavigationScreen.Jobs -> onJobsSelected()
+            BottomNavigationScreen.AboutUs -> onAboutUsSelected()
+            BottomNavigationScreen.Resources -> onResourcesSelected()
         }
     }
 }

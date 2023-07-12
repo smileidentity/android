@@ -68,10 +68,12 @@ import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.net.URL
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun MainScreen(
@@ -79,36 +81,22 @@ fun MainScreen(
         factory = viewModelFactory { MainScreenViewModel() },
     ),
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val currentRoute = navController
+    val currentRoute by navController
         .currentBackStackEntryFlow
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
-        .value
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val bottomNavSelection = uiState.bottomNavSelection
+    val pendingJobCount by viewModel.pendingJobCount.collectAsStateWithLifecycle()
 
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
-    val bottomNavItems = remember { BottomNavigationScreen.values() }
-    val bottomNavSelection = uiState.bottomNavSelection
-
-    val pendingJobCount = viewModel.pendingJobCount
-        .collectAsStateWithLifecycle()
-        .value
-
+    val bottomNavItems = remember { BottomNavigationScreen.values().toList().toImmutableList() }
     // Show up button when not on a BottomNavigationScreen
     val showUpButton = currentRoute?.destination?.route?.let { route ->
         bottomNavItems.none { it.route.contains(route) }
     } ?: false
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    // TODO: Could there be a bug here in case we have the same message twice in a row? (i.e. the same result)
-    LaunchedEffect(uiState.snackbarMessage) {
-        uiState.snackbarMessage?.let { message ->
-            coroutineScope.launch {
-                snackbarHostState.showSnackbar(message)
-            }
-        }
-    }
 
     val clipboardManager = LocalClipboardManager.current
     LaunchedEffect(uiState.clipboardText) {
@@ -122,102 +110,36 @@ fun MainScreen(
     SmileIDTheme {
         Surface {
             Scaffold(
-                snackbarHost = {
-                    SnackbarHost(snackbarHostState) {
-                        Snackbar(
-                            snackbarData = it,
-                            actionColor = MaterialTheme.colorScheme.tertiary,
-                        )
-                    }
-                },
+                snackbarHost = { Snackbar() },
                 topBar = {
-                    TopAppBar(
-                        title = { Text(stringResource(id = uiState.appBarTitle)) },
-                        navigationIcon = {
-                            if (showUpButton) {
-                                IconButton(onClick = { navController.navigateUp() }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.ArrowBack,
-                                        contentDescription = stringResource(R.string.back),
-                                    )
-                                }
-                            }
-                        },
-                        actions = {
-                            FilterChip(
-                                selected = uiState.isProduction,
-                                onClick = viewModel::toggleEnvironment,
-                                leadingIcon = {
-                                    if (uiState.isProduction) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Warning,
-                                            contentDescription = stringResource(
-                                                R.string.production,
-                                            ),
-                                        )
-                                    }
-                                },
-                                label = { Text(stringResource(id = uiState.environmentName)) },
-                            )
-                            if (bottomNavSelection == BottomNavigationScreen.Jobs) {
-                                PlainTooltipBox(
-                                    tooltip = {
-                                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
-                                    },
-                                ) {
-                                    IconButton(
-                                        onClick = viewModel::clearJobs,
-                                        modifier = Modifier.tooltipAnchor(),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(24.dp),
-                                        )
-                                    }
-                                }
-                            }
-                        },
+                    TopBar(
+                        showUpButton = showUpButton,
+                        onNavigateUp = { navController.navigateUp() },
+                        isJobsScreenSelected = bottomNavSelection == BottomNavigationScreen.Jobs,
                     )
                 },
                 bottomBar = {
                     // Don't show bottom bar when navigating to any product screens
-                    val currentRouteValue = remember(currentRoute) {
-                        derivedStateOf { currentRoute?.destination?.route ?: "" }
-                    }.value
-                    if (bottomNavItems.none { it.route.contains(currentRouteValue) }) {
-                        return@Scaffold
+                    val showBottomBar by remember(currentRoute) {
+                        derivedStateOf {
+                            bottomNavItems.any {
+                                it.route.contains(
+                                    currentRoute?.destination?.route ?: "",
+                                )
+                            }
+                        }
                     }
-                    NavigationBar {
-                        bottomNavItems.forEach {
-                            NavigationBarItem(
-                                selected = it == bottomNavSelection,
-                                icon = {
-                                    BadgedBox(
-                                        badge = {
-                                            if (it == BottomNavigationScreen.Jobs &&
-                                                pendingJobCount > 0
-                                            ) {
-                                                Badge { Text(text = pendingJobCount.toString()) }
-                                            }
-                                        },
-                                    ) {
-                                        val imageVector = if (it == bottomNavSelection) {
-                                            it.selectedIcon
-                                        } else {
-                                            it.unselectedIcon
-                                        }
-                                        Icon(imageVector, stringResource(it.label))
-                                    }
-                                },
-                                label = { Text(stringResource(it.label)) },
-                                onClick = {
-                                    navController.navigate(it.route) {
-                                        popUpTo(BottomNavigationScreen.Home.route)
-                                        launchSingleTop = true
-                                    }
-                                },
-                            )
+                    if (showBottomBar) {
+                        BottomBar(
+                            bottomNavItems = bottomNavItems,
+                            bottomNavSelection = bottomNavSelection,
+                            pendingJobCount = pendingJobCount,
+                        ) {
+                            viewModel.onNewBottomNavSelection(it)
+                            navController.navigate(it.route) {
+                                popUpTo(BottomNavigationScreen.Home.route)
+                                launchSingleTop = true
+                            }
                         }
                     }
                 },
@@ -230,23 +152,18 @@ fun MainScreen(
                             .consumeWindowInsets(it),
                     ) {
                         composable(BottomNavigationScreen.Home.route) {
-                            viewModel.onHomeSelected()
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }
                         composable(BottomNavigationScreen.Jobs.route) {
-                            viewModel.onJobsSelected()
                             OrchestratedJobsScreen(uiState.isProduction)
                         }
                         composable(BottomNavigationScreen.Resources.route) {
-                            viewModel.onResourcesSelected()
                             ResourcesScreen()
                         }
                         composable(BottomNavigationScreen.AboutUs.route) {
-                            viewModel.onAboutUsSelected()
                             AboutUsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
-                            viewModel.onSmartSelfieEnrollmentSelected()
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieEnrollment(
@@ -260,7 +177,6 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
-                            viewModel.onSmartSelfieAuthenticationSelected()
                             var userId by rememberSaveable {
                                 val clipboardText = clipboardManager.getText()?.text
                                 // Autofill the value of User ID as it was likely just copied
@@ -307,8 +223,7 @@ fun MainScreen(
                             )
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
-                            viewModel.onSmartSelfieAuthenticationSelected()
-                            val userId = it.arguments?.getString("userId")!!
+                            val userId = rememberSaveable { it.arguments?.getString("userId")!! }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
                                 userId = userId,
@@ -320,14 +235,12 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.EnhancedKyc.route) {
-                            viewModel.onEnhancedKycSelected()
                             OrchestratedEnhancedKycScreen { result ->
                                 viewModel.onEnhancedKycResult(result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.BiometricKyc.route) {
-                            viewModel.onBiometricKycSelected()
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
                             if (idInfo == null) {
                                 IdTypeSelectorAndFieldInputScreen(
@@ -358,7 +271,6 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
-                            viewModel.onDocumentVerificationSelected()
                             DocumentVerificationIdTypeSelector { country, idType ->
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
@@ -368,7 +280,6 @@ fun MainScreen(
                         composable(
                             ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
                         ) {
-                            viewModel.onDocumentVerificationSelected()
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             val documentType = remember(it) {
@@ -394,5 +305,120 @@ fun MainScreen(
                 },
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(
+    showUpButton: Boolean,
+    onNavigateUp: () -> Unit,
+    isJobsScreenSelected: Boolean,
+    viewModel: MainScreenViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    TopAppBar(
+        title = { Text(stringResource(id = uiState.appBarTitle)) },
+        navigationIcon = {
+            if (showUpButton) {
+                IconButton(onClick = onNavigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                    )
+                }
+            }
+        },
+        actions = {
+            FilterChip(
+                selected = uiState.isProduction,
+                onClick = viewModel::toggleEnvironment,
+                leadingIcon = {
+                    if (uiState.isProduction) {
+                        Icon(
+                            imageVector = Icons.Filled.Warning,
+                            contentDescription = stringResource(
+                                R.string.production,
+                            ),
+                        )
+                    }
+                },
+                label = { Text(stringResource(id = uiState.environmentName)) },
+            )
+            if (isJobsScreenSelected) {
+                PlainTooltipBox(
+                    tooltip = {
+                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                    },
+                ) {
+                    IconButton(
+                        onClick = viewModel::clearJobs,
+                        modifier = Modifier.tooltipAnchor(),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BottomBar(
+    bottomNavItems: ImmutableList<BottomNavigationScreen>,
+    bottomNavSelection: BottomNavigationScreen,
+    pendingJobCount: Int,
+    onBottomNavItemSelected: (BottomNavigationScreen) -> Unit,
+) {
+    NavigationBar {
+        bottomNavItems.forEach {
+            NavigationBarItem(
+                selected = it == bottomNavSelection,
+                icon = {
+                    BadgedBox(
+                        badge = {
+                            if (it == BottomNavigationScreen.Jobs &&
+                                pendingJobCount > 0
+                            ) {
+                                Badge { Text(text = pendingJobCount.toString()) }
+                            }
+                        },
+                    ) {
+                        val imageVector = if (it == bottomNavSelection) {
+                            it.selectedIcon
+                        } else {
+                            it.unselectedIcon
+                        }
+                        Icon(imageVector, stringResource(it.label))
+                    }
+                },
+                label = { Text(stringResource(it.label)) },
+                onClick = { onBottomNavItemSelected(it) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun Snackbar(viewModel: MainScreenViewModel = viewModel()) {
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = viewModel.uiState.collectAsStateWithLifecycle().value.snackbarMessage
+
+    // TODO: Could there be a bug here in case we have the same message twice in a row? (i.e. the same result)
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { coroutineScope.launch { snackbarHostState.showSnackbar(it) } }
+    }
+
+    SnackbarHost(snackbarHostState) {
+        Snackbar(
+            snackbarData = it,
+            actionColor = MaterialTheme.colorScheme.tertiary,
+        )
     }
 }
