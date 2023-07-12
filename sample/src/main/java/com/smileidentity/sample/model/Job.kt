@@ -8,6 +8,7 @@ import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
+import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobStatusResponse
@@ -60,7 +61,7 @@ private fun toHumanReadableTimestamp(timestamp: String): String {
 }
 
 fun EnhancedKycResponse.toJob() = Job(
-    jobType = SmartSelfieEnrollment,
+    jobType = EnhancedKyc,
     // Enhanced KYC is a synchronous response
     timestamp = toHumanReadableTimestamp(inputFormat.format(Date())),
     userId = partnerParams.userId,
