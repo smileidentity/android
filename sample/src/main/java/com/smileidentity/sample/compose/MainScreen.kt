@@ -3,6 +3,7 @@ package com.smileidentity.sample.compose
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,6 +31,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,8 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -54,25 +57,18 @@ import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
-import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
-import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.Screen
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
-import com.smileidentity.sample.jobResultMessageBuilder
-import com.smileidentity.sample.model.toJob
-import com.smileidentity.sample.repo.DataStoreRepository
-import com.smileidentity.sample.showSnackbar
+import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -83,28 +79,48 @@ fun MainScreen(
         factory = viewModelFactory { MainScreenViewModel() },
     ),
 ) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val clipboardManager = LocalClipboardManager.current
-    val startScreen = BottomNavigationScreen.Home
     val currentRoute = navController
         .currentBackStackEntryFlow
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
+        .value
 
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
     val bottomNavItems = remember { BottomNavigationScreen.values() }
-    var bottomNavSelection: Screen by remember { mutableStateOf(startScreen) }
+    val bottomNavSelection = uiState.bottomNavSelection
+
+    val pendingJobCount = viewModel.pendingJobCount
+        .collectAsStateWithLifecycle()
+        .value
 
     // Show up button when not on a BottomNavigationScreen
-    val showUpButton = currentRoute.value?.destination?.route?.let { route ->
+    val showUpButton = currentRoute?.destination?.route?.let { route ->
         bottomNavItems.none { it.route.contains(route) }
     } ?: false
-    var isProduction by rememberSaveable { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    // TODO: Could there be a bug here in case we have the same message twice in a row? (i.e. the same result)
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let { message ->
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+    }
+
+    val clipboardManager = LocalClipboardManager.current
+    LaunchedEffect(uiState.clipboardText) {
+        uiState.clipboardText?.let { text ->
+            coroutineScope.launch {
+                clipboardManager.setText(text)
+            }
+        }
+    }
 
     SmileIDTheme {
         Surface {
-            var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
                 snackbarHost = {
                     SnackbarHost(snackbarHostState) {
@@ -116,7 +132,7 @@ fun MainScreen(
                 },
                 topBar = {
                     TopAppBar(
-                        title = { Text(stringResource(currentScreenTitle)) },
+                        title = { Text(stringResource(id = uiState.appBarTitle)) },
                         navigationIcon = {
                             if (showUpButton) {
                                 IconButton(onClick = { navController.navigateUp() }) {
@@ -129,13 +145,10 @@ fun MainScreen(
                         },
                         actions = {
                             FilterChip(
-                                selected = isProduction,
-                                onClick = {
-                                    isProduction = !isProduction
-                                    SmileID.setEnvironment(useSandbox = !isProduction)
-                                },
+                                selected = uiState.isProduction,
+                                onClick = viewModel::toggleEnvironment,
                                 leadingIcon = {
-                                    if (isProduction) {
+                                    if (uiState.isProduction) {
                                         Icon(
                                             imageVector = Icons.Filled.Warning,
                                             contentDescription = stringResource(
@@ -144,14 +157,7 @@ fun MainScreen(
                                         )
                                     }
                                 },
-                                label = {
-                                    val environmentName = if (isProduction) {
-                                        R.string.production
-                                    } else {
-                                        R.string.sandbox
-                                    }
-                                    Text(stringResource(environmentName))
-                                },
+                                label = { Text(stringResource(id = uiState.environmentName)) },
                             )
                             if (bottomNavSelection == BottomNavigationScreen.Jobs) {
                                 PlainTooltipBox(
@@ -166,6 +172,7 @@ fun MainScreen(
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
                                         )
                                     }
                                 }
@@ -175,7 +182,9 @@ fun MainScreen(
                 },
                 bottomBar = {
                     // Don't show bottom bar when navigating to any product screens
-                    val currentRouteValue = currentRoute.value?.destination?.route ?: ""
+                    val currentRouteValue = remember(currentRoute) {
+                        derivedStateOf { currentRoute?.destination?.route ?: "" }
+                    }.value
                     if (bottomNavItems.none { it.route.contains(currentRouteValue) }) {
                         return@Scaffold
                     }
@@ -186,8 +195,10 @@ fun MainScreen(
                                 icon = {
                                     BadgedBox(
                                         badge = {
-                                            if (it == BottomNavigationScreen.Jobs) {
-                                                Badge { Text("1") }
+                                            if (it == BottomNavigationScreen.Jobs &&
+                                                pendingJobCount > 0
+                                            ) {
+                                                Badge { Text(text = pendingJobCount.toString()) }
                                             }
                                         },
                                     ) {
@@ -219,29 +230,23 @@ fun MainScreen(
                             .consumeWindowInsets(it),
                     ) {
                         composable(BottomNavigationScreen.Home.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            // Display "Smile ID" in the top bar instead of "Home" label
-                            currentScreenTitle = R.string.app_name
+                            viewModel.onHomeSelected()
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }
                         composable(BottomNavigationScreen.Jobs.route) {
-                            bottomNavSelection = BottomNavigationScreen.Jobs
-                            currentScreenTitle = BottomNavigationScreen.Jobs.label
-                            OrchestratedJobsScreen(isProduction)
+                            viewModel.onJobsSelected()
+                            OrchestratedJobsScreen(uiState.isProduction)
                         }
                         composable(BottomNavigationScreen.Resources.route) {
-                            bottomNavSelection = BottomNavigationScreen.Resources
-                            currentScreenTitle = BottomNavigationScreen.Resources.label
+                            viewModel.onResourcesSelected()
                             ResourcesScreen()
                         }
                         composable(BottomNavigationScreen.AboutUs.route) {
-                            bottomNavSelection = BottomNavigationScreen.AboutUs
-                            currentScreenTitle = BottomNavigationScreen.AboutUs.label
+                            viewModel.onAboutUsSelected()
                             AboutUsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieEnrollment.label
+                            viewModel.onSmartSelfieEnrollmentSelected()
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieEnrollment(
@@ -250,46 +255,12 @@ fun MainScreen(
                                 allowAgentMode = true,
                                 showInstructions = true,
                             ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse ?: run {
-                                        val errorMessage =
-                                            "SmartSelfie Enrollment jobStatusResponse is null"
-                                        Timber.e(errorMessage)
-                                        snackbarHostState.showSnackbar(coroutineScope, errorMessage)
-                                        return@SmartSelfieEnrollment
-                                    }
-                                    val actualResult = response.result as? JobResult.Entry
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "SmartSelfie Enrollment",
-                                        jobComplete = response.jobComplete,
-                                        jobSuccess = response.jobSuccess,
-                                        code = response.code,
-                                        resultCode = actualResult?.resultCode,
-                                        resultText = actualResult?.resultText,
-                                        suffix = "The User ID has been copied to your clipboard",
-                                    )
-                                    Timber.d("$message: $result")
-                                    clipboardManager.setText(AnnotatedString(userId))
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = response.toJob(userId, jobId, true),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "SmartSelfie Enrollment error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onSmartSelfieEnrollmentResult(userId, jobId, result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
+                            viewModel.onSmartSelfieAuthenticationSelected()
                             var userId by rememberSaveable {
                                 val clipboardText = clipboardManager.getText()?.text
                                 // Autofill the value of User ID as it was likely just copied
@@ -336,8 +307,7 @@ fun MainScreen(
                             )
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
+                            viewModel.onSmartSelfieAuthenticationSelected()
                             val userId = it.arguments?.getString("userId")!!
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
@@ -345,75 +315,19 @@ fun MainScreen(
                                 jobId = jobId,
                                 allowAgentMode = true,
                             ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse ?: run {
-                                        val errorMessage =
-                                            "SmartSelfie Authentication jobStatusResponse is null"
-                                        Timber.e(errorMessage)
-                                        snackbarHostState.showSnackbar(coroutineScope, errorMessage)
-                                        return@SmartSelfieAuthentication
-                                    }
-                                    val actualResult = response.result as? JobResult.Entry
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "SmartSelfie Authentication",
-                                        jobComplete = response.jobComplete,
-                                        jobSuccess = response.jobSuccess,
-                                        code = response.code,
-                                        resultCode = actualResult?.resultCode,
-                                        resultText = actualResult?.resultText,
-                                    )
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    Timber.d("$message: $result")
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = response.toJob(userId, jobId, true),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "SmartSelfie Authentication error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.EnhancedKyc.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.EnhancedKyc.label
+                            viewModel.onEnhancedKycSelected()
                             OrchestratedEnhancedKycScreen { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val resultData = result.data.response
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "Enhanced KYC",
-                                        jobComplete = true,
-                                        jobSuccess = true,
-                                        code = null,
-                                        resultCode = resultData.resultCode,
-                                        resultText = resultData.resultText,
-                                    )
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = resultData.toJob(),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "Enhanced KYC error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onEnhancedKycResult(result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.BiometricKyc.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.BiometricKyc.label
+                            viewModel.onBiometricKycSelected()
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
                             if (idInfo == null) {
                                 IdTypeSelectorAndFieldInputScreen(
@@ -422,7 +336,9 @@ fun MainScreen(
                                 )
                             }
                             idInfo?.let {
-                                val url = URL("https://smileidentity.com/privacy-policy")
+                                val url = remember {
+                                    URL("https://smileidentity.com/privacy-policy")
+                                }
                                 val userId = rememberSaveable { randomUserId() }
                                 val jobId = rememberSaveable { randomJobId() }
                                 SmileID.BiometricKYC(
@@ -436,39 +352,13 @@ fun MainScreen(
                                     productName = it.idType,
                                     partnerPrivacyPolicy = url,
                                 ) { result ->
-                                    if (result is SmileIDResult.Success) {
-                                        val response = result.data.jobStatusResponse
-                                        val actualResult = response.result as? JobResult.Entry
-                                        Timber.d("Biometric KYC Result: $result")
-                                        val message = jobResultMessageBuilder(
-                                            jobName = "Biometric KYC",
-                                            jobComplete = response.jobComplete,
-                                            jobSuccess = response.jobSuccess,
-                                            code = response.code,
-                                            resultCode = actualResult?.resultCode,
-                                            resultText = actualResult?.resultText,
-                                        )
-                                        snackbarHostState.showSnackbar(coroutineScope, message)
-                                        coroutineScope.launch {
-                                            DataStoreRepository.addJob(
-                                                partnerId = SmileID.config.partnerId,
-                                                isProduction = isProduction,
-                                                job = response.toJob(userId, jobId),
-                                            )
-                                        }
-                                    } else if (result is SmileIDResult.Error) {
-                                        val th = result.throwable
-                                        val message = "Biometric KYC error: ${th.message}"
-                                        Timber.e(th, message)
-                                        snackbarHostState.showSnackbar(coroutineScope, message)
-                                    }
+                                    viewModel.onBiometricKycResult(userId, jobId, result)
                                     navController.popBackStack()
                                 }
                             }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.DocumentVerification.label
+                            viewModel.onDocumentVerificationSelected()
                             DocumentVerificationIdTypeSelector { country, idType ->
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
@@ -478,44 +368,22 @@ fun MainScreen(
                         composable(
                             ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
                         ) {
+                            viewModel.onDocumentVerificationSelected()
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
-                            val documentType = Document(
-                                it.arguments?.getString("countryCode")!!,
-                                it.arguments?.getString("idType")!!,
-                            )
+                            val documentType = remember(it) {
+                                Document(
+                                    it.arguments?.getString("countryCode")!!,
+                                    it.arguments?.getString("idType")!!,
+                                )
+                            }
                             SmileID.DocumentVerification(
                                 userId = userId,
                                 jobId = jobId,
                                 idType = documentType,
                                 showInstructions = true,
                             ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse
-                                    val actualResult = response.result as? JobResult.Entry
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "Document Verification",
-                                        jobComplete = response.jobComplete,
-                                        jobSuccess = response.jobSuccess,
-                                        code = response.code,
-                                        resultCode = actualResult?.resultCode,
-                                        resultText = actualResult?.resultText,
-                                    )
-                                    Timber.d("$message: $result")
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = response.toJob(userId, jobId),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "Document Verification error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onDocumentVerificationResult(userId, jobId, result)
                                 navController.popBackStack(
                                     route = BottomNavigationScreen.Home.route,
                                     inclusive = false,
