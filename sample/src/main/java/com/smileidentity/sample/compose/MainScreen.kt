@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
@@ -20,6 +21,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -41,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -61,16 +64,25 @@ import com.smileidentity.sample.Screen
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
 import com.smileidentity.sample.jobResultMessageBuilder
+import com.smileidentity.sample.model.toJob
+import com.smileidentity.sample.repo.DataStoreRepository
 import com.smileidentity.sample.showSnackbar
+import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Preview
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainScreenViewModel = viewModel(
+        factory = viewModelFactory { MainScreenViewModel() },
+    ),
+) {
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -79,7 +91,6 @@ fun MainScreen() {
     val currentRoute = navController
         .currentBackStackEntryFlow
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
-
 
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
     val bottomNavItems = remember { BottomNavigationScreen.values() }
@@ -142,6 +153,23 @@ fun MainScreen() {
                                     Text(stringResource(environmentName))
                                 },
                             )
+                            if (bottomNavSelection == BottomNavigationScreen.Jobs) {
+                                PlainTooltipBox(
+                                    tooltip = {
+                                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                                    },
+                                ) {
+                                    IconButton(
+                                        onClick = viewModel::clearJobs,
+                                        modifier = Modifier.tooltipAnchor(),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                }
+                            }
                         },
                     )
                 },
@@ -243,6 +271,13 @@ fun MainScreen() {
                                     Timber.d("$message: $result")
                                     clipboardManager.setText(AnnotatedString(userId))
                                     snackbarHostState.showSnackbar(coroutineScope, message)
+                                    coroutineScope.launch {
+                                        DataStoreRepository.addJob(
+                                            partnerId = SmileID.config.partnerId,
+                                            isProduction = isProduction,
+                                            job = response.toJob(userId, jobId, true),
+                                        )
+                                    }
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Enrollment error: ${th.message}"
@@ -303,9 +338,10 @@ fun MainScreen() {
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
                             bottomNavSelection = BottomNavigationScreen.Home
                             currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
+                            val userId = it.arguments?.getString("userId")!!
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
-                                userId = it.arguments?.getString("userId")!!,
+                                userId = userId,
                                 jobId = jobId,
                                 allowAgentMode = true,
                             ) { result ->
@@ -328,6 +364,13 @@ fun MainScreen() {
                                     )
                                     snackbarHostState.showSnackbar(coroutineScope, message)
                                     Timber.d("$message: $result")
+                                    coroutineScope.launch {
+                                        DataStoreRepository.addJob(
+                                            partnerId = SmileID.config.partnerId,
+                                            isProduction = isProduction,
+                                            job = response.toJob(userId, jobId, true),
+                                        )
+                                    }
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "SmartSelfie Authentication error: ${th.message}"
@@ -352,6 +395,13 @@ fun MainScreen() {
                                         resultText = resultData.resultText,
                                     )
                                     snackbarHostState.showSnackbar(coroutineScope, message)
+                                    coroutineScope.launch {
+                                        DataStoreRepository.addJob(
+                                            partnerId = SmileID.config.partnerId,
+                                            isProduction = isProduction,
+                                            job = resultData.toJob(),
+                                        )
+                                    }
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "Enhanced KYC error: ${th.message}"
@@ -387,19 +437,25 @@ fun MainScreen() {
                                     partnerPrivacyPolicy = url,
                                 ) { result ->
                                     if (result is SmileIDResult.Success) {
-                                        val resultData = result.data
-                                        val actualResult = resultData.jobStatusResponse.result
-                                            as? JobResult.Entry
+                                        val response = result.data.jobStatusResponse
+                                        val actualResult = response.result as? JobResult.Entry
                                         Timber.d("Biometric KYC Result: $result")
                                         val message = jobResultMessageBuilder(
                                             jobName = "Biometric KYC",
-                                            jobComplete = resultData.jobStatusResponse.jobComplete,
-                                            jobSuccess = resultData.jobStatusResponse.jobSuccess,
-                                            code = resultData.jobStatusResponse.code,
+                                            jobComplete = response.jobComplete,
+                                            jobSuccess = response.jobSuccess,
+                                            code = response.code,
                                             resultCode = actualResult?.resultCode,
                                             resultText = actualResult?.resultText,
                                         )
                                         snackbarHostState.showSnackbar(coroutineScope, message)
+                                        coroutineScope.launch {
+                                            DataStoreRepository.addJob(
+                                                partnerId = SmileID.config.partnerId,
+                                                isProduction = isProduction,
+                                                job = response.toJob(userId, jobId),
+                                            )
+                                        }
                                     } else if (result is SmileIDResult.Error) {
                                         val th = result.throwable
                                         val message = "Biometric KYC error: ${th.message}"
@@ -435,19 +491,25 @@ fun MainScreen() {
                                 showInstructions = true,
                             ) { result ->
                                 if (result is SmileIDResult.Success) {
-                                    val resultData = result.data
-                                    val actualResult = resultData.jobStatusResponse.result
-                                        as? JobResult.Entry
+                                    val response = result.data.jobStatusResponse
+                                    val actualResult = response.result as? JobResult.Entry
                                     val message = jobResultMessageBuilder(
                                         jobName = "Document Verification",
-                                        jobComplete = resultData.jobStatusResponse.jobComplete,
-                                        jobSuccess = resultData.jobStatusResponse.jobSuccess,
-                                        code = resultData.jobStatusResponse.code,
+                                        jobComplete = response.jobComplete,
+                                        jobSuccess = response.jobSuccess,
+                                        code = response.code,
                                         resultCode = actualResult?.resultCode,
                                         resultText = actualResult?.resultText,
                                     )
                                     Timber.d("$message: $result")
                                     snackbarHostState.showSnackbar(coroutineScope, message)
+                                    coroutineScope.launch {
+                                        DataStoreRepository.addJob(
+                                            partnerId = SmileID.config.partnerId,
+                                            isProduction = isProduction,
+                                            job = response.toJob(userId, jobId),
+                                        )
+                                    }
                                 } else if (result is SmileIDResult.Error) {
                                     val th = result.throwable
                                     val message = "Document Verification error: ${th.message}"

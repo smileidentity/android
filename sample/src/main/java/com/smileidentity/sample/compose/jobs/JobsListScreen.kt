@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose.jobs
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -46,30 +47,67 @@ import androidx.compose.ui.unit.sp
 import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Actions
+import com.smileidentity.models.JobType
+import com.smileidentity.models.JobType.BiometricKyc
+import com.smileidentity.models.JobType.DocumentVerification
+import com.smileidentity.models.JobType.EnhancedKyc
+import com.smileidentity.models.JobType.SmartSelfieAuthentication
+import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.sample.compose.SmileIDTheme
-import com.smileidentity.sample.viewmodel.Job
+import com.smileidentity.sample.compose.components.ErrorScreen
+import com.smileidentity.sample.label
+import com.smileidentity.sample.model.Job
 import kotlinx.collections.immutable.ImmutableList
+import timber.log.Timber
 
 @Composable
 fun JobsListScreen(
     jobs: ImmutableList<Job>,
     modifier: Modifier = Modifier,
 ) {
+    if (jobs.isEmpty()) {
+        ErrorScreen(errorText = "No jobs found", onRetry = {})
+        return
+    }
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(jobs) {
+            @DrawableRes
+            val iconRes = when (it.jobType) {
+                SmartSelfieEnrollment -> R.drawable.si_smart_selfie_instructions_hero
+                SmartSelfieAuthentication -> R.drawable.si_smart_selfie_instructions_hero
+                DocumentVerification -> R.drawable.si_doc_v_instructions_hero
+                BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
+                EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
+                JobType.Unknown -> {
+                    Timber.e("Unknown job type")
+                    -1
+                }
+            }
+            val jobStatus = when {
+                it.jobSuccess -> "Success"
+                it.jobComplete -> "Rejected"
+                else -> "Pending"
+            }
             JobListItem(
                 sourceIcon = {
                     Image(
-                        painter = painterResource(it.icon),
+                        painter = painterResource(id = iconRes),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                     )
                 },
                 timestamp = it.timestamp,
-                jobType = stringResource(it.jobType),
-                jobStatus = it.jobStatus,
-                jobMessage = it.jobMessage,
-            )
+                jobType = stringResource(it.jobType.label),
+                jobStatus = jobStatus,
+                resultText = it.resultText,
+            ) {
+                JobListItemAdditionalDetails(
+                    userId = it.userId,
+                    jobId = it.jobId,
+                    smileJobId = it.smileJobId,
+                    resultCode = it.resultCode?.toString(),
+                )
+            }
         }
     }
 }
@@ -81,11 +119,11 @@ private fun JobListItem(
     timestamp: String,
     jobType: String,
     jobStatus: String?,
-    jobMessage: String?,
+    resultText: String?,
     modifier: Modifier = Modifier,
-    initiallyExpanded: Boolean = false,
+    expandedContent: @Composable ColumnScope.() -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(initiallyExpanded) }
+    var expanded by remember { mutableStateOf(false) }
     Card(
         onClick = { expanded = !expanded },
         modifier = modifier
@@ -98,11 +136,11 @@ private fun JobListItem(
             overlineContent = { Text(timestamp) },
             headlineContent = { Text(jobType) },
             supportingContent = {
-                if (jobMessage != null) {
-                    Text(jobMessage)
+                if (resultText != null) {
+                    Text(resultText)
                 }
                 if (expanded) {
-                    JobListItemAdditionalDetails()
+                    expandedContent()
                 }
                 if (jobStatus == null) {
                     Spacer(modifier = Modifier.size(4.dp))
@@ -191,30 +229,17 @@ fun JobListItemPreview() {
             timestamp = "7/6/23 12:04 PM",
             jobType = "SmartSelfie™ Enrollment",
             jobStatus = null,
-            jobMessage = "Enroll User",
-        )
+            resultText = "Enroll User",
+        ) { }
     }
 }
 
 @Composable
 @SmilePreviews
-private fun JobListItemExpandedPreview() {
+private fun JobListItemAdditionalDetailsPreview() {
     SmileIDTheme {
-        JobListItem(
-            sourceIcon = {
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.si_smart_selfie_instructions_hero,
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                )
-            },
-            timestamp = "7/6/23 12:04 PM",
-            jobType = "SmartSelfie™ Enrollment 2",
-            jobStatus = null,
-            jobMessage = "Enroll User",
-            initiallyExpanded = true,
-        )
+        Column {
+            JobListItemAdditionalDetails()
+        }
     }
 }

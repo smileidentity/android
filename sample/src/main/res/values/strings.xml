@@ -16,6 +16,7 @@
     <!--  Jobs Screen  -->
     <string name="jobs">Jobs</string>
     <string name="jobs_loading_error_message">Something went wrong</string>
+    <string name="jobs_clear_jobs_icon_tooltip">Clear Job History</string>
 
     <!--  Resources Screen  -->
     <string name="resources">Resources</string>

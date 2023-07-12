@@ -23,6 +23,7 @@ fun OrchestratedJobsScreen(
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val jobs = viewModel.jobs.collectAsStateWithLifecycle().value
     Box(
         contentAlignment = Center,
         modifier = modifier
@@ -30,8 +31,8 @@ fun OrchestratedJobsScreen(
     ) {
         when (uiState.processingState) {
             ProcessingState.InProgress -> CircularProgressIndicator()
-            ProcessingState.Error -> ErrorScreen { viewModel.onRetry() }
-            ProcessingState.Success -> JobsListScreen(uiState.jobs)
+            ProcessingState.Error -> ErrorScreen { /* Using a Flow, which automatically retries */ }
+            ProcessingState.Success -> JobsListScreen(jobs)
         }
     }
 }

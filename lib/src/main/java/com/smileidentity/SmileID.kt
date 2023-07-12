@@ -34,7 +34,7 @@ object SmileID {
     private lateinit var retrofit: Retrofit
 
     // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
-    internal var useSandbox: Boolean = true
+    var useSandbox: Boolean = true
 
     internal var apiKey: String? = null
 
