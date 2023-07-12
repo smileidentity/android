@@ -105,6 +105,7 @@ dependencies {
     implementation(project(":lib"))
     implementation(libs.kotlin.immutable.collections)
     implementation(libs.androidx.core)
+    implementation(libs.datastore)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment)
