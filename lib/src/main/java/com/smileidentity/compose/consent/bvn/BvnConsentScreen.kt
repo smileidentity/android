@@ -208,7 +208,7 @@ fun BvnConsentScreen(
                         ),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
-                        color = Color.Blue,
+                        color = colorResource(id = R.color.si_color_accent),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
                             viewModel.handleEvent(BvnConsentEvent.GoToSelectOTPDeliveryMode)
@@ -264,8 +264,7 @@ fun BvnConsentScreen(
                             text = stringResource(
                                 id = R.string.si_bvn_consent_different_delivery_option,
                             ),
-                            color = Color.Blue, // color = colorResource(id =
-                            // R.color.si_color_accent) doesn't work (wierd)
+                            color = colorResource(id = R.color.si_color_accent),
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,

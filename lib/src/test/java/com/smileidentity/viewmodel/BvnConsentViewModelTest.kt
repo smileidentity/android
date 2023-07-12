@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class BVnConsentViewModelTest {
+class BvnConsentViewModelTest {
     private lateinit var subject: BvnConsentViewModel
 
     @Before
