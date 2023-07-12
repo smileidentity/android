@@ -7,7 +7,7 @@ import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
@@ -33,7 +33,7 @@ class JobsViewModel(isProduction: Boolean) : ViewModel() {
         _uiState.update { it.copy(processingState = ProcessingState.Success) }
     }.stateIn(
         scope = viewModelScope,
-        started = Eagerly,
+        started = WhileSubscribed(),
         initialValue = persistentListOf(),
     )
 }
