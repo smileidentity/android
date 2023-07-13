@@ -11,9 +11,13 @@
     <string name="cont">Continue</string>
     <string name="loading">Loading…</string>
     <string name="version_info">Partner %1$s • %2$s</string>
+    <string name="try_again">Try Again</string>
+    <string name="something_went_wrong">Something went wrong</string>
 
     <!--  Jobs Screen  -->
     <string name="jobs">Jobs</string>
+    <string name="jobs_clear_jobs_icon_tooltip">Clear Job History</string>
+    <string name="jobs_no_jobs_found">No jobs found</string>
 
     <!--  Resources Screen  -->
     <string name="resources">Resources</string>

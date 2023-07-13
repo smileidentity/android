@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import com.smileidentity.models.JobType
 import com.smileidentity.sample.compose.components.SearchableInputFieldItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -59,6 +60,17 @@ fun jobResultMessageBuilder(
     suffix?.let { message.append(" $it") }
     return message.toString()
 }
+
+val JobType.label: Int
+    @StringRes
+    get() = when (this) {
+        JobType.SmartSelfieEnrollment -> com.smileidentity.R.string.si_smart_selfie_enrollment_product_name // ktlint-disable max-line-length
+        JobType.SmartSelfieAuthentication -> com.smileidentity.R.string.si_smart_selfie_authentication_product_name // ktlint-disable max-line-length
+        JobType.EnhancedKyc -> R.string.enhanced_kyc_product_name
+        JobType.BiometricKyc -> com.smileidentity.R.string.si_biometric_kyc_product_name
+        JobType.DocumentVerification -> com.smileidentity.R.string.si_doc_v_product_name
+        JobType.Unknown -> -1
+    }
 
 val countryDetails = mapOf(
     "AO" to SearchableInputFieldItem("AO", "Angola", "🇦🇴"),
