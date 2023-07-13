@@ -21,7 +21,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.spyk
 import io.mockk.verify
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -53,7 +52,6 @@ class SelfieCaptureScreenTest {
         composeTestRule.onNodeWithTag(cameraPreviewTag).assertIsDisplayed()
     }
 
-    @Ignore("Ignored because we have attribution disabled")
     @Test
     fun attributionShouldBeDisplayed() {
         // given
