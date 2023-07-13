@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -152,23 +151,23 @@ fun MainScreen(
                             .consumeWindowInsets(it),
                     ) {
                         composable(BottomNavigationScreen.Home.route) {
-                            SideEffect { viewModel.onHomeSelected() }
+                            LaunchedEffect(Unit) { viewModel.onHomeSelected() }
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }
                         composable(BottomNavigationScreen.Jobs.route) {
-                            SideEffect { viewModel.onJobsSelected() }
+                            LaunchedEffect(Unit) { viewModel.onJobsSelected() }
                             OrchestratedJobsScreen(uiState.isProduction)
                         }
                         composable(BottomNavigationScreen.Resources.route) {
-                            SideEffect { viewModel.onResourcesSelected() }
+                            LaunchedEffect(Unit) { viewModel.onResourcesSelected() }
                             ResourcesScreen()
                         }
                         composable(BottomNavigationScreen.AboutUs.route) {
-                            SideEffect { viewModel.onAboutUsSelected() }
+                            LaunchedEffect(Unit) { viewModel.onAboutUsSelected() }
                             AboutUsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
-                            SideEffect { viewModel.onSmartSelfieEnrollmentSelected() }
+                            LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieEnrollment(
@@ -182,54 +181,18 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
-                            SideEffect { viewModel.onSmartSelfieAuthenticationSelected() }
-                            var userId by rememberSaveable {
-                                val clipboardText = clipboardManager.getText()?.text
-                                // Autofill the value of User ID as it was likely just copied
-                                mutableStateOf(clipboardText?.takeIf { "user-" in it } ?: "")
-                            }
-                            AlertDialog(
-                                title = { Text(stringResource(R.string.user_id_dialog_title)) },
-                                text = {
-                                    OutlinedTextField(
-                                        value = userId,
-                                        onValueChange = { newValue -> userId = newValue.trim() },
-                                        label = { Text(stringResource(R.string.user_id_label)) },
-                                        supportingText = {
-                                            Text(
-                                                stringResource(
-                                                    R.string.user_id_dialog_supporting_text,
-                                                ),
-                                            )
-                                        },
-                                        // This is needed to allow the dialog to grow vertically in
-                                        // case of a long User ID
-                                        modifier = Modifier.wrapContentHeight(unbounded = true),
-                                    )
+                            LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                            SmartSelfieAuthenticationUserIdInputDialog(
+                                onDismiss = navController::popBackStack,
+                                onConfirm = { userId ->
+                                    navController.navigate(
+                                        "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
+                                    ) { popUpTo(BottomNavigationScreen.Home.route) }
                                 },
-                                onDismissRequest = { navController.popBackStack() },
-                                dismissButton = {
-                                    OutlinedButton(onClick = { navController.popBackStack() }) {
-                                        Text(stringResource(R.string.cancel))
-                                    }
-                                },
-                                confirmButton = {
-                                    Button(
-                                        enabled = userId.isNotBlank(),
-                                        onClick = {
-                                            navController.navigate(
-                                                "${ProductScreen.SmartSelfieAuthentication.route}/$userId", // ktlint-disable max-line-length
-                                            ) { popUpTo(BottomNavigationScreen.Home.route) }
-                                        },
-                                    ) { Text(stringResource(R.string.cont)) }
-                                },
-                                // This is needed to allow the dialog to grow vertically in case of
-                                // a long User ID
-                                modifier = Modifier.wrapContentHeight(),
                             )
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
-                            SideEffect { viewModel.onSmartSelfieAuthenticationSelected() }
+                            LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
                             val userId = rememberSaveable { it.arguments?.getString("userId")!! }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
@@ -242,14 +205,14 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.EnhancedKyc.route) {
-                            SideEffect { viewModel.onEnhancedKycSelected() }
+                            LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
                             OrchestratedEnhancedKycScreen { result ->
                                 viewModel.onEnhancedKycResult(result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.BiometricKyc.route) {
-                            SideEffect { viewModel.onBiometricKycSelected() }
+                            LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
                             if (idInfo == null) {
                                 IdTypeSelectorAndFieldInputScreen(
@@ -280,7 +243,7 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
-                            SideEffect { viewModel.onDocumentVerificationSelected() }
+                            LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                             DocumentVerificationIdTypeSelector { country, idType ->
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
@@ -290,7 +253,7 @@ fun MainScreen(
                         composable(
                             ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
                         ) {
-                            SideEffect { viewModel.onDocumentVerificationSelected() }
+                            LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             val documentType = remember(it) {
@@ -413,6 +376,52 @@ private fun BottomBar(
             )
         }
     }
+}
+
+@Composable
+private fun SmartSelfieAuthenticationUserIdInputDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    val clipboardManager = LocalClipboardManager.current
+    var userId by rememberSaveable {
+        val clipboardText = clipboardManager.getText()?.text
+        // Autofill the value of User ID as it was likely just copied
+        mutableStateOf(clipboardText?.takeIf { "user-" in it } ?: "")
+    }
+    AlertDialog(
+        title = { Text(stringResource(R.string.user_id_dialog_title)) },
+        text = {
+            OutlinedTextField(
+                value = userId,
+                onValueChange = { newValue -> userId = newValue.trim() },
+                label = { Text(stringResource(R.string.user_id_label)) },
+                supportingText = {
+                    Text(
+                        stringResource(
+                            R.string.user_id_dialog_supporting_text,
+                        ),
+                    )
+                },
+                // This is needed to allow the dialog to grow vertically in
+                // case of a long User ID
+                modifier = Modifier.wrapContentHeight(unbounded = true),
+            )
+        },
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        },
+        confirmButton = {
+            Button(
+                enabled = userId.isNotBlank(),
+                onClick = { onConfirm(userId) },
+            ) { Text(stringResource(R.string.cont)) }
+        },
+        // This is needed to allow the dialog to grow vertically in case of
+        // a long User ID
+        modifier = Modifier.wrapContentHeight(),
+    )
 }
 
 @Composable

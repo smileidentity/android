@@ -67,7 +67,6 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onHomeSelected() {
-        Timber.v("onHomeSelected")
         _uiState.update {
             it.copy(
                 appBarTitle = R.string.app_name,
