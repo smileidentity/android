@@ -3,6 +3,7 @@ package com.smileidentity.sample.compose
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,6 +31,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,8 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -54,28 +57,23 @@ import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
-import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
-import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.Screen
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
-import com.smileidentity.sample.jobResultMessageBuilder
-import com.smileidentity.sample.model.toJob
-import com.smileidentity.sample.repo.DataStoreRepository
-import com.smileidentity.sample.showSnackbar
+import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.net.URL
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun MainScreen(
@@ -85,128 +83,62 @@ fun MainScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val clipboardManager = LocalClipboardManager.current
-    val startScreen = BottomNavigationScreen.Home
-    val currentRoute = navController
+    val currentRoute by navController
         .currentBackStackEntryFlow
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
 
-    // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
-    val bottomNavItems = remember { BottomNavigationScreen.values() }
-    var bottomNavSelection: Screen by remember { mutableStateOf(startScreen) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val bottomNavSelection = uiState.bottomNavSelection
+    val pendingJobCount by viewModel.pendingJobCount.collectAsStateWithLifecycle()
 
+    // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
+    val bottomNavItems = remember { BottomNavigationScreen.values().toList().toImmutableList() }
     // Show up button when not on a BottomNavigationScreen
-    val showUpButton = currentRoute.value?.destination?.route?.let { route ->
+    val showUpButton = currentRoute?.destination?.route?.let { route ->
         bottomNavItems.none { it.route.contains(route) }
     } ?: false
-    var isProduction by rememberSaveable { mutableStateOf(false) }
+
+    val clipboardManager = LocalClipboardManager.current
+    LaunchedEffect(uiState.clipboardText) {
+        uiState.clipboardText?.let { text ->
+            coroutineScope.launch {
+                clipboardManager.setText(text)
+            }
+        }
+    }
 
     SmileIDTheme {
         Surface {
-            var currentScreenTitle by remember { mutableStateOf(R.string.app_name) }
             Scaffold(
-                snackbarHost = {
-                    SnackbarHost(snackbarHostState) {
-                        Snackbar(
-                            snackbarData = it,
-                            actionColor = MaterialTheme.colorScheme.tertiary,
-                        )
-                    }
-                },
+                snackbarHost = { Snackbar() },
                 topBar = {
-                    TopAppBar(
-                        title = { Text(stringResource(currentScreenTitle)) },
-                        navigationIcon = {
-                            if (showUpButton) {
-                                IconButton(onClick = { navController.navigateUp() }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.ArrowBack,
-                                        contentDescription = stringResource(R.string.back),
-                                    )
-                                }
-                            }
-                        },
-                        actions = {
-                            FilterChip(
-                                selected = isProduction,
-                                onClick = {
-                                    isProduction = !isProduction
-                                    SmileID.setEnvironment(useSandbox = !isProduction)
-                                },
-                                leadingIcon = {
-                                    if (isProduction) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Warning,
-                                            contentDescription = stringResource(
-                                                R.string.production,
-                                            ),
-                                        )
-                                    }
-                                },
-                                label = {
-                                    val environmentName = if (isProduction) {
-                                        R.string.production
-                                    } else {
-                                        R.string.sandbox
-                                    }
-                                    Text(stringResource(environmentName))
-                                },
-                            )
-                            if (bottomNavSelection == BottomNavigationScreen.Jobs) {
-                                PlainTooltipBox(
-                                    tooltip = {
-                                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
-                                    },
-                                ) {
-                                    IconButton(
-                                        onClick = viewModel::clearJobs,
-                                        modifier = Modifier.tooltipAnchor(),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = null,
-                                        )
-                                    }
-                                }
-                            }
-                        },
+                    TopBar(
+                        showUpButton = showUpButton,
+                        onNavigateUp = { navController.navigateUp() },
+                        isJobsScreenSelected = bottomNavSelection == BottomNavigationScreen.Jobs,
                     )
                 },
                 bottomBar = {
                     // Don't show bottom bar when navigating to any product screens
-                    val currentRouteValue = currentRoute.value?.destination?.route ?: ""
-                    if (bottomNavItems.none { it.route.contains(currentRouteValue) }) {
-                        return@Scaffold
+                    val showBottomBar by remember(currentRoute) {
+                        derivedStateOf {
+                            bottomNavItems.any {
+                                it.route.contains(
+                                    currentRoute?.destination?.route ?: "",
+                                )
+                            }
+                        }
                     }
-                    NavigationBar {
-                        bottomNavItems.forEach {
-                            NavigationBarItem(
-                                selected = it == bottomNavSelection,
-                                icon = {
-                                    BadgedBox(
-                                        badge = {
-                                            if (it == BottomNavigationScreen.Jobs) {
-                                                Badge { Text("1") }
-                                            }
-                                        },
-                                    ) {
-                                        val imageVector = if (it == bottomNavSelection) {
-                                            it.selectedIcon
-                                        } else {
-                                            it.unselectedIcon
-                                        }
-                                        Icon(imageVector, stringResource(it.label))
-                                    }
-                                },
-                                label = { Text(stringResource(it.label)) },
-                                onClick = {
-                                    navController.navigate(it.route) {
-                                        popUpTo(BottomNavigationScreen.Home.route)
-                                        launchSingleTop = true
-                                    }
-                                },
-                            )
+                    if (showBottomBar) {
+                        BottomBar(
+                            bottomNavItems = bottomNavItems,
+                            bottomNavSelection = bottomNavSelection,
+                            pendingJobCount = pendingJobCount,
+                        ) {
+                            navController.navigate(it.route) {
+                                popUpTo(BottomNavigationScreen.Home.route)
+                                launchSingleTop = true
+                            }
                         }
                     }
                 },
@@ -219,29 +151,23 @@ fun MainScreen(
                             .consumeWindowInsets(it),
                     ) {
                         composable(BottomNavigationScreen.Home.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            // Display "Smile ID" in the top bar instead of "Home" label
-                            currentScreenTitle = R.string.app_name
+                            LaunchedEffect(Unit) { viewModel.onHomeSelected() }
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }
                         composable(BottomNavigationScreen.Jobs.route) {
-                            bottomNavSelection = BottomNavigationScreen.Jobs
-                            currentScreenTitle = BottomNavigationScreen.Jobs.label
-                            OrchestratedJobsScreen(isProduction)
+                            LaunchedEffect(Unit) { viewModel.onJobsSelected() }
+                            OrchestratedJobsScreen(uiState.isProduction)
                         }
                         composable(BottomNavigationScreen.Resources.route) {
-                            bottomNavSelection = BottomNavigationScreen.Resources
-                            currentScreenTitle = BottomNavigationScreen.Resources.label
+                            LaunchedEffect(Unit) { viewModel.onResourcesSelected() }
                             ResourcesScreen()
                         }
                         composable(BottomNavigationScreen.AboutUs.route) {
-                            bottomNavSelection = BottomNavigationScreen.AboutUs
-                            currentScreenTitle = BottomNavigationScreen.AboutUs.label
+                            LaunchedEffect(Unit) { viewModel.onAboutUsSelected() }
                             AboutUsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieEnrollment.label
+                            LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieEnrollment(
@@ -250,170 +176,43 @@ fun MainScreen(
                                 allowAgentMode = true,
                                 showInstructions = true,
                             ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse ?: run {
-                                        val errorMessage =
-                                            "SmartSelfie Enrollment jobStatusResponse is null"
-                                        Timber.e(errorMessage)
-                                        snackbarHostState.showSnackbar(coroutineScope, errorMessage)
-                                        return@SmartSelfieEnrollment
-                                    }
-                                    val actualResult = response.result as? JobResult.Entry
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "SmartSelfie Enrollment",
-                                        jobComplete = response.jobComplete,
-                                        jobSuccess = response.jobSuccess,
-                                        code = response.code,
-                                        resultCode = actualResult?.resultCode,
-                                        resultText = actualResult?.resultText,
-                                        suffix = "The User ID has been copied to your clipboard",
-                                    )
-                                    Timber.d("$message: $result")
-                                    clipboardManager.setText(AnnotatedString(userId))
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = response.toJob(userId, jobId, true),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "SmartSelfie Enrollment error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onSmartSelfieEnrollmentResult(userId, jobId, result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
-                            var userId by rememberSaveable {
-                                val clipboardText = clipboardManager.getText()?.text
-                                // Autofill the value of User ID as it was likely just copied
-                                mutableStateOf(clipboardText?.takeIf { "user-" in it } ?: "")
-                            }
-                            AlertDialog(
-                                title = { Text(stringResource(R.string.user_id_dialog_title)) },
-                                text = {
-                                    OutlinedTextField(
-                                        value = userId,
-                                        onValueChange = { newValue -> userId = newValue.trim() },
-                                        label = { Text(stringResource(R.string.user_id_label)) },
-                                        supportingText = {
-                                            Text(
-                                                stringResource(
-                                                    R.string.user_id_dialog_supporting_text,
-                                                ),
-                                            )
-                                        },
-                                        // This is needed to allow the dialog to grow vertically in
-                                        // case of a long User ID
-                                        modifier = Modifier.wrapContentHeight(unbounded = true),
-                                    )
+                            LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                            SmartSelfieAuthenticationUserIdInputDialog(
+                                onDismiss = navController::popBackStack,
+                                onConfirm = { userId ->
+                                    navController.navigate(
+                                        "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
+                                    ) { popUpTo(BottomNavigationScreen.Home.route) }
                                 },
-                                onDismissRequest = { navController.popBackStack() },
-                                dismissButton = {
-                                    OutlinedButton(onClick = { navController.popBackStack() }) {
-                                        Text(stringResource(R.string.cancel))
-                                    }
-                                },
-                                confirmButton = {
-                                    Button(
-                                        enabled = userId.isNotBlank(),
-                                        onClick = {
-                                            navController.navigate(
-                                                "${ProductScreen.SmartSelfieAuthentication.route}/$userId", // ktlint-disable max-line-length
-                                            ) { popUpTo(BottomNavigationScreen.Home.route) }
-                                        },
-                                    ) { Text(stringResource(R.string.cont)) }
-                                },
-                                // This is needed to allow the dialog to grow vertically in case of
-                                // a long User ID
-                                modifier = Modifier.wrapContentHeight(),
                             )
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.SmartSelfieAuthentication.label
-                            val userId = it.arguments?.getString("userId")!!
+                            LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                            val userId = rememberSaveable { it.arguments?.getString("userId")!! }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
                                 userId = userId,
                                 jobId = jobId,
                                 allowAgentMode = true,
                             ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse ?: run {
-                                        val errorMessage =
-                                            "SmartSelfie Authentication jobStatusResponse is null"
-                                        Timber.e(errorMessage)
-                                        snackbarHostState.showSnackbar(coroutineScope, errorMessage)
-                                        return@SmartSelfieAuthentication
-                                    }
-                                    val actualResult = response.result as? JobResult.Entry
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "SmartSelfie Authentication",
-                                        jobComplete = response.jobComplete,
-                                        jobSuccess = response.jobSuccess,
-                                        code = response.code,
-                                        resultCode = actualResult?.resultCode,
-                                        resultText = actualResult?.resultText,
-                                    )
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    Timber.d("$message: $result")
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = response.toJob(userId, jobId, true),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "SmartSelfie Authentication error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.EnhancedKyc.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.EnhancedKyc.label
+                            LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
                             OrchestratedEnhancedKycScreen { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val resultData = result.data.response
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "Enhanced KYC",
-                                        jobComplete = true,
-                                        jobSuccess = true,
-                                        code = null,
-                                        resultCode = resultData.resultCode,
-                                        resultText = resultData.resultText,
-                                    )
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = resultData.toJob(),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "Enhanced KYC error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onEnhancedKycResult(result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.BiometricKyc.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.BiometricKyc.label
+                            LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
                             if (idInfo == null) {
                                 IdTypeSelectorAndFieldInputScreen(
@@ -422,7 +221,9 @@ fun MainScreen(
                                 )
                             }
                             idInfo?.let {
-                                val url = URL("https://smileidentity.com/privacy-policy")
+                                val url = remember {
+                                    URL("https://smileidentity.com/privacy-policy")
+                                }
                                 val userId = rememberSaveable { randomUserId() }
                                 val jobId = rememberSaveable { randomJobId() }
                                 SmileID.BiometricKYC(
@@ -436,39 +237,13 @@ fun MainScreen(
                                     productName = it.idType,
                                     partnerPrivacyPolicy = url,
                                 ) { result ->
-                                    if (result is SmileIDResult.Success) {
-                                        val response = result.data.jobStatusResponse
-                                        val actualResult = response.result as? JobResult.Entry
-                                        Timber.d("Biometric KYC Result: $result")
-                                        val message = jobResultMessageBuilder(
-                                            jobName = "Biometric KYC",
-                                            jobComplete = response.jobComplete,
-                                            jobSuccess = response.jobSuccess,
-                                            code = response.code,
-                                            resultCode = actualResult?.resultCode,
-                                            resultText = actualResult?.resultText,
-                                        )
-                                        snackbarHostState.showSnackbar(coroutineScope, message)
-                                        coroutineScope.launch {
-                                            DataStoreRepository.addJob(
-                                                partnerId = SmileID.config.partnerId,
-                                                isProduction = isProduction,
-                                                job = response.toJob(userId, jobId),
-                                            )
-                                        }
-                                    } else if (result is SmileIDResult.Error) {
-                                        val th = result.throwable
-                                        val message = "Biometric KYC error: ${th.message}"
-                                        Timber.e(th, message)
-                                        snackbarHostState.showSnackbar(coroutineScope, message)
-                                    }
+                                    viewModel.onBiometricKycResult(userId, jobId, result)
                                     navController.popBackStack()
                                 }
                             }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
-                            bottomNavSelection = BottomNavigationScreen.Home
-                            currentScreenTitle = ProductScreen.DocumentVerification.label
+                            LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                             DocumentVerificationIdTypeSelector { country, idType ->
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
@@ -478,44 +253,22 @@ fun MainScreen(
                         composable(
                             ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
                         ) {
+                            LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
-                            val documentType = Document(
-                                it.arguments?.getString("countryCode")!!,
-                                it.arguments?.getString("idType")!!,
-                            )
+                            val documentType = remember(it) {
+                                Document(
+                                    it.arguments?.getString("countryCode")!!,
+                                    it.arguments?.getString("idType")!!,
+                                )
+                            }
                             SmileID.DocumentVerification(
                                 userId = userId,
                                 jobId = jobId,
                                 idType = documentType,
                                 showInstructions = true,
                             ) { result ->
-                                if (result is SmileIDResult.Success) {
-                                    val response = result.data.jobStatusResponse
-                                    val actualResult = response.result as? JobResult.Entry
-                                    val message = jobResultMessageBuilder(
-                                        jobName = "Document Verification",
-                                        jobComplete = response.jobComplete,
-                                        jobSuccess = response.jobSuccess,
-                                        code = response.code,
-                                        resultCode = actualResult?.resultCode,
-                                        resultText = actualResult?.resultText,
-                                    )
-                                    Timber.d("$message: $result")
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                    coroutineScope.launch {
-                                        DataStoreRepository.addJob(
-                                            partnerId = SmileID.config.partnerId,
-                                            isProduction = isProduction,
-                                            job = response.toJob(userId, jobId),
-                                        )
-                                    }
-                                } else if (result is SmileIDResult.Error) {
-                                    val th = result.throwable
-                                    val message = "Document Verification error: ${th.message}"
-                                    Timber.e(th, message)
-                                    snackbarHostState.showSnackbar(coroutineScope, message)
-                                }
+                                viewModel.onDocumentVerificationResult(userId, jobId, result)
                                 navController.popBackStack(
                                     route = BottomNavigationScreen.Home.route,
                                     inclusive = false,
@@ -526,5 +279,165 @@ fun MainScreen(
                 },
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(
+    showUpButton: Boolean,
+    onNavigateUp: () -> Unit,
+    isJobsScreenSelected: Boolean,
+    viewModel: MainScreenViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    TopAppBar(
+        title = { Text(stringResource(id = uiState.appBarTitle)) },
+        navigationIcon = {
+            if (showUpButton) {
+                IconButton(onClick = onNavigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                    )
+                }
+            }
+        },
+        actions = {
+            FilterChip(
+                selected = uiState.isProduction,
+                onClick = viewModel::toggleEnvironment,
+                leadingIcon = {
+                    if (uiState.isProduction) {
+                        Icon(
+                            imageVector = Icons.Filled.Warning,
+                            contentDescription = stringResource(
+                                R.string.production,
+                            ),
+                        )
+                    }
+                },
+                label = { Text(stringResource(id = uiState.environmentName)) },
+            )
+            if (isJobsScreenSelected) {
+                PlainTooltipBox(
+                    tooltip = {
+                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                    },
+                ) {
+                    IconButton(
+                        onClick = viewModel::clearJobs,
+                        modifier = Modifier.tooltipAnchor(),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BottomBar(
+    bottomNavItems: ImmutableList<BottomNavigationScreen>,
+    bottomNavSelection: BottomNavigationScreen,
+    pendingJobCount: Int,
+    onBottomNavItemSelected: (BottomNavigationScreen) -> Unit,
+) {
+    NavigationBar {
+        bottomNavItems.forEach {
+            NavigationBarItem(
+                selected = it == bottomNavSelection,
+                icon = {
+                    BadgedBox(
+                        badge = {
+                            if (it == BottomNavigationScreen.Jobs &&
+                                pendingJobCount > 0
+                            ) {
+                                Badge { Text(text = pendingJobCount.toString()) }
+                            }
+                        },
+                    ) {
+                        val imageVector = if (it == bottomNavSelection) {
+                            it.selectedIcon
+                        } else {
+                            it.unselectedIcon
+                        }
+                        Icon(imageVector, stringResource(it.label))
+                    }
+                },
+                label = { Text(stringResource(it.label)) },
+                onClick = { onBottomNavItemSelected(it) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SmartSelfieAuthenticationUserIdInputDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    val clipboardManager = LocalClipboardManager.current
+    var userId by rememberSaveable {
+        val clipboardText = clipboardManager.getText()?.text
+        // Autofill the value of User ID as it was likely just copied
+        mutableStateOf(clipboardText?.takeIf { "user-" in it } ?: "")
+    }
+    AlertDialog(
+        title = { Text(stringResource(R.string.user_id_dialog_title)) },
+        text = {
+            OutlinedTextField(
+                value = userId,
+                onValueChange = { newValue -> userId = newValue.trim() },
+                label = { Text(stringResource(R.string.user_id_label)) },
+                supportingText = {
+                    Text(
+                        stringResource(
+                            R.string.user_id_dialog_supporting_text,
+                        ),
+                    )
+                },
+                // This is needed to allow the dialog to grow vertically in
+                // case of a long User ID
+                modifier = Modifier.wrapContentHeight(unbounded = true),
+            )
+        },
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        },
+        confirmButton = {
+            Button(
+                enabled = userId.isNotBlank(),
+                onClick = { onConfirm(userId) },
+            ) { Text(stringResource(R.string.cont)) }
+        },
+        // This is needed to allow the dialog to grow vertically in case of
+        // a long User ID
+        modifier = Modifier.wrapContentHeight(),
+    )
+}
+
+@Composable
+private fun Snackbar(viewModel: MainScreenViewModel = viewModel()) {
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = viewModel.uiState.collectAsStateWithLifecycle().value.snackbarMessage
+
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { coroutineScope.launch { snackbarHostState.showSnackbar(it.value) } }
+    }
+
+    SnackbarHost(snackbarHostState) {
+        Snackbar(
+            snackbarData = it,
+            actionColor = MaterialTheme.colorScheme.tertiary,
+        )
     }
 }
