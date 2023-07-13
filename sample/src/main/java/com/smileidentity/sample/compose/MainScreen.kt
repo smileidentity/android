@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -135,7 +136,6 @@ fun MainScreen(
                             bottomNavSelection = bottomNavSelection,
                             pendingJobCount = pendingJobCount,
                         ) {
-                            viewModel.onNewBottomNavSelection(it)
                             navController.navigate(it.route) {
                                 popUpTo(BottomNavigationScreen.Home.route)
                                 launchSingleTop = true
@@ -152,18 +152,23 @@ fun MainScreen(
                             .consumeWindowInsets(it),
                     ) {
                         composable(BottomNavigationScreen.Home.route) {
+                            SideEffect { viewModel.onHomeSelected() }
                             ProductSelectionScreen { navController.navigate(it.route) }
                         }
                         composable(BottomNavigationScreen.Jobs.route) {
+                            SideEffect { viewModel.onJobsSelected() }
                             OrchestratedJobsScreen(uiState.isProduction)
                         }
                         composable(BottomNavigationScreen.Resources.route) {
+                            SideEffect { viewModel.onResourcesSelected() }
                             ResourcesScreen()
                         }
                         composable(BottomNavigationScreen.AboutUs.route) {
+                            SideEffect { viewModel.onAboutUsSelected() }
                             AboutUsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
+                            SideEffect { viewModel.onSmartSelfieEnrollmentSelected() }
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieEnrollment(
@@ -177,6 +182,7 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route) {
+                            SideEffect { viewModel.onSmartSelfieAuthenticationSelected() }
                             var userId by rememberSaveable {
                                 val clipboardText = clipboardManager.getText()?.text
                                 // Autofill the value of User ID as it was likely just copied
@@ -223,6 +229,7 @@ fun MainScreen(
                             )
                         }
                         composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
+                            SideEffect { viewModel.onSmartSelfieAuthenticationSelected() }
                             val userId = rememberSaveable { it.arguments?.getString("userId")!! }
                             val jobId = rememberSaveable { randomJobId() }
                             SmileID.SmartSelfieAuthentication(
@@ -235,12 +242,14 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.EnhancedKyc.route) {
+                            SideEffect { viewModel.onEnhancedKycSelected() }
                             OrchestratedEnhancedKycScreen { result ->
                                 viewModel.onEnhancedKycResult(result)
                                 navController.popBackStack()
                             }
                         }
                         composable(ProductScreen.BiometricKyc.route) {
+                            SideEffect { viewModel.onBiometricKycSelected() }
                             var idInfo: IdInfo? by remember { mutableStateOf(null) }
                             if (idInfo == null) {
                                 IdTypeSelectorAndFieldInputScreen(
@@ -271,6 +280,7 @@ fun MainScreen(
                             }
                         }
                         composable(ProductScreen.DocumentVerification.route) {
+                            SideEffect { viewModel.onDocumentVerificationSelected() }
                             DocumentVerificationIdTypeSelector { country, idType ->
                                 navController.navigate(
                                     "${ProductScreen.DocumentVerification.route}/$country/$idType",
@@ -280,6 +290,7 @@ fun MainScreen(
                         composable(
                             ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
                         ) {
+                            SideEffect { viewModel.onDocumentVerificationSelected() }
                             val userId = rememberSaveable { randomUserId() }
                             val jobId = rememberSaveable { randomJobId() }
                             val documentType = remember(it) {
@@ -410,9 +421,8 @@ private fun Snackbar(viewModel: MainScreenViewModel = viewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarMessage = viewModel.uiState.collectAsStateWithLifecycle().value.snackbarMessage
 
-    // TODO: Could there be a bug here in case we have the same message twice in a row? (i.e. the same result)
     LaunchedEffect(snackbarMessage) {
-        snackbarMessage?.let { coroutineScope.launch { snackbarHostState.showSnackbar(it) } }
+        snackbarMessage?.let { coroutineScope.launch { snackbarHostState.showSnackbar(it.value) } }
     }
 
     SnackbarHost(snackbarHostState) {
