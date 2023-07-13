@@ -55,6 +55,11 @@ jobs:
         with:
           name: SDK AAR
           path: lib/build/outputs/aar/lib-debug.aar
+      - name: Archive Sample App
+        uses: actions/upload-artifact@v3
+        with:
+          name: Sample App APK
+          path: sample/build/outputs/apk/debug/sample-debug.apk
 
   lint:
     runs-on: ubuntu-latest
