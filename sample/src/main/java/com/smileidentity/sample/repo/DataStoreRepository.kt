@@ -76,8 +76,8 @@ object DataStoreRepository {
      *
      * If no config is set, this returns null
      */
-    fun getConfig(): Flow<Config?> = mainDataStore.data.map {
-        it[Keys.config]?.let { SmileID.moshi.adapter(Config::class.java).fromJson(it) }
+    fun getConfig(): Flow<String?> = mainDataStore.data.map { preferences ->
+        preferences[Keys.config]?.let { it }
     }
 
     /**
