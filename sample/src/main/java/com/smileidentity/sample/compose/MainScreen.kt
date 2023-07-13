@@ -161,9 +161,9 @@ fun MainScreen(
                             LaunchedEffect(Unit) { viewModel.onResourcesSelected() }
                             ResourcesScreen()
                         }
-                        composable(BottomNavigationScreen.AboutUs.route) {
-                            LaunchedEffect(Unit) { viewModel.onAboutUsSelected() }
-                            AboutUsScreen()
+                        composable(BottomNavigationScreen.Settings.route) {
+                            LaunchedEffect(Unit) { viewModel.onSettingsSelected() }
+                            SettingsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
                             LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }

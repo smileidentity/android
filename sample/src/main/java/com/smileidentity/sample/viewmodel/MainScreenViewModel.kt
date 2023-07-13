@@ -47,6 +47,7 @@ import timber.log.Timber
 class SnackbarMessage(val value: String)
 
 data class MainScreenUiState(
+    val shouldShowSmileConfigBottomSheet: Boolean = false,
     @StringRes val appBarTitle: Int = R.string.app_name,
     val isProduction: Boolean = !SmileID.useSandbox,
     val snackbarMessage: SnackbarMessage? = null,
@@ -198,13 +199,17 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onAboutUsSelected() {
+    fun onSettingsSelected() {
         _uiState.update {
             it.copy(
-                appBarTitle = BottomNavigationScreen.AboutUs.label,
-                bottomNavSelection = BottomNavigationScreen.AboutUs,
+                appBarTitle = BottomNavigationScreen.Settings.label,
+                bottomNavSelection = BottomNavigationScreen.Settings,
             )
         }
+    }
+
+    fun showSmileConfigBottomSheet() {
+        _uiState.update { it.copy(shouldShowSmileConfigBottomSheet = true) }
     }
 
     fun onSmartSelfieEnrollmentSelected() {
