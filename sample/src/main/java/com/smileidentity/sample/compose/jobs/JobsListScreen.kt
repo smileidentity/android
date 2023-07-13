@@ -66,7 +66,10 @@ fun JobsListScreen(
     modifier: Modifier = Modifier,
 ) {
     if (jobs.isEmpty()) {
-        ErrorScreen(errorText = "No jobs found", onRetry = {})
+        ErrorScreen(
+            errorText = stringResource(com.smileidentity.sample.R.string.jobs_no_jobs_found),
+            onRetry = {},
+        )
         return
     }
     LazyColumn(modifier = modifier.fillMaxSize()) {

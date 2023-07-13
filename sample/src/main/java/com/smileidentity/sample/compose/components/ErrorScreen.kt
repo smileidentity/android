@@ -18,7 +18,7 @@ import com.smileidentity.sample.compose.SmileIDTheme
 @Composable
 fun ErrorScreen(
     modifier: Modifier = Modifier,
-    errorText: String = stringResource(id = R.string.jobs_loading_error_message),
+    errorText: String = stringResource(id = R.string.something_went_wrong),
     onRetry: () -> Unit,
 ) {
     Column(
