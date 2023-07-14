@@ -1,20 +1,33 @@
 # Changelog
 
-## 10.0.0-beta04 (unreleased)
+## 10.0.0-beta05 (unreleased)
+
+### Added
+
+### Fixed
+
+### Changed
+
+### Removed
+
+## 10.0.0-beta04
 
 ### Added
 - Biometric KYC Fragment
 - Made IdInfo Parcelable
 - Option to disable Instructions Screen on Document Verification and SmartSelfie™
+- Smile ID Attribution
 
 ### Fixed
+- Fixed bug where Document Captures were incorrectly cropped
+- Marked `selfieFile` as a required field in the returned `DocumentVerificationResult` 
 
 ### Changed
 - Updated KDocs
-- Bump Gradle to 8.2
 - Rename `ImageType` enums to indicate PNGs are no longer supported 
-
-### Removed
+- Bump Gradle to 8.2.1
+- Bump Coroutines to 1.7.2
+- Bump Sentry to 6.25.0
 
 ## 10.0.0-beta03
 
