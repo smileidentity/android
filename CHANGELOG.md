@@ -1,27 +1,40 @@
 # Changelog
 
-## 10.0.0-beta04 (unreleased)
+## 10.0.0-beta05 (unreleased)
 
 ### Added
-- Biometric KYC Fragment
-- Made IdInfo Parcelable
 - Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
 - Add a `JobStatusResponse` interface
-- Option to disable Instructions Screen on Document Verification and SmartSelfie™
 
 ### Fixed
 
 ### Changed
-- Updated KDocs
-- Bump Gradle to 8.2
 - Updated API key exception error message to be actionable
-- Rename `ImageType` enums to indicate PNGs are no longer supported 
 - `SmileID.useSandbox` is now publicly accessible
 
 ### Removed
-- Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The 
+- Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The
   returned `SmileIDResult`s will now contain only the immediate result of job status without waiting
   for job completion
+
+## 10.0.0-beta04
+
+### Added
+- Biometric KYC Fragment
+- Made IdInfo Parcelable
+- Option to disable Instructions Screen on Document Verification and SmartSelfie™
+- Smile ID Attribution
+
+### Fixed
+- Fixed bug where Document Captures were incorrectly cropped
+- Marked `selfieFile` as a required field in the returned `DocumentVerificationResult` 
+
+### Changed
+- Updated KDocs
+- Rename `ImageType` enums to indicate PNGs are no longer supported 
+- Bump Gradle to 8.2.1
+- Bump Coroutines to 1.7.2
+- Bump Sentry to 6.25.0
 
 ## 10.0.0-beta03
 
