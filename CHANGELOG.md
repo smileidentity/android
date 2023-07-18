@@ -10,7 +10,7 @@
 
 ### Changed
 - Updated API key exception error message to be actionable
-- `SmileID.useSandbox` is now publicly accessible
+- `SmileID.useSandbox` getter is now publicly accessible
 
 ### Removed
 - Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The

@@ -18,6 +18,11 @@
     <string name="jobs">Jobs</string>
     <string name="jobs_clear_jobs_icon_tooltip">Clear Job History</string>
     <string name="jobs_no_jobs_found">No jobs found</string>
+    <string name="jobs_detail_user_id_label">User ID</string>
+    <string name="jobs_detail_job_id_label">Job ID</string>
+    <string name="jobs_detail_smile_job_id_label">Smile Job ID</string>
+    <string name="jobs_detail_result_code_label">Result Code</string>
+    <string name="jobs_detail_code_label">Code</string>
 
     <!--  Resources Screen  -->
     <string name="resources">Resources</string>

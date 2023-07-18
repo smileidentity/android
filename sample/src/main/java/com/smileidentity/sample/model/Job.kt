@@ -96,7 +96,7 @@ fun DocVJobStatusResponse.toJob(userId: String, jobId: String) = toJob(
     jobType = DocumentVerification,
 )
 
-private fun JobStatusResponse.toJob(
+fun JobStatusResponse.toJob(
     userId: String,
     jobId: String,
     jobType: JobType,
