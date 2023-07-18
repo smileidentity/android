@@ -28,7 +28,7 @@ fun UploadRequest.zip(): File {
     zipOutputStream.closeEntry()
 
     // Write images
-    this.images.forEach { imageInfo ->
+    for (imageInfo in images) {
         zipOutputStream.putNextEntry(ZipEntry(imageInfo.image.name))
         imageInfo.image.inputStream().use { it.copyTo(zipOutputStream) }
         zipOutputStream.closeEntry()
