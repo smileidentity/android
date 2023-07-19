@@ -7,6 +7,7 @@
 ### Fixed
 
 ### Changed
+- Kotlin 1.9
 
 ### Removed
 
