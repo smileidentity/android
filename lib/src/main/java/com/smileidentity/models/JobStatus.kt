@@ -22,41 +22,50 @@ data class JobStatusRequest(
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 ) : Parcelable
 
+interface JobStatusResponse {
+    val timestamp: String
+    val jobComplete: Boolean
+    val jobSuccess: Boolean
+    val code: Int
+    val result: JobResult?
+    val imageLinks: ImageLinks?
+}
+
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class JobStatusResponse(
-    @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "job_complete") val jobComplete: Boolean,
-    @Json(name = "job_success") val jobSuccess: Boolean,
-    @Json(name = "code") val code: Int,
-    @Json(name = "result") val result: JobResult?,
+data class SmartSelfieJobStatusResponse(
+    @Json(name = "timestamp") override val timestamp: String,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
+    @Json(name = "job_success") override val jobSuccess: Boolean,
+    @Json(name = "code") override val code: Int,
+    @Json(name = "result") override val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.Entry>?,
-    @Json(name = "image_links") val imageLinks: ImageLinks?,
-) : Parcelable
+    @Json(name = "image_links") override val imageLinks: ImageLinks?,
+) : JobStatusResponse, Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class DocVJobStatusResponse(
-    @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "job_complete") val jobComplete: Boolean,
-    @Json(name = "job_success") val jobSuccess: Boolean,
-    @Json(name = "code") val code: Int,
-    @Json(name = "result") val result: JobResult?,
+    @Json(name = "timestamp") override val timestamp: String,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
+    @Json(name = "job_success") override val jobSuccess: Boolean,
+    @Json(name = "code") override val code: Int,
+    @Json(name = "result") override val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.DocVEntry>?,
-    @Json(name = "image_links") val imageLinks: ImageLinks?,
-) : Parcelable
+    @Json(name = "image_links") override val imageLinks: ImageLinks?,
+) : JobStatusResponse, Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class BiometricKycJobStatusResponse(
-    @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "job_complete") val jobComplete: Boolean,
-    @Json(name = "job_success") val jobSuccess: Boolean,
-    @Json(name = "code") val code: Int,
-    @Json(name = "result") val result: JobResult?,
+    @Json(name = "timestamp") override val timestamp: String,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
+    @Json(name = "job_success") override val jobSuccess: Boolean,
+    @Json(name = "code") override val code: Int,
+    @Json(name = "result") override val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.BiometricKycEntry>?,
-    @Json(name = "image_links") val imageLinks: ImageLinks?,
-) : Parcelable
+    @Json(name = "image_links") override val imageLinks: ImageLinks?,
+) : JobStatusResponse, Parcelable
 
 /**
  * The job result might sometimes be a freeform text field instead of an object (i.e. when the
