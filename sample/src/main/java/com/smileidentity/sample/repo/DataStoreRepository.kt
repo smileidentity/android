@@ -97,30 +97,77 @@ object DataStoreRepository {
         mainDataStore.edit { it.remove(Keys.config) }
     }
 
-    fun getJobs(partnerId: String, isProduction: Boolean) =
+    fun getPendingJobs(partnerId: String, isProduction: Boolean) =
         jobDataStore(partnerId, isProduction).data.map {
-            val completed = it[Keys.jobs] ?: emptySet()
-            completed.mapNotNull {
+            val pendingJobs = it[Keys.pendingJobs] ?: emptySet()
+            pendingJobs.mapNotNull {
                 jobsAdapter.fromJson(it) ?: run {
-                    Timber.e("Failed to parse completed job: $it")
+                    Timber.e("Failed to parse pending job: $it")
                     null
                 }
-            }.sortedBy(Job::timestamp).toImmutableList()
+            }.sortedByDescending(Job::timestamp).toImmutableList()
         }
 
-    suspend fun addJob(partnerId: String, isProduction: Boolean, job: Job) {
+    suspend fun addPendingJob(partnerId: String, isProduction: Boolean, job: Job) {
         val dataStore = jobDataStore(partnerId, isProduction)
         mutex.withLock {
-            // The !! is safe since the Map provides implicit default values
-            val completed = dataStore.data.first()[Keys.jobs] ?: emptySet()
-            dataStore.edit { it[Keys.jobs] = completed + jobsAdapter.toJson(job) }
+            val pendingJobs = dataStore.data.first()[Keys.pendingJobs] ?: emptySet()
+            dataStore.edit { it[Keys.pendingJobs] = pendingJobs + jobsAdapter.toJson(job) }
         }
     }
+
+    suspend fun addCompletedJob(partnerId: String, isProduction: Boolean, job: Job) {
+        val dataStore = jobDataStore(partnerId, isProduction)
+        mutex.withLock {
+            val completedJobs = dataStore.data.first()[Keys.completedJobs] ?: emptySet()
+            dataStore.edit { it[Keys.completedJobs] = completedJobs + jobsAdapter.toJson(job) }
+        }
+    }
+
+    /**
+     * Remove a job from [Keys.pendingJobs] and add it to [Keys.completedJobs] set.
+     *
+     * Pre-condition: [completedJob] should actually be completed (either successfully or errored)
+     */
+    suspend fun markPendingJobAsCompleted(
+        partnerId: String,
+        isProduction: Boolean,
+        completedJob: Job,
+    ) {
+        val dataStore = jobDataStore(partnerId, isProduction)
+        mutex.withLock {
+            val pendingJobs = dataStore.data.first()[Keys.pendingJobs] ?: emptySet()
+            val completedJobs = dataStore.data.first()[Keys.completedJobs] ?: emptySet()
+            val pendingJob = pendingJobs.firstOrNull() { it.contains(completedJob.jobId) }
+            dataStore.edit {
+                if (pendingJob != null) {
+                    it[Keys.pendingJobs] = pendingJobs - pendingJob
+                }
+                it[Keys.completedJobs] = completedJobs + jobsAdapter.toJson(completedJob)
+            }
+        }
+    }
+
+    fun getAllJobs(partnerId: String, isProduction: Boolean) =
+        jobDataStore(partnerId, isProduction).data.map {
+            val pendingJobs = it[Keys.pendingJobs] ?: emptySet()
+            val completedJobs = it[Keys.completedJobs] ?: emptySet()
+            val allJobs = pendingJobs + completedJobs
+            allJobs.mapNotNull {
+                jobsAdapter.fromJson(it) ?: run {
+                    Timber.e("Failed to parse pending job: $it")
+                    null
+                }
+            }.sortedByDescending(Job::timestamp).toImmutableList()
+        }
 
     suspend fun clearJobs(partnerId: String, isProduction: Boolean) {
         val dataStore = jobDataStore(partnerId, isProduction)
         mutex.withLock {
-            dataStore.edit { it.remove(Keys.jobs) }
+            dataStore.edit {
+                it.remove(Keys.pendingJobs)
+                it.remove(Keys.completedJobs)
+            }
         }
     }
 
@@ -136,6 +183,7 @@ object DataStoreRepository {
      */
     private object Keys {
         val config = stringPreferencesKey("config")
-        val jobs = stringSetPreferencesKey("jobs")
+        val pendingJobs = stringSetPreferencesKey("pendingJobs")
+        val completedJobs = stringSetPreferencesKey("completedJobs")
     }
 }

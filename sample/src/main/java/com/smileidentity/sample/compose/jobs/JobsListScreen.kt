@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
@@ -41,12 +39,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.models.Actions
 import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
@@ -83,13 +78,8 @@ fun JobsListScreen(
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
                 JobType.Unknown -> {
                     Timber.e("Unknown job type")
-                    -1
+                    R.drawable.si_smart_selfie_instructions_hero
                 }
-            }
-            val jobStatus = when {
-                it.jobSuccess -> "Success"
-                it.jobComplete -> "Rejected"
-                else -> "Pending"
             }
             JobListItem(
                 sourceIcon = {
@@ -101,7 +91,7 @@ fun JobsListScreen(
                 },
                 timestamp = it.timestamp,
                 jobType = stringResource(it.jobType.label),
-                jobStatus = jobStatus,
+                isProcessing = !it.jobComplete,
                 resultText = it.resultText,
             ) {
                 JobListItemAdditionalDetails(
@@ -109,6 +99,7 @@ fun JobsListScreen(
                     jobId = it.jobId,
                     smileJobId = it.smileJobId,
                     resultCode = it.resultCode?.toString(),
+                    code = it.code?.toString(),
                 )
             }
         }
@@ -121,7 +112,7 @@ private fun JobListItem(
     sourceIcon: @Composable () -> Unit,
     timestamp: String,
     jobType: String,
-    jobStatus: String?,
+    isProcessing: Boolean,
     resultText: String?,
     modifier: Modifier = Modifier,
     expandedContent: @Composable ColumnScope.() -> Unit,
@@ -140,12 +131,12 @@ private fun JobListItem(
             headlineContent = { Text(jobType) },
             supportingContent = {
                 if (resultText != null) {
-                    Text(resultText)
+                    Text(resultText, style = MaterialTheme.typography.labelLarge)
                 }
                 if (expanded) {
                     expandedContent()
                 }
-                if (jobStatus == null) {
+                if (isProcessing) {
                     Spacer(modifier = Modifier.size(4.dp))
                     LinearProgressIndicator(strokeCap = StrokeCap.Round)
                 }
@@ -176,18 +167,6 @@ private fun JobListItem(
                                 shape = CircleShape,
                             ),
                     )
-                    Text(
-                        text = jobStatus ?: "Processing",
-                        fontWeight = FontWeight.Thin,
-                        fontSize = 8.sp,
-                        modifier = Modifier
-                            .border(
-                                1.dp,
-                                MaterialTheme.colorScheme.onSurface,
-                                RoundedCornerShape(4.dp),
-                            )
-                            .padding(4.dp),
-                    )
                 }
             },
         )
@@ -197,22 +176,45 @@ private fun JobListItem(
 @Suppress("UnusedReceiverParameter")
 @Composable
 private fun ColumnScope.JobListItemAdditionalDetails(
-    userId: String? = null,
-    jobId: String? = null,
-    smileJobId: String? = null,
-    resultCode: String? = null,
-    resultText: String? = null,
-    code: String? = null,
-    actions: Actions? = null,
+    userId: String?,
+    jobId: String?,
+    smileJobId: String?,
+    resultCode: String?,
+    code: String?,
 ) {
-    // TODO
-    Text("User ID: $userId")
-    Text("Job ID: $jobId")
-    Text("Smile Job ID: $smileJobId")
-    Text("Result Code: $resultCode")
-    Text("Result Text: $resultText")
-    Text("Code: $code")
-    Text("Actions: $actions")
+    // TODO: Add Actions support
+    JobMetadataItem(
+        label = stringResource(com.smileidentity.sample.R.string.jobs_detail_user_id_label),
+        value = userId,
+    )
+    JobMetadataItem(
+        label = stringResource(com.smileidentity.sample.R.string.jobs_detail_job_id_label),
+        value = jobId,
+    )
+    JobMetadataItem(
+        label = stringResource(com.smileidentity.sample.R.string.jobs_detail_smile_job_id_label),
+        value = smileJobId,
+    )
+    JobMetadataItem(
+        label = stringResource(com.smileidentity.sample.R.string.jobs_detail_result_code_label),
+        value = resultCode,
+    )
+    JobMetadataItem(
+        label = stringResource(com.smileidentity.sample.R.string.jobs_detail_code_label),
+        value = code,
+    )
+}
+
+@Composable
+private fun JobMetadataItem(label: String, value: String?) {
+    if (value != null) {
+        Column {
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(text = label, style = MaterialTheme.typography.labelMedium)
+            Spacer(modifier = Modifier.size(2.dp))
+            Text(value, style = MaterialTheme.typography.bodySmall)
+        }
+    }
 }
 
 @Composable
@@ -231,7 +233,7 @@ fun JobListItemPreview() {
             },
             timestamp = "7/6/23 12:04 PM",
             jobType = "SmartSelfie™ Enrollment",
-            jobStatus = null,
+            isProcessing = true,
             resultText = "Enroll User",
         ) { }
     }
@@ -242,7 +244,13 @@ fun JobListItemPreview() {
 private fun JobListItemAdditionalDetailsPreview() {
     SmileIDTheme {
         Column {
-            JobListItemAdditionalDetails()
+            JobListItemAdditionalDetails(
+                userId = "1234567890",
+                jobId = "1234567890",
+                smileJobId = "1234567890",
+                resultCode = "1234567890",
+                code = "1234567890",
+            )
         }
     }
 }

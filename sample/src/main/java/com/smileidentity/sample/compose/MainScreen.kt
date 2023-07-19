@@ -89,7 +89,6 @@ fun MainScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val bottomNavSelection = uiState.bottomNavSelection
-    val pendingJobCount by viewModel.pendingJobCount.collectAsStateWithLifecycle()
 
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
     val bottomNavItems = remember { BottomNavigationScreen.values().toList().toImmutableList() }
@@ -133,7 +132,7 @@ fun MainScreen(
                         BottomBar(
                             bottomNavItems = bottomNavItems,
                             bottomNavSelection = bottomNavSelection,
-                            pendingJobCount = pendingJobCount,
+                            pendingJobCount = uiState.pendingJobCount,
                         ) {
                             navController.navigate(it.route) {
                                 popUpTo(BottomNavigationScreen.Home.route)

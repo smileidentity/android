@@ -35,6 +35,7 @@ object SmileID {
 
     // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
     var useSandbox: Boolean = true
+        private set
 
     internal var apiKey: String? = null
 

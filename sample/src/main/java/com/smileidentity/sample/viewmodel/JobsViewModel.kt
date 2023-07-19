@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.sample.repo.DataStoreRepository
+import com.smileidentity.sample.repo.DataStoreRepository.getAllJobs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -26,7 +26,7 @@ data class JobsUiState(
 class JobsViewModel(isProduction: Boolean) : ViewModel() {
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState = _uiState.asStateFlow()
-    val jobs = DataStoreRepository.getJobs(SmileID.config.partnerId, isProduction).catch {
+    val jobs = getAllJobs(SmileID.config.partnerId, isProduction).catch {
         Timber.e(it)
         _uiState.update { it.copy(processingState = ProcessingState.Error) }
     }.onEach {

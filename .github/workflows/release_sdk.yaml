@@ -131,6 +131,6 @@ jobs:
           
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
           git config --local user.name "${{ github.actor }}"
-          git add VERSION
+          git add ./lib/VERSION
           git commit -m "Prepare for next development iteration"
           git push
