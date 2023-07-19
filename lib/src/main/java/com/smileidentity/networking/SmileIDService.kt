@@ -3,27 +3,27 @@ package com.smileidentity.networking
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
-import com.smileidentity.models.BvnLookupResponse
+import com.smileidentity.models.BvnToptModeRequest
+import com.smileidentity.models.BvnToptModeResponse
+import com.smileidentity.models.BvnToptRequest
+import com.smileidentity.models.BvnToptResponse
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
-import com.smileidentity.models.PostBvnOtpRequest
-import com.smileidentity.models.PostBvnOtpResponse
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
-import com.smileidentity.models.RequestBvnOtpRequest
-import com.smileidentity.models.RequestBvnOtpResponse
 import com.smileidentity.models.ServicesResponse
+import com.smileidentity.models.SubmitBvnToptRequest
+import com.smileidentity.models.SubmitBvnToptResponse
 import com.smileidentity.models.UploadRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Query
 import retrofit2.http.Url
 
 @Suppress("unused")
@@ -97,27 +97,18 @@ interface SmileIDService {
     /**
      * Returns the different modes of getting the BVN OTP, either via sms or email
      */
-    @GET("/lookup_bvn")
-    suspend fun lookupBvn(
-        @Query("bvn") bvn: String,
-        @Query("nibss_url") nibss_url: String,
-    ): BvnLookupResponse
+    @POST("/v1/totp_consent")
+    suspend fun requestBvnTotp(@Body bvnToptRequest: BvnToptRequest): BvnToptResponse
 
     /**
-     * Request OTP to be sent
+     * Returns the BVN OTP via the selected mode
      */
-    @POST("/mode")
-    suspend fun requestOtp(@Body request: RequestBvnOtpRequest): RequestBvnOtpResponse
+    @POST("/v1/totp_consent/mode")
+    suspend fun requestBvnTotpMode(@Body bvnToptModeRequest: BvnToptModeRequest): BvnToptModeResponse
 
     /**
-     * Returns the different modes of getting the BVN OTP, either via sms or email
+     * Submits the BVN OTP for verification
      */
-    @POST("/otp")
-    suspend fun sendOtp(@Body request: PostBvnOtpRequest): PostBvnOtpResponse
-
-    /**
-     * Returns the different modes of getting the BVN OTP, either via sms or email
-     */
-    @POST("/get_pii")
-    suspend fun getPii(@Query("session_id") session_id: String): BvnLookupResponse
+    @POST("/v1/totp_consent/otp")
+    suspend fun submitBvnTotp(@Body submitBvnToptRequest: SubmitBvnToptRequest): SubmitBvnToptResponse
 }

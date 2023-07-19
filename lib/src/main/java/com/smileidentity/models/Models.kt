@@ -41,6 +41,7 @@ enum class JobType(val value: Int) {
     SmartSelfieEnrollment(4),
     EnhancedKyc(5),
     DocumentVerification(6),
+    BVN(7),
 
     /**
      * Special value used to indicate that the value returned from the server is not yet supported

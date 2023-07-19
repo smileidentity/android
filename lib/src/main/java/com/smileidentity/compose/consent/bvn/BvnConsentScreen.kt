@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -131,6 +130,11 @@ fun BvnConsentScreen(
                                 viewModel.handleEvent(
                                     BvnConsentEvent.SelectOTPDeliveryMode(
                                         otpDeliveryMode = it,
+                                        otpSentTo = it.name,
+                                        country = BvnCountry.NIGERIA.country,
+                                        idType = CountryIdType.NIGERIA_BVN.idType,
+                                        idNumber = uiState.bvn,
+                                        sessionId = uiState.sessionId,
                                     ),
                                 )
                             },
@@ -238,7 +242,15 @@ fun BvnConsentScreen(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.handleEvent(BvnConsentEvent.SubmitOTPMode(otp = otp))
+                            viewModel.handleEvent(
+                                BvnConsentEvent.SubmitBvnOtp(
+                                    otp = otp,
+                                    country = BvnCountry.NIGERIA.country,
+                                    idType = CountryIdType.NIGERIA_BVN.idType,
+                                    idNumber = uiState.bvn,
+                                    sessionId = uiState.sessionId,
+                                ),
+                            )
                         },
                         modifier = Modifier
                             .testTag("bvn_consent_continue_button")
@@ -304,7 +316,7 @@ fun OtpDeliveryModeCard(
         ) {
             Image(
                 painter = icon,
-                contentDescription = "OTP Delivery Mode Icon",
+                contentDescription = null,
                 modifier = Modifier
                     .size(40.dp),
             )
@@ -328,7 +340,7 @@ fun OtpDeliveryModeCard(
             }
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "OTP Delivery Mode Click",
+                contentDescription = null,
             )
         }
     }

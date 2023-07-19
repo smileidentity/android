@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -77,7 +78,7 @@ fun BvnInputScreen(
             )
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Cancel",
+                contentDescription = null,
                 modifier = Modifier
                     .testTag("bvn_input_screen_cancel")
                     .clickable { cancelBvnVerification() },
@@ -110,15 +111,22 @@ fun BvnInputScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                viewModel.handleEvent(BvnConsentEvent.SubmitBVNMode(bvn = bvn))
-                // TODO - Some notes here
-                // I was thinking of using state to navigate instead of callbacks
+                viewModel.handleEvent(
+                    BvnConsentEvent.SubmitBVNMode(
+                        bvn = bvn,
+                        country = BvnCountry.NIGERIA.country,
+                        idType = CountryIdType.NIGERIA_BVN.idType,
+                    ),
+                )
             },
             modifier = Modifier
                 .testTag("bvn_submit_continue_button")
                 .fillMaxWidth(),
         ) {
             Text(text = stringResource(id = R.string.si_continue))
+        }
+        AnimatedVisibility(visible = uiState.showLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
         }
         if (showAttribution) {
             SmileIDAttribution()
