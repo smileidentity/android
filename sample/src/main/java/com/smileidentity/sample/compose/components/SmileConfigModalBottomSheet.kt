@@ -32,7 +32,6 @@ import com.smileidentity.models.Config
 import com.smileidentity.sample.R
 import com.smileidentity.sample.SmileIDApplication
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

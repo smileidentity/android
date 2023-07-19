@@ -159,7 +159,7 @@ fun MainScreen(
                                 viewModel.updateSmileConfig(data = config)
                             },
                             setSmileConfig = smileStringConfig.toString(),
-                            smileConfig = smileConfig
+                            smileConfig = smileConfig,
                         )
                     }
                     NavHost(

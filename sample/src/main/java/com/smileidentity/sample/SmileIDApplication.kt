@@ -3,7 +3,6 @@ package com.smileidentity.sample
 import android.app.Application
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.jakewharton.processphoenix.ProcessPhoenix
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.getOkHttpClientBuilder
 import com.smileidentity.sample.repo.DataStoreRepository

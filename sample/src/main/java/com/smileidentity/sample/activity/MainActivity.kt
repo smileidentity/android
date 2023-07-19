@@ -18,9 +18,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             MainScreen(
                 viewModel = viewModel(
-                    factory = viewModelFactory { MainScreenViewModel(isSmileIDInitialized = isSmileIDInitialized) },
+                    factory = viewModelFactory {
+                        MainScreenViewModel(
+                            isSmileIDInitialized = isSmileIDInitialized,
+                        )
+                    },
                 ),
-                isSmileIDInitialized = SmileID.isInitialized
+                isSmileIDInitialized = SmileID.isInitialized,
             )
         }
     }

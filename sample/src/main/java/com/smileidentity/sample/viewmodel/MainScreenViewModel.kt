@@ -31,7 +31,6 @@ import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
-import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -244,7 +243,11 @@ class MainScreenViewModel(
     }
 
     fun showSmileConfigBottomSheet(shouldShowSmileConfigBottomSheet: Boolean) {
-        _uiState.update { it.copy(shouldShowSmileConfigBottomSheet = shouldShowSmileConfigBottomSheet) }
+        _uiState.update {
+            it.copy(
+                shouldShowSmileConfigBottomSheet = shouldShowSmileConfigBottomSheet,
+            )
+        }
     }
 
     fun onSmartSelfieEnrollmentSelected() {

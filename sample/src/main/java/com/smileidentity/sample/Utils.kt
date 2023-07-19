@@ -19,7 +19,7 @@ fun Context.toast(@StringRes message: Int) {
 }
 
 // A simple extension function to make boolean checks expressive
-fun <T> Boolean.ifTrue(action: () -> T): T? = if(this) action() else null
+fun <T> Boolean.ifTrue(action: () -> T): T? = if (this) action() else null
 
 fun SnackbarHostState.showSnackbar(
     scope: CoroutineScope,
