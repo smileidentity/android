@@ -43,8 +43,9 @@ import com.smileidentity.sample.Screen
 
 @Composable
 fun ProductSelectionScreen(
-    modifier: Modifier = Modifier,
     onProductSelected: (Screen) -> Unit,
+    isSmileIDInitialized: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
     var desiredItemMinHeight by remember { mutableStateOf(0.dp) }
@@ -111,16 +112,18 @@ fun ProductSelectionScreen(
             }
         }
         SelectionContainer {
-            Text(
-                text = stringResource(
-                    R.string.version_info,
-                    SmileID.config.partnerId,
-                    BuildConfig.VERSION_NAME,
-                ),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
-                modifier = Modifier.padding(12.dp),
-            )
+            if (isSmileIDInitialized) {
+                Text(
+                    text = stringResource(
+                        R.string.version_info,
+                        SmileID.config.partnerId,
+                        BuildConfig.VERSION_NAME,
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
+                    modifier = Modifier.padding(12.dp),
+                )
+            }
         }
     }
 }
@@ -131,7 +134,7 @@ private fun ProductSelectionScreenPreview() {
     SmileID.initialize(LocalContext.current, enableCrashReporting = false)
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            ProductSelectionScreen { }
+            ProductSelectionScreen(isSmileIDInitialized = true, onProductSelected = {})
         }
     }
 }

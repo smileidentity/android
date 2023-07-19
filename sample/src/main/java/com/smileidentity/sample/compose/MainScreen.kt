@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,24 +61,23 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
+import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
 import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
-import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.net.URL
 
 @OptIn(ExperimentalLayoutApi::class)
-@Preview
 @Composable
 fun MainScreen(
-    viewModel: MainScreenViewModel = viewModel(
-        factory = viewModelFactory { MainScreenViewModel() },
-    ),
+    viewModel: MainScreenViewModel,
+    isSmileIDInitialized: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
@@ -88,6 +86,8 @@ fun MainScreen(
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val smileStringConfig by viewModel.smileStringConfig.collectAsStateWithLifecycle()
+    val smileConfig by viewModel.smileConfig.collectAsStateWithLifecycle()
     val bottomNavSelection = uiState.bottomNavSelection
 
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
@@ -106,8 +106,14 @@ fun MainScreen(
         }
     }
 
+    if (!isSmileIDInitialized) {
+        viewModel.showSmileConfigBottomSheet(shouldShowSmileConfigBottomSheet = true)
+    }
+
     SmileIDTheme {
-        Surface {
+        Surface(
+            modifier = modifier,
+        ) {
             Scaffold(
                 snackbarHost = { Snackbar() },
                 topBar = {
@@ -142,6 +148,20 @@ fun MainScreen(
                     }
                 },
                 content = {
+                    if (uiState.shouldShowSmileConfigBottomSheet) {
+                        SmileConfigModalBottomSheet(
+                            shouldShowSmileConfigBottomSheet = {
+                                viewModel.showSmileConfigBottomSheet(
+                                    shouldShowSmileConfigBottomSheet = false,
+                                )
+                            },
+                            updateSmileConfig = { config ->
+                                viewModel.updateSmileConfig(data = config)
+                            },
+                            setSmileConfig = smileStringConfig.toString(),
+                            smileConfig = smileConfig
+                        )
+                    }
                     NavHost(
                         navController,
                         startScreen.route,
@@ -151,7 +171,10 @@ fun MainScreen(
                     ) {
                         composable(BottomNavigationScreen.Home.route) {
                             LaunchedEffect(Unit) { viewModel.onHomeSelected() }
-                            ProductSelectionScreen { navController.navigate(it.route) }
+                            ProductSelectionScreen(
+                                isSmileIDInitialized = isSmileIDInitialized,
+                                onProductSelected = { navController.navigate(it.route) },
+                            )
                         }
                         composable(BottomNavigationScreen.Jobs.route) {
                             LaunchedEffect(Unit) { viewModel.onJobsSelected() }
@@ -163,7 +186,7 @@ fun MainScreen(
                         }
                         composable(BottomNavigationScreen.Settings.route) {
                             LaunchedEffect(Unit) { viewModel.onSettingsSelected() }
-                            SettingsScreen()
+                            SettingsScreen(viewModel = viewModel)
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
                             LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }

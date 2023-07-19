@@ -26,8 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.jakewharton.processphoenix.ProcessPhoenix
+import com.smileidentity.SmileID
+import com.smileidentity.models.Config
 import com.smileidentity.sample.R
+import com.smileidentity.sample.SmileIDApplication
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,12 +41,14 @@ fun SmileConfigModalBottomSheet(
     updateSmileConfig: (updatedConfig: String) -> Boolean,
     modifier: Modifier = Modifier,
     setSmileConfig: String = "",
+    smileConfig: Config? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showConfigError by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var config by remember { mutableStateOf(setSmileConfig) }
+    var stringConfig by remember { mutableStateOf(setSmileConfig) }
+    var config by remember { mutableStateOf(smileConfig) }
 
     ModalBottomSheet(
         modifier = modifier,
@@ -60,8 +67,8 @@ fun SmileConfigModalBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(4.dp),
-                value = config,
-                onValueChange = { config = it },
+                value = stringConfig,
+                onValueChange = { stringConfig = it },
                 isError = showConfigError,
                 supportingText = {
                     if (showConfigError) {
@@ -73,7 +80,8 @@ fun SmileConfigModalBottomSheet(
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                maxLines = 10,
+                minLines = 10,
+                maxLines = 15,
                 textStyle = MaterialTheme.typography.bodyMedium,
             )
             Spacer(modifier = Modifier.size(16.dp))
@@ -81,9 +89,11 @@ fun SmileConfigModalBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     coroutineScope.launch {
-                        val updatedConfig = updateSmileConfig(config)
+                        val updatedConfig = updateSmileConfig(stringConfig)
                         if (updatedConfig) {
                             sheetState.hide()
+                            shouldShowSmileConfigBottomSheet(false)
+                            setConfigAndRestart(smileConfig = config)
                         } else {
                             showConfigError = true
                         }
@@ -93,5 +103,14 @@ fun SmileConfigModalBottomSheet(
                 Text(stringResource(id = R.string.settings_show_smile_config))
             }
         }
+    }
+}
+
+fun setConfigAndRestart(smileConfig: Config?) {
+    smileConfig?.let { config ->
+        SmileID.config = config
+        SmileID.isInitialized = true
+        // Restart Process
+        ProcessPhoenix.triggerRebirth(SmileIDApplication.appContext)
     }
 }

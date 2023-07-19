@@ -139,6 +139,8 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
 
+    implementation(libs.phoenix)
+
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
 

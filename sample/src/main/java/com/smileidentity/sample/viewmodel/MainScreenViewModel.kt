@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.Config
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.BiometricKyc
@@ -23,11 +24,14 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
+import com.smileidentity.sample.ifTrue
 import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
+import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -35,6 +39,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -64,12 +69,15 @@ data class MainScreenUiState(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainScreenViewModel : ViewModel() {
+class MainScreenViewModel(
+    isSmileIDInitialized: Boolean,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var pendingJobCountJob = createPendingJobCountPoller()
-    private var backgroundJobsPollingJob = createBackgroundJobsPoller()
+    private var pendingJobCountJob = isSmileIDInitialized.ifTrue { createPendingJobCountPoller() }
+    private var backgroundJobsPollingJob =
+        isSmileIDInitialized.ifTrue { createBackgroundJobsPoller() }
 
     private fun createBackgroundJobsPoller() = viewModelScope.launch {
         val authRequest = AuthenticationRequest(SmartSelfieEnrollment)
@@ -161,8 +169,8 @@ class MainScreenViewModel : ViewModel() {
      * will automatically pick up the correct environment)
      */
     fun toggleEnvironment() {
-        pendingJobCountJob.cancel()
-        backgroundJobsPollingJob.cancel()
+        pendingJobCountJob?.cancel()
+        backgroundJobsPollingJob?.cancel()
 
         SmileID.setEnvironment(!SmileID.useSandbox)
 
@@ -170,6 +178,33 @@ class MainScreenViewModel : ViewModel() {
         backgroundJobsPollingJob = createBackgroundJobsPoller()
 
         _uiState.update { it.copy(isProduction = !SmileID.useSandbox) }
+    }
+
+    val smileStringConfig = DataStoreRepository.getStringConfig()
+        .stateIn(
+            scope = viewModelScope,
+            started = Eagerly,
+            initialValue = "",
+        )
+
+    val smileConfig = DataStoreRepository.getConfig()
+        .stateIn(
+            scope = viewModelScope,
+            started = Eagerly,
+            initialValue = null,
+        )
+
+    fun updateSmileConfig(data: String): Boolean {
+        return try {
+            val config = SmileID.moshi.adapter(Config::class.java).fromJson(data)!!
+            config.let { viewModelScope.launch { DataStoreRepository.setConfig(it) } }
+            true
+        } catch (exception: Exception) {
+            // Can be JsonEncodingException, EOFException etc, so catch generic exceptions
+            // Alternative is to make the moshi adapter lenient, which is not ideal here
+            Timber.e(exception)
+            false
+        }
     }
 
     fun onHomeSelected() {
@@ -208,8 +243,8 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun showSmileConfigBottomSheet() {
-        _uiState.update { it.copy(shouldShowSmileConfigBottomSheet = true) }
+    fun showSmileConfigBottomSheet(shouldShowSmileConfigBottomSheet: Boolean) {
+        _uiState.update { it.copy(shouldShowSmileConfigBottomSheet = shouldShowSmileConfigBottomSheet) }
     }
 
     fun onSmartSelfieEnrollmentSelected() {

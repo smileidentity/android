@@ -37,6 +37,8 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
+    var isInitialized: Boolean = false
+
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
@@ -68,6 +70,7 @@ object SmileID {
         requestFaceDetectionModuleInstallation(context)
 
         SmileID.useSandbox = useSandbox
+        SmileID.isInitialized = true
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
 
         retrofit = Retrofit.Builder()

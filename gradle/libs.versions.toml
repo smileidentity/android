@@ -21,6 +21,7 @@ coil = "2.4.0"
 compose-lint-checks = "1.2.0"
 coroutines = "1.7.2"
 datastore = "1.0.0"
+phoenix = "2.1.2"
 junit = "4.13.2"
 kotlin = "1.8.22"
 kotlin-immutable-collections = "0.3.5"
@@ -81,6 +82,7 @@ compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", v
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+phoenix = { module = "com.jakewharton:process-phoenix", version.ref = "phoenix"}
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-immutable-collections" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
