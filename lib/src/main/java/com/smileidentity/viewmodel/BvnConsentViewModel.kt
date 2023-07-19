@@ -107,7 +107,7 @@ class BvnConsentViewModel : ViewModel() {
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            val response = SmileID.api.requestBvnTotp(bvnToptRequest = bvnToptRequest)
+            val response = SmileID.api.requestBvnTotp(request = bvnToptRequest)
             _uiState.update {
                 it.copy(
                     showLoading = false,
@@ -150,7 +150,7 @@ class BvnConsentViewModel : ViewModel() {
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            val response = SmileID.api.requestBvnTotpMode(bvnToptModeRequest = bvnToptModeRequest)
+            val response = SmileID.api.requestBvnTotpMode(request = bvnToptModeRequest)
             if (response.success) {
                 _uiState.update {
                     it.copy(
@@ -195,7 +195,7 @@ class BvnConsentViewModel : ViewModel() {
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            val response = SmileID.api.submitBvnTotp(submitBvnToptRequest = submitBvnToptRequest)
+            val response = SmileID.api.submitBvnTotp(request = submitBvnToptRequest)
             _uiState.getAndUpdate {
                 if (it.showWrongOtp) {
                     it.copy(

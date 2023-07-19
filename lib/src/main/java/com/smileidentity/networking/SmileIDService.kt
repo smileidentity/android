@@ -98,17 +98,17 @@ interface SmileIDService {
      * Returns the different modes of getting the BVN OTP, either via sms or email
      */
     @POST("/v1/totp_consent")
-    suspend fun requestBvnTotp(@Body bvnToptRequest: BvnToptRequest): BvnToptResponse
+    suspend fun requestBvnTotp(@Body request: BvnToptRequest): BvnToptResponse
 
     /**
      * Returns the BVN OTP via the selected mode
      */
     @POST("/v1/totp_consent/mode")
-    suspend fun requestBvnTotpMode(@Body bvnToptModeRequest: BvnToptModeRequest): BvnToptModeResponse
+    suspend fun requestBvnTotpMode(@Body request: BvnToptModeRequest): BvnToptModeResponse
 
     /**
      * Submits the BVN OTP for verification
      */
     @POST("/v1/totp_consent/otp")
-    suspend fun submitBvnTotp(@Body submitBvnToptRequest: SubmitBvnToptRequest): SubmitBvnToptResponse
+    suspend fun submitBvnTotp(@Body request: SubmitBvnToptRequest): SubmitBvnToptResponse
 }

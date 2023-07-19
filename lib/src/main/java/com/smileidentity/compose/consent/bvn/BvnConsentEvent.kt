@@ -31,9 +31,9 @@ enum class OtpDeliveryMode {
 }
 
 enum class BvnCountry(val country: String) {
-    NIGERIA("NG")
+    NIGERIA("NG"),
 }
 
 enum class CountryIdType(val idType: String) {
-    NIGERIA_BVN("BVN_MFA")
+    NIGERIA_BVN("BVN_MFA"),
 }

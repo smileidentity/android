@@ -126,7 +126,9 @@ fun BvnInputScreen(
             Text(text = stringResource(id = R.string.si_continue))
         }
         AnimatedVisibility(visible = uiState.showLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+            CircularProgressIndicator(
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+            )
         }
         if (showAttribution) {
             SmileIDAttribution()
