@@ -4,6 +4,7 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocVJobStatusResponse
+import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
@@ -49,9 +50,22 @@ interface SmileIDService {
      * Query the Identity Information of an individual using their ID number from a supported ID
      * Type. Return the personal information of the individual found in the database of the ID
      * authority.
+     *
+     * This will be done synchronously, and the result will be returned in the response. If the ID
+     * provider is unavailable, the response will be an error.
      */
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
+
+    /**
+     * Same as [doEnhancedKyc], but the final result is delivered the URL provided in the (required)
+     * [EnhancedKycRequest.callbackUrl] field.
+     *
+     * If the ID provider is unavailable, the response will be delivered to the callback URL once
+     * the ID provider is available again.
+     */
+    @POST("v1/async_id_verification")
+    suspend fun doEnhancedKycAsync(@Body request: EnhancedKycRequest): EnhancedKycAsyncResponse
 
     /**
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
@@ -85,6 +99,9 @@ interface SmileIDService {
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
 
+    /**
+     * Returns supported products and metadata
+     */
     @GET("/v1/services")
     suspend fun getServices(): ServicesResponse
 }

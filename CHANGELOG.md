@@ -3,6 +3,7 @@
 ## 10.0.0-beta05 (unreleased)
 
 ### Added
+- Enhanced KYC Async API endpoint
 
 ### Fixed
 
