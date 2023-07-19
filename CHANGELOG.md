@@ -9,6 +9,7 @@
 ### Fixed
 
 ### Changed
+- Kotlin 1.9
 - Updated API key exception error message to be actionable
 - `SmileID.useSandbox` getter is now publicly accessible
 
