@@ -3,10 +3,11 @@
 package com.smileidentity.models
 
 import android.os.Parcelable
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
-import java.util.UUID
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
 @Parcelize
@@ -30,8 +31,8 @@ class SmileIDException(val details: Details) : Exception(details.message), Parce
 @Parcelize
 data class PartnerParams(
     val jobType: JobType? = null,
-    val jobId: String = UUID.randomUUID().toString(),
-    val userId: String = UUID.randomUUID().toString(),
+    val jobId: String = randomJobId(),
+    val userId: String = randomUserId(),
     val extras: Map<String, String> = mapOf(),
 ) : Parcelable
 
