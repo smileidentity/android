@@ -6,6 +6,7 @@
     <string name="si_agent_mode">Agent Mode</string>
 
     <!--  Common Resources -->
+    <string name="si_continue">Continue</string>
     <string name="si_allow">Allow</string>
     <string name="si_cancel">Cancel</string>
 
@@ -44,7 +45,6 @@
     <string name="si_smart_selfie_processing_success_title">Selfie Capture Complete</string>
     <string name="si_smart_selfie_processing_success_subtitle">Your selfie was successfully taken. You can now proceed</string>
     <string name="si_smart_selfie_processing_error_title">Your selfie failed to process</string>
-    <string name="si_smart_selfie_processing_continue_button">Continue</string>
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
@@ -123,6 +123,11 @@
     <string name="si_consent_consent_denied_description">Do you wish to go back and correct that?</string>
     <string name="si_consent_go_back">Yes, go back</string>
     <string name="si_consent_cancel_verification">No, cancel verification</string>
+
+    <!--  BVN Consent Screen  -->
+    <string name="si_bvn_enter_id_title">Enter ID Information</string>
+    <string name="si_bvn_enter_id_bank_verification">Bank Verification</string>
+    <string name="si_bvn_enter_id_wrong_bvn">You have entered an invalid BVN. Please try again</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
