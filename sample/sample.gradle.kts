@@ -18,7 +18,7 @@ android {
         targetSdk = 34
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
-        versionName = "1.3_sdk-" + project(":lib").version.toString()
+        versionName = "1.4_sdk-" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -138,8 +138,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest) // UI Tests
 
     implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.phoenix)
 
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)

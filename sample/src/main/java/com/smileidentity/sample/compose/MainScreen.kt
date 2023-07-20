@@ -61,12 +61,12 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
-import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
 import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -75,9 +75,10 @@ import java.net.URL
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
-    viewModel: MainScreenViewModel,
-    isSmileIDInitialized: Boolean,
     modifier: Modifier = Modifier,
+    viewModel: MainScreenViewModel = viewModel(
+        factory = viewModelFactory { MainScreenViewModel() },
+    ),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
@@ -86,8 +87,6 @@ fun MainScreen(
         .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val smileStringConfig by viewModel.smileStringConfig.collectAsStateWithLifecycle()
-    val smileConfig by viewModel.smileConfig.collectAsStateWithLifecycle()
     val bottomNavSelection = uiState.bottomNavSelection
 
     // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
@@ -104,10 +103,6 @@ fun MainScreen(
                 clipboardManager.setText(text)
             }
         }
-    }
-
-    if (!isSmileIDInitialized) {
-        viewModel.showSmileConfigBottomSheet(shouldShowSmileConfigBottomSheet = true)
     }
 
     SmileIDTheme {
@@ -148,20 +143,6 @@ fun MainScreen(
                     }
                 },
                 content = {
-                    if (uiState.shouldShowSmileConfigBottomSheet) {
-                        SmileConfigModalBottomSheet(
-                            shouldShowSmileConfigBottomSheet = {
-                                viewModel.showSmileConfigBottomSheet(
-                                    shouldShowSmileConfigBottomSheet = false,
-                                )
-                            },
-                            updateSmileConfig = { config ->
-                                viewModel.updateSmileConfig(data = config)
-                            },
-                            setSmileConfig = smileStringConfig.toString(),
-                            smileConfig = smileConfig,
-                        )
-                    }
                     NavHost(
                         navController,
                         startScreen.route,
@@ -172,7 +153,6 @@ fun MainScreen(
                         composable(BottomNavigationScreen.Home.route) {
                             LaunchedEffect(Unit) { viewModel.onHomeSelected() }
                             ProductSelectionScreen(
-                                isSmileIDInitialized = isSmileIDInitialized,
                                 onProductSelected = { navController.navigate(it.route) },
                             )
                         }
@@ -186,7 +166,7 @@ fun MainScreen(
                         }
                         composable(BottomNavigationScreen.Settings.route) {
                             LaunchedEffect(Unit) { viewModel.onSettingsSelected() }
-                            SettingsScreen(viewModel = viewModel)
+                            SettingsScreen()
                         }
                         composable(ProductScreen.SmartSelfieEnrollment.route) {
                             LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
