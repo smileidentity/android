@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.Config
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.BiometricKyc
@@ -188,25 +187,6 @@ class MainScreenViewModel : ViewModel() {
             started = Eagerly,
             initialValue = null,
         )
-
-    /**
-     * Validates the inputted config JSON string. If valid, it is saved to DataStore. This will
-     * automatically trigger a reload of the config, which will update the UI.
-     *
-     * If it is invalid, this returns false, to indicate that the UI should show an error.
-     */
-    fun updateSmileConfig(configString: String): Boolean {
-        return try {
-            val config = SmileID.moshi.adapter(Config::class.java).fromJson(configString)
-            config?.let { viewModelScope.launch { DataStoreRepository.setConfig(config) } }
-            true
-        } catch (exception: Exception) {
-            // Can be JsonEncodingException, EOFException etc, so catch generic exceptions
-            // Alternative is to make the moshi adapter lenient, which is not ideal here
-            Timber.w(exception)
-            false
-        }
-    }
 
     fun onHomeSelected() {
         _uiState.update {
