@@ -338,13 +338,13 @@ fun MainScreen() {
                                 )
                             }
                             idInfo?.let { idInfo ->
-                                val url = URL("https://smileidentity.com/privacy-policy")
+                                val url = URL("https://usesmileid.com/privacy-policy")
                                 SmileID.BiometricKYC(
                                     idInfo = idInfo,
                                     partnerIcon = painterResource(
                                         id = com.smileidentity.R.drawable.si_logo_with_text,
                                     ),
-                                    partnerName = "Smile Identity",
+                                    partnerName = "Smile ID",
                                     productName = idInfo.idType,
                                     partnerPrivacyPolicy = url,
                                 ) { result ->

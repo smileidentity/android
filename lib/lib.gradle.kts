@@ -84,11 +84,11 @@ mavenPublishing {
     pom {
         name = "Smile ID Android SDK"
         description = "The Official Smile ID Android SDK"
-        url = "https://docs.smileidentity.com/mobile/android"
+        url = "https://docs.usesmileid.com/integration-options/mobile/android-v10-beta"
         licenses {
             license {
                 name = "Smile ID Terms of Use"
-                url = "https://smileidentity.com/terms-and-conditions"
+                url = "https://usesmileid.com/terms-and-conditions"
                 distribution = "repo"
             }
             license {
@@ -109,7 +109,7 @@ mavenPublishing {
                 email = "vansh@smileidentity.com"
                 url = "https://github.com/vanshg"
                 organization = "Smile ID"
-                organizationUrl = "https://smileidentity.com"
+                organizationUrl = "https://usesmileid.com"
             }
             developer {
                 id = "JNdhlovu"
@@ -117,7 +117,7 @@ mavenPublishing {
                 email = "japhet@smileidentity.com"
                 url = "https://github.com/jndhlovu"
                 organization = "Smile ID"
-                organizationUrl = "https://smileidentity.com"
+                organizationUrl = "https://usesmileid.com"
             }
             developer {
                 id = "jumaallan"
@@ -125,7 +125,7 @@ mavenPublishing {
                 email = "juma@smileidentity.com"
                 url = "https://github.com/jumaallan"
                 organization = "Smile ID"
-                organizationUrl = "https://smileidentity.com"
+                organizationUrl = "https://usesmileid.com"
             }
         }
     }
