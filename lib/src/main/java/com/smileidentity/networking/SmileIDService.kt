@@ -5,6 +5,10 @@ package com.smileidentity.networking
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
+import com.smileidentity.models.BvnToptModeRequest
+import com.smileidentity.models.BvnToptModeResponse
+import com.smileidentity.models.BvnToptRequest
+import com.smileidentity.models.BvnToptResponse
 import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
@@ -17,6 +21,8 @@ import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.ServicesResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
+import com.smileidentity.models.SubmitBvnToptRequest
+import com.smileidentity.models.SubmitBvnToptResponse
 import com.smileidentity.models.UploadRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
@@ -112,6 +118,24 @@ interface SmileIDService {
      */
     @GET("/v1/services")
     suspend fun getServices(): ServicesResponse
+
+    /**
+     * Returns the different modes of getting the BVN OTP, either via sms or email
+     */
+    @POST("/v1/totp_consent")
+    suspend fun requestBvnOtpMode(@Body request: BvnToptRequest): BvnToptResponse
+
+    /**
+     * Returns the BVN OTP via the selected mode
+     */
+    @POST("/v1/totp_consent/mode")
+    suspend fun requestBvnOtp(@Body request: BvnToptModeRequest): BvnToptModeResponse
+
+    /**
+     * Submits the BVN OTP for verification
+     */
+    @POST("/v1/totp_consent/otp")
+    suspend fun submitBvnOtp(@Body request: SubmitBvnToptRequest): SubmitBvnToptResponse
 }
 
 /**
