@@ -70,7 +70,7 @@ interface SmileIDService {
      * If the ID provider is unavailable, the response will be delivered to the callback URL once
      * the ID provider is available again.
      */
-    @POST("v1/async_id_verification")
+    @POST("/v1/async_id_verification")
     suspend fun doEnhancedKycAsync(@Body request: EnhancedKycRequest): EnhancedKycAsyncResponse
 
     /**
