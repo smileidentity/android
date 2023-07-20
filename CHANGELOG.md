@@ -5,6 +5,7 @@
 ### Added
 - Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
 - Add a `JobStatusResponse` interface
+- Enhanced KYC Async API endpoint
 
 ### Fixed
 
