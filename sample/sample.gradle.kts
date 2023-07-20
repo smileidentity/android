@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.moshix)
     alias(libs.plugins.parcelize)
 }
 
@@ -17,7 +18,7 @@ android {
         targetSdk = 34
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
-        versionName = "1.2.0_sdk-" + project(":lib").version.toString()
+        versionName = "1.3_sdk-" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -39,6 +40,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "_debug"
+        }
         release {
             isMinifyEnabled = false
             isDebuggable = false

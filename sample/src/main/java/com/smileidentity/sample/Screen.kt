@@ -6,12 +6,12 @@ import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.Icons.Outlined
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed interface Screen {
@@ -19,63 +19,66 @@ sealed interface Screen {
     val label: Int
 }
 
-sealed class ProductScreen(
+enum class ProductScreen(
     override val route: String,
     @StringRes override val label: Int,
     @DrawableRes val icon: Int,
 ) : Screen {
-    object SmartSelfieEnrollment : ProductScreen(
+    SmartSelfieEnrollment(
         "smart_selfie_enrollment",
         com.smileidentity.R.string.si_smart_selfie_enrollment_product_name,
         com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
-    )
-
-    object SmartSelfieAuthentication : ProductScreen(
+    ),
+    SmartSelfieAuthentication(
         "smart_selfie_authentication",
         com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
         com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
-    )
-
-    object EnhancedKyc : ProductScreen(
+    ),
+    EnhancedKyc(
         "enhanced_kyc",
         R.string.enhanced_kyc_product_name,
         R.drawable.enhanced_kyc,
-    )
-
-    object BiometricKyc : ProductScreen(
+    ),
+    BiometricKyc(
         "biometric_kyc",
         com.smileidentity.R.string.si_biometric_kyc_product_name,
         R.drawable.biometric_kyc,
-    )
-
-    object DocumentVerification : ProductScreen(
+    ),
+    DocumentVerification(
         "document_verification",
         com.smileidentity.R.string.si_doc_v_product_name,
         com.smileidentity.R.drawable.si_doc_v_instructions_hero,
-    )
+    ),
 }
 
-sealed class BottomNavigationScreen(
+enum class BottomNavigationScreen(
     override val route: String,
     @StringRes override val label: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 ) : Screen {
-    object Home : BottomNavigationScreen("home", R.string.home, Filled.Home, Outlined.Home)
-    object Resources :
-        BottomNavigationScreen("resources", R.string.resources, Filled.Info, Outlined.Info)
-
-    object AboutUs :
-        BottomNavigationScreen("about_us", R.string.about_us, Filled.Settings, Outlined.Settings)
-}
-
-object BottomNavigationScreenSaver : Saver<BottomNavigationScreen, String> {
-    override fun restore(value: String): BottomNavigationScreen = when (value) {
-        BottomNavigationScreen.Home.route -> BottomNavigationScreen.Home
-        BottomNavigationScreen.Resources.route -> BottomNavigationScreen.Resources
-        BottomNavigationScreen.AboutUs.route -> BottomNavigationScreen.AboutUs
-        else -> throw IllegalArgumentException("Unknown route: $value")
-    }
-
-    override fun SaverScope.save(value: BottomNavigationScreen): String = value.route
+    Home(
+        "home",
+        R.string.home,
+        Filled.Home,
+        Outlined.Home,
+    ),
+    Jobs(
+        "jobs",
+        R.string.jobs,
+        Filled.List,
+        Outlined.List,
+    ),
+    Resources(
+        "resources",
+        R.string.resources,
+        Filled.Info,
+        Outlined.Info,
+    ),
+    AboutUs(
+        "about_us",
+        R.string.about_us,
+        Filled.Settings,
+        Outlined.Settings,
+    ),
 }

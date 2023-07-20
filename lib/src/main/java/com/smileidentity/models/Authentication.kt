@@ -50,6 +50,9 @@ data class AuthenticationRequest(
  * [consentInfo] is only populated when a country and ID type are provided in the
  * [AuthenticationRequest]. To get information about *all* countries and ID types instead, use
  * [com.smileidentity.networking.SmileIDService.getProductsConfig]
+ *
+ * [timestamp] is *not* a [java.util.Date] because technically, any arbitrary value could have been
+ * passed to it. This applies to all other timestamp fields in the SDK.
  */
 @Parcelize
 @JsonClass(generateAdapter = true)

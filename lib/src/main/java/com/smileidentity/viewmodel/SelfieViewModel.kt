@@ -16,7 +16,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
-import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PrepUploadRequest
@@ -33,7 +32,6 @@ import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImageBitmap
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,7 +43,6 @@ import timber.log.Timber
 import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 private val UI_DEBOUNCE_DURATION = 250.milliseconds
 private const val INTRA_IMAGE_MIN_DELAY_MS = 350
@@ -296,17 +293,7 @@ class SelfieViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            lateinit var jobStatusResponse: JobStatusResponse
-            val jobStatusPollDelay = 1.seconds
-            for (i in 1..10) {
-                Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
-                delay(jobStatusPollDelay)
-                jobStatusResponse = SmileID.api.getJobStatus(jobStatusRequest)
-                Timber.v("Job Status Response: $jobStatusResponse")
-                if (jobStatusResponse.jobComplete) {
-                    break
-                }
-            }
+            val jobStatusResponse = SmileID.api.getSmartSelfieJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
                 SmartSelfieResult(
                     selfieFile,
