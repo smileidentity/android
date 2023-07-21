@@ -21,12 +21,17 @@ data class BvnToptRequest(
     val signature: String = calculateSignature(timestamp),
 )
 
+/**
+ * BVN Verification Modes (e.g. {"sms": "0800*******67"}
+ */
+typealias BvnVerificationMode = Map<String, String>
+
 @JsonClass(generateAdapter = true)
 data class BvnToptResponse(
     @Json(name = "message")
     val message: String,
     @Json(name = "modes")
-    val modes: List<Mode>,
+    val modes: List<BvnVerificationMode> = emptyList(),
     @Json(name = "session_id")
     val sessionId: String,
     @Json(name = "signature")
@@ -35,14 +40,6 @@ data class BvnToptResponse(
     val success: Boolean,
     @Json(name = "timestamp")
     val timestamp: String,
-)
-
-@JsonClass(generateAdapter = true)
-data class Mode(
-    @Json(name = "email")
-    val email: String,
-    @Json(name = "sms")
-    val sms: String,
 )
 
 @JsonClass(generateAdapter = true)

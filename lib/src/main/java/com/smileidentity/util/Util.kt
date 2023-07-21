@@ -32,15 +32,30 @@ import androidx.core.graphics.scale
 import androidx.core.text.getSpans
 import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
+import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.SmileIDCrashReporting
+import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.SmileIDException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.io.Serializable
+
+internal val bvnVerificationModes = mapOf(
+    "sms" to BvnOtpVerificationMode(
+        "",
+        description = R.string.si_bvn_sms_verification,
+        icon = R.drawable.si_bvn_mode_sms,
+    ),
+    "email" to BvnOtpVerificationMode(
+        "",
+        description = R.string.si_bvn_email_verification,
+        icon = R.drawable.si_bvn_mode_email,
+    ),
+)
 
 @Composable
 internal fun annotatedStringResource(
