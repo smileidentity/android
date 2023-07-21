@@ -9,6 +9,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Document
+import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
@@ -24,6 +25,7 @@ import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -123,7 +125,7 @@ class DocumentViewModel(
         }
     }
 
-    fun submitJob(documentFrontFile: File, documentBackFile: File? = null) {
+    fun submitJob(documentFrontFile: File, documentBackFile: File? = null): Job {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
             result = SmileIDResult.Error(e)
@@ -134,7 +136,7 @@ class DocumentViewModel(
                 )
             }
         }
-        viewModelScope.launch(getExceptionHandler(proxy)) {
+        return viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 jobType = JobType.DocumentVerification,
                 enrollment = false,
@@ -158,6 +160,7 @@ class DocumentViewModel(
             )
             val uploadRequest = UploadRequest(
                 images = listOfNotNull(frontImageInfo, backImageInfo, selfieImageInfo),
+                idInfo = IdInfo(idType.countryCode, idType.documentType),
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")

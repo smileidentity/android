@@ -244,30 +244,28 @@ internal fun createDocumentFile() = createSmileTempFile("document")
  *
  * @param proxy Callback to be invoked with the exception
  */
-fun getExceptionHandler(proxy: (Throwable) -> Unit): CoroutineExceptionHandler {
-    return CoroutineExceptionHandler { _, throwable ->
-        Timber.e(throwable, "Error during coroutine execution")
-        val converted = if (throwable is HttpException) {
-            val adapter = moshi.adapter(SmileIDException.Details::class.java)
-            try {
-                val details = adapter.fromJson(throwable.response()?.errorBody()?.source()!!)!!
-                SmileIDException(details)
-            } catch (e: Exception) {
-                Timber.w(e, "Unable to convert HttpException to SmileIDException")
+fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler { _, throwable ->
+    Timber.e(throwable, "Error during coroutine execution")
+    val converted = if (throwable is HttpException) {
+        val adapter = moshi.adapter(SmileIDException.Details::class.java)
+        try {
+            val details = adapter.fromJson(throwable.response()?.errorBody()?.source()!!)!!
+            SmileIDException(details)
+        } catch (e: Exception) {
+            Timber.w(e, "Unable to convert HttpException to SmileIDException")
 
-                // Report the *conversion* error to Sentry, rather than the original error
-                SmileIDCrashReporting.hub.captureException(e)
+            // Report the *conversion* error to Sentry, rather than the original error
+            SmileIDCrashReporting.hub.captureException(e)
 
-                // More informative to pass back the original exception than the conversion error
-                throwable
-            }
-        } else {
-            // Unexpected error, report to Sentry
-            SmileIDCrashReporting.hub.captureException(throwable)
+            // More informative to pass back the original exception than the conversion error
             throwable
         }
-        proxy(converted)
+    } else {
+        // Unexpected error, report to Sentry
+        SmileIDCrashReporting.hub.captureException(throwable)
+        throwable
     }
+    proxy(converted)
 }
 
 fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
