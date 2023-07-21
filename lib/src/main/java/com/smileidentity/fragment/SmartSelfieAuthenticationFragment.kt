@@ -21,7 +21,7 @@ import com.smileidentity.util.randomUserId
 /**
  * Perform a SmartSelfie™ Authentication
  *
- * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-authentication)
  *
  * A [Fragment] wrapper for the [SmartSelfieAuthentication] to be used if not using Jetpack
  * Compose. New instances *must* be created via [newInstance]. Results are communicated back to the

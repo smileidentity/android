@@ -27,7 +27,7 @@ class ConsentScreenTest {
                 partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
                 partnerName = "Smile ID",
                 productName = "BVN",
-                partnerPrivacyPolicy = URL("https://smileidentity.com/privacy"),
+                partnerPrivacyPolicy = URL("https://usesmileid.com/privacy"),
                 onContinue = onContinueClicked,
                 onCancel = {},
             )
@@ -51,7 +51,7 @@ class ConsentScreenTest {
                 partnerIcon = painterResource(id = R.drawable.si_logo_with_text),
                 partnerName = "Smile ID",
                 productName = "BVN",
-                partnerPrivacyPolicy = URL("https://smileidentity.com/privacy"),
+                partnerPrivacyPolicy = URL("https://usesmileid.com/privacy"),
                 onContinue = {},
                 onCancel = onCancelClicked,
             )

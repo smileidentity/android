@@ -25,7 +25,7 @@ data class UploadImageInfo(
 
 /**
  * @param country The 2 letter country code of the user's ID (ISO 3166-1 alpha-2 format)
- * @param idType The ID type from the list [here](https://docs.smileidentity.com/supported-id-types/for-individuals-kyc/backed-by-id-authority)
+ * @param idType The ID type from the list [here](https://docs.usesmileid.com/supported-id-types/for-individuals-kyc/backed-by-id-authority)
  * @param idNumber The ID number of the user's ID
  * @param firstName The first name of the user
  * @param middleName The middle name of the user
