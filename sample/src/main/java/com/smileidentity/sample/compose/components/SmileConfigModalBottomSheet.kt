@@ -64,8 +64,8 @@ fun SmileConfigModalBottomSheet(
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                minLines = 4,
-                maxLines = 8,
+                minLines = 8,
+                maxLines = 12,
                 textStyle = MaterialTheme.typography.bodySmall,
             )
             Spacer(modifier = Modifier.size(16.dp))
