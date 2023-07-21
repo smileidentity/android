@@ -224,10 +224,6 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun showSmileConfigBottomSheet(showSmileConfigBottomSheet: Boolean) {
-        _uiState.update { it.copy(showSmileConfigBottomSheet = showSmileConfigBottomSheet) }
-    }
-
     fun onSmartSelfieEnrollmentSelected() {
         _uiState.update {
             it.copy(
