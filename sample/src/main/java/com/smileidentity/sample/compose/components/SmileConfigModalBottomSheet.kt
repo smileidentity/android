@@ -34,11 +34,15 @@ fun SmileConfigModalBottomSheet(
     hint: String,
     modifier: Modifier = Modifier,
     @StringRes errorMessage: Int? = null,
+    canDismissConfigSheet: Boolean = true,
 ) {
     var configInput by remember { mutableStateOf("") }
 
     ModalBottomSheet(
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+            confirmValueChange = { canDismissConfigSheet },
+        ),
         onDismissRequest = onDismiss,
         modifier = modifier,
     ) {

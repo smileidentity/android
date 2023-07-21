@@ -85,6 +85,7 @@ fun RootScreen(
             onDismiss = { Timber.v("onDismiss") },
             errorMessage = errorMessage,
             hint = "Paste your config from the Portal here",
+            canDismissConfigSheet = false
         )
     }
 
