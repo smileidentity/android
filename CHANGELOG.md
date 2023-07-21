@@ -5,10 +5,12 @@
 ### Added
 - Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
 - Add a `JobStatusResponse` interface
+- Enhanced KYC Async API endpoint
 
 ### Fixed
 
 ### Changed
+- Kotlin 1.9
 - Updated API key exception error message to be actionable
 - `SmileID.useSandbox` getter is now publicly accessible
 

@@ -43,7 +43,7 @@
     <string name="settings">Settings</string>
     <string name="settings_update_smile_config">Update Smile Config</string>
     <string name="settings_smile_config_error">There is an error in your Smile Config</string>
-
+  
     <!--  SmartSelfie Auth  -->
     <string name="user_id_label">User ID</string>
     <string name="user_id_dialog_title">Enter User ID</string>

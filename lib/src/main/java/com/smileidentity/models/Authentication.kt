@@ -33,7 +33,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class AuthenticationRequest(
-    @Json(name = "job_type") val jobType: JobType,
+    @Json(name = "job_type") val jobType: JobType? = null,
     @Json(name = "enrollment") val enrollment: Boolean = jobType == SmartSelfieEnrollment,
     @Json(name = "country") val country: String? = null,
     @Json(name = "id_type") val idType: String? = null,
@@ -61,6 +61,7 @@ data class AuthenticationResponse(
     @Json(name = "signature") val signature: String,
     @Json(name = "timestamp") val timestamp: String,
     @Json(name = "partner_params") val partnerParams: PartnerParams,
+    @Json(name = "callback_url") val callbackUrl: String? = null,
     @Json(name = "consent_info") val consentInfo: ConsentInfo? = null,
 ) : Parcelable
 
