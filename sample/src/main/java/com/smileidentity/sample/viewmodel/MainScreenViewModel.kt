@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.Config
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.BiometricKyc
@@ -24,7 +23,6 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.ifTrue
 import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
@@ -51,12 +49,12 @@ import timber.log.Timber
 class SnackbarMessage(val value: String)
 
 data class MainScreenUiState(
-    val shouldShowSmileConfigBottomSheet: Boolean = false,
     @StringRes val appBarTitle: Int = R.string.app_name,
     val isProduction: Boolean = !SmileID.useSandbox,
     val snackbarMessage: SnackbarMessage? = null,
     val bottomNavSelection: BottomNavigationScreen = startScreen,
     val pendingJobCount: Int = 0,
+    val showSmileConfigBottomSheet: Boolean = false,
     val clipboardText: AnnotatedString? = null,
 ) {
     @StringRes
@@ -68,15 +66,12 @@ data class MainScreenUiState(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainScreenViewModel(
-    isSmileIDInitialized: Boolean,
-) : ViewModel() {
+class MainScreenViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var pendingJobCountJob = isSmileIDInitialized.ifTrue { createPendingJobCountPoller() }
-    private var backgroundJobsPollingJob =
-        isSmileIDInitialized.ifTrue { createBackgroundJobsPoller() }
+    private var pendingJobCountJob = createPendingJobCountPoller()
+    private var backgroundJobsPollingJob = createBackgroundJobsPoller()
 
     private fun createBackgroundJobsPoller() = viewModelScope.launch {
         val authRequest = AuthenticationRequest(SmartSelfieEnrollment)
@@ -193,19 +188,6 @@ class MainScreenViewModel(
             initialValue = null,
         )
 
-    fun updateSmileConfig(data: String): Boolean {
-        return try {
-            val config = SmileID.moshi.adapter(Config::class.java).fromJson(data)!!
-            config.let { viewModelScope.launch { DataStoreRepository.setConfig(it) } }
-            true
-        } catch (exception: Exception) {
-            // Can be JsonEncodingException, EOFException etc, so catch generic exceptions
-            // Alternative is to make the moshi adapter lenient, which is not ideal here
-            Timber.e(exception)
-            false
-        }
-    }
-
     fun onHomeSelected() {
         _uiState.update {
             it.copy(
@@ -238,14 +220,6 @@ class MainScreenViewModel(
             it.copy(
                 appBarTitle = BottomNavigationScreen.Settings.label,
                 bottomNavSelection = BottomNavigationScreen.Settings,
-            )
-        }
-    }
-
-    fun showSmileConfigBottomSheet(shouldShowSmileConfigBottomSheet: Boolean) {
-        _uiState.update {
-            it.copy(
-                shouldShowSmileConfigBottomSheet = shouldShowSmileConfigBottomSheet,
             )
         }
     }

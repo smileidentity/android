@@ -15,22 +15,41 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
-import com.smileidentity.sample.viewmodel.MainScreenViewModel
+import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
+import com.smileidentity.sample.viewmodel.SettingsViewModel
+import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 fun SettingsScreen(
-    viewModel: MainScreenViewModel,
     modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = viewModel(
+        factory = viewModelFactory { SettingsViewModel() },
+    ),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val settings = listOf(
-        Triple(R.string.settings_show_smile_config, Icons.Default.Settings) {
-            viewModel.showSmileConfigBottomSheet(shouldShowSmileConfigBottomSheet = true)
-        },
+        Triple(
+            R.string.settings_update_smile_config,
+            Icons.Default.Settings,
+            viewModel::showSmileConfigInput,
+        ),
     )
+
+    if (uiState.showSmileConfigBottomSheet) {
+        SmileConfigModalBottomSheet(
+            onSaveSmileConfig = viewModel::updateSmileConfig,
+            onDismiss = viewModel::hideSmileConfigInput,
+            hint = uiState.smileConfigHint,
+            errorMessage = uiState.smileConfigError,
+        )
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -50,10 +69,10 @@ fun SettingsScreen(
 
 @Preview
 @Composable
-private fun PreviewAboutUsScreen() {
+private fun PreviewSettingsScreen() {
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            // SettingsScreen()
+            SettingsScreen()
         }
     }
 }

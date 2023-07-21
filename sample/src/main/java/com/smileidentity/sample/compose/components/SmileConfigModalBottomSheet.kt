@@ -1,11 +1,11 @@
 package com.smileidentity.sample.compose.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,43 +18,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.jakewharton.processphoenix.ProcessPhoenix
-import com.smileidentity.SmileID
-import com.smileidentity.models.Config
 import com.smileidentity.sample.R
-import com.smileidentity.sample.SmileIDApplication
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmileConfigModalBottomSheet(
-    shouldShowSmileConfigBottomSheet: (shouldDismiss: Boolean) -> Unit,
-    updateSmileConfig: (updatedConfig: String) -> Boolean,
+    onSaveSmileConfig: (updatedConfig: String) -> Unit,
+    onDismiss: () -> Unit,
+    hint: String,
     modifier: Modifier = Modifier,
-    setSmileConfig: String = "",
-    smileConfig: Config? = null,
+    @StringRes errorMessage: Int? = null,
+    dismissable: Boolean = true,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    var showConfigError by rememberSaveable { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    var stringConfig by remember { mutableStateOf(setSmileConfig) }
-    var config by remember { mutableStateOf(smileConfig) }
+    var configInput by remember { mutableStateOf("") }
 
     ModalBottomSheet(
+        sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+            confirmValueChange = { dismissable },
+        ),
+        onDismissRequest = onDismiss,
         modifier = modifier,
-        onDismissRequest = {
-            shouldShowSmileConfigBottomSheet(false)
-        },
-        sheetState = sheetState,
     ) {
         Column(
             Modifier
@@ -65,51 +55,30 @@ fun SmileConfigModalBottomSheet(
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(4.dp),
-                value = stringConfig,
-                onValueChange = { stringConfig = it },
-                isError = showConfigError,
+                value = configInput,
+                onValueChange = { configInput = it },
+                placeholder = { Text(hint, style = MaterialTheme.typography.bodySmall) },
+                isError = errorMessage != null,
                 supportingText = {
-                    if (showConfigError) {
+                    if (errorMessage != null) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(id = R.string.settings_smile_config_error),
-                            color = MaterialTheme.colorScheme.error,
+                            text = stringResource(id = errorMessage),
                         )
                     }
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                minLines = 10,
-                maxLines = 15,
-                textStyle = MaterialTheme.typography.bodyMedium,
+                minLines = 8,
+                maxLines = 12,
+                textStyle = MaterialTheme.typography.bodySmall,
             )
             Spacer(modifier = Modifier.size(16.dp))
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    coroutineScope.launch {
-                        val updatedConfig = updateSmileConfig(stringConfig)
-                        if (updatedConfig) {
-                            sheetState.hide()
-                            shouldShowSmileConfigBottomSheet(false)
-                            setConfigAndRestart(smileConfig = config)
-                        } else {
-                            showConfigError = true
-                        }
-                    }
-                },
+                onClick = { onSaveSmileConfig(configInput) },
             ) {
-                Text(stringResource(id = R.string.settings_show_smile_config))
+                Text(stringResource(id = R.string.settings_update_smile_config))
             }
         }
-    }
-}
-
-fun setConfigAndRestart(smileConfig: Config?) {
-    smileConfig?.let { config ->
-        SmileID.config = config
-        SmileID.isInitialized = true
-        // Restart Process
-        ProcessPhoenix.triggerRebirth(SmileIDApplication.appContext)
     }
 }
