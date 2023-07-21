@@ -26,7 +26,6 @@ import timber.log.Timber
 fun RootScreen(
     modifier: Modifier = Modifier,
 ) {
-
     var initialized by remember { mutableStateOf(false) }
     val runtimeConfig by DataStoreRepository.getConfig().collectAsStateWithLifecycle(null)
     val context = LocalContext.current
@@ -85,7 +84,7 @@ fun RootScreen(
             onDismiss = { Timber.v("onDismiss") },
             errorMessage = errorMessage,
             hint = "Paste your config from the Portal here",
-            canDismissConfigSheet = false
+            canDismissConfigSheet = false,
         )
     }
 
