@@ -221,7 +221,7 @@ fun MainScreen(
                             }
                             idInfo?.let {
                                 val url = remember {
-                                    URL("https://smileidentity.com/privacy-policy")
+                                    URL("https://usesmileid.com/privacy-policy")
                                 }
                                 val userId = rememberSaveable { randomUserId() }
                                 val jobId = rememberSaveable { randomJobId() }
@@ -232,7 +232,7 @@ fun MainScreen(
                                     partnerIcon = painterResource(
                                         id = com.smileidentity.R.drawable.si_logo_with_text,
                                     ),
-                                    partnerName = "Smile Identity",
+                                    partnerName = "Smile ID",
                                     productName = it.idType,
                                     partnerPrivacyPolicy = url,
                                 ) { result ->

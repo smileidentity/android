@@ -28,19 +28,19 @@ fun ResourcesScreen(
         Triple(
             stringResource(R.string.resources_explore_docs_title),
             stringResource(R.string.resources_explore_docs_subtitle),
-        ) { uriHandler.openUri("https://docs.smileidentity.com") },
+        ) { uriHandler.openUri("https://docs.usesmileid.com") },
         Triple(
             stringResource(R.string.resources_privacy_policy_title),
             stringResource(R.string.resources_privacy_policy_subtitle),
-        ) { uriHandler.openUri("https://smileidentity.com/privacy-policy") },
+        ) { uriHandler.openUri("https://usesmileid.com/privacy-policy") },
         Triple(
             stringResource(R.string.resources_faqs_title),
             stringResource(R.string.resources_faqs_subtitle),
-        ) { uriHandler.openUri("https://docs.smileidentity.com/further-reading/faqs") },
+        ) { uriHandler.openUri("https://docs.usesmileid.com/further-reading/faqs") },
         Triple(
             stringResource(R.string.resources_supported_types_title),
             stringResource(R.string.resources_supported_types_subtitle),
-        ) { uriHandler.openUri("https://docs.smileidentity.com/supported-id-types") },
+        ) { uriHandler.openUri("https://docs.usesmileid.com/supported-id-types") },
     )
     Column(
         modifier = modifier
