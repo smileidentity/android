@@ -28,7 +28,7 @@ import java.net.URL
 /**
  * Perform a SmartSelfie™ Enrollment
  *
- * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-authentication)
  *
  * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often, this
  * will correspond to a unique User ID within your own system. If not provided, a random user ID
@@ -75,7 +75,7 @@ fun SmileID.SmartSelfieEnrollment(
 /**
  * Perform a SmartSelfie™ Authentication
  *
- * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-authentication)
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-authentication)
  *
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
  * an ID that was previously registered via a SmartSelfie™ Enrollment
@@ -118,7 +118,7 @@ fun SmileID.SmartSelfieAuthentication(
 /**
  * Perform a Document Verification.
  *
- * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/document-verification)
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/document-verification)
  *
  * @param idType The type of ID to be captured
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, it will be
@@ -180,7 +180,7 @@ fun SmileID.DocumentVerification(
  * belongs to the user. This is achieved by comparing the user's SmartSelfie™ to the user's photo in
  * an ID authority database
  *
- * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/biometric-kyc)
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-kyc)
  *
  * @param idInfo The ID information to look up in the ID Authority
  * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond

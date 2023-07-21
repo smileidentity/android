@@ -25,7 +25,7 @@ import java.io.File
 /**
  * Perform a Document Verification
  *
- * [Docs](https://docs.smileidentity.com/products/for-individuals-kyc/document-verification)
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/document-verification)
  *
  * A [Fragment] wrapper for the [DocumentVerification] to be used if not using Jetpack Compose.
  * New instances *must* be created via [newInstance]. Results are communicated back to the caller
