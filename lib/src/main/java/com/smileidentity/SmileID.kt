@@ -31,7 +31,7 @@ object SmileID {
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
 
     lateinit var config: Config
-        private set
+        internal set
     private lateinit var retrofit: Retrofit
 
     // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
