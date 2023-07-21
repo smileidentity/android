@@ -18,6 +18,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -51,7 +52,6 @@ class DocumentViewModelTest {
             prodBaseUrl = "prodBaseUrl",
             sandboxBaseUrl = "sandboxBaseUrl",
         )
-        SmileID.api = mockk()
     }
 
     @After
@@ -69,16 +69,22 @@ class DocumentViewModelTest {
     @Test
     fun `submitJob should move processingState to InProgress`() {
         // when
+        SmileID.api = mockk(relaxed = true)
+        coEvery { SmileID.api.authenticate(any()) } coAnswers {
+            delay(1000)
+            throw RuntimeException("unreachable")
+        }
         subject.submitJob(documentFrontFile)
 
         // then
-        // at this point, the coroutines will not have finished executing
+        // the submitJob coroutine won't have finished executing yet, so should still be processing
         assertEquals(ProcessingState.InProgress, subject.uiState.value.processingState)
     }
 
     @Test
     fun `submitJob should move processingState to Error`() = runTest {
         // given
+        SmileID.api = mockk()
         coEvery { SmileID.api.authenticate(any()) } throws RuntimeException()
 
         // when
@@ -91,6 +97,7 @@ class DocumentViewModelTest {
     @Test
     fun `submitJob should include idInfo`() = runTest {
         // given
+        SmileID.api = mockk()
         coEvery { SmileID.api.authenticate(any()) } returns AuthenticationResponse(
             success = true,
             signature = "signature",
