@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -38,16 +37,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
-import com.smileidentity.compose.components.SmileIDAttribution
+import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 internal fun BvnInputScreen(
     cancelBvnVerification: () -> Unit,
-    onBvnVerified: () -> Unit,
     modifier: Modifier = Modifier,
-    showAttribution: Boolean = true,
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel()
@@ -55,7 +52,7 @@ internal fun BvnInputScreen(
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    var bvn by rememberSaveable { mutableStateOf("") }
+    var bvnNumber by rememberSaveable { mutableStateOf("") }
 
     val focusRequester = remember { FocusRequester() }
 
@@ -89,8 +86,8 @@ internal fun BvnInputScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = bvn,
-            onValueChange = { bvn = it },
+            value = bvnNumber,
+            onValueChange = { bvnNumber = it },
             isError = uiState.showWrongBvn,
             singleLine = true,
             modifier = Modifier
@@ -107,16 +104,13 @@ internal fun BvnInputScreen(
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {},
+        LoadingButton(
+            buttonText = stringResource(id = R.string.si_continue),
+            loading = uiState.showLoading,
+            onClick = { viewModel.requestBvnOtpMode(bvnNumber = bvnNumber) },
             modifier = Modifier
                 .testTag("bvn_submit_continue_button")
                 .fillMaxWidth(),
-        ) {
-            Text(text = stringResource(id = R.string.si_continue))
-        }
-        if (showAttribution) {
-            SmileIDAttribution()
-        }
+        )
     }
 }
