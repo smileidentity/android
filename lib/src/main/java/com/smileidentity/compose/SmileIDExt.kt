@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.painter.Painter
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
@@ -225,5 +226,13 @@ fun SmileID.BiometricKYC(
             showAttribution = showAttribution,
             onResult = onResult,
         )
+    }
+}
+
+@Composable
+fun SmileID.BvnConsentScreen(
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedBvnConsentScreen()
     }
 }
