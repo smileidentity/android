@@ -1,6 +1,6 @@
 # Changelog
 
-## 10.0.0-beta05 (unreleased)
+## 10.0.0-beta05
 
 ### Added
 - Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
@@ -14,6 +14,7 @@
 - Kotlin 1.9
 - Updated API key exception error message to be actionable
 - `SmileID.useSandbox` getter is now publicly accessible
+- Bump Sentry to 6.25.2
 
 ### Removed
 - Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The
