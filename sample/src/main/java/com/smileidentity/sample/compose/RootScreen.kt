@@ -8,7 +8,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,9 +19,14 @@ import com.smileidentity.sample.viewmodel.RootViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import timber.log.Timber
 
+/**
+ * *****Note to Partners*****
+ *
+ * To enable runtime switching of the Smile Config, it is essential to have the RootScreen.
+ * For instructions on initializing the SDK, please refer to [SmileIDApplication].
+ */
 @Composable
 fun RootScreen(
-    modifier: Modifier = Modifier,
     viewModel: RootViewModel = viewModel(
         factory = viewModelFactory { RootViewModel() },
     ),

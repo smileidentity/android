@@ -15,6 +15,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * *****Note to Partners*****
+ *
+ * To enable runtime switching of the Smile Config, it is essential to have the RootViewModel.
+ * For instructions on initializing the SDK, please refer to [SmileIDApplication].
+ */
+
 data class RootUiState(
     val showSmileConfigBottomSheet: Boolean = false,
     val smileConfigHint: String = "Your Smile Config from the Smile ID Portal",
