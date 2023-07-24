@@ -8,8 +8,8 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.Document
+import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
@@ -25,7 +25,7 @@ import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -35,7 +35,6 @@ import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.time.Duration.Companion.seconds
 
 data class DocumentUiState(
     val frontDocumentImageToConfirm: File? = null,
@@ -126,7 +125,7 @@ class DocumentViewModel(
         }
     }
 
-    fun submitJob(documentFrontFile: File, documentBackFile: File? = null) {
+    fun submitJob(documentFrontFile: File, documentBackFile: File? = null): Job {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = { e: Throwable ->
             result = SmileIDResult.Error(e)
@@ -137,7 +136,7 @@ class DocumentViewModel(
                 )
             }
         }
-        viewModelScope.launch(getExceptionHandler(proxy)) {
+        return viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 jobType = JobType.DocumentVerification,
                 enrollment = false,
@@ -161,6 +160,7 @@ class DocumentViewModel(
             )
             val uploadRequest = UploadRequest(
                 images = listOfNotNull(frontImageInfo, backImageInfo, selfieImageInfo),
+                idInfo = IdInfo(idType.countryCode, idType.documentType),
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
@@ -173,17 +173,7 @@ class DocumentViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            lateinit var jobStatusResponse: DocVJobStatusResponse
-            val jobStatusPollDelay = 1.seconds
-            for (i in 1..10) {
-                Timber.v("Job Status poll attempt #$i in $jobStatusPollDelay")
-                delay(jobStatusPollDelay)
-                jobStatusResponse = SmileID.api.getDocVJobStatus(jobStatusRequest)
-                Timber.v("Job Status Response: $jobStatusResponse")
-                if (jobStatusResponse.jobComplete) {
-                    break
-                }
-            }
+            val jobStatusResponse = SmileID.api.getDocVJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
                 DocumentVerificationResult(
                     selfieFile = selfieImageInfo.image,

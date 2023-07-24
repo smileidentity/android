@@ -1,9 +1,12 @@
+@file:Suppress("unused")
+
 package com.smileidentity.networking
 
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocVJobStatusResponse
+import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
@@ -13,14 +16,18 @@ import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.ServicesResponse
+import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.UploadRequest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.channelFlow
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Url
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-@Suppress("unused")
 interface SmileIDService {
     /**
      * Returns a signature and timestamp that can be used to authenticate future requests. This is
@@ -49,9 +56,22 @@ interface SmileIDService {
      * Query the Identity Information of an individual using their ID number from a supported ID
      * Type. Return the personal information of the individual found in the database of the ID
      * authority.
+     *
+     * This will be done synchronously, and the result will be returned in the response. If the ID
+     * provider is unavailable, the response will be an error.
      */
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
+
+    /**
+     * Same as [doEnhancedKyc], but the final result is delivered the URL provided in the (required)
+     * [EnhancedKycRequest.callbackUrl] field.
+     *
+     * If the ID provider is unavailable, the response will be delivered to the callback URL once
+     * the ID provider is available again.
+     */
+    @POST("/v1/async_id_verification")
+    suspend fun doEnhancedKycAsync(@Body request: EnhancedKycRequest): EnhancedKycAsyncResponse
 
     /**
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
@@ -59,7 +79,9 @@ interface SmileIDService {
      * SmartSelfie Authentication/Registration.
      */
     @POST("/v1/job_status")
-    suspend fun getJobStatus(@Body request: JobStatusRequest): JobStatusResponse
+    suspend fun getSmartSelfieJobStatus(
+        @Body request: JobStatusRequest,
+    ): SmartSelfieJobStatusResponse
 
     /**
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
@@ -85,6 +107,102 @@ interface SmileIDService {
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
 
+    /**
+     * Returns supported products and metadata
+     */
     @GET("/v1/services")
     suspend fun getServices(): ServicesResponse
+}
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+fun SmileIDService.pollSmartSelfieJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getSmartSelfieJobStatus(request) }
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+fun SmileIDService.pollDocVJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getDocVJobStatus(request) }
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+fun SmileIDService.pollBiometricKycJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getBiometricKycJobStatus(request) }
+
+/**
+ * This uses a generics (as compared to the interface as the return type of [action] directly) so
+ * that the higher level callers (defined above) have a concrete return type
+ *
+ * [channelFlow] is used instead of [kotlinx.coroutines.flow.flow] so that API calls continue to be
+ * made when the consumer processes slower than the producer
+ *
+ * It is recommended to collect this flow with [kotlinx.coroutines.flow.collectLatest] (note: if
+ * consuming slower than this is producing, the consumer coroutine will continue getting cancelled
+ * until the last value) since the flow will complete when the job is complete
+ *
+ * Alternatively, [kotlinx.coroutines.flow.collect] can be used along with
+ * [kotlinx.coroutines.flow.conflate] to drop older, non-consumed values when newer values are
+ * present
+ */
+internal fun <T : JobStatusResponse> poll(
+    interval: Duration,
+    numAttempts: Int,
+    action: suspend (attempt: Int) -> T,
+) = channelFlow {
+    var latestError: Exception? = null
+    // TODO: Replace `until` with `..<` once ktlint-gradle plugin stops throwing an exception for it
+    //  see: https://github.com/JLLeitschuh/ktlint-gradle/issues/692
+    for (attempt in 0 until numAttempts) {
+        try {
+            val response = action(attempt)
+            send(response)
+
+            // Reset the error if the API response was successful
+            latestError = null
+
+            if (response.jobComplete) {
+                break
+            }
+        } catch (e: Exception) {
+            latestError = e
+        }
+        delay(interval)
+    }
+    latestError?.let { throw it }
 }

@@ -1,5 +1,9 @@
 # Smile ID Android SDK
 
+<p align="center">
+    <img width="200" height="200" style="border-radius:15%" src="sample/listing/ic_launcher-playstore.png" />
+</p>
+
 [![Build](https://github.com/smileidentity/android/actions/workflows/build.yaml/badge.svg)](https://github.com/smileidentity/android/actions/workflows/build.yaml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.smileidentity/android-sdk)](https://mvnrepository.com/artifact/com.smileidentity/android-sdk)
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.smileidentity/android-sdk?server=https%3A%2F%2Foss.sonatype.org)](https://oss.sonatype.org/content/repositories/snapshots/com/smileidentity/android-sdk/)
@@ -12,10 +16,9 @@ If you haven’t already,
 [sign up](https://www.usesmileid.com/schedule-a-demo/) for a free Smile ID account, which comes
 with Sandbox access.
 
-Please see [CHANGELOG.md](CHANGELOG.md) or 
-[Releases](https://github.com/smileidentity/android/releases) for the most recent version and 
+Please see [CHANGELOG.md](CHANGELOG.md) or
+[Releases](https://github.com/smileidentity/android/releases) for the most recent version and
 release notes
-
 
 ## Getting Started
 
@@ -23,7 +26,7 @@ Full documentation is available at https://docs.usesmileid.com/integration-optio
 
 Javadocs are available at https://javadoc.io/doc/com.smileidentity/android-sdk/latest/index.html
 
-The [sample app](sample/src/main/java/com/smileidentity/sample/compose/MainScreen.kt) included in 
+The [sample app](sample/src/main/java/com/smileidentity/sample/compose/MainScreen.kt) included in
 this repo is a good reference implementation
 
 #### 0. Requirements
@@ -59,9 +62,10 @@ All UI functionality is exposed via either Jetpack Compose or Fragments
 
 #### Jetpack Compose
 
-All Composables are available under the `SmileID` object. 
+All Composables are available under the `SmileID` object.
 
 e.g.
+
 ```kotlin
 SmileID.SmartSelfieEnrollment()
 SmileID.SmartSelfieAuthentication()

@@ -1,15 +1,25 @@
 # Changelog
 
-## 10.0.0-beta05 (unreleased)
+## 10.0.0-beta05
 
 ### Added
+- Add helper functions which return a Flow of the latest JobStatus for a Job until it is complete
+- Add a `JobStatusResponse` interface
+- Enhanced KYC Async API endpoint
 
 ### Fixed
+- Fixed a bug where `id_info` was not included in Document Verification network requests
 
 ### Changed
 - Kotlin 1.9
+- Updated API key exception error message to be actionable
+- `SmileID.useSandbox` getter is now publicly accessible
+- Bump Sentry to 6.25.2
 
 ### Removed
+- Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The
+  returned `SmileIDResult`s will now contain only the immediate result of job status without waiting
+  for job completion
 
 ## 10.0.0-beta04
 

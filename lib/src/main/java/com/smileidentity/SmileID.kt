@@ -27,14 +27,15 @@ import java.util.concurrent.TimeUnit
 @Suppress("unused", "RemoveRedundantQualifierName")
 object SmileID {
     @JvmStatic
-    lateinit var api: SmileIDService private set
+    lateinit var api: SmileIDService internal set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
 
     lateinit var config: Config
     private lateinit var retrofit: Retrofit
 
     // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
-    internal var useSandbox: Boolean = true
+    var useSandbox: Boolean = true
+        private set
 
     internal var apiKey: String? = null
 

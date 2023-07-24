@@ -20,6 +20,7 @@ data class EnhancedKycRequest(
     @Json(name = "dob") val dob: String? = null,
     @Json(name = "phone_number") val phoneNumber: String? = null,
     @Json(name = "bank_code") val bankCode: String? = null,
+    @Json(name = "callback_url") val callbackUrl: String? = null,
     @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "partner_id") val partnerId: String = SmileID.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
@@ -44,3 +45,7 @@ data class EnhancedKycResponse(
     @Json(name = "DOB") val dob: String?,
     @Json(name = "Photo") val base64Photo: String?,
 ) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class EnhancedKycAsyncResponse(@Json(name = "success") val success: Boolean) : Parcelable
