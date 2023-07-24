@@ -3,8 +3,9 @@
 name: Lint Build and Test
 on:
   pull_request:
+  merge_group:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
