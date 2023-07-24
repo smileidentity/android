@@ -8,6 +8,7 @@
 - Enhanced KYC Async API endpoint
 
 ### Fixed
+- Fixed a bug where `id_info` was not included in Document Verification network requests
 
 ### Changed
 - Kotlin 1.9

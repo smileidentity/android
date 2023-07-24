@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 @Suppress("unused")
 object SmileID {
     @JvmStatic
-    lateinit var api: SmileIDService private set
+    lateinit var api: SmileIDService internal set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
 
     lateinit var config: Config
