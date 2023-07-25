@@ -112,7 +112,7 @@ fun WhoWeAreDialog(onDialogClose: () -> Unit = {}) {
 
 @Preview
 @Composable
-private fun PreviewWhoWeAreDialog() {
+private fun WhoWeAreDialogPreview() {
     SmileIDTheme {
         WhoWeAreDialog()
     }

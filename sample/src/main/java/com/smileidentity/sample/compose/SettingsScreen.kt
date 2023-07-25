@@ -69,7 +69,7 @@ fun SettingsScreen(
 
 @Preview
 @Composable
-private fun PreviewSettingsScreen() {
+private fun SettingsScreenPreview() {
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             SettingsScreen()

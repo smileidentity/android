@@ -53,7 +53,7 @@ class DataStoreRepositoryTest {
         DataStoreRepository.clearConfig()
 
         // then
-        val actual = DataStoreRepository.getStringConfig().first()
+        val actual = DataStoreRepository.getConfigJsonString().first()
         assertNull(actual)
     }
 }

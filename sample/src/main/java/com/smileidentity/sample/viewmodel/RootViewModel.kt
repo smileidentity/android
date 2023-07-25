@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.Config
 import com.smileidentity.sample.R
+import com.smileidentity.sample.SmileIDApplication
 import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,16 +16,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+const val SMILE_CONFIG_DEFAULT_HINT = "Smile Config from the Portal"
+
 /**
  * *****Note to Partners*****
  *
  * To enable runtime switching of the Smile Config, it is essential to have the RootViewModel.
  * For instructions on initializing the SDK, please refer to [SmileIDApplication].
  */
-
 data class RootUiState(
     val showSmileConfigBottomSheet: Boolean = false,
-    val smileConfigHint: String = "Your Smile Config from the Smile ID Portal",
+    val smileConfigHint: String = SMILE_CONFIG_DEFAULT_HINT,
     @StringRes val smileConfigError: Int? = null,
 )
 
@@ -40,8 +42,8 @@ class RootViewModel : ViewModel() {
         )
 
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
-    private val currentConfig = DataStoreRepository.getConfig()
-        .map { it?.let { configAdapter.toJson(it) } ?: "Smile Config from the Smile ID Portal" }
+    private val currentConfig = DataStoreRepository.getConfigJsonString()
+        .map { it ?: SMILE_CONFIG_DEFAULT_HINT }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

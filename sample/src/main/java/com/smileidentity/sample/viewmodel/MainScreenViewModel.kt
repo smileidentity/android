@@ -28,7 +28,6 @@ import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -163,8 +161,8 @@ class MainScreenViewModel : ViewModel() {
      * will automatically pick up the correct environment)
      */
     fun toggleEnvironment() {
-        pendingJobCountJob?.cancel()
-        backgroundJobsPollingJob?.cancel()
+        pendingJobCountJob.cancel()
+        backgroundJobsPollingJob.cancel()
 
         SmileID.setEnvironment(!SmileID.useSandbox)
 
@@ -173,21 +171,6 @@ class MainScreenViewModel : ViewModel() {
 
         _uiState.update { it.copy(isProduction = !SmileID.useSandbox) }
     }
-
-    val smileStringConfig = DataStoreRepository.getStringConfig()
-        .stateIn(
-            scope = viewModelScope,
-            started = Eagerly,
-            initialValue = "",
-        )
-
-    val smileConfig = DataStoreRepository.getConfig()
-        .stateIn(
-            scope = viewModelScope,
-            started = Eagerly,
-            initialValue = null,
-        )
-
     fun onHomeSelected() {
         _uiState.update {
             it.copy(

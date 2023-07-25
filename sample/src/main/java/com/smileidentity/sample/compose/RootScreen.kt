@@ -43,7 +43,7 @@ fun RootScreen(
 
         if (runtimeConfig != null) {
             // If a config has been set at runtime, it takes first priority
-            LaunchedEffect(viewModel.runtimeConfig) {
+            LaunchedEffect(runtimeConfig) {
                 initialized = false
                 SmileID.initialize(
                     context = context,

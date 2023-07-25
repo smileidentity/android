@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiState(
     val showSmileConfigBottomSheet: Boolean = false,
-    val smileConfigHint: String = "Your Smile Config from the Smile ID Portal",
+    val smileConfigHint: String = SMILE_CONFIG_DEFAULT_HINT,
     @StringRes val smileConfigError: Int? = null,
 )
 
@@ -25,8 +25,8 @@ class SettingsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState = _uiState.asStateFlow()
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
-    private val currentConfig = DataStoreRepository.getConfig()
-        .map { it?.let { configAdapter.toJson(it) } ?: "Smile Config from the Smile ID Portal" }
+    private val currentConfig = DataStoreRepository.getConfigJsonString()
+        .map { it ?: SMILE_CONFIG_DEFAULT_HINT }
         .stateIn(
             scope = viewModelScope,
             started = WhileSubscribed(),
