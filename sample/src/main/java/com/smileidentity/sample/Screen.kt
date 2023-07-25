@@ -75,9 +75,9 @@ enum class BottomNavigationScreen(
         Filled.Info,
         Outlined.Info,
     ),
-    AboutUs(
-        "about_us",
-        R.string.about_us,
+    Settings(
+        "settings",
+        R.string.settings,
         Filled.Settings,
         Outlined.Settings,
     ),

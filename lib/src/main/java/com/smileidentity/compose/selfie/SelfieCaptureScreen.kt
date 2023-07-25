@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,6 +67,7 @@ internal fun SelfieCaptureScreen(
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
     val viewfinderZoom = 1.1f
+    val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
     // Force maximum brightness in order to light up the user's face
     ForceBrightness()
     Box(modifier = Modifier.fillMaxSize()) {
@@ -89,14 +91,14 @@ internal fun SelfieCaptureScreen(
                 // "out of bounds" content as a fraud prevention technique
                 .scale(viewfinderZoom),
         )
-        val animatedProgress = animateFloatAsState(
+        val animatedProgress by animateFloatAsState(
             targetValue = uiState.progress,
             animationSpec = tween(easing = LinearEasing),
             label = "selfie_progress",
-        ).value
+        )
         FaceShapedProgressIndicator(
             progress = animatedProgress,
-            faceFillPercent = MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2,
+            faceFillPercent = faceFillPercent,
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("selfie_progress_indicator"),

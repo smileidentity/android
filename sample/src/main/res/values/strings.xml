@@ -34,14 +34,16 @@
     <string name="resources_faqs_subtitle">Explore frequently asked questions</string>
     <string name="resources_supported_types_title">Supported ID types and documents</string>
     <string name="resources_supported_types_subtitle">See our coverage range across the continent</string>
-
-    <!--  About Us Screen  -->
-    <string name="about_us">About Us</string>
     <string name="about_us_who_we_are">Who we are</string>
     <string name="about_us_who_we_are_content">Smile ID products are tools for developers to perform real-time digital KYC, identity verification, user onboarding, and user authentication across Africa</string>
     <string name="about_us_visit_our_website">Visit our website</string>
     <string name="about_us_contact_support">Contact support</string>
 
+    <!--  Settings Screen  -->
+    <string name="settings">Settings</string>
+    <string name="settings_update_smile_config">Update Smile Config</string>
+    <string name="settings_smile_config_error">There is an error in your Smile Config</string>
+  
     <!--  SmartSelfie Auth  -->
     <string name="user_id_label">User ID</string>
     <string name="user_id_dialog_title">Enter User ID</string>

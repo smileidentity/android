@@ -71,10 +71,18 @@ object DataStoreRepository {
     }
 
     /**
-     * Get the Smile [Config] from [mainDataStore], if one has been manually set. (It may not be set if
-     * the sample app is utilizing the assets/smile_config.json file instead).
+     * Get the Smile Config JSON representation from [mainDataStore], if one has been manually set.
+     * (It may not be set if the sample app is utilizing the assets/smile_config.json file instead).
      *
-     * If no config is set, this returns null
+     * If no config is set, this emits null
+     */
+    fun getConfigJsonString(): Flow<String?> = mainDataStore.data.map { it[Keys.config] }
+
+    /**
+     * Get the Smile [Config] from [mainDataStore], if one has been manually set. (It may not be set
+     * if the sample app is utilizing the assets/smile_config.json file instead).
+     *
+     * If no config is set, this emits null
      */
     fun getConfig(): Flow<Config?> = mainDataStore.data.map {
         it[Keys.config]?.let { SmileID.moshi.adapter(Config::class.java).fromJson(it) }

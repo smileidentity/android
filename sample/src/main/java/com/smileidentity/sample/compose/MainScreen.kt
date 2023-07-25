@@ -27,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -43,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -74,9 +72,9 @@ import kotlinx.coroutines.launch
 import java.net.URL
 
 @OptIn(ExperimentalLayoutApi::class)
-@Preview
 @Composable
 fun MainScreen(
+    modifier: Modifier = Modifier,
     viewModel: MainScreenViewModel = viewModel(
         factory = viewModelFactory { MainScreenViewModel() },
     ),
@@ -105,180 +103,173 @@ fun MainScreen(
             }
         }
     }
-
-    SmileIDTheme {
-        Surface {
-            Scaffold(
-                snackbarHost = { Snackbar() },
-                topBar = {
-                    TopBar(
-                        showUpButton = showUpButton,
-                        onNavigateUp = { navController.navigateUp() },
-                        isJobsScreenSelected = bottomNavSelection == BottomNavigationScreen.Jobs,
-                    )
-                },
-                bottomBar = {
-                    // Don't show bottom bar when navigating to any product screens
-                    val showBottomBar by remember(currentRoute) {
-                        derivedStateOf {
-                            bottomNavItems.any {
-                                it.route.contains(
-                                    currentRoute?.destination?.route ?: "",
-                                )
-                            }
-                        }
-                    }
-                    if (showBottomBar) {
-                        BottomBar(
-                            bottomNavItems = bottomNavItems,
-                            bottomNavSelection = bottomNavSelection,
-                            pendingJobCount = uiState.pendingJobCount,
-                        ) {
-                            navController.navigate(it.route) {
-                                popUpTo(BottomNavigationScreen.Home.route)
-                                launchSingleTop = true
-                            }
-                        }
-                    }
-                },
-                content = {
-                    NavHost(
-                        navController,
-                        startScreen.route,
-                        Modifier
-                            .padding(it)
-                            .consumeWindowInsets(it),
-                    ) {
-                        composable(BottomNavigationScreen.Home.route) {
-                            LaunchedEffect(Unit) { viewModel.onHomeSelected() }
-                            ProductSelectionScreen { navController.navigate(it.route) }
-                        }
-                        composable(BottomNavigationScreen.Jobs.route) {
-                            LaunchedEffect(Unit) { viewModel.onJobsSelected() }
-                            OrchestratedJobsScreen(uiState.isProduction)
-                        }
-                        composable(BottomNavigationScreen.Resources.route) {
-                            LaunchedEffect(Unit) { viewModel.onResourcesSelected() }
-                            ResourcesScreen()
-                        }
-                        composable(BottomNavigationScreen.AboutUs.route) {
-                            LaunchedEffect(Unit) { viewModel.onAboutUsSelected() }
-                            AboutUsScreen()
-                        }
-                        composable(ProductScreen.SmartSelfieEnrollment.route) {
-                            LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
-                            val userId = rememberSaveable { randomUserId() }
-                            val jobId = rememberSaveable { randomJobId() }
-                            SmileID.SmartSelfieEnrollment(
-                                userId = userId,
-                                jobId = jobId,
-                                allowAgentMode = true,
-                                showInstructions = true,
-                            ) { result ->
-                                viewModel.onSmartSelfieEnrollmentResult(userId, jobId, result)
-                                navController.popBackStack()
-                            }
-                        }
-                        composable(ProductScreen.SmartSelfieAuthentication.route) {
-                            LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
-                            SmartSelfieAuthenticationUserIdInputDialog(
-                                onDismiss = navController::popBackStack,
-                                onConfirm = { userId ->
-                                    navController.navigate(
-                                        "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
-                                    ) { popUpTo(BottomNavigationScreen.Home.route) }
-                                },
-                            )
-                        }
-                        composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
-                            LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
-                            val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                            val jobId = rememberSaveable { randomJobId() }
-                            SmileID.SmartSelfieAuthentication(
-                                userId = userId,
-                                jobId = jobId,
-                                allowAgentMode = true,
-                            ) { result ->
-                                viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
-                                navController.popBackStack()
-                            }
-                        }
-                        composable(ProductScreen.EnhancedKyc.route) {
-                            LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
-                            OrchestratedEnhancedKycScreen { result ->
-                                viewModel.onEnhancedKycResult(result)
-                                navController.popBackStack()
-                            }
-                        }
-                        composable(ProductScreen.BiometricKyc.route) {
-                            LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
-                            var idInfo: IdInfo? by remember { mutableStateOf(null) }
-                            if (idInfo == null) {
-                                IdTypeSelectorAndFieldInputScreen(
-                                    jobType = JobType.BiometricKyc,
-                                    onResult = { idInfo = it },
-                                )
-                            }
-                            idInfo?.let {
-                                val url = remember {
-                                    URL("https://usesmileid.com/privacy-policy")
-                                }
-                                val userId = rememberSaveable { randomUserId() }
-                                val jobId = rememberSaveable { randomJobId() }
-                                SmileID.BiometricKYC(
-                                    idInfo = it,
-                                    userId = userId,
-                                    jobId = jobId,
-                                    partnerIcon = painterResource(
-                                        id = com.smileidentity.R.drawable.si_logo_with_text,
-                                    ),
-                                    partnerName = "Smile ID",
-                                    productName = it.idType,
-                                    partnerPrivacyPolicy = url,
-                                ) { result ->
-                                    viewModel.onBiometricKycResult(userId, jobId, result)
-                                    navController.popBackStack()
-                                }
-                            }
-                        }
-                        composable(ProductScreen.DocumentVerification.route) {
-                            LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                            DocumentVerificationIdTypeSelector { country, idType ->
-                                navController.navigate(
-                                    "${ProductScreen.DocumentVerification.route}/$country/$idType",
-                                ) { popUpTo(ProductScreen.DocumentVerification.route) }
-                            }
-                        }
-                        composable(
-                            ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
-                        ) {
-                            LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                            val userId = rememberSaveable { randomUserId() }
-                            val jobId = rememberSaveable { randomJobId() }
-                            val documentType = remember(it) {
-                                Document(
-                                    it.arguments?.getString("countryCode")!!,
-                                    it.arguments?.getString("idType")!!,
-                                )
-                            }
-                            SmileID.DocumentVerification(
-                                userId = userId,
-                                jobId = jobId,
-                                idType = documentType,
-                                showInstructions = true,
-                            ) { result ->
-                                viewModel.onDocumentVerificationResult(userId, jobId, result)
-                                navController.popBackStack(
-                                    route = BottomNavigationScreen.Home.route,
-                                    inclusive = false,
-                                )
-                            }
-                        }
-                    }
-                },
+    Scaffold(
+        modifier = modifier,
+        snackbarHost = { Snackbar() },
+        topBar = {
+            TopBar(
+                showUpButton = showUpButton,
+                onNavigateUp = navController::navigateUp,
+                isJobsScreenSelected = bottomNavSelection == BottomNavigationScreen.Jobs,
             )
-        }
-    }
+        },
+        bottomBar = {
+            // Don't show bottom bar when navigating to any product screens
+            val showBottomBar by remember(currentRoute) {
+                derivedStateOf {
+                    bottomNavItems.any { it.route.contains(currentRoute?.destination?.route ?: "") }
+                }
+            }
+            if (showBottomBar) {
+                BottomBar(
+                    bottomNavItems = bottomNavItems,
+                    bottomNavSelection = bottomNavSelection,
+                    pendingJobCount = uiState.pendingJobCount,
+                ) {
+                    navController.navigate(it.route) {
+                        popUpTo(BottomNavigationScreen.Home.route)
+                        launchSingleTop = true
+                    }
+                }
+            }
+        },
+        content = {
+            NavHost(
+                navController,
+                startScreen.route,
+                Modifier
+                    .padding(it)
+                    .consumeWindowInsets(it),
+            ) {
+                composable(BottomNavigationScreen.Home.route) {
+                    LaunchedEffect(Unit) { viewModel.onHomeSelected() }
+                    ProductSelectionScreen(
+                        onProductSelected = { navController.navigate(it.route) },
+                    )
+                }
+                composable(BottomNavigationScreen.Jobs.route) {
+                    LaunchedEffect(Unit) { viewModel.onJobsSelected() }
+                    OrchestratedJobsScreen(uiState.isProduction)
+                }
+                composable(BottomNavigationScreen.Resources.route) {
+                    LaunchedEffect(Unit) { viewModel.onResourcesSelected() }
+                    ResourcesScreen()
+                }
+                composable(BottomNavigationScreen.Settings.route) {
+                    LaunchedEffect(Unit) { viewModel.onSettingsSelected() }
+                    SettingsScreen()
+                }
+                composable(ProductScreen.SmartSelfieEnrollment.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
+                    SmileID.SmartSelfieEnrollment(
+                        userId = userId,
+                        jobId = jobId,
+                        allowAgentMode = true,
+                        showInstructions = true,
+                    ) { result ->
+                        viewModel.onSmartSelfieEnrollmentResult(userId, jobId, result)
+                        navController.popBackStack()
+                    }
+                }
+                composable(ProductScreen.SmartSelfieAuthentication.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                    SmartSelfieAuthenticationUserIdInputDialog(
+                        onDismiss = navController::popBackStack,
+                        onConfirm = { userId ->
+                            navController.navigate(
+                                "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
+                            ) { popUpTo(BottomNavigationScreen.Home.route) }
+                        },
+                    )
+                }
+                composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                    val jobId = rememberSaveable { randomJobId() }
+                    SmileID.SmartSelfieAuthentication(
+                        userId = userId,
+                        jobId = jobId,
+                        allowAgentMode = true,
+                    ) { result ->
+                        viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
+                        navController.popBackStack()
+                    }
+                }
+                composable(ProductScreen.EnhancedKyc.route) {
+                    LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
+                    OrchestratedEnhancedKycScreen { result ->
+                        viewModel.onEnhancedKycResult(result)
+                        navController.popBackStack()
+                    }
+                }
+                composable(ProductScreen.BiometricKyc.route) {
+                    LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
+                    var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                    if (idInfo == null) {
+                        IdTypeSelectorAndFieldInputScreen(
+                            jobType = JobType.BiometricKyc,
+                            onResult = { idInfo = it },
+                        )
+                    }
+                    idInfo?.let {
+                        val url = remember { URL("https://usesmileid.com/privacy-policy") }
+                        val userId = rememberSaveable { randomUserId() }
+                        val jobId = rememberSaveable { randomJobId() }
+                        SmileID.BiometricKYC(
+                            idInfo = it,
+                            userId = userId,
+                            jobId = jobId,
+                            partnerIcon = painterResource(
+                                id = com.smileidentity.R.drawable.si_logo_with_text,
+                            ),
+                            partnerName = "Smile ID",
+                            productName = it.idType,
+                            partnerPrivacyPolicy = url,
+                        ) { result ->
+                            viewModel.onBiometricKycResult(userId, jobId, result)
+                            navController.popBackStack()
+                        }
+                    }
+                }
+                composable(ProductScreen.DocumentVerification.route) {
+                    LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
+                    DocumentVerificationIdTypeSelector { country, idType ->
+                        navController.navigate(
+                            "${ProductScreen.DocumentVerification.route}/$country/$idType",
+                        ) { popUpTo(ProductScreen.DocumentVerification.route) }
+                    }
+                }
+                composable(
+                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
+                ) {
+                    LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
+                    val documentType = remember(it) {
+                        Document(
+                            it.arguments?.getString("countryCode")!!,
+                            it.arguments?.getString("idType")!!,
+                        )
+                    }
+                    SmileID.DocumentVerification(
+                        userId = userId,
+                        jobId = jobId,
+                        idType = documentType,
+                        showInstructions = true,
+                        allowGalleryUpload = true,
+                    ) { result ->
+                        viewModel.onDocumentVerificationResult(userId, jobId, result)
+                        navController.popBackStack(
+                            route = BottomNavigationScreen.Home.route,
+                            inclusive = false,
+                        )
+                    }
+                }
+            }
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
