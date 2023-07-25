@@ -18,7 +18,7 @@ android {
         targetSdk = 34
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
-        versionName = "1.4_sdk-" + project(":lib").version.toString()
+        versionName = "1.4_" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

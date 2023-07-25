@@ -58,10 +58,10 @@ fun ResourcesScreen(
             shouldShowWhoWeAreDialog = true
         },
         Triple(R.string.about_us_visit_our_website, Icons.Default.Star) {
-            uriHandler.openUri("https://smileidentity.com")
+            uriHandler.openUri("https://usesmileid.com")
         },
         Triple(R.string.about_us_contact_support, Icons.Default.Email) {
-            uriHandler.openUri("https://smileidentity.com/contact-us")
+            uriHandler.openUri("https://usesmileid.com/contact-us")
         },
     )
     Column(

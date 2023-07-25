@@ -136,8 +136,8 @@ fun SmileID.SmartSelfieAuthentication(
  * generated
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
- * @param showInstructions Whether to deactivate capture screen's instructions for
- * Document Verification.
+ * @param showInstructions Whether to deactivate capture screen's instructions for Document
+ * Verification (NB! If instructions are disabled, gallery upload won't be possible)
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID

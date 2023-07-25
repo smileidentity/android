@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-const val SMILE_CONFIG_DEFAULT_HINT = "Smile Config from the Portal"
+const val SMILE_CONFIG_DEFAULT_HINT = "Paste your Smile Config from the Portal here"
 
 /**
  * *****Note to Partners*****
@@ -62,11 +62,11 @@ class RootViewModel : ViewModel() {
         try {
             val config = configAdapter.fromJson(updatedConfig)
             if (config != null) {
+                _uiState.update { it.copy(smileConfigError = null) }
                 viewModelScope.launch {
                     DataStoreRepository.setConfig(config)
                     _uiState.update { it.copy(showSmileConfigBottomSheet = false) }
                 }
-                _uiState.update { it.copy(smileConfigError = null) }
             } else {
                 _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }
             }
