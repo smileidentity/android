@@ -93,10 +93,8 @@ val checkSmileConfigFileTaskName = "checkSmileConfigFile"
 tasks.register(checkSmileConfigFileTaskName) {
     doLast {
         val configFile = file("src/main/assets/smile_config.json")
-        if (!configFile.exists()) {
-            throw IllegalArgumentException("Missing smile_config.json file in src/main/assets!")
-        }
-        if (configFile.readText().isBlank()) {
+        // It is okay if the Smile Config doesn't exist -- it will be prompted for upon startup
+        if (configFile.exists() && configFile.readText().isBlank()) {
             throw IllegalArgumentException("Empty smile_config.json file in src/main/assets!")
         }
     }
