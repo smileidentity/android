@@ -16,7 +16,7 @@ import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
-fun LoadingButton(
+internal fun LoadingButton(
     buttonText: String,
     modifier: Modifier = Modifier,
     loading: Boolean = false,
