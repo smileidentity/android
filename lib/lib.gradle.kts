@@ -144,6 +144,8 @@ dependencies {
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.adapters.lazy)
 
+    implementation(libs.coroutines.core)
+
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity.compose)
