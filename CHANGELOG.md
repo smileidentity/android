@@ -1,5 +1,21 @@
 # Changelog
 
+## 10.0.0-beta06 (unreleased)
+
+### Added
+
+### Fixed
+- Added OkHttp as an `api` dependency
+- Updated `LoadingButton` visibility modifier
+
+### Changed
+- Switch from Java 17 to Java 11 to support Flutter
+- Bump coroutines to 1.7.3
+- Bump Sentry to 6.28.0
+- Bump AndroidX Fragment to 1.6.1
+
+### Removed
+
 ## 10.0.0-beta05
 
 ### Added
