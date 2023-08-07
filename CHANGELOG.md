@@ -18,6 +18,7 @@
 
 ### Changed
 - Switch from Java 17 to Java 11 to support Flutter
+- Allow passing in a custom `Config` instance to `SmileID.initialize`  
 - Bump coroutines to 1.7.3
 - Bump Sentry to 6.28.0
 - Bump AndroidX Fragment to 1.6.1
