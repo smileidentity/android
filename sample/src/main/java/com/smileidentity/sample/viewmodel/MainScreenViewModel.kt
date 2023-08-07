@@ -171,6 +171,7 @@ class MainScreenViewModel : ViewModel() {
 
         _uiState.update { it.copy(isProduction = !SmileID.useSandbox) }
     }
+
     fun onHomeSelected() {
         _uiState.update {
             it.copy(
