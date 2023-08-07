@@ -1,8 +1,16 @@
 # Changelog
 
-## 10.0.0-beta06 (unreleased)
+## 10.0.0-beta07 (unreleased)
 
 ### Added
+
+### Fixed
+
+### Changed
+
+### Removed
+
+## 10.0.0-beta06
 
 ### Fixed
 - Added OkHttp as an `api` dependency
@@ -13,8 +21,6 @@
 - Bump coroutines to 1.7.3
 - Bump Sentry to 6.28.0
 - Bump AndroidX Fragment to 1.6.1
-
-### Removed
 
 ## 10.0.0-beta05
 
