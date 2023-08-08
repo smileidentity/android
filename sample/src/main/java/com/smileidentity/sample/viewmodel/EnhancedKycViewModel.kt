@@ -12,6 +12,7 @@ import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +49,7 @@ class EnhancedKycViewModel : ViewModel() {
                 jobType = JobType.EnhancedKyc,
                 enrollment = false,
                 userId = randomUserId(),
+                jobId = randomJobId(),
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val enhancedKycRequest = EnhancedKycRequest(

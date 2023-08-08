@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.moshix)
     alias(libs.plugins.parcelize)
@@ -47,12 +48,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
         moduleName = "${groupId}_$artifactId"
         compileOptions {
             // https://kotlinlang.org/docs/opt-in-requirements.html#module-wide-opt-in
@@ -132,6 +133,8 @@ mavenPublishing {
 }
 
 dependencies {
+    // OkHttp is exposed in public SmileID interface (initialize), hence "api" vs "implementation"
+    api(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.moshi)
     implementation(libs.okhttp.logging.interceptor)
@@ -140,6 +143,8 @@ dependencies {
     api(libs.moshi)
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.adapters.lazy)
+
+    implementation(libs.coroutines.core)
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)

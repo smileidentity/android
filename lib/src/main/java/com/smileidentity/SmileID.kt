@@ -24,13 +24,14 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-@Suppress("unused", "RemoveRedundantQualifierName")
+@Suppress("unused")
 object SmileID {
     @JvmStatic
     lateinit var api: SmileIDService internal set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
 
     lateinit var config: Config
+        internal set
     private lateinit var retrofit: Retrofit
 
     // Can't use lateinit on primitives, this default will be overwritten as soon as init is called
@@ -44,7 +45,9 @@ object SmileID {
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
      *
-     * @param context A [Context] instance which will be used to load the config file from assets
+     * @param context A [Context] instance
+     * @param config The [Config] to use for the SDK. If not provided, will attempt to load from
+     * assets (the recommended approach)
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
      * crashes. This is powered by Sentry, and further details on inner workings can be found in the
@@ -55,11 +58,12 @@ object SmileID {
     @JvmOverloads
     fun initialize(
         context: Context,
+        config: Config = Config.fromAssets(context),
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
-        SmileID.config = Config.fromAssets(context)
+        SmileID.config = config
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
             val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
@@ -89,7 +93,9 @@ object SmileID {
      * authToken from [config] need not be used.
      *
      * @param apiKey The API Key to use
-     * @param context A [Context] instance which will be used to load the config file from assets
+     * @param context A [Context] instance
+     * @param config The [Config] to use for the SDK. If not provided, will attempt to load from
+     * assets (the recommended approach)
      * @param useSandbox Whether to use the sandbox environment. If false, uses production
      * @param enableCrashReporting Whether to enable crash reporting for *ONLY* Smile ID related
      * crashes. This is powered by Sentry, and further details on inner workings can be found in the
@@ -101,12 +107,13 @@ object SmileID {
     fun initialize(
         apiKey: String,
         context: Context,
+        config: Config = Config.fromAssets(context),
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
         SmileID.apiKey = apiKey
-        initialize(context, useSandbox, enableCrashReporting, okHttpClient)
+        initialize(context, config, useSandbox, enableCrashReporting, okHttpClient)
     }
 
     /**

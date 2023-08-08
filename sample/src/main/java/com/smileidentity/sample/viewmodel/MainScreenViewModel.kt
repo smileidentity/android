@@ -52,6 +52,7 @@ data class MainScreenUiState(
     val snackbarMessage: SnackbarMessage? = null,
     val bottomNavSelection: BottomNavigationScreen = startScreen,
     val pendingJobCount: Int = 0,
+    val showSmileConfigBottomSheet: Boolean = false,
     val clipboardText: AnnotatedString? = null,
 ) {
     @StringRes
@@ -198,11 +199,11 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onAboutUsSelected() {
+    fun onSettingsSelected() {
         _uiState.update {
             it.copy(
-                appBarTitle = BottomNavigationScreen.AboutUs.label,
-                bottomNavSelection = BottomNavigationScreen.AboutUs,
+                appBarTitle = BottomNavigationScreen.Settings.label,
+                bottomNavSelection = BottomNavigationScreen.Settings,
             )
         }
     }

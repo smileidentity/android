@@ -18,7 +18,7 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
       # https://github.com/actions/checkout/issues/766
@@ -29,11 +29,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Write Smile Config
-        run: |
-          echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
-        env:
-          SMILE_CONFIG: ${{ secrets.SMILE_CONFIG_PARTNER_2423 }}
       - name: Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1
@@ -91,6 +86,11 @@ jobs:
         with:
           name: SDK AAR
           path: lib/build/outputs/aar/lib-release.aar
+      - name: Archive Sample App
+        uses: actions/upload-artifact@v3
+        with:
+          name: Sample App APK
+          path: sample/build/outputs/apk/release/sample-release.apk
       - name: Create GitHub Release
         uses: actions/create-release@v1
         id: create_release
@@ -109,6 +109,15 @@ jobs:
           asset_path: lib/build/outputs/aar/lib-release.aar
           asset_name: com.smileidentity_android-sdk_${{ steps.read_version.outputs.version }}.aar
           asset_content_type: application/octet-stream
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: sample/build/outputs/apk/release/sample-release.apk
+          asset_name: sample_${{ steps.read_version.outputs.version }}.apk
+          asset_content_type: application/vnd.android.package-archive
       - name: Bump Version
         if: ${{ github.event.inputs.bump_version == 'true' }}
         run: |
