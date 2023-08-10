@@ -7,6 +7,7 @@
 ### Fixed
 
 ### Changed
+- Bump Compose BOM to 2023.08.00
 
 ### Removed
 
