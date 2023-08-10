@@ -431,6 +431,15 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onBvnConsentSelected() {
+        _uiState.update {
+            it.copy(
+                appBarTitle = ProductScreen.BvnConsent.label,
+                bottomNavSelection = BottomNavigationScreen.Home,
+            )
+        }
+    }
+
     fun clearJobs() {
         viewModelScope.launch {
             DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)
