@@ -8,6 +8,7 @@
 - Fix a Document Verification bug where selfie wasn't capture when also capturing the back of an ID
 
 ### Changed
+- Bump Compose BOM to 2023.08.00
 
 ### Removed
 
