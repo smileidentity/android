@@ -2,6 +2,7 @@ package com.smileidentity.compose.consent.bvn
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,6 @@ import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.bvnVerificationModes
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
@@ -63,16 +63,23 @@ internal fun BvnConsentScreen(
                 fontWeight = FontWeight.ExtraBold,
             )
             uiState.bvnVerificationModes.map {
-
             }
         },
         pinnedContent = {
             LoadingButton(
                 buttonText = stringResource(id = R.string.si_continue),
-                onClick = {},
+                onClick = { viewModel.requestBvnOtp() },
             )
         },
     )
+}
+
+@Composable
+fun ContactMethod(
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier) {
+    }
 }
 
 @SmilePreviews
