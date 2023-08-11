@@ -66,6 +66,15 @@ android {
             // without having to add the opt-in annotation to every usage. The annotation's purpose
             // is primarily for consumers of the SDK to use, not for us.
             freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
+            if (project.hasProperty("enableComposeCompilerReports")) {
+                val outputDir = project.buildDir.path + "/compose-reports"
+                freeCompilerArgs += listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$outputDir",
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$outputDir",
+                )
+            }
         }
     }
 

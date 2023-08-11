@@ -104,6 +104,9 @@ uploadKeystorePassword=<The password for the upload keystore>
 - The linter enforces a maximum line length of 100 characters. Please try to keep lines under this
   length. However, if it is not possible (i.e. a long resource name), you can disable the check for
   the line by adding `// ktlint-disable max-line-length` to the end of the line
+- You can obtain Compose Compiler metrics (i.e. to debug performance or recomposition issues) by
+  running `./gradlew clean assemble -PenableComposeCompilerReports=true`. The reports will be
+  saved to `lib/build/compose-metrics` and `sample/build/compose-metrics`
 - It is recommended to set up a pre-commit hook (ktLint - formatting, lint - Composable lints). To
   do so, add the following to `.git/hooks/pre-commit`:
   ```
