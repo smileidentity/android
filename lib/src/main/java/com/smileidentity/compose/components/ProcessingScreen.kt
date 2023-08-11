@@ -263,7 +263,7 @@ private fun ProcessingSuccessScreenPreview() {
             icon = painterResource(R.drawable.si_processing_success),
             title = stringResource(R.string.si_smart_selfie_processing_success_title),
             subtitle = stringResource(R.string.si_smart_selfie_processing_success_subtitle),
-            continueButtonText = stringResource(R.string.si_continue,),
+            continueButtonText = stringResource(R.string.si_continue),
             onContinue = {},
         )
     }

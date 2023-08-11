@@ -2,14 +2,17 @@ package com.smileidentity.compose.consent.bvn
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +24,7 @@ import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
@@ -31,7 +35,7 @@ internal data class BvnOtpVerificationMode(
 )
 
 @Composable
-internal fun BvnConsentScreen(
+internal fun ChooseOtpDeliveryScreen(
     modifier: Modifier = Modifier,
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
@@ -62,13 +66,21 @@ internal fun BvnConsentScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.ExtraBold,
             )
-            uiState.bvnVerificationModes.map {
+            uiState.bvnVerificationModes.forEach {
+                ContactMethod(
+                    bvnVerificationMode = it,
+                    onClick = { mode -> viewModel.updateMode(mode) },
+                )
             }
         },
         pinnedContent = {
             LoadingButton(
                 buttonText = stringResource(id = R.string.si_continue),
+                loading = uiState.showLoading,
                 onClick = { viewModel.requestBvnOtp() },
+                modifier = Modifier
+                    .testTag("choose_otp_delivery_continue_button")
+                    .fillMaxWidth(),
             )
         },
     )
@@ -76,16 +88,19 @@ internal fun BvnConsentScreen(
 
 @Composable
 fun ContactMethod(
+    bvnVerificationMode: BvnVerificationMode,
     modifier: Modifier = Modifier,
+    onClick: (String) -> Unit,
 ) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier.clickable { onClick.invoke(bvnVerificationMode["sms"].toString()) }) {
+        Text(text = bvnVerificationMode.entries.toString())
     }
 }
 
 @SmilePreviews
 @Composable
-private fun BvnConsentScreenPreview() {
+private fun ChooseOtpDeliveryScreenPreview() {
     Preview {
-        BvnConsentScreen()
+        ChooseOtpDeliveryScreen()
     }
 }

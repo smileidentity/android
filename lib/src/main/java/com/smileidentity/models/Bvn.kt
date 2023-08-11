@@ -5,14 +5,17 @@ import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+private const val NIGERIA = "NG"
+private const val NIGERIA_BVN = "BVN_MFA"
+
 @JsonClass(generateAdapter = true)
 data class BvnToptRequest(
     @Json(name = "country")
-    val country: String,
+    val country: String = NIGERIA,
     @Json(name = "id_number")
     val idNumber: String,
     @Json(name = "id_type")
-    val idType: String,
+    val idType: String = NIGERIA_BVN,
     @Json(name = "partner_id")
     val partnerId: String = SmileID.config.partnerId,
     @Json(name = "timestamp")
@@ -45,11 +48,11 @@ data class BvnToptResponse(
 @JsonClass(generateAdapter = true)
 data class BvnToptModeRequest(
     @Json(name = "country")
-    val country: String,
+    val country: String = NIGERIA,
     @Json(name = "id_number")
     val idNumber: String,
     @Json(name = "id_type")
-    val idType: String,
+    val idType: String = NIGERIA_BVN,
     @Json(name = "mode")
     val mode: String,
     @Json(name = "session_id")
@@ -77,11 +80,11 @@ data class BvnToptModeResponse(
 @JsonClass(generateAdapter = true)
 data class SubmitBvnToptRequest(
     @Json(name = "country")
-    val country: String,
+    val country: String = NIGERIA,
     @Json(name = "id_number")
     val idNumber: String,
     @Json(name = "id_type")
-    val idType: String,
+    val idType: String = NIGERIA_BVN,
     @Json(name = "otp")
     val otp: String,
     @Json(name = "session_id")

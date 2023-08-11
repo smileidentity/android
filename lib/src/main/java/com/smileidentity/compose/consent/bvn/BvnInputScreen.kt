@@ -1,6 +1,5 @@
 package com.smileidentity.compose.consent.bvn
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -48,7 +43,6 @@ internal fun BvnInputScreen(
 ) {
     val bvnNumberLength = 11
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    var bvnNumber by rememberSaveable { mutableStateOf("") }
 
     val focusRequester = remember { FocusRequester() }
 
@@ -75,9 +69,9 @@ internal fun BvnInputScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = bvnNumber,
-            onValueChange = { if (it.length <= bvnNumberLength) bvnNumber = it },
-            isError = uiState.showWrongBvn,
+            value = viewModel.bvnNumber,
+            onValueChange = { if (it.length <= bvnNumberLength) viewModel.updateBvnNumber(it) },
+            isError = uiState.showError,
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -85,7 +79,7 @@ internal fun BvnInputScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
         Spacer(modifier = Modifier.height(16.dp))
-        when (uiState.showWrongBvn) {
+        when (uiState.showError) {
             true -> Text(
                 text = stringResource(id = R.string.si_bvn_enter_id_wrong_bvn),
                 style = MaterialTheme.typography.bodyMedium,
@@ -103,7 +97,7 @@ internal fun BvnInputScreen(
         LoadingButton(
             buttonText = stringResource(id = R.string.si_continue),
             loading = uiState.showLoading,
-            onClick = { viewModel.requestBvnOtpMode(bvnNumber = bvnNumber) },
+            onClick = { viewModel.submitUserBvn() },
             modifier = Modifier
                 .testTag("bvn_submit_continue_button")
                 .fillMaxWidth(),
