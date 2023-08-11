@@ -88,9 +88,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             subtitle = stringResource(id = R.string.si_verify_identity_instruction_subtitle),
             showAttribution = showAttribution,
             allowPhotoFromGallery = allowGalleryUpload,
-            onInstructionsAcknowledgedTakePhoto = {
-                acknowledgedInstructions = true
-            },
+            onInstructionsAcknowledgedTakePhoto = { acknowledgedInstructions = true },
             onInstructionsAcknowledgedSelectFromGallery = {
                 acknowledgedInstructions = true
                 shouldSelectFromGallery = true
@@ -110,8 +108,9 @@ internal fun OrchestratedDocumentVerificationScreen(
                 uiState.errorMessage ?: R.string.si_processing_error_subtitle,
             ),
             errorIcon = painterResource(R.drawable.si_processing_error),
-            continueButtonText =
-            stringResource(R.string.si_smart_selfie_processing_continue_button),
+            continueButtonText = stringResource(
+                id = R.string.si_smart_selfie_processing_continue_button,
+            ),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
             onRetry = { viewModel.onRetry(captureBothSides) },
@@ -228,7 +227,7 @@ internal fun OrchestratedDocumentVerificationScreen(
                 id = R.string.si_doc_v_confirmation_dialog_retake_button,
             ),
             onRetake = {
-                viewModel.onDocumentRejected()
+                viewModel.onDocumentRejected(isBackSide = false)
                 isFrontDocumentPhotoValid = false
             },
         )
@@ -250,12 +249,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             confirmButtonText = stringResource(
                 id = R.string.si_doc_v_confirmation_dialog_confirm_button,
             ),
-            onConfirm = {
-                viewModel.submitJob(
-                    uiState.frontDocumentImageToConfirm!!,
-                    uiState.backDocumentImageToConfirm,
-                )
-            },
+            onConfirm = { viewModel.onDocumentConfirmed() },
             retakeButtonText = stringResource(
                 id = R.string.si_doc_v_confirmation_dialog_retake_button,
             ),
@@ -277,16 +271,11 @@ internal fun OrchestratedDocumentVerificationScreen(
             confirmButtonText = stringResource(
                 id = R.string.si_doc_v_confirmation_dialog_confirm_button,
             ),
-            onConfirm = {
-                viewModel.submitJob(
-                    uiState.frontDocumentImageToConfirm,
-                    uiState.backDocumentImageToConfirm,
-                )
-            },
+            onConfirm = { viewModel.onDocumentConfirmed() },
             retakeButtonText = stringResource(
                 id = R.string.si_doc_v_confirmation_dialog_retake_button,
             ),
-            onRetake = { viewModel.onDocumentRejected() },
+            onRetake = { viewModel.onDocumentRejected(isBackSide = false) },
         )
 
         DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
@@ -324,7 +313,7 @@ internal fun OrchestratedDocumentVerificationScreen(
 @Composable
 fun PhotoPickerScreen(onPhotoSelected: (documentPhoto: Uri) -> Unit) {
     val context = LocalContext.current
-    val frontDocumentPhotoPickerLauncher = rememberLauncherForActivityResult(
+    val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = PickVisualMedia(),
         onResult = { uri ->
             Timber.v("selectedUri: $uri")
@@ -338,6 +327,6 @@ fun PhotoPickerScreen(onPhotoSelected: (documentPhoto: Uri) -> Unit) {
         },
     )
     LaunchedEffect(Unit) {
-        frontDocumentPhotoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
+        photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
     }
 }

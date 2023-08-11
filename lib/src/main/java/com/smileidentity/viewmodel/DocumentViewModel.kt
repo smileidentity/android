@@ -187,19 +187,19 @@ class DocumentViewModel(
     }
 
     fun onDocumentConfirmed() {
-        _uiState.update { it.copy(showSelfieCapture = true) }
+        if (selfieFile != null) {
+            submitJob(documentFrontFile = documentFrontFile!!, documentBackFile = documentBackFile)
+        } else {
+            _uiState.update { it.copy(showSelfieCapture = true) }
+        }
     }
 
-    fun onDocumentRejected(
-        isBackSide: Boolean = false,
-    ) {
+    fun onDocumentRejected(isBackSide: Boolean) {
         _uiState.update {
             if (isBackSide) {
                 it.copy(backDocumentImageToConfirm = null)
             } else {
-                it.copy(
-                    frontDocumentImageToConfirm = null,
-                )
+                it.copy(frontDocumentImageToConfirm = null)
             }
         }
         if (isBackSide) {
@@ -217,7 +217,8 @@ class DocumentViewModel(
     }
 
     fun onRetry(hasBackSide: Boolean) {
-        // If document files are present, all captures were completed, so we're retrying a network issue
+        // If document files are present, all captures were completed, so we're retrying a network
+        // issue
         when {
             hasBackSide -> if (documentFrontFile != null && documentBackFile != null) {
                 submitJob(documentFrontFile!!, documentBackFile)
