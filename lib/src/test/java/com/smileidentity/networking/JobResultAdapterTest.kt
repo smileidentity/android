@@ -34,7 +34,7 @@ class JobResultAdapterTest {
         val json = """{
             "Source": "Source",
             "Actions": {},
-            "ResultCode":  1,
+            "ResultCode":  "1",
             "ResultText": "ResultText",
             "ResultType": "ResultType",
             "SmileJobID": "SmileJobID",
@@ -53,7 +53,7 @@ class JobResultAdapterTest {
         val jobResult: JobResult.Entry = adapter.fromJson(json) as JobResult.Entry
 
         // then
-        assertEquals(1, jobResult.resultCode)
+        assertEquals("1", jobResult.resultCode)
         assertEquals("ResultText", jobResult.resultText)
         assertEquals("SmileJobID", jobResult.smileJobId)
         assertEquals("jobId", jobResult.partnerParams.jobId)
