@@ -16,7 +16,7 @@ data class ServicesResponse(
 @JsonClass(generateAdapter = true)
 data class BankCode(
     @Json(name = "name") val name: String,
-    @Json(name = "code") val code: Int,
+    @Json(name = "code") val code: String,
 )
 
 /**

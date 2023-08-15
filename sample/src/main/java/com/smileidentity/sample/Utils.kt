@@ -44,8 +44,8 @@ fun jobResultMessageBuilder(
     jobName: String,
     jobComplete: Boolean?,
     jobSuccess: Boolean?,
-    code: Int?,
-    resultCode: Int?,
+    code: String?,
+    resultCode: String?,
     resultText: String?,
     suffix: String? = null,
 ): String {

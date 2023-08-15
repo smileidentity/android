@@ -106,7 +106,7 @@ class DocumentViewModelTest {
         )
 
         coEvery { SmileID.api.prepUpload(any()) } returns PrepUploadResponse(
-            code = 0,
+            code = "0",
             refId = "refId",
             uploadUrl = "uploadUrl",
             smileJobId = "smileJobId",

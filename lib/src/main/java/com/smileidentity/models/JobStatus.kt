@@ -26,7 +26,7 @@ interface JobStatusResponse {
     val timestamp: String
     val jobComplete: Boolean
     val jobSuccess: Boolean
-    val code: Int
+    val code: String
     val result: JobResult?
     val imageLinks: ImageLinks?
 }
@@ -37,7 +37,7 @@ data class SmartSelfieJobStatusResponse(
     @Json(name = "timestamp") override val timestamp: String,
     @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") override val jobSuccess: Boolean,
-    @Json(name = "code") override val code: Int,
+    @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
@@ -49,7 +49,7 @@ data class DocVJobStatusResponse(
     @Json(name = "timestamp") override val timestamp: String,
     @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") override val jobSuccess: Boolean,
-    @Json(name = "code") override val code: Int,
+    @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.DocVEntry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
@@ -61,7 +61,7 @@ data class BiometricKycJobStatusResponse(
     @Json(name = "timestamp") override val timestamp: String,
     @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") override val jobSuccess: Boolean,
-    @Json(name = "code") override val code: Int,
+    @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: JobResult?,
     @Json(name = "history") val history: List<JobResult.BiometricKycEntry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
@@ -81,7 +81,7 @@ sealed interface JobResult : Parcelable {
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Actions") val actions: Actions,
-        @Json(name = "ResultCode") val resultCode: Int,
+        @Json(name = "ResultCode") val resultCode: String,
         @Json(name = "ResultText") val resultText: String,
         @Json(name = "SmileJobID") val smileJobId: String,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
@@ -92,7 +92,7 @@ sealed interface JobResult : Parcelable {
     @JsonClass(generateAdapter = true)
     data class DocVEntry(
         @Json(name = "Actions") val actions: Actions,
-        @Json(name = "ResultCode") val resultCode: Int,
+        @Json(name = "ResultCode") val resultCode: String,
         @Json(name = "ResultText") val resultText: String,
         @Json(name = "SmileJobID") val smileJobId: String,
         @Json(name = "PartnerParams") val partnerParams: PartnerParams,
@@ -113,7 +113,7 @@ sealed interface JobResult : Parcelable {
     @JsonClass(generateAdapter = true)
     data class BiometricKycEntry(
         @Json(name = "Actions") val actions: Actions,
-        @Json(name = "ResultCode") val resultCode: Int,
+        @Json(name = "ResultCode") val resultCode: String,
         @Json(name = "ResultText") val resultText: String,
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") val smileJobId: String,
