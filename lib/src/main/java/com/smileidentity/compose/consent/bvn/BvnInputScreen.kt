@@ -28,6 +28,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.LoadingButton
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
@@ -79,20 +81,24 @@ internal fun BvnInputScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
         Spacer(modifier = Modifier.height(16.dp))
-        when (uiState.showError) {
-            true -> Text(
-                text = stringResource(id = R.string.si_bvn_enter_id_wrong_bvn),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = colorResource(id = R.color.si_color_error),
-            )
-
-            false -> Text(
-                text = stringResource(id = R.string.si_bvn_enter_bvn_number_limit),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-            )
-        }
+        Text(
+            text = stringResource(
+                id = if (uiState.showError) {
+                    R.string.si_bvn_enter_id_wrong_bvn
+                } else {
+                    R.string.si_bvn_enter_bvn_number_limit
+                },
+            ),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = colorResource(
+                id = if (uiState.showError) {
+                    R.color.si_color_error
+                } else {
+                    R.color.si_color_material_on_primary_container
+                },
+            ),
+        )
         Spacer(modifier = Modifier.height(56.dp))
         LoadingButton(
             buttonText = stringResource(id = R.string.si_continue),
@@ -102,5 +108,13 @@ internal fun BvnInputScreen(
                 .testTag("bvn_submit_continue_button")
                 .fillMaxWidth(),
         )
+    }
+}
+
+@SmilePreviews
+@Composable
+internal fun BvnInputScreenPreview() {
+    Preview {
+        BvnInputScreen(cancelBvnVerification = {})
     }
 }

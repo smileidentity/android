@@ -6,12 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
+import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.BvnToptModeRequest
 import com.smileidentity.models.BvnToptRequest
-import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.models.JobType
 import com.smileidentity.models.SubmitBvnToptRequest
+import com.smileidentity.util.createBvnOtpVerificationModes
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-enum class BvnConsentScreens {
+internal enum class BvnConsentScreens {
     BvnInputScreen,
     ChooseOtpDeliveryScreen,
     ShowVerifyOtpScreen,
@@ -33,7 +34,8 @@ internal data class BvnConsentUiState(
     val showLoading: Boolean = false,
     val showError: Boolean = false,
     val showSuccess: Boolean = false,
-    val bvnVerificationModes: List<BvnVerificationMode> = listOf(),
+    val selectedBvnOtpVerificationMode: BvnOtpVerificationMode? = null,
+    val bvnVerificationModes: List<BvnOtpVerificationMode> = listOf(),
 )
 
 internal class BvnConsentViewModel : ViewModel() {
@@ -47,22 +49,28 @@ internal class BvnConsentViewModel : ViewModel() {
     var otp by mutableStateOf("")
         private set
 
-    var mode by mutableStateOf("")
+    var otpSentBy by mutableStateOf("")
         private set
 
-    fun updateBvnNumber(input: String) {
+    internal fun updateBvnNumber(input: String) {
         bvnNumber = input
     }
 
-    fun updateOtp(input: String) {
+    internal fun updateOtp(input: String) {
         otp = input
     }
 
-    fun updateMode(input: String) {
-        mode = input
+    internal fun updateMode(input: BvnOtpVerificationMode) {
+        _uiState.update { it.copy(selectedBvnOtpVerificationMode = input) }
+        otpSentBy = input.otpSentBy
     }
 
-    fun submitUserBvn() {
+    internal fun selectContactMethod() {
+        _uiState.update { it.copy(bvnConsentScreens = BvnConsentScreens.ChooseOtpDeliveryScreen) }
+        otp = ""
+    }
+
+    internal fun submitUserBvn() {
         _uiState.update { it.copy(showLoading = true) }
         val proxy = { e: Throwable ->
             Timber.e(e)
@@ -87,13 +95,13 @@ internal class BvnConsentViewModel : ViewModel() {
                     showLoading = false,
                     sessionId = response.sessionId,
                     showError = false,
-                    bvnVerificationModes = response.modes,
+                    bvnVerificationModes = createBvnOtpVerificationModes(response.modes),
                 )
             }
         }
     }
 
-    fun requestBvnOtp() {
+    internal fun requestBvnOtp() {
         _uiState.update { it.copy(showLoading = true) }
         val proxy = { e: Throwable ->
             Timber.e(e)
@@ -108,7 +116,7 @@ internal class BvnConsentViewModel : ViewModel() {
             val authResponse = SmileID.api.authenticate(authRequest)
             val request = BvnToptModeRequest(
                 idNumber = bvnNumber,
-                mode = mode,
+                mode = otpSentBy,
                 sessionId = uiState.value.sessionId,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
@@ -124,7 +132,7 @@ internal class BvnConsentViewModel : ViewModel() {
         }
     }
 
-    fun submitBvnOtp() {
+    internal fun submitBvnOtp() {
         _uiState.update { it.copy(showLoading = true) }
         val proxy = { e: Throwable ->
             Timber.e(e)
