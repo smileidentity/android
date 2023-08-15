@@ -15,7 +15,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+enum class BvnConsentState {
+    Initial,
+    Loading,
+    ShowWrongBvn,
+}
+
 internal data class BvnConsentUiState(
+    val bvnConsentState: BvnConsentState = BvnConsentState.Initial,
     val showLoading: Boolean = false,
     val showWrongBvn: Boolean = false,
     val bvnVerificationSuccess: Boolean = false,

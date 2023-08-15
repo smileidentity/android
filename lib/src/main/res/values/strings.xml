@@ -126,14 +126,23 @@
 
     <!--  BVN Consent Screen  -->
     <string name="si_bvn_product_name">BVN Consent</string>
-    <string name="si_bvn_enter_id_title">Enter ID Information</string>
-    <string name="si_bvn_enter_id_bank_verification">Bank Verification</string>
+    <string name="si_bvn_enter_bvn_number">Enter your BVN Number</string>
+    <string name="si_bvn_enter_id_bank_verification">Bank Verification Number</string>
+    <string name="si_bvn_enter_bvn_number_limit">Your BVN should be 11 digits long</string>
     <string name="si_bvn_enter_id_wrong_bvn">You have entered an invalid BVN. Please try again</string>
     <string name="si_bvn_select_contact_method">Select Contact Method</string>
     <string name="si_bvn_nibss">NIBSS, the data custodian of BVN, will send you a One-Time Password (OTP)</string>
     <string name="si_bvn_nibss_partner">The request will be from Chams Plc, who is NIBSS\' technical partner.</string>
     <string name="si_bvn_email_verification">An OTP will be sent to your email to verify your identity</string>
     <string name="si_bvn_sms_verification">An OTP will be sent as an SMS to your phone to verify your identity</string>
+    <string name="si_bvn_verification">OTP Verification</string>
+    <string name="si_bvn_verification_enter_otp">Enter the OTP sent to</string>
+    <string name="si_bvn_verification_didnt_receive_otp">Didn\'t receive the OTP?</string>
+    <string name="si_bvn_verification_different_contact_method">Try another contact method</string>
+    <string name="si_bvn_verification_invalid_otp">OTP entered is invalid</string>
+    <string name="si_bvn_verification_didnt_receive_otp_at">Didn\'t receive the OTP at</string>
+    <string name="si_bvn_verification_if_didnt_receive_otp">If you didn\'t receive the OTP:</string>
+    <string name="si_bvn_verification_otp_expired">Your OTP has expired</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>

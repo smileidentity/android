@@ -1,8 +1,6 @@
 package com.smileidentity.compose.consent.bvn
 
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -51,6 +46,7 @@ internal fun BvnInputScreen(
         },
     ),
 ) {
+    val bvnNumberLength = 11
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var bvnNumber by rememberSaveable { mutableStateOf("") }
 
@@ -65,21 +61,14 @@ internal fun BvnInputScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(id = R.string.si_bvn_enter_id_title),
+                text = stringResource(id = R.string.si_bvn_enter_bvn_number),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.weight(1f),
             )
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = null,
-                modifier = Modifier
-                    .testTag("bvn_input_screen_cancel")
-                    .clickable { cancelBvnVerification() },
-            )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(36.dp))
         Text(
             text = stringResource(id = R.string.si_bvn_enter_id_bank_verification),
             style = MaterialTheme.typography.titleMedium,
@@ -87,7 +76,7 @@ internal fun BvnInputScreen(
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = bvnNumber,
-            onValueChange = { bvnNumber = it },
+            onValueChange = { if (it.length <= bvnNumberLength) bvnNumber = it },
             isError = uiState.showWrongBvn,
             singleLine = true,
             modifier = Modifier
@@ -95,15 +84,22 @@ internal fun BvnInputScreen(
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
-        AnimatedVisibility(visible = uiState.showWrongBvn) {
-            Text(
+        Spacer(modifier = Modifier.height(16.dp))
+        when (uiState.showWrongBvn) {
+            true -> Text(
                 text = stringResource(id = R.string.si_bvn_enter_id_wrong_bvn),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = colorResource(id = R.color.si_color_error),
             )
+
+            false -> Text(
+                text = stringResource(id = R.string.si_bvn_enter_bvn_number_limit),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+            )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(56.dp))
         LoadingButton(
             buttonText = stringResource(id = R.string.si_continue),
             loading = uiState.showLoading,
