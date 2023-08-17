@@ -133,7 +133,7 @@ private fun CaptureDocumentButton(
         contentDescription = "smile_camera_capture",
         modifier = Modifier
             .size(70.dp)
-            .clickable { onCaptureClicked.invoke() },
+            .clickable(onClick = onCaptureClicked),
     )
 }
 

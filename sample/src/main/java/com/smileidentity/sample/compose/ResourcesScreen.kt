@@ -74,7 +74,7 @@ fun ResourcesScreen(
                 headlineContent = { Text(it.first) },
                 supportingContent = { Text(it.second) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { it.third() },
+                modifier = Modifier.clickable(onClick = it.third),
             )
             Divider()
         }
@@ -83,7 +83,7 @@ fun ResourcesScreen(
                 headlineContent = { Text(stringResource(it.first)) },
                 leadingContent = { Icon(it.second, null) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { it.third() },
+                modifier = Modifier.clickable(onClick = it.third),
             )
             Divider()
         }
