@@ -1,7 +1,7 @@
 package com.smileidentity.models
 
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.viewmodel.document.DocumentUiState
+import com.smileidentity.viewmodel.document.OrchestratedDocumentUiState
 
 /**
  * Handles the navigation logic for the document orchestration screen,
@@ -47,7 +47,7 @@ internal sealed class DocumentCaptureFlow {
         fun stateFrom(
             acknowledgedInstructions: Boolean,
             processingState: ProcessingState?,
-            uiState: DocumentUiState?,
+            uiState: OrchestratedDocumentUiState?,
             shouldSelectFromGallery: Boolean,
             captureBothSides: Boolean,
             isFrontDocumentPhotoValid: Boolean,

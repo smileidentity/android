@@ -36,7 +36,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-data class DocumentUiState(
+data class OrchestratedDocumentUiState(
     val frontDocumentImageToConfirm: File? = null,
     val backDocumentImageToConfirm: File? = null,
     val showSelfieCapture: Boolean = false,
@@ -55,7 +55,7 @@ class OrchestratedDocumentViewModel(
     private val idAspectRatio: Float? = idType.aspectRatio,
     private var selfieFile: File? = null,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(DocumentUiState())
+    private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
     var result: SmileIDResult<DocumentVerificationResult>? = null
     private var documentFrontFile: File? = null
