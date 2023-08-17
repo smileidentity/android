@@ -34,7 +34,7 @@ import com.smileidentity.util.isImageAtLeast
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.util.toast
-import com.smileidentity.viewmodel.DocumentViewModel
+import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import timber.log.Timber
 import java.io.File
@@ -54,9 +54,9 @@ internal fun OrchestratedDocumentVerificationScreen(
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
-    viewModel: DocumentViewModel = viewModel(
+    viewModel: OrchestratedDocumentViewModel = viewModel(
         factory = viewModelFactory {
-            DocumentViewModel(
+            OrchestratedDocumentViewModel(
                 userId = userId,
                 jobId = jobId,
                 idType = idType,

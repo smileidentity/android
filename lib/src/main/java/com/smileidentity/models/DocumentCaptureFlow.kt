@@ -1,7 +1,7 @@
 package com.smileidentity.models
 
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.viewmodel.DocumentUiState
+import com.smileidentity.viewmodel.document.DocumentUiState
 
 /**
  * Handles the navigation logic for the document orchestration screen,

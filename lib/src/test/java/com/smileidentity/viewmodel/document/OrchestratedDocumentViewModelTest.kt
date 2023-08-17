@@ -1,4 +1,4 @@
-package com.smileidentity.viewmodel
+package com.smileidentity.viewmodel.document
 
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
@@ -30,8 +30,8 @@ import org.junit.Test
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DocumentViewModelTest {
-    private lateinit var subject: DocumentViewModel
+class OrchestratedDocumentViewModelTest {
+    private lateinit var subject: OrchestratedDocumentViewModel
 
     private val documentFrontFile = File.createTempFile("documentFront", ".jpg")
     private val selfieFile = File.createTempFile("selfie", ".jpg")
@@ -40,7 +40,7 @@ class DocumentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = DocumentViewModel(
+        subject = OrchestratedDocumentViewModel(
             randomUserId(),
             randomJobId(),
             document,

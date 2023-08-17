@@ -1,4 +1,4 @@
-package com.smileidentity.viewmodel
+package com.smileidentity.viewmodel.document
 
 import android.graphics.Bitmap
 import androidx.annotation.StringRes
@@ -48,7 +48,7 @@ data class DocumentUiState(
  * @param selfieFile The selfie image file to use for authentication. If null, selfie capture will
  * be performed
  */
-class DocumentViewModel(
+class OrchestratedDocumentViewModel(
     private val userId: String,
     private val jobId: String,
     private val idType: Document,

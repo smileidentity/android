@@ -35,7 +35,7 @@ import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.Document
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
-import com.smileidentity.viewmodel.DocumentViewModel
+import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
@@ -55,9 +55,9 @@ internal fun DocumentCaptureScreen(
     jobId: String = rememberSaveable { randomJobId() },
     isBackSide: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
-    viewModel: DocumentViewModel = viewModel(
+    viewModel: OrchestratedDocumentViewModel = viewModel(
         factory = viewModelFactory {
-            DocumentViewModel(
+            OrchestratedDocumentViewModel(
                 userId = userId,
                 jobId = jobId,
                 idType = idType,
