@@ -147,7 +147,8 @@ fun SmileID.SmartSelfieAuthentication(
 @Composable
 fun SmileID.DocumentVerification(
     idType: Document,
-    idAspectRatio: Float? = idType.aspectRatio,
+    // todo: make this optional again
+    idAspectRatio: Float = idType.aspectRatio,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },

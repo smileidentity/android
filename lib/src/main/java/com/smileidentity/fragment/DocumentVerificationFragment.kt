@@ -72,7 +72,8 @@ class DocumentVerificationFragment : Fragment() {
             showAttribution: Boolean = true,
             allowGalleryUpload: Boolean = false,
             idType: Document,
-            idAspectRatio: Float? = idType.aspectRatio,
+            // todo: make this optional again
+            idAspectRatio: Float = idType.aspectRatio,
             captureBothSides: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
         ) = DocumentVerificationFragment().apply {
@@ -145,7 +146,9 @@ private var Bundle.idType: Document
     set(value) = putParcelable(KEY_ID_TYPE, value)
 
 private const val KEY_ID_ASPECT_RATIO = "idAspectRatio"
-private var Bundle.idAspectRatio: Float?
+
+// todo: make this optional again
+private var Bundle.idAspectRatio: Float
     get() = getFloat(KEY_ID_ASPECT_RATIO)
     set(value) = putFloat(KEY_ID_ASPECT_RATIO, value ?: -1f)
 

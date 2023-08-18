@@ -25,18 +25,18 @@ val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
  * has an outline which changes color depending on edge detection algorithm
  *
  * @param aspectRatio The aspect ratio of the document, used to calculate the height of the view.
- * @param modifier The modifier to be applied to the indicator.
- * @param strokeWidth The width of the progress indicator stroke.
  * @param areEdgesDetected A boolean flag that is updated when document edges are within bounding
  * box edges
+ * @param modifier The modifier to be applied to the indicator.
+ * @param strokeWidth The width of the progress indicator stroke.
  * @param backgroundColor The color of the background that is drawn around the document shape.
  */
 @Composable
 fun DocumentShapedBoundingBox(
     aspectRatio: Float?,
+    areEdgesDetected: Boolean,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
-    areEdgesDetected: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
 ) {
     val strokeColor = if (areEdgesDetected) MaterialTheme.colorScheme.tertiary else Color.Gray
@@ -87,6 +87,9 @@ fun DocumentShapedBoundingBox(
 @Composable
 private fun DocumentShapedBoundingBoxPreview() {
     Preview {
-        DocumentShapedBoundingBox(aspectRatio = 16f / 9f)
+        DocumentShapedBoundingBox(
+            areEdgesDetected = true,
+            aspectRatio = 16f / 9f,
+        )
     }
 }
