@@ -1,9 +1,7 @@
 package com.smileidentity.viewmodel.document
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smileidentity.R
 import com.smileidentity.util.createDocumentFile
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -21,7 +19,7 @@ data class DocumentCaptureUiState(
     val areEdgesDetected: Boolean = false,
     val showManualCaptureButton: Boolean = false,
     val documentImageToConfirm: File? = null,
-    @StringRes val errorMessage: Int? = null,
+    val captureError: Throwable? = null,
 )
 
 class DocumentCaptureViewModel : ViewModel() {
@@ -49,10 +47,9 @@ class DocumentCaptureViewModel : ViewModel() {
 
     fun onPhotoSelectedFromGallery(selectedPhoto: File?) {
         if (selectedPhoto == null) {
-            Timber.e("selectedPhoto is null")
-            _uiState.update {
-                it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle)
-            }
+            val throwable = IllegalStateException("selectedPhoto is null")
+            Timber.w(throwable)
+            _uiState.update { it.copy(captureError = throwable) }
         } else {
             _uiState.update {
                 it.copy(acknowledgedInstructions = true, documentImageToConfirm = selectedPhoto)
@@ -75,9 +72,7 @@ class DocumentCaptureViewModel : ViewModel() {
 
                 is ImageCaptureResult.Error -> {
                     Timber.e("Error capturing document", result.throwable)
-                    _uiState.update {
-                        it.copy(errorMessage = R.string.si_doc_v_capture_error_subtitle)
-                    }
+                    _uiState.update { it.copy(captureError = result.throwable) }
                 }
             }
         }
@@ -89,7 +84,7 @@ class DocumentCaptureViewModel : ViewModel() {
         uiState.value.documentImageToConfirm?.delete()
         _uiState.update {
             it.copy(
-                errorMessage = null,
+                captureError = null,
                 documentImageToConfirm = null,
                 acknowledgedInstructions = false,
             )

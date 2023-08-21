@@ -21,7 +21,6 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getExceptionHandler
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -48,11 +47,14 @@ internal class OrchestratedDocumentViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
-    var result: SmileIDResult<DocumentVerificationResult>? = null
+    var result: SmileIDResult<DocumentVerificationResult> = SmileIDResult.Error(
+        IllegalStateException("Document Capture incomplete"),
+    )
     private var documentFrontFile: File? = null
     private var documentBackFile: File? = null
+    private var stepToRetry: DocumentCaptureFlow? = null
 
-    fun onDocumentFrontConfirmed(documentImageFile: File) {
+    fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
         if (captureBothSides) {
             _uiState.update {
@@ -63,22 +65,29 @@ internal class OrchestratedDocumentViewModel(
                 it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
             }
         } else {
-            submitJob(documentFrontFile!!)
+            submitJob()
         }
     }
 
-    fun onDocumentBackConfirmed(documentImageFile: File) {
+    fun onDocumentBackCaptureSuccess(documentImageFile: File) {
         documentBackFile = documentImageFile
         if (selfieFile == null) {
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
             }
         } else {
-            submitJob(documentFrontFile!!)
+            submitJob()
         }
     }
 
-    fun submitJob(documentFrontFile: File, documentBackFile: File? = null): Job {
+    fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
+        selfieFile = it.data.selfieFile
+        submitJob()
+    }
+
+    private fun submitJob() {
+        val documentFrontFile = documentFrontFile
+            ?: throw IllegalStateException("documentFrontFile is null")
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
         }
@@ -91,7 +100,7 @@ internal class OrchestratedDocumentViewModel(
                 )
             }
         }
-        return viewModelScope.launch(getExceptionHandler(proxy)) {
+        viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 jobType = JobType.DocumentVerification,
                 enrollment = false,
@@ -138,77 +147,43 @@ internal class OrchestratedDocumentViewModel(
                 ),
             )
             _uiState.update {
-                it.copy(
-                    currentStep = DocumentCaptureFlow.ProcessingScreen(
-                        ProcessingState.Success,
-                    ),
-                )
+                it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
             }
         }
     }
 
-    fun onDocumentRejected(isBackSide: Boolean) {
-        // TODO: Handle step cancellation (i.e. deliver result back to caller)
-        // _uiState.update {
-        //     if (isBackSide) {
-        //         it.copy(backDocumentImageToConfirm = null)
-        //     } else {
-        //         it.copy(frontDocumentImageToConfirm = null)
-        //     }
-        // }
-        // if (isBackSide) {
-        //     documentBackFile?.delete()?.also { deleted ->
-        //         if (!deleted) Timber.w("Failed to delete $documentBackFile")
-        //     }
-        //     documentBackFile = null
-        // } else {
-        //     documentFrontFile?.delete()?.also { deleted ->
-        //         if (!deleted) Timber.w("Failed to delete $documentFrontFile")
-        //     }
-        //     documentFrontFile = null
-        // }
-        // result = null
-    }
-
-    fun onRetry(hasBackSide: Boolean) {
-        // TODO: Retry network submission (or just restart the flow?)
-
-        // // If document files are present, all captures were completed, so we're retrying a network
-        // // issue
-        // when {
-        //     hasBackSide -> if (documentFrontFile != null && documentBackFile != null) {
-        //         submitJob(documentFrontFile!!, documentBackFile)
-        //     } else {
-        //         _uiState.update {
-        //             it.copy(processingState = null)
-        //         }
-        //     }
-        //
-        //     else -> {
-        //         if (documentFrontFile != null) {
-        //             submitJob(documentFrontFile!!)
-        //         } else {
-        //             _uiState.update {
-        //                 it.copy(processingState = null)
-        //             }
-        //         }
-        //     }
-        // }
-    }
-
-    fun onFinished(callback: SmileIDCallback<DocumentVerificationResult>) {
-        callback(result!!)
-    }
-
-    fun onSelfieCaptureError(error: SmileIDResult.Error) {
-        Timber.w("Selfie capture error: $error")
+    /**
+     * Trigger the display of the Error dialog
+     */
+    fun onError(throwable: Throwable) {
+        stepToRetry = uiState.value.currentStep
         _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error))
+            it.copy(
+                currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
+                errorMessage = R.string.si_processing_error_subtitle,
+            )
+        }
+        Timber.w(throwable, "Error in $stepToRetry")
+        result = SmileIDResult.Error(throwable)
+    }
+
+    /**
+     * If stepToRetry is ProcessingScreen, we're retrying a network issue, so we need to kick off
+     * the resubmission manually. Otherwise, we're retrying a capture error, so we just need to
+     * reset the UI state
+     */
+    fun onRetry() {
+        // The step to retry is the one that failed, which should have been saved in onError.
+        // onError sets the current step to ProcessingScreen Error.
+        val step = stepToRetry
+        stepToRetry = null
+        step?.let { stepToRetry ->
+            _uiState.update { it.copy(currentStep = stepToRetry, errorMessage = null) }
+            if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
+                submitJob()
+            }
         }
     }
 
-    fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
-        selfieFile = it.data.selfieFile
-        submitJob(documentFrontFile!!, documentBackFile)
-    }
+    fun onFinished(callback: SmileIDCallback<DocumentVerificationResult>) = callback(result)
 }

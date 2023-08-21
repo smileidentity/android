@@ -41,7 +41,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
-import com.smileidentity.compose.components.ProcessingErrorScreen
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.generateFileFromUri
@@ -58,11 +57,17 @@ import com.ujizin.camposer.state.rememberCameraState
 import timber.log.Timber
 import java.io.File
 
+internal enum class DocumentCaptureSide {
+    Front,
+    Back,
+}
+
 /**
  * This handles Instructions + Capture + Confirmation for a single side of a document
  */
 @Composable
 internal fun DocumentCaptureScreen(
+    side: DocumentCaptureSide,
     showInstructions: Boolean,
     showAttribution: Boolean,
     allowGallerySelection: Boolean,
@@ -72,12 +77,11 @@ internal fun DocumentCaptureScreen(
     captureSubtitleText: String,
     idAspectRatio: Float,
     onConfirm: (File) -> Unit,
-    onError: () -> Unit,
+    onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DocumentCaptureViewModel = viewModel(
         factory = viewModelFactory { DocumentCaptureViewModel() },
-        // TODO: They key should be something more logical
-        key = instructionsTitleText,
+        key = side.name,
     ),
 ) {
     val context = LocalContext.current
@@ -100,22 +104,9 @@ internal fun DocumentCaptureScreen(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val documentImageToConfirm = uiState.documentImageToConfirm
+    val captureError = uiState.captureError
     when {
-        uiState.errorMessage != null -> {
-            ProcessingErrorScreen(
-                icon = painterResource(id = R.drawable.si_processing_error),
-                // todo: string resources
-                title = "Something went wrong",
-                subtitle = "Please try again",
-                retryButtonText = "Retry",
-                onRetry = viewModel::onRetry,
-                closeButtonText = "Close",
-                // TODO: should this be handled directly by the caller (i.e. OrchDocVScreen)? and we
-                //  just bubble up the error?
-                onClose = onError,
-            )
-        }
-
+        captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
             DocumentCaptureInstructionsScreen(
                 title = instructionsTitleText,

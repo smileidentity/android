@@ -52,10 +52,9 @@ internal fun OrchestratedDocumentVerificationScreen(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentStep = uiState.currentStep
-
-    when (currentStep) {
+    when (val currentStep = uiState.currentStep) {
         DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
+            side = DocumentCaptureSide.Front,
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
@@ -70,11 +69,12 @@ internal fun OrchestratedDocumentVerificationScreen(
                 id = R.string.si_doc_v_capture_instructions_subtitle,
             ),
             idAspectRatio = idAspectRatio,
-            onConfirm = viewModel::onDocumentFrontConfirmed,
-            onError = { viewModel.onDocumentRejected(isBackSide = false) },
+            onConfirm = viewModel::onDocumentFrontCaptureSuccess,
+            onError = viewModel::onError,
         )
 
         DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
+            side = DocumentCaptureSide.Back,
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
@@ -89,8 +89,8 @@ internal fun OrchestratedDocumentVerificationScreen(
                 id = R.string.si_doc_v_capture_instructions_subtitle,
             ),
             idAspectRatio = idAspectRatio,
-            onConfirm = viewModel::onDocumentBackConfirmed,
-            onError = { viewModel.onDocumentRejected(isBackSide = true) },
+            onConfirm = viewModel::onDocumentBackCaptureSuccess,
+            onError = viewModel::onError,
         )
 
         DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
@@ -103,7 +103,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             skipApiSubmission = true,
         ) {
             when (it) {
-                is SmileIDResult.Error -> viewModel.onSelfieCaptureError(it)
+                is SmileIDResult.Error -> viewModel.onError(it.throwable)
                 is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
             }
         }
@@ -126,7 +126,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             ),
             onContinue = { viewModel.onFinished(onResult) },
             retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-            onRetry = { viewModel.onRetry(captureBothSides) },
+            onRetry = viewModel::onRetry,
             closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
             onClose = { viewModel.onFinished(onResult) },
         )

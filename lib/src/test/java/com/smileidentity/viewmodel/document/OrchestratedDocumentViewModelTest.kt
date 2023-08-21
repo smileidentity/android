@@ -5,6 +5,7 @@ import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.Config
 import com.smileidentity.models.Document
+import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadResponse
@@ -22,12 +23,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrchestratedDocumentViewModelTest {
@@ -62,23 +66,30 @@ class OrchestratedDocumentViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(null, uiState.frontDocumentImageToConfirm)
+        assertEquals(DocumentCaptureFlow.FrontDocumentCapture, uiState.currentStep)
         assertEquals(null, uiState.errorMessage)
     }
 
     @Test
-    fun `submitJob should move processingState to InProgress`() {
-        // when
+    fun `processingState should move to InProgress `() {
+        // given
         SmileID.api = mockk(relaxed = true)
         coEvery { SmileID.api.authenticate(any()) } coAnswers {
             delay(1000)
             throw RuntimeException("unreachable")
         }
-        subject.submitJob(documentFrontFile)
+
+        // when
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
 
         // then
         // the submitJob coroutine won't have finished executing yet, so should still be processing
-        assertEquals(ProcessingState.InProgress, subject.uiState.value.processingState)
+        val currentStep = subject.uiState.value.currentStep
+        assertThat(currentStep, instanceOf(DocumentCaptureFlow.ProcessingScreen::class.java))
+        assertEquals(
+            ProcessingState.InProgress,
+            (currentStep as DocumentCaptureFlow.ProcessingScreen).processingState,
+        )
     }
 
     @Test
@@ -88,10 +99,13 @@ class OrchestratedDocumentViewModelTest {
         coEvery { SmileID.api.authenticate(any()) } throws RuntimeException()
 
         // when
-        subject.submitJob(documentFrontFile).join()
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        delay(10.milliseconds)
 
         // then
-        assertEquals(ProcessingState.Error, subject.uiState.value.processingState)
+        val currentStep = subject.uiState.value.currentStep
+        val processingScreen = currentStep as? DocumentCaptureFlow.ProcessingScreen
+        assertEquals(ProcessingState.Error, processingScreen?.processingState)
     }
 
     @Test
@@ -117,9 +131,9 @@ class OrchestratedDocumentViewModelTest {
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
 
         // when
-        subject.submitJob(documentFrontFile).join()
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        delay(10.milliseconds)
 
-        // then
         assertNotNull(uploadBodySlot.captured.idInfo)
         assertEquals(document.countryCode, uploadBodySlot.captured.idInfo?.country)
         assertEquals(document.documentType, uploadBodySlot.captured.idInfo?.idType)
