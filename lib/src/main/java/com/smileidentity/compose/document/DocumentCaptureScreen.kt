@@ -45,7 +45,7 @@ import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.generateFileFromUri
-import com.smileidentity.util.isImageAtLeast
+import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
 import com.smileidentity.viewmodel.document.DocumentCaptureViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -95,7 +95,7 @@ internal fun DocumentCaptureScreen(
                 context.toast(R.string.si_doc_v_capture_error_subtitle)
                 return@rememberLauncherForActivityResult
             }
-            if (isImageAtLeast(context, uri, width = 1920, height = 1080)) {
+            if (isValidDocumentImage(context, uri)) {
                 val selectedPhotoFile = generateFileFromUri(uri = uri, context = context)
                 viewModel.onPhotoSelectedFromGallery(selectedPhotoFile)
             } else {

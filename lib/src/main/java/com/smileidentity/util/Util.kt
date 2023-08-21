@@ -67,6 +67,11 @@ fun isImageAtLeast(
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
 }
 
+fun isValidDocumentImage(
+    context: Context,
+    uri: Uri?,
+) = isImageAtLeast(context, uri, width = 1920, height = 1080)
+
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
  * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
