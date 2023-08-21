@@ -75,7 +75,7 @@ internal fun DocumentCaptureScreen(
     instructionsSubtitleText: String,
     captureTitleText: String,
     captureSubtitleText: String,
-    idAspectRatio: Float,
+    idAspectRatio: Float?,
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
@@ -159,7 +159,7 @@ internal fun DocumentCaptureScreen(
 private fun CaptureScreenContent(
     titleText: String,
     subtitleText: String,
-    idAspectRatio: Float,
+    idAspectRatio: Float?,
     areEdgesDetected: Boolean,
     onCaptureClicked: (CameraState) -> Unit,
     modifier: Modifier = Modifier,

@@ -28,8 +28,7 @@ import java.io.File
 @Composable
 internal fun OrchestratedDocumentVerificationScreen(
     idType: Document,
-    // todo: make this optional again
-    idAspectRatio: Float = idType.aspectRatio,
+    idAspectRatio: Float? = null,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
@@ -43,7 +42,6 @@ internal fun OrchestratedDocumentVerificationScreen(
                 userId = userId,
                 jobId = jobId,
                 idType = idType,
-                idAspectRatio = idAspectRatio,
                 captureBothSides = captureBothSides,
                 selfieFile = bypassSelfieCaptureWithFile,
             )

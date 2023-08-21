@@ -121,9 +121,9 @@ fun SmileID.SmartSelfieAuthentication(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/document-verification)
  *
  * @param idType The type of ID to be captured
- * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, it will be
- * inferred from the enforced ID type (if provided). If neither are provided, the aspect ratio will
- * attempt to be inferred from the device's camera. If that fails, it will default to 1.6.
+ * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
+ * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
+ * standard size of ~1.6
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
  * side will be captured.
  * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
@@ -147,8 +147,7 @@ fun SmileID.SmartSelfieAuthentication(
 @Composable
 fun SmileID.DocumentVerification(
     idType: Document,
-    // todo: make this optional again
-    idAspectRatio: Float = idType.aspectRatio,
+    idAspectRatio: Float? = null,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },

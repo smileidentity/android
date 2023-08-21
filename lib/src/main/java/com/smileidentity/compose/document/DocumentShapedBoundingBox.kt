@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
-const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.56f
+const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.375f / 2.125f
 const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
 val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
 

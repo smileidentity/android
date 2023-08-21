@@ -41,7 +41,6 @@ internal class OrchestratedDocumentViewModel(
     private val userId: String,
     private val jobId: String,
     private val idType: Document,
-    private val idAspectRatio: Float? = idType.aspectRatio,
     private val captureBothSides: Boolean = false,
     private var selfieFile: File? = null,
 ) : ViewModel() {
