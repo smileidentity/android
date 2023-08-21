@@ -20,6 +20,7 @@ data class DocumentCaptureUiState(
     val showManualCaptureButton: Boolean = false,
     val documentImageToConfirm: File? = null,
     val captureError: Throwable? = null,
+    val showCaptureInProgress: Boolean = false,
 )
 
 class DocumentCaptureViewModel : ViewModel() {
@@ -59,20 +60,31 @@ class DocumentCaptureViewModel : ViewModel() {
 
     /**
      * To be called when auto capture determines the image quality is sufficient or when the user
-     * taps the manual capture button
+     * taps the manual capture button.
      */
     fun captureDocument(cameraState: CameraState) {
-        // todo: lock this method to prevent multiple calls
+        if (uiState.value.showCaptureInProgress) {
+            Timber.v("Already capturing. Skipping duplicate capture request")
+            return
+        }
+        _uiState.update { it.copy(showCaptureInProgress = true) }
         val documentFile = createDocumentFile()
         cameraState.takePicture(documentFile) { result ->
             when (result) {
                 is ImageCaptureResult.Success -> {
-                    _uiState.update { it.copy(documentImageToConfirm = documentFile) }
+                    _uiState.update {
+                        it.copy(
+                            documentImageToConfirm = documentFile,
+                            showCaptureInProgress = false,
+                        )
+                    }
                 }
 
                 is ImageCaptureResult.Error -> {
                     Timber.e("Error capturing document", result.throwable)
-                    _uiState.update { it.copy(captureError = result.throwable) }
+                    _uiState.update {
+                        it.copy(captureError = result.throwable, showCaptureInProgress = false)
+                    }
                 }
             }
         }

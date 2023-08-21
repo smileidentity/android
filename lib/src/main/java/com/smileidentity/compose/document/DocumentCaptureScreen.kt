@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -149,6 +150,7 @@ internal fun DocumentCaptureScreen(
             subtitleText = captureSubtitleText,
             idAspectRatio = idAspectRatio,
             areEdgesDetected = uiState.areEdgesDetected,
+            showCaptureInProgress = uiState.showCaptureInProgress,
             onCaptureClicked = viewModel::captureDocument,
             modifier = modifier,
         )
@@ -161,6 +163,7 @@ private fun CaptureScreenContent(
     subtitleText: String,
     idAspectRatio: Float?,
     areEdgesDetected: Boolean,
+    showCaptureInProgress: Boolean,
     onCaptureClicked: (CameraState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -214,20 +217,25 @@ private fun CaptureScreenContent(
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CaptureDocumentButton { onCaptureClicked(cameraState) }
+            val captureButtonSize = Modifier.size(64.dp)
+            if (showCaptureInProgress) {
+                CircularProgressIndicator(modifier = captureButtonSize)
+            } else {
+                CaptureDocumentButton(captureButtonSize) { onCaptureClicked(cameraState) }
+            }
         }
     }
 }
 
 @Composable
 private fun CaptureDocumentButton(
+    modifier: Modifier = Modifier,
     onCaptureClicked: () -> Unit,
 ) {
     Image(
         painter = painterResource(id = R.drawable.si_camera_capture),
         contentDescription = "smile_camera_capture",
-        modifier = Modifier
-            .size(70.dp)
+        modifier = modifier
             .clickable(onClick = onCaptureClicked),
     )
 }
@@ -241,6 +249,7 @@ private fun CaptureScreenContentPreview() {
             subtitleText = "Make sure all corners are visible and there is no glare",
             idAspectRatio = 1.59f,
             areEdgesDetected = true,
+            showCaptureInProgress = false,
             onCaptureClicked = {},
         )
     }
