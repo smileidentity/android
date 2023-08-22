@@ -1,5 +1,5 @@
 [versions]
-accompanist-permissions = "0.30.1"
+accompanist-permissions = "0.32.0"
 android-gradle-plugin = "8.1.0"
 androidx-activity = "1.7.2"
 # TODO: Check if https://android-review.googlesource.com/c/platform/frameworks/support/+/2576871 has
@@ -15,7 +15,7 @@ androidx-test-espresso = "3.5.1"
 androidx-test-fragment = "1.6.1"
 androidx-test-junit = "1.1.5"
 androidx-test-rules = "1.5.0"
-camposer = "0.2.2"
+camposer = "0.3.0"
 chucker = "4.0.0"
 coil = "2.4.0"
 compose-lint-checks = "1.2.0"
