@@ -117,7 +117,7 @@ public class JavaActivity extends FragmentActivity {
     }
 
     private void doDocumentVerification() {
-        Document document = new Document("GH", "DRIVERS_LICENSE", 1.6f);
+        Document document = new Document("GH", "DRIVERS_LICENSE");
         DocumentVerificationFragment documentVerificationFragment = DocumentVerificationFragment
             .newInstance(document);
         getSupportFragmentManager().setFragmentResultListener(

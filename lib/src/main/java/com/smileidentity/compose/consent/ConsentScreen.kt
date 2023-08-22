@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.SmileIDAttribution
+import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.annotatedStringResource
 import java.net.URL
 
 @Composable
