@@ -111,7 +111,7 @@ internal fun SelfieCaptureScreen(
                 .fillMaxSize(),
         ) {
             Text(
-                text = stringResource(uiState.currentDirective.displayText),
+                text = stringResource(uiState.directive.displayText),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,

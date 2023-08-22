@@ -57,7 +57,9 @@
     <string name="si_doc_v_instruction_back_subtitle">For this ID type, we require that you submit the back of the ID</string>
     <string name="si_doc_v_capture_instructions_front_title">Front of ID</string>
     <string name="si_doc_v_capture_instructions_back_title">Back of ID</string>
-    <string name="si_doc_v_capture_instructions_subtitle">Make sure all the corners are visible and there is no glare</string>
+    <string name="si_doc_v_capture_directive_default">Please center your ID within the frame. Ensure all corners are visible and there is no glare</string>
+    <string name="si_doc_v_capture_directive_ensure_well_lit">Ensure the document is well lit</string>
+    <string name="si_doc_v_capture_directive_capturing">Capturing…</string>
     <string name="si_doc_v_capture_error_subtitle">Your document capture failed to process</string>
     <string name="si_doc_v_validation_image_too_small">Selected image is too small. Please select a larger resolution image.</string>
     <string name="si_doc_v_confirmation_dialog_title">Is the document clear and readable?</string>
