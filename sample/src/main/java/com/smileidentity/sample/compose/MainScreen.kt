@@ -252,7 +252,7 @@ fun MainScreen(
                     SmileID.DocumentVerification(
                         userId = userId,
                         jobId = jobId,
-                        countryCode = it.arguments?.getString("countryCode"),
+                        countryCode = it.arguments?.getString("countryCode")!!,
                         documentType = it.arguments?.getString("documentType"),
                         showInstructions = true,
                         allowGalleryUpload = true,
