@@ -4,7 +4,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.Config
-import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
@@ -40,7 +39,6 @@ class OrchestratedDocumentViewModelTest {
 
     private val documentFrontFile = File.createTempFile("documentFront", ".jpg")
     private val selfieFile = File.createTempFile("selfie", ".jpg")
-    private val document = Document("KE", "ID_CARD")
 
     @Before
     fun setup() {
@@ -48,7 +46,8 @@ class OrchestratedDocumentViewModelTest {
         subject = OrchestratedDocumentViewModel(
             randomUserId(),
             randomJobId(),
-            document,
+            countryCode = "KE",
+            documentType = "ID_CARD",
             selfieFile = selfieFile,
         )
         SmileID.config = Config(
@@ -135,8 +134,8 @@ class OrchestratedDocumentViewModelTest {
 
         // then
         assertNotNull(uploadBodySlot.captured.idInfo)
-        assertEquals(document.countryCode, uploadBodySlot.captured.idInfo?.country)
-        assertEquals(document.documentType, uploadBodySlot.captured.idInfo?.idType)
+        assertEquals("KE", uploadBodySlot.captured.idInfo?.country)
+        assertEquals("KE", uploadBodySlot.captured.idInfo?.idType)
     }
 
     @Test
