@@ -26,7 +26,7 @@ import java.io.File
  */
 @Composable
 internal fun OrchestratedDocumentVerificationScreen(
-    countryCode: String? = null,
+    countryCode: String,
     documentType: String? = null,
     idAspectRatio: Float? = null,
     captureBothSides: Boolean = false,

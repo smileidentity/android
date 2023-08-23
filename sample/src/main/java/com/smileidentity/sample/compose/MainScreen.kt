@@ -237,7 +237,7 @@ fun MainScreen(
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     DocumentVerificationIdTypeSelector { country, idType, hasBackSide ->
                         navController.navigate(
-                            route = "${ProductScreen.DocumentVerification.route}" +
+                            route = ProductScreen.DocumentVerification.route +
                                 "/$country/$idType/$hasBackSide",
                         ) { popUpTo(ProductScreen.DocumentVerification.route) }
                     }

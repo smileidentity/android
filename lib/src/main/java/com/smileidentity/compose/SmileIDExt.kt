@@ -120,7 +120,8 @@ fun SmileID.SmartSelfieAuthentication(
  *
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/document-verification)
  *
- * @param idType The type of ID to be captured
+ * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ * @param documentType An optional document type of the document
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
  * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
  * standard size of ~1.6
@@ -146,7 +147,7 @@ fun SmileID.SmartSelfieAuthentication(
  */
 @Composable
 fun SmileID.DocumentVerification(
-    countryCode: String? = null,
+    countryCode: String,
     documentType: String? = null,
     idAspectRatio: Float? = null,
     captureBothSides: Boolean = false,
