@@ -30,3 +30,8 @@ data class IdSelection(
     @Json(name = "enhanced_kyc") val enhancedKyc: IdTypes = emptyMap(),
     @Json(name = "doc_verification") val documentVerification: IdTypes = emptyMap(),
 )
+
+@JsonClass(generateAdapter = true)
+data class HasBackSideResponse(
+    @Json(name = "has_back_side") val hasBackSide: Boolean,
+)
