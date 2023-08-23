@@ -23,7 +23,6 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.impl.utils.Exif
 import androidx.core.graphics.scale
-import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
@@ -34,6 +33,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.io.Serializable
+import java.nio.ByteBuffer
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -51,7 +51,7 @@ internal val InputImage.area get() = height * width
  * @param width Minimum width of the image
  * @param height Minimum height of the image
  */
-fun isImageAtLeast(
+internal fun isImageAtLeast(
     context: Context,
     uri: Uri?,
     width: Int? = 1920,
@@ -67,7 +67,7 @@ fun isImageAtLeast(
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
 }
 
-fun isValidDocumentImage(
+internal fun isValidDocumentImage(
     context: Context,
     uri: Uri?,
 ) = isImageAtLeast(context, uri, width = 1920, height = 1080)
@@ -105,14 +105,12 @@ internal fun postProcessImageBitmap(
 
     if (processRotation) {
         val exif = Exif.createFromFile(file)
-        val degrees = when (exif.orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> 90F
-            ExifInterface.ORIENTATION_ROTATE_180 -> 180F
-            ExifInterface.ORIENTATION_ROTATE_270 -> 270F
-            else -> 0f
+        val degrees = exif.rotation.toFloat()
+        val scale = if (exif.isFlippedHorizontally) -1F else 1F
+        val matrix = Matrix().apply {
+            postScale(scale, 1F)
+            postRotate(degrees)
         }
-
-        val matrix = Matrix().apply { postRotate(degrees) }
         mutableBitmap = Bitmap.createBitmap(
             mutableBitmap,
             0,
@@ -353,4 +351,11 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
+}
+
+internal fun ByteBuffer.toByteArray(): ByteArray {
+    rewind()
+    val data = ByteArray(remaining())
+    get(data)
+    return data
 }

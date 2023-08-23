@@ -5,21 +5,21 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+import androidx.camera.core.ImageAnalysis
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,9 +52,11 @@ import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState
+import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
+import com.ujizin.camposer.state.rememberImageAnalyzer
 import timber.log.Timber
 import java.io.File
 
@@ -75,7 +77,6 @@ internal fun DocumentCaptureScreen(
     instructionsTitleText: String,
     instructionsSubtitleText: String,
     captureTitleText: String,
-    captureSubtitleText: String,
     idAspectRatio: Float?,
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
@@ -147,11 +148,13 @@ internal fun DocumentCaptureScreen(
 
         else -> CaptureScreenContent(
             titleText = captureTitleText,
-            subtitleText = captureSubtitleText,
+            subtitleText = stringResource(id = uiState.directive.displayText),
             idAspectRatio = idAspectRatio,
             areEdgesDetected = uiState.areEdgesDetected,
             showCaptureInProgress = uiState.showCaptureInProgress,
+            showManualCaptureButton = uiState.showManualCaptureButton,
             onCaptureClicked = viewModel::captureDocument,
+            imageAnalyzer = viewModel,
             modifier = modifier,
         )
     }
@@ -164,7 +167,9 @@ private fun CaptureScreenContent(
     idAspectRatio: Float?,
     areEdgesDetected: Boolean,
     showCaptureInProgress: Boolean,
+    showManualCaptureButton: Boolean,
     onCaptureClicked: (CameraState) -> Unit,
+    imageAnalyzer: ImageAnalysis.Analyzer,
     modifier: Modifier = Modifier,
 ) {
     val cameraState = rememberCameraState()
@@ -179,6 +184,12 @@ private fun CaptureScreenContent(
                 cameraState = cameraState,
                 camSelector = camSelector,
                 scaleType = ScaleType.FillCenter,
+                isImageAnalysisEnabled = true,
+                imageAnalyzer = cameraState.rememberImageAnalyzer(
+                    analyze = imageAnalyzer,
+                    // Guarantees only one image will be delivered for analysis at a time
+                    imageAnalysisBackpressureStrategy = KeepOnlyLatest,
+                ),
                 modifier = Modifier
                     .testTag("document_camera_preview")
                     .fillMaxSize()
@@ -199,7 +210,8 @@ private fun CaptureScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(16.dp)
-                .wrapContentSize(),
+                .wrapContentHeight()
+                .fillMaxWidth(),
         ) {
             Text(
                 text = titleText,
@@ -207,21 +219,28 @@ private fun CaptureScreenContent(
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = subtitleText,
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
+                // Since some directives are longer, setting minLines to 2 reserves space in the
+                // layout to prevent UI elements from moving around when the directive changes
+                minLines = 2,
+                modifier = Modifier.padding(4.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            val captureButtonSize = Modifier.size(64.dp)
-            if (showCaptureInProgress) {
-                CircularProgressIndicator(modifier = captureButtonSize)
-            } else {
-                CaptureDocumentButton(captureButtonSize) { onCaptureClicked(cameraState) }
+
+            // By using Box with a fixed size here, we ensure the UI doesn't move around when the
+            // manual capture button becomes visible
+            Box(modifier = Modifier.size(64.dp)) {
+                if (showCaptureInProgress) {
+                    CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+                } else if (showManualCaptureButton) {
+                    CaptureDocumentButton { onCaptureClicked(cameraState) }
+                }
             }
         }
     }
@@ -250,7 +269,9 @@ private fun CaptureScreenContentPreview() {
             idAspectRatio = 1.59f,
             areEdgesDetected = true,
             showCaptureInProgress = false,
+            showManualCaptureButton = true,
             onCaptureClicked = {},
+            imageAnalyzer = {},
         )
     }
 }
