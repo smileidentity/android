@@ -135,7 +135,7 @@ class OrchestratedDocumentViewModelTest {
         // then
         assertNotNull(uploadBodySlot.captured.idInfo)
         assertEquals("KE", uploadBodySlot.captured.idInfo?.country)
-        assertEquals("KE", uploadBodySlot.captured.idInfo?.idType)
+        assertEquals("ID_CARD", uploadBodySlot.captured.idInfo?.idType)
     }
 
     @Test
