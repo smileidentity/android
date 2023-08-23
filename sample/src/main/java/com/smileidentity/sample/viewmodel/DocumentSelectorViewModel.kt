@@ -53,8 +53,7 @@ class DocumentSelectorViewModel : ViewModel() {
     fun documentHasBackSide(
         country: String,
         documentType: String?,
-    ) = viewModelScope.launch(getExceptionHandler(proxy))
-    {
+    ) = viewModelScope.launch(getExceptionHandler(proxy)) {
         val response = SmileID.api.documentHasBackSide(country = country, idType = documentType)
         _uiState.update { it.copy(hasBackSide = response.hasBackSide) }
     }

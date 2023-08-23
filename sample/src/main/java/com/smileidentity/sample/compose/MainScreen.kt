@@ -237,12 +237,14 @@ fun MainScreen(
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     DocumentVerificationIdTypeSelector { country, idType, hasBackSide ->
                         navController.navigate(
-                            "${ProductScreen.DocumentVerification.route}/$country/$idType/$hasBackSide",
+                            route = "${ProductScreen.DocumentVerification.route}" +
+                                "/$country/$idType/$hasBackSide",
                         ) { popUpTo(ProductScreen.DocumentVerification.route) }
                     }
                 }
                 composable(
-                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}/{hasBackSide}",
+                    ProductScreen.DocumentVerification.route +
+                        "/{countryCode}/{idType}/{hasBackSide}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
