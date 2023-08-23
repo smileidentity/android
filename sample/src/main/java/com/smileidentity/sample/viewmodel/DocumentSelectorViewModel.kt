@@ -17,6 +17,7 @@ import timber.log.Timber
 data class DocumentSelectorUiState(
     val idTypes: Map<String, List<String>>? = null,
     val errorMessage: String? = null,
+    val hasBackSide: Boolean = false,
 )
 
 class DocumentSelectorViewModel : ViewModel() {
@@ -27,27 +28,35 @@ class DocumentSelectorViewModel : ViewModel() {
         loadData()
     }
 
-    private fun loadData() {
-        val proxy = { e: Throwable ->
-            Timber.e(e)
-            _uiState.update { it.copy(errorMessage = e.message) }
+    private val proxy = { e: Throwable ->
+        Timber.e(e)
+        _uiState.update { it.copy(errorMessage = e.message) }
+    }
+
+    private fun loadData() = viewModelScope.launch(getExceptionHandler(proxy)) {
+        val authRequest = AuthenticationRequest(
+            userId = randomUserId(),
+            jobType = JobType.DocumentVerification,
+        )
+        val authResponse = SmileID.api.authenticate(authRequest)
+        val productsConfigRequest = ProductsConfigRequest(
+            partnerId = SmileID.config.partnerId,
+            timestamp = authResponse.timestamp,
+            signature = authResponse.signature,
+        )
+        val productsConfigResponse = SmileID.api.getProductsConfig(productsConfigRequest)
+        _uiState.update {
+            it.copy(idTypes = productsConfigResponse.idSelection.documentVerification)
         }
-        viewModelScope.launch(getExceptionHandler(proxy)) {
-            val authRequest = AuthenticationRequest(
-                userId = randomUserId(),
-                jobType = JobType.DocumentVerification,
-            )
-            val authResponse = SmileID.api.authenticate(authRequest)
-            val productsConfigRequest = ProductsConfigRequest(
-                partnerId = SmileID.config.partnerId,
-                timestamp = authResponse.timestamp,
-                signature = authResponse.signature,
-            )
-            val productsConfigResponse = SmileID.api.getProductsConfig(productsConfigRequest)
-            _uiState.update {
-                it.copy(idTypes = productsConfigResponse.idSelection.documentVerification)
-            }
-        }
+    }
+
+    fun documentHasBackSide(
+        country: String,
+        documentType: String?,
+    ) = viewModelScope.launch(getExceptionHandler(proxy))
+    {
+        val response = SmileID.api.documentHasBackSide(country = country, idType = documentType)
+        _uiState.update { it.copy(hasBackSide = response.hasBackSide) }
     }
 }
 

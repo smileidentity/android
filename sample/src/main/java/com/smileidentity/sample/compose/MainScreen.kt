@@ -54,7 +54,6 @@ import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -236,31 +235,26 @@ fun MainScreen(
                 }
                 composable(ProductScreen.DocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    DocumentVerificationIdTypeSelector { country, idType ->
+                    DocumentVerificationIdTypeSelector { country, idType, hasBackSide ->
                         navController.navigate(
-                            "${ProductScreen.DocumentVerification.route}/$country/$idType",
+                            "${ProductScreen.DocumentVerification.route}/$country/$idType/$hasBackSide",
                         ) { popUpTo(ProductScreen.DocumentVerification.route) }
                     }
                 }
                 composable(
-                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
+                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}/{hasBackSide}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
                     val jobId = rememberSaveable { randomJobId() }
-                    val documentType = remember(it) {
-                        Document(
-                            it.arguments?.getString("countryCode")!!,
-                            it.arguments?.getString("idType")!!,
-                        )
-                    }
                     SmileID.DocumentVerification(
                         userId = userId,
                         jobId = jobId,
-                        idType = documentType,
+                        countryCode = it.arguments?.getString("countryCode"),
+                        documentType = it.arguments?.getString("documentType"),
                         showInstructions = true,
                         allowGalleryUpload = true,
-                        captureBothSides = true,
+                        captureBothSides = it.arguments?.getBoolean("hasBackSide")!!,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
                         navController.popBackStack(

@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentActivity;
 import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
-import com.smileidentity.models.Document;
 import com.smileidentity.models.SmartSelfieJobStatusResponse;
 import com.smileidentity.results.DocumentVerificationResult;
 import com.smileidentity.results.SmartSelfieResult;
@@ -117,9 +116,8 @@ public class JavaActivity extends FragmentActivity {
     }
 
     private void doDocumentVerification() {
-        Document document = new Document("GH", "DRIVERS_LICENSE");
         DocumentVerificationFragment documentVerificationFragment = DocumentVerificationFragment
-            .newInstance(document);
+            .newInstance("GH", "DRIVERS_LICENSE");
         getSupportFragmentManager().setFragmentResultListener(
             DocumentVerificationFragment.KEY_REQUEST,
             this,

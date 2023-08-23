@@ -61,12 +61,12 @@ import timber.log.Timber
 fun DocumentVerificationIdTypeSelector(
     modifier: Modifier = Modifier,
     viewModel: DocumentSelectorViewModel = viewModel(),
-    onIdTypeSelected: (String, String) -> Unit,
+    onIdTypeSelected: (String, String?, Boolean) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val context = LocalContext.current
 
     uiState.errorMessage?.let {
-        val context = LocalContext.current
         LaunchedEffect(it) { context.toast("Error loading ID Types: $it") }
     }
 
@@ -86,9 +86,7 @@ fun DocumentVerificationIdTypeSelector(
 
     var selectedCountry: String? by rememberSaveable { mutableStateOf(null) }
     var selectedIdType: String? by rememberSaveable { mutableStateOf(null) }
-    val isContinueEnabled by remember {
-        derivedStateOf { selectedCountry != null && selectedIdType != null }
-    }
+    val isContinueEnabled by remember { derivedStateOf { selectedCountry != null } }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize(),
@@ -205,7 +203,13 @@ fun DocumentVerificationIdTypeSelector(
             }
         }
         Button(
-            onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType!!) },
+            // onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType) },
+            onClick = {
+                viewModel.documentHasBackSide(
+                    country = selectedCountry!!,
+                    documentType = selectedIdType,
+                )
+            },
             enabled = isContinueEnabled,
             modifier = Modifier
                 .padding(16.dp)
@@ -222,7 +226,7 @@ fun DocumentVerificationIdTypeSelectorPreview() {
     SmileIDTheme {
         Surface {
             DocumentVerificationIdTypeSelector(
-                onIdTypeSelected = { _, _ -> },
+                onIdTypeSelected = { _, _, _ -> },
             )
         }
     }

@@ -15,7 +15,6 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
@@ -147,7 +146,8 @@ fun SmileID.SmartSelfieAuthentication(
  */
 @Composable
 fun SmileID.DocumentVerification(
-    idType: Document,
+    countryCode: String? = null,
+    documentType: String? = null,
     idAspectRatio: Float? = null,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
@@ -162,7 +162,8 @@ fun SmileID.DocumentVerification(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
-            idType = idType,
+            countryCode = countryCode,
+            documentType = documentType,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,

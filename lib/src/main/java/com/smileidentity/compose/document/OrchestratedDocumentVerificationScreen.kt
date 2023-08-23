@@ -10,7 +10,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDCallback
@@ -27,7 +26,8 @@ import java.io.File
  */
 @Composable
 internal fun OrchestratedDocumentVerificationScreen(
-    idType: Document,
+    countryCode: String? = null,
+    documentType: String? = null,
     idAspectRatio: Float? = null,
     captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
@@ -41,7 +41,8 @@ internal fun OrchestratedDocumentVerificationScreen(
             OrchestratedDocumentViewModel(
                 userId = userId,
                 jobId = jobId,
-                idType = idType,
+                countryCode = countryCode,
+                documentType = documentType,
                 captureBothSides = captureBothSides,
                 selfieFile = bypassSelfieCaptureWithFile,
             )
