@@ -10,6 +10,8 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.results.SmartSelfieResult
+import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import io.mockk.Runs
@@ -31,7 +33,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrchestratedDocumentViewModelTest {
@@ -100,7 +101,6 @@ class OrchestratedDocumentViewModelTest {
 
         // when
         subject.onDocumentFrontCaptureSuccess(documentFrontFile)
-        delay(10.milliseconds)
 
         // then
         val currentStep = subject.uiState.value.currentStep
@@ -132,10 +132,45 @@ class OrchestratedDocumentViewModelTest {
 
         // when
         subject.onDocumentFrontCaptureSuccess(documentFrontFile)
-        delay(10.milliseconds)
 
+        // then
         assertNotNull(uploadBodySlot.captured.idInfo)
         assertEquals(document.countryCode, uploadBodySlot.captured.idInfo?.country)
         assertEquals(document.documentType, uploadBodySlot.captured.idInfo?.idType)
+    }
+
+    @Test
+    fun `should submit liveness photos after selfie capture`() = runTest {
+        SmileID.api = mockk()
+        val selfieResult = SmartSelfieResult(
+            selfieFile = selfieFile,
+            livenessFiles = listOf(File.createTempFile("liveness", ".jpg")),
+            jobStatusResponse = null,
+        )
+        coEvery { SmileID.api.authenticate(any()) } returns AuthenticationResponse(
+            success = true,
+            signature = "signature",
+            timestamp = "timestamp",
+            partnerParams = PartnerParams(jobType = JobType.DocumentVerification),
+        )
+
+        coEvery { SmileID.api.prepUpload(any()) } returns PrepUploadResponse(
+            code = "0",
+            refId = "refId",
+            uploadUrl = "uploadUrl",
+            smileJobId = "smileJobId",
+            cameraConfig = null,
+        )
+
+        val uploadBodySlot = slot<UploadRequest>()
+        coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
+
+        // when
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        subject.onSelfieCaptureSuccess(SmileIDResult.Success(selfieResult))
+
+        // then
+        // 3 <- selfie file + document front file + 1 liveness file
+        assertEquals(3, uploadBodySlot.captured.images.size)
     }
 }

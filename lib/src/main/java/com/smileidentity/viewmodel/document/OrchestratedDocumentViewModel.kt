@@ -15,6 +15,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentImage
+import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
@@ -51,6 +52,7 @@ internal class OrchestratedDocumentViewModel(
     )
     private var documentFrontFile: File? = null
     private var documentBackFile: File? = null
+    private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
@@ -81,6 +83,7 @@ internal class OrchestratedDocumentViewModel(
 
     fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
         selfieFile = it.data.selfieFile
+        livenessFiles = it.data.livenessFiles
         submitJob()
     }
 
@@ -121,8 +124,14 @@ internal class OrchestratedDocumentViewModel(
             val selfieImageInfo = selfieFile?.asSelfieImage() ?: throw IllegalStateException(
                 "Selfie file is null",
             )
+            // Liveness files will be null when the partner bypasses our Selfie capture with a file
+            val livenessImageInfo = livenessFiles?.map { it.asLivenessImage() } ?: emptyList()
             val uploadRequest = UploadRequest(
-                images = listOfNotNull(frontImageInfo, backImageInfo, selfieImageInfo),
+                images = listOfNotNull(
+                    frontImageInfo,
+                    backImageInfo,
+                    selfieImageInfo,
+                ) + livenessImageInfo,
                 idInfo = IdInfo(idType.countryCode, idType.documentType),
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
