@@ -3,6 +3,8 @@
 ## 10.0.0-beta07 (unreleased)
 
 ### Added
+- Detection of bad lighting in Document Verification
+- Detection of unfocused states in Document Verification
 
 ### Fixed
 - Fix a Document Verification bug where selfie wasn't captured when also capturing the back of an ID
@@ -11,6 +13,7 @@
 - `resultCode`s, `code`s, and `BankCode.code`s are all now `String`s in order to maintain leading 0s
 - Bump Compose BOM to 2023.08.00
 - Include liveness images for Document Verification jobs, if selfie capture was not bypassed
+- Bump CameraX to 1.2.3
 
 ### Removed
 
