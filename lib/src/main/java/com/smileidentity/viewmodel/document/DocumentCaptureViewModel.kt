@@ -4,9 +4,9 @@ import android.graphics.ImageFormat.YUV_420_888
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.camera.view.CameraController
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_STARTED
+import androidx.camera.view.CameraController.TapToFocusStates
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
@@ -125,7 +125,7 @@ class DocumentCaptureViewModel : ViewModel(), ImageAnalysis.Analyzer {
         }
     }
 
-    fun onFocusEvent(@CameraController.TapToFocusStates focusEvent: Int) {
+    fun onFocusEvent(@TapToFocusStates focusEvent: Int) {
         isFocusing = focusEvent == TAP_TO_FOCUS_STARTED || focusEvent == TAP_TO_FOCUS_NOT_FOCUSED
         if (isFocusing) {
             _uiState.update { it.copy(directive = DocumentDirective.Focusing) }
