@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -155,6 +156,7 @@ internal fun DocumentCaptureScreen(
             showManualCaptureButton = uiState.showManualCaptureButton,
             onCaptureClicked = viewModel::captureDocument,
             imageAnalyzer = viewModel,
+            onFocusEvent = viewModel::onFocusEvent,
             modifier = modifier,
         )
     }
@@ -170,10 +172,14 @@ private fun CaptureScreenContent(
     showManualCaptureButton: Boolean,
     onCaptureClicked: (CameraState) -> Unit,
     imageAnalyzer: ImageAnalysis.Analyzer,
+    onFocusEvent: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    cameraState.controller.tapToFocusState.observe(lifecycleOwner, onFocusEvent)
+
     Column(modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -272,6 +278,7 @@ private fun CaptureScreenContentPreview() {
             showManualCaptureButton = true,
             onCaptureClicked = {},
             imageAnalyzer = {},
+            onFocusEvent = {},
         )
     }
 }
