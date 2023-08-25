@@ -199,17 +199,23 @@ class DocumentCaptureViewModel(
                     boundingBox = bBox,
                     imageWidth = inputImage.width,
                     imageHeight = inputImage.height,
+                    imageRotation = rotation,
                 )
 
                 val detectedAspectRatio = bBox.width().toFloat() / bBox.height()
                 val isCorrectAspectRatio = isCorrectAspectRatio(
                     detectedAspectRatio = detectedAspectRatio,
                 )
+                val idAspectRatio = if (rotation == 90 || rotation == 270) {
+                    knownAspectRatio ?: detectedAspectRatio
+                } else {
+                    1 / (knownAspectRatio ?: detectedAspectRatio)
+                }
 
                 _uiState.update {
                     it.copy(
                         areEdgesDetected = isCentered && isCorrectAspectRatio,
-                        idAspectRatio = knownAspectRatio ?: detectedAspectRatio,
+                        idAspectRatio = idAspectRatio,
                     )
                 }
             }
@@ -237,19 +243,29 @@ class DocumentCaptureViewModel(
         boundingBox: Rect,
         imageWidth: Int,
         imageHeight: Int,
+        imageRotation: Int,
         tolerance: Int = CENTERED_BOUNDING_BOX_TOLERANCE,
     ): Boolean {
-        // NB! The bounding box X dimension corresponds with the image *height* not width
+        if (imageRotation == 90 || imageRotation == 270) {
+            // The image height/width need to be swapped
+            return isBoundingBoxCentered(
+                boundingBox = boundingBox,
+                imageWidth = imageHeight,
+                imageHeight = imageWidth,
+                imageRotation = 0,
+                tolerance = tolerance,
+            )
+        }
 
         // Sometimes, the bounding box is out of frame. This cannot be considered centered
         // We check only left and right because the document should always fill the width but may
         // not fill the height
-        if (boundingBox.left < tolerance || boundingBox.right > (imageHeight - tolerance)) {
+        if (boundingBox.left < tolerance || boundingBox.right > (imageWidth - tolerance)) {
             return false
         }
 
-        val imageCenterX = imageHeight / 2
-        val imageCenterY = imageWidth / 2
+        val imageCenterX = imageWidth / 2
+        val imageCenterY = imageHeight / 2
 
         val deltaX = abs(imageCenterX - boundingBox.centerX())
         val deltaY = abs(imageCenterY - boundingBox.centerY())
