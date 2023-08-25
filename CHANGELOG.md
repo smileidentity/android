@@ -3,6 +3,7 @@
 ## 10.0.0-beta07 (unreleased)
 
 ### Added
+- Added BVN Verification for Nigeria
 
 ### Fixed
 
