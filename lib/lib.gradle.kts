@@ -200,6 +200,9 @@ dependencies {
     // Unbundled model -- will be dynamically downloaded via Google Play Services
     implementation(libs.play.services.mlkit.face.detection)
 
+    // Bundled model
+    implementation(libs.mlkit.`object`.detection)
+
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.coroutines.test)

@@ -6,6 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.camera.core.ImageAnalysis
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
@@ -61,6 +63,8 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 import timber.log.Timber
 import java.io.File
 
+const val PREVIEW_SCALE_FACTOR = 1.1f
+
 internal enum class DocumentCaptureSide {
     Front,
     Back,
@@ -78,12 +82,12 @@ internal fun DocumentCaptureScreen(
     instructionsTitleText: String,
     instructionsSubtitleText: String,
     captureTitleText: String,
-    idAspectRatio: Float?,
+    knownIdAspectRatio: Float?,
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DocumentCaptureViewModel = viewModel(
-        factory = viewModelFactory { DocumentCaptureViewModel() },
+        factory = viewModelFactory { DocumentCaptureViewModel(knownIdAspectRatio) },
         key = side.name,
     ),
 ) {
@@ -136,6 +140,7 @@ internal fun DocumentCaptureScreen(
                 titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
                 subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
                 painter = painter,
+                scaleFactor = PREVIEW_SCALE_FACTOR,
                 confirmButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_confirm_button,
                 ),
@@ -147,18 +152,24 @@ internal fun DocumentCaptureScreen(
             )
         }
 
-        else -> CaptureScreenContent(
-            titleText = captureTitleText,
-            subtitleText = stringResource(id = uiState.directive.displayText),
-            idAspectRatio = idAspectRatio,
-            areEdgesDetected = uiState.areEdgesDetected,
-            showCaptureInProgress = uiState.showCaptureInProgress,
-            showManualCaptureButton = uiState.showManualCaptureButton,
-            onCaptureClicked = viewModel::captureDocument,
-            imageAnalyzer = viewModel,
-            onFocusEvent = viewModel::onFocusEvent,
-            modifier = modifier,
-        )
+        else -> {
+            val aspectRatio by animateFloatAsState(
+                targetValue = uiState.idAspectRatio,
+                label = "ID Aspect Ratio",
+            )
+            CaptureScreenContent(
+                titleText = captureTitleText,
+                subtitleText = stringResource(id = uiState.directive.displayText),
+                idAspectRatio = aspectRatio,
+                areEdgesDetected = uiState.areEdgesDetected,
+                showCaptureInProgress = uiState.showCaptureInProgress,
+                showManualCaptureButton = uiState.showManualCaptureButton,
+                onCaptureClicked = viewModel::captureDocument,
+                imageAnalyzer = viewModel,
+                onFocusEvent = viewModel::onFocusEvent,
+                modifier = modifier,
+            )
+        }
     }
 }
 
@@ -166,7 +177,7 @@ internal fun DocumentCaptureScreen(
 private fun CaptureScreenContent(
     titleText: String,
     subtitleText: String,
-    idAspectRatio: Float?,
+    idAspectRatio: Float,
     areEdgesDetected: Boolean,
     showCaptureInProgress: Boolean,
     showManualCaptureButton: Boolean,
@@ -179,10 +190,10 @@ private fun CaptureScreenContent(
     val camSelector by rememberCamSelector(CamSelector.Back)
     val lifecycleOwner = LocalLifecycleOwner.current
     cameraState.controller.tapToFocusState.observe(lifecycleOwner, onFocusEvent)
-
     Column(modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
+                .clipToBounds()
                 .fillMaxSize()
                 .weight(1f),
         ) {
@@ -199,7 +210,10 @@ private fun CaptureScreenContent(
                 modifier = Modifier
                     .testTag("document_camera_preview")
                     .fillMaxSize()
-                    .clipToBounds(),
+                    .clipToBounds()
+                    // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
+                    // "out of bounds" content as a fraud prevention technique AND UX reasons
+                    .scale(PREVIEW_SCALE_FACTOR),
             )
             DocumentShapedBoundingBox(
                 aspectRatio = idAspectRatio,

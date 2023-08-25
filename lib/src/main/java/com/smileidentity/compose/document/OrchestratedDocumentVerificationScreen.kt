@@ -63,7 +63,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             captureTitleText = stringResource(
                 id = R.string.si_doc_v_capture_instructions_front_title,
             ),
-            idAspectRatio = idAspectRatio,
+            knownIdAspectRatio = idAspectRatio,
             onConfirm = viewModel::onDocumentFrontCaptureSuccess,
             onError = viewModel::onError,
         )
@@ -80,7 +80,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             captureTitleText = stringResource(
                 id = R.string.si_doc_v_capture_instructions_back_title,
             ),
-            idAspectRatio = idAspectRatio,
+            knownIdAspectRatio = idAspectRatio,
             onConfirm = viewModel::onDocumentBackCaptureSuccess,
             onError = viewModel::onError,
         )

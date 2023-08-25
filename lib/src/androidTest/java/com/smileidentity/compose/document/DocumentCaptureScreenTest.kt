@@ -44,7 +44,7 @@ class DocumentCaptureScreenTest {
                 instructionsTitleText = "",
                 instructionsSubtitleText = "",
                 captureTitleText = "",
-                idAspectRatio = null,
+                knownIdAspectRatio = null,
                 onConfirm = {},
                 onError = {},
             )
@@ -74,7 +74,7 @@ class DocumentCaptureScreenTest {
                 instructionsTitleText = titleText,
                 instructionsSubtitleText = subtitleText,
                 captureTitleText = "",
-                idAspectRatio = null,
+                knownIdAspectRatio = null,
                 onConfirm = {},
                 onError = {},
             )
