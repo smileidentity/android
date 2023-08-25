@@ -72,7 +72,7 @@ class DocumentCaptureViewModel(
     private var isFocusing = false
     private var documentFirstDetectedTimeMs: Long? = null
     private var captureNextAnalysisFrame = false
-    private val defaultAspectRatio get() = knownAspectRatio ?: 1f
+    private val defaultAspectRatio = knownAspectRatio ?: 1f
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
