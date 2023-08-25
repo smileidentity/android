@@ -28,7 +28,7 @@ class DocumentCaptureViewModelTest {
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         SmileID.fileSavePath = "."
-        subject = DocumentCaptureViewModel()
+        subject = DocumentCaptureViewModel(knownAspectRatio = null)
     }
 
     @Test
