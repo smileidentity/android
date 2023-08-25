@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.Dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
-const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.375f / 2.125f
-const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
+const val DOCUMENT_BOUNDING_BOX_MARGINS = 64f
 val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
 
 /**
@@ -33,7 +32,7 @@ val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
  */
 @Composable
 fun DocumentShapedBoundingBox(
-    aspectRatio: Float?,
+    aspectRatio: Float,
     areEdgesDetected: Boolean,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
@@ -50,9 +49,18 @@ fun DocumentShapedBoundingBox(
 
         // 2. Draw the outline of the bounding box and add a stroke that shows different edge
         // detection states
-        val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
-        val outlineBoundingBoxHeight =
-            outlineBoundingBoxWidth / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
+
+        val (outlineBoundingBoxWidth, outlineBoundingBoxHeight) = if (aspectRatio >= 1) {
+            // Horizontal ID
+            val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
+            val outlineBoundingBoxHeight = outlineBoundingBoxWidth / aspectRatio
+            outlineBoundingBoxWidth to outlineBoundingBoxHeight
+        } else {
+            // Vertical ID
+            val outlineBoundingBoxHeight = size.height - DOCUMENT_BOUNDING_BOX_MARGINS
+            val outlineBoundingBoxWidth = outlineBoundingBoxHeight * aspectRatio
+            outlineBoundingBoxWidth to outlineBoundingBoxHeight
+        }
         val outlineBoundingBoxX = (size.width - outlineBoundingBoxWidth) / 2
         val outlineBoundingBoxY = (size.height - outlineBoundingBoxHeight) / 2
         drawRoundRect(
@@ -71,14 +79,17 @@ fun DocumentShapedBoundingBox(
             color = Color.Transparent,
             blendMode = BlendMode.Clear,
             topLeft = Offset(
-                x = outlineBoundingBoxX,
+                x = outlineBoundingBoxX + (strokeWidth.toPx() / 2),
                 y = outlineBoundingBoxY + (strokeWidth.toPx() / 2),
             ),
             size = Size(
                 width = (outlineBoundingBoxWidth - strokeWidth.toPx()),
                 height = (outlineBoundingBoxHeight - strokeWidth.toPx()),
             ),
-            cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS,
+            cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS - CornerRadius(
+                strokeWidth.value,
+                strokeWidth.value,
+            ),
         )
     }
 }

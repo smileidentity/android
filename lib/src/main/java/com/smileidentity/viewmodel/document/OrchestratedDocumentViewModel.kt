@@ -14,7 +14,8 @@ import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.networking.asDocumentImage
+import com.smileidentity.networking.asDocumentBackImage
+import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.DocumentVerificationResult
@@ -119,8 +120,8 @@ internal class OrchestratedDocumentViewModel(
                 timestamp = authResponse.timestamp,
             )
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
-            val frontImageInfo = documentFrontFile.asDocumentImage()
-            val backImageInfo = documentBackFile?.asDocumentImage()
+            val frontImageInfo = documentFrontFile.asDocumentFrontImage()
+            val backImageInfo = documentBackFile?.asDocumentBackImage()
             val selfieImageInfo = selfieFile?.asSelfieImage() ?: throw IllegalStateException(
                 "Selfie file is null",
             )

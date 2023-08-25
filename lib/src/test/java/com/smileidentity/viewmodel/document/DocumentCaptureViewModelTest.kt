@@ -1,6 +1,7 @@
 package com.smileidentity.viewmodel.document
 
 import androidx.camera.view.CameraController
+import com.google.mlkit.vision.objects.ObjectDetector
 import com.smileidentity.SmileID
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -28,7 +29,8 @@ class DocumentCaptureViewModelTest {
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         SmileID.fileSavePath = "."
-        subject = DocumentCaptureViewModel()
+        val objectDetector: ObjectDetector = mockk()
+        subject = DocumentCaptureViewModel(knownAspectRatio = null, objectDetector)
     }
 
     @Test

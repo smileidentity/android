@@ -1,7 +1,9 @@
 package com.smileidentity.viewmodel.document
 
 import android.graphics.ImageFormat.YUV_420_888
+import android.graphics.Rect
 import androidx.annotation.StringRes
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
@@ -9,6 +11,10 @@ import androidx.camera.view.CameraController.TAP_TO_FOCUS_STARTED
 import androidx.camera.view.CameraController.TapToFocusStates
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.ObjectDetector
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -22,15 +28,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
-private const val LUMINOSITY_THRESHOLD = 35
+private const val LUMINANCE_THRESHOLD = 35
+private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
+private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
 
 data class DocumentCaptureUiState(
     val acknowledgedInstructions: Boolean = false,
     val directive: DocumentDirective = DocumentDirective.DefaultInstructions,
     val areEdgesDetected: Boolean = false,
+    val idAspectRatio: Float = 1f,
     val showManualCaptureButton: Boolean = false,
     val documentImageToConfirm: File? = null,
     val captureError: Throwable? = null,
@@ -44,15 +54,25 @@ enum class DocumentDirective(@StringRes val displayText: Int) {
     Capturing(R.string.si_doc_v_capture_directive_capturing),
 }
 
-class DocumentCaptureViewModel : ViewModel(), ImageAnalysis.Analyzer {
+class DocumentCaptureViewModel(
+    private val knownAspectRatio: Float?,
+    private val objectDetector: ObjectDetector = ObjectDetection.getClient(
+        ObjectDetectorOptions.Builder()
+            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .build(),
+    ),
+) : ViewModel(), ImageAnalysis.Analyzer {
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
     private var lastAnalysisTimeMs = 0L
     private var isCapturing = false
     private var isFocusing = false
+    private val defaultAspectRatio get() = knownAspectRatio ?: 1f
 
     init {
-        // Show manual capture after 10 seconds, using coroutine
+        _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
+
+        // Show manual capture after 10 seconds
         viewModelScope.launch {
             delay(10.seconds)
             _uiState.update { it.copy(showManualCaptureButton = true) }
@@ -95,7 +115,10 @@ class DocumentCaptureViewModel : ViewModel(), ImageAnalysis.Analyzer {
                 is ImageCaptureResult.Success -> {
                     _uiState.update {
                         it.copy(
-                            documentImageToConfirm = postProcessImage(documentFile),
+                            documentImageToConfirm = postProcessImage(
+                                documentFile,
+                                desiredAspectRatio = uiState.value.idAspectRatio,
+                            ),
                             showCaptureInProgress = false,
                         )
                     }
@@ -121,6 +144,7 @@ class DocumentCaptureViewModel : ViewModel(), ImageAnalysis.Analyzer {
                 documentImageToConfirm = null,
                 acknowledgedInstructions = false,
                 directive = DocumentDirective.DefaultInstructions,
+                areEdgesDetected = false,
             )
         }
     }
@@ -128,35 +152,135 @@ class DocumentCaptureViewModel : ViewModel(), ImageAnalysis.Analyzer {
     fun onFocusEvent(@TapToFocusStates focusEvent: Int) {
         isFocusing = focusEvent == TAP_TO_FOCUS_STARTED || focusEvent == TAP_TO_FOCUS_NOT_FOCUSED
         if (isFocusing) {
-            _uiState.update { it.copy(directive = DocumentDirective.Focusing) }
+            _uiState.update {
+                it.copy(
+                    directive = DocumentDirective.Focusing,
+                    areEdgesDetected = false,
+                )
+            }
         }
     }
 
-    override fun analyze(imageProxy: ImageProxy) = imageProxy.use {
+    @ExperimentalGetImage
+    override fun analyze(imageProxy: ImageProxy) {
         // YUV_420_888 is the format produced by CameraX
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
-
+        val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAnalysisTimeMs
-        // When capturing or focusing, skip performing image analysis
-        if (isCapturing) {
-            _uiState.update { it.copy(directive = DocumentDirective.Capturing) }
-        } else if (isFocusing) {
-            _uiState.update { it.copy(directive = DocumentDirective.Focusing) }
-        } else if (elapsedTimeMs < ANALYSIS_SAMPLE_INTERVAL_MS) {
+        val enoughTimeHasPassed = elapsedTimeMs > ANALYSIS_SAMPLE_INTERVAL_MS
+
+        if (isCapturing || isFocusing || !enoughTimeHasPassed || image == null) {
+            imageProxy.close()
             return
-        } else {
-            lastAnalysisTimeMs = System.currentTimeMillis()
-
-            // planes[0] is the Y plane aka "luma"
-            val data = imageProxy.planes[0].buffer.toByteArray()
-            val pixels = data.map { it.toInt() and 0xFF }
-            val luminance = pixels.average()
-
-            if (luminance < LUMINOSITY_THRESHOLD) {
-                _uiState.update { it.copy(directive = DocumentDirective.EnsureWellLit) }
-            } else {
-                _uiState.update { it.copy(directive = DocumentDirective.DefaultInstructions) }
-            }
         }
+        lastAnalysisTimeMs = System.currentTimeMillis()
+
+        val luminance = calculateLuminance(imageProxy)
+        if (luminance < LUMINANCE_THRESHOLD) {
+            _uiState.update {
+                it.copy(directive = DocumentDirective.EnsureWellLit, areEdgesDetected = false)
+            }
+            imageProxy.close()
+            return
+        }
+
+        _uiState.update { it.copy(directive = DocumentDirective.DefaultInstructions) }
+        val rotation = imageProxy.imageInfo.rotationDegrees
+        val inputImage = InputImage.fromMediaImage(image, rotation)
+        objectDetector.process(inputImage)
+            .addOnSuccessListener {
+                if (it.isEmpty()) {
+                    resetBoundingBox()
+                    return@addOnSuccessListener
+                }
+                val bBox = it.first().boundingBox
+
+                val isCentered = isBoundingBoxCentered(
+                    boundingBox = bBox,
+                    imageWidth = inputImage.width,
+                    imageHeight = inputImage.height,
+                    imageRotation = rotation,
+                )
+
+                val detectedAspectRatio = bBox.width().toFloat() / bBox.height()
+                val isCorrectAspectRatio = isCorrectAspectRatio(
+                    detectedAspectRatio = detectedAspectRatio,
+                )
+                val idAspectRatio = if (rotation == 90 || rotation == 270) {
+                    knownAspectRatio ?: detectedAspectRatio
+                } else {
+                    1 / (knownAspectRatio ?: detectedAspectRatio)
+                }
+
+                _uiState.update {
+                    it.copy(
+                        areEdgesDetected = isCentered && isCorrectAspectRatio,
+                        idAspectRatio = idAspectRatio,
+                    )
+                }
+            }
+            .addOnFailureListener {
+                Timber.e(it)
+                resetBoundingBox()
+            }
+            .addOnCompleteListener { imageProxy.close() }
+    }
+
+    private fun resetBoundingBox() {
+        _uiState.update {
+            it.copy(areEdgesDetected = false, idAspectRatio = defaultAspectRatio)
+        }
+    }
+
+    private fun calculateLuminance(imageProxy: ImageProxy): Double {
+        // planes[0] is the Y plane aka "luma"
+        val data = imageProxy.planes[0].buffer.toByteArray()
+        val pixels = data.map { it.toInt() and 0xFF }
+        return pixels.average()
+    }
+
+    private fun isBoundingBoxCentered(
+        boundingBox: Rect,
+        imageWidth: Int,
+        imageHeight: Int,
+        imageRotation: Int,
+        tolerance: Int = CENTERED_BOUNDING_BOX_TOLERANCE,
+    ): Boolean {
+        if (imageRotation == 90 || imageRotation == 270) {
+            // The image height/width need to be swapped
+            return isBoundingBoxCentered(
+                boundingBox = boundingBox,
+                imageWidth = imageHeight,
+                imageHeight = imageWidth,
+                imageRotation = 0,
+                tolerance = tolerance,
+            )
+        }
+
+        // Sometimes, the bounding box is out of frame. This cannot be considered centered
+        // We check only left and right because the document should always fill the width but may
+        // not fill the height
+        if (boundingBox.left < tolerance || boundingBox.right > (imageWidth - tolerance)) {
+            return false
+        }
+
+        val imageCenterX = imageWidth / 2
+        val imageCenterY = imageHeight / 2
+
+        val deltaX = abs(imageCenterX - boundingBox.centerX())
+        val deltaY = abs(imageCenterY - boundingBox.centerY())
+
+        val isCenteredHorizontally = deltaX < tolerance
+        val isCenteredVertically = deltaY < tolerance
+
+        return isCenteredHorizontally && isCenteredVertically
+    }
+
+    private fun isCorrectAspectRatio(
+        detectedAspectRatio: Float,
+        tolerance: Float = CORRECT_ASPECT_RATIO_TOLERANCE,
+    ): Boolean {
+        val expectedAspectRatio = knownAspectRatio ?: detectedAspectRatio
+        return abs(detectedAspectRatio - expectedAspectRatio) < tolerance
     }
 }
