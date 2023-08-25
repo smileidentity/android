@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.util.createDocumentFile
@@ -52,6 +53,11 @@ enum class DocumentDirective(@StringRes val displayText: Int) {
 
 class DocumentCaptureViewModel(
     private val knownAspectRatio: Float?,
+    private val objectDetector: ObjectDetector = ObjectDetection.getClient(
+        ObjectDetectorOptions.Builder()
+            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .build(),
+    ),
 ) : ViewModel(), ImageAnalysis.Analyzer {
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
@@ -59,12 +65,6 @@ class DocumentCaptureViewModel(
     private var isCapturing = false
     private var isFocusing = false
     private val defaultAspectRatio get() = knownAspectRatio ?: 1f
-
-    private val objectDetector = ObjectDetection.getClient(
-        ObjectDetectorOptions.Builder()
-            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
-            .build(),
-    )
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
