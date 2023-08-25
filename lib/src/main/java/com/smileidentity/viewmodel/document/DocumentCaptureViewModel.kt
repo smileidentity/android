@@ -1,6 +1,7 @@
 package com.smileidentity.viewmodel.document
 
 import android.graphics.ImageFormat.YUV_420_888
+import android.graphics.Rect
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -31,7 +32,9 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
-private const val LUMINOSITY_THRESHOLD = 35
+private const val LUMINANCE_THRESHOLD = 35
+private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
+private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
 
 data class DocumentCaptureUiState(
     val acknowledgedInstructions: Boolean = false,
@@ -149,7 +152,12 @@ class DocumentCaptureViewModel(
     fun onFocusEvent(@TapToFocusStates focusEvent: Int) {
         isFocusing = focusEvent == TAP_TO_FOCUS_STARTED || focusEvent == TAP_TO_FOCUS_NOT_FOCUSED
         if (isFocusing) {
-            _uiState.update { it.copy(directive = DocumentDirective.Focusing) }
+            _uiState.update {
+                it.copy(
+                    directive = DocumentDirective.Focusing,
+                    areEdgesDetected = false,
+                )
+            }
         }
     }
 
@@ -159,73 +167,104 @@ class DocumentCaptureViewModel(
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAnalysisTimeMs
-        // When capturing or focusing, skip performing image analysis
-        if (isCapturing) {
-            _uiState.update { it.copy(directive = DocumentDirective.Capturing) }
-            imageProxy.close()
-        } else if (isFocusing) {
-            _uiState.update {
-                it.copy(directive = DocumentDirective.Focusing, areEdgesDetected = false)
-            }
-            imageProxy.close()
-        } else if (elapsedTimeMs < ANALYSIS_SAMPLE_INTERVAL_MS || image == null) {
+        val enoughTimeHasPassed = elapsedTimeMs > ANALYSIS_SAMPLE_INTERVAL_MS
+
+        if (isCapturing || isFocusing || !enoughTimeHasPassed || image == null) {
             imageProxy.close()
             return
-        } else {
-            lastAnalysisTimeMs = System.currentTimeMillis()
-
-            // planes[0] is the Y plane aka "luma"
-            val data = imageProxy.planes[0].buffer.toByteArray()
-            val pixels = data.map { it.toInt() and 0xFF }
-            val luminance = pixels.average()
-
-            if (luminance < LUMINOSITY_THRESHOLD) {
-                _uiState.update {
-                    it.copy(directive = DocumentDirective.EnsureWellLit, areEdgesDetected = false)
-                }
-                imageProxy.close()
-            } else {
-                _uiState.update { it.copy(directive = DocumentDirective.DefaultInstructions) }
-                val rotation = imageProxy.imageInfo.rotationDegrees
-                val inputImage = InputImage.fromMediaImage(image, rotation)
-                objectDetector.process(inputImage)
-                    .addOnSuccessListener {
-                        if (it.isEmpty()) {
-                            resetBoundingBox()
-                        } else {
-                            val boundingBox = it.first().boundingBox
-                            Timber.v("Detected object: $boundingBox")
-                            val detectedAspectRatio =
-                                boundingBox.width().toFloat() / boundingBox.height()
-                            val expectedAspectRatio = knownAspectRatio ?: defaultAspectRatio
-                            // todo: ensure bounding box is in the center
-                            if (abs(detectedAspectRatio - expectedAspectRatio) < 0.1) {
-                                _uiState.update {
-                                    it.copy(
-                                        areEdgesDetected = true,
-                                        idAspectRatio = detectedAspectRatio,
-                                    )
-                                }
-                            } else {
-                                resetBoundingBox()
-                            }
-                        }
-                    }
-                    .addOnFailureListener {
-                        resetBoundingBox()
-                        Timber.e(it)
-                    }
-                    .addOnCompleteListener {
-                        imageProxy.close()
-                    }
-                return
-            }
         }
+        lastAnalysisTimeMs = System.currentTimeMillis()
+
+        val luminance = calculateLuminance(imageProxy)
+        if (luminance < LUMINANCE_THRESHOLD) {
+            _uiState.update {
+                it.copy(directive = DocumentDirective.EnsureWellLit, areEdgesDetected = false)
+            }
+            imageProxy.close()
+            return
+        }
+
+        _uiState.update { it.copy(directive = DocumentDirective.DefaultInstructions) }
+        val rotation = imageProxy.imageInfo.rotationDegrees
+        val inputImage = InputImage.fromMediaImage(image, rotation)
+        objectDetector.process(inputImage)
+            .addOnSuccessListener {
+                if (it.isEmpty()) {
+                    resetBoundingBox()
+                    return@addOnSuccessListener
+                }
+                val bBox = it.first().boundingBox
+
+                val isCentered = isBoundingBoxCentered(
+                    boundingBox = bBox,
+                    imageWidth = inputImage.width,
+                    imageHeight = inputImage.height,
+                )
+
+                val detectedAspectRatio = bBox.width().toFloat() / bBox.height()
+                val isCorrectAspectRatio = isCorrectAspectRatio(
+                    detectedAspectRatio = detectedAspectRatio,
+                )
+
+                _uiState.update {
+                    it.copy(
+                        areEdgesDetected = isCentered && isCorrectAspectRatio,
+                        idAspectRatio = knownAspectRatio ?: detectedAspectRatio,
+                    )
+                }
+            }
+            .addOnFailureListener {
+                Timber.e(it)
+                resetBoundingBox()
+            }
+            .addOnCompleteListener { imageProxy.close() }
     }
 
     private fun resetBoundingBox() {
         _uiState.update {
             it.copy(areEdgesDetected = false, idAspectRatio = defaultAspectRatio)
         }
+    }
+
+    private fun calculateLuminance(imageProxy: ImageProxy): Double {
+        // planes[0] is the Y plane aka "luma"
+        val data = imageProxy.planes[0].buffer.toByteArray()
+        val pixels = data.map { it.toInt() and 0xFF }
+        return pixels.average()
+    }
+
+    private fun isBoundingBoxCentered(
+        boundingBox: Rect,
+        imageWidth: Int,
+        imageHeight: Int,
+        tolerance: Int = CENTERED_BOUNDING_BOX_TOLERANCE,
+    ): Boolean {
+        // NB! The bounding box X dimension corresponds with the image *height* not width
+
+        // Sometimes, the bounding box is out of frame. This cannot be considered centered
+        // We check only left and right because the document should always fill the width but may
+        // not fill the height
+        if (boundingBox.left < tolerance || boundingBox.right > (imageHeight - tolerance)) {
+            return false
+        }
+
+        val imageCenterX = imageHeight / 2
+        val imageCenterY = imageWidth / 2
+
+        val deltaX = abs(imageCenterX - boundingBox.centerX())
+        val deltaY = abs(imageCenterY - boundingBox.centerY())
+
+        val isCenteredHorizontally = deltaX < tolerance
+        val isCenteredVertically = deltaY < tolerance
+
+        return isCenteredHorizontally && isCenteredVertically
+    }
+
+    private fun isCorrectAspectRatio(
+        detectedAspectRatio: Float,
+        tolerance: Float = CORRECT_ASPECT_RATIO_TOLERANCE,
+    ): Boolean {
+        val expectedAspectRatio = knownAspectRatio ?: detectedAspectRatio
+        return abs(detectedAspectRatio - expectedAspectRatio) < tolerance
     }
 }
