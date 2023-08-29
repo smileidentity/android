@@ -35,7 +35,7 @@ data class EnhancedKycResponse(
     @Json(name = "SmileJobID") val smileJobId: String,
     @Json(name = "PartnerParams") val partnerParams: PartnerParams,
     @Json(name = "ResultText") val resultText: String,
-    @Json(name = "ResultCode") val resultCode: Int,
+    @Json(name = "ResultCode") val resultCode: String,
     @Json(name = "Actions") val actions: Actions,
     @Json(name = "Country") val country: String,
     @Json(name = "IDType") val idType: String,

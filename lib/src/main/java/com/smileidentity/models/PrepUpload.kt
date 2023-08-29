@@ -26,7 +26,7 @@ data class PrepUploadRequest(
 
 @JsonClass(generateAdapter = true)
 data class PrepUploadResponse(
-    @Json(name = "code") val code: Int,
+    @Json(name = "code") val code: String,
     @Json(name = "ref_id") val refId: String,
     @Json(name = "upload_url") val uploadUrl: String,
     @Json(name = "smile_job_id") val smileJobId: String,

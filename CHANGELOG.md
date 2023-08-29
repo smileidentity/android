@@ -6,8 +6,10 @@
 - Added BVN Verification for Nigeria
 
 ### Fixed
+- Fix a Document Verification bug where selfie wasn't captured when also capturing the back of an ID
 
 ### Changed
+- `resultCode`s, `code`s, and `BankCode.code`s are all now `String`s in order to maintain leading 0s
 - Bump Compose BOM to 2023.08.00
 
 ### Removed

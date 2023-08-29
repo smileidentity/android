@@ -18,7 +18,7 @@ class SmileIDException(val details: Details) : Exception(details.message), Parce
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Details(
-        @Json(name = "code") val code: Int,
+        @Json(name = "code") val code: String,
         @Json(name = "error") val message: String,
     ) : Parcelable
 }
