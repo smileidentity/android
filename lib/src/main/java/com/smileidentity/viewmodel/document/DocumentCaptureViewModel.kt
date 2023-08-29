@@ -16,8 +16,10 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
+import com.smileidentity.util.BitmapUtils
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
+import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.toByteArray
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -35,6 +37,7 @@ private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
 private const val LUMINANCE_THRESHOLD = 35
 private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
 private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
+private const val DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS = 1_000L
 
 data class DocumentCaptureUiState(
     val acknowledgedInstructions: Boolean = false,
@@ -67,7 +70,9 @@ class DocumentCaptureViewModel(
     private var lastAnalysisTimeMs = 0L
     private var isCapturing = false
     private var isFocusing = false
-    private val defaultAspectRatio get() = knownAspectRatio ?: 1f
+    private var documentFirstDetectedTimeMs: Long? = null
+    private var captureNextAnalysisFrame = false
+    private val defaultAspectRatio = knownAspectRatio ?: 1f
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
@@ -76,6 +81,23 @@ class DocumentCaptureViewModel(
         viewModelScope.launch {
             delay(10.seconds)
             _uiState.update { it.copy(showManualCaptureButton = true) }
+        }
+
+        viewModelScope.launch {
+            uiState.collect {
+                if (it.areEdgesDetected) {
+                    documentFirstDetectedTimeMs?.let {
+                        if (System.currentTimeMillis() - it > DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS) {
+                            captureNextAnalysisFrame = true
+                        }
+                    }
+                    if (documentFirstDetectedTimeMs == null) {
+                        documentFirstDetectedTimeMs = System.currentTimeMillis()
+                    }
+                } else {
+                    documentFirstDetectedTimeMs = null
+                }
+            }
         }
     }
 
@@ -138,6 +160,7 @@ class DocumentCaptureViewModel(
         // It is safe to delete the file here, EVEN THOUGH it may have been selected from gallery
         // because the URI we get back from the PhotoPicker does not grant us write access
         uiState.value.documentImageToConfirm?.delete()
+        isCapturing = false
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -212,11 +235,34 @@ class DocumentCaptureViewModel(
                     1 / (knownAspectRatio ?: detectedAspectRatio)
                 }
 
+                val areEdgesDetected = isCentered && isCorrectAspectRatio
                 _uiState.update {
                     it.copy(
-                        areEdgesDetected = isCentered && isCorrectAspectRatio,
+                        areEdgesDetected = areEdgesDetected,
                         idAspectRatio = idAspectRatio,
                     )
+                }
+
+                if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing && !isFocusing) {
+                    _uiState.update { it.copy(showCaptureInProgress = true) }
+                    isCapturing = true
+                    captureNextAnalysisFrame = false
+
+                    // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap
+                    //  Incorporate once stable
+                    BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
+                        _uiState.update {
+                            it.copy(
+                                showCaptureInProgress = false,
+                                documentImageToConfirm = postProcessImageBitmap(
+                                    bitmap = bitmap,
+                                    file = createDocumentFile(),
+                                    processRotation = false,
+                                    desiredAspectRatio = uiState.value.idAspectRatio,
+                                ),
+                            )
+                        }
+                    }
                 }
             }
             .addOnFailureListener {
