@@ -5,7 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
-import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -165,7 +165,7 @@ internal fun DocumentCaptureScreen(
                 showCaptureInProgress = uiState.showCaptureInProgress,
                 showManualCaptureButton = uiState.showManualCaptureButton,
                 onCaptureClicked = viewModel::captureDocument,
-                imageAnalyzer = viewModel,
+                imageAnalyzer = viewModel::analyze,
                 onFocusEvent = viewModel::onFocusEvent,
                 modifier = modifier,
             )
@@ -182,7 +182,7 @@ private fun CaptureScreenContent(
     showCaptureInProgress: Boolean,
     showManualCaptureButton: Boolean,
     onCaptureClicked: (CameraState) -> Unit,
-    imageAnalyzer: ImageAnalysis.Analyzer,
+    imageAnalyzer: (ImageProxy, CameraState) -> Unit,
     onFocusEvent: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -203,7 +203,7 @@ private fun CaptureScreenContent(
                 scaleType = ScaleType.FillCenter,
                 isImageAnalysisEnabled = true,
                 imageAnalyzer = cameraState.rememberImageAnalyzer(
-                    analyze = imageAnalyzer,
+                    analyze = { imageAnalyzer(it, cameraState) },
                     // Guarantees only one image will be delivered for analysis at a time
                     imageAnalysisBackpressureStrategy = KeepOnlyLatest,
                 ),
@@ -291,7 +291,7 @@ private fun CaptureScreenContentPreview() {
             showCaptureInProgress = false,
             showManualCaptureButton = true,
             onCaptureClicked = {},
-            imageAnalyzer = {},
+            imageAnalyzer = { _, _ -> },
             onFocusEvent = {},
         )
     }

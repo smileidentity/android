@@ -2,9 +2,9 @@ package com.smileidentity.viewmodel.document
 
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
+import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_STARTED
@@ -16,10 +16,8 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
-import com.smileidentity.util.BitmapUtils
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
-import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.toByteArray
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -64,7 +62,7 @@ class DocumentCaptureViewModel(
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
             .build(),
     ),
-) : ViewModel(), ImageAnalysis.Analyzer {
+) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
     private var lastAnalysisTimeMs = 0L
@@ -184,8 +182,8 @@ class DocumentCaptureViewModel(
         }
     }
 
-    @ExperimentalGetImage
-    override fun analyze(imageProxy: ImageProxy) {
+    @OptIn(ExperimentalGetImage::class)
+    fun analyze(imageProxy: ImageProxy, cameraState: CameraState) {
         // YUV_420_888 is the format produced by CameraX
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val image = imageProxy.image
@@ -244,25 +242,8 @@ class DocumentCaptureViewModel(
                 }
 
                 if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing && !isFocusing) {
-                    _uiState.update { it.copy(showCaptureInProgress = true) }
-                    isCapturing = true
                     captureNextAnalysisFrame = false
-
-                    // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap
-                    //  Incorporate once stable
-                    BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
-                        _uiState.update {
-                            it.copy(
-                                showCaptureInProgress = false,
-                                documentImageToConfirm = postProcessImageBitmap(
-                                    bitmap = bitmap,
-                                    file = createDocumentFile(),
-                                    processRotation = false,
-                                    desiredAspectRatio = uiState.value.idAspectRatio,
-                                ),
-                            )
-                        }
-                    }
+                    captureDocument(cameraState)
                 }
             }
             .addOnFailureListener {

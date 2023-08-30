@@ -89,11 +89,9 @@ internal fun postProcessImageBitmap(
     maxOutputSize: Size? = null,
     desiredAspectRatio: Float? = null,
 ): File {
+    check(compressionQuality in 0..100) { "Compression quality must be between 0 and 100" }
     if (maxOutputSize != null && desiredAspectRatio != null) {
         throw IllegalArgumentException("Only one of maxOutputSize or desiredAspectRatio can be set")
-    }
-    if (compressionQuality < 0 || compressionQuality > 100) {
-        throw IllegalArgumentException("Compression quality must be between 0 and 100")
     }
     var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
@@ -147,7 +145,7 @@ internal fun postProcessImageBitmap(
             Timber.w("Image is wider than it is tall, so not cropping the height")
             mutableBitmap.height
         } else {
-            (mutableBitmap.width / it).toInt()
+            (mutableBitmap.width / it).toInt().coerceIn(0..mutableBitmap.height)
         }
     } ?: mutableBitmap.height
 

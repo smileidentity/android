@@ -1,9 +1,10 @@
 package com.smileidentity.viewmodel
 
-import android.annotation.SuppressLint
 import android.util.Size
+import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -83,7 +84,7 @@ class SelfieViewModel(
     private val _uiState = MutableStateFlow(SelfieUiState())
 
     // Debounce to avoid spamming SelfieDirective updates so that they can be read by the user
-    @OptIn(FlowPreview::class)
+    @kotlin.OptIn(FlowPreview::class)
     val uiState = _uiState.asStateFlow().debounce(UI_DEBOUNCE_DURATION).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
@@ -108,7 +109,7 @@ class SelfieViewModel(
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
-    @SuppressLint("UnsafeOptInUsageError")
+    @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
