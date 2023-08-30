@@ -85,7 +85,7 @@ internal fun ShowVerifyOtpScreen(
 
 @SmilePreviews
 @Composable
-internal fun ShowVerifyOtpScreenPreview() {
+private fun ShowVerifyOtpScreenPreview() {
     Preview {
         ShowVerifyOtpScreen()
     }

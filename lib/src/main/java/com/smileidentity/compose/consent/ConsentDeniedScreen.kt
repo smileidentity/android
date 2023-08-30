@@ -89,7 +89,7 @@ internal fun ConsentDeniedScreen(
 
 @SmilePreviews
 @Composable
-internal fun ConsentDeniedScreenPreview() {
+private fun ConsentDeniedScreenPreview() {
     Preview {
         ConsentDeniedScreen(
             onGoBack = {},

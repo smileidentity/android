@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +45,7 @@ internal fun BvnInputScreen(
     ),
 ) {
     val bvnNumberLength = 11
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -113,7 +114,7 @@ internal fun BvnInputScreen(
 
 @SmilePreviews
 @Composable
-internal fun BvnInputScreenPreview() {
+private fun BvnInputScreenPreview() {
     Preview {
         BvnInputScreen(cancelBvnVerification = {})
     }

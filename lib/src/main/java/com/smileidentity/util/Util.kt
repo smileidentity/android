@@ -37,6 +37,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
+import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.models.SmileIDException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
@@ -44,7 +45,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 
-internal fun createBvnOtpVerificationModes(maps: List<Map<String, String>>):
+internal fun createBvnOtpVerificationModes(maps: List<BvnVerificationMode>):
     List<BvnOtpVerificationMode> {
     val verificationModes = mutableListOf<BvnOtpVerificationMode>()
 

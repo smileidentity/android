@@ -65,7 +65,7 @@ internal fun ShowWrongOtpScreen(
 
 @SmilePreviews
 @Composable
-internal fun ShowWrongOtpScreenPreview() {
+private fun ShowWrongOtpScreenPreview() {
     Preview {
         ShowWrongOtpScreen()
     }

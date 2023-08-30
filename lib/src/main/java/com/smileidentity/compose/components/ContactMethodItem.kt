@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.smileidentity.R
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
@@ -46,6 +47,14 @@ internal fun ContactMethodItem(
 @Composable
 private fun ContactMethodItemPreview() {
     Preview {
-        // ContactMethodItem()
+        ContactMethodItem(
+            bvnOtpVerificationMode = BvnOtpVerificationMode(
+                mode = "sms",
+                otpSentBy = "07xxxxxxx74",
+                description = R.string.si_bvn_sms_verification,
+                icon = R.drawable.si_bvn_mode_sms,
+            ),
+            onItemSelected = {},
+        )
     }
 }

@@ -155,7 +155,7 @@ internal fun ContactMethod(
 
 @SmilePreviews
 @Composable
-internal fun ChooseOtpDeliveryScreenPreview() {
+private fun ChooseOtpDeliveryScreenPreview() {
     Preview {
         ChooseOtpDeliveryScreen()
     }

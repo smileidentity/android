@@ -80,7 +80,7 @@ internal class BvnConsentViewModel : ViewModel() {
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 userId = randomUserId(),
-                jobType = JobType.BVN, // TODO - What JobType?
+                jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val request = BvnToptRequest(
@@ -111,7 +111,7 @@ internal class BvnConsentViewModel : ViewModel() {
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 userId = randomUserId(),
-                jobType = JobType.BVN, // TODO - What JobType?
+                jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val request = BvnToptModeRequest(
@@ -147,7 +147,7 @@ internal class BvnConsentViewModel : ViewModel() {
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
                 userId = randomUserId(),
-                jobType = JobType.BVN, // TODO - What JobType?
+                jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val request = SubmitBvnToptRequest(

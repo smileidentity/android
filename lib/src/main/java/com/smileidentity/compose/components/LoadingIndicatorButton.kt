@@ -18,17 +18,16 @@ import com.smileidentity.compose.preview.SmilePreviews
 fun LoadingButton(
     buttonText: String,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     loading: Boolean = false,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
+        enabled = !loading,
     ) {
         Box {
-            if (enabled) {
+            if (!loading) {
                 Text(text = buttonText)
             }
             if (loading) {
@@ -46,7 +45,7 @@ fun LoadingButton(
 
 @SmilePreviews
 @Composable
-fun LoadingIndicatorButtonPreview() {
+private fun LoadingIndicatorButtonPreview() {
     LoadingButton(
         buttonText = "Continue",
         onClick = {},
