@@ -21,9 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.smileidentity.sample.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +39,8 @@ fun SmileConfigModalBottomSheet(
     dismissable: Boolean = true,
 ) {
     var configInput by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scanner = GmsBarcodeScanning.getClient(context)
 
     ModalBottomSheet(
         sheetState = rememberModalBottomSheetState(
@@ -52,6 +56,18 @@ fun SmileConfigModalBottomSheet(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    scanner.startScan()
+                        .addOnSuccessListener { barcode ->
+                            barcode.rawValue?.let { onSaveSmileConfig(it) }
+                        }
+                },
+            ) {
+                Text(text = stringResource(id = R.string.scan_qr_code))
+            }
+            Spacer(modifier = Modifier.size(16.dp))
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth(),

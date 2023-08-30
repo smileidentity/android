@@ -2,6 +2,8 @@ package com.smileidentity.sample
 
 import android.app.Application
 import android.content.Context
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.smileidentity.sample.repo.DataStoreRepository
 import timber.log.Timber
 
@@ -15,6 +17,19 @@ class SmileIDApplication : Application() {
         // *****Note to Partners*****
         // The line below is how you should initialize the SmileID SDK
         // SmileID.initialize(this)
+
+        // Initialize bar code scanner
+        initializeBarcodeScanner()
+    }
+
+    private fun initializeBarcodeScanner() {
+        GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_QR_CODE,
+                Barcode.FORMAT_AZTEC,
+            )
+            .enableAutoZoom()
+            .build()
     }
 
     companion object {
