@@ -1,7 +1,9 @@
 package com.smileidentity.sample.compose.components
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -40,7 +43,7 @@ fun SmileConfigModalBottomSheet(
 ) {
     var configInput by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val scanner = GmsBarcodeScanning.getClient(context)
+    val scanner = remember(context) { GmsBarcodeScanning.getClient(context) }
 
     ModalBottomSheet(
         sheetState = rememberModalBottomSheetState(
@@ -56,17 +59,6 @@ fun SmileConfigModalBottomSheet(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    scanner.startScan()
-                        .addOnSuccessListener { barcode ->
-                            barcode.rawValue?.let { onSaveSmileConfig(it) }
-                        }
-                },
-            ) {
-                Text(text = stringResource(id = R.string.scan_qr_code))
-            }
             Spacer(modifier = Modifier.size(16.dp))
             OutlinedTextField(
                 modifier = Modifier
@@ -89,11 +81,25 @@ fun SmileConfigModalBottomSheet(
                 textStyle = MaterialTheme.typography.bodySmall,
             )
             Spacer(modifier = Modifier.size(16.dp))
-            Button(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onSaveSmileConfig(configInput) },
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(stringResource(id = R.string.settings_update_smile_config))
+                OutlinedButton(
+                    onClick = {
+                        scanner.startScan()
+                            .addOnSuccessListener { barcode ->
+                                barcode.rawValue?.let { onSaveSmileConfig(it) }
+                            }
+                    },
+                ) {
+                    Text(text = stringResource(id = R.string.scan_qr_code))
+                }
+                Button(
+                    onClick = { onSaveSmileConfig(configInput) },
+                ) {
+                    Text(stringResource(id = R.string.settings_update_smile_config))
+                }
             }
         }
     }
