@@ -230,8 +230,12 @@ fun SmileID.BiometricKYC(
 }
 
 @Composable
-fun SmileID.BvnConsentScreen() {
+fun SmileID.BvnConsentScreen(
+    cancelBvnVerification: () -> Unit,
+) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedBvnConsentScreen()
+        OrchestratedBvnConsentScreen(
+            cancelBvnVerification = cancelBvnVerification,
+        )
     }
 }

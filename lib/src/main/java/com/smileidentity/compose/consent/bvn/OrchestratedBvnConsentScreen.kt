@@ -14,10 +14,11 @@ internal fun OrchestratedBvnConsentScreen(
             BvnConsentViewModel()
         },
     ),
+    cancelBvnVerification: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     when (uiState.bvnConsentScreens) {
-        BvnConsentScreens.BvnInputScreen -> BvnInputScreen(cancelBvnVerification = { /*TODO*/ })
+        BvnConsentScreens.BvnInputScreen -> BvnInputScreen(cancelBvnVerification)
         BvnConsentScreens.ChooseOtpDeliveryScreen -> ChooseOtpDeliveryScreen()
         BvnConsentScreens.ShowVerifyOtpScreen -> ShowVerifyOtpScreen()
         BvnConsentScreens.ShowWrongOtpScreen -> ShowWrongOtpScreen()

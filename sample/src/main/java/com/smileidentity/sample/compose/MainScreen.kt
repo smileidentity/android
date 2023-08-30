@@ -270,7 +270,12 @@ fun MainScreen(
                 }
                 composable(ProductScreen.BvnConsent.route) {
                     LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
-                    SmileID.BvnConsentScreen()
+                    SmileID.BvnConsentScreen {
+                        navController.popBackStack(
+                            route = BottomNavigationScreen.Home.route,
+                            inclusive = false,
+                        )
+                    }
                 }
             }
         },
