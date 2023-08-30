@@ -4,7 +4,7 @@
 
     <!--  Declared so Chucker can show a notification for network activity  -->
     <!--  Though declared, must be manually enabled  -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
             android:name=".SmileIDApplication"
@@ -14,6 +14,11 @@
             android:enableOnBackInvokedCallback="true"
             android:theme="@style/Theme.SmileID"
             tools:targetApi="33">
+
+        <meta-data
+                android:name="com.google.mlkit.vision.DEPENDENCIES"
+                android:value="barcode_ui" />
+
         <activity
                 android:name=".activity.MainActivity"
                 android:exported="true"
@@ -25,11 +30,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
                 android:name=".activity.JavaActivity"
                 android:label="Java Activity"
-                android:exported="true">
-        </activity>
+                android:exported="true" />
+
     </application>
 
 </manifest>

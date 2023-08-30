@@ -37,6 +37,7 @@ play-services-mlkit-face-detection = "17.1.0"
 retrofit = "2.9.0"
 sentry = "6.28.0"
 timber = "5.0.1"
+qr-code-scanner = "16.1.0"
 truth = "1.1.5"
 uiautomator = "2.3.0-alpha04"
 
@@ -99,5 +100,6 @@ retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", 
 sentry = { module = "io.sentry:sentry" }
 sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+qr-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "qr-code-scanner"}
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
