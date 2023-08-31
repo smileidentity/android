@@ -112,7 +112,6 @@ class DocumentVerificationFragment : Fragment() {
                 countryCode = args.countryCode,
                 documentType = args.documentType,
                 idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
-                captureBothSides = args.captureBothSides,
                 bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
@@ -143,10 +142,12 @@ private var Bundle.allowGalleryUpload: Boolean
     set(value) = putBoolean(KEY_ALLOW_GALLERY_UPLOAD, value)
 
 private const val KEY_COUNTRY_CODE = "countryCode"
-private const val KEY_DOCUMENT_TYPE = "documentType"
+
 private var Bundle.countryCode: String
     get() = getString(KEY_COUNTRY_CODE)!!
     set(value) = putString(KEY_COUNTRY_CODE, value)
+
+private const val KEY_DOCUMENT_TYPE = "documentType"
 
 private var Bundle.documentType: String
     get() = getString(KEY_DOCUMENT_TYPE)!!

@@ -150,7 +150,6 @@ fun SmileID.DocumentVerification(
     countryCode: String,
     documentType: String? = null,
     idAspectRatio: Float? = null,
-    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -171,7 +170,6 @@ fun SmileID.DocumentVerification(
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
-            captureBothSides = captureBothSides,
             bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
             onResult = onResult,
         )

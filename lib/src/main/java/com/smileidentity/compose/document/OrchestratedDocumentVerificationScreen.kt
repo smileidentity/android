@@ -29,7 +29,6 @@ internal fun OrchestratedDocumentVerificationScreen(
     countryCode: String,
     documentType: String? = null,
     idAspectRatio: Float? = null,
-    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -43,7 +42,6 @@ internal fun OrchestratedDocumentVerificationScreen(
                 jobId = jobId,
                 countryCode = countryCode,
                 documentType = documentType,
-                captureBothSides = captureBothSides,
                 selfieFile = bypassSelfieCaptureWithFile,
             )
         },

@@ -51,21 +51,6 @@ class DocumentSelectorViewModel : ViewModel() {
             }
         }
     }
-
-    fun documentHasBackSide(
-        country: String,
-        documentType: String?,
-    ) {
-        val proxy = { e: Throwable ->
-            Timber.e(e)
-            _uiState.update { it.copy(errorMessage = e.message) }
-        }
-
-        viewModelScope.launch(getExceptionHandler(proxy)) {
-            val response = SmileID.api.documentHasBackSide(country = country, idType = documentType)
-            _uiState.update { it.copy(hasBackSide = response.hasBackSide) }
-        }
-    }
 }
 
 val idTypeFriendlyNames = mapOf(

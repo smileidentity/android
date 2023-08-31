@@ -243,8 +243,7 @@ fun MainScreen(
                     }
                 }
                 composable(
-                    ProductScreen.DocumentVerification.route +
-                        "/{countryCode}/{idType}/{hasBackSide}",
+                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
@@ -256,7 +255,6 @@ fun MainScreen(
                         documentType = it.arguments?.getString("documentType"),
                         showInstructions = true,
                         allowGalleryUpload = true,
-                        captureBothSides = it.arguments?.getBoolean("hasBackSide")!!,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
                         navController.popBackStack(
