@@ -9,7 +9,7 @@ private const val NIGERIA = "NG"
 private const val NIGERIA_BVN = "BVN_MFA"
 
 @JsonClass(generateAdapter = true)
-data class BvnToptRequest(
+data class BvnTotpRequest(
     @Json(name = "country")
     val country: String = NIGERIA,
     @Json(name = "id_number")
@@ -30,7 +30,7 @@ data class BvnToptRequest(
 typealias BvnVerificationMode = Map<String, String>
 
 @JsonClass(generateAdapter = true)
-data class BvnToptResponse(
+data class BvnTotpResponse(
     @Json(name = "message")
     val message: String,
     @Json(name = "modes")
@@ -46,7 +46,7 @@ data class BvnToptResponse(
 )
 
 @JsonClass(generateAdapter = true)
-data class BvnToptModeRequest(
+data class BvnTotpModeRequest(
     @Json(name = "country")
     val country: String = NIGERIA,
     @Json(name = "id_number")
@@ -66,7 +66,7 @@ data class BvnToptModeRequest(
 )
 
 @JsonClass(generateAdapter = true)
-data class BvnToptModeResponse(
+data class BvnTotpModeResponse(
     @Json(name = "message")
     val message: String,
     @Json(name = "signature")
@@ -78,7 +78,7 @@ data class BvnToptModeResponse(
 )
 
 @JsonClass(generateAdapter = true)
-data class SubmitBvnToptRequest(
+data class SubmitBvnTotpRequest(
     @Json(name = "country")
     val country: String = NIGERIA,
     @Json(name = "id_number")
@@ -98,7 +98,7 @@ data class SubmitBvnToptRequest(
 )
 
 @JsonClass(generateAdapter = true)
-data class SubmitBvnToptResponse(
+data class SubmitBvnTotpResponse(
     @Json(name = "message")
     val message: String,
     @Json(name = "signature")

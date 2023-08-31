@@ -8,10 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.BvnToptModeRequest
-import com.smileidentity.models.BvnToptRequest
+import com.smileidentity.models.BvnTotpModeRequest
+import com.smileidentity.models.BvnTotpRequest
 import com.smileidentity.models.JobType
-import com.smileidentity.models.SubmitBvnToptRequest
+import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.util.createBvnOtpVerificationModes
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
@@ -83,12 +83,12 @@ internal class BvnConsentViewModel : ViewModel() {
                 jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
-            val request = BvnToptRequest(
+            val request = BvnTotpRequest(
                 idNumber = bvnNumber,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            val response = SmileID.api.requestBvnOtpMode(request = request)
+            val response = SmileID.api.requestBvnTotpMode(request = request)
             _uiState.update {
                 it.copy(
                     bvnConsentScreens = BvnConsentScreens.ChooseOtpDeliveryScreen,
@@ -114,7 +114,7 @@ internal class BvnConsentViewModel : ViewModel() {
                 jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
-            val request = BvnToptModeRequest(
+            val request = BvnTotpModeRequest(
                 idNumber = bvnNumber,
                 mode = otpSentBy,
                 sessionId = uiState.value.sessionId,
@@ -150,7 +150,7 @@ internal class BvnConsentViewModel : ViewModel() {
                 jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
-            val request = SubmitBvnToptRequest(
+            val request = SubmitBvnTotpRequest(
                 idNumber = bvnNumber,
                 otp = otp,
                 sessionId = uiState.value.sessionId,

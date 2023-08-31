@@ -2,12 +2,12 @@ package com.smileidentity.viewmodel
 
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationResponse
-import com.smileidentity.models.BvnToptModeResponse
-import com.smileidentity.models.BvnToptResponse
+import com.smileidentity.models.BvnTotpModeResponse
+import com.smileidentity.models.BvnTotpResponse
 import com.smileidentity.models.Config
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
-import com.smileidentity.models.SubmitBvnToptResponse
+import com.smileidentity.models.SubmitBvnTotpResponse
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ class BvnConsentViewModelTest {
             partnerParams = PartnerParams(jobType = JobType.BVN),
         )
 
-        coEvery { SmileID.api.requestBvnOtpMode(any()) } returns BvnToptResponse(
+        coEvery { SmileID.api.requestBvnTotpMode(any()) } returns BvnTotpResponse(
             message = "message",
             modes = listOf(),
             sessionId = "sessionId",
@@ -82,7 +82,7 @@ class BvnConsentViewModelTest {
             partnerParams = PartnerParams(jobType = JobType.BVN),
         )
 
-        coEvery { SmileID.api.requestBvnOtp(any()) } returns BvnToptModeResponse(
+        coEvery { SmileID.api.requestBvnOtp(any()) } returns BvnTotpModeResponse(
             message = "message",
             signature = "signature",
             success = true,
@@ -110,7 +110,7 @@ class BvnConsentViewModelTest {
             partnerParams = PartnerParams(jobType = JobType.BVN),
         )
 
-        coEvery { SmileID.api.submitBvnOtp(any()) } returns SubmitBvnToptResponse(
+        coEvery { SmileID.api.submitBvnOtp(any()) } returns SubmitBvnTotpResponse(
             message = "message",
             signature = "signature",
             success = true,
