@@ -225,7 +225,7 @@ fun MainScreen(
                                 id = com.smileidentity.R.drawable.si_logo_with_text,
                             ),
                             partnerName = "Smile ID",
-                            productName = it.idType,
+                            productName = it.idType!!,
                             partnerPrivacyPolicy = url,
                         ) { result ->
                             viewModel.onBiometricKycResult(userId, jobId, result)
@@ -235,10 +235,9 @@ fun MainScreen(
                 }
                 composable(ProductScreen.DocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    DocumentVerificationIdTypeSelector { country, idType, hasBackSide ->
+                    DocumentVerificationIdTypeSelector { country, idType ->
                         navController.navigate(
-                            route = ProductScreen.DocumentVerification.route +
-                                "/$country/$idType/$hasBackSide",
+                            route = ProductScreen.DocumentVerification.route + "/$country/$idType",
                         ) { popUpTo(ProductScreen.DocumentVerification.route) }
                     }
                 }

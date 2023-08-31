@@ -61,7 +61,7 @@ import timber.log.Timber
 fun DocumentVerificationIdTypeSelector(
     modifier: Modifier = Modifier,
     viewModel: DocumentSelectorViewModel = viewModel(),
-    onIdTypeSelected: (String, String?, Boolean) -> Unit,
+    onIdTypeSelected: (String, String?) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val context = LocalContext.current
@@ -203,13 +203,7 @@ fun DocumentVerificationIdTypeSelector(
             }
         }
         Button(
-            // onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType) },
-            onClick = {
-                viewModel.documentHasBackSide(
-                    country = selectedCountry!!,
-                    documentType = selectedIdType,
-                )
-            },
+            onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType) },
             enabled = isContinueEnabled,
             modifier = Modifier
                 .padding(16.dp)
@@ -226,7 +220,7 @@ fun DocumentVerificationIdTypeSelectorPreview() {
     SmileIDTheme {
         Surface {
             DocumentVerificationIdTypeSelector(
-                onIdTypeSelected = { _, _, _ -> },
+                onIdTypeSelected = { _, _ -> },
             )
         }
     }

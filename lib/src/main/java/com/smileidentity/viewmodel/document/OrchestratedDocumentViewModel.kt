@@ -7,7 +7,6 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
@@ -42,7 +41,8 @@ internal data class OrchestratedDocumentUiState(
 internal class OrchestratedDocumentViewModel(
     private val userId: String,
     private val jobId: String,
-    private val idType: Document,
+    private val countryCode: String,
+    private val documentType: String? = null,
     private val captureBothSides: Boolean = false,
     private var selfieFile: File? = null,
 ) : ViewModel() {
@@ -133,7 +133,7 @@ internal class OrchestratedDocumentViewModel(
                     backImageInfo,
                     selfieImageInfo,
                 ) + livenessImageInfo,
-                idInfo = IdInfo(idType.countryCode, idType.documentType),
+                idInfo = IdInfo(countryCode, documentType),
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
