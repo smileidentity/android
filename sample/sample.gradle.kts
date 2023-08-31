@@ -146,7 +146,7 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
 
-    implementation(libs.qr.code.scanner)
+    implementation(libs.mlkit.code.scanner )
 
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
