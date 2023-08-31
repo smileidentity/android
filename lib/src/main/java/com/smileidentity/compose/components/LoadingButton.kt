@@ -27,9 +27,6 @@ internal fun LoadingButton(
         enabled = !loading,
     ) {
         Box {
-            if (!loading) {
-                Text(text = buttonText)
-            }
             if (loading) {
                 CircularProgressIndicator(
                     color = colorResource(id = R.color.si_color_accent),
@@ -38,6 +35,8 @@ internal fun LoadingButton(
                         .size(15.dp)
                         .align(Alignment.Center),
                 )
+            } else {
+                Text(text = buttonText)
             }
         }
     }
