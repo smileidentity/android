@@ -1,12 +1,15 @@
 package com.smileidentity.sample.compose.components
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,10 +71,11 @@ fun SmileConfigModalBottomSheet(
         Column(
             Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Spacer(modifier = Modifier.size(16.dp))
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -92,14 +96,12 @@ fun SmileConfigModalBottomSheet(
                 maxLines = 12,
                 textStyle = MaterialTheme.typography.bodySmall,
             )
-            Spacer(modifier = Modifier.size(16.dp))
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onSaveSmileConfig(configInput) },
             ) {
                 Text(stringResource(id = R.string.settings_update_smile_config))
             }
-            Spacer(modifier = Modifier.size(16.dp))
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
