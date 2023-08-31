@@ -18,7 +18,7 @@
         <meta-data
                 android:name="com.google.mlkit.vision.DEPENDENCIES"
                 android:value="face,barcode_ui"
-                tools:replace="android:value"/>
+                tools:replace="android:value"/> <!-- Needed to override the metadata value from lib module -->
 
         <activity
                 android:name=".activity.MainActivity"

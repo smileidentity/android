@@ -29,6 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.smileidentity.sample.R
 
@@ -44,7 +46,16 @@ fun SmileConfigModalBottomSheet(
 ) {
     var configInput by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val scanner = remember(context) { GmsBarcodeScanning.getClient(context) }
+    val options = remember {
+        GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_QR_CODE,
+                Barcode.FORMAT_AZTEC,
+            )
+            .enableAutoZoom()
+            .build()
+    }
+    val scanner = remember(context) { GmsBarcodeScanning.getClient(context, options) }
 
     ModalBottomSheet(
         sheetState = rememberModalBottomSheetState(
