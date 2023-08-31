@@ -146,7 +146,6 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
 
-    // QR Scanner
     implementation(libs.qr.code.scanner)
 
     testImplementation(libs.junit)
