@@ -4,6 +4,7 @@
     <string name="sandbox">Sandbox</string>
     <string name="home">Home</string>
     <string name="back">Back</string>
+    <string name="scan_qr_code">Scan QR Code from Portal</string>
     <string name="test_our_products">Test Our Products</string>
     <string name="product_name_icon">%1$s icon</string>
     <string name="okay">Okay</string>
