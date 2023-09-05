@@ -26,12 +26,12 @@ internal fun LoadingButton(
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
+        enabled = enabled && !loading,
     ) {
         Box {
             if (loading) {
                 CircularProgressIndicator(
-                    color = colorResource(id = R.color.si_color_background_light),
+                    color = colorResource(id = R.color.si_color_accent),
                     strokeWidth = 2.dp,
                     modifier = Modifier
                         .size(15.dp)

@@ -14,7 +14,6 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.util.createBvnOtpVerificationModes
 import com.smileidentity.util.getExceptionHandler
-import com.smileidentity.util.randomUserId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -30,6 +29,8 @@ internal enum class BvnConsentScreens {
 
 internal data class BvnConsentUiState(
     val bvnConsentScreens: BvnConsentScreens = BvnConsentScreens.BvnInputScreen,
+    val isBvnValid: Boolean = false,
+    val isBvnOtpValid: Boolean = false,
     val sessionId: String = "",
     val showLoading: Boolean = false,
     val showError: Boolean = false,
@@ -38,7 +39,12 @@ internal data class BvnConsentUiState(
     val bvnVerificationModes: List<BvnOtpVerificationMode> = listOf(),
 )
 
-internal class BvnConsentViewModel : ViewModel() {
+const val bvnNumberLength = 11
+const val bvnOtpLength = 6
+
+internal class BvnConsentViewModel(
+    private val userId: String,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BvnConsentUiState())
     val uiState = _uiState.asStateFlow()
@@ -53,10 +59,12 @@ internal class BvnConsentViewModel : ViewModel() {
         private set
 
     internal fun updateBvnNumber(input: String) {
+        _uiState.update { it.copy(isBvnValid = input.length == bvnNumberLength) }
         bvnNumber = input
     }
 
     internal fun updateOtp(input: String) {
+        _uiState.update { it.copy(isBvnOtpValid = input.length == bvnOtpLength) }
         otp = input
     }
 
@@ -79,7 +87,7 @@ internal class BvnConsentViewModel : ViewModel() {
 
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
-                userId = randomUserId(),
+                userId = userId,
                 jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -110,7 +118,7 @@ internal class BvnConsentViewModel : ViewModel() {
 
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
-                userId = randomUserId(),
+                userId = userId,
                 jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -145,7 +153,7 @@ internal class BvnConsentViewModel : ViewModel() {
 
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
-                userId = randomUserId(),
+                userId = userId,
                 jobType = JobType.BVN,
             )
             val authResponse = SmileID.api.authenticate(authRequest)

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,15 +24,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 internal fun ShowWrongOtpScreen(
     modifier: Modifier = Modifier,
+    userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
-            BvnConsentViewModel()
+            BvnConsentViewModel(userId = userId)
         },
     ),
 ) {
@@ -53,7 +56,7 @@ internal fun ShowWrongOtpScreen(
         Text(
             text = stringResource(id = R.string.si_bvn_verification_different_contact_method),
             color = Color.Blue,
-            modifier = Modifier.clickable { viewModel.selectContactMethod() },
+            modifier = Modifier.clickable(onClick = viewModel::selectContactMethod),
         )
         Spacer(modifier = Modifier.height(32.dp))
         Image(

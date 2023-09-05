@@ -15,9 +15,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -36,24 +35,24 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
+import com.smileidentity.viewmodel.bvnNumberLength
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 internal fun BvnInputScreen(
     cancelBvnVerification: () -> Unit,
     modifier: Modifier = Modifier,
+    userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
-            BvnConsentViewModel()
+            BvnConsentViewModel(userId = userId)
         },
     ),
 ) {
-    val bvnNumberLength = 11
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val focusRequester = remember { FocusRequester() }
-    var bvnNumber by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -81,10 +80,7 @@ internal fun BvnInputScreen(
         OutlinedTextField(
             value = viewModel.bvnNumber,
             onValueChange = {
-                if (it.length <= bvnNumberLength) {
-                    bvnNumber = it
-                    viewModel.updateBvnNumber(it)
-                }
+                if (it.length <= bvnNumberLength) viewModel.updateBvnNumber(it)
             },
             isError = uiState.showError,
             singleLine = true,
@@ -97,9 +93,7 @@ internal fun BvnInputScreen(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    if (bvnNumber.length == bvnNumberLength) {
-                        viewModel.submitUserBvn()
-                    }
+                    if (uiState.isBvnValid) viewModel.submitUserBvn()
                 },
             ),
         )
@@ -126,8 +120,8 @@ internal fun BvnInputScreen(
         LoadingButton(
             buttonText = stringResource(id = R.string.si_continue),
             loading = uiState.showLoading,
-            enabled = bvnNumber.length == bvnNumberLength,
-            onClick = { viewModel.submitUserBvn() },
+            enabled = uiState.isBvnValid,
+            onClick = viewModel::submitUserBvn,
             modifier = Modifier
                 .testTag("bvn_submit_continue_button")
                 .fillMaxWidth(),

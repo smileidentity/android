@@ -229,15 +229,28 @@ fun SmileID.BiometricKYC(
     }
 }
 
+/**
+ * Perform BVN verification: Verify the BVN information of your user and confirm that the ID actually
+ * belongs to the user.
+ *
+ * [Docs](https://docs.usesmileid.com/integration-options/mobile/android/consent-screen#bvn-consent-screen)
+ *
+ * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
+ * to a unique User ID within your own system. If not provided, a random user ID will be generated
+ * @param cancelBvnVerification Callback to be invoked when the BVN verification job is cancelled.
+ * @param successfulBvnVerification Callback to be invoked when the BVN verification job is complete.
+ */
 @Composable
 fun SmileID.BvnConsentScreen(
     cancelBvnVerification: () -> Unit,
     successfulBvnVerification: () -> Unit,
+    userId: String = rememberSaveable { randomUserId() },
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
             cancelBvnVerification = cancelBvnVerification,
             successfulBvnVerification = successfulBvnVerification,
+            userId = userId,
         )
     }
 }

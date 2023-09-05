@@ -14,9 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -33,25 +31,24 @@ import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
+import com.smileidentity.viewmodel.bvnOtpLength
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 internal fun ShowVerifyOtpScreen(
     successfulBvnVerification: () -> Unit,
     modifier: Modifier = Modifier,
+    userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
-            BvnConsentViewModel()
+            BvnConsentViewModel(userId = userId)
         },
     ),
 ) {
-    val bvnOtpLength = 6
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-
-    var bvnTopt by remember { mutableStateOf("") }
-
-    if (uiState.showSuccess) successfulBvnVerification.invoke()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    if (uiState.showSuccess) successfulBvnVerification()
 
     BottomPinnedColumn(
         modifier = modifier
@@ -77,10 +74,7 @@ internal fun ShowVerifyOtpScreen(
                 value = viewModel.otp,
                 singleLine = true,
                 onValueChange = {
-                    if (it.length <= bvnOtpLength) {
-                        viewModel.updateOtp(it)
-                        bvnTopt = it
-                    }
+                    if (it.length <= bvnOtpLength) viewModel.updateOtp(it)
                 },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
@@ -88,9 +82,7 @@ internal fun ShowVerifyOtpScreen(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        if (bvnTopt.length == bvnOtpLength) {
-                            viewModel.submitBvnOtp()
-                        }
+                        if (uiState.isBvnOtpValid) viewModel.submitBvnOtp()
                     },
                 ),
             )
@@ -107,8 +99,8 @@ internal fun ShowVerifyOtpScreen(
             LoadingButton(
                 buttonText = stringResource(id = R.string.si_continue),
                 loading = uiState.showLoading,
-                enabled = bvnTopt.length == bvnOtpLength,
-                onClick = { viewModel.submitBvnOtp() },
+                enabled = uiState.isBvnOtpValid,
+                onClick = viewModel::submitBvnOtp,
                 modifier = Modifier
                     .testTag("show_verify_otp_continue_button")
                     .fillMaxWidth(),

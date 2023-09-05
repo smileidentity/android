@@ -43,6 +43,7 @@ import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.annotatedStringResource
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
@@ -56,15 +57,16 @@ internal data class BvnOtpVerificationMode(
 @Composable
 internal fun ChooseOtpDeliveryScreen(
     modifier: Modifier = Modifier,
+    userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
-            BvnConsentViewModel()
+            BvnConsentViewModel(userId = userId)
         },
     ),
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var canRequestBvnTopt by rememberSaveable { mutableStateOf(false) }
+    var canRequestBvnTotp by rememberSaveable { mutableStateOf(false) }
 
     BottomPinnedColumn(
         modifier = modifier
@@ -104,7 +106,7 @@ internal fun ChooseOtpDeliveryScreen(
                 selectedBvnOtpVerificationMode = uiState.selectedBvnOtpVerificationMode,
                 onClick = {
                     viewModel.updateMode(it)
-                    canRequestBvnTopt = true
+                    canRequestBvnTotp = true
                 },
             )
         },
@@ -112,8 +114,8 @@ internal fun ChooseOtpDeliveryScreen(
             LoadingButton(
                 buttonText = stringResource(id = R.string.si_continue),
                 loading = uiState.showLoading,
-                enabled = canRequestBvnTopt,
-                onClick = { viewModel.requestBvnOtp() },
+                enabled = canRequestBvnTotp,
+                onClick = viewModel::requestBvnOtp,
                 modifier = Modifier
                     .testTag("choose_otp_delivery_continue_button")
                     .fillMaxWidth(),
