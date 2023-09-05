@@ -7,3 +7,19 @@ updates:
       interval: "weekly"
       time: "10:00"
       timezone: "America/Los_Angeles"
+    groups:
+      # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#groups
+      # Group updates together, so that they are all applied in a single PR.
+      kotlin:
+        # KSP and Kotlin updates need to be applied simultaneously
+        patterns:
+          - "com.google.devtools.ksp"
+          - "org.jetbrains.kotlin.*"
+      all:
+        # Group all patch and minor updates together. Kotlin/KSP updates belong to the first group
+        # so they will not be updated as part of this group
+        update-types:
+          - "patch"
+          - "minor"
+        patterns:
+          - "*"
