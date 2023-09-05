@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
@@ -19,21 +20,23 @@ internal fun LoadingButton(
     buttonText: String,
     modifier: Modifier = Modifier,
     loading: Boolean = false,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        enabled = !loading,
+        enabled = enabled,
     ) {
         Box {
             if (loading) {
                 CircularProgressIndicator(
-                    color = colorResource(id = R.color.si_color_accent),
+                    color = colorResource(id = R.color.si_color_background_light),
                     strokeWidth = 2.dp,
                     modifier = Modifier
                         .size(15.dp)
-                        .align(Alignment.Center),
+                        .align(Alignment.Center)
+                        .testTag("circular_loading_indicator"),
                 )
             } else {
                 Text(text = buttonText)

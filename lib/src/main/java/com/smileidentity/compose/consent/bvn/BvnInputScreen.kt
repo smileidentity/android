@@ -6,14 +6,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -22,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,10 +55,12 @@ internal fun BvnInputScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
+    var bvnNumber by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .padding(24.dp),
     ) {
         Row(
@@ -73,13 +82,28 @@ internal fun BvnInputScreen(
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = viewModel.bvnNumber,
-            onValueChange = { if (it.length <= bvnNumberLength) viewModel.updateBvnNumber(it) },
+            onValueChange = {
+                if (it.length <= bvnNumberLength) {
+                    bvnNumber = it
+                    viewModel.updateBvnNumber(it)
+                }
+            },
             isError = uiState.showError,
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.NumberPassword,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (bvnNumber.length == bvnNumberLength) {
+                        viewModel.submitUserBvn()
+                    }
+                },
+            ),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
@@ -104,6 +128,7 @@ internal fun BvnInputScreen(
         LoadingButton(
             buttonText = stringResource(id = R.string.si_continue),
             loading = uiState.showLoading,
+            enabled = bvnNumber.length == bvnNumberLength,
             onClick = { viewModel.submitUserBvn() },
             modifier = Modifier
                 .testTag("bvn_submit_continue_button")

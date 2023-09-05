@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,8 +63,13 @@ internal fun ChooseOtpDeliveryScreen(
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    var canRequestBvnTopt by rememberSaveable { mutableStateOf(false) }
+
     BottomPinnedColumn(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
         scrollableContent = {
             Text(
                 text = stringResource(id = R.string.si_bvn_select_contact_method),
@@ -92,13 +102,17 @@ internal fun ChooseOtpDeliveryScreen(
             ContactMethod(
                 bvnVerificationMode = uiState.bvnVerificationModes,
                 selectedBvnOtpVerificationMode = uiState.selectedBvnOtpVerificationMode,
-                onClick = { viewModel.updateMode(it) },
+                onClick = {
+                    viewModel.updateMode(it)
+                    canRequestBvnTopt = true
+                },
             )
         },
         pinnedContent = {
             LoadingButton(
                 buttonText = stringResource(id = R.string.si_continue),
                 loading = uiState.showLoading,
+                enabled = canRequestBvnTopt,
                 onClick = { viewModel.requestBvnOtp() },
                 modifier = Modifier
                     .testTag("choose_otp_delivery_continue_button")

@@ -126,7 +126,6 @@ internal class BvnConsentViewModel : ViewModel() {
                 it.copy(
                     bvnConsentScreens = BvnConsentScreens.ShowVerifyOtpScreen,
                     showLoading = false,
-                    showSuccess = response.success,
                 )
             }
         }

@@ -9,18 +9,19 @@ import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 internal fun OrchestratedBvnConsentScreen(
+    cancelBvnVerification: () -> Unit,
+    successfulBvnVerification: () -> Unit,
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel()
         },
     ),
-    cancelBvnVerification: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     when (uiState.bvnConsentScreens) {
         BvnConsentScreens.BvnInputScreen -> BvnInputScreen(cancelBvnVerification)
         BvnConsentScreens.ChooseOtpDeliveryScreen -> ChooseOtpDeliveryScreen()
-        BvnConsentScreens.ShowVerifyOtpScreen -> ShowVerifyOtpScreen()
+        BvnConsentScreens.ShowVerifyOtpScreen -> ShowVerifyOtpScreen(successfulBvnVerification)
         BvnConsentScreens.ShowWrongOtpScreen -> ShowWrongOtpScreen()
     }
 }
