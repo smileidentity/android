@@ -42,7 +42,6 @@ import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 internal fun BvnInputScreen(
-    cancelBvnVerification: () -> Unit,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
@@ -133,6 +132,6 @@ internal fun BvnInputScreen(
 @Composable
 private fun BvnInputScreenPreview() {
     Preview {
-        BvnInputScreen(cancelBvnVerification = {})
+        BvnInputScreen()
     }
 }

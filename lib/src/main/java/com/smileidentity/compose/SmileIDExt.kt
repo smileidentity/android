@@ -237,18 +237,15 @@ fun SmileID.BiometricKYC(
  *
  * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
- * @param cancelBvnVerification Callback to be invoked when the BVN verification job is cancelled.
  * @param successfulBvnVerification Callback to be invoked when the BVN verification job is complete.
  */
 @Composable
 fun SmileID.BvnConsentScreen(
-    cancelBvnVerification: () -> Unit,
     successfulBvnVerification: () -> Unit,
     userId: String = rememberSaveable { randomUserId() },
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
-            cancelBvnVerification = cancelBvnVerification,
             successfulBvnVerification = successfulBvnVerification,
             userId = userId,
         )
