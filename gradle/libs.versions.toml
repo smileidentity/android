@@ -28,10 +28,11 @@ ksp = "1.9.10-1.0.13"
 ktlint-plugin = "11.5.1"
 leakcanary = "2.12"
 maven-publish = "0.25.3"
+mlkit-code-scanner = "16.1.0"
 mlkit-object-detection = "17.0.0"
 mockk = "1.13.7"
 moshi = "1.15.0"
-moshix = "0.24.0"
+moshix = "0.24.2"
 moshi-lazy-adapters = "2.2"
 okhttp = "4.11.0"
 play-services-mlkit-face-detection = "17.1.0"
@@ -86,6 +87,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-immutable-collections" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 leakcanary-noop = { module = "com.squareup.leakcanary:leakcanary-android-release", version.ref = "leakcanary" }
+mlkit-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "mlkit-code-scanner"}
 mlkit-object-detection = { module = "com.google.mlkit:object-detection", version.ref = "mlkit-object-detection" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
