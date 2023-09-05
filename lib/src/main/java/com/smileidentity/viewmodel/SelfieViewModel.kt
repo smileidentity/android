@@ -1,9 +1,10 @@
 package com.smileidentity.viewmodel
 
-import android.annotation.SuppressLint
 import android.util.Size
+import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -57,14 +58,14 @@ const val MAX_FACE_AREA_THRESHOLD = 0.25f
 private const val SMILE_THRESHOLD = 0.8f
 
 data class SelfieUiState(
-    val currentDirective: Directive = Directive.InitialInstruction,
+    val directive: SelfieDirective = SelfieDirective.InitialInstruction,
     val progress: Float = 0f,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
     @StringRes val errorMessage: Int? = null,
 )
 
-enum class Directive(@StringRes val displayText: Int) {
+enum class SelfieDirective(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),
     Capturing(R.string.si_smart_selfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smart_selfie_directive_unable_to_detect_face),
@@ -82,8 +83,8 @@ class SelfieViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
 
-    // Debounce to avoid spamming Directive updates so that they can be read by the user
-    @OptIn(FlowPreview::class)
+    // Debounce to avoid spamming SelfieDirective updates so that they can be read by the user
+    @kotlin.OptIn(FlowPreview::class)
     val uiState = _uiState.asStateFlow().debounce(UI_DEBOUNCE_DURATION).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
@@ -108,7 +109,7 @@ class SelfieViewModel(
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
-    @SuppressLint("UnsafeOptInUsageError")
+    @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
@@ -120,7 +121,7 @@ class SelfieViewModel(
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
             if (faces.isEmpty()) {
-                _uiState.update { it.copy(currentDirective = Directive.EnsureFaceInFrame) }
+                _uiState.update { it.copy(directive = SelfieDirective.EnsureFaceInFrame) }
                 // If no faces are detected for a while, reset the state
                 if (elapsedTimeMs > NO_FACE_RESET_DELAY_MS) {
                     _uiState.update {
@@ -140,7 +141,7 @@ class SelfieViewModel(
 
             // Ensure only 1 face is in frame
             if (faces.size > 1) {
-                _uiState.update { it.copy(currentDirective = Directive.EnsureOnlyOneFace) }
+                _uiState.update { it.copy(directive = SelfieDirective.EnsureOnlyOneFace) }
                 return@addOnSuccessListener
             }
 
@@ -152,31 +153,31 @@ class SelfieViewModel(
                 face.boundingBox.top >= 0 &&
                 face.boundingBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
-                _uiState.update { it.copy(currentDirective = Directive.EnsureFaceInFrame) }
+                _uiState.update { it.copy(directive = SelfieDirective.EnsureFaceInFrame) }
                 return@addOnSuccessListener
             }
 
             // Check that the face is close enough to the camera
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
             if (faceFillRatio < MIN_FACE_AREA_THRESHOLD) {
-                _uiState.update { it.copy(currentDirective = Directive.MoveCloser) }
+                _uiState.update { it.copy(directive = SelfieDirective.MoveCloser) }
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
             if (faceFillRatio > MAX_FACE_AREA_THRESHOLD) {
-                _uiState.update { it.copy(currentDirective = Directive.MoveAway) }
+                _uiState.update { it.copy(directive = SelfieDirective.MoveAway) }
                 return@addOnSuccessListener
             }
 
             // Ask the user to start smiling partway through liveness images
             val isSmiling = (face.smilingProbability ?: 0f) > SMILE_THRESHOLD
             if (livenessFiles.size > NUM_LIVENESS_IMAGES / 2 && !isSmiling) {
-                _uiState.update { it.copy(currentDirective = Directive.Smile) }
+                _uiState.update { it.copy(directive = SelfieDirective.Smile) }
                 return@addOnSuccessListener
             }
 
-            _uiState.update { it.copy(currentDirective = Directive.Capturing) }
+            _uiState.update { it.copy(directive = SelfieDirective.Capturing) }
 
             // Perform the rotation checks *after* changing directive to Capturing -- we don't want
             // to explicitly tell the user to move their head

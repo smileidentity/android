@@ -54,7 +54,12 @@ fun File.asLivenessImage() = UploadImageInfo(
     image = this,
 )
 
-fun File.asDocumentImage() = UploadImageInfo(
+fun File.asDocumentFrontImage() = UploadImageInfo(
     imageTypeId = ImageType.IdCardJpgFile,
+    image = this,
+)
+
+fun File.asDocumentBackImage() = UploadImageInfo(
+    imageTypeId = ImageType.IdCardRearJpgFile,
     image = this,
 )

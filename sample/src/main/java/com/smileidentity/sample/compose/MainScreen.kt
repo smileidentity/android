@@ -259,6 +259,7 @@ fun MainScreen(
                         idType = documentType,
                         showInstructions = true,
                         allowGalleryUpload = true,
+                        captureBothSides = true,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
                         navController.popBackStack(

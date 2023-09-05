@@ -72,7 +72,7 @@ class DocumentVerificationFragment : Fragment() {
             showAttribution: Boolean = true,
             allowGalleryUpload: Boolean = false,
             idType: Document,
-            idAspectRatio: Float? = idType.aspectRatio,
+            idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
         ) = DocumentVerificationFragment().apply {
@@ -82,7 +82,7 @@ class DocumentVerificationFragment : Fragment() {
                 this.showAttribution = showAttribution
                 this.allowGalleryUpload = allowGalleryUpload
                 this.idType = idType
-                this.idAspectRatio = idAspectRatio
+                this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
             }
@@ -102,13 +102,14 @@ class DocumentVerificationFragment : Fragment() {
         setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
         val args = requireArguments()
         setContent {
+            val aspectRatio = args.idAspectRatio
             SmileID.DocumentVerification(
                 userId = args.userId,
                 jobId = args.jobId,
                 showAttribution = args.showAttribution,
                 allowGalleryUpload = args.allowGalleryUpload,
                 idType = args.idType,
-                idAspectRatio = args.idAspectRatio,
+                idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
                 captureBothSides = args.captureBothSides,
                 bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
                 onResult = {
@@ -145,9 +146,10 @@ private var Bundle.idType: Document
     set(value) = putParcelable(KEY_ID_TYPE, value)
 
 private const val KEY_ID_ASPECT_RATIO = "idAspectRatio"
-private var Bundle.idAspectRatio: Float?
+
+private var Bundle.idAspectRatio: Float
     get() = getFloat(KEY_ID_ASPECT_RATIO)
-    set(value) = putFloat(KEY_ID_ASPECT_RATIO, value ?: -1f)
+    set(value) = putFloat(KEY_ID_ASPECT_RATIO, value)
 
 private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean

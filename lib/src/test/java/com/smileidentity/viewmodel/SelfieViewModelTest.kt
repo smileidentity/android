@@ -34,7 +34,7 @@ class SelfieViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(Directive.InitialInstruction, uiState.currentDirective)
+        assertEquals(SelfieDirective.InitialInstruction, uiState.directive)
         assertEquals(0f, uiState.progress)
         assertEquals(null, uiState.selfieToConfirm)
         assertEquals(null, uiState.processingState)

@@ -17,20 +17,12 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.Annotation
-import android.text.SpannedString
 import android.util.Size
 import android.widget.Toast
 import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.impl.utils.Exif
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.core.graphics.scale
-import androidx.core.text.getSpans
-import androidx.exifinterface.media.ExifInterface
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
@@ -41,31 +33,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.io.Serializable
-
-@Composable
-internal fun annotatedStringResource(
-    @StringRes id: Int,
-    vararg formatArgs: Any,
-    spanStyles: (Annotation) -> SpanStyle? = { null },
-): AnnotatedString {
-    // Using resources.getText() instead of stringResource() in order to preserve Spans
-    val resources = LocalContext.current.resources
-    val spannedString = SpanFormatter.format(SpannedString(resources.getText(id)), *formatArgs)
-    val resultBuilder = AnnotatedString.Builder()
-    resultBuilder.append(spannedString.toString())
-    spannedString.getSpans<Annotation>().forEach { annotation ->
-        val spanStart = spannedString.getSpanStart(annotation)
-        val spanEnd = spannedString.getSpanEnd(annotation)
-        resultBuilder.addStringAnnotation(
-            tag = annotation.key,
-            annotation = annotation.value,
-            start = spanStart,
-            end = spanEnd,
-        )
-        spanStyles(annotation)?.let { resultBuilder.addStyle(it, spanStart, spanEnd) }
-    }
-    return resultBuilder.toAnnotatedString()
-}
+import java.nio.ByteBuffer
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -83,7 +51,7 @@ internal val InputImage.area get() = height * width
  * @param width Minimum width of the image
  * @param height Minimum height of the image
  */
-fun isImageAtLeast(
+internal fun isImageAtLeast(
     context: Context,
     uri: Uri?,
     width: Int? = 1920,
@@ -98,6 +66,11 @@ fun isImageAtLeast(
     val imageWidth = options.outWidth
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
 }
+
+internal fun isValidDocumentImage(
+    context: Context,
+    uri: Uri?,
+) = isImageAtLeast(context, uri, width = 1920, height = 1080)
 
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
@@ -116,11 +89,9 @@ internal fun postProcessImageBitmap(
     maxOutputSize: Size? = null,
     desiredAspectRatio: Float? = null,
 ): File {
+    check(compressionQuality in 0..100) { "Compression quality must be between 0 and 100" }
     if (maxOutputSize != null && desiredAspectRatio != null) {
         throw IllegalArgumentException("Only one of maxOutputSize or desiredAspectRatio can be set")
-    }
-    if (compressionQuality < 0 || compressionQuality > 100) {
-        throw IllegalArgumentException("Compression quality must be between 0 and 100")
     }
     var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     if (saveAsGrayscale) {
@@ -132,14 +103,12 @@ internal fun postProcessImageBitmap(
 
     if (processRotation) {
         val exif = Exif.createFromFile(file)
-        val degrees = when (exif.orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> 90F
-            ExifInterface.ORIENTATION_ROTATE_180 -> 180F
-            ExifInterface.ORIENTATION_ROTATE_270 -> 270F
-            else -> 0f
+        val degrees = exif.rotation.toFloat()
+        val scale = if (exif.isFlippedHorizontally) -1F else 1F
+        val matrix = Matrix().apply {
+            postScale(scale, 1F)
+            postRotate(degrees)
         }
-
-        val matrix = Matrix().apply { postRotate(degrees) }
         mutableBitmap = Bitmap.createBitmap(
             mutableBitmap,
             0,
@@ -176,7 +145,7 @@ internal fun postProcessImageBitmap(
             Timber.w("Image is wider than it is tall, so not cropping the height")
             mutableBitmap.height
         } else {
-            (mutableBitmap.width / it).toInt()
+            (mutableBitmap.width / it).toInt().coerceIn(0..mutableBitmap.height)
         }
     } ?: mutableBitmap.height
 
@@ -380,4 +349,11 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
+}
+
+internal fun ByteBuffer.toByteArray(): ByteArray {
+    rewind()
+    val data = ByteArray(remaining())
+    get(data)
+    return data
 }
