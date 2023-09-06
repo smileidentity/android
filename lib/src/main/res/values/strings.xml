@@ -140,9 +140,7 @@
     <string name="si_bvn_verification_didnt_receive_otp">Didn\'t receive the OTP?</string>
     <string name="si_bvn_verification_different_contact_method">Try another contact method</string>
     <string name="si_bvn_verification_invalid_otp">OTP entered is invalid</string>
-    <string name="si_bvn_verification_didnt_receive_otp_at">Didn\'t receive the OTP at %1$s</string>
-    <string name="si_bvn_verification_if_didnt_receive_otp">If you didn\'t receive the OTP:</string>
-    <string name="si_bvn_verification_otp_expired">Your OTP has expired</string>
+    <string name="si_bvn_verification_didnt_receive_otp_at">Didn\'t receive the OTP at %1$s ?</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>

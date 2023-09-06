@@ -24,7 +24,6 @@ internal enum class BvnConsentScreens {
     BvnInputScreen,
     ChooseOtpDeliveryScreen,
     ShowVerifyOtpScreen,
-    ShowWrongOtpScreen,
 }
 
 internal data class BvnConsentUiState(
@@ -71,11 +70,16 @@ internal class BvnConsentViewModel(
     internal fun updateMode(input: BvnOtpVerificationMode) {
         _uiState.update { it.copy(selectedBvnOtpVerificationMode = input) }
         otpSentBy = input.otpSentBy
+        otp = ""
     }
 
     internal fun selectContactMethod() {
-        _uiState.update { it.copy(bvnConsentScreens = BvnConsentScreens.ChooseOtpDeliveryScreen) }
-        otp = ""
+        _uiState.update {
+            it.copy(
+                bvnConsentScreens = BvnConsentScreens.ChooseOtpDeliveryScreen,
+                showError = false,
+            )
+        }
     }
 
     internal fun submitUserBvn() {
@@ -144,10 +148,7 @@ internal class BvnConsentViewModel(
         val proxy = { e: Throwable ->
             Timber.e(e)
             _uiState.update {
-                it.copy(
-                    showLoading = false,
-                    bvnConsentScreens = BvnConsentScreens.ShowWrongOtpScreen,
-                )
+                it.copy(showLoading = false, showError = true)
             }
         }
 

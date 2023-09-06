@@ -25,6 +25,5 @@ internal fun OrchestratedBvnConsentScreen(
         BvnConsentScreens.BvnInputScreen -> BvnInputScreen()
         BvnConsentScreens.ChooseOtpDeliveryScreen -> ChooseOtpDeliveryScreen()
         BvnConsentScreens.ShowVerifyOtpScreen -> ShowVerifyOtpScreen(successfulBvnVerification)
-        BvnConsentScreens.ShowWrongOtpScreen -> ShowWrongOtpScreen()
     }
 }

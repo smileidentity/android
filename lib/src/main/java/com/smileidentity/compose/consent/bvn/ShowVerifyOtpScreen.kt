@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -63,15 +64,25 @@ internal fun ShowVerifyOtpScreen(
                 fontWeight = FontWeight.ExtraBold,
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = stringResource(
-                    id = R.string.si_bvn_verification_enter_otp,
-                    uiState.selectedBvnOtpVerificationMode?.mode ?: "",
-                ),
-            )
+            if (uiState.showError) {
+                Text(
+                    text = stringResource(R.string.si_bvn_verification_invalid_otp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = colorResource(R.color.si_color_error),
+                )
+            } else {
+                Text(
+                    text = stringResource(
+                        id = R.string.si_bvn_verification_enter_otp,
+                        uiState.selectedBvnOtpVerificationMode?.mode ?: "",
+                    ),
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
                 value = viewModel.otp,
+                isError = uiState.showError,
                 singleLine = true,
                 onValueChange = {
                     if (it.length <= bvnOtpLength) viewModel.updateOtp(it)
@@ -87,12 +98,22 @@ internal fun ShowVerifyOtpScreen(
                 ),
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Text(text = stringResource(id = R.string.si_bvn_verification_didnt_receive_otp))
+            if (uiState.showError) {
+                Text(
+                    text = stringResource(
+                        id = R.string.si_bvn_verification_didnt_receive_otp_at,
+                        uiState.selectedBvnOtpVerificationMode?.mode ?: "",
+                    ),
+                    textAlign = TextAlign.Center,
+                )
+            } else {
+                Text(text = stringResource(id = R.string.si_bvn_verification_didnt_receive_otp))
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(id = R.string.si_bvn_verification_different_contact_method),
                 color = Color.Blue,
-                modifier = Modifier.clickable { viewModel.selectContactMethod() },
+                modifier = Modifier.clickable(onClick = viewModel::selectContactMethod),
             )
         },
         pinnedContent = {
