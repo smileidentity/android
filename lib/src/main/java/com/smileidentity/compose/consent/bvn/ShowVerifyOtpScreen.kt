@@ -34,7 +34,6 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
-import com.smileidentity.viewmodel.bvnOtpLength
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
@@ -84,17 +83,13 @@ internal fun ShowVerifyOtpScreen(
                 value = viewModel.otp,
                 isError = uiState.showError,
                 singleLine = true,
-                onValueChange = {
-                    if (it.length <= bvnOtpLength) viewModel.updateOtp(it)
-                },
+                onValueChange = viewModel::updateOtp,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.NumberPassword,
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (uiState.isBvnOtpValid) viewModel.submitBvnOtp()
-                    },
+                    onDone = { viewModel.submitBvnOtp() },
                 ),
             )
             Spacer(modifier = Modifier.height(32.dp))

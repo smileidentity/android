@@ -37,7 +37,6 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
-import com.smileidentity.viewmodel.bvnNumberLength
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
@@ -78,9 +77,7 @@ internal fun BvnInputScreen(
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = viewModel.bvnNumber,
-            onValueChange = {
-                if (it.length <= bvnNumberLength) viewModel.updateBvnNumber(it)
-            },
+            onValueChange = viewModel::updateBvnNumber,
             isError = uiState.showError,
             singleLine = true,
             modifier = Modifier
@@ -91,9 +88,7 @@ internal fun BvnInputScreen(
                 keyboardType = KeyboardType.NumberPassword,
             ),
             keyboardActions = KeyboardActions(
-                onDone = {
-                    if (uiState.isBvnValid) viewModel.submitUserBvn()
-                },
+                onDone = { viewModel.submitUserBvn() },
             ),
         )
         Spacer(modifier = Modifier.height(16.dp))

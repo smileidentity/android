@@ -270,14 +270,12 @@ fun MainScreen(
                 }
                 composable(ProductScreen.BvnConsent.route) {
                     LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
-                    SmileID.BvnConsentScreen(
-                        successfulBvnVerification = {
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        },
-                    )
+                    SmileID.BvnConsentScreen {
+                        navController.popBackStack(
+                            route = BottomNavigationScreen.Home.route,
+                            inclusive = false,
+                        )
+                    }
                 }
             }
         },

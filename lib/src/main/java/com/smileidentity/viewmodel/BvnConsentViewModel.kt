@@ -58,13 +58,17 @@ internal class BvnConsentViewModel(
         private set
 
     internal fun updateBvnNumber(input: String) {
-        _uiState.update { it.copy(isBvnValid = input.length == bvnNumberLength) }
-        bvnNumber = input
+        if (input.length <= bvnNumberLength) {
+            _uiState.update { it.copy(isBvnValid = input.length == bvnNumberLength) }
+            bvnNumber = input
+        }
     }
 
     internal fun updateOtp(input: String) {
-        _uiState.update { it.copy(isBvnOtpValid = input.length == bvnOtpLength) }
-        otp = input
+        if (input.length <= bvnOtpLength) {
+            _uiState.update { it.copy(isBvnOtpValid = input.length == bvnOtpLength) }
+            otp = input
+        }
     }
 
     internal fun updateMode(input: BvnOtpVerificationMode) {
@@ -83,6 +87,10 @@ internal class BvnConsentViewModel(
     }
 
     internal fun submitUserBvn() {
+        if (bvnNumber.length != bvnNumberLength) {
+            return
+        }
+
         _uiState.update { it.copy(showLoading = true) }
         val proxy = { e: Throwable ->
             Timber.e(e)
@@ -144,6 +152,10 @@ internal class BvnConsentViewModel(
     }
 
     internal fun submitBvnOtp() {
+        if (otp.length == bvnOtpLength) {
+            return
+        }
+
         _uiState.update { it.copy(showLoading = true) }
         val proxy = { e: Throwable ->
             Timber.e(e)
