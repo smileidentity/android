@@ -60,7 +60,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(it.first)) },
                 leadingContent = { Icon(it.second, null) },
                 trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable { it.third() },
+                modifier = Modifier.clickable(onClick = it.third),
             )
             Divider()
         }

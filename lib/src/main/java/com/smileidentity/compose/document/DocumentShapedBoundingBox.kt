@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.Dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
-const val DEFAULT_DOCUMENT_ASPECT_RATIO = 3.56f
-const val DOCUMENT_BOUNDING_BOX_MARGINS = 30f
+const val DOCUMENT_BOUNDING_BOX_MARGINS = 64f
 val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
 
 /**
@@ -25,18 +24,18 @@ val DOCUMENT_BOUNDING_BOX_RADIUS = CornerRadius(30f, 30f)
  * has an outline which changes color depending on edge detection algorithm
  *
  * @param aspectRatio The aspect ratio of the document, used to calculate the height of the view.
- * @param modifier The modifier to be applied to the indicator.
- * @param strokeWidth The width of the progress indicator stroke.
  * @param areEdgesDetected A boolean flag that is updated when document edges are within bounding
  * box edges
+ * @param modifier The modifier to be applied to the indicator.
+ * @param strokeWidth The width of the progress indicator stroke.
  * @param backgroundColor The color of the background that is drawn around the document shape.
  */
 @Composable
 fun DocumentShapedBoundingBox(
-    aspectRatio: Float?,
+    aspectRatio: Float,
+    areEdgesDetected: Boolean,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
-    areEdgesDetected: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
 ) {
     val strokeColor = if (areEdgesDetected) MaterialTheme.colorScheme.tertiary else Color.Gray
@@ -50,9 +49,18 @@ fun DocumentShapedBoundingBox(
 
         // 2. Draw the outline of the bounding box and add a stroke that shows different edge
         // detection states
-        val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
-        val outlineBoundingBoxHeight =
-            outlineBoundingBoxWidth / (aspectRatio ?: DEFAULT_DOCUMENT_ASPECT_RATIO)
+
+        val (outlineBoundingBoxWidth, outlineBoundingBoxHeight) = if (aspectRatio >= 1) {
+            // Horizontal ID
+            val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
+            val outlineBoundingBoxHeight = outlineBoundingBoxWidth / aspectRatio
+            outlineBoundingBoxWidth to outlineBoundingBoxHeight
+        } else {
+            // Vertical ID
+            val outlineBoundingBoxHeight = size.height - DOCUMENT_BOUNDING_BOX_MARGINS
+            val outlineBoundingBoxWidth = outlineBoundingBoxHeight * aspectRatio
+            outlineBoundingBoxWidth to outlineBoundingBoxHeight
+        }
         val outlineBoundingBoxX = (size.width - outlineBoundingBoxWidth) / 2
         val outlineBoundingBoxY = (size.height - outlineBoundingBoxHeight) / 2
         drawRoundRect(
@@ -71,14 +79,17 @@ fun DocumentShapedBoundingBox(
             color = Color.Transparent,
             blendMode = BlendMode.Clear,
             topLeft = Offset(
-                x = outlineBoundingBoxX,
+                x = outlineBoundingBoxX + (strokeWidth.toPx() / 2),
                 y = outlineBoundingBoxY + (strokeWidth.toPx() / 2),
             ),
             size = Size(
                 width = (outlineBoundingBoxWidth - strokeWidth.toPx()),
                 height = (outlineBoundingBoxHeight - strokeWidth.toPx()),
             ),
-            cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS,
+            cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS - CornerRadius(
+                strokeWidth.value,
+                strokeWidth.value,
+            ),
         )
     }
 }
@@ -87,6 +98,9 @@ fun DocumentShapedBoundingBox(
 @Composable
 private fun DocumentShapedBoundingBoxPreview() {
     Preview {
-        DocumentShapedBoundingBox(aspectRatio = 16f / 9f)
+        DocumentShapedBoundingBox(
+            areEdgesDetected = true,
+            aspectRatio = 16f / 9f,
+        )
     }
 }
