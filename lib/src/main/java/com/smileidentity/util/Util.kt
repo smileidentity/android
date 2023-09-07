@@ -79,31 +79,6 @@ internal fun createBvnOtpVerificationModes(maps: List<BvnVerificationMode>):
     return verificationModes
 }
 
-@Composable
-internal fun annotatedStringResource(
-    @StringRes id: Int,
-    vararg formatArgs: Any,
-    spanStyles: (Annotation) -> SpanStyle? = { null },
-): AnnotatedString {
-    // Using resources.getText() instead of stringResource() in order to preserve Spans
-    val resources = LocalContext.current.resources
-    val spannedString = SpanFormatter.format(SpannedString(resources.getText(id)), *formatArgs)
-    val resultBuilder = AnnotatedString.Builder()
-    resultBuilder.append(spannedString.toString())
-    spannedString.getSpans<Annotation>().forEach { annotation ->
-        val spanStart = spannedString.getSpanStart(annotation)
-        val spanEnd = spannedString.getSpanEnd(annotation)
-        resultBuilder.addStringAnnotation(
-            tag = annotation.key,
-            annotation = annotation.value,
-            start = spanStart,
-            end = spanEnd,
-        )
-        spanStyles(annotation)?.let { resultBuilder.addStyle(it, spanStart, spanEnd) }
-    }
-    return resultBuilder.toAnnotatedString()
-}
-
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 }

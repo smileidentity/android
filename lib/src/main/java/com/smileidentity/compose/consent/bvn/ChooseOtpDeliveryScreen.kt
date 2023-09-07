@@ -40,9 +40,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.LoadingButton
+import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.annotatedStringResource
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
