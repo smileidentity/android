@@ -27,7 +27,7 @@ class BvnConsentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = BvnConsentViewModel()
+        subject = BvnConsentViewModel(userId = "userId")
         SmileID.config = Config(
             partnerId = "partnerId",
             authToken = "authToken",
@@ -61,6 +61,9 @@ class BvnConsentViewModelTest {
             timestamp = "timestamp",
         )
 
+        // set dummy bvn number
+        subject.updateBvnNumber("00000000000")
+
         // when
         subject.submitUserBvn()
 
@@ -88,6 +91,9 @@ class BvnConsentViewModelTest {
             success = true,
             timestamp = "timestamp",
         )
+
+        // set dummy otp number
+        subject.updateOtp("000000")
 
         // when
         subject.requestBvnOtp()
