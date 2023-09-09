@@ -50,6 +50,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
 import com.smileidentity.compose.BiometricKYC
+import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
@@ -262,6 +263,15 @@ fun MainScreen(
                         captureBothSides = true,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
+                        navController.popBackStack(
+                            route = BottomNavigationScreen.Home.route,
+                            inclusive = false,
+                        )
+                    }
+                }
+                composable(ProductScreen.BvnConsent.route) {
+                    LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
+                    SmileID.BvnConsentScreen {
                         navController.popBackStack(
                             route = BottomNavigationScreen.Home.route,
                             inclusive = false,

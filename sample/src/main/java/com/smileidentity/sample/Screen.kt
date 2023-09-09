@@ -49,6 +49,11 @@ enum class ProductScreen(
         com.smileidentity.R.string.si_doc_v_product_name,
         com.smileidentity.R.drawable.si_doc_v_instructions_hero,
     ),
+    BvnConsent(
+        "bvn_consent",
+        com.smileidentity.R.string.si_bvn_product_name,
+        R.drawable.biometric_kyc,
+    ),
 }
 
 enum class BottomNavigationScreen(

@@ -3,6 +3,7 @@
 ## 10.0.0-beta07 (unreleased)
 
 ### Added
+- Added BVN Verification for Nigeria
 - Detection of bad lighting for Document Verification
 - Detection of unfocused states for Document Verification
 - Document detection for Document Verification

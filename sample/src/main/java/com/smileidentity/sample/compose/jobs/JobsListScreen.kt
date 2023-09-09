@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.JobType
+import com.smileidentity.models.JobType.BVN
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
 import com.smileidentity.models.JobType.EnhancedKyc
@@ -76,6 +77,7 @@ fun JobsListScreen(
                 DocumentVerification -> R.drawable.si_doc_v_instructions_hero
                 BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
+                BVN -> com.smileidentity.sample.R.drawable.biometric_kyc
                 JobType.Unknown -> {
                     Timber.e("Unknown job type")
                     R.drawable.si_smart_selfie_instructions_hero

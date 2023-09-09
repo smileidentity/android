@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.painter.Painter
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
@@ -224,6 +225,29 @@ fun SmileID.BiometricKYC(
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             onResult = onResult,
+        )
+    }
+}
+
+/**
+ * Perform BVN verification: Verify the BVN information of your user and confirm that the ID actually
+ * belongs to the user.
+ *
+ * [Docs](https://docs.usesmileid.com/integration-options/mobile/android/consent-screen#bvn-consent-screen)
+ *
+ * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
+ * to a unique User ID within your own system. If not provided, a random user ID will be generated
+ * @param onSuccessfulBvnVerification Callback to be invoked when the BVN verification job is complete.
+ */
+@Composable
+fun SmileID.BvnConsentScreen(
+    userId: String = rememberSaveable { randomUserId() },
+    onSuccessfulBvnVerification: () -> Unit,
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedBvnConsentScreen(
+            userId = userId,
+            successfulBvnVerification = onSuccessfulBvnVerification,
         )
     }
 }

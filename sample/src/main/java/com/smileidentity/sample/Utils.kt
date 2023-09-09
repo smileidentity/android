@@ -72,6 +72,7 @@ val JobType.label: Int
         JobType.EnhancedKyc -> R.string.enhanced_kyc_product_name
         JobType.BiometricKyc -> com.smileidentity.R.string.si_biometric_kyc_product_name
         JobType.DocumentVerification -> com.smileidentity.R.string.si_doc_v_product_name
+        JobType.BVN -> com.smileidentity.R.string.si_bvn_product_name
         JobType.Unknown -> -1
     }
 

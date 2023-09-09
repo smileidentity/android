@@ -20,12 +20,13 @@ internal fun LoadingButton(
     buttonText: String,
     modifier: Modifier = Modifier,
     loading: Boolean = false,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        enabled = !loading,
+        enabled = enabled && !loading,
     ) {
         Box {
             if (loading) {
@@ -46,7 +47,7 @@ internal fun LoadingButton(
 
 @SmilePreviews
 @Composable
-fun LoadingButtonPreview() {
+private fun LoadingIndicatorButtonPreview() {
     LoadingButton(
         buttonText = "Continue",
         onClick = {},
