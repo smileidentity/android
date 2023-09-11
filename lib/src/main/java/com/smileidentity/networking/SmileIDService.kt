@@ -13,6 +13,7 @@ import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
+import com.smileidentity.models.GlobalDocVResponse
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
@@ -112,6 +113,12 @@ interface SmileIDService {
      */
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
+
+    /**
+     * Returns Global DocV supported products and metadata
+     */
+    @POST("/v1/valid_documents")
+    suspend fun getGlobalDocVConfig(@Body request: ProductsConfigRequest): GlobalDocVResponse
 
     /**
      * Returns supported products and metadata

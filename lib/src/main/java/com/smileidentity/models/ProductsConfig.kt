@@ -32,6 +32,37 @@ data class IdSelection(
 )
 
 @JsonClass(generateAdapter = true)
-data class HasBackSideResponse(
-    @Json(name = "has_back_side") val hasBackSide: Boolean,
+data class GlobalDocVResponse(
+    @Json(name = "valid_documents")
+    val validDocuments: List<ValidDocument>
+)
+
+@JsonClass(generateAdapter = true)
+data class ValidDocument(
+    @Json(name = "country")
+    val country: Country,
+    @Json(name = "id_types")
+    val idTypes: List<IdType>
+)
+
+@JsonClass(generateAdapter = true)
+data class Country(
+    @Json(name = "code")
+    val code: String,
+    @Json(name = "continent")
+    val continent: String,
+    @Json(name = "name")
+    val name: String
+)
+
+@JsonClass(generateAdapter = true)
+data class IdType(
+    @Json(name = "code")
+    val code: String,
+    @Json(name = "example")
+    val example: List<String>,
+    @Json(name = "has_back")
+    val hasBack: Boolean,
+    @Json(name = "name")
+    val name: String
 )

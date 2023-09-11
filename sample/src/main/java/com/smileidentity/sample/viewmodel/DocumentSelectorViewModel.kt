@@ -45,10 +45,10 @@ class DocumentSelectorViewModel : ViewModel() {
                 timestamp = authResponse.timestamp,
                 signature = authResponse.signature,
             )
-            val productsConfigResponse = SmileID.api.getProductsConfig(productsConfigRequest)
-            _uiState.update {
-                it.copy(idTypes = productsConfigResponse.idSelection.documentVerification)
-            }
+            val productsConfigResponse = SmileID.api.getGlobalDocVConfig(productsConfigRequest)
+            // _uiState.update {
+            //     // it.copy(idTypes = productsConfigResponse.idSelection.documentVerification)
+            // }
         }
     }
 }
@@ -72,3 +72,5 @@ val idTypeFriendlyNames = mapOf(
     "VOTER_ID" to "Voter ID",
     "V_NIN" to "Virtual NIN",
 )
+
+
