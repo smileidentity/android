@@ -72,5 +72,3 @@ val idTypeFriendlyNames = mapOf(
     "VOTER_ID" to "Voter ID",
     "V_NIN" to "Virtual NIN",
 )
-
-
