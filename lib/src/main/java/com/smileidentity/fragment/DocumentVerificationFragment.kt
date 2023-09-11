@@ -66,12 +66,12 @@ class DocumentVerificationFragment : Fragment() {
         @JvmStatic
         @JvmOverloads
         fun newInstance(
+            countryCode: String,
+            documentType: String,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             showAttribution: Boolean = true,
             allowGalleryUpload: Boolean = false,
-            countryCode: String,
-            documentType: String,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
