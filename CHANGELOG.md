@@ -1,6 +1,19 @@
 # Changelog
 
-## 10.0.0-beta07 (unreleased)
+## 10.0.0-beta08 (unreleased)
+
+### Added
+- BVN Consent Screen
+- Dependency on `org.jetbrains.kotlinx:kotlinx-collections-immutable`
+
+### Fixed
+
+### Changed
+- Bump Sentry to 6.29.0
+
+### Removed
+
+## 10.0.0-beta07
 
 ### Added
 - Added BVN Verification for Nigeria

@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -32,23 +35,24 @@ import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
-internal fun ShowVerifyOtpScreen(
-    successfulBvnVerification: () -> Unit,
+internal fun VerifyOtpScreen(
+    userId: String,
     modifier: Modifier = Modifier,
-    userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel(userId = userId)
         },
     ),
+    successfulBvnVerification: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     if (uiState.showSuccess) successfulBvnVerification()
+
+    val focusRequester = remember { FocusRequester() }
 
     BottomPinnedColumn(
         modifier = modifier
@@ -79,18 +83,23 @@ internal fun ShowVerifyOtpScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            TextField(
+            OutlinedTextField(
                 value = viewModel.otp,
-                isError = uiState.showError,
-                singleLine = true,
                 onValueChange = viewModel::updateOtp,
+                singleLine = true,
+                isError = uiState.showError,
+                label = {
+                    Text(text = stringResource(id = R.string.si_bvn_verification_otp_acronym))
+                },
                 keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
+                    imeAction = if (uiState.isBvnOtpValid) ImeAction.Send else ImeAction.None,
+                    // Use NumberPassword instead of Number to prevent entering '.' or ','
                     keyboardType = KeyboardType.NumberPassword,
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { viewModel.submitBvnOtp() },
+                    onSend = { viewModel.submitBvnOtp() },
                 ),
+                modifier = Modifier.focusRequester(focusRequester),
             )
             Spacer(modifier = Modifier.height(32.dp))
             if (uiState.showError) {
@@ -123,12 +132,16 @@ internal fun ShowVerifyOtpScreen(
             )
         },
     )
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 }
 
 @SmilePreviews
 @Composable
 private fun ShowVerifyOtpScreenPreview() {
     Preview {
-        ShowVerifyOtpScreen(successfulBvnVerification = {})
+        VerifyOtpScreen(userId = "") { }
     }
 }

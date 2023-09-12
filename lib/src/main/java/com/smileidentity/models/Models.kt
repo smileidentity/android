@@ -53,6 +53,6 @@ enum class JobType(val value: Int) {
 
     companion object {
         @JvmStatic
-        fun fromValue(value: Int): JobType = values().find { it.value == value } ?: Unknown
+        fun fromValue(value: Int): JobType = entries.find { it.value == value } ?: Unknown
     }
 }

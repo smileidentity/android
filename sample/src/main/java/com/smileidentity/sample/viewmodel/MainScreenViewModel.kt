@@ -440,6 +440,12 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onSuccessfulBvnConsent() {
+        _uiState.update {
+            it.copy(snackbarMessage = SnackbarMessage("BVN Consent Successful"))
+        }
+    }
+
     fun clearJobs() {
         viewModelScope.launch {
             DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)

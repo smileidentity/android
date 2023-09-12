@@ -131,6 +131,7 @@
     <string name="si_bvn_product_name">BVN Consent</string>
     <string name="si_bvn_enter_bvn_number">Enter your BVN Number</string>
     <string name="si_bvn_enter_id_bank_verification">Bank Verification Number</string>
+    <string name="si_bvn_acronym">BVN</string>
     <string name="si_bvn_enter_bvn_number_limit">Your BVN should be 11 digits long</string>
     <string name="si_bvn_enter_id_wrong_bvn">You have entered an invalid BVN. Please try again</string>
     <string name="si_bvn_select_contact_method">Select Contact Method</string>
@@ -144,6 +145,7 @@
     <string name="si_bvn_verification_different_contact_method">Try another contact method</string>
     <string name="si_bvn_verification_invalid_otp">OTP entered is invalid</string>
     <string name="si_bvn_verification_didnt_receive_otp_at">Didn\'t receive the OTP at %1$s?</string>
+    <string name="si_bvn_verification_otp_acronym">OTP</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
