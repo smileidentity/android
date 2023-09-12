@@ -124,6 +124,7 @@ class BvnConsentViewModelTest {
         )
 
         // when
+        subject.updateOtp("000000")
         subject.submitBvnOtp()
 
         // then
