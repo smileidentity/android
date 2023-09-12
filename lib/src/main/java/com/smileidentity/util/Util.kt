@@ -31,6 +31,7 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.models.SmileIDException
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 import timber.log.Timber
@@ -38,46 +39,28 @@ import java.io.File
 import java.io.Serializable
 import java.nio.ByteBuffer
 
-internal fun createBvnOtpVerificationModes(maps: List<BvnVerificationMode>):
-    List<BvnOtpVerificationMode> {
-    val verificationModes = mutableListOf<BvnOtpVerificationMode>()
-
-    for (map in maps) {
-        val modeEntry = map.entries.firstOrNull() // Assuming there's only one entry in each map
-        modeEntry?.let { entry ->
-            val mode = entry.key
-            val value = entry.value
-
-            val descriptionRes = when (mode) {
-                "sms" -> R.string.si_bvn_sms_verification
-                "email" -> R.string.si_bvn_email_verification
-                else -> R.string.si_bvn_sms_verification
-            }
-
-            val iconRes = when (mode) {
-                "sms" -> R.drawable.si_bvn_mode_sms
-                "email" -> R.drawable.si_bvn_mode_email
-                else -> R.drawable.si_bvn_mode_sms
-            }
-
-            val otpSentBy = when (mode) {
+internal fun createBvnOtpVerificationModes(maps: List<BvnVerificationMode>) = maps.flatMap {
+    it.entries.map { (mode, value) ->
+        BvnOtpVerificationMode(
+            mode = value,
+            otpSentBy = when (mode) {
                 "sms" -> "sms"
                 "email" -> "email"
                 else -> ""
-            }
-
-            val verificationMode = BvnOtpVerificationMode(
-                mode = value,
-                otpSentBy = otpSentBy,
-                description = descriptionRes,
-                icon = iconRes,
-            )
-            verificationModes.add(verificationMode)
-        }
+            },
+            description = when (mode) {
+                "sms" -> R.string.si_bvn_sms_verification
+                "email" -> R.string.si_bvn_email_verification
+                else -> R.string.si_bvn_sms_verification
+            },
+            icon = when (mode) {
+                "sms" -> R.drawable.si_bvn_mode_sms
+                "email" -> R.drawable.si_bvn_mode_email
+                else -> R.drawable.si_bvn_mode_sms
+            },
+        )
     }
-
-    return verificationModes
-}
+}.toImmutableList()
 
 internal fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()

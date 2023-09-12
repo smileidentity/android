@@ -100,7 +100,7 @@ class BvnConsentViewModelTest {
 
         // then
         Assert.assertEquals(
-            BvnConsentScreens.ShowVerifyOtpScreen,
+            BvnConsentScreens.VerifyOtpScreen,
             subject.uiState.value.bvnConsentScreens,
         )
     }

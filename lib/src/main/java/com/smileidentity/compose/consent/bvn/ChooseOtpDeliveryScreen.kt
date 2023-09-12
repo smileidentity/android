@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,9 +21,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,9 +41,9 @@ import com.smileidentity.compose.components.LoadingButton
 import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableList
 
 internal data class BvnOtpVerificationMode(
     val mode: String,
@@ -56,8 +54,8 @@ internal data class BvnOtpVerificationMode(
 
 @Composable
 internal fun ChooseOtpDeliveryScreen(
+    userId: String,
     modifier: Modifier = Modifier,
-    userId: String = rememberSaveable { randomUserId() },
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
             BvnConsentViewModel(userId = userId)
@@ -66,12 +64,11 @@ internal fun ChooseOtpDeliveryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var canRequestBvnTotp by rememberSaveable { mutableStateOf(false) }
-
     BottomPinnedColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(16.dp)
+            .imePadding(),
         scrollableContent = {
             Text(
                 text = stringResource(id = R.string.si_bvn_select_contact_method),
@@ -101,20 +98,17 @@ internal fun ChooseOtpDeliveryScreen(
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(32.dp))
-            ContactMethod(
-                bvnVerificationMode = uiState.bvnVerificationModes,
+            ContactMethods(
+                bvnVerificationModes = uiState.bvnVerificationModes,
                 selectedBvnOtpVerificationMode = uiState.selectedBvnOtpVerificationMode,
-                onClick = {
-                    viewModel.updateMode(it)
-                    canRequestBvnTotp = true
-                },
+                onClick = viewModel::updateMode,
             )
         },
         pinnedContent = {
             LoadingButton(
                 buttonText = stringResource(id = R.string.si_continue),
                 loading = uiState.showLoading,
-                enabled = canRequestBvnTotp,
+                enabled = uiState.selectedBvnOtpVerificationMode != null,
                 onClick = viewModel::requestBvnOtp,
                 modifier = Modifier
                     .testTag("choose_otp_delivery_continue_button")
@@ -125,19 +119,19 @@ internal fun ChooseOtpDeliveryScreen(
 }
 
 @Composable
-internal fun ContactMethod(
-    bvnVerificationMode: List<BvnOtpVerificationMode>,
+internal fun ContactMethods(
+    bvnVerificationModes: ImmutableList<BvnOtpVerificationMode>,
     selectedBvnOtpVerificationMode: BvnOtpVerificationMode?,
     modifier: Modifier = Modifier,
     onClick: (BvnOtpVerificationMode) -> Unit,
 ) {
-    bvnVerificationMode.forEach {
+    bvnVerificationModes.forEach {
         val selected = selectedBvnOtpVerificationMode == it
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surface)
                 .selectable(
@@ -173,6 +167,6 @@ internal fun ContactMethod(
 @Composable
 private fun ChooseOtpDeliveryScreenPreview() {
     Preview {
-        ChooseOtpDeliveryScreen()
+        ChooseOtpDeliveryScreen(userId = "")
     }
 }

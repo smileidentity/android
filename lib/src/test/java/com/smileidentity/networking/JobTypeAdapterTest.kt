@@ -15,7 +15,7 @@ class JobTypeAdapterTest {
     @Test
     fun `toJson should return the correct value`() {
         // given
-        for (value in JobType.values()) {
+        for (value in JobType.entries) {
             // when
             val result = adapter.toJson(value)
 
@@ -27,7 +27,7 @@ class JobTypeAdapterTest {
     @Test
     fun `fromJson should return the correct value`() {
         // given
-        for (value in JobType.values()) {
+        for (value in JobType.entries) {
             // when
             val result = adapter.fromJson(value.value.toString())
 
