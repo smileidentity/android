@@ -153,6 +153,7 @@ dependencies {
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.adapters.lazy)
 
+    implementation(libs.kotlin.immutable.collections)
     implementation(libs.coroutines.core)
 
     implementation(libs.androidx.core)

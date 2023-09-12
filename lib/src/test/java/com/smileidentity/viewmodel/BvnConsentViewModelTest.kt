@@ -100,7 +100,7 @@ class BvnConsentViewModelTest {
 
         // then
         Assert.assertEquals(
-            BvnConsentScreens.ShowVerifyOtpScreen,
+            BvnConsentScreens.VerifyOtpScreen,
             subject.uiState.value.bvnConsentScreens,
         )
     }
@@ -124,6 +124,7 @@ class BvnConsentViewModelTest {
         )
 
         // when
+        subject.updateOtp("000000")
         subject.submitBvnOtp()
 
         // then

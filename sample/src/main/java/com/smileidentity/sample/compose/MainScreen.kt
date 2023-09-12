@@ -88,8 +88,7 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val bottomNavSelection = uiState.bottomNavSelection
 
-    // TODO: Switch to BottomNavigationScreen.entries once we are using Kotlin 1.9
-    val bottomNavItems = remember { BottomNavigationScreen.values().toList().toImmutableList() }
+    val bottomNavItems = remember { BottomNavigationScreen.entries.toImmutableList() }
     // Show up button when not on a BottomNavigationScreen
     val showUpButton = currentRoute?.destination?.route?.let { route ->
         bottomNavItems.none { it.route.contains(route) }
@@ -265,6 +264,7 @@ fun MainScreen(
                 composable(ProductScreen.BvnConsent.route) {
                     LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
                     SmileID.BvnConsentScreen {
+                        viewModel.onSuccessfulBvnConsent()
                         navController.popBackStack(
                             route = BottomNavigationScreen.Home.route,
                             inclusive = false,

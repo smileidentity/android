@@ -2,6 +2,7 @@ package com.smileidentity.compose.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +26,8 @@ import com.smileidentity.compose.preview.SmilePreviews
 @SmileIDOptIn
 @Composable
 fun BottomPinnedColumn(
-    scrollableContent: @Composable () -> Unit,
-    pinnedContent: @Composable () -> Unit,
+    scrollableContent: @Composable ColumnScope.() -> Unit,
+    pinnedContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     columnWidth: Dp? = null,
     showDivider: Boolean = false,
