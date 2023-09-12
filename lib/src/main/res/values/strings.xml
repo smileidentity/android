@@ -135,7 +135,7 @@
     <string name="si_bvn_enter_bvn_number_limit">Your BVN should be 11 digits long</string>
     <string name="si_bvn_enter_id_wrong_bvn">You have entered an invalid BVN. Please try again</string>
     <string name="si_bvn_select_contact_method">Select Contact Method</string>
-    <string name="si_bvn_nibss"> <annotation is_link="true">NIBSS</annotation>, the data custodian of BVN, will send you a One-Time Password (OTP)</string>
+    <string name="si_bvn_nibss">NIBSS, the data custodian of BVN, will send you a One-Time Password (OTP)</string>
     <string name="si_bvn_nibss_partner">The request will be from Chams Plc, who is NIBSS\' technical partner.</string>
     <string name="si_bvn_email_verification">An OTP will be sent to your email to verify your identity</string>
     <string name="si_bvn_sms_verification">An OTP will be sent as an SMS to your phone to verify your identity</string>
