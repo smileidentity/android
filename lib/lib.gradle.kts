@@ -180,8 +180,8 @@ dependencies {
     androidTestImplementation(composeBom)
     lintChecks(libs.compose.lint.checks)
 
-    // Material Design 3 components
-    implementation(libs.androidx.compose.material3)
+    // Material Design components (ColorScheme and Typography exposed, hence api vs implementation)
+    api(libs.androidx.compose.material3)
     // Jetpack Compose UI
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.text.google.fonts)
