@@ -7,6 +7,7 @@
 - Dependency on `org.jetbrains.kotlinx:kotlinx-collections-immutable`
 
 ### Fixed
+- Expose Compose Material 3 as an `api` dependency 
 
 ### Changed
 - Bump Sentry to 6.29.0
