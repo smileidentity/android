@@ -11,6 +11,7 @@
 
 ### Changed
 - Bump Sentry to 6.29.0
+- Made `*Result` classes JSON serializable
 
 ### Removed
 - `filename` property from `PrepUploadRequest`, as it is no longer required

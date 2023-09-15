@@ -6,6 +6,7 @@ import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
+import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 import java.io.File
 
@@ -53,6 +54,7 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
  * If [jobStatusResponse] is null, that means submission to the API was skipped
  */
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class SmartSelfieResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
@@ -63,6 +65,7 @@ data class SmartSelfieResult(
  * Enhanced KYC flow and API requests were successful
  */
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class EnhancedKycResult(
     val request: EnhancedKycRequest,
     val response: EnhancedKycResponse,
@@ -76,6 +79,7 @@ data class EnhancedKycResult(
  * with [DocVJobStatusResponse.jobSuccess].
  */
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class DocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
@@ -91,6 +95,7 @@ data class DocumentVerificationResult(
  * checked with [BiometricKycJobStatusResponse.jobSuccess].
  */
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
