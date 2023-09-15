@@ -75,6 +75,7 @@ data class BiometricKycJobStatusResponse(
 sealed interface JobResult : Parcelable {
     @JvmInline
     @Parcelize
+    @JsonClass(generateAdapter = true)
     value class Freeform(val result: String) : JobResult
 
     @Parcelize
