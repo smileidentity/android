@@ -12,6 +12,7 @@
 ### Changed
 - Bump Sentry to 6.29.0
 - Made `*Result` classes JSON serializable
+- [Breaking] `JobResult.Freeform` is no longer a value class
 
 ### Removed
 - `filename` property from `PrepUploadRequest`, as it is no longer required
