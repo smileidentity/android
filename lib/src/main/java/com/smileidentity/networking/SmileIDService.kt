@@ -9,7 +9,7 @@ import com.smileidentity.models.BvnTotpModeRequest
 import com.smileidentity.models.BvnTotpModeResponse
 import com.smileidentity.models.BvnTotpRequest
 import com.smileidentity.models.BvnTotpResponse
-import com.smileidentity.models.DocVJobStatusResponse
+import com.smileidentity.models.DocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
@@ -95,7 +95,9 @@ interface SmileIDService {
      * Document Verification.
      */
     @POST("/v1/job_status")
-    suspend fun getDocVJobStatus(@Body request: JobStatusRequest): DocVJobStatusResponse
+    suspend fun getDocumentVerificationJobStatus(
+        @Body request: JobStatusRequest,
+    ): DocumentVerificationJobStatusResponse
 
     /**
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
@@ -166,11 +168,11 @@ fun SmileIDService.pollSmartSelfieJobStatus(
  * @param interval The interval between each poll
  * @param numAttempts The number of times to poll before giving up
  */
-fun SmileIDService.pollDocVJobStatus(
+fun SmileIDService.pollDocumentVerificationJobStatus(
     request: JobStatusRequest,
     interval: Duration = 1.seconds,
     numAttempts: Int = 30,
-) = poll(interval, numAttempts) { getDocVJobStatus(request) }
+) = poll(interval, numAttempts) { getDocumentVerificationJobStatus(request) }
 
 /**
  * Polls the server for the status of a Job until it is complete. This should be called after the

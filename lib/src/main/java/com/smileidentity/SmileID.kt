@@ -8,10 +8,13 @@ import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.models.Config
+import com.smileidentity.networking.BiometricKycJobResultAdapter
+import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
+import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -176,6 +179,9 @@ object SmileID {
             .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
             .add(FileAdapter)
+            .add(SmartSelfieJobResultAdapter)
+            .add(DocumentVerificationJobResultAdapter)
+            .add(BiometricKycJobResultAdapter)
             .add(JobResultAdapter)
             .add(FallbackEnum.ADAPTER_FACTORY)
             .build()

@@ -7,12 +7,20 @@
 - Dependency on `org.jetbrains.kotlinx:kotlinx-collections-immutable`
 
 ### Fixed
-- Expose Compose Material 3 as an `api` dependency 
+- Expose Compose Material 3 as an `api` dependency
+- A bug where all results were being parsed to `JobResult.Entry`
 
 ### Changed
 - Bump Sentry to 6.29.0
 - Made `*Result` classes JSON serializable
-- [Breaking] `JobResult.Freeform` is no longer a value class
+- Renamed `DocVJobStatusResponse` to `DocumentVerificationJobStatusResponse`
+- Renamed `getDocVJobStatus` to `getDocumentVerificationJobStatus`
+- Renamed `pollDocVJobStatus` to `pollDocumentVerificationJobStatus`
+- New sealed interface hierarchy for JobResult
+  - Renamed `DocVEntry` to `DocumentVerificationJobResult.Entry`
+  - Renamed `JobResult.Entry` to `SmartSelfieJobResult.Entry`
+  - Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
+  - `JobResult.Entry` is now an interface for all job types
 
 ### Removed
 - `filename` property from `PrepUploadRequest`, as it is no longer required
