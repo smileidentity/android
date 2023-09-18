@@ -6,14 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.JobResult
+import com.smileidentity.models.BiometricKycJobResult
+import com.smileidentity.models.DocumentVerificationJobResult
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
+import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.networking.pollBiometricKycJobStatus
-import com.smileidentity.networking.pollDocVJobStatus
+import com.smileidentity.networking.pollDocumentVerificationJobStatus
 import com.smileidentity.networking.pollSmartSelfieJobStatus
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
@@ -93,7 +95,7 @@ class MainScreenViewModel : ViewModel() {
                 val pollFlow = when (jobType) {
                     SmartSelfieAuthentication -> SmileID.api.pollSmartSelfieJobStatus(request)
                     SmartSelfieEnrollment -> SmileID.api.pollSmartSelfieJobStatus(request)
-                    DocumentVerification -> SmileID.api.pollDocVJobStatus(request)
+                    DocumentVerification -> SmileID.api.pollDocumentVerificationJobStatus(request)
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
                     else -> {
                         Timber.e("Unexpected pending job: $job")
@@ -229,7 +231,7 @@ class MainScreenViewModel : ViewModel() {
                 _uiState.update { it.copy(snackbarMessage = SnackbarMessage(errorMessage)) }
                 return
             }
-            val actualResult = response.result as? JobResult.Entry
+            val actualResult = response.result as? SmartSelfieJobResult.Entry
             val message = jobResultMessageBuilder(
                 jobName = "SmartSelfie Enrollment",
                 jobComplete = response.jobComplete,
@@ -282,7 +284,7 @@ class MainScreenViewModel : ViewModel() {
                 _uiState.update { it.copy(snackbarMessage = SnackbarMessage(errorMessage)) }
                 return
             }
-            val actualResult = response.result as? JobResult.Entry
+            val actualResult = response.result as? SmartSelfieJobResult.Entry
             val message = jobResultMessageBuilder(
                 jobName = "SmartSelfie Authentication",
                 jobComplete = response.jobComplete,
@@ -362,7 +364,7 @@ class MainScreenViewModel : ViewModel() {
     ) {
         if (result is SmileIDResult.Success) {
             val response = result.data.jobStatusResponse
-            val actualResult = response.result as? JobResult.Entry
+            val actualResult = response.result as? BiometricKycJobResult.Entry
             Timber.d("Biometric KYC Result: $result")
             val message = jobResultMessageBuilder(
                 jobName = "Biometric KYC",
@@ -405,7 +407,7 @@ class MainScreenViewModel : ViewModel() {
     ) {
         if (result is SmileIDResult.Success) {
             val response = result.data.jobStatusResponse
-            val actualResult = response.result as? JobResult.Entry
+            val actualResult = response.result as? DocumentVerificationJobResult.Entry
             val message = jobResultMessageBuilder(
                 jobName = "Document Verification",
                 jobComplete = response.jobComplete,

@@ -146,7 +146,7 @@ internal class OrchestratedDocumentViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getDocVJobStatus(jobStatusRequest)
+            val jobStatusResponse = SmileID.api.getDocumentVerificationJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
                 DocumentVerificationResult(
                     selfieFile = selfieImageInfo.image,
