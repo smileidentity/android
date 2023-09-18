@@ -1,5 +1,6 @@
 package com.smileidentity.compose.selfie
 
+import android.content.pm.ActivityInfo
 import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.compose.components.ForceOrientation
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.results.SmartSelfieResult
@@ -40,6 +42,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    ForceOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     when {

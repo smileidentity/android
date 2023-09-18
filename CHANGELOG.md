@@ -21,6 +21,7 @@
   - Renamed `JobResult.Entry` to `SmartSelfieJobResult.Entry`
   - Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
   - `JobResult.Entry` is now an interface for all job types
+- Enforce portrait orientation
 
 ### Removed
 - `filename` property from `PrepUploadRequest`, as it is no longer required

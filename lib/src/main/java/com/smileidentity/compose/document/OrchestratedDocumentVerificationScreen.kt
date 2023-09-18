@@ -1,5 +1,6 @@
 package com.smileidentity.compose.document
 
+import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -8,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.compose.components.ForceOrientation
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.Document
@@ -49,6 +51,7 @@ internal fun OrchestratedDocumentVerificationScreen(
     ),
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
+    ForceOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentStep = uiState.currentStep) {
         DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(

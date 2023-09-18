@@ -24,6 +24,21 @@ fun ForceBrightness(brightness: Float = 1f) {
     }
 }
 
+/**
+ * Locks the screen orientation to a given orientation and reverts after exiting screen
+ *
+ * @param orientation One of the [ActivityInfo.SCREEN_ORIENTATION_*] constants
+ */
+@Composable
+fun ForceOrientation(orientation: Int) {
+    val activity = LocalContext.current.getActivity() ?: return
+    DisposableEffect(Unit) {
+        val originalOrientation = activity.requestedOrientation
+        activity.requestedOrientation = orientation
+        onDispose { activity.requestedOrientation = originalOrientation }
+    }
+}
+
 private fun Context.getActivity(): Activity? {
     var context = this
     while (context is ContextWrapper) {
