@@ -127,7 +127,7 @@ interface SmileIDService {
     suspend fun getServices(): ServicesResponse
 
     /**
-     * Returns the different modes of getting the BVN OTP, either via sms or email
+     * Returns the different modes of getting the BVN OTP, either via sms or exmail
      */
     @POST("/v1/totp_consent")
     suspend fun requestBvnTotpMode(@Body request: BvnTotpRequest): BvnTotpResponse

@@ -1,22 +1,23 @@
 package com.smileidentity.sample.compose
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -33,24 +34,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.sample.R
-import com.smileidentity.sample.compose.components.SearchableInputField
-import com.smileidentity.sample.compose.components.SearchableInputFieldItem
-import com.smileidentity.sample.countryDetails
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
-import com.smileidentity.sample.viewmodel.idTypeFriendlyNames
-import kotlinx.collections.immutable.toImmutableList
-import timber.log.Timber
 
 /**
  * A composable that allows the user to select a country and ID type for Document Verification.
@@ -61,155 +55,117 @@ import timber.log.Timber
 fun DocumentVerificationIdTypeSelector(
     modifier: Modifier = Modifier,
     viewModel: DocumentSelectorViewModel = viewModel(),
-    onIdTypeSelected: (String, String?) -> Unit,
+    onIdTypeSelected: (String, String?, Boolean) -> Unit,
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    var selectedCountry: String? by rememberSaveable { mutableStateOf(null) }
+    var selectedIdType: String? by rememberSaveable { mutableStateOf(null) }
+    var captureBothSides: Boolean by rememberSaveable { mutableStateOf(true) }
+    val isContinueEnabled by remember {
+        derivedStateOf { selectedCountry != null && selectedIdType != null }
+    }
 
     uiState.errorMessage?.let {
         LaunchedEffect(it) { context.toast("Error loading ID Types: $it") }
     }
 
-    val idTypes = uiState.idTypes
-
-    // If an unsupported country code is passed in, it will display the country code with no emoji
-    val countries by remember(idTypes) {
-        derivedStateOf {
-            idTypes?.keys?.map {
-                countryDetails[it] ?: SearchableInputFieldItem(
-                    it,
-                    it,
-                )
-            }?.sortedBy { it.displayName }?.toImmutableList()
-        }
-    }
-
-    var selectedCountry: String? by rememberSaveable { mutableStateOf(null) }
-    var selectedIdType: String? by rememberSaveable { mutableStateOf(null) }
-    val isContinueEnabled by remember { derivedStateOf { selectedCountry != null } }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize(),
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(320.dp)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-                .weight(1f),
-        ) {
-            Text(
-                text = stringResource(R.string.doc_v_info_title),
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                text = stringResource(R.string.doc_v_info_subtitle),
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Light,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 32.dp),
-            )
-            Text(text = stringResource(R.string.doc_v_select_country), fontWeight = FontWeight.Bold)
-            SearchableInputField(
-                fieldLabel = stringResource(R.string.doc_v_country_search_field_hint),
-                selectedItem = countryDetails[selectedCountry],
-                unfilteredItems = countries,
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                Timber.v("Selected: ${it.displayName}")
-                selectedCountry = it.key
-                selectedIdType = null
-            }
-
-            if (selectedCountry == null) {
-                val instructions = listOf(
-                    Triple(
-                        R.drawable.doc_v_info_government_issued,
-                        R.string.doc_v_info_government_issued_title,
-                        R.string.doc_v_info_government_issued_subtitle,
-                    ),
-                    Triple(
-                        R.drawable.doc_v_info_encrypted,
-                        R.string.doc_v_info_encrypted_title,
-                        R.string.doc_v_info_encrypted_subtitle,
-                    ),
-                )
-                instructions.forEach { (imageId, title, subtitle) ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+        if (selectedCountry == null) {
+            LazyColumn {
+                itemsIndexed(uiState.idTypes) { index, item ->
+                    Text(
+                        text = item.country.name,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 32.dp),
-                    ) {
-                        Image(
-                            painter = painterResource(id = imageId),
-                            contentDescription = null,
+                            .padding(16.dp)
+                            .clickable { selectedCountry = item.country.name },
+                    )
+                    if (index < uiState.idTypes.lastIndex) {
+                        Divider(
+                            color = colorResource(id = R.color.si_color_on_light),
+                            thickness = 0.5.dp,
                         )
-                        Column(modifier = Modifier.padding(start = 16.dp)) {
-                            Text(
-                                text = stringResource(title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = stringResource(subtitle),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
                     }
                 }
             }
+        }
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
             selectedCountry?.let { selectedCountry ->
-                Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.doc_v_select_id_type),
                     fontWeight = FontWeight.Bold,
                 )
-                val idTypesForCountry = idTypes!![selectedCountry]
-                idTypesForCountry?.forEach { idType ->
-                    val selected = selectedIdType == idType
-                    val onClick = { selectedIdType = idType }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surface)
-                            .selectable(
+                Spacer(Modifier.height(16.dp))
+                uiState.idTypes.filter { it.country.name == selectedCountry }
+                    .flatMap { it.idTypes }
+                    .forEach { idType ->
+                        val selected = selectedIdType == idType.name
+                        val onClick = {
+                            selectedIdType = idType.name
+                            captureBothSides = idType.hasBack
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surface)
+                                .selectable(
+                                    selected = selected,
+                                    onClick = onClick,
+                                    role = Role.RadioButton,
+                                )
+                                .padding(vertical = 2.dp),
+                        ) {
+                            RadioButton(
                                 selected = selected,
                                 onClick = onClick,
-                                role = Role.RadioButton,
                             )
-                            .padding(vertical = 2.dp),
-                    ) {
-                        RadioButton(
-                            selected = selected,
-                            onClick = onClick,
-                        )
-                        // If ID type ID is not in the friendly name map, display the raw ID type ID
-                        Text(text = idTypeFriendlyNames[idType] ?: idType)
+                            Text(text = idType.name)
+                        }
                     }
+                Button(
+                    onClick = {
+                        onIdTypeSelected(
+                            selectedCountry,
+                            selectedIdType,
+                            captureBothSides,
+                        )
+                    },
+                    enabled = isContinueEnabled,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Text(text = stringResource(R.string.cont))
                 }
             }
         }
-        Button(
-            onClick = { onIdTypeSelected(selectedCountry!!, selectedIdType) },
-            enabled = isContinueEnabled,
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-        ) {
-            Text(text = stringResource(R.string.cont))
+
+        if (uiState.idTypes.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.loading),
+                    modifier = Modifier
+                        .padding(vertical = 16.dp),
+                )
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -220,7 +176,7 @@ fun DocumentVerificationIdTypeSelectorPreview() {
     SmileIDTheme {
         Surface {
             DocumentVerificationIdTypeSelector(
-                onIdTypeSelected = { _, _ -> },
+                onIdTypeSelected = { _, _, _ -> },
             )
         }
     }

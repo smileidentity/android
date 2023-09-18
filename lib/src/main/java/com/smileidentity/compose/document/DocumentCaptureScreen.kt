@@ -79,11 +79,13 @@ internal fun DocumentCaptureScreen(
     showInstructions: Boolean,
     showAttribution: Boolean,
     allowGallerySelection: Boolean,
+    captureBothSides: Boolean,
     instructionsTitleText: String,
     instructionsSubtitleText: String,
     captureTitleText: String,
     knownIdAspectRatio: Float?,
     onConfirm: (File) -> Unit,
+    onSkip: () -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DocumentCaptureViewModel = viewModel(
@@ -120,6 +122,7 @@ internal fun DocumentCaptureScreen(
                 subtitle = instructionsSubtitleText,
                 showAttribution = showAttribution,
                 allowPhotoFromGallery = allowGallerySelection,
+                captureBothSides = captureBothSides,
                 onInstructionsAcknowledgedSelectFromGallery = {
                     Timber.v("onInstructionsAcknowledgedSelectFromGallery")
                     photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
@@ -127,6 +130,7 @@ internal fun DocumentCaptureScreen(
                 onInstructionsAcknowledgedTakePhoto = {
                     viewModel.onInstructionsAcknowledged()
                 },
+                skipCapturingBackSide = onSkip,
             )
         }
 

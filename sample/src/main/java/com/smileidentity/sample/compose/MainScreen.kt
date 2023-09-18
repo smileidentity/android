@@ -234,14 +234,16 @@ fun MainScreen(
                 }
                 composable(ProductScreen.DocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    DocumentVerificationIdTypeSelector { country, idType ->
+                    DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
                         navController.navigate(
-                            route = ProductScreen.DocumentVerification.route + "/$country/$idType",
+                            route = ProductScreen.DocumentVerification.route +
+                                "/$country/$idType/$captureBothSides",
                         ) { popUpTo(ProductScreen.DocumentVerification.route) }
                     }
                 }
                 composable(
-                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
+                    ProductScreen.DocumentVerification.route +
+                        "/{countryCode}/{idType}/{captureBothSides}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
@@ -251,6 +253,7 @@ fun MainScreen(
                         jobId = jobId,
                         countryCode = it.arguments?.getString("countryCode")!!,
                         documentType = it.arguments?.getString("documentType"),
+                        captureBothSides = it.arguments?.getBoolean("captureBothSides")!!,
                         showInstructions = true,
                         allowGalleryUpload = true,
                     ) { result ->

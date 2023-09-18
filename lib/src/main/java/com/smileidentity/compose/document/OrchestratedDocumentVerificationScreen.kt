@@ -28,6 +28,7 @@ import java.io.File
 internal fun OrchestratedDocumentVerificationScreen(
     countryCode: String,
     documentType: String? = null,
+    captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
@@ -42,6 +43,7 @@ internal fun OrchestratedDocumentVerificationScreen(
                 jobId = jobId,
                 countryCode = countryCode,
                 documentType = documentType,
+                captureBothSides = captureBothSides,
                 selfieFile = bypassSelfieCaptureWithFile,
             )
         },
@@ -55,6 +57,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
+            captureBothSides = captureBothSides,
             instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
             instructionsSubtitleText = stringResource(
                 id = R.string.si_verify_identity_instruction_subtitle,
@@ -65,6 +68,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             knownIdAspectRatio = idAspectRatio,
             onConfirm = viewModel::onDocumentFrontCaptureSuccess,
             onError = viewModel::onError,
+            onSkip = viewModel::onDocumentBackSkip,
         )
 
         DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
@@ -72,6 +76,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
+            captureBothSides = captureBothSides,
             instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
             instructionsSubtitleText = stringResource(
                 id = R.string.si_doc_v_instruction_back_subtitle,
@@ -82,6 +87,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             knownIdAspectRatio = idAspectRatio,
             onConfirm = viewModel::onDocumentBackCaptureSuccess,
             onError = viewModel::onError,
+            onSkip = viewModel::onDocumentBackSkip,
         )
 
         DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(

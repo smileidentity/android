@@ -6,8 +6,12 @@ import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.ProductsConfigRequest
+import com.smileidentity.models.ValidDocument
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,7 +19,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 data class DocumentSelectorUiState(
-    val idTypes: Map<String, List<String>>? = null,
+    val idTypes: ImmutableList<ValidDocument> = persistentListOf(),
     val errorMessage: String? = null,
     val hasBackSide: Boolean = false,
 )
@@ -45,10 +49,10 @@ class DocumentSelectorViewModel : ViewModel() {
                 timestamp = authResponse.timestamp,
                 signature = authResponse.signature,
             )
-            val productsConfigResponse = SmileID.api.getGlobalDocVConfig(productsConfigRequest)
-            // _uiState.update {
-            //     // it.copy(idTypes = productsConfigResponse.idSelection.documentVerification)
-            // }
+            val response = SmileID.api.getGlobalDocVConfig(productsConfigRequest)
+            _uiState.update {
+                it.copy(idTypes = response.validDocuments.toPersistentList())
+            }
         }
     }
 }

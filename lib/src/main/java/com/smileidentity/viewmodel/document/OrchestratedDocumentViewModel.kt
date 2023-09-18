@@ -43,7 +43,7 @@ internal class OrchestratedDocumentViewModel(
     private val jobId: String,
     private val countryCode: String,
     private val documentType: String? = null,
-    private val captureBothSides: Boolean = false,
+    private val captureBothSides: Boolean,
     private var selfieFile: File? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
@@ -62,6 +62,24 @@ internal class OrchestratedDocumentViewModel(
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture, errorMessage = null)
             }
+        } else if (selfieFile == null) {
+            _uiState.update {
+                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
+            }
+        } else {
+            submitJob()
+        }
+    }
+
+    fun onDocumentBackSkip() {
+        if (documentFrontFile == null) {
+            _uiState.update {
+                it.copy(
+                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
+                    errorMessage = R.string.si_processing_error_subtitle,
+                )
+            }
+            stepToRetry = DocumentCaptureFlow.FrontDocumentCapture
         } else if (selfieFile == null) {
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)

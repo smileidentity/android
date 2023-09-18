@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,11 +30,13 @@ import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
 fun DocumentCaptureInstructionsScreen(
+    skipCapturingBackSide: () -> Unit,
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
+    captureBothSides: Boolean = true,
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
     onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
@@ -93,6 +96,17 @@ fun DocumentCaptureInstructionsScreen(
             }
         },
         pinnedContent = {
+            if (captureBothSides) {
+                TextButton(
+                    onClick = skipCapturingBackSide,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.si_doc_v_instruction_skip_back_id),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
             CameraPermissionButton(
                 text = stringResource(R.string.si_doc_v_instruction_ready_button),
                 onGranted = onInstructionsAcknowledgedTakePhoto,
@@ -127,6 +141,7 @@ fun DocumentCaptureInstructionsScreenPreview() {
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedSelectFromGallery = {},
                 onInstructionsAcknowledgedTakePhoto = {},
+                skipCapturingBackSide = {},
             )
         }
     }
