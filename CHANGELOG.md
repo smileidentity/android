@@ -22,6 +22,7 @@
   - Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
   - `JobResult.Entry` is now an interface for all job types
 - Enforce portrait orientation
+- Set brightness to maximum only on selfies, but not for Agent Mode
 
 ### Removed
 - `filename` property from `PrepUploadRequest`, as it is no longer required

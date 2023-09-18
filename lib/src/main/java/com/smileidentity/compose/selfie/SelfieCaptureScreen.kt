@@ -68,8 +68,10 @@ internal fun SelfieCaptureScreen(
     var camSelector by rememberCamSelector(CamSelector.Front)
     val viewfinderZoom = 1.1f
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
-    // Force maximum brightness in order to light up the user's face
-    ForceBrightness()
+    if (camSelector == CamSelector.Front) {
+        // Force maximum brightness in order to light up the user's face
+        ForceBrightness()
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         CameraPreview(
             cameraState = cameraState,
