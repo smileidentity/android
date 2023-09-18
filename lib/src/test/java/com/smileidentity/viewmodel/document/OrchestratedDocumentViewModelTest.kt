@@ -49,6 +49,7 @@ class OrchestratedDocumentViewModelTest {
             countryCode = "KE",
             documentType = "ID_CARD",
             selfieFile = selfieFile,
+            captureBothSides = true,
         )
         SmileID.config = Config(
             partnerId = "partnerId",
