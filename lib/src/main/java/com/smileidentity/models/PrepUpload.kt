@@ -10,9 +10,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PrepUploadRequest(
-    // This filename is largely irrelevant, it is just the name created on S3. No correlation
-    // with the file name on the device's filesystem.
-    @Json(name = "file_name") val filename: String = "upload.zip",
     @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "model_parameters") val modelParameters: Map<String, Any> = mapOf(),
     // Callback URL *must* be defined either within your Partner Portal or here

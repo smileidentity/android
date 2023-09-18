@@ -24,12 +24,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,7 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.LoadingButton
-import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.viewmodel.BvnConsentViewModel
@@ -77,17 +74,8 @@ internal fun ChooseOtpDeliveryScreen(
                 fontWeight = FontWeight.ExtraBold,
             )
             Spacer(modifier = Modifier.height(48.dp))
-            val annotatedText = annotatedStringResource(
-                id = R.string.si_bvn_nibss,
-                spanStyles = { annotation ->
-                    when (annotation.key) {
-                        "is_link" -> SpanStyle(color = Color.Blue)
-                        else -> null
-                    }
-                },
-            )
             Text(
-                text = annotatedText,
+                text = stringResource(id = R.string.si_bvn_nibss),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
             )

@@ -7,11 +7,13 @@
 - Dependency on `org.jetbrains.kotlinx:kotlinx-collections-immutable`
 
 ### Fixed
+- Expose Compose Material 3 as an `api` dependency 
 
 ### Changed
 - Bump Sentry to 6.29.0
 
 ### Removed
+- `filename` property from `PrepUploadRequest`, as it is no longer required
 
 ## 10.0.0-beta07
 
