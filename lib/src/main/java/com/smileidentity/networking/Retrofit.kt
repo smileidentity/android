@@ -1,8 +1,11 @@
 package com.smileidentity.networking
 
+import com.smileidentity.models.BiometricKycJobResult
+import com.smileidentity.models.DocumentVerificationJobResult
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
+import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.UploadRequest
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
@@ -85,18 +88,103 @@ object FileAdapter {
     fun fromJson(fileName: String): File = throw NotImplementedError()
 }
 
-@Suppress("unused", "UNUSED_PARAMETER")
+@Suppress("unused")
 object JobResultAdapter {
     @FromJson
-    fun fromJson(reader: JsonReader, delegate: JsonAdapter<JobResult.Entry>): JobResult {
-        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-            return delegate.fromJson(reader)!!
+    fun fromJson(@Suppress("UNUSED_PARAMETER") result: JobResult): JobResult =
+        throw NotImplementedError("Unable to determine JobResult type solely from network response")
+
+    @ToJson
+    fun toJson(
+        writer: JsonWriter,
+        result: JobResult,
+        smartSelfieDelegate: JsonAdapter<SmartSelfieJobResult>,
+        documentVerificationDelegate: JsonAdapter<DocumentVerificationJobResult>,
+        biometricKycDelegate: JsonAdapter<BiometricKycJobResult>,
+    ) {
+        when (result) {
+            is JobResult.Freeform -> writer.value(result.result)
+            is SmartSelfieJobResult -> smartSelfieDelegate.toJson(writer, result)
+            is DocumentVerificationJobResult -> documentVerificationDelegate.toJson(writer, result)
+            is BiometricKycJobResult -> biometricKycDelegate.toJson(writer, result)
+            else -> throw NotImplementedError("Unknown JobResult type: $result")
         }
-        return JobResult.Freeform(reader.nextString())
+    }
+}
+
+@Suppress("unused")
+object SmartSelfieJobResultAdapter {
+    @FromJson
+    fun fromJson(
+        reader: JsonReader,
+        delegate: JsonAdapter<SmartSelfieJobResult.Entry>,
+    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+        delegate.fromJson(reader)!!
+    } else {
+        JobResult.Freeform(reader.nextString())
     }
 
     @ToJson
-    fun toJson(result: JobResult): String = throw NotImplementedError()
+    fun toJson(
+        writer: JsonWriter,
+        result: SmartSelfieJobResult,
+        delegate: JsonAdapter<SmartSelfieJobResult.Entry>,
+    ) {
+        when (result) {
+            is JobResult.Freeform -> writer.value(result.result)
+            is SmartSelfieJobResult.Entry -> delegate.toJson(writer, result)
+        }
+    }
+}
+
+@Suppress("unused")
+object DocumentVerificationJobResultAdapter {
+    @FromJson
+    fun fromJson(
+        reader: JsonReader,
+        delegate: JsonAdapter<DocumentVerificationJobResult.Entry>,
+    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+        delegate.fromJson(reader)!!
+    } else {
+        JobResult.Freeform(reader.nextString())
+    }
+
+    @ToJson
+    fun toJson(
+        writer: JsonWriter,
+        result: DocumentVerificationJobResult,
+        delegate: JsonAdapter<DocumentVerificationJobResult.Entry>,
+    ) {
+        when (result) {
+            is JobResult.Freeform -> writer.value(result.result)
+            is DocumentVerificationJobResult.Entry -> delegate.toJson(writer, result)
+        }
+    }
+}
+
+@Suppress("unused")
+object BiometricKycJobResultAdapter {
+    @FromJson
+    fun fromJson(
+        reader: JsonReader,
+        delegate: JsonAdapter<BiometricKycJobResult.Entry>,
+    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+        delegate.fromJson(reader)!!
+    } else {
+        JobResult.Freeform(reader.nextString())
+    }
+
+    @ToJson
+    fun toJson(
+        writer: JsonWriter,
+        result: BiometricKycJobResult,
+        delegate: JsonAdapter<BiometricKycJobResult.Entry>,
+    ) {
+        when (result) {
+            is JobResult.Freeform -> writer.value(result.result)
+            is BiometricKycJobResult.Entry -> delegate.toJson(writer, result)
+        }
+    }
 }
 
 @JsonQualifier

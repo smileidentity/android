@@ -1,7 +1,7 @@
 package com.smileidentity.sample.model
 
 import com.smileidentity.models.BiometricKycJobStatusResponse
-import com.smileidentity.models.DocVJobStatusResponse
+import com.smileidentity.models.DocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobStatusResponse
@@ -52,7 +52,7 @@ private val inputFormat =
  */
 private fun toHumanReadableTimestamp(timestamp: String): String {
     return try {
-        val date = inputFormat.parse(timestamp)
+        val date = inputFormat.parse(timestamp) as Date
         outputFormat.format(date)
     } catch (e: Exception) {
         Timber.e(e, "Failed to parse timestamp: $timestamp")
@@ -90,7 +90,7 @@ fun BiometricKycJobStatusResponse.toJob(userId: String, jobId: String) = toJob(
     jobType = BiometricKyc,
 )
 
-fun DocVJobStatusResponse.toJob(userId: String, jobId: String) = toJob(
+fun DocumentVerificationJobStatusResponse.toJob(userId: String, jobId: String) = toJob(
     userId = userId,
     jobId = jobId,
     jobType = DocumentVerification,
