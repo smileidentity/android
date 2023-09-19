@@ -22,7 +22,7 @@
 - Detection of bad lighting for Document Verification
 - Detection of unfocused states for Document Verification
 - Document detection for Document Verification
-- DocV updated to dynamically shows back of ID capture 
+- Document Verification updated to dynamically show back of ID capture
 
 ### Fixed
 - Fix a Document Verification bug where selfie wasn't captured when also capturing the back of an ID
@@ -39,9 +39,9 @@
 - Bump AndroidX Navigation to 2.7.1
 
 ### Removed
-- Removed `documentType` as a required field in DocV
+- Removed `documentType` as a required field in Document Verification
 - Removed `Document` model, so you now pass `countryCode` and `documentType` as separate params in
-  DocV
+  Document Verification
 
 ## 10.0.0-beta06
 

@@ -13,7 +13,7 @@ import com.smileidentity.models.DocVJobStatusResponse
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
-import com.smileidentity.models.GlobalDocVResponse
+import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
@@ -118,7 +118,7 @@ interface SmileIDService {
      * Returns Global DocV supported products and metadata
      */
     @POST("/v1/valid_documents")
-    suspend fun getGlobalDocVConfig(@Body request: ProductsConfigRequest): GlobalDocVResponse
+    suspend fun getGlobalDocVConfig(@Body request: ProductsConfigRequest): ValidDocumentsResponse
 
     /**
      * Returns supported products and metadata
@@ -127,7 +127,7 @@ interface SmileIDService {
     suspend fun getServices(): ServicesResponse
 
     /**
-     * Returns the different modes of getting the BVN OTP, either via sms or exmail
+     * Returns the different modes of getting the BVN OTP, either via sms or email
      */
     @POST("/v1/totp_consent")
     suspend fun requestBvnTotpMode(@Body request: BvnTotpRequest): BvnTotpResponse

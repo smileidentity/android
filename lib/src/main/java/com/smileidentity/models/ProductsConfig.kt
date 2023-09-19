@@ -32,7 +32,7 @@ data class IdSelection(
 )
 
 @JsonClass(generateAdapter = true)
-data class GlobalDocVResponse(
+data class ValidDocumentsResponse(
     @Json(name = "valid_documents")
     val validDocuments: List<ValidDocument>,
 )

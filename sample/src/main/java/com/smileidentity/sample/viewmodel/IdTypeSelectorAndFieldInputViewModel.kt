@@ -88,17 +88,6 @@ class IdTypeSelectorAndFieldInputViewModel(
                 EnhancedKyc -> servicesResponse.hostedWeb.enhancedKyc
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
-            // val countryList = servicesResponseForJobType
-            //     .filter { it.countryCode in supportedCountriesAndIdTypes }
-            //     .map {
-            //         // If we fall back, we will not have emoji
-            //         // countryDetails[it.countryCode] ?: SearchableInputFieldItem(
-            //         //     it.countryCode,
-            //         //     it.name,
-            //         // )
-            //     }
-            //     .sortedBy { it.displayName }
-            //     .toImmutableList()
 
             _uiState.update { it.copy(countries = persistentListOf()) }
         }

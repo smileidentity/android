@@ -55,7 +55,7 @@ import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
 fun DocumentVerificationIdTypeSelector(
     modifier: Modifier = Modifier,
     viewModel: DocumentSelectorViewModel = viewModel(),
-    onIdTypeSelected: (String, String?, Boolean) -> Unit,
+    onIdTypeSelected: (countryCode: String, idType: String?, captureBothSides: Boolean) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
