@@ -87,7 +87,7 @@ internal fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
-    onSkip: (() -> Unit)? = null,
+    onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
         factory = viewModelFactory { DocumentCaptureViewModel(knownIdAspectRatio) },
         key = side.name,

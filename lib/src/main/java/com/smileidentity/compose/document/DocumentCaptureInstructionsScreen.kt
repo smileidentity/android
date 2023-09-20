@@ -36,7 +36,7 @@ fun DocumentCaptureInstructionsScreen(
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
     showSkipButton: Boolean = true,
-    onSkip: (() -> Unit)? = null,
+    onSkip: () -> Unit = { },
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
     onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
@@ -97,9 +97,7 @@ fun DocumentCaptureInstructionsScreen(
         },
         pinnedContent = {
             if (showSkipButton) {
-                TextButton(
-                    onClick = onSkip ?: {},
-                ) {
+                TextButton(onClick = onSkip) {
                     Text(
                         text = stringResource(id = R.string.si_doc_v_instruction_skip_back_id),
                         modifier = Modifier.fillMaxWidth(),
