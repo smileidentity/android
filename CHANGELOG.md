@@ -11,7 +11,6 @@
 - A bug where all results were being parsed to `JobResult.Entry`
 
 ### Changed
-- Bump Sentry to 6.29.0
 - Made `*Result` classes JSON serializable
 - Renamed `DocVJobStatusResponse` to `DocumentVerificationJobStatusResponse`
 - Renamed `getDocVJobStatus` to `getDocumentVerificationJobStatus`
@@ -21,6 +20,11 @@
   - Renamed `JobResult.Entry` to `SmartSelfieJobResult.Entry`
   - Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
   - `JobResult.Entry` is now an interface for all job types
+- Bump Sentry to 6.29.0
+- Bump Compose BOM to 2023.09.01
+- Bump AndroidX Core to 1.12.0
+- Bump AndroidX Lifecycle to 2.6.2
+- Bump AndroidX Navigation to 2.7.2
 
 ### Removed
 - `filename` property from `PrepUploadRequest`, as it is no longer required
