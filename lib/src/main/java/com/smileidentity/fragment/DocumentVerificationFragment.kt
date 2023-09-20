@@ -67,7 +67,7 @@ class DocumentVerificationFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             countryCode: String,
-            documentType: String,
+            documentType: String? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             showAttribution: Boolean = true,
@@ -105,12 +105,12 @@ class DocumentVerificationFragment : Fragment() {
         setContent {
             val aspectRatio = args.idAspectRatio
             SmileID.DocumentVerification(
+                countryCode = args.countryCode,
+                documentType = args.documentType,
                 userId = args.userId,
                 jobId = args.jobId,
                 showAttribution = args.showAttribution,
                 allowGalleryUpload = args.allowGalleryUpload,
-                countryCode = args.countryCode,
-                documentType = args.documentType,
                 idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
                 bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
                 onResult = {
@@ -149,8 +149,8 @@ private var Bundle.countryCode: String
 
 private const val KEY_DOCUMENT_TYPE = "documentType"
 
-private var Bundle.documentType: String
-    get() = getString(KEY_DOCUMENT_TYPE)!!
+private var Bundle.documentType: String?
+    get() = getString(KEY_DOCUMENT_TYPE)
     set(value) = putString(KEY_DOCUMENT_TYPE, value)
 
 private const val KEY_ID_ASPECT_RATIO = "idAspectRatio"
