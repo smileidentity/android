@@ -38,7 +38,6 @@ import com.smileidentity.sample.compose.SmileIDTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 
 @Parcelize
 data class SearchableInputFieldItem(
@@ -78,10 +77,7 @@ fun SearchableInputField(
     val shape = RoundedCornerShape(8.dp)
     DockedSearchBar(
         query = query,
-        onQueryChange = {
-            query = it.trim()
-            Timber.v("Query: $query")
-        },
+        onQueryChange = { query = it.trim() },
         onSearch = {
             query = it
             keyboardController?.hide()

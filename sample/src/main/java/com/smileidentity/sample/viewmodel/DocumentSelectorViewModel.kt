@@ -11,7 +11,7 @@ import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,7 +21,6 @@ import timber.log.Timber
 data class DocumentSelectorUiState(
     val idTypes: ImmutableList<ValidDocument> = persistentListOf(),
     val errorMessage: String? = null,
-    val hasBackSide: Boolean = false,
 )
 
 class DocumentSelectorViewModel : ViewModel() {
@@ -51,28 +50,8 @@ class DocumentSelectorViewModel : ViewModel() {
             )
             val response = SmileID.api.getValidDocuments(productsConfigRequest)
             _uiState.update {
-                it.copy(idTypes = response.validDocuments.toPersistentList())
+                it.copy(idTypes = response.validDocuments.toImmutableList())
             }
         }
     }
 }
-
-val idTypeFriendlyNames = mapOf(
-    "ALIEN_CARD" to "Alien Card",
-    "BANK_ACCOUNT" to "Bank Account",
-    "BVN" to "BVN",
-    "CAC" to "CAC",
-    "DRIVERS_LICENSE" to "Driver's License",
-    "KRA_PIN" to "KRA PIN",
-    "NATIONAL_ID" to "National ID",
-    "NATIONAL_ID_NO_PHOTO" to "National ID (No Photo)",
-    "NEW_VOTER_ID" to "New Voter ID",
-    "NIN_SLIP" to "NIN Slip",
-    "NIN_V2" to "NIN v2",
-    "PASSPORT" to "Passport",
-    "PHONE_NUMBER" to "Phone Number",
-    "SSNIT" to "SSNIT",
-    "TIN" to "TIN",
-    "VOTER_ID" to "Voter ID",
-    "V_NIN" to "Virtual NIN",
-)

@@ -253,7 +253,7 @@ fun MainScreen(
                         jobId = jobId,
                         countryCode = it.arguments?.getString("countryCode")!!,
                         documentType = it.arguments?.getString("documentType"),
-                        captureBothSides = it.arguments?.getBoolean("captureBothSides")!!,
+                        captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
                         showInstructions = true,
                         allowGalleryUpload = true,
                     ) { result ->

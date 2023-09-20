@@ -57,7 +57,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
-            captureBothSides = captureBothSides,
+            showSkipButton = false,
             instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
             instructionsSubtitleText = stringResource(
                 id = R.string.si_verify_identity_instruction_subtitle,
@@ -68,7 +68,6 @@ internal fun OrchestratedDocumentVerificationScreen(
             knownIdAspectRatio = idAspectRatio,
             onConfirm = viewModel::onDocumentFrontCaptureSuccess,
             onError = viewModel::onError,
-            onSkip = viewModel::onDocumentBackSkip,
         )
 
         DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
@@ -76,7 +75,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
-            captureBothSides = captureBothSides,
+            showSkipButton = captureBothSides,
             instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
             instructionsSubtitleText = stringResource(
                 id = R.string.si_doc_v_instruction_back_subtitle,

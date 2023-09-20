@@ -30,13 +30,13 @@ import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
 fun DocumentCaptureInstructionsScreen(
-    skipCapturingBackSide: () -> Unit,
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
-    captureBothSides: Boolean = true,
+    showSkipButton: Boolean = true,
+    onSkip: (() -> Unit)? = null,
     onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
     onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
@@ -96,9 +96,9 @@ fun DocumentCaptureInstructionsScreen(
             }
         },
         pinnedContent = {
-            if (captureBothSides) {
+            if (showSkipButton) {
                 TextButton(
-                    onClick = skipCapturingBackSide,
+                    onClick = onSkip ?: {},
                 ) {
                     Text(
                         text = stringResource(id = R.string.si_doc_v_instruction_skip_back_id),
@@ -141,7 +141,7 @@ fun DocumentCaptureInstructionsScreenPreview() {
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedSelectFromGallery = {},
                 onInstructionsAcknowledgedTakePhoto = {},
-                skipCapturingBackSide = {},
+                onSkip = {},
             )
         }
     }
