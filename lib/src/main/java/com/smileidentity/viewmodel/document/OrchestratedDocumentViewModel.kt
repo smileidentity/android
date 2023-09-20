@@ -72,15 +72,7 @@ internal class OrchestratedDocumentViewModel(
     }
 
     fun onDocumentBackSkip() {
-        if (documentFrontFile == null) {
-            _uiState.update {
-                it.copy(
-                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                    errorMessage = R.string.si_processing_error_subtitle,
-                )
-            }
-            stepToRetry = DocumentCaptureFlow.FrontDocumentCapture
-        } else if (selfieFile == null) {
+        if (selfieFile == null) {
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
             }

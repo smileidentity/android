@@ -13,7 +13,6 @@ import com.smileidentity.models.DocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
-import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.PrepUploadRequest
@@ -25,6 +24,7 @@ import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.ValidDocumentsResponse
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
 import retrofit2.http.Body
@@ -120,7 +120,7 @@ interface SmileIDService {
      * Returns Global DocV supported products and metadata
      */
     @POST("/v1/valid_documents")
-    suspend fun getGlobalDocVConfig(@Body request: ProductsConfigRequest): ValidDocumentsResponse
+    suspend fun getValidDocuments(@Body request: ProductsConfigRequest): ValidDocumentsResponse
 
     /**
      * Returns supported products and metadata

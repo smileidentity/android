@@ -49,7 +49,7 @@ class DocumentSelectorViewModel : ViewModel() {
                 timestamp = authResponse.timestamp,
                 signature = authResponse.signature,
             )
-            val response = SmileID.api.getGlobalDocVConfig(productsConfigRequest)
+            val response = SmileID.api.getValidDocuments(productsConfigRequest)
             _uiState.update {
                 it.copy(idTypes = response.validDocuments.toPersistentList())
             }
