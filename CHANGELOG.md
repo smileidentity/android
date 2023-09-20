@@ -3,6 +3,7 @@
 ## 10.0.0-beta08 (unreleased)
 
 ### Added
+- Global Document Verification support
 - BVN Consent Screen
 - Dependency on `org.jetbrains.kotlinx:kotlinx-collections-immutable`
 
@@ -27,6 +28,8 @@
 - Bump AndroidX Navigation to 2.7.2
 
 ### Removed
+- Removed `Document` model, so you now pass `countryCode` and `documentType` as separate params in
+  `SmileID.DocumentVerification`
 - `filename` property from `PrepUploadRequest`, as it is no longer required
 
 ## 10.0.0-beta07
@@ -36,7 +39,6 @@
 - Detection of bad lighting for Document Verification
 - Detection of unfocused states for Document Verification
 - Document detection for Document Verification
-- Document Verification updated to dynamically show back of ID capture
 
 ### Fixed
 - Fix a Document Verification bug where selfie wasn't captured when also capturing the back of an ID
@@ -51,11 +53,6 @@
 - Bump Compose BOM to 2023.08.00
 - Bump CameraX to 1.2.3
 - Bump AndroidX Navigation to 2.7.1
-
-### Removed
-- Removed `documentType` as a required field in Document Verification
-- Removed `Document` model, so you now pass `countryCode` and `documentType` as separate params in
-  Document Verification
 
 ## 10.0.0-beta06
 
