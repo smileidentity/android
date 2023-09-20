@@ -64,4 +64,4 @@ jobs:
       - uses: actions/checkout@v3
       - uses: musichin/ktlint-check@v2
         with:
-          ktlint-version: "1.0.0"
+          ktlint-version: "0.49.1"
