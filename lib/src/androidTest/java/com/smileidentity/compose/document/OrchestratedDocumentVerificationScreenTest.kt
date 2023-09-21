@@ -3,15 +3,12 @@ package com.smileidentity.compose.document
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import com.smileidentity.models.Document
 import org.junit.Rule
 import org.junit.Test
 
 class OrchestratedDocumentVerificationScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
-
-    private val document = Document(countryCode = "254", documentType = "NATIONAL_ID")
 
     @Test
     fun shouldShowInstructions() {
@@ -21,7 +18,8 @@ class OrchestratedDocumentVerificationScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
-                idType = document,
+                countryCode = "254",
+                documentType = "NATIONAL_ID",
             )
         }
 
@@ -37,8 +35,8 @@ class OrchestratedDocumentVerificationScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
-                idType = document,
-                showInstructions = false,
+                countryCode = "254",
+                documentType = "NATIONAL_ID",
             )
         }
 

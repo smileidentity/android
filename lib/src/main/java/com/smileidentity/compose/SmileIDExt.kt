@@ -15,7 +15,6 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
@@ -121,7 +120,9 @@ fun SmileID.SmartSelfieAuthentication(
  *
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/document-verification)
  *
- * @param idType The type of ID to be captured
+ * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ * @param documentType An optional document type of the document
+ * @param captureBothSides Determines if the document has a back side
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
  * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
  * standard size of ~1.6
@@ -147,29 +148,31 @@ fun SmileID.SmartSelfieAuthentication(
  */
 @Composable
 fun SmileID.DocumentVerification(
-    idType: Document,
+    countryCode: String,
+    documentType: String? = null,
+    captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
-    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
-    showInstructions: Boolean = false,
+    showInstructions: Boolean = true,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
-            idType = idType,
+            countryCode = countryCode,
+            documentType = documentType,
+            captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
-            captureBothSides = captureBothSides,
             bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
             onResult = onResult,
         )

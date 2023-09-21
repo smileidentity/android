@@ -38,7 +38,7 @@ data class UploadImageInfo(
 @JsonClass(generateAdapter = true)
 data class IdInfo(
     @Json(name = "country") val country: String,
-    @Json(name = "id_type") val idType: String,
+    @Json(name = "id_type") val idType: String? = null,
     @Json(name = "id_number") val idNumber: String? = null,
     @Json(name = "first_name") val firstName: String? = null,
     @Json(name = "middle_name") val middleName: String? = null,

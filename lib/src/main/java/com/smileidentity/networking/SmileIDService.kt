@@ -24,6 +24,7 @@ import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.ValidDocumentsResponse
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
 import retrofit2.http.Body
@@ -114,6 +115,12 @@ interface SmileIDService {
      */
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
+
+    /**
+     * Returns Global DocV supported products and metadata
+     */
+    @POST("/v1/valid_documents")
+    suspend fun getValidDocuments(@Body request: ProductsConfigRequest): ValidDocumentsResponse
 
     /**
      * Returns supported products and metadata

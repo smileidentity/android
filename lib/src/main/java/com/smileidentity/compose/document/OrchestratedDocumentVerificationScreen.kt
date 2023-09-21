@@ -10,7 +10,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.models.Document
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDCallback
@@ -27,9 +26,10 @@ import java.io.File
  */
 @Composable
 internal fun OrchestratedDocumentVerificationScreen(
-    idType: Document,
+    countryCode: String,
+    documentType: String? = null,
+    captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
-    captureBothSides: Boolean = false,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -41,7 +41,8 @@ internal fun OrchestratedDocumentVerificationScreen(
             OrchestratedDocumentViewModel(
                 userId = userId,
                 jobId = jobId,
-                idType = idType,
+                countryCode = countryCode,
+                documentType = documentType,
                 captureBothSides = captureBothSides,
                 selfieFile = bypassSelfieCaptureWithFile,
             )
@@ -56,6 +57,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
+            showSkipButton = false,
             instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
             instructionsSubtitleText = stringResource(
                 id = R.string.si_verify_identity_instruction_subtitle,
@@ -73,6 +75,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             showInstructions = showInstructions,
             showAttribution = showAttribution,
             allowGallerySelection = allowGalleryUpload,
+            showSkipButton = captureBothSides,
             instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
             instructionsSubtitleText = stringResource(
                 id = R.string.si_doc_v_instruction_back_subtitle,
@@ -83,6 +86,7 @@ internal fun OrchestratedDocumentVerificationScreen(
             knownIdAspectRatio = idAspectRatio,
             onConfirm = viewModel::onDocumentBackCaptureSuccess,
             onError = viewModel::onError,
+            onSkip = viewModel::onDocumentBackSkip,
         )
 
         DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(

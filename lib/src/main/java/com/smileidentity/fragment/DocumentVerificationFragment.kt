@@ -13,7 +13,6 @@ import com.smileidentity.fragment.DocumentVerificationFragment.Companion.KEY_REQ
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.newInstance
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.resultFromBundle
-import com.smileidentity.models.Document
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
@@ -67,11 +66,12 @@ class DocumentVerificationFragment : Fragment() {
         @JvmStatic
         @JvmOverloads
         fun newInstance(
+            countryCode: String,
+            documentType: String? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             showAttribution: Boolean = true,
             allowGalleryUpload: Boolean = false,
-            idType: Document,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
@@ -81,7 +81,8 @@ class DocumentVerificationFragment : Fragment() {
                 this.jobId = jobId
                 this.showAttribution = showAttribution
                 this.allowGalleryUpload = allowGalleryUpload
-                this.idType = idType
+                this.countryCode = countryCode
+                this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
@@ -104,13 +105,13 @@ class DocumentVerificationFragment : Fragment() {
         setContent {
             val aspectRatio = args.idAspectRatio
             SmileID.DocumentVerification(
+                countryCode = args.countryCode,
+                documentType = args.documentType,
                 userId = args.userId,
                 jobId = args.jobId,
                 showAttribution = args.showAttribution,
                 allowGalleryUpload = args.allowGalleryUpload,
-                idType = args.idType,
                 idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
-                captureBothSides = args.captureBothSides,
                 bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
@@ -140,10 +141,17 @@ private var Bundle.allowGalleryUpload: Boolean
     get() = getBoolean(KEY_ALLOW_GALLERY_UPLOAD)
     set(value) = putBoolean(KEY_ALLOW_GALLERY_UPLOAD, value)
 
-private const val KEY_ID_TYPE = "idType"
-private var Bundle.idType: Document
-    get() = getParcelableCompat(KEY_ID_TYPE)!!
-    set(value) = putParcelable(KEY_ID_TYPE, value)
+private const val KEY_COUNTRY_CODE = "countryCode"
+
+private var Bundle.countryCode: String
+    get() = getString(KEY_COUNTRY_CODE)!!
+    set(value) = putString(KEY_COUNTRY_CODE, value)
+
+private const val KEY_DOCUMENT_TYPE = "documentType"
+
+private var Bundle.documentType: String?
+    get() = getString(KEY_DOCUMENT_TYPE)
+    set(value) = putString(KEY_DOCUMENT_TYPE, value)
 
 private const val KEY_ID_ASPECT_RATIO = "idAspectRatio"
 

@@ -11,6 +11,7 @@
     <string name="cancel">Cancel</string>
     <string name="cont">Continue</string>
     <string name="loading">Loading…</string>
+    <string name="search">Search</string>
     <string name="version_info">Partner %1$s • %2$s</string>
     <string name="try_again">Try Again</string>
     <string name="something_went_wrong">Something went wrong</string>
@@ -71,13 +72,9 @@
     <string name="biometric_kyc_enter_id_info">Enter ID Information</string>
 
     <!--  Document Verification  -->
-    <string name="doc_v_select_country">Country of Issue</string>
+    <string name="doc_v_select_country">Select Country of Issue</string>
     <string name="doc_v_country_search_field_hint">Select Country</string>
     <string name="doc_v_select_id_type">Select ID Type</string>
     <string name="doc_v_info_title">Get Your ID Verified</string>
     <string name="doc_v_info_subtitle">We need a valid document to verify who you are.</string>
-    <string name="doc_v_info_government_issued_title">Government Issued ID</string>
-    <string name="doc_v_info_government_issued_subtitle">You will need a government-issued ID document for this process</string>
-    <string name="doc_v_info_encrypted_title">Data and Privacy</string>
-    <string name="doc_v_info_encrypted_subtitle">Your data will be used only for verification of your Identity. It will be encrypted and stored securely</string>
 </resources>

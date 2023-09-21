@@ -35,11 +35,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.SmileIDTheme
-import com.smileidentity.sample.countryDetails
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 
 @Parcelize
 data class SearchableInputFieldItem(
@@ -79,10 +77,7 @@ fun SearchableInputField(
     val shape = RoundedCornerShape(8.dp)
     DockedSearchBar(
         query = query,
-        onQueryChange = {
-            query = it.trim()
-            Timber.v("Query: $query")
-        },
+        onQueryChange = { query = it.trim() },
         onSearch = {
             query = it
             keyboardController?.hide()
@@ -148,7 +143,7 @@ private fun SearchableInputFieldPreview() {
         SearchableInputField(
             fieldLabel = "Country of Issue",
             selectedItem = null,
-            unfilteredItems = countryDetails.values.toImmutableList(),
+            unfilteredItems = persistentListOf(),
             onItemSelected = { },
         )
     }

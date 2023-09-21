@@ -1,9 +1,11 @@
 package com.smileidentity.models
 
+import android.os.Parcelable
 import com.smileidentity.SmileID
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 
 @JsonClass(generateAdapter = true)
 data class ProductsConfigRequest(
@@ -30,3 +32,43 @@ data class IdSelection(
     @Json(name = "enhanced_kyc") val enhancedKyc: IdTypes = emptyMap(),
     @Json(name = "doc_verification") val documentVerification: IdTypes = emptyMap(),
 )
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class ValidDocumentsResponse(
+    @Json(name = "valid_documents")
+    val validDocuments: List<ValidDocument>,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class ValidDocument(
+    @Json(name = "country")
+    val country: Country,
+    @Json(name = "id_types")
+    val idTypes: List<IdType>,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class Country(
+    @Json(name = "code")
+    val code: String,
+    @Json(name = "continent")
+    val continent: String,
+    @Json(name = "name")
+    val name: String,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class IdType(
+    @Json(name = "code")
+    val code: String,
+    @Json(name = "example")
+    val example: List<String>,
+    @Json(name = "has_back")
+    val hasBack: Boolean,
+    @Json(name = "name")
+    val name: String,
+) : Parcelable

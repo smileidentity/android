@@ -57,7 +57,7 @@ class EnhancedKycViewModel : ViewModel() {
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
                 country = idInfo.country,
-                idType = idInfo.idType,
+                idType = idInfo.idType!!,
                 idNumber = idInfo.idNumber ?: throw IllegalArgumentException("ID Number required"),
                 firstName = idInfo.firstName,
                 lastName = idInfo.lastName,

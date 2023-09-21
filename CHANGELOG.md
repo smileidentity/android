@@ -1,8 +1,9 @@
 # Changelog
 
-## 10.0.0-beta08 (unreleased)
+## 10.0.0-beta08
 
 ### Added
+- Global Document Verification support
 - BVN Consent Screen
 - Dependency on `org.jetbrains.kotlinx:kotlinx-collections-immutable`
 
@@ -11,7 +12,6 @@
 - A bug where all results were being parsed to `JobResult.Entry`
 
 ### Changed
-- Bump Sentry to 6.29.0
 - Made `*Result` classes JSON serializable
 - Renamed `DocVJobStatusResponse` to `DocumentVerificationJobStatusResponse`
 - Renamed `getDocVJobStatus` to `getDocumentVerificationJobStatus`
@@ -21,8 +21,15 @@
   - Renamed `JobResult.Entry` to `SmartSelfieJobResult.Entry`
   - Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
   - `JobResult.Entry` is now an interface for all job types
+- Bump Sentry to 6.29.0
+- Bump Compose BOM to 2023.09.01
+- Bump AndroidX Core to 1.12.0
+- Bump AndroidX Lifecycle to 2.6.2
+- Bump AndroidX Navigation to 2.7.2
 
 ### Removed
+- Removed `Document` model, so you now pass `countryCode` and `documentType` as separate params in
+  `SmileID.DocumentVerification`
 - `filename` property from `PrepUploadRequest`, as it is no longer required
 
 ## 10.0.0-beta07
@@ -46,8 +53,6 @@
 - Bump Compose BOM to 2023.08.00
 - Bump CameraX to 1.2.3
 - Bump AndroidX Navigation to 2.7.1
-
-### Removed
 
 ## 10.0.0-beta06
 

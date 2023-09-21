@@ -54,7 +54,6 @@ import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.models.Document
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -225,7 +224,7 @@ fun MainScreen(
                                 id = com.smileidentity.R.drawable.si_logo_with_text,
                             ),
                             partnerName = "Smile ID",
-                            productName = it.idType,
+                            productName = it.idType!!,
                             partnerPrivacyPolicy = url,
                         ) { result ->
                             viewModel.onBiometricKycResult(userId, jobId, result)
@@ -235,31 +234,28 @@ fun MainScreen(
                 }
                 composable(ProductScreen.DocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    DocumentVerificationIdTypeSelector { country, idType ->
+                    DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
                         navController.navigate(
-                            "${ProductScreen.DocumentVerification.route}/$country/$idType",
+                            route = ProductScreen.DocumentVerification.route +
+                                "/$country/$idType/$captureBothSides",
                         ) { popUpTo(ProductScreen.DocumentVerification.route) }
                     }
                 }
                 composable(
-                    ProductScreen.DocumentVerification.route + "/{countryCode}/{idType}",
+                    ProductScreen.DocumentVerification.route +
+                        "/{countryCode}/{idType}/{captureBothSides}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
                     val jobId = rememberSaveable { randomJobId() }
-                    val documentType = remember(it) {
-                        Document(
-                            it.arguments?.getString("countryCode")!!,
-                            it.arguments?.getString("idType")!!,
-                        )
-                    }
                     SmileID.DocumentVerification(
                         userId = userId,
                         jobId = jobId,
-                        idType = documentType,
+                        countryCode = it.arguments?.getString("countryCode")!!,
+                        documentType = it.arguments?.getString("documentType"),
+                        captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
                         showInstructions = true,
                         allowGalleryUpload = true,
-                        captureBothSides = true,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
                         navController.popBackStack(

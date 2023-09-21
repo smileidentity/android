@@ -16,11 +16,10 @@ import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.RequiredField
 import com.smileidentity.sample.compose.components.SearchableInputFieldItem
-import com.smileidentity.sample.countryDetails
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -89,19 +88,8 @@ class IdTypeSelectorAndFieldInputViewModel(
                 EnhancedKyc -> servicesResponse.hostedWeb.enhancedKyc
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
-            val countryList = servicesResponseForJobType
-                .filter { it.countryCode in supportedCountriesAndIdTypes }
-                .map {
-                    // If we fall back, we will not have emoji
-                    countryDetails[it.countryCode] ?: SearchableInputFieldItem(
-                        it.countryCode,
-                        it.name,
-                    )
-                }
-                .sortedBy { it.displayName }
-                .toImmutableList()
 
-            _uiState.update { it.copy(countries = countryList) }
+            _uiState.update { it.copy(countries = persistentListOf()) }
         }
     }
 
