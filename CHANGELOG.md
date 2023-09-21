@@ -1,6 +1,6 @@
 # Changelog
 
-## 10.0.0-beta08 (unreleased)
+## 10.0.0-beta08
 
 ### Added
 - Global Document Verification support
