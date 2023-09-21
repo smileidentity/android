@@ -131,7 +131,7 @@ private fun ColumnScope.CountrySelector(
     Text(
         text = stringResource(id = R.string.doc_v_select_country),
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(top = 16.dp)
+        modifier = Modifier.padding(top = 16.dp),
     )
     DockedSearchBar(
         query = query,
