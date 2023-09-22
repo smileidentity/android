@@ -1,5 +1,16 @@
 # Changelog
 
+## 10.0.0-beta09 (unreleased)
+
+### Added
+
+### Fixed
+
+### Changed
+
+### Removed
+- Unused string resources
+
 ## 10.0.0-beta08
 
 ### Added
