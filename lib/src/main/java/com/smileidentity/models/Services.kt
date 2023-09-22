@@ -31,6 +31,7 @@ private typealias CountryCodeToCountryInfo = Map<String, CountryInfo>
  */
 private typealias IdTypeKeyToAvailableIdType = Map<String, AvailableIdType>
 
+@Suppress("unused", "PropertyName")
 @JsonClass(generateAdapter = true)
 data class HostedWeb(
     @Json(name = "basic_kyc") internal val _basicKyc: CountryCodeToCountryInfo,
@@ -58,6 +59,7 @@ data class HostedWeb(
  * The [countryCode] field is not populated/returned by the API response, hence it being marked as
  * [Transient]. However, it should be populated before usage of this class.
  */
+@Suppress("PropertyName")
 @JsonClass(generateAdapter = true)
 data class CountryInfo(
     @Transient val countryCode: String = "",

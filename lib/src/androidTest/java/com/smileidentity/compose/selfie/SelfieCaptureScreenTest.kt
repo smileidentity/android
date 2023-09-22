@@ -1,4 +1,4 @@
-package com.smileidentity.compose
+package com.smileidentity.compose.selfie
 
 import android.Manifest
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -14,7 +14,6 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
-import com.smileidentity.compose.selfie.SelfieCaptureScreen
 import com.smileidentity.viewmodel.SelfieViewModel
 import io.mockk.Runs
 import io.mockk.every

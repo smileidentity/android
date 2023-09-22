@@ -110,7 +110,7 @@ class IdTypeSelectorAndFieldInputViewModel(
 
     fun onIdTypeSelected(idType: AvailableIdType) {
         // Remove all the default fields
-        val ignoredFields = listOf(
+        val ignoredFields = setOf(
             RequiredField.Country,
             RequiredField.IdType,
             RequiredField.UserId,
@@ -161,7 +161,7 @@ class IdTypeSelectorAndFieldInputViewModel(
             entered = true,
         )
 
-    fun getInputFieldUi(requiredField: RequiredField) = when (requiredField) {
+    private fun getInputFieldUi(requiredField: RequiredField) = when (requiredField) {
         RequiredField.IdNumber -> InputFieldUi(
             key = requiredField,
             label = "ID Number",

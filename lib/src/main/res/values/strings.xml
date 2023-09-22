@@ -12,8 +12,6 @@
 
     <!--  Content Descriptions (for accessibility)  -->
     <string name="si_cd_logo">Smile ID logo</string>
-    <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
-    <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
 
     <!--  Generic Instructions  -->
     <string name="si_photo_capture_instruction_good_light_title">Good Light</string>
@@ -80,36 +78,6 @@
     <string name="si_biometric_kyc_processing_success_title">Submission Complete</string>
     <string name="si_biometric_kyc_processing_success_subtitle">You may now proceed</string>
     <string name="si_biometric_kyc_processing_error_subtitle">Your submission failed to process</string>
-
-    <!--  Country Names  -->
-    <string name="si_country_name_ghana">Ghana</string>
-    <string name="si_country_name_kenya">Kenya</string>
-    <string name="si_country_name_nigeria">Nigeria</string>
-    <string name="si_country_name_south_africa">South Africa</string>
-    <string name="si_country_name_uganda">Uganda</string>
-
-    <!--  ID Type Names  -->
-    <string name="si_id_type_name_drivers_license">Driver\'s License</string>
-    <string name="si_id_type_name_passport">Passport</string>
-    <string name="si_id_type_name_ssnit">SSNIT</string>
-    <string name="si_id_type_name_voter_id">Voter ID</string>
-    <string name="si_id_type_name_new_voter_id">New Voter ID</string>
-    <string name="si_id_type_name_alien_card">Alien Card</string>
-    <string name="si_id_type_name_national_id">National ID</string>
-    <string name="si_id_type_name_national_id_no_photo">National ID (No Photo)</string>
-    <string name="si_id_type_name_bank_account">Bank Account</string>
-    <string name="si_id_type_name_bvn">BVN</string>
-    <string name="si_id_type_name_nin_v2">NIN v2</string>
-    <string name="si_id_type_name_nin_slip">NIN Slip</string>
-    <string name="si_id_type_name_v_nin">Virtual NIN</string>
-    <string name="si_id_type_name_phone_number">Phone Number</string>
-
-    <!--  ID Field Names  -->
-    <string name="si_id_field_name_id_number">ID Number</string>
-    <string name="si_id_field_name_first_name">First Name</string>
-    <string name="si_id_field_name_last_name">Last Name</string>
-    <string name="si_id_field_name_dob">Date of Birth</string>
-    <string name="si_id_field_name_bank_code">Bank Code</string>
 
     <!--  Consent Screen  -->
     <string name="si_consent_title">%1$s wants to access your %2$s information</string>

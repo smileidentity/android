@@ -1,4 +1,4 @@
-@file:Suppress("unused", "UnusedReceiverParameter")
+@file:Suppress("UnusedReceiverParameter")
 
 package com.smileidentity.compose
 

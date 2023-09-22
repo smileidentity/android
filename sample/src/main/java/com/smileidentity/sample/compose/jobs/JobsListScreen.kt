@@ -100,8 +100,8 @@ fun JobsListScreen(
                     userId = it.userId,
                     jobId = it.jobId,
                     smileJobId = it.smileJobId,
-                    resultCode = it.resultCode?.toString(),
-                    code = it.code?.toString(),
+                    resultCode = it.resultCode,
+                    code = it.code,
                 )
             }
         }

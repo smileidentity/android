@@ -20,6 +20,7 @@ import com.smileidentity.sample.R;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 import timber.log.Timber;
 
@@ -62,7 +63,7 @@ public class JavaActivity extends FragmentActivity {
                     // Note: Although the API submission is successful, the job status response
                     // may indicate that the job is still in progress or failed. You should
                     // check the job status response to determine the final status of the job.
-                    if (jobStatusResponse.getJobSuccess()) {
+                    if (Objects.requireNonNull(jobStatusResponse).getJobSuccess()) {
                         Timber.v("SmartSelfieEnrollment Job Success");
                     } else if (!jobStatusResponse.getJobComplete()) {
                         Timber.v("SmartSelfieEnrollment Job Not Complete");

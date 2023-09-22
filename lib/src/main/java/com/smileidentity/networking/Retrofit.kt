@@ -58,7 +58,7 @@ object PartnerParamsAdapter {
             jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"]),
             jobId = paramsJson["job_id"]!!,
             userId = paramsJson["user_id"]!!,
-            extras = paramsJson - listOf("job_id", "user_id", "job_type"),
+            extras = paramsJson - setOf("job_id", "user_id", "job_type"),
         )
     }
 }

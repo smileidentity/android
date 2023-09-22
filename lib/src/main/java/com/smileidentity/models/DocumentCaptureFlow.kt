@@ -8,10 +8,10 @@ import com.smileidentity.compose.components.ProcessingState
  */
 internal sealed interface DocumentCaptureFlow {
 
-    object FrontDocumentCapture : DocumentCaptureFlow
-    object BackDocumentCapture : DocumentCaptureFlow
+    data object FrontDocumentCapture : DocumentCaptureFlow
+    data object BackDocumentCapture : DocumentCaptureFlow
 
-    object SelfieCapture : DocumentCaptureFlow
+    data object SelfieCapture : DocumentCaptureFlow
     data class ProcessingScreen(
         val processingState: ProcessingState,
     ) : DocumentCaptureFlow

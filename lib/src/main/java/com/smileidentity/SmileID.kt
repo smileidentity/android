@@ -27,7 +27,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-@Suppress("unused")
 object SmileID {
     @JvmStatic
     lateinit var api: SmileIDService internal set

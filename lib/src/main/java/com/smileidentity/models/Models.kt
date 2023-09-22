@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.smileidentity.models
 
 import android.os.Parcelable

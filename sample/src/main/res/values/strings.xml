@@ -53,10 +53,6 @@
 
     <!--  Enhanced KYC  -->
     <string name="enhanced_kyc_product_name">Enhanced KYC</string>
-    <string name="enhanced_kyc_instructions">Provide ID Information</string>
-    <string name="enhanced_kyc_country_picker_label">Country</string>
-    <string name="enhanced_kyc_id_type_picker_label">ID Type</string>
-    <string name="enhanced_kyc_submit_button">Submit</string>
     <string name="enhanced_kyc_processing_title">Processing Enhanced KYC…</string>
     <string name="enhanced_kyc_processing_subtitle">Just a few more seconds</string>
     <string name="enhanced_kyc_processing_success_title">Enhanced KYC Complete</string>
@@ -75,6 +71,4 @@
     <string name="doc_v_select_country">Select Country of Issue</string>
     <string name="doc_v_country_search_field_hint">Select Country</string>
     <string name="doc_v_select_id_type">Select ID Type</string>
-    <string name="doc_v_info_title">Get Your ID Verified</string>
-    <string name="doc_v_info_subtitle">We need a valid document to verify who you are.</string>
 </resources>
