@@ -442,8 +442,12 @@ private fun Snackbar(viewModel: MainScreenViewModel = viewModel()) {
     val snackbarMessage = viewModel.uiState.collectAsStateWithLifecycle().value.snackbarMessage
 
     LaunchedEffect(snackbarMessage) {
-        snackbarMessage?.let { coroutineScope.launch { snackbarHostState.showSnackbar(it) } }
-        viewModel.clearSnackbar()
+        snackbarMessage?.let {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(it)
+                viewModel.clearSnackbar()
+            }
+        }
     }
 
     SnackbarHost(snackbarHostState) {
