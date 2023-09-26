@@ -47,6 +47,7 @@ class DocumentCaptureScreenTest {
                 knownIdAspectRatio = null,
                 onConfirm = {},
                 onError = {},
+                showSkipButton = true,
             )
         }
 
@@ -77,6 +78,7 @@ class DocumentCaptureScreenTest {
                 knownIdAspectRatio = null,
                 onConfirm = {},
                 onError = {},
+                showSkipButton = true,
             )
         }
 
