@@ -187,6 +187,10 @@ fun SmileID.DocumentVerification(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-kyc)
  *
  * @param idInfo The ID information to look up in the ID Authority
+ * @param partnerIcon Your own icon to display on the Biometric KYC screen (i.e. company logo)
+ * @param partnerName Your own name to display on the Biometric KYC screen (i.e. company name)
+ * @param productName The type of information you are trying to access (i.e. ID type)
+ * @param partnerPrivacyPolicy A link to your own privacy policy to display
  * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
  * @param jobId The job ID to associate with the Biometric KYC. Most often, this will correspond
@@ -233,24 +237,39 @@ fun SmileID.BiometricKYC(
 }
 
 /**
- * Perform BVN verification: Verify the BVN information of your user and confirm that the ID actually
- * belongs to the user.
+ * Perform BVN verification: Verify the BVN information of your user and confirm that the ID
+ * actually belongs to the user by requesting an OTP.
  *
  * [Docs](https://docs.usesmileid.com/integration-options/mobile/android/consent-screen#bvn-consent-screen)
  *
+ * @param partnerIcon Your own icon to display on the BVN Consent screen (i.e. company logo)
+ * @param partnerName Your own name to display on the BVN Consent screen (i.e. company name)
+ * @param partnerPrivacyPolicy A link to your own privacy policy to display
  * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
- * @param onSuccessfulBvnVerification Callback to be invoked when the BVN verification job is complete.
+ * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
+ * @param onConsentGranted Callback to be invoked when the BVN verification job is
+ * complete.
  */
 @Composable
 fun SmileID.BvnConsentScreen(
+    partnerIcon: Painter,
+    partnerName: String,
+    partnerPrivacyPolicy: URL,
+    onConsentGranted: () -> Unit,
+    onConsentDenied: () -> Unit,
+    showAttribution: Boolean = true,
     userId: String = rememberSaveable { randomUserId() },
-    onSuccessfulBvnVerification: () -> Unit,
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
             userId = userId,
-            successfulBvnVerification = onSuccessfulBvnVerification,
+            partnerIcon = partnerIcon,
+            partnerName = partnerName,
+            partnerPrivacyPolicy = partnerPrivacyPolicy,
+            onConsentGranted = onConsentGranted,
+            onConsentDenied = onConsentDenied,
+            showAttribution = showAttribution,
         )
     }
 }

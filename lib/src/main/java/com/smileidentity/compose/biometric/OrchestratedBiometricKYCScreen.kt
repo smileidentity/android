@@ -15,8 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.consent.ConsentDeniedScreen
-import com.smileidentity.compose.consent.ConsentScreen
+import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
@@ -52,19 +51,15 @@ fun OrchestratedBiometricKYCScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
 
-        uiState.showConsent -> ConsentScreen(
+        uiState.showConsent -> OrchestratedConsentScreen(
             partnerIcon = partnerIcon,
             partnerName = partnerName,
             productName = productName,
             partnerPrivacyPolicy = partnerPrivacyPolicy,
             showAttribution = showAttribution,
-            onContinue = { viewModel.onConsentGranted() },
-            onCancel = { viewModel.onConsentDenied() },
-        )
-
-        uiState.consentDenied -> ConsentDeniedScreen(
-            onGoBack = { viewModel.onConsentDeniedTryAgain() },
-            onCancel = {
+            modifier = modifier,
+            onConsentGranted = viewModel::onConsentGranted,
+            onConsentDenied = {
                 onResult(SmileIDResult.Error(OperationCanceledException("User did not consent")))
             },
         )

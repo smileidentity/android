@@ -442,6 +442,12 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onConsentDenied() {
+        _uiState.update {
+            it.copy(snackbarMessage = SnackbarMessage("Consent Denied"))
+        }
+    }
+
     fun onSuccessfulBvnConsent() {
         _uiState.update {
             it.copy(snackbarMessage = SnackbarMessage("BVN Consent Successful"))

@@ -26,7 +26,6 @@ import java.io.File
 data class BiometricKycUiState(
     val showLoading: Boolean = true,
     val showConsent: Boolean = false,
-    val consentDenied: Boolean = false,
     val processingState: ProcessingState? = null,
 )
 
@@ -67,15 +66,7 @@ class BiometricKycViewModel(
     }
 
     fun onConsentGranted() {
-        _uiState.update { it.copy(showConsent = false, consentDenied = false) }
-    }
-
-    fun onConsentDenied() {
-        _uiState.update { it.copy(showConsent = false, consentDenied = true) }
-    }
-
-    fun onConsentDeniedTryAgain() {
-        _uiState.update { it.copy(showConsent = true, consentDenied = false) }
+        _uiState.update { it.copy(showConsent = false) }
     }
 
     fun onSelfieCaptured(selfieFile: File, livenessFiles: List<File>) {

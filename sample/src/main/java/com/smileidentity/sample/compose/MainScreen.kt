@@ -79,6 +79,7 @@ fun MainScreen(
         factory = viewModelFactory { MainScreenViewModel() },
     ),
 ) {
+    val privacyPolicy = remember { URL("https://usesmileid.com/privacy-policy") }
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
     val currentRoute by navController
@@ -213,7 +214,6 @@ fun MainScreen(
                         )
                     }
                     idInfo?.let {
-                        val url = remember { URL("https://usesmileid.com/privacy-policy") }
                         val userId = rememberSaveable { randomUserId() }
                         val jobId = rememberSaveable { randomJobId() }
                         SmileID.BiometricKYC(
@@ -225,7 +225,7 @@ fun MainScreen(
                             ),
                             partnerName = "Smile ID",
                             productName = it.idType!!,
-                            partnerPrivacyPolicy = url,
+                            partnerPrivacyPolicy = privacyPolicy,
                         ) { result ->
                             viewModel.onBiometricKycResult(userId, jobId, result)
                             navController.popBackStack()
@@ -266,13 +266,27 @@ fun MainScreen(
                 }
                 composable(ProductScreen.BvnConsent.route) {
                     LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
-                    SmileID.BvnConsentScreen {
-                        viewModel.onSuccessfulBvnConsent()
-                        navController.popBackStack(
-                            route = BottomNavigationScreen.Home.route,
-                            inclusive = false,
-                        )
-                    }
+                    SmileID.BvnConsentScreen(
+                        partnerIcon = painterResource(
+                            id = com.smileidentity.R.drawable.si_logo_with_text,
+                        ),
+                        partnerName = stringResource(com.smileidentity.R.string.si_company_name),
+                        partnerPrivacyPolicy = privacyPolicy,
+                        onConsentDenied = {
+                            viewModel.onConsentDenied()
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        },
+                        onConsentGranted = {
+                            viewModel.onSuccessfulBvnConsent()
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        },
+                    )
                 }
             }
         },

@@ -47,10 +47,10 @@ internal fun VerifyOtpScreen(
             BvnConsentViewModel(userId = userId)
         },
     ),
-    successfulBvnVerification: () -> Unit,
+    onSuccessfulBvnVerification: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    if (uiState.showSuccess) successfulBvnVerification()
+    if (uiState.showSuccess) onSuccessfulBvnVerification()
 
     val focusRequester = remember { FocusRequester() }
 
