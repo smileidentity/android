@@ -24,13 +24,14 @@ internal fun OrchestratedConsentScreen(
     showAttribution: Boolean = true,
 ) {
     var showTryAgain by remember { mutableStateOf(false) }
-    when {
-        showTryAgain -> ConsentDeniedScreen(
+    if (showTryAgain) {
+        ConsentDeniedScreen(
             onGoBack = { showTryAgain = false },
             onCancel = onConsentDenied,
             modifier = modifier,
         )
-        else -> ConsentScreen(
+    } else {
+        ConsentScreen(
             partnerIcon = partnerIcon,
             partnerName = partnerName,
             productName = productName,
