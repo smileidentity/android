@@ -41,17 +41,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-/**
- * Wrapper for the message, so that LaunchedEffect's key changes even if we need to display the same
- * message again. We *can't* use data class because the generated equals would be the same for the
- * same String
- */
-class SnackbarMessage(val value: String)
-
 data class MainScreenUiState(
     @StringRes val appBarTitle: Int = R.string.app_name,
     val isProduction: Boolean = !SmileID.useSandbox,
-    val snackbarMessage: SnackbarMessage? = null,
+    val snackbarMessage: String? = null,
     val bottomNavSelection: BottomNavigationScreen = startScreen,
     val pendingJobCount: Int = 0,
     val showSmileConfigBottomSheet: Boolean = false,
@@ -127,7 +120,7 @@ class MainScreenViewModel : ViewModel() {
                                 completedJob = it,
                             )
                             _uiState.update {
-                                it.copy(snackbarMessage = SnackbarMessage("Job Completed"))
+                                it.copy(snackbarMessage = "Job Completed")
                             }
                         } else {
                             DataStoreRepository.markPendingJobAsCompleted(
@@ -139,9 +132,7 @@ class MainScreenViewModel : ViewModel() {
                                 ),
                             )
                             _uiState.update {
-                                it.copy(
-                                    snackbarMessage = SnackbarMessage("Job Polling Timed Out"),
-                                )
+                                it.copy(snackbarMessage = "Job Polling Timed Out")
                             }
                         }
                     }
@@ -228,7 +219,7 @@ class MainScreenViewModel : ViewModel() {
             val response = result.data.jobStatusResponse ?: run {
                 val errorMessage = "SmartSelfie Enrollment jobStatusResponse is null"
                 Timber.e(errorMessage)
-                _uiState.update { it.copy(snackbarMessage = SnackbarMessage(errorMessage)) }
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
                 return
             }
             val actualResult = response.result as? SmartSelfieJobResult.Entry
@@ -245,7 +236,7 @@ class MainScreenViewModel : ViewModel() {
             _uiState.update {
                 it.copy(
                     clipboardText = AnnotatedString(userId),
-                    snackbarMessage = SnackbarMessage(message),
+                    snackbarMessage = message,
                 )
             }
             viewModelScope.launch {
@@ -259,7 +250,7 @@ class MainScreenViewModel : ViewModel() {
             val th = result.throwable
             val message = "SmartSelfie Enrollment error: ${th.message}"
             Timber.e(th, message)
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
         }
     }
 
@@ -281,7 +272,7 @@ class MainScreenViewModel : ViewModel() {
             val response = result.data.jobStatusResponse ?: run {
                 val errorMessage = "SmartSelfie Authentication jobStatusResponse is null"
                 Timber.e(errorMessage)
-                _uiState.update { it.copy(snackbarMessage = SnackbarMessage(errorMessage)) }
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
                 return
             }
             val actualResult = response.result as? SmartSelfieJobResult.Entry
@@ -294,7 +285,7 @@ class MainScreenViewModel : ViewModel() {
                 resultText = actualResult?.resultText,
             )
             Timber.d("$message: $result")
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
                 DataStoreRepository.addPendingJob(
                     partnerId = SmileID.config.partnerId,
@@ -306,7 +297,7 @@ class MainScreenViewModel : ViewModel() {
             val th = result.throwable
             val message = "SmartSelfie Authentication error: ${th.message}"
             Timber.e(th, message)
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
         }
     }
 
@@ -331,7 +322,7 @@ class MainScreenViewModel : ViewModel() {
                 resultText = resultData.resultText,
             )
             Timber.d("$message: $result")
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
                 // Enhanced KYC completes synchronously
                 DataStoreRepository.addCompletedJob(
@@ -344,7 +335,7 @@ class MainScreenViewModel : ViewModel() {
             val th = result.throwable
             val message = "Enhanced KYC error: ${th.message}"
             Timber.e(th, message)
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
         }
     }
 
@@ -375,7 +366,7 @@ class MainScreenViewModel : ViewModel() {
                 resultText = actualResult?.resultText,
             )
             Timber.d("$message: $result")
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
                 DataStoreRepository.addPendingJob(
                     partnerId = SmileID.config.partnerId,
@@ -387,7 +378,7 @@ class MainScreenViewModel : ViewModel() {
             val th = result.throwable
             val message = "Biometric KYC error: ${th.message}"
             Timber.e(th, message)
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
         }
     }
 
@@ -417,7 +408,7 @@ class MainScreenViewModel : ViewModel() {
                 resultText = actualResult?.resultText,
             )
             Timber.d("$message: $result")
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
                 DataStoreRepository.addPendingJob(
                     partnerId = SmileID.config.partnerId,
@@ -429,7 +420,7 @@ class MainScreenViewModel : ViewModel() {
             val th = result.throwable
             val message = "Document Verification error: ${th.message}"
             Timber.e(th, message)
-            _uiState.update { it.copy(snackbarMessage = SnackbarMessage(message)) }
+            _uiState.update { it.copy(snackbarMessage = message) }
         }
     }
 
@@ -444,13 +435,13 @@ class MainScreenViewModel : ViewModel() {
 
     fun onConsentDenied() {
         _uiState.update {
-            it.copy(snackbarMessage = SnackbarMessage("Consent Denied"))
+            it.copy(snackbarMessage = "Consent Denied")
         }
     }
 
     fun onSuccessfulBvnConsent() {
         _uiState.update {
-            it.copy(snackbarMessage = SnackbarMessage("BVN Consent Successful"))
+            it.copy(snackbarMessage = "BVN Consent Successful")
         }
     }
 
@@ -458,5 +449,9 @@ class MainScreenViewModel : ViewModel() {
         viewModelScope.launch {
             DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)
         }
+    }
+
+    fun clearSnackbar() {
+        _uiState.update { it.copy(snackbarMessage = null) }
     }
 }
