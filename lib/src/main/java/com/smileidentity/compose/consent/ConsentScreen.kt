@@ -157,7 +157,7 @@ internal fun ConsentScreen(
                 SmileIDAttribution()
             }
         },
-        modifier = modifier,
+        modifier = modifier.testTag("consent_screen"),
         showDivider = true,
     )
 }

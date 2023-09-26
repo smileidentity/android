@@ -83,7 +83,7 @@ internal fun ConsentDeniedScreen(
                 SmileIDAttribution()
             }
         },
-        modifier = modifier,
+        modifier = modifier.testTag("consent_denied_screen"),
     )
 }
 

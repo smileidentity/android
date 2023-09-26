@@ -27,13 +27,14 @@ const val BVN_LENGTH = 11
 const val BVN_OTP_LENGTH = 6
 
 internal enum class BvnConsentScreens {
+    ConsentScreen,
     BvnInputScreen,
     ChooseOtpDeliveryScreen,
     VerifyOtpScreen,
 }
 
 internal data class BvnConsentUiState(
-    val bvnConsentScreens: BvnConsentScreens = BvnConsentScreens.BvnInputScreen,
+    val currentScreen: BvnConsentScreens = BvnConsentScreens.ConsentScreen,
     val isBvnValid: Boolean = false,
     val isBvnOtpValid: Boolean = false,
     val sessionId: String = "",
@@ -69,6 +70,10 @@ internal class BvnConsentViewModel(
         }
     }
 
+    fun onConsentGranted() {
+        _uiState.update { it.copy(currentScreen = BvnConsentScreens.BvnInputScreen) }
+    }
+
     internal fun updateBvnNumber(input: String) {
         if (input.length <= BVN_LENGTH) {
             _uiState.update { it.copy(isBvnValid = input.length == BVN_LENGTH, showError = false) }
@@ -91,7 +96,7 @@ internal class BvnConsentViewModel(
     internal fun selectContactMethod() {
         _uiState.update {
             it.copy(
-                bvnConsentScreens = BvnConsentScreens.ChooseOtpDeliveryScreen,
+                currentScreen = BvnConsentScreens.ChooseOtpDeliveryScreen,
                 showError = false,
             )
         }
@@ -119,7 +124,7 @@ internal class BvnConsentViewModel(
             val response = SmileID.api.requestBvnTotpMode(request = request)
             _uiState.update {
                 it.copy(
-                    bvnConsentScreens = BvnConsentScreens.ChooseOtpDeliveryScreen,
+                    currentScreen = BvnConsentScreens.ChooseOtpDeliveryScreen,
                     showLoading = false,
                     sessionId = response.sessionId,
                     showError = false,
@@ -148,7 +153,7 @@ internal class BvnConsentViewModel(
             if (response.success) {
                 _uiState.update {
                     it.copy(
-                        bvnConsentScreens = BvnConsentScreens.VerifyOtpScreen,
+                        currentScreen = BvnConsentScreens.VerifyOtpScreen,
                         showLoading = false,
                     )
                 }

@@ -70,7 +70,7 @@ class BvnConsentViewModelTest {
         // then
         Assert.assertEquals(
             BvnConsentScreens.ChooseOtpDeliveryScreen,
-            subject.uiState.value.bvnConsentScreens,
+            subject.uiState.value.currentScreen,
         )
     }
 
@@ -101,7 +101,7 @@ class BvnConsentViewModelTest {
         // then
         Assert.assertEquals(
             BvnConsentScreens.VerifyOtpScreen,
-            subject.uiState.value.bvnConsentScreens,
+            subject.uiState.value.currentScreen,
         )
     }
 

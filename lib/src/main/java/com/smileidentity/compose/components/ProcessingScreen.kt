@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,11 @@ enum class ProcessingState {
 /**
  * This screen represents a generic Processing state. It has 3 sub-states: In Progress, Success, and
  * Error. These sub-states are represented by the [processingState] parameter.
+ *
+ * Note: because we accept [Painter] for the icons, this may cause some extra recompositions.
+ * However, this is done so that partners can have the flexibility to replace icons with normal
+ * images, if they so choose (as opposed to an optimization where we accept only [ImageVector],
+ * which is immutable)
  *
  * @param processingState The state of the processing.
  * @param inProgressTitle The title to display when the processing is in progress.

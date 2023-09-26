@@ -1,5 +1,18 @@
 # Changelog
 
+## 10.0.0-beta09 (unreleased)
+
+### Added
+
+### Fixed
+- Updated KDocs with missing parameter descriptions
+
+### Changed
+- Show the normal consent screen as part of BVN Verification
+- The parameters of BvnConsentScreen have been updated to support inclusion of the consent screen
+
+### Removed
+
 ## 10.0.0-beta08
 
 ### Added
