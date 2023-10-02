@@ -127,9 +127,7 @@ internal fun DocumentCaptureScreen(
                     Timber.v("onInstructionsAcknowledgedSelectFromGallery")
                     photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
                 },
-                onInstructionsAcknowledgedTakePhoto = {
-                    viewModel.onInstructionsAcknowledged()
-                },
+                onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
                 onSkip = onSkip,
             )
         }

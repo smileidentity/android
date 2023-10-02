@@ -10,6 +10,9 @@
 ### Changed
 - Show the normal consent screen as part of BVN Verification
 - The parameters of BvnConsentScreen have been updated to support inclusion of the consent screen
+- Bump Compose BOM to 2023.09.02
+- Bump AGP to 8.1.2
+- Bump Sentry to 6.30.0
 
 ### Removed
 
