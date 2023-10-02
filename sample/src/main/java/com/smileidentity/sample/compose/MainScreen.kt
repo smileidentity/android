@@ -57,6 +57,7 @@ import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
+import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
@@ -361,7 +362,17 @@ private fun BottomBar(
     onBottomNavItemSelected: (BottomNavigationScreen) -> Unit,
 ) {
     NavigationBar {
-        bottomNavItems.forEach {
+        // We want to show settings on debug builds only. This will allow partners to share
+        // prod builds without sharing their Smile ID credentials.
+        //
+        // If we add more options in the settings page, we can move this condition inside
+        // SettingsScreen and add individual checks - no need to show a blank screen
+        val filteredBottomNavItems = if (BuildConfig.DEBUG) {
+            bottomNavItems
+        } else {
+            bottomNavItems.filterNot { it.label == R.string.settings }
+        }
+        filteredBottomNavItems.forEach {
             NavigationBarItem(
                 selected = it == bottomNavSelection,
                 icon = {
