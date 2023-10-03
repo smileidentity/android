@@ -42,21 +42,6 @@ class RootViewModel : ViewModel() {
         )
 
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
-    private val currentConfig = DataStoreRepository.getConfigJsonString()
-        .map { it ?: SMILE_CONFIG_DEFAULT_HINT }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    init {
-        viewModelScope.launch {
-            currentConfig.collect { config ->
-                _uiState.update { it.copy(smileConfigHint = config) }
-            }
-        }
-    }
 
     fun updateSmileConfig(updatedConfig: String) {
         try {

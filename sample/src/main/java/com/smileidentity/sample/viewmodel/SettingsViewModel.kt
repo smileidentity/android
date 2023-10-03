@@ -25,21 +25,6 @@ class SettingsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState = _uiState.asStateFlow()
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
-    private val currentConfig = DataStoreRepository.getConfigJsonString()
-        .map { it ?: SMILE_CONFIG_DEFAULT_HINT }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileSubscribed(),
-            initialValue = "",
-        )
-
-    init {
-        viewModelScope.launch {
-            currentConfig.collect { config ->
-                _uiState.update { it.copy(smileConfigHint = config) }
-            }
-        }
-    }
 
     fun showSmileConfigInput() {
         _uiState.update { it.copy(showSmileConfigBottomSheet = true) }
