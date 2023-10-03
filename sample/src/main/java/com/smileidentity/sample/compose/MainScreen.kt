@@ -57,7 +57,6 @@ import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
-import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
