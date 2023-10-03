@@ -44,7 +44,6 @@ internal class OrchestratedEnhancedDocVViewModel(
     private val countryCode: String,
     private val documentType: String? = null,
     private val captureBothSides: Boolean,
-    private var selfieFile: File? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedEnhancedDocVUiState())
     val uiState = _uiState.asStateFlow()
@@ -53,6 +52,7 @@ internal class OrchestratedEnhancedDocVViewModel(
     )
     private var documentFrontFile: File? = null
     private var documentBackFile: File? = null
+    private var selfieFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
