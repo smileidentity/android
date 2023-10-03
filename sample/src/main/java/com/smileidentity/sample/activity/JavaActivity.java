@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.smileidentity.fragment.DocumentVerificationFragment;
+import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
 import com.smileidentity.models.SmartSelfieJobStatusResponse;
@@ -43,6 +44,8 @@ public class JavaActivity extends FragmentActivity {
             .setOnClickListener(v -> doSmartSelfieEnrollment());
         findViewById(R.id.button_document_verification)
             .setOnClickListener(v -> doDocumentVerification());
+        findViewById(R.id.button_enhanced_document_verification)
+            .setOnClickListener(v -> doEnhancedDocumentVerification());
     }
 
     private void doSmartSelfieEnrollment() {
@@ -128,6 +131,25 @@ public class JavaActivity extends FragmentActivity {
                 getSupportFragmentManager()
                     .beginTransaction()
                     .remove(documentVerificationFragment)
+                    .commit();
+                hideProductFragment();
+            }
+        );
+    }
+
+    private void doEnhancedDocumentVerification() {
+        EnhancedDocumentVerificationFragment enhancedDocVFragment = EnhancedDocumentVerificationFragment
+            .newInstance("GH", "DRIVERS_LICENSE");
+        getSupportFragmentManager().setFragmentResultListener(
+            EnhancedDocumentVerificationFragment.KEY_REQUEST,
+            this,
+            (requestKey, result) -> {
+                SmileIDResult<DocumentVerificationResult> enhancedDocVResult =
+                    DocumentVerificationFragment.resultFromBundle(result);
+                Timber.v("EnhancedDocumentVerification Result: %s", enhancedDocVResult);
+                getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(enhancedDocVFragment)
                     .commit();
                 hideProductFragment();
             }
