@@ -13,6 +13,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
+import com.smileidentity.compose.document.OrchestratedEnhancedDocVScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
@@ -361,6 +362,66 @@ fun SmileID.BvnConsentScreen(
             onConsentGranted = onConsentGranted,
             onConsentDenied = onConsentDenied,
             showAttribution = showAttribution,
+        )
+    }
+}
+
+/**
+ * Perform Enhanced Document Verification
+ *
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
+ *
+ * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ * @param documentType An optional document type of the document
+ * @param captureBothSides Determines if the document has a back side
+ * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
+ * side will be captured.
+ * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
+ * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
+ * standard size of ~1.6
+ * @param userId The user ID to associate with the Enhanced Document Verification. Most often, this will
+ * correspond to a unique User ID within your own system. If not provided, a random user ID will be
+ * generated
+ * @param jobId The job ID to associate with the Enhanced Document Verification. Most often, this will
+ * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
+ * generated
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
+ * @param showInstructions Whether to deactivate capture screen's instructions for Document
+ * Verification (NB! If instructions are disabled, gallery upload won't be possible)
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Enhanced Document Verification is complete.
+ */
+@Composable
+fun SmileID.EnhancedDocVScreen(
+    countryCode: String,
+    documentType: String? = null,
+    captureBothSides: Boolean = true,
+    idAspectRatio: Float? = null,
+    userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
+    showAttribution: Boolean = true,
+    allowGalleryUpload: Boolean = false,
+    showInstructions: Boolean = true,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<DocumentVerificationResult> = {},
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedEnhancedDocVScreen(
+            countryCode = countryCode,
+            documentType = documentType,
+            captureBothSides = captureBothSides,
+            userId = userId,
+            jobId = jobId,
+            showAttribution = showAttribution,
+            allowGalleryUpload = allowGalleryUpload,
+            showInstructions = showInstructions,
+            idAspectRatio = idAspectRatio,
+            onResult = onResult,
         )
     }
 }
