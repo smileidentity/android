@@ -44,6 +44,7 @@ val products = listOf(
     ProductScreen.BiometricKyc,
     ProductScreen.DocumentVerification,
     ProductScreen.BvnConsent,
+    ProductScreen.EnhancedDocV,
 )
 
 @Composable

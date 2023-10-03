@@ -445,6 +445,15 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onEnhancedDocVSelected() {
+        _uiState.update {
+            it.copy(
+                appBarTitle = ProductScreen.EnhancedDocV.label,
+                bottomNavSelection = BottomNavigationScreen.Home,
+            )
+        }
+    }
+
     fun clearJobs() {
         viewModelScope.launch {
             DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)

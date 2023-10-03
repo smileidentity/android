@@ -52,6 +52,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
+import com.smileidentity.compose.EnhancedDocVScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.IdInfo
@@ -60,6 +61,7 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
+import com.smileidentity.sample.compose.components.IdTypeSelectorScreen
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
 import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
@@ -287,6 +289,35 @@ fun MainScreen(
                             )
                         },
                     )
+                }
+                composable(ProductScreen.EnhancedDocV.route) {
+                    LaunchedEffect(Unit) { viewModel.onEnhancedDocVSelected() }
+                    var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                    if (idInfo == null) {
+                        IdTypeSelectorScreen(
+                            jobType = JobType.BiometricKyc,
+                            onResult = { idInfo = it },
+                        )
+                    }
+                    idInfo?.let {
+                        val userId = rememberSaveable { randomUserId() }
+                        val jobId = rememberSaveable { randomJobId() }
+                        SmileID.EnhancedDocVScreen(
+                            userId = userId,
+                            jobId = jobId,
+                            countryCode = it.country,
+                            documentType = it.idType,
+                            captureBothSides = true,
+                            showInstructions = true,
+                            allowGalleryUpload = true,
+                        ) { result ->
+                            viewModel.onDocumentVerificationResult(userId, jobId, result)
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        }
+                    }
                 }
             }
         },

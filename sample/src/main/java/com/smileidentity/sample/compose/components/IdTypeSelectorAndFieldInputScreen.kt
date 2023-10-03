@@ -1,34 +1,25 @@
 package com.smileidentity.sample.compose.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -71,70 +62,6 @@ fun IdTypeSelectorAndFieldInputScreen(
             onNext = { onResult(viewModel.currentIdInfo) },
         )
     }
-}
-
-@Composable
-private fun IdSelectorScreen(
-    modifier: Modifier = Modifier,
-    viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(),
-    onNext: () -> Unit,
-) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    BottomPinnedColumn(
-        scrollableContent = {
-            Text(
-                text = stringResource(R.string.biometric_kyc_instructions),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 16.dp),
-            )
-            SearchableInputField(
-                fieldLabel = stringResource(R.string.doc_v_country_search_field_hint),
-                selectedItem = uiState.selectedCountry,
-                unfilteredItems = uiState.countries,
-            ) { viewModel.onCountrySelected(it) }
-
-            uiState.idTypesForCountry?.let { idTypesForCountry ->
-                Text(
-                    text = stringResource(R.string.doc_v_select_id_type),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 16.dp),
-                )
-
-                idTypesForCountry.forEach {
-                    val selected = uiState.selectedIdType == it
-                    val onClick = { viewModel.onIdTypeSelected(it) }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surface)
-                            .selectable(
-                                selected = selected,
-                                onClick = onClick,
-                                role = Role.RadioButton,
-                            )
-                            .padding(vertical = 2.dp),
-                    ) {
-                        RadioButton(selected = selected, onClick = onClick)
-                        Text(text = it.label)
-                    }
-                }
-            }
-        },
-        pinnedContent = {
-            Button(
-                onClick = onNext,
-                enabled = uiState.isIdTypeContinueEnabled,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(text = stringResource(R.string.cont))
-            }
-        },
-        columnWidth = 320.dp,
-        modifier = modifier,
-    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
