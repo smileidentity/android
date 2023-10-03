@@ -362,17 +362,7 @@ private fun BottomBar(
     onBottomNavItemSelected: (BottomNavigationScreen) -> Unit,
 ) {
     NavigationBar {
-        // We want to show settings on debug builds only. This will allow partners to share
-        // prod builds without sharing their Smile ID credentials.
-        //
-        // If we add more options in the settings page, we can move this condition inside
-        // SettingsScreen and add individual checks - no need to show a blank screen
-        val filteredBottomNavItems = if (BuildConfig.DEBUG) {
-            bottomNavItems
-        } else {
-            bottomNavItems.filterNot { it.label == R.string.settings }
-        }
-        filteredBottomNavItems.forEach {
+        bottomNavItems.forEach {
             NavigationBarItem(
                 selected = it == bottomNavSelection,
                 icon = {
