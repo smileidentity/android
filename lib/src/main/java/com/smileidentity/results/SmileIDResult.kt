@@ -119,3 +119,9 @@ data class BiometricKycResult(
     val livenessFiles: List<File>,
     val jobStatusResponse: BiometricKycJobStatusResponse,
 ) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class EnhancedDocumentVerificationResult(
+    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse,
+) : Parcelable

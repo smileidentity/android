@@ -10,14 +10,14 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
-import com.smileidentity.models.JobType
+import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
-import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -34,10 +34,6 @@ internal data class OrchestratedEnhancedDocVUiState(
     @StringRes val errorMessage: Int? = null,
 )
 
-/**
- * @param selfieFile The selfie image file to use for authentication. If null, selfie capture will
- * be performed
- */
 internal class OrchestratedEnhancedDocVViewModel(
     private val userId: String,
     private val jobId: String,
@@ -47,7 +43,7 @@ internal class OrchestratedEnhancedDocVViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedEnhancedDocVUiState())
     val uiState = _uiState.asStateFlow()
-    var result: SmileIDResult<DocumentVerificationResult> = SmileIDResult.Error(
+    var result: SmileIDResult<EnhancedDocumentVerificationResult> = SmileIDResult.Error(
         IllegalStateException("Document Capture incomplete"),
     )
     private var documentFrontFile: File? = null
@@ -101,7 +97,7 @@ internal class OrchestratedEnhancedDocVViewModel(
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
-                jobType = JobType.DocumentVerification,
+                jobType = EnhancedDocumentVerification,
                 enrollment = false,
                 userId = userId,
                 jobId = jobId,
@@ -142,14 +138,9 @@ internal class OrchestratedEnhancedDocVViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getDocumentVerificationJobStatus(jobStatusRequest)
+            val jobStatusResponse = SmileID.api.getEnhancedDocVJobStatus(jobStatusRequest)
             result = SmileIDResult.Success(
-                DocumentVerificationResult(
-                    selfieFile = selfieImageInfo.image,
-                    documentFrontFile = documentFrontFile,
-                    documentBackFile = documentBackFile,
-                    jobStatusResponse = jobStatusResponse,
-                ),
+                EnhancedDocumentVerificationResult(jobStatusResponse = jobStatusResponse),
             )
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
@@ -190,5 +181,5 @@ internal class OrchestratedEnhancedDocVViewModel(
         }
     }
 
-    fun onFinished(callback: SmileIDCallback<DocumentVerificationResult>) = callback(result)
+    fun onFinished(callback: SmileIDCallback<EnhancedDocumentVerificationResult>) = callback(result)
 }
