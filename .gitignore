@@ -38,3 +38,5 @@ google-services.json
 smile_config.json
 
 play_console_github_actions_service_account_credentials.json
+
+sample/release/*
