@@ -54,7 +54,7 @@ enum class ProductScreen(
         com.smileidentity.R.string.si_bvn_product_name,
         R.drawable.biometric_kyc,
     ),
-    EnhancedDocV(
+    EnhancedDocumentVerification(
         "enhanced_docv",
         com.smileidentity.R.string.si_enhanced_docv_product_name,
         com.smileidentity.R.drawable.si_doc_v_instructions_hero,

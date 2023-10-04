@@ -290,8 +290,8 @@ fun MainScreen(
                         },
                     )
                 }
-                composable(ProductScreen.EnhancedDocV.route) {
-                    LaunchedEffect(Unit) { viewModel.onEnhancedDocVSelected() }
+                composable(ProductScreen.EnhancedDocumentVerification.route) {
+                    LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
                     if (idInfo == null) {
                         IdTypeSelectorScreen(
@@ -311,7 +311,7 @@ fun MainScreen(
                             showInstructions = true,
                             allowGalleryUpload = true,
                         ) { result ->
-                            viewModel.onEnhancedDocVResult(userId, jobId, result)
+                            viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
                             navController.popBackStack(
                                 route = BottomNavigationScreen.Home.route,
                                 inclusive = false,

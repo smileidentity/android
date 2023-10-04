@@ -74,7 +74,7 @@ data class EnhancedDocumentVerificationJobStatusResponse(
     @Json(name = "job_complete") override val jobComplete: Boolean,
     @Json(name = "job_success") override val jobSuccess: Boolean,
     @Json(name = "code") override val code: String,
-    @Json(name = "result") override val result: EnhancedDocVJobResult?,
+    @Json(name = "result") override val result: EnhancedDocumentVerificationJobResult?,
     @Json(name = "history") val history: List<DocumentVerificationJobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
 ) : JobStatusResponse, Parcelable
@@ -93,7 +93,7 @@ interface JobResult : Parcelable {
     ) : SmartSelfieJobResult,
         DocumentVerificationJobResult,
         BiometricKycJobResult,
-        EnhancedDocVJobResult
+        EnhancedDocumentVerificationJobResult
 
     interface Entry : JobResult {
         val actions: Actions
@@ -170,7 +170,7 @@ sealed interface BiometricKycJobResult : JobResult {
     ) : BiometricKycJobResult, JobResult.Entry
 }
 
-sealed interface EnhancedDocVJobResult : JobResult {
+sealed interface EnhancedDocumentVerificationJobResult : JobResult {
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Entry(
@@ -197,7 +197,7 @@ sealed interface EnhancedDocVJobResult : JobResult {
         @Json(name = "Secondary_ID_Number") val secondaryIdNumber: String?,
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
-    ) : EnhancedDocVJobResult, JobResult.Entry
+    ) : EnhancedDocumentVerificationJobResult, JobResult.Entry
 }
 
 @Parcelize

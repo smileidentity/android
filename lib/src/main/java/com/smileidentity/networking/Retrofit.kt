@@ -2,7 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult
-import com.smileidentity.models.EnhancedDocVJobResult
+import com.smileidentity.models.EnhancedDocumentVerificationJobResult
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
@@ -193,7 +193,7 @@ object EnhancedDocumentVerificationJobResultAdapter {
     @FromJson
     fun fromJson(
         reader: JsonReader,
-        delegate: JsonAdapter<EnhancedDocVJobResult.Entry>,
+        delegate: JsonAdapter<EnhancedDocumentVerificationJobResult.Entry>,
     ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
         delegate.fromJson(reader)!!
     } else {
@@ -203,12 +203,12 @@ object EnhancedDocumentVerificationJobResultAdapter {
     @ToJson
     fun toJson(
         writer: JsonWriter,
-        result: EnhancedDocVJobResult,
-        delegate: JsonAdapter<EnhancedDocVJobResult.Entry>,
+        result: EnhancedDocumentVerificationJobResult,
+        delegate: JsonAdapter<EnhancedDocumentVerificationJobResult.Entry>,
     ) {
         when (result) {
             is JobResult.Freeform -> writer.value(result.result)
-            is EnhancedDocVJobResult.Entry -> delegate.toJson(writer, result)
+            is EnhancedDocumentVerificationJobResult.Entry -> delegate.toJson(writer, result)
         }
     }
 }

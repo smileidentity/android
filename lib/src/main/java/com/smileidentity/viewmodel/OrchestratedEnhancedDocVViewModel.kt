@@ -138,7 +138,9 @@ internal class OrchestratedEnhancedDocVViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getEnhancedDocVJobStatus(jobStatusRequest)
+            val jobStatusResponse = SmileID.api.getEnhancedDocumentVerificationJobStatus(
+                jobStatusRequest,
+            )
             result = SmileIDResult.Success(
                 EnhancedDocumentVerificationResult(jobStatusResponse = jobStatusResponse),
             )

@@ -115,7 +115,7 @@ interface SmileIDService {
      * whether it was successful. This should be called when the Job is known to be Enhanced DocV.
      */
     @POST("/v1/job_status")
-    suspend fun getEnhancedDocVJobStatus(
+    suspend fun getEnhancedDocumentVerificationJobStatus(
         @Body request: JobStatusRequest,
     ): EnhancedDocumentVerificationJobStatusResponse
 
@@ -219,11 +219,11 @@ fun SmileIDService.pollBiometricKycJobStatus(
  * @param interval The interval between each poll
  * @param numAttempts The number of times to poll before giving up
  */
-fun SmileIDService.pollEnhancedDocVJobStatus(
+fun SmileIDService.pollEnhancedDocumentVerificationJobStatus(
     request: JobStatusRequest,
     interval: Duration = 1.seconds,
     numAttempts: Int = 30,
-) = poll(interval, numAttempts) { getEnhancedDocVJobStatus(request) }
+) = poll(interval, numAttempts) { getEnhancedDocumentVerificationJobStatus(request) }
 
 /**
  * This uses a generics (as compared to the interface as the return type of [action] directly) so

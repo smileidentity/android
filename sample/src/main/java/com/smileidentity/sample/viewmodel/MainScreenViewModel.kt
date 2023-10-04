@@ -8,7 +8,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult
-import com.smileidentity.models.EnhancedDocVJobResult
+import com.smileidentity.models.EnhancedDocumentVerificationJobResult
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
@@ -18,7 +18,7 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.networking.pollBiometricKycJobStatus
 import com.smileidentity.networking.pollDocumentVerificationJobStatus
-import com.smileidentity.networking.pollEnhancedDocVJobStatus
+import com.smileidentity.networking.pollEnhancedDocumentVerificationJobStatus
 import com.smileidentity.networking.pollSmartSelfieJobStatus
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
@@ -94,7 +94,8 @@ class MainScreenViewModel : ViewModel() {
                     SmartSelfieEnrollment -> SmileID.api.pollSmartSelfieJobStatus(request)
                     DocumentVerification -> SmileID.api.pollDocumentVerificationJobStatus(request)
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
-                    EnhancedDocumentVerification -> SmileID.api.pollEnhancedDocVJobStatus(request)
+                    EnhancedDocumentVerification ->
+                        SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
                     else -> {
                         Timber.e("Unexpected pending job: $job")
                         throw IllegalStateException("Unexpected pending job: $job")
@@ -450,23 +451,23 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onEnhancedDocVSelected() {
+    fun onEnhancedDocumentVerificationSelected() {
         _uiState.update {
             it.copy(
-                appBarTitle = ProductScreen.EnhancedDocV.label,
+                appBarTitle = ProductScreen.EnhancedDocumentVerification.label,
                 bottomNavSelection = BottomNavigationScreen.Home,
             )
         }
     }
 
-    fun onEnhancedDocVResult(
+    fun onEnhancedDocumentVerificationResult(
         userId: String,
         jobId: String,
         result: SmileIDResult<EnhancedDocumentVerificationResult>,
     ) {
         if (result is SmileIDResult.Success) {
             val response = result.data.jobStatusResponse
-            val actualResult = response.result as? EnhancedDocVJobResult.Entry
+            val actualResult = response.result as? EnhancedDocumentVerificationJobResult.Entry
             val message = jobResultMessageBuilder(
                 jobName = "Enhanced Document Verification",
                 jobComplete = response.jobComplete,
