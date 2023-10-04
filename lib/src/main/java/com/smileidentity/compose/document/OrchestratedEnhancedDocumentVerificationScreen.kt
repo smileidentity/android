@@ -11,7 +11,7 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.DocumentCaptureFlow
-import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
@@ -20,7 +20,7 @@ import com.smileidentity.viewmodel.OrchestratedEnhancedDocVViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
-internal fun OrchestratedEnhancedDocVScreen(
+internal fun OrchestratedEnhancedDocumentVerificationScreen(
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean = true,
@@ -41,7 +41,7 @@ internal fun OrchestratedEnhancedDocVScreen(
             )
         },
     ),
-    onResult: SmileIDCallback<DocumentVerificationResult> = {},
+    onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentStep = uiState.currentStep) {

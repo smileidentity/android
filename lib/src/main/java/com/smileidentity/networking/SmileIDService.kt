@@ -10,6 +10,7 @@ import com.smileidentity.models.BvnTotpModeResponse
 import com.smileidentity.models.BvnTotpRequest
 import com.smileidentity.models.BvnTotpResponse
 import com.smileidentity.models.DocumentVerificationJobStatusResponse
+import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
@@ -110,6 +111,15 @@ interface SmileIDService {
     ): BiometricKycJobStatusResponse
 
     /**
+     * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
+     * whether it was successful. This should be called when the Job is known to be Enhanced DocV.
+     */
+    @POST("/v1/job_status")
+    suspend fun getEnhancedDocVJobStatus(
+        @Body request: JobStatusRequest,
+    ): EnhancedDocumentVerificationJobStatusResponse
+
+    /**
      * Returns the ID types that are enabled for authenticated partner and which of those require
      * consent
      */
@@ -197,6 +207,23 @@ fun SmileIDService.pollBiometricKycJobStatus(
     interval: Duration = 1.seconds,
     numAttempts: Int = 30,
 ) = poll(interval, numAttempts) { getBiometricKycJobStatus(request) }
+
+/**
+ * Polls the server for the status of a Job until it is complete. This should be called after the
+ * Job has been submitted to the server. The returned flow will be updated with every job status
+ * response. The flow will complete when the job is complete, or the attempt limit is reached.
+ * If any exceptions occur, only the last one will be thrown. If there is a successful API response
+ * after an exception, the exception will be ignored.
+ *
+ * @param request The [JobStatusRequest] to make to the server
+ * @param interval The interval between each poll
+ * @param numAttempts The number of times to poll before giving up
+ */
+fun SmileIDService.pollEnhancedDocVJobStatus(
+    request: JobStatusRequest,
+    interval: Duration = 1.seconds,
+    numAttempts: Int = 30,
+) = poll(interval, numAttempts) { getEnhancedDocVJobStatus(request) }
 
 /**
  * This uses a generics (as compared to the interface as the return type of [action] directly) so

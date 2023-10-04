@@ -52,7 +52,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
-import com.smileidentity.compose.EnhancedDocVScreen
+import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.IdInfo
@@ -302,7 +302,7 @@ fun MainScreen(
                     idInfo?.let {
                         val userId = rememberSaveable { randomUserId() }
                         val jobId = rememberSaveable { randomJobId() }
-                        SmileID.EnhancedDocVScreen(
+                        SmileID.EnhancedDocumentVerificationScreen(
                             userId = userId,
                             jobId = jobId,
                             countryCode = it.country,
@@ -311,7 +311,7 @@ fun MainScreen(
                             showInstructions = true,
                             allowGalleryUpload = true,
                         ) { result ->
-                            viewModel.onDocumentVerificationResult(userId, jobId, result)
+                            viewModel.onEnhancedDocVResult(userId, jobId, result)
                             navController.popBackStack(
                                 route = BottomNavigationScreen.Home.route,
                                 inclusive = false,

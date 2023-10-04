@@ -12,13 +12,14 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.document.OrchestratedEnhancedDocVScreen
+import com.smileidentity.compose.document.OrchestratedEnhancedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
@@ -305,7 +306,7 @@ fun SmileID.BvnConsentScreen(
  * @param onResult Callback to be invoked when the Enhanced Document Verification is complete.
  */
 @Composable
-fun SmileID.EnhancedDocVScreen(
+fun SmileID.EnhancedDocumentVerificationScreen(
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean = true,
@@ -317,10 +318,10 @@ fun SmileID.EnhancedDocVScreen(
     showInstructions: Boolean = true,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
-    onResult: SmileIDCallback<DocumentVerificationResult> = {},
+    onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedEnhancedDocVScreen(
+        OrchestratedEnhancedDocumentVerificationScreen(
             countryCode = countryCode,
             documentType = documentType,
             captureBothSides = captureBothSides,

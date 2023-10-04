@@ -10,6 +10,7 @@ import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.models.Config
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
+import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
 import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
@@ -182,6 +183,7 @@ object SmileID {
             .add(SmartSelfieJobResultAdapter)
             .add(DocumentVerificationJobResultAdapter)
             .add(BiometricKycJobResultAdapter)
+            .add(EnhancedDocumentVerificationJobResultAdapter)
             .add(JobResultAdapter)
             .add(FallbackEnum.ADAPTER_FACTORY)
             .build()

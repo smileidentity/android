@@ -3,6 +3,7 @@ package com.smileidentity.results
 import android.os.Parcelable
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocumentVerificationJobStatusResponse
+import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
@@ -100,4 +101,10 @@ data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
     val jobStatusResponse: BiometricKycJobStatusResponse,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class EnhancedDocumentVerificationResult(
+    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse,
 ) : Parcelable

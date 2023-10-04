@@ -8,12 +8,12 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.smileidentity.SmileID
-import com.smileidentity.compose.EnhancedDocVScreen
+import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.newInstance
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
-import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.randomJobId
@@ -100,7 +100,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
         val args = requireArguments()
         setContent {
             val aspectRatio = args.idAspectRatio
-            SmileID.EnhancedDocVScreen(
+            SmileID.EnhancedDocumentVerificationScreen(
                 countryCode = args.countryCode,
                 documentType = args.documentType,
                 userId = args.userId,
@@ -159,6 +159,6 @@ private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
 
-private var Bundle.smileIDResult: SmileIDResult<DocumentVerificationResult>
+private var Bundle.smileIDResult: SmileIDResult<EnhancedDocumentVerificationResult>
     get() = getParcelableCompat(DocumentVerificationFragment.KEY_RESULT)!!
     set(value) = putParcelable(DocumentVerificationFragment.KEY_RESULT, value)
