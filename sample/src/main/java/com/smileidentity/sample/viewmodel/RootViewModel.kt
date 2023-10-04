@@ -11,7 +11,6 @@ import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,21 +41,6 @@ class RootViewModel : ViewModel() {
         )
 
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
-    private val currentConfig = DataStoreRepository.getConfigJsonString()
-        .map { it ?: SMILE_CONFIG_DEFAULT_HINT }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = "",
-        )
-
-    init {
-        viewModelScope.launch {
-            currentConfig.collect { config ->
-                _uiState.update { it.copy(smileConfigHint = config) }
-            }
-        }
-    }
 
     fun updateSmileConfig(updatedConfig: String) {
         try {
