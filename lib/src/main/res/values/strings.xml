@@ -149,7 +149,7 @@
     <string name="si_bvn_verification_otp_acronym">OTP</string>
 
     <!--  Enhanced DocV Screen  -->
-    <string name="si_enhanced_docv_product_name">Enhanced DocV</string>
+    <string name="si_enhanced_docv_product_name">Enhanced Document Verification</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
