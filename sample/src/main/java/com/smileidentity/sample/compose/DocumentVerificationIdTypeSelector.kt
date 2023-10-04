@@ -103,7 +103,7 @@ fun DocumentVerificationIdTypeSelector(
 
         idTypesForCountry?.let { idTypesForCountry ->
             IdTypeSelector(idTypesForCountry = idTypesForCountry) {
-                onIdTypeSelected(selectedCountry!!.country.name, it.name, it.hasBack)
+                onIdTypeSelected(selectedCountry!!.country.code, it.name, it.hasBack)
             }
         }
     }
