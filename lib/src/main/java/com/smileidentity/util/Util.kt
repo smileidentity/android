@@ -28,7 +28,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
+import com.smileidentity.compose.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.models.SmileIDException
 import kotlinx.collections.immutable.toImmutableList

@@ -199,7 +199,14 @@ fun MainScreen(
                 }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
-                    OrchestratedEnhancedKycScreen { result ->
+                    OrchestratedEnhancedKycScreen(
+                        partnerIcon = painterResource(
+                            id = com.smileidentity.R.drawable.si_logo_with_text,
+                        ),
+                        partnerName = "Smile ID",
+                        productName = it.idType!!,
+                        partnerPrivacyPolicy = privacyPolicy,
+                    ) { result ->
                         viewModel.onEnhancedKycResult(result)
                         navController.popBackStack()
                     }

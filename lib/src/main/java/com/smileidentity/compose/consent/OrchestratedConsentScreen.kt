@@ -13,7 +13,7 @@ import java.net.URL
  * Responsible for showing the consent screen and the consent denied (try again) screens.
  */
 @Composable
-internal fun OrchestratedConsentScreen(
+fun OrchestratedConsentScreen(
     partnerIcon: Painter,
     partnerName: String,
     productName: String,

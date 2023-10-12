@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
-import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
+import com.smileidentity.compose.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BvnTotpModeRequest
