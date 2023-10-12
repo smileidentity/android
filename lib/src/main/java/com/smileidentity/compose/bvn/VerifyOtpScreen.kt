@@ -1,4 +1,4 @@
-package com.smileidentity.compose.consent.bvn
+package com.smileidentity.compose.bvn
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer

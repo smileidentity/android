@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
-import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
+import com.smileidentity.compose.bvn.BvnOtpVerificationMode
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 

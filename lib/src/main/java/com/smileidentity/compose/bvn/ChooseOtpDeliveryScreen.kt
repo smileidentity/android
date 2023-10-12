@@ -1,4 +1,4 @@
-package com.smileidentity.compose.consent.bvn
+package com.smileidentity.compose.bvn
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

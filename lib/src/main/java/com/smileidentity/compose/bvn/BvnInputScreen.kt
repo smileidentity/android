@@ -1,4 +1,4 @@
-package com.smileidentity.compose.consent.bvn
+package com.smileidentity.compose.bvn
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +36,6 @@ import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun BvnInputScreen(
     userId: String,
