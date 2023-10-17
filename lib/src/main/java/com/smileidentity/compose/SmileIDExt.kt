@@ -124,8 +124,7 @@ fun SmileID.SmartSelfieAuthentication(
  * @param documentType An optional document type of the document
  * @param captureBothSides Determines if the document has a back side
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
- * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
- * standard size of ~1.6
+ * ratio will attempt to be inferred from the device's camera.
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
  * side will be captured.
  * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
