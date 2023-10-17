@@ -9,6 +9,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
@@ -35,7 +36,7 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrchestratedDocumentViewModelTest {
-    private lateinit var subject: OrchestratedDocumentViewModel
+    private lateinit var subject: OrchestratedDocumentViewModel<DocumentVerificationResult>
 
     private val documentFrontFile = File.createTempFile("documentFront", ".jpg")
     private val selfieFile = File.createTempFile("selfie", ".jpg")
@@ -43,9 +44,10 @@ class OrchestratedDocumentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = OrchestratedDocumentViewModel(
-            randomUserId(),
-            randomJobId(),
+        subject = DocumentVerificationViewModel(
+            jobType = JobType.DocumentVerification,
+            userId = randomUserId(),
+            jobId = randomJobId(),
             countryCode = "KE",
             documentType = "ID_CARD",
             selfieFile = selfieFile,

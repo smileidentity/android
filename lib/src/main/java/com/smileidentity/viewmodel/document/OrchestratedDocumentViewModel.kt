@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel.document
 
+import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,7 @@ import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -38,7 +40,8 @@ internal data class OrchestratedDocumentUiState(
  * @param selfieFile The selfie image file to use for authentication. If null, selfie capture will
  * be performed
  */
-internal class OrchestratedDocumentViewModel(
+internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
+    private val jobType: JobType,
     private val userId: String,
     private val jobId: String,
     private val countryCode: String,
@@ -48,7 +51,7 @@ internal class OrchestratedDocumentViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
-    var result: SmileIDResult<DocumentVerificationResult> = SmileIDResult.Error(
+    var result: SmileIDResult<T> = SmileIDResult.Error(
         IllegalStateException("Document Capture incomplete"),
     )
     private var documentFrontFile: File? = null
@@ -98,6 +101,13 @@ internal class OrchestratedDocumentViewModel(
         submitJob()
     }
 
+    abstract fun getJobStatus(
+        jobStatusRequest: JobStatusRequest,
+        selfieImage: File,
+        documentFrontFile: File,
+        documentBackFile: File?,
+    )
+
     private fun submitJob() {
         val documentFrontFile = documentFrontFile
             ?: throw IllegalStateException("documentFrontFile is null")
@@ -115,7 +125,7 @@ internal class OrchestratedDocumentViewModel(
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
-                jobType = JobType.DocumentVerification,
+                jobType = jobType,
                 enrollment = false,
                 userId = userId,
                 jobId = jobId,
@@ -156,15 +166,13 @@ internal class OrchestratedDocumentViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getDocumentVerificationJobStatus(jobStatusRequest)
-            result = SmileIDResult.Success(
-                DocumentVerificationResult(
-                    selfieFile = selfieImageInfo.image,
-                    documentFrontFile = documentFrontFile,
-                    documentBackFile = documentBackFile,
-                    jobStatusResponse = jobStatusResponse,
-                ),
+            getJobStatus(
+                jobStatusRequest,
+                selfieImageInfo.image,
+                documentFrontFile,
+                documentBackFile,
             )
+
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
             }
@@ -204,5 +212,80 @@ internal class OrchestratedDocumentViewModel(
         }
     }
 
-    fun onFinished(callback: SmileIDCallback<DocumentVerificationResult>) = callback(result)
+    fun onFinished(callback: SmileIDCallback<T>) = callback(result)
+}
+
+internal class DocumentVerificationViewModel(
+    jobType: JobType = JobType.DocumentVerification,
+    userId: String,
+    jobId: String,
+    countryCode: String,
+    documentType: String? = null,
+    captureBothSides: Boolean,
+    selfieFile: File? = null,
+) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
+    jobType = jobType,
+    userId = userId,
+    jobId = jobId,
+    countryCode = countryCode,
+    documentType = documentType,
+    captureBothSides = captureBothSides,
+    selfieFile = selfieFile,
+) {
+
+    override fun getJobStatus(
+        jobStatusRequest: JobStatusRequest,
+        selfieImage: File,
+        documentFrontFile: File,
+        documentBackFile: File?,
+    ) {
+        viewModelScope.launch {
+            val jobStatusResponse =
+                SmileID.api.getDocumentVerificationJobStatus(jobStatusRequest)
+            result = SmileIDResult.Success(
+                DocumentVerificationResult(
+                    selfieFile = selfieImage,
+                    documentFrontFile = documentFrontFile,
+                    documentBackFile = documentBackFile,
+                    jobStatusResponse = jobStatusResponse,
+                ),
+            )
+        }
+    }
+}
+
+internal class EnhancedDocumentVerificationViewModel(
+    jobType: JobType = JobType.EnhancedDocumentVerification,
+    userId: String,
+    jobId: String,
+    countryCode: String,
+    documentType: String? = null,
+    captureBothSides: Boolean,
+    selfieFile: File? = null,
+) :
+    OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
+        jobType = jobType,
+        userId = userId,
+        jobId = jobId,
+        countryCode = countryCode,
+        documentType = documentType,
+        captureBothSides = captureBothSides,
+        selfieFile = selfieFile,
+    ) {
+
+    override fun getJobStatus(
+        jobStatusRequest: JobStatusRequest,
+        selfieImage: File,
+        documentFrontFile: File,
+        documentBackFile: File?,
+    ) {
+        viewModelScope.launch {
+            val jobStatusResponse = SmileID.api.getEnhancedDocumentVerificationJobStatus(
+                jobStatusRequest,
+            )
+            result = SmileIDResult.Success(
+                EnhancedDocumentVerificationResult(jobStatusResponse = jobStatusResponse),
+            )
+        }
+    }
 }

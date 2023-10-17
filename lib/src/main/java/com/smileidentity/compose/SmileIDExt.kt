@@ -8,15 +8,16 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.document.OrchestratedEnhancedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.IdInfo
+import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -24,6 +25,9 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
+import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
+import com.smileidentity.viewmodel.viewModelFactory
 import java.io.File
 import java.net.URL
 
@@ -166,8 +170,6 @@ fun SmileID.DocumentVerification(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
-            countryCode = countryCode,
-            documentType = documentType,
             captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
@@ -175,8 +177,20 @@ fun SmileID.DocumentVerification(
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
-            bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile,
             onResult = onResult,
+            viewModel = viewModel(
+                factory = viewModelFactory {
+                    DocumentVerificationViewModel(
+                        jobType = JobType.DocumentVerification,
+                        userId = userId,
+                        jobId = jobId,
+                        countryCode = countryCode,
+                        documentType = documentType,
+                        captureBothSides = captureBothSides,
+                        selfieFile = bypassSelfieCaptureWithFile,
+                    )
+                },
+            ),
         )
     }
 }
@@ -321,9 +335,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedEnhancedDocumentVerificationScreen(
-            countryCode = countryCode,
-            documentType = documentType,
+        OrchestratedDocumentVerificationScreen(
             captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
@@ -332,6 +344,18 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
             onResult = onResult,
+            viewModel = viewModel(
+                factory = viewModelFactory {
+                    EnhancedDocumentVerificationViewModel(
+                        jobType = JobType.EnhancedDocumentVerification,
+                        userId = userId,
+                        jobId = jobId,
+                        countryCode = countryCode,
+                        documentType = documentType,
+                        captureBothSides = captureBothSides,
+                    )
+                },
+            ),
         )
     }
 }
