@@ -13,7 +13,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.document.OrchestratedEnhancedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
@@ -411,9 +410,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedEnhancedDocumentVerificationScreen(
-            countryCode = countryCode,
-            documentType = documentType,
+        OrchestratedDocumentVerificationScreen(
             captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
@@ -422,6 +419,18 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
             onResult = onResult,
+            viewModel = viewModel(
+                factory = viewModelFactory {
+                    EnhancedDocumentVerificationViewModel(
+                        jobType = JobType.EnhancedDocumentVerification,
+                        userId = userId,
+                        jobId = jobId,
+                        countryCode = countryCode,
+                        documentType = documentType,
+                        captureBothSides = captureBothSides,
+                    )
+                },
+            ),
         )
     }
 }
