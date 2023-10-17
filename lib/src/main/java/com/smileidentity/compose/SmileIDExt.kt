@@ -244,11 +244,15 @@ fun SmileID.BiometricKYC(
  * @param partnerIcon Your own icon to display on the BVN Consent screen (i.e. company logo)
  * @param partnerName Your own name to display on the BVN Consent screen (i.e. company name)
  * @param partnerPrivacyPolicy A link to your own privacy policy to display
+ * @param onConsentGranted Callback to be invoked when the BVN verification job is complete.
+ * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
- * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
- * @param onConsentGranted Callback to be invoked when the BVN verification job is
- * complete.
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
  */
 @Composable
 fun SmileID.BvnConsentScreen(
@@ -259,6 +263,8 @@ fun SmileID.BvnConsentScreen(
     onConsentDenied: () -> Unit,
     showAttribution: Boolean = true,
     userId: String = rememberSaveable { randomUserId() },
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
