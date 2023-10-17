@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -67,7 +65,7 @@ android {
             // is primarily for consumers of the SDK to use, not for us.
             freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
             if (project.hasProperty("enableComposeCompilerReports")) {
-                val outputDir = project.buildDir.path + "/compose-reports"
+                val outputDir = layout.buildDirectory.dir("compose-reports").get().asFile.path
                 freeCompilerArgs += listOf(
                     "-P",
                     "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$outputDir",
