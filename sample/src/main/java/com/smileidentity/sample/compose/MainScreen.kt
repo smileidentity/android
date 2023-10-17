@@ -295,7 +295,7 @@ fun MainScreen(
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
                     if (idInfo == null) {
                         IdTypeSelectorScreen(
-                            jobType = JobType.BiometricKyc,
+                            jobType = JobType.EnhancedDocumentVerification,
                             onResult = { idInfo = it },
                         )
                     }

@@ -16,6 +16,7 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
@@ -129,6 +130,13 @@ class OrchestratedDocumentViewModelTest {
             cameraConfig = null,
         )
 
+        every { subject.getJobStatus(
+            jobStatusRequest = any(),
+            selfieImage = any(),
+            documentFrontFile = any(),
+            documentBackFile = any()
+        ) } just Runs
+
         val uploadBodySlot = slot<UploadRequest>()
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
 
@@ -144,6 +152,7 @@ class OrchestratedDocumentViewModelTest {
     @Test
     fun `should submit liveness photos after selfie capture`() = runTest {
         SmileID.api = mockk()
+        val jobStatusProvider = mockk<OrchestratedDocumentViewModel<DocumentVerificationResult>>()
         val selfieResult = SmartSelfieResult(
             selfieFile = selfieFile,
             livenessFiles = listOf(File.createTempFile("liveness", ".jpg")),
@@ -163,6 +172,8 @@ class OrchestratedDocumentViewModelTest {
             smileJobId = "smileJobId",
             cameraConfig = null,
         )
+
+        every { jobStatusProvider.getJobStatus(any(), any(), any(), any()) } just Runs
 
         val uploadBodySlot = slot<UploadRequest>()
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs

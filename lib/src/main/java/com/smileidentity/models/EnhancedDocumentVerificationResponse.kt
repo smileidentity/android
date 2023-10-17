@@ -13,7 +13,7 @@ data class EnhancedDocumentVerificationResponse(
     @Json(name = "Country")
     val country: String,
     @Json(name = "DOB")
-    val dOB: String,
+    val dob: String,
     @Json(name = "Document")
     val document: String,
     @Json(name = "ExpirationDate")
@@ -23,9 +23,9 @@ data class EnhancedDocumentVerificationResponse(
     @Json(name = "Gender")
     val gender: String,
     @Json(name = "IDNumber")
-    val iDNumber: String,
+    val idNumber: String,
     @Json(name = "IDType")
-    val iDType: String,
+    val idType: String,
     @Json(name = "PartnerParams")
     val partnerParams: PartnerParams,
     @Json(name = "ResultCode")

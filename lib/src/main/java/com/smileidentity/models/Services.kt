@@ -38,12 +38,15 @@ data class HostedWeb(
     @Json(name = "enhanced_kyc") internal val _enhancedKyc: CountryCodeToCountryInfo,
     @Json(name = "doc_verification") internal val _docVerification: CountryCodeToCountryInfo,
     @Json(name = "ekyc_smartselfie") internal val _enhancedKycSmartSelfie: CountryCodeToCountryInfo,
+    @Json(name = "enhanced_document_verification")
+    internal val _enhancedDocumentVerification: CountryCodeToCountryInfo,
 ) {
     val basicKyc = _basicKyc.toCountryInfo()
     val biometricKyc = _biometricKyc.toCountryInfo()
     val enhancedKyc = _enhancedKyc.toCountryInfo()
     val docVerification = _docVerification.toCountryInfo()
     val enhancedKycSmartSelfie = _enhancedKycSmartSelfie.toCountryInfo()
+    val enhancedDocumentVerification = _enhancedDocumentVerification.toCountryInfo()
 
     /**
      * This is used to convert the [Map] type response to a single object, which makes for a better
