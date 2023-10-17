@@ -244,9 +244,8 @@ fun SmileID.BiometricKYC(
  * @param partnerIcon Your own icon to display on the BVN Consent screen (i.e. company logo)
  * @param partnerName Your own name to display on the BVN Consent screen (i.e. company name)
  * @param partnerPrivacyPolicy A link to your own privacy policy to display
+ * @param onConsentGranted Callback to be invoked when the BVN verification job is complete.
  * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
- * @param onConsentGranted Callback to be invoked when the BVN verification job is
- * complete.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
