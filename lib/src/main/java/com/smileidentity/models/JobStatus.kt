@@ -22,12 +22,13 @@ data class JobStatusRequest(
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 ) : Parcelable
 
-interface JobStatusResponse {
+interface JobStatusResponse : Parcelable {
     val timestamp: String
     val jobComplete: Boolean
     val jobSuccess: Boolean
     val code: String
     val result: JobResult?
+    val history: List<JobResult.Entry>?
     val imageLinks: ImageLinks?
 }
 
@@ -39,9 +40,9 @@ data class SmartSelfieJobStatusResponse(
     @Json(name = "job_success") override val jobSuccess: Boolean,
     @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: SmartSelfieJobResult?,
-    @Json(name = "history") val history: List<SmartSelfieJobResult.Entry>?,
+    @Json(name = "history") override val history: List<SmartSelfieJobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
-) : JobStatusResponse, Parcelable
+) : JobStatusResponse
 
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -51,9 +52,9 @@ data class DocumentVerificationJobStatusResponse(
     @Json(name = "job_success") override val jobSuccess: Boolean,
     @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: DocumentVerificationJobResult?,
-    @Json(name = "history") val history: List<DocumentVerificationJobResult.Entry>?,
+    @Json(name = "history") override val history: List<DocumentVerificationJobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
-) : JobStatusResponse, Parcelable
+) : JobStatusResponse
 
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -63,9 +64,9 @@ data class BiometricKycJobStatusResponse(
     @Json(name = "job_success") override val jobSuccess: Boolean,
     @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: BiometricKycJobResult?,
-    @Json(name = "history") val history: List<BiometricKycJobResult.Entry>?,
+    @Json(name = "history") override val history: List<BiometricKycJobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
-) : JobStatusResponse, Parcelable
+) : JobStatusResponse
 
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -75,9 +76,9 @@ data class EnhancedDocumentVerificationJobStatusResponse(
     @Json(name = "job_success") override val jobSuccess: Boolean,
     @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: EnhancedDocumentVerificationJobResult?,
-    @Json(name = "history") val history: List<DocumentVerificationJobResult.Entry>?,
+    @Json(name = "history") override val history: List<DocumentVerificationJobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
-) : JobStatusResponse, Parcelable
+) : JobStatusResponse
 
 interface JobResult : Parcelable {
     /**
