@@ -30,7 +30,7 @@ internal fun IdSelectorScreen(
     viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(),
     onNext: () -> Unit,
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BottomPinnedColumn(
         scrollableContent = {
             Text(
