@@ -291,7 +291,8 @@ internal class EnhancedDocumentVerificationViewModel(
                 EnhancedDocumentVerificationResult(
                     selfieFile = selfieImage,
                     livenessFiles = livenessFiles,
-                    jobStatusResponse = jobStatusResponse),
+                    jobStatusResponse = jobStatusResponse,
+                ),
             )
         }
     }
