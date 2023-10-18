@@ -42,8 +42,8 @@ val products = listOf(
     ProductScreen.SmartSelfieAuthentication,
     ProductScreen.EnhancedKyc,
     ProductScreen.BiometricKyc,
-    ProductScreen.DocumentVerification,
     ProductScreen.BvnConsent,
+    ProductScreen.DocumentVerification,
     ProductScreen.EnhancedDocumentVerification,
 )
 
