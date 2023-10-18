@@ -149,7 +149,7 @@ object SmileID {
      */
     @JvmStatic
     fun setCallbackUrl(callbackUrl: URL?) {
-        SmileID.callbackUrl = callbackUrl.toString()
+        SmileID.callbackUrl = callbackUrl?.toString() ?: ""
     }
 
     /**
