@@ -1,7 +1,14 @@
 package com.smileidentity.compose.consent.bvn
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,6 +26,7 @@ internal fun OrchestratedBvnConsentScreen(
     partnerPrivacyPolicy: URL,
     onConsentGranted: () -> Unit,
     onConsentDenied: () -> Unit,
+    modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     viewModel: BvnConsentViewModel = viewModel(
         factory = viewModelFactory {
@@ -27,21 +35,29 @@ internal fun OrchestratedBvnConsentScreen(
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    when (uiState.currentScreen) {
-        BvnConsentScreens.ConsentScreen -> OrchestratedConsentScreen(
-            partnerIcon = partnerIcon,
-            partnerName = partnerName,
-            productName = "BVN",
-            partnerPrivacyPolicy = partnerPrivacyPolicy,
-            showAttribution = showAttribution,
-            onConsentGranted = viewModel::onConsentGranted,
-            onConsentDenied = onConsentDenied,
-        )
-        BvnConsentScreens.BvnInputScreen -> BvnInputScreen(userId = userId)
-        BvnConsentScreens.ChooseOtpDeliveryScreen -> ChooseOtpDeliveryScreen(userId = userId)
-        BvnConsentScreens.VerifyOtpScreen -> VerifyOtpScreen(
-            userId = userId,
-            onSuccessfulBvnVerification = onConsentGranted,
-        )
+    Box(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .fillMaxSize(),
+    ) {
+        when (uiState.currentScreen) {
+            BvnConsentScreens.ConsentScreen -> OrchestratedConsentScreen(
+                partnerIcon = partnerIcon,
+                partnerName = partnerName,
+                productName = "BVN",
+                partnerPrivacyPolicy = partnerPrivacyPolicy,
+                showAttribution = showAttribution,
+                onConsentGranted = viewModel::onConsentGranted,
+                onConsentDenied = onConsentDenied,
+            )
+
+            BvnConsentScreens.BvnInputScreen -> BvnInputScreen(userId = userId)
+            BvnConsentScreens.ChooseOtpDeliveryScreen -> ChooseOtpDeliveryScreen(userId = userId)
+            BvnConsentScreens.VerifyOtpScreen -> VerifyOtpScreen(
+                userId = userId,
+                onSuccessfulBvnVerification = onConsentGranted,
+            )
+        }
     }
 }

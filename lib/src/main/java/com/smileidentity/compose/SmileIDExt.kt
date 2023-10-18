@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
@@ -56,6 +57,7 @@ import java.net.URL
  */
 @Composable
 fun SmileID.SmartSelfieEnrollment(
+    modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
@@ -67,6 +69,7 @@ fun SmileID.SmartSelfieEnrollment(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
+            modifier = modifier,
             userId = userId,
             jobId = jobId,
             isEnroll = true,
@@ -102,6 +105,7 @@ fun SmileID.SmartSelfieEnrollment(
 @Composable
 fun SmileID.SmartSelfieAuthentication(
     userId: String,
+    modifier: Modifier = Modifier,
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
@@ -111,6 +115,7 @@ fun SmileID.SmartSelfieAuthentication(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
+            modifier = modifier,
             userId = userId,
             jobId = jobId,
             isEnroll = false,
@@ -154,6 +159,7 @@ fun SmileID.SmartSelfieAuthentication(
 @Composable
 fun SmileID.DocumentVerification(
     countryCode: String,
+    modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
@@ -169,6 +175,7 @@ fun SmileID.DocumentVerification(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
+            modifier = modifier,
             captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
@@ -187,6 +194,78 @@ fun SmileID.DocumentVerification(
                         documentType = documentType,
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
+                    )
+                },
+            ),
+        )
+    }
+}
+
+/**
+ * Perform Enhanced Document Verification
+ *
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
+ *
+ * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ * @param documentType An optional document type of the document
+ * @param captureBothSides Determines if the document has a back side
+ * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
+ * side will be captured.
+ * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
+ * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
+ * standard size of ~1.6
+ * @param userId The user ID to associate with the Enhanced Document Verification. Most often, this will
+ * correspond to a unique User ID within your own system. If not provided, a random user ID will be
+ * generated
+ * @param jobId The job ID to associate with the Enhanced Document Verification. Most often, this will
+ * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
+ * generated
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
+ * @param showInstructions Whether to deactivate capture screen's instructions for Document
+ * Verification (NB! If instructions are disabled, gallery upload won't be possible)
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Enhanced Document Verification is complete.
+ */
+@Composable
+fun SmileID.EnhancedDocumentVerificationScreen(
+    countryCode: String,
+    modifier: Modifier = Modifier,
+    documentType: String? = null,
+    captureBothSides: Boolean = true,
+    idAspectRatio: Float? = null,
+    userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
+    showAttribution: Boolean = true,
+    allowGalleryUpload: Boolean = false,
+    showInstructions: Boolean = true,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedDocumentVerificationScreen(
+            modifier = modifier,
+            captureBothSides = captureBothSides,
+            userId = userId,
+            jobId = jobId,
+            showAttribution = showAttribution,
+            allowGalleryUpload = allowGalleryUpload,
+            showInstructions = showInstructions,
+            idAspectRatio = idAspectRatio,
+            onResult = onResult,
+            viewModel = viewModel(
+                factory = viewModelFactory {
+                    EnhancedDocumentVerificationViewModel(
+                        jobType = JobType.EnhancedDocumentVerification,
+                        userId = userId,
+                        jobId = jobId,
+                        countryCode = countryCode,
+                        documentType = documentType,
+                        captureBothSides = captureBothSides,
                     )
                 },
             ),
@@ -227,6 +306,7 @@ fun SmileID.BiometricKYC(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
+    modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
@@ -237,6 +317,7 @@ fun SmileID.BiometricKYC(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBiometricKYCScreen(
+            modifier = modifier,
             idInfo = idInfo,
             partnerIcon = partnerIcon,
             partnerName = partnerName,
@@ -247,76 +328,6 @@ fun SmileID.BiometricKYC(
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             onResult = onResult,
-        )
-    }
-}
-
-/**
- * Perform Enhanced Document Verification
- *
- * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
- *
- * @param countryCode The ISO 3166-1 alpha-3 country code of the document
- * @param documentType An optional document type of the document
- * @param captureBothSides Determines if the document has a back side
- * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
- * side will be captured.
- * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
- * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
- * standard size of ~1.6
- * @param userId The user ID to associate with the Enhanced Document Verification. Most often, this will
- * correspond to a unique User ID within your own system. If not provided, a random user ID will be
- * generated
- * @param jobId The job ID to associate with the Enhanced Document Verification. Most often, this will
- * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
- * generated
- * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
- * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
- * @param showInstructions Whether to deactivate capture screen's instructions for Document
- * Verification (NB! If instructions are disabled, gallery upload won't be possible)
- * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
- * ID branded UI by default, but allow the user to override it if they want.
- * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
- * branded UI by default, but allow the user to override it if they want.
- * @param onResult Callback to be invoked when the Enhanced Document Verification is complete.
- */
-@Composable
-fun SmileID.EnhancedDocumentVerificationScreen(
-    countryCode: String,
-    documentType: String? = null,
-    captureBothSides: Boolean = true,
-    idAspectRatio: Float? = null,
-    userId: String = rememberSaveable { randomUserId() },
-    jobId: String = rememberSaveable { randomJobId() },
-    showAttribution: Boolean = true,
-    allowGalleryUpload: Boolean = false,
-    showInstructions: Boolean = true,
-    colorScheme: ColorScheme = SmileID.colorScheme,
-    typography: Typography = SmileID.typography,
-    onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
-) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedDocumentVerificationScreen(
-            captureBothSides = captureBothSides,
-            userId = userId,
-            jobId = jobId,
-            showAttribution = showAttribution,
-            allowGalleryUpload = allowGalleryUpload,
-            showInstructions = showInstructions,
-            idAspectRatio = idAspectRatio,
-            onResult = onResult,
-            viewModel = viewModel(
-                factory = viewModelFactory {
-                    EnhancedDocumentVerificationViewModel(
-                        jobType = JobType.EnhancedDocumentVerification,
-                        userId = userId,
-                        jobId = jobId,
-                        countryCode = countryCode,
-                        documentType = documentType,
-                        captureBothSides = captureBothSides,
-                    )
-                },
-            ),
         )
     }
 }
@@ -347,6 +358,7 @@ fun SmileID.BvnConsentScreen(
     partnerPrivacyPolicy: URL,
     onConsentGranted: () -> Unit,
     onConsentDenied: () -> Unit,
+    modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     userId: String = rememberSaveable { randomUserId() },
     colorScheme: ColorScheme = SmileID.colorScheme,
@@ -354,6 +366,7 @@ fun SmileID.BvnConsentScreen(
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
+            modifier = modifier,
             userId = userId,
             partnerIcon = partnerIcon,
             partnerName = partnerName,
