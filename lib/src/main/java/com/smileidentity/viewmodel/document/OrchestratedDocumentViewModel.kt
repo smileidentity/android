@@ -134,7 +134,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                callbackUrl = "",
+                callbackUrl = SmileID.callbackUrl,
                 partnerParams = authResponse.partnerParams,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,

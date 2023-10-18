@@ -42,6 +42,9 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
+    var callbackUrl: String = ""
+        private set
+
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
@@ -133,6 +136,19 @@ object SmileID {
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
         retrofit = retrofit.newBuilder().baseUrl(url).build()
         api = retrofit.create(SmileIDService::class.java)
+    }
+
+    /**
+     * The callback mechanism allows for asynchronous job requests and responses.
+     * While the job_status API can be polled to get a result, a better method is to set up a
+     * callback url and let the system POST a JSON response.
+     *
+     * @param callbackUrl The callback url that will be used to asynchronously send results of your
+     * job requests
+     */
+    @JvmStatic
+    fun setCallbackUrl(callbackUrl: String) {
+        SmileID.callbackUrl = callbackUrl
     }
 
     /**
