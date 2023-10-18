@@ -130,8 +130,7 @@ fun SmileID.SmartSelfieAuthentication(
  * @param documentType An optional document type of the document
  * @param captureBothSides Determines if the document has a back side
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
- * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
- * standard size of ~1.6
+ * ratio will attempt to be inferred from the device's camera.
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
  * side will be captured.
  * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
@@ -261,11 +260,15 @@ fun SmileID.BiometricKYC(
  * @param partnerIcon Your own icon to display on the BVN Consent screen (i.e. company logo)
  * @param partnerName Your own name to display on the BVN Consent screen (i.e. company name)
  * @param partnerPrivacyPolicy A link to your own privacy policy to display
+ * @param onConsentGranted Callback to be invoked when the BVN verification job is complete.
+ * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
- * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
- * @param onConsentGranted Callback to be invoked when the BVN verification job is
- * complete.
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
  */
 @Composable
 fun SmileID.BvnConsentScreen(
@@ -276,6 +279,8 @@ fun SmileID.BvnConsentScreen(
     onConsentDenied: () -> Unit,
     showAttribution: Boolean = true,
     userId: String = rememberSaveable { randomUserId() },
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
