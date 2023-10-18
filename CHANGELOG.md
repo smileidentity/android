@@ -8,7 +8,7 @@
 
 ### Changed
 
-## 10.0.0-beta09 (unreleased)
+## 10.0.0-beta09
 
 ### Added
 - Added missing `colorScheme` and `typography` parameters on `SmileID.BvnConsentScreen`
