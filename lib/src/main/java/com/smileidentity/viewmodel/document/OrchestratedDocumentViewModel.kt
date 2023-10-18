@@ -104,7 +104,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     abstract fun getJobStatus(
         jobStatusRequest: JobStatusRequest,
         selfieImage: File,
-        livenessFiles: List<File>,
         documentFrontFile: File,
         documentBackFile: File?,
     )
@@ -170,7 +169,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             getJobStatus(
                 jobStatusRequest = jobStatusRequest,
                 selfieImage = selfieImageInfo.image,
-                livenessFiles = livenessFiles!!,
                 documentFrontFile = documentFrontFile,
                 documentBackFile = documentBackFile,
             )
@@ -238,7 +236,6 @@ internal class DocumentVerificationViewModel(
     override fun getJobStatus(
         jobStatusRequest: JobStatusRequest,
         selfieImage: File,
-        livenessFiles: List<File>,
         documentFrontFile: File,
         documentBackFile: File?,
     ) {
@@ -279,7 +276,6 @@ internal class EnhancedDocumentVerificationViewModel(
     override fun getJobStatus(
         jobStatusRequest: JobStatusRequest,
         selfieImage: File,
-        livenessFiles: List<File>,
         documentFrontFile: File,
         documentBackFile: File?,
     ) {
@@ -290,7 +286,8 @@ internal class EnhancedDocumentVerificationViewModel(
             result = SmileIDResult.Success(
                 EnhancedDocumentVerificationResult(
                     selfieFile = selfieImage,
-                    livenessFiles = livenessFiles,
+                    documentFrontFile = documentFrontFile,
+                    documentBackFile = documentBackFile,
                     jobStatusResponse = jobStatusResponse,
                 ),
             )

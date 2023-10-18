@@ -89,6 +89,23 @@ data class DocumentVerificationResult(
 ) : Parcelable
 
 /**
+ * The result of Enhanced Document Verification capture and submission to the Smile ID API.
+ * Indicates that the capture and network requests were successful. The Job itself may or may not
+ * be complete yet.
+ * This can be checked with [EnhancedDocumentVerificationJobStatusResponse.jobComplete]. If not yet
+ * complete, the job status will need to be fetched again later. If the job is complete, the final
+ * job success can be checked with [EnhancedDocumentVerificationJobStatusResponse.jobSuccess].
+ */
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class EnhancedDocumentVerificationResult(
+    val selfieFile: File,
+    val documentFrontFile: File,
+    val documentBackFile: File? = null,
+    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse,
+) : Parcelable
+
+/**
  * The result of a Biometric KYC capture and submission to the Smile ID API. Indicates that the
  * capture and network requests were successful. The Job itself may or may not be complete yet. This
  * can be checked with [BiometricKycJobStatusResponse.jobComplete]. If not yet complete, the job
@@ -101,12 +118,4 @@ data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
     val jobStatusResponse: BiometricKycJobStatusResponse,
-) : Parcelable
-
-@Parcelize
-@JsonClass(generateAdapter = true)
-data class EnhancedDocumentVerificationResult(
-    val selfieFile: File,
-    val livenessFiles: List<File>,
-    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse,
 ) : Parcelable
