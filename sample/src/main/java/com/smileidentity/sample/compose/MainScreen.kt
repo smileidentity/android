@@ -266,30 +266,6 @@ fun MainScreen(
                         )
                     }
                 }
-                composable(ProductScreen.BvnConsent.route) {
-                    LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
-                    SmileID.BvnConsentScreen(
-                        partnerIcon = painterResource(
-                            id = com.smileidentity.R.drawable.si_logo_with_text,
-                        ),
-                        partnerName = stringResource(com.smileidentity.R.string.si_company_name),
-                        partnerPrivacyPolicy = privacyPolicy,
-                        onConsentDenied = {
-                            viewModel.onConsentDenied()
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        },
-                        onConsentGranted = {
-                            viewModel.onSuccessfulBvnConsent()
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        },
-                    )
-                }
                 composable(ProductScreen.EnhancedDocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
@@ -318,6 +294,30 @@ fun MainScreen(
                             )
                         }
                     }
+                }
+                composable(ProductScreen.BvnConsent.route) {
+                    LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
+                    SmileID.BvnConsentScreen(
+                        partnerIcon = painterResource(
+                            id = com.smileidentity.R.drawable.si_logo_with_text,
+                        ),
+                        partnerName = stringResource(com.smileidentity.R.string.si_company_name),
+                        partnerPrivacyPolicy = privacyPolicy,
+                        onConsentDenied = {
+                            viewModel.onConsentDenied()
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        },
+                        onConsentGranted = {
+                            viewModel.onSuccessfulBvnConsent()
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        },
+                    )
                 }
             }
         },

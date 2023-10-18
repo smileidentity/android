@@ -252,50 +252,6 @@ fun SmileID.BiometricKYC(
 }
 
 /**
- * Perform BVN verification: Verify the BVN information of your user and confirm that the ID
- * actually belongs to the user by requesting an OTP.
- *
- * [Docs](https://docs.usesmileid.com/integration-options/mobile/android/consent-screen#bvn-consent-screen)
- *
- * @param partnerIcon Your own icon to display on the BVN Consent screen (i.e. company logo)
- * @param partnerName Your own name to display on the BVN Consent screen (i.e. company name)
- * @param partnerPrivacyPolicy A link to your own privacy policy to display
- * @param onConsentGranted Callback to be invoked when the BVN verification job is complete.
- * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
- * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
- * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
- * to a unique User ID within your own system. If not provided, a random user ID will be generated
- * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
- * ID branded UI by default, but allow the user to override it if they want.
- * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
- * branded UI by default, but allow the user to override it if they want.
- */
-@Composable
-fun SmileID.BvnConsentScreen(
-    partnerIcon: Painter,
-    partnerName: String,
-    partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
-    onConsentDenied: () -> Unit,
-    showAttribution: Boolean = true,
-    userId: String = rememberSaveable { randomUserId() },
-    colorScheme: ColorScheme = SmileID.colorScheme,
-    typography: Typography = SmileID.typography,
-) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedBvnConsentScreen(
-            userId = userId,
-            partnerIcon = partnerIcon,
-            partnerName = partnerName,
-            partnerPrivacyPolicy = partnerPrivacyPolicy,
-            onConsentGranted = onConsentGranted,
-            onConsentDenied = onConsentDenied,
-            showAttribution = showAttribution,
-        )
-    }
-}
-
-/**
  * Perform Enhanced Document Verification
  *
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
@@ -361,6 +317,50 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                     )
                 },
             ),
+        )
+    }
+}
+
+/**
+ * Perform BVN verification: Verify the BVN information of your user and confirm that the ID
+ * actually belongs to the user by requesting an OTP.
+ *
+ * [Docs](https://docs.usesmileid.com/integration-options/mobile/android/consent-screen#bvn-consent-screen)
+ *
+ * @param partnerIcon Your own icon to display on the BVN Consent screen (i.e. company logo)
+ * @param partnerName Your own name to display on the BVN Consent screen (i.e. company name)
+ * @param partnerPrivacyPolicy A link to your own privacy policy to display
+ * @param onConsentGranted Callback to be invoked when the BVN verification job is complete.
+ * @param onConsentDenied Callback to be invoked when the user denies consent to BVN verification.
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param userId The user ID to associate with the BVN Job. Most often, this will correspond
+ * to a unique User ID within your own system. If not provided, a random user ID will be generated
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ */
+@Composable
+fun SmileID.BvnConsentScreen(
+    partnerIcon: Painter,
+    partnerName: String,
+    partnerPrivacyPolicy: URL,
+    onConsentGranted: () -> Unit,
+    onConsentDenied: () -> Unit,
+    showAttribution: Boolean = true,
+    userId: String = rememberSaveable { randomUserId() },
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedBvnConsentScreen(
+            userId = userId,
+            partnerIcon = partnerIcon,
+            partnerName = partnerName,
+            partnerPrivacyPolicy = partnerPrivacyPolicy,
+            onConsentGranted = onConsentGranted,
+            onConsentDenied = onConsentDenied,
+            showAttribution = showAttribution,
         )
     }
 }
