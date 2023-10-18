@@ -2,7 +2,11 @@ package com.smileidentity.compose.biometric
 
 import android.os.OperationCanceledException
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,56 +49,65 @@ fun OrchestratedBiometricKYCScreen(
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    Box(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .fillMaxSize(),
+    ) {
+        when {
+            uiState.showLoading ->
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
-    when {
-        uiState.showLoading -> Box(modifier = modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
+            uiState.showConsent -> OrchestratedConsentScreen(
+                partnerIcon = partnerIcon,
+                partnerName = partnerName,
+                productName = productName,
+                partnerPrivacyPolicy = partnerPrivacyPolicy,
+                showAttribution = showAttribution,
+                modifier = Modifier,
+                onConsentGranted = viewModel::onConsentGranted,
+                onConsentDenied = {
+                    onResult(
+                        SmileIDResult.Error(OperationCanceledException("User did not consent")),
+                    )
+                },
+            )
 
-        uiState.showConsent -> OrchestratedConsentScreen(
-            partnerIcon = partnerIcon,
-            partnerName = partnerName,
-            productName = productName,
-            partnerPrivacyPolicy = partnerPrivacyPolicy,
-            showAttribution = showAttribution,
-            modifier = modifier,
-            onConsentGranted = viewModel::onConsentGranted,
-            onConsentDenied = {
-                onResult(SmileIDResult.Error(OperationCanceledException("User did not consent")))
-            },
-        )
+            uiState.processingState != null -> ProcessingScreen(
+                processingState = uiState.processingState,
+                inProgressTitle = stringResource(R.string.si_biometric_kyc_processing_title),
+                inProgressSubtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
+                inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
+                successTitle = stringResource(R.string.si_biometric_kyc_processing_success_title),
+                successSubtitle = stringResource(
+                    R.string.si_biometric_kyc_processing_success_subtitle,
+                ),
+                successIcon = painterResource(R.drawable.si_processing_success),
+                errorTitle = stringResource(R.string.si_biometric_kyc_processing_error_subtitle),
+                errorSubtitle = stringResource(R.string.si_processing_error_subtitle),
+                errorIcon = painterResource(R.drawable.si_processing_error),
+                continueButtonText = stringResource(R.string.si_continue),
+                onContinue = { viewModel.onFinished(onResult) },
+                retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
+                onRetry = { viewModel.onRetry() },
+                closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
+                onClose = { viewModel.onFinished(onResult) },
+            )
 
-        uiState.processingState != null -> ProcessingScreen(
-            processingState = uiState.processingState,
-            inProgressTitle = stringResource(R.string.si_biometric_kyc_processing_title),
-            inProgressSubtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
-            inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
-            successTitle = stringResource(R.string.si_biometric_kyc_processing_success_title),
-            successSubtitle = stringResource(R.string.si_biometric_kyc_processing_success_subtitle),
-            successIcon = painterResource(R.drawable.si_processing_success),
-            errorTitle = stringResource(R.string.si_biometric_kyc_processing_error_subtitle),
-            errorSubtitle = stringResource(R.string.si_processing_error_subtitle),
-            errorIcon = painterResource(R.drawable.si_processing_error),
-            continueButtonText = stringResource(R.string.si_continue),
-            onContinue = { viewModel.onFinished(onResult) },
-            retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-            onRetry = { viewModel.onRetry() },
-            closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
-            onClose = { viewModel.onFinished(onResult) },
-        )
-
-        else -> OrchestratedSelfieCaptureScreen(
-            userId = userId,
-            jobId = jobId,
-            allowAgentMode = allowAgentMode,
-            skipApiSubmission = true,
-        ) {
-            when (it) {
-                is SmileIDResult.Error -> onResult(it)
-                is SmileIDResult.Success -> viewModel.onSelfieCaptured(
-                    selfieFile = it.data.selfieFile,
-                    livenessFiles = it.data.livenessFiles,
-                )
+            else -> OrchestratedSelfieCaptureScreen(
+                userId = userId,
+                jobId = jobId,
+                allowAgentMode = allowAgentMode,
+                skipApiSubmission = true,
+            ) {
+                when (it) {
+                    is SmileIDResult.Error -> onResult(it)
+                    is SmileIDResult.Success -> viewModel.onSelfieCaptured(
+                        selfieFile = it.data.selfieFile,
+                        livenessFiles = it.data.livenessFiles,
+                    )
+                }
             }
         }
     }
