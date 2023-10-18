@@ -26,6 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
@@ -147,8 +148,8 @@ object SmileID {
      * job requests
      */
     @JvmStatic
-    fun setCallbackUrl(callbackUrl: String) {
-        SmileID.callbackUrl = callbackUrl
+    fun setCallbackUrl(callbackUrl: URL) {
+        SmileID.callbackUrl = callbackUrl.toString()
     }
 
     /**
