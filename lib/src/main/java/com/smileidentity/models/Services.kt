@@ -23,7 +23,7 @@ data class BankCode(
  * The key is the 2 letter ISO country code for the country. The key should be copied in to
  * [CountryInfo.countryCode]
  */
-private typealias CountryCodeToCountryInfo = Map<String, CountryInfo>
+internal typealias CountryCodeToCountryInfo = Map<String, CountryInfo>
 
 /**
  * The key is the unique identifier for the ID type. The key should be copied in to

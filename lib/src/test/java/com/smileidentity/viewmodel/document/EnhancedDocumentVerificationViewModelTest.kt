@@ -5,18 +5,18 @@ import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.Config
 import com.smileidentity.models.DocumentCaptureFlow
+import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import io.mockk.Runs
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
@@ -36,8 +36,8 @@ import org.junit.Test
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OrchestratedDocumentViewModelTest {
-    private lateinit var subject: OrchestratedDocumentViewModel<DocumentVerificationResult>
+class EnhancedDocumentVerificationViewModelTest {
+    private lateinit var subject: OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>
 
     private val documentFrontFile = File.createTempFile("documentFront", ".jpg")
     private val selfieFile = File.createTempFile("selfie", ".jpg")
@@ -45,8 +45,8 @@ class OrchestratedDocumentViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = DocumentVerificationViewModel(
-            jobType = JobType.DocumentVerification,
+        subject = EnhancedDocumentVerificationViewModel(
+            jobType = JobType.EnhancedDocumentVerification,
             userId = randomUserId(),
             jobId = randomJobId(),
             countryCode = "KE",
@@ -130,12 +130,16 @@ class OrchestratedDocumentViewModelTest {
             cameraConfig = null,
         )
 
-        every { subject.getJobStatus(
-            jobStatusRequest = any(),
-            selfieImage = any(),
-            documentFrontFile = any(),
-            documentBackFile = any()
-        ) } just Runs
+        coEvery { SmileID.api.getEnhancedDocumentVerificationJobStatus(any()) } returns
+            EnhancedDocumentVerificationJobStatusResponse(
+                timestamp = "timestamp",
+                jobComplete = true,
+                jobSuccess = true,
+                code = "0",
+                history = null,
+                imageLinks = null,
+                result = null,
+            )
 
         val uploadBodySlot = slot<UploadRequest>()
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
@@ -152,7 +156,6 @@ class OrchestratedDocumentViewModelTest {
     @Test
     fun `should submit liveness photos after selfie capture`() = runTest {
         SmileID.api = mockk()
-        val jobStatusProvider = mockk<OrchestratedDocumentViewModel<DocumentVerificationResult>>()
         val selfieResult = SmartSelfieResult(
             selfieFile = selfieFile,
             livenessFiles = listOf(File.createTempFile("liveness", ".jpg")),
@@ -173,7 +176,16 @@ class OrchestratedDocumentViewModelTest {
             cameraConfig = null,
         )
 
-        every { jobStatusProvider.getJobStatus(any(), any(), any(), any()) } just Runs
+        coEvery { SmileID.api.getEnhancedDocumentVerificationJobStatus(any()) } returns
+            EnhancedDocumentVerificationJobStatusResponse(
+                timestamp = "timestamp",
+                jobComplete = true,
+                jobSuccess = true,
+                code = "0",
+                history = null,
+                imageLinks = null,
+                result = null,
+            )
 
         val uploadBodySlot = slot<UploadRequest>()
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs

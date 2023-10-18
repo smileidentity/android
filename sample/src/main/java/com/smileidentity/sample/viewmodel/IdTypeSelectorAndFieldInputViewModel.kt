@@ -79,8 +79,8 @@ class IdTypeSelectorAndFieldInputViewModel(
             supportedCountriesAndIdTypes = when (jobType) {
                 BiometricKyc -> productsConfigResponse.idSelection.biometricKyc
                 EnhancedKyc -> productsConfigResponse.idSelection.enhancedKyc
-                EnhancedDocumentVerification ->
-                    productsConfigResponse.idSelection.enhancedDocumentVerification
+                EnhancedDocumentVerification -> productsConfigResponse.idSelection.enhancedKyc
+
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
 
@@ -92,6 +92,7 @@ class IdTypeSelectorAndFieldInputViewModel(
                 EnhancedKyc -> servicesResponse.hostedWeb.enhancedKyc
                 EnhancedDocumentVerification ->
                     servicesResponse.hostedWeb.enhancedDocumentVerification
+
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
             val countryList = servicesResponseForJobType
