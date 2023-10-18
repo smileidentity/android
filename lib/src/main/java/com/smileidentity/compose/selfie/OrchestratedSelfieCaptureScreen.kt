@@ -88,8 +88,9 @@ internal fun OrchestratedSelfieCaptureScreen(
 
             uiState.selfieToConfirm != null -> ImageCaptureConfirmationDialog(
                 titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
-                subtitleText =
-                stringResource(R.string.si_smart_selfie_confirmation_dialog_subtitle),
+                subtitleText = stringResource(
+                    R.string.si_smart_selfie_confirmation_dialog_subtitle,
+                ),
                 painter = BitmapPainter(
                     BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath).asImageBitmap(),
                 ),
