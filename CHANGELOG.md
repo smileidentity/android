@@ -18,6 +18,7 @@
 ### Fixed
 - Updated KDocs with missing parameter descriptions
 - Fix Broken Country Selection on EnhancedKYC and BiometricKYC
+- Update Window Insets to avoid content being drawn under system insets
 
 ### Changed
 - Show the normal consent screen as part of BVN Verification
