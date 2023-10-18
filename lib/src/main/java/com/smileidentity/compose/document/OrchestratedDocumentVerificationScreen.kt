@@ -1,54 +1,37 @@
 package com.smileidentity.compose.document
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.DocumentCaptureFlow
-import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
-import com.smileidentity.viewmodel.viewModelFactory
-import java.io.File
 
 /**
  * Orchestrates the document capture flow - navigates between instructions, requesting permissions,
  * showing camera view, and displaying processing screen
  */
 @Composable
-internal fun OrchestratedDocumentVerificationScreen(
-    countryCode: String,
-    documentType: String? = null,
+internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
+    viewModel: OrchestratedDocumentViewModel<T>,
     captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
-    bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
-    viewModel: OrchestratedDocumentViewModel = viewModel(
-        factory = viewModelFactory {
-            OrchestratedDocumentViewModel(
-                userId = userId,
-                jobId = jobId,
-                countryCode = countryCode,
-                documentType = documentType,
-                captureBothSides = captureBothSides,
-                selfieFile = bypassSelfieCaptureWithFile,
-            )
-        },
-    ),
-    onResult: SmileIDCallback<DocumentVerificationResult> = {},
+    onResult: SmileIDCallback<T> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentStep = uiState.currentStep) {

@@ -2,12 +2,14 @@ package com.smileidentity.sample.model
 
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocumentVerificationJobStatusResponse
+import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobStatusResponse
 import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
+import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
@@ -94,6 +96,12 @@ fun DocumentVerificationJobStatusResponse.toJob(userId: String, jobId: String) =
     userId = userId,
     jobId = jobId,
     jobType = DocumentVerification,
+)
+
+fun EnhancedDocumentVerificationJobStatusResponse.toJob(userId: String, jobId: String) = toJob(
+    userId = userId,
+    jobId = jobId,
+    jobType = EnhancedDocumentVerification,
 )
 
 fun JobStatusResponse.toJob(

@@ -2,6 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult
+import com.smileidentity.models.EnhancedDocumentVerificationJobResult
 import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
@@ -183,6 +184,31 @@ object BiometricKycJobResultAdapter {
         when (result) {
             is JobResult.Freeform -> writer.value(result.result)
             is BiometricKycJobResult.Entry -> delegate.toJson(writer, result)
+        }
+    }
+}
+
+@Suppress("unused")
+object EnhancedDocumentVerificationJobResultAdapter {
+    @FromJson
+    fun fromJson(
+        reader: JsonReader,
+        delegate: JsonAdapter<EnhancedDocumentVerificationJobResult.Entry>,
+    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+        delegate.fromJson(reader)!!
+    } else {
+        JobResult.Freeform(reader.nextString())
+    }
+
+    @ToJson
+    fun toJson(
+        writer: JsonWriter,
+        result: EnhancedDocumentVerificationJobResult,
+        delegate: JsonAdapter<EnhancedDocumentVerificationJobResult.Entry>,
+    ) {
+        when (result) {
+            is JobResult.Freeform -> writer.value(result.result)
+            is EnhancedDocumentVerificationJobResult.Entry -> delegate.toJson(writer, result)
         }
     }
 }

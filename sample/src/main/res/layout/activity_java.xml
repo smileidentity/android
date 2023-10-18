@@ -25,6 +25,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/si_doc_v_product_name" />
+
+        <Button
+                android:id="@+id/button_enhanced_document_verification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/si_enhanced_docv_product_name" />
     </LinearLayout>
 
     <FrameLayout

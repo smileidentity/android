@@ -3,6 +3,7 @@ package com.smileidentity.results
 import android.os.Parcelable
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocumentVerificationJobStatusResponse
+import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
@@ -85,6 +86,23 @@ data class DocumentVerificationResult(
     val documentFrontFile: File,
     val documentBackFile: File? = null,
     val jobStatusResponse: DocumentVerificationJobStatusResponse,
+) : Parcelable
+
+/**
+ * The result of Enhanced Document Verification capture and submission to the Smile ID API.
+ * Indicates that the capture and network requests were successful. The Job itself may or may not
+ * be complete yet.
+ * This can be checked with [EnhancedDocumentVerificationJobStatusResponse.jobComplete]. If not yet
+ * complete, the job status will need to be fetched again later. If the job is complete, the final
+ * job success can be checked with [EnhancedDocumentVerificationJobStatusResponse.jobSuccess].
+ */
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class EnhancedDocumentVerificationResult(
+    val selfieFile: File,
+    val documentFrontFile: File,
+    val documentBackFile: File? = null,
+    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse,
 ) : Parcelable
 
 /**

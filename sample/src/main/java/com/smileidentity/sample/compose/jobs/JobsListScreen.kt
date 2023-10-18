@@ -46,6 +46,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.BVN
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
+import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
@@ -78,6 +79,7 @@ fun JobsListScreen(
                 BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
                 BVN -> com.smileidentity.sample.R.drawable.biometric_kyc
+                EnhancedDocumentVerification -> R.drawable.si_smart_selfie_instructions_hero
                 JobType.Unknown -> {
                     Timber.e("Unknown job type")
                     R.drawable.si_smart_selfie_instructions_hero

@@ -43,6 +43,7 @@ enum class JobType(val value: Int) {
     EnhancedKyc(5),
     DocumentVerification(6),
     BVN(7),
+    EnhancedDocumentVerification(11),
 
     /**
      * Special value used to indicate that the value returned from the server is not yet supported

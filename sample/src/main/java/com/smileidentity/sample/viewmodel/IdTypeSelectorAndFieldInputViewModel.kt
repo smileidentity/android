@@ -12,6 +12,7 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.IdTypes
 import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.BiometricKyc
+import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.RequiredField
@@ -78,6 +79,7 @@ class IdTypeSelectorAndFieldInputViewModel(
             supportedCountriesAndIdTypes = when (jobType) {
                 BiometricKyc -> productsConfigResponse.idSelection.biometricKyc
                 EnhancedKyc -> productsConfigResponse.idSelection.enhancedKyc
+                EnhancedDocumentVerification -> productsConfigResponse.idSelection.enhancedKyc
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
 
@@ -87,9 +89,11 @@ class IdTypeSelectorAndFieldInputViewModel(
             servicesResponseForJobType = when (jobType) {
                 BiometricKyc -> servicesResponse.hostedWeb.biometricKyc
                 EnhancedKyc -> servicesResponse.hostedWeb.enhancedKyc
+                EnhancedDocumentVerification ->
+                    servicesResponse.hostedWeb.enhancedDocumentVerification
+
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
-
             val countryList = servicesResponseForJobType
                 .filter { it.countryCode in supportedCountriesAndIdTypes }
                 .map {

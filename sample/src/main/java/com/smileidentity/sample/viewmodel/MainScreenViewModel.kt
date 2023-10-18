@@ -8,17 +8,21 @@ import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult
+import com.smileidentity.models.EnhancedDocumentVerificationJobResult
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.BiometricKyc
 import com.smileidentity.models.JobType.DocumentVerification
+import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.networking.pollBiometricKycJobStatus
 import com.smileidentity.networking.pollDocumentVerificationJobStatus
+import com.smileidentity.networking.pollEnhancedDocumentVerificationJobStatus
 import com.smileidentity.networking.pollSmartSelfieJobStatus
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
+import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
@@ -90,6 +94,8 @@ class MainScreenViewModel : ViewModel() {
                     SmartSelfieEnrollment -> SmileID.api.pollSmartSelfieJobStatus(request)
                     DocumentVerification -> SmileID.api.pollDocumentVerificationJobStatus(request)
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
+                    EnhancedDocumentVerification ->
+                        SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
                     else -> {
                         Timber.e("Unexpected pending job: $job")
                         throw IllegalStateException("Unexpected pending job: $job")
@@ -442,6 +448,48 @@ class MainScreenViewModel : ViewModel() {
     fun onSuccessfulBvnConsent() {
         _uiState.update {
             it.copy(snackbarMessage = "BVN Consent Successful")
+        }
+    }
+
+    fun onEnhancedDocumentVerificationSelected() {
+        _uiState.update {
+            it.copy(
+                appBarTitle = ProductScreen.EnhancedDocumentVerification.label,
+                bottomNavSelection = BottomNavigationScreen.Home,
+            )
+        }
+    }
+
+    fun onEnhancedDocumentVerificationResult(
+        userId: String,
+        jobId: String,
+        result: SmileIDResult<EnhancedDocumentVerificationResult>,
+    ) {
+        if (result is SmileIDResult.Success) {
+            val response = result.data.jobStatusResponse
+            val actualResult = response.result as? EnhancedDocumentVerificationJobResult.Entry
+            val message = jobResultMessageBuilder(
+                jobName = "Enhanced Document Verification",
+                jobComplete = response.jobComplete,
+                jobSuccess = response.jobSuccess,
+                code = response.code,
+                resultCode = actualResult?.resultCode,
+                resultText = actualResult?.resultText,
+            )
+            Timber.d("$message: $result")
+            _uiState.update { it.copy(snackbarMessage = message) }
+            viewModelScope.launch {
+                DataStoreRepository.addPendingJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = response.toJob(userId, jobId),
+                )
+            }
+        } else if (result is SmileIDResult.Error) {
+            val th = result.throwable
+            val message = "Enhanced Document Verification error: ${th.message}"
+            Timber.e(th, message)
+            _uiState.update { it.copy(snackbarMessage = message) }
         }
     }
 
