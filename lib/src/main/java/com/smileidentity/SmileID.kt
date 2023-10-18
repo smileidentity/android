@@ -148,7 +148,7 @@ object SmileID {
      * job requests
      */
     @JvmStatic
-    fun setCallbackUrl(callbackUrl: URL) {
+    fun setCallbackUrl(callbackUrl: URL?) {
         SmileID.callbackUrl = callbackUrl.toString()
     }
 
