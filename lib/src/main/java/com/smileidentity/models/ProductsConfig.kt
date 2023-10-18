@@ -31,8 +31,6 @@ data class IdSelection(
     @Json(name = "biometric_kyc") val biometricKyc: IdTypes = emptyMap(),
     @Json(name = "enhanced_kyc") val enhancedKyc: IdTypes = emptyMap(),
     @Json(name = "doc_verification") val documentVerification: IdTypes = emptyMap(),
-    @Json(name = "enhanced_document_verification")
-    val enhancedDocumentVerification: IdTypes = emptyMap(),
 )
 
 @Parcelize
