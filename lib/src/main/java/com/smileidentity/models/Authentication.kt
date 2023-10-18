@@ -61,7 +61,7 @@ data class AuthenticationResponse(
     @Json(name = "signature") val signature: String,
     @Json(name = "timestamp") val timestamp: String,
     @Json(name = "partner_params") val partnerParams: PartnerParams,
-    @Json(name = "callback_url") val callbackUrl: String? = null,
+    @Json(name = "callback_url") val callbackUrl: String? = SmileID.callbackUrl,
     @Json(name = "consent_info") val consentInfo: ConsentInfo? = null,
 ) : Parcelable
 

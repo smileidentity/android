@@ -13,7 +13,7 @@ data class PrepUploadRequest(
     @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "model_parameters") val modelParameters: Map<String, Any> = mapOf(),
     // Callback URL *must* be defined either within your Partner Portal or here
-    @Json(name = "callback_url") val callbackUrl: String? = null,
+    @Json(name = "callback_url") val callbackUrl: String? = SmileID.callbackUrl,
     @Json(name = "smile_client_id") val partnerId: String = SmileID.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,

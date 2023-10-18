@@ -1,12 +1,23 @@
 # Changelog
 
+## 10.0.0-beta10 (unreleased)
+
+### Added
+
+### Fixed
+
+### Changed
+
 ## 10.0.0-beta09 (unreleased)
 
 ### Added
 - Added missing `colorScheme` and `typography` parameters on `SmileID.BvnConsentScreen`
+- Added option to set callback URL using `setCallbackUrl(callbackUrl: URL?)` method
+- Added EnhancedDocumentVerification support
 
 ### Fixed
 - Updated KDocs with missing parameter descriptions
+- Fix Broken Country Selection on EnhancedKYC and BiometricKYC
 
 ### Changed
 - Show the normal consent screen as part of BVN Verification
