@@ -80,7 +80,6 @@ class IdTypeSelectorAndFieldInputViewModel(
                 BiometricKyc -> productsConfigResponse.idSelection.biometricKyc
                 EnhancedKyc -> productsConfigResponse.idSelection.enhancedKyc
                 EnhancedDocumentVerification -> productsConfigResponse.idSelection.enhancedKyc
-
                 else -> throw IllegalArgumentException("Unsupported JobType: $jobType")
             }
 
