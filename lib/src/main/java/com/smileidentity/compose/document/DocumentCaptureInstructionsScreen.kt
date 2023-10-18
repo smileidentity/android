@@ -46,7 +46,7 @@ fun DocumentCaptureInstructionsScreen(
                 painter = painterResource(id = R.drawable.si_doc_v_instructions_hero),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(128.dp)
+                    .size(98.dp)
                     .padding(top = 8.dp),
             )
             Text(

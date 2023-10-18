@@ -35,7 +35,7 @@ internal fun SmartSelfieInstructionsScreen(
         scrollableContent = {
             Image(
                 painter = painterResource(id = R.drawable.si_smart_selfie_instructions_hero),
-                modifier = Modifier.size(128.dp),
+                modifier = Modifier.size(98.dp),
                 contentDescription = null,
             )
             Text(
