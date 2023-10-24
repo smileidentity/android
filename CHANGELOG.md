@@ -5,6 +5,7 @@
 ### Added
 
 ### Fixed
+- Fix bug where `showAttirubtion` was not respected on the Consent Denied screen
 
 ### Changed
 
