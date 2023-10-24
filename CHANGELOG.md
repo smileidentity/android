@@ -8,6 +8,9 @@
 - Fix bug where `showAttirubtion` was not respected on the Consent Denied screen
 
 ### Changed
+- Increased selfie capture resolution to 640px
+- Bump Sentry to 6.32.0
+- Bump OkHttp to 4.12.0
 
 ## 10.0.0-beta09
 
