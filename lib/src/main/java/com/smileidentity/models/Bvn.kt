@@ -34,7 +34,7 @@ data class BvnTotpResponse(
     @Json(name = "message")
     val message: String,
     @Json(name = "modes")
-    val modes: List<BvnVerificationMode> = emptyList(),
+    val modes: List<BvnVerificationMode>,
     @Json(name = "session_id")
     val sessionId: String,
     @Json(name = "signature")

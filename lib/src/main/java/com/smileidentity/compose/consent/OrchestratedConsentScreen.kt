@@ -29,6 +29,7 @@ internal fun OrchestratedConsentScreen(
             onGoBack = { showTryAgain = false },
             onCancel = onConsentDenied,
             modifier = modifier,
+            showAttribution = showAttribution,
         )
     } else {
         ConsentScreen(
