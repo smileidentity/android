@@ -71,7 +71,6 @@ class IdTypeSelectorAndFieldInputViewModel(
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val productsConfigRequest = ProductsConfigRequest(
-                partnerId = SmileID.config.partnerId,
                 timestamp = authResponse.timestamp,
                 signature = authResponse.signature,
             )
