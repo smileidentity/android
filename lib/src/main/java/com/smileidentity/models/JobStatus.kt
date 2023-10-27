@@ -46,18 +46,6 @@ data class SmartSelfieJobStatusResponse(
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class DocumentVerificationJobStatusResponse(
-    @Json(name = "timestamp") override val timestamp: String,
-    @Json(name = "job_complete") override val jobComplete: Boolean,
-    @Json(name = "job_success") override val jobSuccess: Boolean,
-    @Json(name = "code") override val code: String,
-    @Json(name = "result") override val result: DocumentVerificationJobResult?,
-    @Json(name = "history") override val history: List<DocumentVerificationJobResult.Entry>?,
-    @Json(name = "image_links") override val imageLinks: ImageLinks?,
-) : JobStatusResponse
-
-@Parcelize
-@JsonClass(generateAdapter = true)
 data class BiometricKycJobStatusResponse(
     @Json(name = "timestamp") override val timestamp: String,
     @Json(name = "job_complete") override val jobComplete: Boolean,
@@ -65,6 +53,18 @@ data class BiometricKycJobStatusResponse(
     @Json(name = "code") override val code: String,
     @Json(name = "result") override val result: BiometricKycJobResult?,
     @Json(name = "history") override val history: List<BiometricKycJobResult.Entry>?,
+    @Json(name = "image_links") override val imageLinks: ImageLinks?,
+) : JobStatusResponse
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class DocumentVerificationJobStatusResponse(
+    @Json(name = "timestamp") override val timestamp: String,
+    @Json(name = "job_complete") override val jobComplete: Boolean,
+    @Json(name = "job_success") override val jobSuccess: Boolean,
+    @Json(name = "code") override val code: String,
+    @Json(name = "result") override val result: DocumentVerificationJobResult?,
+    @Json(name = "history") override val history: List<DocumentVerificationJobResult.Entry>?,
     @Json(name = "image_links") override val imageLinks: ImageLinks?,
 ) : JobStatusResponse
 

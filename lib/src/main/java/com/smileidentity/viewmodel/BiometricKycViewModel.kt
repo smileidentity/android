@@ -92,7 +92,6 @@ class BiometricKycViewModel(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                callbackUrl = SmileID.callbackUrl,
                 partnerParams = authResponse.partnerParams,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,

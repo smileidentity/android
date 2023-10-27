@@ -54,7 +54,7 @@ fun IdTypeSelectorAndFieldInputScreen(
 
         !uiState.hasIdTypeSelectionBeenConfirmed -> IdSelectorScreen(
             modifier = modifier,
-            onNext = { viewModel.onIdTypeConfirmed() },
+            onNext = viewModel::onIdTypeConfirmed,
         )
 
         else -> IdInputScreen(
