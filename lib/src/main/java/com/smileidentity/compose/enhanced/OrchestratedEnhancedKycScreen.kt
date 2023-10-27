@@ -77,13 +77,17 @@ fun OrchestratedEnhancedKycScreen(
                 inProgressSubtitle = stringResource(R.string.si_enhanced_kyc_processing_subtitle),
                 inProgressIcon = rememberVectorPainter(Icons.Default.MailOutline),
                 successTitle = stringResource(R.string.si_enhanced_kyc_processing_success_title),
-                successSubtitle = stringResource(R.string.si_enhanced_kyc_processing_success_subtitle),
+                successSubtitle = stringResource(
+                    R.string.si_enhanced_kyc_processing_success_subtitle,
+                ),
                 successIcon = rememberVectorPainter(Icons.Default.Done),
                 errorTitle = stringResource(R.string.si_enhanced_kyc_processing_error_title),
                 errorSubtitle = uiState.errorMessage
                     ?: stringResource(R.string.si_enhanced_kyc_processing_error_subtitle),
                 errorIcon = rememberVectorPainter(Icons.Default.Warning),
-                continueButtonText = stringResource(R.string.si_enhanced_kyc_processing_continue_button),
+                continueButtonText = stringResource(
+                    R.string.si_enhanced_kyc_processing_continue_button,
+                ),
                 onContinue = { viewModel.onFinished(onResult) },
                 retryButtonText = stringResource(R.string.si_enhanced_kyc_processing_retry_button),
                 onRetry = { viewModel.onRetry() },

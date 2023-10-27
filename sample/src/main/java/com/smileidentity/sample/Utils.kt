@@ -6,7 +6,6 @@ import androidx.annotation.StringRes
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import com.smileidentity.models.JobType
-import com.smileidentity.compose.components.SearchableInputFieldItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

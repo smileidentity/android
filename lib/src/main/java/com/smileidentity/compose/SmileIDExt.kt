@@ -371,7 +371,7 @@ fun SmileID.EnhancedKYC(
             partnerPrivacyPolicy = partnerPrivacyPolicy,
             modifier = modifier,
             showAttribution = showAttribution,
-            onResult = onResult
+            onResult = onResult,
         )
     }
 }
