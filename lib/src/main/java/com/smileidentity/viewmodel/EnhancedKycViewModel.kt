@@ -1,4 +1,4 @@
-package com.smileidentity.sample.viewmodel
+package com.smileidentity.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class EnhancedKycUiState(
+    val showLoading: Boolean = true,
+    val showConsent: Boolean = false,
     val processingState: ProcessingState? = null,
     val errorMessage: String? = null,
 )
@@ -68,6 +70,10 @@ class EnhancedKycViewModel : ViewModel() {
             result = SmileIDResult.Success(EnhancedKycResult(enhancedKycRequest, response))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
+    }
+
+    fun onConsentGranted() {
+        _uiState.update { it.copy(showConsent = false) }
     }
 
     fun onRetry() {

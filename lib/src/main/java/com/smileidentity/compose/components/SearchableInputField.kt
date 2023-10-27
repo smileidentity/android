@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose.components
+package com.smileidentity.compose.components
 
 import android.os.Parcelable
 import androidx.compose.foundation.border
@@ -31,10 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.smileidentity.sample.R
-import com.smileidentity.sample.compose.SmileIDTheme
+import com.smileidentity.R
+import com.smileidentity.compose.preview.SmilePreviews
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.parcelize.Parcelize
@@ -108,7 +107,7 @@ fun SearchableInputField(
     ) {
         if (filteredItems == null) {
             Text(
-                text = stringResource(R.string.loading),
+                text = stringResource(R.string.si_loading),
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .align(alignment = CenterHorizontally),
@@ -136,15 +135,13 @@ fun SearchableInputField(
     }
 }
 
-@Preview
+@SmilePreviews
 @Composable
 private fun SearchableInputFieldPreview() {
-    SmileIDTheme {
-        SearchableInputField(
-            fieldLabel = "Country of Issue",
-            selectedItem = null,
-            unfilteredItems = persistentListOf(),
-            onItemSelected = { },
-        )
-    }
+    SearchableInputField(
+        fieldLabel = "Country of Issue",
+        selectedItem = null,
+        unfilteredItems = persistentListOf(),
+        onItemSelected = { },
+    )
 }

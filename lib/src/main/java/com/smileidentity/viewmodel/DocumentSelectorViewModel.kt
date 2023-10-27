@@ -1,4 +1,4 @@
-package com.smileidentity.sample.viewmodel
+package com.smileidentity.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

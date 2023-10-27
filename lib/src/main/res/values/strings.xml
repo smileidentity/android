@@ -9,6 +9,14 @@
     <string name="si_continue">Continue</string>
     <string name="si_allow">Allow</string>
     <string name="si_cancel">Cancel</string>
+    <string name="si_loading">Loading…</string>
+    <string name="si_search">Search</string>
+<!--    todo rename me to remove docv-->
+    <string name="si_biometric_kyc_instructions">Provide ID Information</string>
+    <string name="si_biometric_kyc_enter_id_info">Enter ID Information</string>
+    <string name="si_doc_v_select_country">Select Country of Issue</string>
+    <string name="si_doc_v_country_search_field_hint">Select Country</string>
+    <string name="si_doc_v_select_id_type">Select ID Type</string>
 
     <!--  Content Descriptions (for accessibility)  -->
     <string name="si_cd_logo">Smile ID logo</string>
@@ -80,6 +88,22 @@
     <string name="si_biometric_kyc_processing_success_title">Submission Complete</string>
     <string name="si_biometric_kyc_processing_success_subtitle">You may now proceed</string>
     <string name="si_biometric_kyc_processing_error_subtitle">Your submission failed to process</string>
+
+    <!--  Enhanced KYC  -->
+    <string name="si_enhanced_kyc_product_name">Enhanced KYC</string>
+    <string name="si_enhanced_kyc_instructions">Provide ID Information</string>
+    <string name="si_enhanced_kyc_country_picker_label">Country</string>
+    <string name="si_enhanced_kyc_id_type_picker_label">ID Type</string>
+    <string name="si_enhanced_kyc_submit_button">Submit</string>
+    <string name="si_enhanced_kyc_processing_title">Processing Enhanced KYC…</string>
+    <string name="si_enhanced_kyc_processing_subtitle">Just a few more seconds</string>
+    <string name="si_enhanced_kyc_processing_success_title">Enhanced KYC Complete</string>
+    <string name="si_enhanced_kyc_processing_success_subtitle">You can now proceed</string>
+    <string name="si_enhanced_kyc_processing_error_title">Enhanced KYC Failed</string>
+    <string name="si_enhanced_kyc_processing_error_subtitle">This could be because of internet connectivity</string>
+    <string name="si_enhanced_kyc_processing_continue_button">Continue</string>
+    <string name="si_enhanced_kyc_processing_retry_button">Retry</string>
+    <string name="si_enhanced_kyc_processing_close_button">Close</string>
 
     <!--  Country Names  -->
     <string name="si_country_name_ghana">Ghana</string>

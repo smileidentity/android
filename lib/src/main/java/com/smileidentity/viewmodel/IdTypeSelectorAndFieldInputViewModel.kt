@@ -1,10 +1,11 @@
-package com.smileidentity.sample.viewmodel
+package com.smileidentity.viewmodel
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
+import com.smileidentity.compose.components.SearchableInputFieldItem
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AvailableIdType
 import com.smileidentity.models.CountryInfo
@@ -16,8 +17,7 @@ import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.RequiredField
-import com.smileidentity.sample.compose.components.SearchableInputFieldItem
-import com.smileidentity.sample.countryDetails
+import com.smileidentity.util.countryDetails
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
 import kotlinx.collections.immutable.ImmutableList

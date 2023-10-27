@@ -55,13 +55,15 @@ import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
+import com.smileidentity.compose.components.DocumentVerificationIdTypeSelector
+import com.smileidentity.compose.enhanced.OrchestratedEnhancedKycScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
-import com.smileidentity.sample.compose.components.IdTypeSelectorScreen
+import com.smileidentity.compose.components.IdTypeSelectorAndFieldInputScreen
+import com.smileidentity.compose.components.IdTypeSelectorScreen
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
 import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
@@ -201,7 +203,14 @@ fun MainScreen(
                 }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
-                    OrchestratedEnhancedKycScreen { result ->
+                    OrchestratedEnhancedKycScreen(
+                        partnerIcon = painterResource(
+                            id = com.smileidentity.R.drawable.si_logo_with_text,
+                        ),
+                        partnerName = "Smile ID",
+                        productName = "it.idType!!",
+                        partnerPrivacyPolicy = privacyPolicy,
+                    ) { result ->
                         viewModel.onEnhancedKycResult(result)
                         navController.popBackStack()
                     }

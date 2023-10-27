@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose.components
+package com.smileidentity.compose.components
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,12 +25,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.R
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
-import com.smileidentity.sample.R
-import com.smileidentity.sample.toast
-import com.smileidentity.sample.viewmodel.IdTypeSelectorAndFieldInputViewModel
+import com.smileidentity.util.toast
+import com.smileidentity.viewmodel.IdTypeSelectorAndFieldInputViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import timber.log.Timber
 
@@ -80,7 +79,7 @@ private fun IdInputScreen(
     BottomPinnedColumn(
         scrollableContent = {
             Text(
-                text = stringResource(R.string.biometric_kyc_enter_id_info),
+                text = stringResource(R.string.si_biometric_kyc_enter_id_info),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 16.dp),
             )
@@ -125,7 +124,7 @@ private fun IdInputScreen(
                 onClick = onNext,
                 enabled = uiState.isFinalContinueEnabled,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(text = stringResource(R.string.cont)) }
+            ) { Text(text = stringResource(R.string.si_continue)) }
         },
         columnWidth = 320.dp,
         modifier = modifier

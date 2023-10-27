@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose.components
+package com.smileidentity.compose.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,8 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
-import com.smileidentity.sample.toast
-import com.smileidentity.sample.viewmodel.IdTypeSelectorAndFieldInputViewModel
+import com.smileidentity.util.toast
+import com.smileidentity.viewmodel.IdTypeSelectorAndFieldInputViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable

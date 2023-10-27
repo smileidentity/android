@@ -14,6 +14,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
+import com.smileidentity.compose.enhanced.OrchestratedEnhancedKycScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
@@ -22,6 +23,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
+import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
@@ -328,6 +330,48 @@ fun SmileID.BiometricKYC(
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             onResult = onResult,
+        )
+    }
+}
+
+/**
+ * Perform Enhanced KYC: The Enhanced KYC API allows you to query the Identity Information for an
+ * individual using their ID number from one of our supported ID Types.
+ *
+ * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/identity-lookup)
+ *
+ * @param partnerIcon Your own icon to display on the Biometric KYC screen (i.e. company logo)
+ * @param partnerName Your own name to display on the Biometric KYC screen (i.e. company name)
+ * @param productName The type of information you are trying to access (i.e. ID type)
+ * @param partnerPrivacyPolicy A link to your own privacy policy to display
+ * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Enhanced KYC is complete.
+ */
+@Composable
+fun SmileID.EnhancedKYC(
+    partnerIcon: Painter,
+    partnerName: String,
+    productName: String,
+    partnerPrivacyPolicy: URL,
+    modifier: Modifier = Modifier,
+    showAttribution: Boolean = true,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<EnhancedKycResult> = {},
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedEnhancedKycScreen(
+            partnerIcon = partnerIcon,
+            partnerName = partnerName,
+            productName = productName,
+            partnerPrivacyPolicy = partnerPrivacyPolicy,
+            modifier = modifier,
+            showAttribution = showAttribution,
+            onResult = onResult
         )
     }
 }

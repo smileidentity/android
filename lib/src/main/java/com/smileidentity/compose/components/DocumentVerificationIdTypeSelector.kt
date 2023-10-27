@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose
+package com.smileidentity.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,15 +45,15 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.R
+import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.IdType
 import com.smileidentity.models.ValidDocument
-import com.smileidentity.sample.R
-import com.smileidentity.sample.toast
-import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
+import com.smileidentity.util.toast
+import com.smileidentity.viewmodel.DocumentSelectorViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import timber.log.Timber
@@ -91,7 +90,7 @@ fun DocumentVerificationIdTypeSelector(
     ) {
         if (uiState.idTypes.isEmpty()) {
             CircularProgressIndicator()
-            Text(text = stringResource(id = R.string.loading))
+            Text(text = stringResource(id = R.string.si_loading))
             return
         }
 
@@ -129,7 +128,7 @@ private fun ColumnScope.CountrySelector(
         }
     }
     Text(
-        text = stringResource(id = R.string.doc_v_select_country),
+        text = stringResource(id = R.string.si_doc_v_select_country),
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(top = 16.dp),
     )
@@ -147,11 +146,11 @@ private fun ColumnScope.CountrySelector(
         onActiveChange = { active = it },
         placeholder = {
             val text = if (active) {
-                stringResource(id = R.string.search)
+                stringResource(id = R.string.si_search)
             } else if (selectedCountry?.country?.name != null) {
                 selectedCountry.country.name
             } else {
-                stringResource(id = R.string.doc_v_country_search_field_hint)
+                stringResource(id = R.string.si_doc_v_country_search_field_hint)
             }
             Text(text)
         },
@@ -200,7 +199,7 @@ private fun ColumnScope.IdTypeSelector(
 ) {
     var selectedIdType: IdType? by rememberSaveable { mutableStateOf(null) }
     Text(
-        text = stringResource(id = R.string.doc_v_select_id_type),
+        text = stringResource(id = R.string.si_doc_v_select_id_type),
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
@@ -237,17 +236,13 @@ private fun ColumnScope.IdTypeSelector(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 0.dp)
             .fillMaxWidth(),
-    ) { Text(text = stringResource(id = R.string.cont)) }
+    ) { Text(text = stringResource(id = R.string.si_continue)) }
 }
 
-@Preview
+@SmilePreviews
 @Composable
 fun DocumentVerificationIdTypeSelectorPreview() {
-    SmileIDTheme {
-        Surface {
-            DocumentVerificationIdTypeSelector(
-                onIdTypeSelected = { _, _, _ -> },
-            )
-        }
-    }
+    DocumentVerificationIdTypeSelector(
+        onIdTypeSelected = { _, _, _ -> },
+    )
 }

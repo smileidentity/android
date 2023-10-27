@@ -1,4 +1,4 @@
-package com.smileidentity.sample.compose.components
+package com.smileidentity.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -21,9 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.compose.components.BottomPinnedColumn
-import com.smileidentity.sample.R
-import com.smileidentity.sample.viewmodel.IdTypeSelectorAndFieldInputViewModel
+import com.smileidentity.R
+import com.smileidentity.viewmodel.IdTypeSelectorAndFieldInputViewModel
 
 @Composable
 internal fun IdSelectorScreen(
@@ -35,19 +34,19 @@ internal fun IdSelectorScreen(
     BottomPinnedColumn(
         scrollableContent = {
             Text(
-                text = stringResource(R.string.biometric_kyc_instructions),
+                text = stringResource(R.string.si_biometric_kyc_instructions),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(vertical = 16.dp),
             )
             SearchableInputField(
-                fieldLabel = stringResource(R.string.doc_v_country_search_field_hint),
+                fieldLabel = stringResource(R.string.si_doc_v_country_search_field_hint),
                 selectedItem = uiState.selectedCountry,
                 unfilteredItems = uiState.countries,
             ) { viewModel.onCountrySelected(it) }
 
             uiState.idTypesForCountry?.let { idTypesForCountry ->
                 Text(
-                    text = stringResource(R.string.doc_v_select_id_type),
+                    text = stringResource(R.string.si_doc_v_select_id_type),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 16.dp),
                 )
@@ -81,7 +80,7 @@ internal fun IdSelectorScreen(
                 enabled = uiState.isIdTypeContinueEnabled,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(text = stringResource(R.string.cont))
+                Text(text = stringResource(R.string.si_continue))
             }
         },
         columnWidth = 320.dp,

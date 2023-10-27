@@ -36,7 +36,7 @@ enum class ProductScreen(
     ),
     EnhancedKyc(
         "enhanced_kyc",
-        R.string.enhanced_kyc_product_name,
+        com.smileidentity.R.string.si_enhanced_kyc_product_name,
         R.drawable.enhanced_kyc,
     ),
     BiometricKyc(
