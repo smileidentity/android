@@ -1,5 +1,6 @@
 package com.smileidentity.sample.activity;
 
+import static com.smileidentity.util.UtilKt.randomJobId;
 import static com.smileidentity.util.UtilKt.randomUserId;
 
 import android.os.Bundle;
@@ -93,9 +94,10 @@ public class JavaActivity extends FragmentActivity {
 
     private void doSmartSelfieAuthentication() {
         String userId = randomUserId();
+        String jobId = randomJobId();
         boolean allowAgentMode = false;
         SmartSelfieAuthenticationFragment smartSelfieFragment = SmartSelfieAuthenticationFragment
-            .newInstance(userId, allowAgentMode);
+            .newInstance(userId, jobId, allowAgentMode);
         getSupportFragmentManager().setFragmentResultListener(
             SmartSelfieEnrollmentFragment.KEY_REQUEST,
             this,
