@@ -340,8 +340,8 @@ fun SmileID.BiometricKYC(
  *
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/identity-lookup)
  *
- * @param partnerIcon Your own icon to display on the Biometric KYC screen (i.e. company logo)
- * @param partnerName Your own name to display on the Biometric KYC screen (i.e. company name)
+ * @param partnerIcon Your own icon to display on the Enhanced KYC screen (i.e. company logo)
+ * @param partnerName Your own name to display on the Enhanced KYC screen (i.e. company name)
  * @param productName The type of information you are trying to access (i.e. ID type)
  * @param partnerPrivacyPolicy A link to your own privacy policy to display
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
