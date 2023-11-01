@@ -53,12 +53,11 @@ import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
+import com.smileidentity.compose.EnhancedKYC
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.compose.components.DocumentVerificationIdTypeSelector
-import com.smileidentity.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.compose.components.IdTypeSelectorScreen
-import com.smileidentity.compose.enhanced.OrchestratedEnhancedKycScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -203,7 +202,7 @@ fun MainScreen(
                 }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
-                    OrchestratedEnhancedKycScreen(
+                    SmileID.EnhancedKYC(
                         partnerIcon = painterResource(
                             id = com.smileidentity.R.drawable.si_logo_with_text,
                         ),
@@ -217,30 +216,37 @@ fun MainScreen(
                 }
                 composable(ProductScreen.BiometricKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
-                    var idInfo: IdInfo? by remember { mutableStateOf(null) }
-                    if (idInfo == null) {
-                        IdTypeSelectorAndFieldInputScreen(
-                            jobType = JobType.BiometricKyc,
-                            onResult = { idInfo = it },
-                        )
+                    DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
+                        navController.navigate(
+                            route = ProductScreen.BiometricKyc.route +
+                                "/$country/$idType/$captureBothSides",
+                        ) { popUpTo(ProductScreen.BiometricKyc.route) }
                     }
-                    idInfo?.let {
-                        val userId = rememberSaveable { randomUserId() }
-                        val jobId = rememberSaveable { randomJobId() }
-                        SmileID.BiometricKYC(
-                            idInfo = it,
-                            userId = userId,
-                            jobId = jobId,
-                            partnerIcon = painterResource(
-                                id = com.smileidentity.R.drawable.si_logo_with_text,
-                            ),
-                            partnerName = "Smile ID",
-                            productName = it.idType!!,
-                            partnerPrivacyPolicy = privacyPolicy,
-                        ) { result ->
-                            viewModel.onBiometricKycResult(userId, jobId, result)
-                            navController.popBackStack()
-                        }
+
+                }
+                composable(
+                    ProductScreen.BiometricKyc.route +
+                        "/{countryCode}/{idType}/{captureBothSides}",
+                ) {
+                    LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
+                    SmileID.BiometricKYC(
+                        idInfo = IdInfo(
+                            country = it.arguments?.getString("countryCode")!!,
+                            idType = it.arguments?.getString("idType")!!,
+                        ),
+                        userId = userId,
+                        jobId = jobId,
+                        partnerIcon = painterResource(
+                            id = com.smileidentity.R.drawable.si_logo_with_text,
+                        ),
+                        partnerName = "Smile ID",
+                        productName = it.arguments?.getString("idType")!!,
+                        partnerPrivacyPolicy = privacyPolicy,
+                    ) { result ->
+                        viewModel.onBiometricKycResult(userId, jobId, result)
+                        navController.popBackStack()
                     }
                 }
                 composable(ProductScreen.DocumentVerification.route) {
@@ -263,7 +269,7 @@ fun MainScreen(
                         userId = userId,
                         jobId = jobId,
                         countryCode = it.arguments?.getString("countryCode")!!,
-                        documentType = it.arguments?.getString("documentType"),
+                        documentType = it.arguments?.getString("idType"),
                         captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
                         showInstructions = true,
                         allowGalleryUpload = true,

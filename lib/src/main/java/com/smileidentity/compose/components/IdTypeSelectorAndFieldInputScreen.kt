@@ -34,7 +34,7 @@ import com.smileidentity.viewmodel.viewModelFactory
 import timber.log.Timber
 
 @Composable
-fun IdTypeSelectorAndFieldInputScreen(
+internal fun IdTypeSelectorAndFieldInputScreen(
     jobType: JobType,
     modifier: Modifier = Modifier,
     viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
@@ -57,6 +57,7 @@ fun IdTypeSelectorAndFieldInputScreen(
         )
 
         else -> IdInputScreen(
+            jobType = jobType,
             modifier = modifier,
             onNext = { onResult(viewModel.currentIdInfo) },
         )
@@ -66,8 +67,11 @@ fun IdTypeSelectorAndFieldInputScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun IdInputScreen(
+    jobType: JobType,
     modifier: Modifier = Modifier,
-    viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(),
+    viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
+        factory = viewModelFactory { IdTypeSelectorAndFieldInputViewModel(jobType) },
+    ),
     onNext: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value

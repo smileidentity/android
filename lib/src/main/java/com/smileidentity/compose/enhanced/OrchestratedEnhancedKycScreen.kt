@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -28,20 +29,27 @@ import com.smileidentity.models.JobType
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.EnhancedKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import java.net.URL
 
 @Composable
-fun OrchestratedEnhancedKycScreen(
+internal fun OrchestratedEnhancedKycScreen(
     partnerIcon: Painter,
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
     modifier: Modifier = Modifier,
+    userId: String = rememberSaveable { randomUserId() },
+    jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
     viewModel: EnhancedKycViewModel = viewModel(
-        factory = viewModelFactory { EnhancedKycViewModel() },
+        factory = viewModelFactory { EnhancedKycViewModel(
+            userId = userId,
+            jobId = jobId
+        ) },
     ),
     onResult: SmileIDCallback<EnhancedKycResult> = {},
 ) {

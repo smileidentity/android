@@ -23,13 +23,13 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
-data class BiometricKycUiState(
+internal data class BiometricKycUiState(
     val showLoading: Boolean = true,
     val showConsent: Boolean = false,
     val processingState: ProcessingState? = null,
 )
 
-class BiometricKycViewModel(
+internal class BiometricKycViewModel(
     private val idInfo: IdInfo,
     private val userId: String,
     private val jobId: String,

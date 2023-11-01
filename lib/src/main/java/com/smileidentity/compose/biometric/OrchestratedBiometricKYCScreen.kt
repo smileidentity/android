@@ -32,7 +32,7 @@ import com.smileidentity.viewmodel.viewModelFactory
 import java.net.URL
 
 @Composable
-fun OrchestratedBiometricKYCScreen(
+internal fun OrchestratedBiometricKYCScreen(
     idInfo: IdInfo,
     partnerIcon: Painter,
     partnerName: String,
@@ -44,7 +44,11 @@ fun OrchestratedBiometricKYCScreen(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     viewModel: BiometricKycViewModel = viewModel(
-        factory = viewModelFactory { BiometricKycViewModel(idInfo, userId, jobId) },
+        factory = viewModelFactory { BiometricKycViewModel(
+            idInfo = idInfo,
+            userId = userId,
+            jobId = jobId
+        ) },
     ),
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {

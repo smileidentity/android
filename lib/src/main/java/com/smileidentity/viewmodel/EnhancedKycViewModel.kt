@@ -18,20 +18,52 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-data class EnhancedKycUiState(
+internal data class EnhancedKycUiState(
     val showLoading: Boolean = true,
     val showConsent: Boolean = false,
     val processingState: ProcessingState? = null,
     val errorMessage: String? = null,
 )
 
-class EnhancedKycViewModel : ViewModel() {
+internal class EnhancedKycViewModel(
+    private val userId: String,
+    private val jobId: String,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(EnhancedKycUiState())
     val uiState = _uiState.asStateFlow()
 
     private lateinit var idInfo: IdInfo
     private var result: SmileIDResult<EnhancedKycResult>? = null
+
+    init {
+        // Check whether consent is required (returned in the auth smile response)
+        // on error, fall back to showing consent
+        val proxy = { e: Throwable ->
+            Timber.w(e)
+            _uiState.update { it.copy(showLoading = false, showConsent = true) }
+        }
+        viewModelScope.launch(getExceptionHandler(proxy)) {
+            val authRequest = AuthenticationRequest(
+                jobType = JobType.EnhancedKyc,
+                userId = userId,
+                jobId = jobId,
+                country = idInfo.country,
+                idType = idInfo.idType,
+            )
+            val authResponse = SmileID.api.authenticate(authRequest)
+            if (authResponse.consentInfo?.consentRequired == true) {
+                _uiState.update { it.copy(showLoading = false, showConsent = true) }
+            } else {
+                _uiState.update { it.copy(showLoading = false, showConsent = false) }
+            }
+        }
+    }
+
+    fun onConsentGranted() {
+        _uiState.update { it.copy(showConsent = false) }
+    }
 
     fun onIdInfoReceived(idInfo: IdInfo) {
         this.idInfo = idInfo
@@ -70,10 +102,6 @@ class EnhancedKycViewModel : ViewModel() {
             result = SmileIDResult.Success(EnhancedKycResult(enhancedKycRequest, response))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
-    }
-
-    fun onConsentGranted() {
-        _uiState.update { it.copy(showConsent = false) }
     }
 
     fun onRetry() {

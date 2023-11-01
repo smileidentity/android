@@ -111,8 +111,8 @@ fun DocumentVerificationIdTypeSelector(
 @Suppress("UnusedReceiverParameter")
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun ColumnScope.CountrySelector(
-    validDocuments: ImmutableList<ValidDocument>,
+private fun <T> ColumnScope.CountrySelector(
+    validDocuments: ImmutableList<T>,
     selectedCountry: ValidDocument?,
     modifier: Modifier = Modifier,
     onCountrySelected: (ValidDocument) -> Unit,
@@ -192,8 +192,8 @@ private fun ColumnScope.CountrySelector(
 }
 
 @Composable
-private fun ColumnScope.IdTypeSelector(
-    idTypesForCountry: ImmutableList<IdType>,
+private fun <T> ColumnScope.IdTypeSelector(
+    idTypesForCountry: ImmutableList<T>,
     modifier: Modifier = Modifier,
     onIdTypeSelected: (IdType) -> Unit,
 ) {

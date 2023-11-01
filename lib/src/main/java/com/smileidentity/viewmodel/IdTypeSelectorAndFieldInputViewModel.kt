@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-data class IdTypeSelectorAndFieldInputUiState(
+internal data class IdTypeSelectorAndFieldInputUiState(
     val countries: ImmutableList<SearchableInputFieldItem>? = null,
     val selectedCountry: SearchableInputFieldItem? = null,
     val idTypesForCountry: List<AvailableIdType>? = null,
@@ -49,7 +49,7 @@ data class IdTypeSelectorAndFieldInputUiState(
         get() = isIdTypeContinueEnabled && idInputFieldValues.values.all { it.isNotBlank() }
 }
 
-class IdTypeSelectorAndFieldInputViewModel(
+internal class IdTypeSelectorAndFieldInputViewModel(
     private val jobType: JobType,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IdTypeSelectorAndFieldInputUiState())

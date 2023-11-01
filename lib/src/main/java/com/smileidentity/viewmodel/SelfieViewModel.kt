@@ -57,7 +57,7 @@ private const val MIN_FACE_AREA_THRESHOLD = 0.15f
 const val MAX_FACE_AREA_THRESHOLD = 0.25f
 private const val SMILE_THRESHOLD = 0.8f
 
-data class SelfieUiState(
+internal data class SelfieUiState(
     val directive: SelfieDirective = SelfieDirective.InitialInstruction,
     val progress: Float = 0f,
     val selfieToConfirm: File? = null,
@@ -65,7 +65,7 @@ data class SelfieUiState(
     @StringRes val errorMessage: Int? = null,
 )
 
-enum class SelfieDirective(@StringRes val displayText: Int) {
+internal enum class SelfieDirective(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),
     Capturing(R.string.si_smart_selfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smart_selfie_directive_unable_to_detect_face),
@@ -75,7 +75,7 @@ enum class SelfieDirective(@StringRes val displayText: Int) {
     Smile(R.string.si_smart_selfie_directive_smile),
 }
 
-class SelfieViewModel(
+internal class SelfieViewModel(
     private val isEnroll: Boolean,
     private val userId: String,
     private val jobId: String,
