@@ -1,8 +1,18 @@
 # Changelog
 
+## 10.0.0-beta11 (unreleased)
+
+### Added
+
+### Fixed
+
+### Changed
+
 ## 10.0.0-beta10 (unreleased)
 
 ### Added
+- Added `jobId` on `SmartSelfieEnrollmentFragment` and `SmartSelfieAuthenticationFragment`
+- Added `showInstructions` on `SmartSelfieEnrollmentFragment`
 
 ### Fixed
 - Fix bug where `showAttirubtion` was not respected on the Consent Denied screen
