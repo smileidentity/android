@@ -8,7 +8,7 @@
 
 ### Changed
 
-## 10.0.0-beta10 (unreleased)
+## 10.0.0-beta10
 
 ### Added
 - Added `jobId` on `SmartSelfieEnrollmentFragment` and `SmartSelfieAuthenticationFragment`
