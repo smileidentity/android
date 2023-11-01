@@ -16,6 +16,7 @@ import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.result
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
+import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 
 /**
@@ -64,22 +65,31 @@ class SmartSelfieEnrollmentFragment : Fragment() {
          * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
          * random user ID will be generated.
+         * @param jobId The job ID to associate with the SmartSelfie™ Enrollment. Most often, this
+         * will correspond to a unique Job ID within your own system. If not provided, a random job ID
+         * will be generated.
          * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
          * displayed allowing toggling between the back camera and front camera. If not allowed,
          * only the front camera will be used.
          * @param showAttribution Whether to show the Smile ID attribution or not.
+         * @param showInstructions Whether to deactivate capture screen's instructions for
+         * SmartSelfie.
          */
         @JvmStatic
         @JvmOverloads
         fun newInstance(
             userId: String = randomUserId(),
+            jobId: String = randomJobId(),
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
+            showInstructions: Boolean = true,
         ) = SmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
+                this.jobId = jobId
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
+                this.showInstructions = showInstructions
             }
         }
 
@@ -99,8 +109,10 @@ class SmartSelfieEnrollmentFragment : Fragment() {
         setContent {
             SmileID.SmartSelfieEnrollment(
                 userId = args.userId,
+                jobId = args.jobId,
                 allowAgentMode = args.allowAgentMode,
                 showAttribution = args.showAttribution,
+                showInstructions = args.showInstructions,
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
                 },
@@ -119,10 +131,20 @@ private var Bundle.userId: String
     get() = getString(KEY_USER_ID)!!
     set(value) = putString(KEY_USER_ID, value)
 
+private const val KEY_JOB_ID = "jobId"
+private var Bundle.jobId: String
+    get() = getString(KEY_JOB_ID)!!
+    set(value) = putString(KEY_JOB_ID, value)
+
 private const val KEY_SHOW_ATTRIBUTION = "showAttribution"
 private var Bundle.showAttribution: Boolean
     get() = getBoolean(KEY_SHOW_ATTRIBUTION)
     set(value) = putBoolean(KEY_SHOW_ATTRIBUTION, value)
+
+private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
+private var Bundle.showInstructions: Boolean
+    get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
+    set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
 
 private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
     get() = getParcelableCompat(KEY_RESULT)!!
