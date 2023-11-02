@@ -115,6 +115,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
         }
         val proxy = { e: Throwable ->
+            stepToRetry = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error)
             result = SmileIDResult.Error(e)
             _uiState.update {
                 it.copy(
