@@ -5,6 +5,7 @@
 ### Added
 
 ### Fixed
+- Fixed retry document submission on failed document submission
 
 ### Changed
 
