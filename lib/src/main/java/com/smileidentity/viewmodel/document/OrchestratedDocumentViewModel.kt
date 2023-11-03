@@ -114,17 +114,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
         }
-        val proxy = { e: Throwable ->
-            stepToRetry = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error)
-            result = SmileIDResult.Error(e)
-            _uiState.update {
-                it.copy(
-                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                    errorMessage = R.string.si_processing_error_subtitle,
-                )
-            }
-        }
-        viewModelScope.launch(getExceptionHandler(proxy)) {
+        viewModelScope.launch(getExceptionHandler(::onError)) {
             val authRequest = AuthenticationRequest(
                 jobType = jobType,
                 enrollment = false,
