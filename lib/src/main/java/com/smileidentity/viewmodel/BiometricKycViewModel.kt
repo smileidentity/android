@@ -101,7 +101,7 @@ class BiometricKycViewModel(
             val selfieImageInfo = selfieFile.asSelfieImage()
             val uploadRequest = UploadRequest(
                 images = livenessImagesInfo + selfieImageInfo,
-                idInfo = idInfo,
+                idInfo = idInfo.copy(entered = true),
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")

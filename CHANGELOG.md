@@ -1,6 +1,6 @@
 # Changelog
 
-## 10.0.0-beta11 (unreleased)
+## 10.0.0-beta12 (unreleased)
 
 ### Added
 
@@ -8,6 +8,14 @@
 - Fixed retry document submission on failed document submission
 
 ### Changed
+
+### Removed
+
+## 10.0.0-beta11
+
+### Fixed
+- Fixed retry document submission on failed document submission
+- Fixed missing `entered` key in BiometricKYC
 
 ## 10.0.0-beta10
 
@@ -42,8 +50,6 @@
 - Bump Compose BOM to 2023.09.02
 - Bump AGP to 8.1.2
 - Bump Sentry to 6.30.0
-
-### Removed
 
 ## 10.0.0-beta08
 
