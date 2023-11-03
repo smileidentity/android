@@ -6,6 +6,7 @@
 
 ### Fixed
 - Fixed retry document submission on failed document submission
+- Fixed missing `entered` key in BiometricKYC
 
 ### Changed
 
