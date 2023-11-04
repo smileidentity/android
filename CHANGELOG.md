@@ -5,7 +5,7 @@
 ### Added
 
 ### Fixed
-- Fixed retry document submission on failed document submission
+- Fixed a bug where the document preview showed a black box for some older devices
 
 ### Changed
 

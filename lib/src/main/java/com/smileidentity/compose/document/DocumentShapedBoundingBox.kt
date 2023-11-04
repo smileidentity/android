@@ -8,10 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.Dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
@@ -44,12 +48,8 @@ fun DocumentShapedBoundingBox(
         modifier = modifier
             .fillMaxSize(),
     ) {
-        // 1. Set the background color using a rectangle
-        drawRect(backgroundColor)
-
-        // 2. Draw the outline of the bounding box and add a stroke that shows different edge
+        // Define the outline of the bounding box and add a stroke that shows different edge
         // detection states
-
         val (outlineBoundingBoxWidth, outlineBoundingBoxHeight) = if (aspectRatio >= 1) {
             // Horizontal ID
             val outlineBoundingBoxWidth = size.width - DOCUMENT_BOUNDING_BOX_MARGINS
@@ -63,34 +63,46 @@ fun DocumentShapedBoundingBox(
         }
         val outlineBoundingBoxX = (size.width - outlineBoundingBoxWidth) / 2
         val outlineBoundingBoxY = (size.height - outlineBoundingBoxHeight) / 2
-        drawRoundRect(
-            color = strokeColor,
-            topLeft = Offset(
-                x = outlineBoundingBoxX,
-                y = outlineBoundingBoxY,
-            ),
-            size = Size(width = outlineBoundingBoxWidth, height = outlineBoundingBoxHeight),
-            cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS,
-            style = Stroke(width = strokeWidth.toPx()),
-        )
 
-        // 3. Draw the transparent bounding box, and make it slightly smaller than the outline box
-        drawRoundRect(
-            color = Color.Transparent,
-            blendMode = BlendMode.Clear,
-            topLeft = Offset(
-                x = outlineBoundingBoxX + (strokeWidth.toPx() / 2),
-                y = outlineBoundingBoxY + (strokeWidth.toPx() / 2),
-            ),
-            size = Size(
-                width = (outlineBoundingBoxWidth - strokeWidth.toPx()),
-                height = (outlineBoundingBoxHeight - strokeWidth.toPx()),
-            ),
-            cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS - CornerRadius(
-                strokeWidth.value,
-                strokeWidth.value,
-            ),
-        )
+        // Create the transparent bounding box, and make it slightly smaller than the outline box
+        val roundRectPath = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    rect = Rect(
+                        offset = Offset(
+                            x = outlineBoundingBoxX + (strokeWidth.toPx() / 2),
+                            y = outlineBoundingBoxY + (strokeWidth.toPx() / 2),
+                        ),
+                        size = Size(
+                            width = (outlineBoundingBoxWidth - strokeWidth.toPx()),
+                            height = (outlineBoundingBoxHeight - strokeWidth.toPx()),
+                        ),
+                    ),
+                    cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS - CornerRadius(
+                        strokeWidth.value,
+                        strokeWidth.value,
+                    ),
+                ),
+            )
+        }
+
+        // Draw the bounding box and clip the background to the shape of the document
+        clipPath(roundRectPath, clipOp = ClipOp.Difference) {
+            // Draw the background
+            drawRect(color = backgroundColor)
+
+            // Draw the outline
+            drawRoundRect(
+                color = strokeColor,
+                topLeft = Offset(
+                    x = outlineBoundingBoxX,
+                    y = outlineBoundingBoxY,
+                ),
+                size = Size(width = outlineBoundingBoxWidth, height = outlineBoundingBoxHeight),
+                cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS,
+                style = Stroke(width = strokeWidth.toPx()),
+            )
+        }
     }
 }
 
