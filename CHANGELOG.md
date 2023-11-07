@@ -1,11 +1,19 @@
 # Changelog
 
-## 10.0.0-beta12 (unreleased)
+## 10.0.0-beta13 (unreleased)
 
 ### Added
 
 ### Fixed
-- Fixed retry document submission on failed document submission
+
+### Changed
+
+## 10.0.0-beta12
+
+### Added
+
+### Fixed
+- Fixed a bug where the document preview showed a black box for some older devices
 
 ### Changed
 
