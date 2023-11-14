@@ -155,6 +155,9 @@ fun SmileID.SmartSelfieAuthentication(
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be displayed
+ * allowing toggling between the back camera and front camera. If not allowed, only the front
+ * camera will be used.
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
  * @param showInstructions Whether to deactivate capture screen's instructions for Document
  * Verification (NB! If instructions are disabled, gallery upload won't be possible)
@@ -176,6 +179,7 @@ fun SmileID.DocumentVerification(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
+    allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
     extras: ImmutableMap<String, String> = persistentMapOf(),
@@ -190,6 +194,7 @@ fun SmileID.DocumentVerification(
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
+            allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
@@ -232,6 +237,9 @@ fun SmileID.DocumentVerification(
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
+ * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be displayed
+ * allowing toggling between the back camera and front camera. If not allowed, only the front
+ * camera will be used.
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
  * @param showInstructions Whether to deactivate capture screen's instructions for Document
  * Verification (NB! If instructions are disabled, gallery upload won't be possible)
@@ -252,6 +260,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     showAttribution: Boolean = true,
+    allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
     extras: ImmutableMap<String, String> = persistentMapOf(),
@@ -266,6 +275,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
+            allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
