@@ -22,9 +22,15 @@ class PartnerParamsAdapterTest {
             jobType = JobType.SmartSelfieEnrollment,
             jobId = "jobId",
             userId = "userId",
+            photo = "photo",
             extras = mapOf("extra1" to "value1", "extra2" to "value2"),
         )
-        val kepMap = mapOf("jobId" to "job_id", "userId" to "user_id", "jobType" to "job_type")
+        val kepMap = mapOf(
+            "jobId" to "job_id",
+            "userId" to "user_id",
+            "jobType" to "job_type",
+            "photo" to "photo",
+        )
 
         // when
         val jsonString = adapter.toJson(partnerParams)
