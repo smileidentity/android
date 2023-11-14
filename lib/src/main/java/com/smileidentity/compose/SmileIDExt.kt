@@ -308,8 +308,8 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param extras Custom values specific to partners
- * @param idAuthorityBypassPhoto We allow a photo field in sandbox (to stand in as ID authority photo)
- * to be submitted
+ * @param idAuthorityBypassPhoto We allow a base64 photo field in sandbox (to stand in as ID
+ * authority photo) to be submitted
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
