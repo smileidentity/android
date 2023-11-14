@@ -3,6 +3,7 @@
 ## 10.0.0-beta13 (unreleased)
 
 ### Added
+- Added `allowAgentMode` option on Document Verification and Enhanced Document Verification
 
 ### Fixed
 
