@@ -44,6 +44,7 @@ object PartnerParamsAdapter {
             "job_id" to partnerParams.jobId,
             "user_id" to partnerParams.userId,
             "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
+            "photo" to partnerParams.photo.toString(),
         )
         mapDelegate.toJson(writer, map)
     }
@@ -59,7 +60,8 @@ object PartnerParamsAdapter {
             jobType = jobTypeDelegate.fromJsonValue(paramsJson["job_type"]),
             jobId = paramsJson["job_id"]!!,
             userId = paramsJson["user_id"]!!,
-            extras = paramsJson - listOf("job_id", "user_id", "job_type"),
+            photo = paramsJson["photo"],
+            extras = paramsJson - listOf("job_id", "user_id", "job_type", "photo"),
         )
     }
 }

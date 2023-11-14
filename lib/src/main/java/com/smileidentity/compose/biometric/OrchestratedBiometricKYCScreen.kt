@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
@@ -29,6 +30,8 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import java.net.URL
 
 @Composable
@@ -43,11 +46,29 @@ fun OrchestratedBiometricKYCScreen(
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
+    extras: ImmutableMap<String, String> = persistentMapOf(),
+    idAuthorityBypassPhoto: String? = null,
     viewModel: BiometricKycViewModel = viewModel(
-        factory = viewModelFactory { BiometricKycViewModel(idInfo, userId, jobId) },
+        factory = viewModelFactory {
+            BiometricKycViewModel(
+                idInfo = idInfo,
+                userId = userId,
+                jobId = jobId,
+                extras = extras,
+                idAuthorityBypassPhoto = idAuthorityBypassPhoto,
+            )
+        },
     ),
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
+    // We only allow this in Sandbox
+    if (!SmileID.useSandbox && idAuthorityBypassPhoto != null) {
+        onResult(
+            SmileIDResult.Error(
+                IllegalArgumentException("ID Authority Bypass File only allowed in Sandbox"),
+            ),
+        )
+    }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     Box(
         modifier = modifier

@@ -24,6 +24,8 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getExceptionHandler
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -48,6 +50,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val documentType: String? = null,
     private val captureBothSides: Boolean,
     private var selfieFile: File? = null,
+    private var extras: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -125,7 +128,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams,
+                partnerParams = authResponse.partnerParams.copy(extras = extras),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
@@ -213,6 +216,7 @@ internal class DocumentVerificationViewModel(
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
+    extras: ImmutableMap<String, String> = persistentMapOf(),
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -221,6 +225,7 @@ internal class DocumentVerificationViewModel(
     documentType = documentType,
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
+    extras = extras,
 ) {
 
     override fun getJobStatus(
@@ -252,6 +257,7 @@ internal class EnhancedDocumentVerificationViewModel(
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
+    extras: ImmutableMap<String, String> = persistentMapOf(),
 ) :
     OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
         jobType = jobType,
@@ -261,6 +267,7 @@ internal class EnhancedDocumentVerificationViewModel(
         documentType = documentType,
         captureBothSides = captureBothSides,
         selfieFile = selfieFile,
+        extras = extras,
     ) {
 
     override fun getJobStatus(
