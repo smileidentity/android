@@ -29,9 +29,7 @@ internal fun OrchestratedBvnConsentScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     viewModel: BvnConsentViewModel = viewModel(
-        factory = viewModelFactory {
-            BvnConsentViewModel(userId = userId)
-        },
+        factory = viewModelFactory { BvnConsentViewModel(userId = userId) },
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

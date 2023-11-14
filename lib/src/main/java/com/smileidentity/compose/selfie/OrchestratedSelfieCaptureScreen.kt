@@ -28,6 +28,8 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 
 /**
  * Orchestrates the selfie capture flow - navigates between instructions, requesting permissions,
@@ -43,8 +45,17 @@ internal fun OrchestratedSelfieCaptureScreen(
     skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
+        factory = viewModelFactory {
+            SelfieViewModel(
+                isEnroll = isEnroll,
+                userId = userId,
+                jobId = jobId,
+                skipApiSubmission = skipApiSubmission,
+                partnerParams = partnerParams,
+            )
+        },
     ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {

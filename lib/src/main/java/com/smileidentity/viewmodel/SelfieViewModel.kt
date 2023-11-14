@@ -32,6 +32,8 @@ import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImageBitmap
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -80,6 +82,7 @@ class SelfieViewModel(
     private val userId: String,
     private val jobId: String,
     private val skipApiSubmission: Boolean,
+    private val partnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
 
@@ -274,7 +277,7 @@ class SelfieViewModel(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams,
+                partnerParams = authResponse.partnerParams.copy(extras = partnerParams),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )

@@ -29,6 +29,8 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import java.net.URL
 
 @Composable
@@ -43,8 +45,16 @@ fun OrchestratedBiometricKYCScreen(
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: BiometricKycViewModel = viewModel(
-        factory = viewModelFactory { BiometricKycViewModel(idInfo, userId, jobId) },
+        factory = viewModelFactory {
+            BiometricKycViewModel(
+                idInfo = idInfo,
+                userId = userId,
+                jobId = jobId,
+                partnerParams = partnerParams,
+            )
+        },
     ),
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {

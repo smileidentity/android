@@ -16,6 +16,8 @@ import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getExceptionHandler
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -33,6 +35,7 @@ class BiometricKycViewModel(
     private val idInfo: IdInfo,
     private val userId: String,
     private val jobId: String,
+    private val partnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricKycUiState())
     val uiState = _uiState.asStateFlow()
@@ -92,7 +95,7 @@ class BiometricKycViewModel(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams,
+                partnerParams = authResponse.partnerParams.copy(extras = partnerParams),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
