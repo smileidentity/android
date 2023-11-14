@@ -25,9 +25,6 @@ class SmileIDException(val details: Details) : Exception(details.message), Parce
 
 /**
  * Custom values specific to partners can be placed in [extras]
- *
- * @param photo base64 string to stand in as ID authority photo. For Biometric KYC
- *  * jobs, this should be submitted in Sandbox
  */
 // The class uses a custom adapter in order to support placing the key-value pairs in [extras] into
 // top level fields in the JSON
@@ -36,7 +33,6 @@ data class PartnerParams(
     val jobType: JobType? = null,
     val jobId: String = randomJobId(),
     val userId: String = randomUserId(),
-    @Json(name = "Photo") val photo: String? = null,
     val extras: Map<String, String> = mapOf(),
 ) : Parcelable
 

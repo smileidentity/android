@@ -45,7 +45,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
-    extras: ImmutableMap<String, String> = persistentMapOf(),
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory {
             SelfieViewModel(
@@ -53,7 +53,7 @@ internal fun OrchestratedSelfieCaptureScreen(
                 userId = userId,
                 jobId = jobId,
                 skipApiSubmission = skipApiSubmission,
-                extras = extras,
+                partnerParams = partnerParams,
             )
         },
     ),

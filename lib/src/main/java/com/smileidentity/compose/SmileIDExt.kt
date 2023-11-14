@@ -51,7 +51,7 @@ import java.net.URL
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for
  * SmartSelfie.
- * @param extras Custom values specific to partners
+ * @param partnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -66,7 +66,7 @@ fun SmileID.SmartSelfieEnrollment(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
-    extras: ImmutableMap<String, String> = persistentMapOf(),
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
@@ -80,7 +80,7 @@ fun SmileID.SmartSelfieEnrollment(
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             showInstructions = showInstructions,
-            extras = extras,
+            partnerParams = partnerParams,
             onResult = onResult,
         )
     }
@@ -101,7 +101,7 @@ fun SmileID.SmartSelfieEnrollment(
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
- * @param extras Custom values specific to partners
+ * @param partnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -115,7 +115,7 @@ fun SmileID.SmartSelfieAuthentication(
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    extras: ImmutableMap<String, String> = persistentMapOf(),
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
@@ -128,7 +128,7 @@ fun SmileID.SmartSelfieAuthentication(
             isEnroll = false,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
-            extras = extras,
+            partnerParams = partnerParams,
             onResult = onResult,
         )
     }
@@ -161,7 +161,7 @@ fun SmileID.SmartSelfieAuthentication(
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
  * @param showInstructions Whether to deactivate capture screen's instructions for Document
  * Verification (NB! If instructions are disabled, gallery upload won't be possible)
- * @param extras Custom values specific to partners
+ * @param partnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -182,7 +182,7 @@ fun SmileID.DocumentVerification(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
-    extras: ImmutableMap<String, String> = persistentMapOf(),
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
@@ -209,7 +209,7 @@ fun SmileID.DocumentVerification(
                         documentType = documentType,
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
-                        extras = extras,
+                        partnerParams = partnerParams,
                     )
                 },
             ),
@@ -243,7 +243,7 @@ fun SmileID.DocumentVerification(
  * @param allowGalleryUpload Whether to allow the user to upload images from their gallery or not
  * @param showInstructions Whether to deactivate capture screen's instructions for Document
  * Verification (NB! If instructions are disabled, gallery upload won't be possible)
- * @param extras Custom values specific to partners
+ * @param partnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -263,7 +263,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
-    extras: ImmutableMap<String, String> = persistentMapOf(),
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
@@ -289,7 +289,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
-                        extras = extras,
+                        partnerParams = partnerParams,
                     )
                 },
             ),
@@ -317,9 +317,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * allowing toggling between the back camera and front camera. If not allowed, only the front
  * camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
- * @param extras Custom values specific to partners
- * @param idAuthorityBypassPhoto We allow a base64 photo field in sandbox (to stand in as ID
- * authority photo) to be submitted
+ * @param partnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -338,8 +336,7 @@ fun SmileID.BiometricKYC(
     jobId: String = rememberSaveable { randomJobId() },
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
-    extras: ImmutableMap<String, String> = persistentMapOf(),
-    idAuthorityBypassPhoto: String? = null,
+    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
@@ -356,8 +353,7 @@ fun SmileID.BiometricKYC(
             jobId = jobId,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
-            extras = extras,
-            idAuthorityBypassPhoto = idAuthorityBypassPhoto,
+            partnerParams = partnerParams,
             onResult = onResult,
         )
     }

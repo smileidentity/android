@@ -82,7 +82,7 @@ class SelfieViewModel(
     private val userId: String,
     private val jobId: String,
     private val skipApiSubmission: Boolean,
-    private val extras: ImmutableMap<String, String> = persistentMapOf(),
+    private val partnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
 
@@ -277,7 +277,7 @@ class SelfieViewModel(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams.copy(extras = extras),
+                partnerParams = authResponse.partnerParams.copy(extras = partnerParams),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
