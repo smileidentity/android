@@ -12,7 +12,6 @@
 
 ### Added
 - Added `extras` as optional params on all job types
-- Added `idAuthorityBypassPhoto` on Sandbox BiometricKYC jobs
 - Added `allowAgentMode` option on Document Verification and Enhanced Document Verification
 
 ### Fixed
