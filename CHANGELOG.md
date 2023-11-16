@@ -6,6 +6,7 @@
 - Added missing `showInstructions` on some Composables
 
 ### Fixed
+- Fixed a bug where some attributes passed in were not respected
 
 ### Changed
 
