@@ -31,6 +31,8 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
 import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.models.SmileIDException
+import io.sentry.Breadcrumb
+import io.sentry.SentryLevel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
@@ -258,7 +260,10 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
         }
     } else {
         // Unexpected error, report to Sentry
-        SmileIDCrashReporting.hub.captureException(throwable)
+        SmileIDCrashReporting.hub.captureException(throwable) {
+            it.level = SentryLevel.INFO
+            it.addBreadcrumb(Breadcrumb("Smile ID Coroutine Exception Handler"))
+        }
         throwable
     }
     proxy(converted)
