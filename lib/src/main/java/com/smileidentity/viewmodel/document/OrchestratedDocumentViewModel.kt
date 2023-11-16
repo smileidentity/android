@@ -50,7 +50,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val documentType: String? = null,
     private val captureBothSides: Boolean,
     private var selfieFile: File? = null,
-    private var partnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -128,7 +128,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams.copy(extras = partnerParams),
+                partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
@@ -216,7 +216,7 @@ internal class DocumentVerificationViewModel(
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
-    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -225,7 +225,7 @@ internal class DocumentVerificationViewModel(
     documentType = documentType,
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
-    partnerParams = partnerParams,
+    extraPartnerParams = extraPartnerParams,
 ) {
 
     override fun getJobStatus(
@@ -257,7 +257,7 @@ internal class EnhancedDocumentVerificationViewModel(
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
-    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) :
     OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
         jobType = jobType,
@@ -267,7 +267,7 @@ internal class EnhancedDocumentVerificationViewModel(
         documentType = documentType,
         captureBothSides = captureBothSides,
         selfieFile = selfieFile,
-        partnerParams = partnerParams,
+        extraPartnerParams = extraPartnerParams,
     ) {
 
     override fun getJobStatus(

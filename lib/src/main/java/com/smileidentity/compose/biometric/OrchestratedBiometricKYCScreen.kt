@@ -46,14 +46,14 @@ fun OrchestratedBiometricKYCScreen(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
-    partnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: BiometricKycViewModel = viewModel(
         factory = viewModelFactory {
             BiometricKycViewModel(
                 idInfo = idInfo,
                 userId = userId,
                 jobId = jobId,
-                partnerParams = partnerParams,
+                extraPartnerParams = extraPartnerParams,
             )
         },
     ),

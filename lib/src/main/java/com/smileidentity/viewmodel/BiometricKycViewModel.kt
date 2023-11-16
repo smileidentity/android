@@ -35,7 +35,7 @@ class BiometricKycViewModel(
     private val idInfo: IdInfo,
     private val userId: String,
     private val jobId: String,
-    private val partnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricKycUiState())
     val uiState = _uiState.asStateFlow()
@@ -95,7 +95,7 @@ class BiometricKycViewModel(
             val authResponse = SmileID.api.authenticate(authRequest)
 
             val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams.copy(extras = partnerParams),
+                partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
