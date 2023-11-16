@@ -55,8 +55,8 @@ fun UploadRequest.zip(): File {
  * If we don't do this, then we will crash when attempting to include the file in the Zip with a
  * [ZipException] stating that the entry already exists
  */
-private fun deDupedUploadRequest(uploadRequest: UploadRequest): UploadRequest {
-    val deDupedImages = uploadRequest.images
+private fun deDupedUploadRequest(uploadRequest: UploadRequest) = uploadRequest.copy(
+    images = uploadRequest.images
         .groupBy { it.image.name }
         .flatMap { (fileName, images) ->
             if (images.size > 1) {
@@ -71,9 +71,8 @@ private fun deDupedUploadRequest(uploadRequest: UploadRequest): UploadRequest {
             } else {
                 images
             }
-        }
-    return uploadRequest.copy(images = deDupedImages)
-}
+        },
+)
 
 fun File.asSelfieImage() = UploadImageInfo(
     imageTypeId = ImageType.SelfieJpgFile,
