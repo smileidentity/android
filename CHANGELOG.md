@@ -5,6 +5,7 @@
 ### Added
 
 ### Fixed
+- Fixed crash when duplicate images are attempted to be zipped
 
 ### Changed
 
