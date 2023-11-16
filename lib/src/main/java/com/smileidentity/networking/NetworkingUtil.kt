@@ -56,21 +56,22 @@ fun UploadRequest.zip(): File {
  * [ZipException] stating that the entry already exists
  */
 private fun deDupedUploadRequest(uploadRequest: UploadRequest): UploadRequest {
-    val imageCounts = uploadRequest.images.groupBy { it.image.name }
-    val deDupedImages = imageCounts.flatMap { (fileName, images) ->
-        if (images.size > 1) {
-            images.mapIndexed { index, imageInfo ->
-                val fileNameWithoutExtension = fileName.substringBeforeLast(".")
-                val fileNameExtension = fileName.substringAfterLast(".")
-                val newFileName = "$fileNameWithoutExtension-$index.$fileNameExtension"
-                val newFile = File(SmileID.fileSavePath, newFileName)
-                imageInfo.image.copyTo(newFile, overwrite = true)
-                imageInfo.copy(image = newFile)
+    val deDupedImages = uploadRequest.images
+        .groupBy { it.image.name }
+        .flatMap { (fileName, images) ->
+            if (images.size > 1) {
+                images.mapIndexed { index, imageInfo ->
+                    val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+                    val fileNameExtension = fileName.substringAfterLast(".")
+                    val newFileName = "$fileNameWithoutExtension-$index.$fileNameExtension"
+                    val newFile = File(SmileID.fileSavePath, newFileName)
+                    imageInfo.image.copyTo(newFile, overwrite = true)
+                    imageInfo.copy(image = newFile)
+                }
+            } else {
+                images
             }
-        } else {
-            images
         }
-    }
     return uploadRequest.copy(images = deDupedImages)
 }
 
