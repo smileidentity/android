@@ -7,6 +7,13 @@
 ### Fixed
 
 ### Changed
+- Bump Kotlin to 1.9.20
+- Bump Compose BOM to 2023.10.01
+- Bump AndroidX Activity to 1.8.1
+- Bump AndroidX Fragment to 1.6.2
+- Bump AndroidX Navigation to 2.7.5
+- Bump Sentry to 6.33.1
+- Bump Coil to 2.5.0
 
 ## 10.0.0-beta13
 

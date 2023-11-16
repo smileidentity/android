@@ -15,6 +15,7 @@ updates:
         patterns:
           - "com.google.devtools.ksp"
           - "org.jetbrains.kotlin.*"
+          - "dev.zacsweers.moshix"
       all:
         # Group all patch and minor updates together. Kotlin/KSP updates belong to the first group
         # so they will not be updated as part of this group
