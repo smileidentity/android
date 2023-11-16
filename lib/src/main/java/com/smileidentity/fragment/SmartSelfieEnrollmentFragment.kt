@@ -16,8 +16,10 @@ import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.result
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
+import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import kotlinx.collections.immutable.toImmutableMap
 
 /**
  * Perform a SmartSelfie™ Enrollment
@@ -83,6 +85,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
+            extraPartnerParams: HashMap<String, String>? = null,
         ) = SmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
@@ -90,6 +93,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
+                this.extraPartnerParams = extraPartnerParams
             }
         }
 
@@ -113,6 +117,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
                 allowAgentMode = args.allowAgentMode,
                 showAttribution = args.showAttribution,
                 showInstructions = args.showInstructions,
+                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
                 },
@@ -145,6 +150,11 @@ private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
 private var Bundle.showInstructions: Boolean
     get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
+
+private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
+private var Bundle.extraPartnerParams: HashMap<String, String>?
+    get() = getSerializableCompat(KEY_EXTRA_PARTNER_PARAMS)
+    set(value) = putSerializable(KEY_EXTRA_PARTNER_PARAMS, value)
 
 private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
     get() = getParcelableCompat(KEY_RESULT)!!
