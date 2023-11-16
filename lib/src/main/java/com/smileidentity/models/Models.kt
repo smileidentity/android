@@ -8,19 +8,26 @@ import com.smileidentity.util.randomUserId
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
 @Parcelize
 class SmileIDException(val details: Details) : Exception(details.message), Parcelable {
 
-    // This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
-    // to have parent classes - i.e. Exception as a parent class)
+    /**
+     * This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
+     * to have parent classes - i.e. Exception as a parent class)
+     *
+     * This class implements [Serializable] in order to allow [SmileIDException] to be [Parcelable].
+     * This is because the parent class is [Exception], which is Serializable but not Parcelable,
+     * and therefore, all members of [SmileIDException] must also be [Serializable]
+     */
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Details(
         @Json(name = "code") val code: String,
         @Json(name = "error") val message: String,
-    ) : Parcelable
+    ) : Parcelable, Serializable
 }
 
 /**

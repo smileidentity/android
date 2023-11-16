@@ -5,6 +5,7 @@
 ### Added
 
 ### Fixed
+- Fixed a bug when attempting to parcelize `SmileIDException`
 
 ### Changed
 - Bump Kotlin to 1.9.20
@@ -15,26 +16,18 @@
 - Bump Sentry to 6.33.1
 - Bump Coil to 2.5.0
 
+### Removed
+
 ## 10.0.0-beta13
 
 ### Added
 - Added `extras` as optional params on all job types
 - Added `allowAgentMode` option on Document Verification and Enhanced Document Verification
 
-### Fixed
-
-### Changed
-
 ## 10.0.0-beta12
-
-### Added
 
 ### Fixed
 - Fixed a bug where the document preview showed a black box for some older devices
-
-### Changed
-
-### Removed
 
 ## 10.0.0-beta11
 
