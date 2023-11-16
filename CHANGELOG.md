@@ -3,11 +3,23 @@
 ## 10.0.0-beta14 (unreleased)
 
 ### Added
+- Added missing `showInstructions` on some Composables
 
 ### Fixed
 - Fixed crash when duplicate images are attempted to be zipped
+- Fixed a bug where some attributes passed in were not respected
+- Fixed a bug when attempting to parcelize `SmileIDException`
 
 ### Changed
+- Bump Kotlin to 1.9.20
+- Bump Compose BOM to 2023.10.01
+- Bump AndroidX Activity to 1.8.1
+- Bump AndroidX Fragment to 1.6.2
+- Bump AndroidX Navigation to 2.7.5
+- Bump Sentry to 6.33.1
+- Bump Coil to 2.5.0
+
+### Removed
 
 ## 10.0.0-beta13
 
@@ -15,20 +27,10 @@
 - Added `extras` as optional params on all job types
 - Added `allowAgentMode` option on Document Verification and Enhanced Document Verification
 
-### Fixed
-
-### Changed
-
 ## 10.0.0-beta12
-
-### Added
 
 ### Fixed
 - Fixed a bug where the document preview showed a black box for some older devices
-
-### Changed
-
-### Removed
 
 ## 10.0.0-beta11
 
