@@ -3,6 +3,7 @@
 ## 10.0.0-beta14 (unreleased)
 
 ### Added
+- Added missing `showInstructions` on some Composables
 
 ### Fixed
 
