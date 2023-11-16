@@ -14,6 +14,8 @@
 
 ### Added
 - Added missing `showInstructions` on some Composables
+- Added missing proguard rule and updated consumer rules
+- Added missing parameters on Fragments
 
 ### Fixed
 - Fixed crash when duplicate images are attempted to be zipped
@@ -28,6 +30,7 @@
 - Bump AndroidX Navigation to 2.7.5
 - Bump Sentry to 6.33.1
 - Bump Coil to 2.5.0
+- Changed the OKHTTP call timeout to 60 seconds 
 - Rename `partnerParams` to `extraPartnerParams`
 
 ### Removed
@@ -35,7 +38,7 @@
 ## 10.0.0-beta13
 
 ### Added
-- Added `extras` as optional params on all job types
+- Added `partnerParams` as optional params on all job types
 - Added `allowAgentMode` option on Document Verification and Enhanced Document Verification
 
 ## 10.0.0-beta12

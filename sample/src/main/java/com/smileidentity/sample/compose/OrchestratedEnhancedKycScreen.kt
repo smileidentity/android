@@ -23,6 +23,9 @@ import com.smileidentity.sample.viewmodel.EnhancedKycViewModel
 
 @Composable
 fun OrchestratedEnhancedKycScreen(
+    userId: String,
+    jobId: String,
+    onConsentDenied: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EnhancedKycViewModel = viewModel(),
     onResult: SmileIDCallback<EnhancedKycResult> = {},
@@ -49,10 +52,14 @@ fun OrchestratedEnhancedKycScreen(
             closeButtonText = stringResource(R.string.enhanced_kyc_processing_close_button),
             onClose = { viewModel.onFinished(onResult) },
         )
+
         else -> IdTypeSelectorAndFieldInputScreen(
+            userId = userId,
+            jobId = jobId,
             jobType = JobType.EnhancedKyc,
             onResult = { viewModel.onIdInfoReceived(it) },
             modifier = modifier,
+            onConsentDenied = onConsentDenied,
         )
     }
 }
@@ -62,7 +69,7 @@ fun OrchestratedEnhancedKycScreen(
 private fun PreviewOrchestratedEnhancedKycScreen() {
     SmileIDTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            OrchestratedEnhancedKycScreen()
+            OrchestratedEnhancedKycScreen(userId = "", jobId = "", onConsentDenied = {})
         }
     }
 }

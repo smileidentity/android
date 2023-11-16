@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.painterResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.smileidentity.SmileID
@@ -22,7 +21,7 @@ import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
-import java.net.URL
+import kotlinx.collections.immutable.toImmutableMap
 
 /**
  * Perform a Biometric KYC: Verify the ID information of your user and confirm that the ID actually
@@ -74,24 +73,21 @@ class BiometricKYCFragment : Fragment() {
         fun newInstance(
             idInfo: IdInfo,
             @DrawableRes partnerIcon: Int,
-            partnerName: String,
-            productName: String,
-            partnerPrivacyPolicy: URL,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
+            showInstructions: Boolean = true,
+            extraPartnerParams: HashMap<String, String>? = null,
         ) = BiometricKYCFragment().apply {
             arguments = Bundle().apply {
                 this.idInfo = idInfo
-                this.partnerIcon = partnerIcon
-                this.partnerName = partnerName
-                this.productName = productName
-                this.partnerPrivacyPolicy = partnerPrivacyPolicy
                 this.userId = userId
                 this.jobId = jobId
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
+                this.showInstructions = showInstructions
+                this.extraPartnerParams = extraPartnerParams
             }
         }
 
@@ -111,14 +107,12 @@ class BiometricKYCFragment : Fragment() {
         setContent {
             SmileID.BiometricKYC(
                 idInfo = args.idInfo,
-                partnerIcon = painterResource(id = args.partnerIcon),
-                partnerName = args.partnerName,
-                productName = args.productName,
-                partnerPrivacyPolicy = args.partnerPrivacyPolicy,
                 userId = args.userId,
                 jobId = args.jobId,
                 allowAgentMode = args.allowAgentMode,
                 showAttribution = args.showAttribution,
+                showInstructions = args.showInstructions,
+                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
                 },
@@ -131,26 +125,6 @@ private const val KEY_ID_INFO = "idInfo"
 private var Bundle.idInfo: IdInfo
     get() = getParcelableCompat(KEY_ID_INFO)!!
     set(value) = putParcelable(KEY_ID_INFO, value)
-
-private const val KEY_PARTNER_ICON = "partnerIcon"
-private var Bundle.partnerIcon: Int
-    get() = getInt(KEY_PARTNER_ICON)
-    set(value) = putInt(KEY_PARTNER_ICON, value)
-
-private const val KEY_PARTNER_NAME = "partnerName"
-private var Bundle.partnerName: String
-    get() = getString(KEY_PARTNER_NAME)!!
-    set(value) = putString(KEY_PARTNER_NAME, value)
-
-private const val KEY_PRODUCT_NAME = "productName"
-private var Bundle.productName: String
-    get() = getString(KEY_PRODUCT_NAME)!!
-    set(value) = putString(KEY_PRODUCT_NAME, value)
-
-private const val KEY_PARTNER_PRIVACY_POLICY = "partnerPrivacyPolicy"
-private var Bundle.partnerPrivacyPolicy: URL
-    get() = getSerializableCompat(KEY_PARTNER_PRIVACY_POLICY)!!
-    set(value) = putSerializable(KEY_PARTNER_PRIVACY_POLICY, value)
 
 private const val KEY_USER_ID = "userId"
 private var Bundle.userId: String
@@ -171,6 +145,16 @@ private const val KEY_ALLOW_AGENT_MODE = "allowAgentMode"
 private var Bundle.allowAgentMode: Boolean
     get() = getBoolean(KEY_ALLOW_AGENT_MODE)
     set(value) = putBoolean(KEY_ALLOW_AGENT_MODE, value)
+
+private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
+private var Bundle.showInstructions: Boolean
+    get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
+    set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
+
+private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
+private var Bundle.extraPartnerParams: HashMap<String, String>?
+    get() = getSerializableCompat(KEY_EXTRA_PARTNER_PARAMS)
+    set(value) = putSerializable(KEY_EXTRA_PARTNER_PARAMS, value)
 
 private var Bundle.smileIDResult: SmileIDResult<BiometricKycResult>
     get() = getParcelableCompat(KEY_RESULT)!!

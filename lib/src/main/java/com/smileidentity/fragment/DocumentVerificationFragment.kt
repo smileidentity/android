@@ -19,6 +19,7 @@ import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import kotlinx.collections.immutable.toImmutableMap
 import java.io.File
 
 /**
@@ -71,21 +72,27 @@ class DocumentVerificationFragment : Fragment() {
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             showAttribution: Boolean = true,
+            allowAgentMode: Boolean = false,
             allowGalleryUpload: Boolean = false,
+            showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
+            extraPartnerParams: HashMap<String, String>? = null,
         ) = DocumentVerificationFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
                 this.jobId = jobId
                 this.showAttribution = showAttribution
+                this.allowAgentMode = allowAgentMode
                 this.allowGalleryUpload = allowGalleryUpload
+                this.showInstructions = showInstructions
                 this.countryCode = countryCode
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
+                this.extraPartnerParams = extraPartnerParams
             }
         }
 
@@ -110,9 +117,12 @@ class DocumentVerificationFragment : Fragment() {
                 userId = args.userId,
                 jobId = args.jobId,
                 showAttribution = args.showAttribution,
+                allowAgentMode = args.allowAgentMode,
                 allowGalleryUpload = args.allowGalleryUpload,
+                showInstructions = args.showInstructions,
                 idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
                 bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
+                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
                 },
@@ -136,10 +146,20 @@ private var Bundle.showAttribution: Boolean
     get() = getBoolean(KEY_SHOW_ATTRIBUTION)
     set(value) = putBoolean(KEY_SHOW_ATTRIBUTION, value)
 
+private const val KEY_ALLOW_AGENT_MODE = "allowAgentMode"
+private var Bundle.allowAgentMode: Boolean
+    get() = getBoolean(KEY_ALLOW_AGENT_MODE)
+    set(value) = putBoolean(KEY_ALLOW_AGENT_MODE, value)
+
 private const val KEY_ALLOW_GALLERY_UPLOAD = "allowGalleryUpload"
 private var Bundle.allowGalleryUpload: Boolean
     get() = getBoolean(KEY_ALLOW_GALLERY_UPLOAD)
     set(value) = putBoolean(KEY_ALLOW_GALLERY_UPLOAD, value)
+
+private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
+private var Bundle.showInstructions: Boolean
+    get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
+    set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
 
 private const val KEY_COUNTRY_CODE = "countryCode"
 
@@ -168,6 +188,11 @@ private const val KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE = "bypassSelfieCaptureWith
 private var Bundle.bypassSelfieCaptureWithFile: File?
     get() = getSerializableCompat(KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE) as File?
     set(value) = putSerializable(KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE, value)
+
+private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
+private var Bundle.extraPartnerParams: HashMap<String, String>?
+    get() = getSerializableCompat(KEY_EXTRA_PARTNER_PARAMS)
+    set(value) = putSerializable(KEY_EXTRA_PARTNER_PARAMS, value)
 
 private var Bundle.smileIDResult: SmileIDResult<DocumentVerificationResult>
     get() = getParcelableCompat(KEY_RESULT)!!
