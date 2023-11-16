@@ -3,8 +3,10 @@
 ## 10.0.0-beta14 (unreleased)
 
 ### Added
+- Added missing `showInstructions` on some Composables
 
 ### Fixed
+- Fixed a bug where some attributes passed in were not respected
 - Fixed a bug when attempting to parcelize `SmileIDException`
 
 ### Changed
