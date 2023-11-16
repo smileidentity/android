@@ -18,11 +18,10 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
+import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import kotlinx.collections.immutable.toImmutableMap
-import java.net.URL
-
 
 /**
  * Perform a Biometric KYC: Verify the ID information of your user and confirm that the ID actually
