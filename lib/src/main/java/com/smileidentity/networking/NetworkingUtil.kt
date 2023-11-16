@@ -31,7 +31,8 @@ fun UploadRequest.zip(): File {
 
     // Write info.json
     zipOutputStream.putNextEntry(ZipEntry("info.json"))
-    zipOutputStream.write(moshi.adapter(UploadRequest::class.java).toJson(uploadRequest).toByteArray())
+    val infoJson = moshi.adapter(UploadRequest::class.java).toJson(uploadRequest)
+    zipOutputStream.write(infoJson.toByteArray())
     zipOutputStream.closeEntry()
 
     // Write images
@@ -48,16 +49,30 @@ fun UploadRequest.zip(): File {
 
 /**
  * This function takes an [UploadRequest] and returns a new [UploadRequest] with duplicate images
- * removed. This is necessary because we can't have duplicate entries in a zip file. There is no
- * valid use-case where we would want to upload the same image twice. The only scenario where that
- * could happen is if the user selects the same image for both the front and back of a document.
+ * copied to a new File with a new name. This is necessary because we can't have duplicate entries
+ * in a zip file.
  *
  * If we don't do this, then we will crash when attempting to include the file in the Zip with a
  * [ZipException] stating that the entry already exists
  */
-private fun deDupedUploadRequest(uploadRequest: UploadRequest) = uploadRequest.copy(
-    images = uploadRequest.images.distinctBy { it.image.name },
-)
+private fun deDupedUploadRequest(uploadRequest: UploadRequest): UploadRequest {
+    val imageCounts = uploadRequest.images.groupBy { it.image.name }
+    val deDupedImages = imageCounts.flatMap { (fileName, images) ->
+        if (images.size > 1) {
+            images.mapIndexed { index, imageInfo ->
+                val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+                val fileNameExtension = fileName.substringAfterLast(".")
+                val newFileName = "$fileNameWithoutExtension-$index.$fileNameExtension"
+                val newFile = File(SmileID.fileSavePath, newFileName)
+                imageInfo.image.copyTo(newFile, overwrite = true)
+                imageInfo.copy(image = newFile)
+            }
+        } else {
+            images
+        }
+    }
+    return uploadRequest.copy(images = deDupedImages)
+}
 
 fun File.asSelfieImage() = UploadImageInfo(
     imageTypeId = ImageType.SelfieJpgFile,
