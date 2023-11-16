@@ -1,30 +1,41 @@
 package com.smileidentity.sample.compose.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.SmileID
+import com.smileidentity.compose.ConsentScreen
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
@@ -33,10 +44,14 @@ import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.IdTypeSelectorAndFieldInputViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import timber.log.Timber
+import java.net.URL
 
 @Composable
 fun IdTypeSelectorAndFieldInputScreen(
+    userId: String,
+    jobId: String,
     jobType: JobType,
+    onConsentDenied: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
         factory = viewModelFactory { IdTypeSelectorAndFieldInputViewModel(jobType) },
@@ -44,23 +59,53 @@ fun IdTypeSelectorAndFieldInputScreen(
     onResult: (IdInfo) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    when {
-        uiState.errorMessage != null -> {
-            val context = LocalContext.current
-            LaunchedEffect(uiState.errorMessage) {
-                context.toast("Error loading ID Types: ${uiState.errorMessage}")
+    Box(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .fillMaxSize(),
+    ) {
+        when {
+            uiState.errorMessage != null -> {
+                val context = LocalContext.current
+                LaunchedEffect(uiState.errorMessage) {
+                    context.toast("Error loading ID Types: ${uiState.errorMessage}")
+                }
             }
+
+            !uiState.hasIdTypeSelectionBeenConfirmed -> IdSelectorScreen(
+                modifier = Modifier,
+                onNext = {
+                    viewModel.onIdTypeConfirmed()
+                    viewModel.loadConsent(
+                        userId = userId,
+                        jobId = jobId,
+                        idInfo = viewModel.currentIdInfo,
+                    )
+                },
+            )
+
+            uiState.showLoading ->
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+
+            uiState.showConsent -> SmileID.ConsentScreen(
+                partnerIcon = painterResource(
+                    id = com.smileidentity.R.drawable.si_logo_with_text,
+                ),
+                partnerName = "SmileID",
+                productName = "ID",
+                partnerPrivacyPolicy = URL("https://usesmileid.com"),
+                showAttribution = true,
+                modifier = Modifier,
+                onConsentGranted = viewModel::onConsentGranted,
+                onConsentDenied = { onConsentDenied("User did not consent") },
+            )
+
+            else -> IdInputScreen(
+                modifier = Modifier,
+                onNext = { onResult(viewModel.currentIdInfo) },
+            )
         }
-
-        !uiState.hasIdTypeSelectionBeenConfirmed -> IdSelectorScreen(
-            modifier = modifier,
-            onNext = viewModel::onIdTypeConfirmed,
-        )
-
-        else -> IdInputScreen(
-            modifier = modifier,
-            onNext = { onResult(viewModel.currentIdInfo) },
-        )
     }
 }
 
