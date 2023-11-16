@@ -6,6 +6,7 @@
 - Added missing `showInstructions` on some Composables
 
 ### Fixed
+- Fixed crash when duplicate images are attempted to be zipped
 - Fixed a bug where some attributes passed in were not respected
 - Fixed a bug when attempting to parcelize `SmileIDException`
 
