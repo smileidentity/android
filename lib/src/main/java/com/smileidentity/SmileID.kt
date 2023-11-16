@@ -159,7 +159,7 @@ object SmileID {
     @JvmStatic
     fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
         retryOnConnectionFailure(true)
-        callTimeout(30, TimeUnit.SECONDS)
+        callTimeout(60, TimeUnit.SECONDS)
         connectTimeout(30, TimeUnit.SECONDS)
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)

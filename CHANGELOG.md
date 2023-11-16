@@ -4,6 +4,7 @@
 
 ### Added
 - Added missing `showInstructions` on some Composables
+- Added missing proguard rule and updated consumer rules
 
 ### Fixed
 - Fixed crash when duplicate images are attempted to be zipped
@@ -18,6 +19,7 @@
 - Bump AndroidX Navigation to 2.7.5
 - Bump Sentry to 6.33.1
 - Bump Coil to 2.5.0
+- Changed the OKHTTP call timeout to 60 seconds 
 
 ### Removed
 
