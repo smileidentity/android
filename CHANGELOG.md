@@ -18,6 +18,7 @@
 - Bump AndroidX Navigation to 2.7.5
 - Bump Sentry to 6.33.1
 - Bump Coil to 2.5.0
+- Rename `partnerParams` to `extraPartnerParams`
 
 ### Removed
 
