@@ -201,33 +201,48 @@ fun MainScreen(
                 }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
-                    OrchestratedEnhancedKycScreen { result ->
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
+                    OrchestratedEnhancedKycScreen(
+                        userId = userId,
+                        jobId = jobId,
+                        onConsentDenied = {
+                            viewModel.onConsentDenied()
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        },
+                    ) { result ->
                         viewModel.onEnhancedKycResult(result)
                         navController.popBackStack()
                     }
                 }
                 composable(ProductScreen.BiometricKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
                     if (idInfo == null) {
                         IdTypeSelectorAndFieldInputScreen(
+                            userId = userId,
+                            jobId = jobId,
                             jobType = JobType.BiometricKyc,
+                            onConsentDenied = {
+                                viewModel.onConsentDenied()
+                                navController.popBackStack(
+                                    route = BottomNavigationScreen.Home.route,
+                                    inclusive = false,
+                                )
+                            },
                             onResult = { idInfo = it },
                         )
                     }
                     idInfo?.let {
-                        val userId = rememberSaveable { randomUserId() }
-                        val jobId = rememberSaveable { randomJobId() }
                         SmileID.BiometricKYC(
                             idInfo = it,
                             userId = userId,
                             jobId = jobId,
-                            partnerIcon = painterResource(
-                                id = com.smileidentity.R.drawable.si_logo_with_text,
-                            ),
-                            partnerName = "Smile ID",
-                            productName = it.idType!!,
-                            partnerPrivacyPolicy = privacyPolicy,
                         ) { result ->
                             viewModel.onBiometricKycResult(userId, jobId, result)
                             navController.popBackStack()

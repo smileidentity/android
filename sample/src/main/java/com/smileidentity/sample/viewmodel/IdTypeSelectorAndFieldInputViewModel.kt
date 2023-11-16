@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 data class IdTypeSelectorAndFieldInputUiState(
+    val showLoading: Boolean = true,
+    val showConsent: Boolean = false,
     val countries: ImmutableList<SearchableInputFieldItem>? = null,
     val selectedCountry: SearchableInputFieldItem? = null,
     val idTypesForCountry: List<AvailableIdType>? = null,
@@ -106,6 +108,41 @@ class IdTypeSelectorAndFieldInputViewModel(
                 .toImmutableList()
             _uiState.update { it.copy(countries = countryList) }
         }
+    }
+
+    fun loadConsent(
+        userId: String,
+        jobId: String,
+        idInfo: IdInfo,
+    ) {
+        // Check whether consent is required (returned in the auth smile response)
+        // on error, fall back to showing consent
+        val proxy = { e: Throwable ->
+            Timber.w(e)
+            _uiState.update { it.copy(showLoading = false, showConsent = true) }
+        }
+        viewModelScope.launch(getExceptionHandler(proxy)) {
+            _uiState.update { it.copy(showLoading = true) }
+            val authRequest = AuthenticationRequest(
+                jobType = BiometricKyc,
+                userId = userId,
+                jobId = jobId,
+                country = idInfo.country,
+                idType = idInfo.idType,
+            )
+            val authResponse = SmileID.api.authenticate(authRequest)
+            if (authResponse.consentInfo?.consentRequired == true) {
+                _uiState.update { it.copy(showLoading = false, showConsent = true) }
+            } else {
+                _uiState.update {
+                    it.copy(showLoading = false, showConsent = false)
+                }
+            }
+        }
+    }
+
+    fun onConsentGranted() {
+        _uiState.update { it.copy(showConsent = false) }
     }
 
     fun onCountrySelected(selectedCountry: SearchableInputFieldItem) {

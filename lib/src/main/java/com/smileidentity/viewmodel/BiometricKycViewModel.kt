@@ -26,8 +26,6 @@ import timber.log.Timber
 import java.io.File
 
 data class BiometricKycUiState(
-    val showLoading: Boolean = true,
-    val showConsent: Boolean = false,
     val processingState: ProcessingState? = null,
 )
 
@@ -43,34 +41,6 @@ class BiometricKycViewModel(
     private var result: SmileIDResult<BiometricKycResult>? = null
     private var selfieFile: File? = null
     private var livenessFiles: List<File>? = null
-
-    init {
-        // Check whether consent is required (returned in the auth smile response)
-        // on error, fall back to showing consent
-        val proxy = { e: Throwable ->
-            Timber.w(e)
-            _uiState.update { it.copy(showLoading = false, showConsent = true) }
-        }
-        viewModelScope.launch(getExceptionHandler(proxy)) {
-            val authRequest = AuthenticationRequest(
-                jobType = JobType.BiometricKyc,
-                userId = userId,
-                jobId = jobId,
-                country = idInfo.country,
-                idType = idInfo.idType,
-            )
-            val authResponse = SmileID.api.authenticate(authRequest)
-            if (authResponse.consentInfo?.consentRequired == true) {
-                _uiState.update { it.copy(showLoading = false, showConsent = true) }
-            } else {
-                _uiState.update { it.copy(showLoading = false, showConsent = false) }
-            }
-        }
-    }
-
-    fun onConsentGranted() {
-        _uiState.update { it.copy(showConsent = false) }
-    }
 
     fun onSelfieCaptured(selfieFile: File, livenessFiles: List<File>) {
         this.selfieFile = selfieFile

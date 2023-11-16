@@ -1,25 +1,20 @@
 package com.smileidentity.compose.biometric
 
-import android.os.OperationCanceledException
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
@@ -31,15 +26,10 @@ import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
-import java.net.URL
 
 @Composable
 fun OrchestratedBiometricKYCScreen(
     idInfo: IdInfo,
-    partnerIcon: Painter,
-    partnerName: String,
-    productName: String,
-    partnerPrivacyPolicy: URL,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -67,24 +57,6 @@ fun OrchestratedBiometricKYCScreen(
             .fillMaxSize(),
     ) {
         when {
-            uiState.showLoading ->
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-
-            uiState.showConsent -> OrchestratedConsentScreen(
-                partnerIcon = partnerIcon,
-                partnerName = partnerName,
-                productName = productName,
-                partnerPrivacyPolicy = partnerPrivacyPolicy,
-                showAttribution = showAttribution,
-                modifier = Modifier,
-                onConsentGranted = viewModel::onConsentGranted,
-                onConsentDenied = {
-                    onResult(
-                        SmileIDResult.Error(OperationCanceledException("User did not consent")),
-                    )
-                },
-            )
-
             uiState.processingState != null -> ProcessingScreen(
                 processingState = uiState.processingState,
                 inProgressTitle = stringResource(R.string.si_biometric_kyc_processing_title),

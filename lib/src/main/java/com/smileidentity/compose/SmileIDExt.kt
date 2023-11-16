@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
@@ -330,10 +331,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
 @Composable
 fun SmileID.BiometricKYC(
     idInfo: IdInfo,
-    partnerIcon: Painter,
-    partnerName: String,
-    productName: String,
-    partnerPrivacyPolicy: URL,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -349,10 +346,6 @@ fun SmileID.BiometricKYC(
         OrchestratedBiometricKYCScreen(
             modifier = modifier,
             idInfo = idInfo,
-            partnerIcon = partnerIcon,
-            partnerName = partnerName,
-            productName = productName,
-            partnerPrivacyPolicy = partnerPrivacyPolicy,
             userId = userId,
             jobId = jobId,
             allowAgentMode = allowAgentMode,
@@ -405,6 +398,31 @@ fun SmileID.BvnConsentScreen(
             partnerPrivacyPolicy = partnerPrivacyPolicy,
             onConsentGranted = onConsentGranted,
             onConsentDenied = onConsentDenied,
+            showAttribution = showAttribution,
+        )
+    }
+}
+
+@Composable
+fun SmileID.ConsentScreen(
+    partnerIcon: Painter,
+    partnerName: String,
+    productName: String,
+    partnerPrivacyPolicy: URL,
+    onConsentGranted: () -> Unit,
+    onConsentDenied: () -> Unit,
+    modifier: Modifier = Modifier,
+    showAttribution: Boolean = true,
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedConsentScreen(
+            partnerIcon = partnerIcon,
+            partnerName = partnerName,
+            productName = productName,
+            partnerPrivacyPolicy = partnerPrivacyPolicy,
+            onConsentGranted = onConsentGranted,
+            onConsentDenied = onConsentDenied,
+            modifier = modifier,
             showAttribution = showAttribution,
         )
     }
