@@ -41,9 +41,18 @@
     <string name="about_us_visit_our_website">Visit our website</string>
     <string name="about_us_contact_support">Contact support</string>
 
+    <!--  Root Screen  -->
+    <string name="root_welcome">Welcome to our Sample App!</string>
+    <string name="root_description">To begin testing on this app, you need to add a configuration from Smile Portal. \n\nSee link here: \n<annotation is_url="true">portal.smileidentity.com/sdk</annotation></string>
+    <string name="root_scan_qr">Scan Configuration QR</string>
+    <string name="root_add_config">Add Config manually</string>
+    <string name="root_config_added">Configuration Added</string>
+    <string name="root_config_added_welcome">Welcome partner_%1$s, you can now proceed to the home screen of the Sample App</string>
+
     <!--  Settings Screen  -->
     <string name="settings">Settings</string>
-    <string name="settings_update_smile_config">Update Smile Config</string>
+    <string name="settings_add_smile_config">Add your config manually</string>
+    <string name="settings_update_smile_config">Apply config</string>
     <string name="settings_smile_config_error">There is an error in your Smile Config</string>
 
     <!--  SmartSelfie Auth  -->

@@ -13,7 +13,7 @@ import com.smileidentity.util.SpanFormatter
 
 @Composable
 @ReadOnlyComposable
-internal fun annotatedStringResource(
+fun annotatedStringResource(
     @StringRes id: Int,
     vararg formatArgs: Any,
     spanStyles: (Annotation) -> SpanStyle? = { null },

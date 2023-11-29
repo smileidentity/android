@@ -12,7 +12,7 @@
             android:label="@string/app_name"
             android:supportsRtl="true"
             android:enableOnBackInvokedCallback="true"
-            android:theme="@style/Theme.SmileID"
+            android:theme="@style/Theme.SmileID.Splash"
             tools:targetApi="33">
 
         <meta-data

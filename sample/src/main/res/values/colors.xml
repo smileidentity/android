@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="color_background">#F9F0E7</color>
+    <color name="color_digital_blue">#001096</color>
     <!--  White label the brand-neutral SDK with Smile branding  -->
     <color name="si_color_on_dark">#FFF6EDE4</color>
     <color name="si_color_on_light">#FF2D2B2A</color>
