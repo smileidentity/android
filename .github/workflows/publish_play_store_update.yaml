@@ -20,15 +20,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Write Smile Config
-        id: write_config
-        # Mask the config so it doesn't show up in the logs
-        run: |
-          echo "$SMILE_CONFIG" > sample/src/main/assets/smile_config.json
-          PARTNER_ID=$(jq -r '.partner_id' sample/src/main/assets/smile_config.json)
-          echo "partner_id=$PARTNER_ID" >> $GITHUB_OUTPUT
-        env:
-          SMILE_CONFIG: ${{ secrets.SMILE_CONFIG_PARTNER_2423 }}
       - name: Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1
@@ -69,5 +60,5 @@ jobs:
           packageName: com.smileidentity.sample
           track: internal
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
-          releaseName: ${{ steps.short_sha.outputs.short_sha }} (Partner ${{ steps.write_config.outputs.partner_id }})
+          releaseName: ${{ steps.short_sha.outputs.short_sha }}
           whatsNewDirectory: release_notes
