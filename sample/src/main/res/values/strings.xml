@@ -15,6 +15,7 @@
     <string name="version_info">Partner %1$s • %2$s</string>
     <string name="try_again">Try Again</string>
     <string name="something_went_wrong">Something went wrong</string>
+    <string name="warning_no_internet">No internet connection</string>
 
     <!--  Jobs Screen  -->
     <string name="jobs">Jobs</string>
