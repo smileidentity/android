@@ -1,10 +1,9 @@
 package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Settings
@@ -19,8 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.SmileID
+import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 import com.smileidentity.sample.viewmodel.SettingsViewModel
@@ -50,21 +53,35 @@ fun SettingsScreen(
             errorMessage = uiState.smileConfigError,
         )
     }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        settings.forEach {
-            ListItem(
-                headlineContent = { Text(stringResource(it.first)) },
-                leadingContent = { Icon(it.second, null) },
-                trailingContent = { Icon(Icons.Default.ArrowForward, null) },
-                modifier = Modifier.clickable(onClick = it.third),
-            )
-            Divider()
-        }
-    }
+
+    BottomPinnedColumn(
+        modifier = modifier.fillMaxSize(),
+        scrollableContent = {
+            settings.forEach {
+                ListItem(
+                    headlineContent = { Text(stringResource(it.first)) },
+                    leadingContent = { Icon(it.second, null) },
+                    trailingContent = { Icon(Icons.Default.ArrowForward, null) },
+                    modifier = Modifier.clickable(onClick = it.third),
+                )
+                Divider()
+            }
+        },
+        pinnedContent = {
+            SelectionContainer {
+                Text(
+                    text = stringResource(
+                        R.string.version_info,
+                        SmileID.config.partnerId,
+                        BuildConfig.VERSION_NAME,
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
+                    modifier = Modifier.padding(12.dp),
+                )
+            }
+        },
+    )
 }
 
 @Preview

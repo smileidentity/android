@@ -24,8 +24,6 @@ const val SMILE_CONFIG_DEFAULT_HINT = "Paste your Smile Config from the Portal h
  * For instructions on initializing the SDK, please refer to [SmileIDApplication].
  */
 data class RootUiState(
-    val showSmileConfigBottomSheet: Boolean = false,
-    val showSmileWelcomeAlert: Boolean = false,
     val partnerId: String = "",
     val smileConfigHint: String = SMILE_CONFIG_DEFAULT_HINT,
     @StringRes val smileConfigError: Int? = null,
@@ -51,13 +49,7 @@ class RootViewModel : ViewModel() {
                 _uiState.update { it.copy(smileConfigError = null) }
                 viewModelScope.launch {
                     DataStoreRepository.setConfig(config)
-                    _uiState.update {
-                        it.copy(
-                            showSmileConfigBottomSheet = false,
-                            showSmileWelcomeAlert = true,
-                            partnerId = config.partnerId,
-                        )
-                    }
+                    _uiState.update { it.copy(partnerId = config.partnerId) }
                 }
             } else {
                 _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }

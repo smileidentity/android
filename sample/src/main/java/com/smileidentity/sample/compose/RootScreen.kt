@@ -62,11 +62,12 @@ fun RootScreen(
         factory = viewModelFactory { RootViewModel() },
     ),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val runtimeConfig by viewModel.runtimeConfig.collectAsStateWithLifecycle()
     var initialized by remember { mutableStateOf(false) }
+    var showWelcomeDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val options = remember {
         GmsBarcodeScannerOptions.Builder()
             .setBarcodeFormats(
@@ -135,7 +136,10 @@ fun RootScreen(
                         onClick = {
                             scanner.startScan()
                                 .addOnSuccessListener { barcode ->
-                                    barcode.rawValue?.let { viewModel.updateSmileConfig(it) }
+                                    barcode.rawValue?.let { config ->
+                                        viewModel.updateSmileConfig(updatedConfig = config)
+                                        showWelcomeDialog = true
+                                    }
                                 }
                         },
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -166,17 +170,27 @@ fun RootScreen(
             )
 
             if (runtimeConfig != null) {
-                // If a config has been set at runtime, it takes first priority
-                LaunchedEffect(runtimeConfig) {
-                    initialized = false
-                    SmileID.initialize(
-                        context = context,
-                        config = runtimeConfig!!,
-                        useSandbox = true,
-                        enableCrashReporting = !BuildConfig.DEBUG,
-                        okHttpClient = client,
+                if (showWelcomeDialog) {
+                    SmileConfigConfirmationScreen(
+                        partnerId = uiState.partnerId,
+                        goToMainScreen = {
+                            showBottomSheet = false
+                            showWelcomeDialog = false
+                        },
                     )
-                    initialized = true
+                } else {
+                    // If a config has been set at runtime, it takes first priority
+                    LaunchedEffect(runtimeConfig) {
+                        initialized = false
+                        SmileID.initialize(
+                            context = context,
+                            config = runtimeConfig!!,
+                            useSandbox = true,
+                            enableCrashReporting = !BuildConfig.DEBUG,
+                            okHttpClient = client,
+                        )
+                        initialized = true
+                    }
                 }
             } else if (context.isConfigDefineInAssets()) {
                 // Otherwise, fallback to the config defined in assets
@@ -194,18 +208,14 @@ fun RootScreen(
 
             if (showBottomSheet) {
                 SmileConfigModalBottomSheet(
-                    onSaveSmileConfig = viewModel::updateSmileConfig,
+                    onSaveSmileConfig = { config ->
+                        viewModel.updateSmileConfig(updatedConfig = config)
+                        showWelcomeDialog = true
+                    },
                     onDismiss = { showBottomSheet = false },
                     errorMessage = uiState.smileConfigError,
                     hint = uiState.smileConfigHint,
-                    dismissable = false,
-                )
-            }
-
-            if (uiState.showSmileWelcomeAlert) {
-                SmileConfigConfirmationScreen(
-                    partnerId = uiState.partnerId,
-                    goToMainScreen = { initialized = true },
+                    dismissable = true,
                 )
             }
 
