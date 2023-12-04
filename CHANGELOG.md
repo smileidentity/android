@@ -9,6 +9,7 @@
 ### Changed
 
 ### Removed
+- Removed `model_parameters` from `PrepUploadRequest`
 
 ## 10.0.0-beta14
 

@@ -202,7 +202,7 @@ dependencies {
     implementation(libs.play.services.mlkit.face.detection)
 
     // Bundled model
-    implementation(libs.mlkit.`object`.detection)
+    implementation(libs.mlkit.obj.detection)
 
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)

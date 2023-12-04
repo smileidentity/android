@@ -7,9 +7,6 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class ServicesResponse(
     @Json(name = "bank_codes") val bankCodes: List<BankCode>,
-    // TODO: There is an id_types key. Country -> ID type -> array of fields. what do the fields
-    //  represent? i.e. PHONE_NUMBER has country, user_id, first_name, last_name as fields. Are
-    //  these expected response fields?
     @Json(name = "hosted_web") val hostedWeb: HostedWeb,
 )
 
@@ -31,6 +28,7 @@ internal typealias CountryCodeToCountryInfo = Map<String, CountryInfo>
  */
 private typealias IdTypeKeyToAvailableIdType = Map<String, AvailableIdType>
 
+@Suppress("unused")
 @JsonClass(generateAdapter = true)
 data class HostedWeb(
     @Json(name = "basic_kyc") internal val _basicKyc: CountryCodeToCountryInfo,
