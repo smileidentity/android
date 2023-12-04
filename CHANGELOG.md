@@ -5,6 +5,7 @@
 ### Added
 
 ### Fixed
+- Made `code` nullable on `SmileIDException.Details`
 
 ### Changed
 
