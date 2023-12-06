@@ -20,7 +20,7 @@ import com.smileidentity.sample.R
 fun SmileConfigConfirmationScreen(
     partnerId: String,
     modifier: Modifier = Modifier,
-    goToMainScreen: () -> Unit,
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         icon = {
@@ -48,7 +48,7 @@ fun SmileConfigConfirmationScreen(
         },
         confirmButton = {
             Button(
-                onClick = goToMainScreen,
+                onClick = onConfirm,
                 modifier = Modifier
                     .fillMaxWidth(),
             ) { Text(text = stringResource(id = R.string.cont)) }
