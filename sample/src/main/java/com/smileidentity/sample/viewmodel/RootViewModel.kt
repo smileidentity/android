@@ -33,12 +33,11 @@ class RootViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(RootUiState())
     val uiState = _uiState.asStateFlow()
 
-    val runtimeConfig = DataStoreRepository.getConfig()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = null,
-        )
+    val runtimeConfig = DataStoreRepository.getConfig().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = null,
+    )
 
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
 

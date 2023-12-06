@@ -46,6 +46,8 @@ import com.smileidentity.sample.R
 import com.smileidentity.sample.SmileIDApplication
 import com.smileidentity.sample.compose.components.SmileConfigConfirmationScreen
 import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
+import com.smileidentity.sample.isInternetAvailable
+import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.RootViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
@@ -222,6 +224,11 @@ fun RootScreen(
             key(runtimeConfig) {
                 if (initialized) {
                     MainScreen()
+                    LaunchedEffect(Unit) {
+                        if (!context.isInternetAvailable()) {
+                            context.toast(R.string.warning_no_internet)
+                        }
+                    }
                 }
             }
         }
