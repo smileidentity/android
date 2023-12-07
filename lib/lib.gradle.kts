@@ -28,8 +28,9 @@ android {
 
     buildTypes {
         all {
-            val sentryDsn = findProperty("SENTRY_DSN")
-                ?: throw IllegalArgumentException("Please set the SENTRY_DSN gradle property")
+            val sentryDsn =
+                findProperty("SENTRY_DSN")
+                    ?: throw IllegalArgumentException("Please set the SENTRY_DSN gradle property")
             buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
             buildConfigField("String", "VERSION_NAME", "\"${version}\"")
         }
@@ -62,13 +63,14 @@ android {
             // is primarily for consumers of the SDK to use, not for us.
             freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
             if (project.hasProperty("enableComposeCompilerReports")) {
-                val outputDir = layout.buildDirectory.dir("compose-reports").get().asFile.path
-                freeCompilerArgs += listOf(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$outputDir",
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$outputDir",
-                )
+                val dir = layout.buildDirectory.dir("compose-reports").get().asFile.path
+                freeCompilerArgs +=
+                    listOf(
+                        "-P",
+                        "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$dir",
+                        "-P",
+                        "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$dir",
+                    )
             }
         }
     }
