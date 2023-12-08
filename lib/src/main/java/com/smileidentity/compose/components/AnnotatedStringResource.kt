@@ -13,6 +13,7 @@ import com.smileidentity.util.SpanFormatter
 
 @Composable
 @ReadOnlyComposable
+@SmileIDOptIn
 fun annotatedStringResource(
     @StringRes id: Int,
     vararg formatArgs: Any,
