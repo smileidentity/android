@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.core.text.getSpans
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.util.SpanFormatter
 
 @Composable
