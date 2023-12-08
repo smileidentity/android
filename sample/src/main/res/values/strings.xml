@@ -48,7 +48,7 @@
     <string name="root_scan_qr">Scan Configuration QR</string>
     <string name="root_add_config">Add Config manually</string>
     <string name="root_config_added">Configuration Added</string>
-    <string name="root_config_added_welcome">Welcome partner_%1$s, you can now proceed to the home screen of the Sample App</string>
+    <string name="root_config_added_welcome">Welcome Partner %1$s, you can now proceed to the home screen of the Sample App</string>
 
     <!--  Settings Screen  -->
     <string name="settings">Settings</string>
