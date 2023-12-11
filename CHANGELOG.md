@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 10.0.1
+
+### Fixed
+- Marked `kotlinx-collections-immutable` as an `api` dependency
+
 ## 10.0.0
 
 ### Fixed
