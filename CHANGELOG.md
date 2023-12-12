@@ -1,13 +1,20 @@
 # Changelog
 
-## 10.0.0-beta15 (unreleased)
+## Unreleased
 
-### Added
+## 10.0.1
+
+### Fixed
+- Marked `kotlinx-collections-immutable` as an `api` dependency
+
+## 10.0.0
 
 ### Fixed
 - Made `code` nullable on `SmileIDException.Details`
 
 ### Changed
+- Bump Kotlin to 1.9.21
+- Bump Sentry to 7.0.0
 
 ### Removed
 - Removed `model_parameters` from `PrepUploadRequest`
@@ -34,8 +41,6 @@
 - Bump Coil to 2.5.0
 - Changed the OKHTTP call timeout to 60 seconds 
 - Rename `partnerParams` to `extraPartnerParams`
-
-### Removed
 
 ## 10.0.0-beta13
 

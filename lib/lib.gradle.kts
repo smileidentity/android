@@ -155,7 +155,8 @@ dependencies {
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.adapters.lazy)
 
-    implementation(libs.kotlin.immutable.collections)
+    // Immutable collections are exposed in public SmileID interface
+    api(libs.kotlin.immutable.collections)
     implementation(libs.coroutines.core)
 
     implementation(libs.androidx.core)
