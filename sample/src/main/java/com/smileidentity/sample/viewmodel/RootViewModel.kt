@@ -24,9 +24,10 @@ const val SMILE_CONFIG_DEFAULT_HINT = "Paste your Smile Config from the Portal h
  * For instructions on initializing the SDK, please refer to [SmileIDApplication].
  */
 data class RootUiState(
-    val showSmileConfigBottomSheet: Boolean = false,
+    val partnerId: String = "",
     val smileConfigHint: String = SMILE_CONFIG_DEFAULT_HINT,
     @StringRes val smileConfigError: Int? = null,
+    val showSmileConfigConfirmation: Boolean = false,
 )
 
 class RootViewModel : ViewModel() {
@@ -40,6 +41,7 @@ class RootViewModel : ViewModel() {
     )
 
     private val configAdapter = SmileID.moshi.adapter(Config::class.java)
+    private var pendingConfig: Config? = null
 
     fun updateSmileConfig(updatedConfig: String) {
         try {
@@ -47,13 +49,28 @@ class RootViewModel : ViewModel() {
             if (config != null) {
                 _uiState.update { it.copy(smileConfigError = null) }
                 viewModelScope.launch {
-                    DataStoreRepository.setConfig(config)
-                    _uiState.update { it.copy(showSmileConfigBottomSheet = false) }
+                    _uiState.update {
+                        it.copy(partnerId = config.partnerId, showSmileConfigConfirmation = true)
+                    }
+                    pendingConfig = config
                 }
             } else {
                 _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }
             }
         } catch (e: Exception) {
+            _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }
+        }
+    }
+
+    fun onConfirmationContinue() {
+        try {
+            pendingConfig?.let { config ->
+                viewModelScope.launch {
+                    DataStoreRepository.setConfig(config)
+                }
+            }
+        } catch (e: Exception) {
+            pendingConfig = null
             _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }
         }
     }

@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
@@ -44,6 +45,7 @@ fun SmileConfigModalBottomSheet(
     onDismiss: () -> Unit,
     hint: String,
     modifier: Modifier = Modifier,
+    showQrScannerButton: Boolean = true,
     @StringRes errorMessage: Int? = null,
     dismissable: Boolean = true,
 ) {
@@ -76,6 +78,12 @@ fun SmileConfigModalBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            Text(
+                text = stringResource(id = R.string.settings_add_smile_config),
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            )
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -102,22 +110,24 @@ fun SmileConfigModalBottomSheet(
             ) {
                 Text(stringResource(id = R.string.settings_update_smile_config))
             }
-            OutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    scanner.startScan()
-                        .addOnSuccessListener { barcode ->
-                            barcode.rawValue?.let { onSaveSmileConfig(it) }
-                        }
-                },
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_qr_code),
-                    contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                )
-                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                Text(text = stringResource(id = R.string.scan_qr_code))
+            if (showQrScannerButton) {
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scanner.startScan()
+                            .addOnSuccessListener { barcode ->
+                                barcode.rawValue?.let { onSaveSmileConfig(it) }
+                            }
+                    },
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_qr_code),
+                        contentDescription = null,
+                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                    )
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = stringResource(id = R.string.scan_qr_code))
+                }
             }
         }
     }

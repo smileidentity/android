@@ -1,6 +1,9 @@
 package com.smileidentity.sample.compose
 
 import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,12 +21,10 @@ import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.SmileIDApplication
-import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 import com.smileidentity.sample.isInternetAvailable
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.RootViewModel
 import com.smileidentity.viewmodel.viewModelFactory
-import timber.log.Timber
 
 /**
  * *****Note to Partners*****
@@ -34,9 +35,7 @@ import timber.log.Timber
 @Composable
 fun RootScreen(
     modifier: Modifier = Modifier,
-    viewModel: RootViewModel = viewModel(
-        factory = viewModelFactory { RootViewModel() },
-    ),
+    viewModel: RootViewModel = viewModel(factory = viewModelFactory { RootViewModel() }),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val runtimeConfig by viewModel.runtimeConfig.collectAsStateWithLifecycle()
@@ -47,6 +46,7 @@ fun RootScreen(
             .addInterceptor(ChuckerInterceptor.Builder(context).build())
             .build()
     }
+
     SmileIDTheme {
         Surface(modifier = modifier) {
             if (runtimeConfig != null) {
@@ -75,14 +75,19 @@ fun RootScreen(
                     initialized = true
                 }
             } else {
-                // Otherwise, ask the user to input a config. Once input, the runtimeConfig will
-                // be updated and the LaunchedEffect above will be triggered.
-                SmileConfigModalBottomSheet(
-                    onSaveSmileConfig = viewModel::updateSmileConfig,
-                    onDismiss = { Timber.v("onDismiss") },
+                WelcomeScreen(
+                    partnerId = uiState.partnerId,
                     errorMessage = uiState.smileConfigError,
                     hint = uiState.smileConfigHint,
-                    dismissable = false,
+                    showConfirmation = uiState.showSmileConfigConfirmation,
+                    onSaveSmileConfig = {
+                        viewModel.updateSmileConfig(it)
+                        Toast.makeText(context, R.string.applying_config, Toast.LENGTH_SHORT).show()
+                    },
+                    onContinue = viewModel::onConfirmationContinue,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding(),
                 )
             }
 

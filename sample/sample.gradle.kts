@@ -119,6 +119,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.timber)
 
     // Debug Helpers

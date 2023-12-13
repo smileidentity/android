@@ -3,6 +3,9 @@ package com.smileidentity.compose.document
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import com.smileidentity.models.JobType
+import com.smileidentity.util.randomUserId
+import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,8 +21,14 @@ class OrchestratedDocumentVerificationScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
-                countryCode = "254",
-                documentType = "NATIONAL_ID",
+                viewModel = DocumentVerificationViewModel(
+                    jobType = JobType.DocumentVerification,
+                    userId = randomUserId(),
+                    jobId = randomUserId(),
+                    countryCode = "254",
+                    documentType = "NATIONAL_ID",
+                    captureBothSides = false,
+                ),
             )
         }
 
@@ -35,8 +44,14 @@ class OrchestratedDocumentVerificationScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
-                countryCode = "254",
-                documentType = "NATIONAL_ID",
+                viewModel = DocumentVerificationViewModel(
+                    jobType = JobType.DocumentVerification,
+                    userId = randomUserId(),
+                    jobId = randomUserId(),
+                    countryCode = "254",
+                    documentType = "NATIONAL_ID",
+                    captureBothSides = false,
+                ),
             )
         }
 
