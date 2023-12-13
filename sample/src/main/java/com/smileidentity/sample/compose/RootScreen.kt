@@ -3,6 +3,7 @@ package com.smileidentity.sample.compose
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -84,7 +85,9 @@ fun RootScreen(
                         Toast.makeText(context, "Applying config...", Toast.LENGTH_SHORT).show()
                     },
                     onContinue = viewModel::onConfirmationContinue,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding(),
                 )
             }
 
