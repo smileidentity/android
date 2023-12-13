@@ -82,7 +82,7 @@ fun RootScreen(
                     showConfirmation = uiState.showSmileConfigConfirmation,
                     onSaveSmileConfig = {
                         viewModel.updateSmileConfig(it)
-                        Toast.makeText(context, "Applying config...", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.applying_config, Toast.LENGTH_SHORT).show()
                     },
                     onContinue = viewModel::onConfirmationContinue,
                     modifier = Modifier

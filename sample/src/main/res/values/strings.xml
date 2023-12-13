@@ -16,6 +16,7 @@
     <string name="try_again">Try Again</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="warning_no_internet">No internet connection</string>
+    <string name="applying_config">Applying config…</string>
 
     <!--  Jobs Screen  -->
     <string name="jobs">Jobs</string>

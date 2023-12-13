@@ -52,7 +52,7 @@ fun SettingsScreen(
         SmileConfigModalBottomSheet(
             onSaveSmileConfig = {
                 viewModel.updateSmileConfig(it)
-                Toast.makeText(context, "Applying config...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.applying_config, Toast.LENGTH_SHORT).show()
             },
             onDismiss = viewModel::hideSmileConfigInput,
             hint = uiState.smileConfigHint,
