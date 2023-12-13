@@ -51,6 +51,7 @@ fun SettingsScreen(
             onDismiss = viewModel::hideSmileConfigInput,
             hint = uiState.smileConfigHint,
             errorMessage = uiState.smileConfigError,
+            showQrScannerButton = true,
         )
     }
 
