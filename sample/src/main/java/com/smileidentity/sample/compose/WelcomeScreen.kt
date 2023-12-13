@@ -93,7 +93,7 @@ fun WelcomeScreen(
                     fontSize = 32.sp,
                     lineHeight = 40.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = colorResource(R.color.color_digital_blue),
+                    color = colorResource(R.color.si_color_accent),
                 ),
             )
             Spacer(modifier = Modifier.height(46.dp))

@@ -25,7 +25,7 @@ fun SmileConfigConfirmationScreen(
     AlertDialog(
         icon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_icon_check_mark),
+                painter = painterResource(id = com.smileidentity.R.drawable.si_processing_success),
                 contentDescription = null,
                 tint = Color.Unspecified,
             )
