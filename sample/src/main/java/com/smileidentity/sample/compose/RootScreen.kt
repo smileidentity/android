@@ -1,6 +1,7 @@
 package com.smileidentity.sample.compose
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -78,7 +79,10 @@ fun RootScreen(
                     errorMessage = uiState.smileConfigError,
                     hint = uiState.smileConfigHint,
                     showConfirmation = uiState.showSmileConfigConfirmation,
-                    onSaveSmileConfig = viewModel::updateSmileConfig,
+                    onSaveSmileConfig = {
+                        viewModel.updateSmileConfig(it)
+                        Toast.makeText(context, "Applying config...", Toast.LENGTH_SHORT).show()
+                    },
                     onContinue = viewModel::onConfirmationContinue,
                     modifier = Modifier.fillMaxSize(),
                 )
