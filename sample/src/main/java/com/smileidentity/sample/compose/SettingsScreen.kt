@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,7 @@ fun SettingsScreen(
         factory = viewModelFactory { SettingsViewModel() },
     ),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val settings = listOf(
         Triple(
@@ -47,10 +50,14 @@ fun SettingsScreen(
 
     if (uiState.showSmileConfigBottomSheet) {
         SmileConfigModalBottomSheet(
-            onSaveSmileConfig = viewModel::updateSmileConfig,
+            onSaveSmileConfig = {
+                viewModel.updateSmileConfig(it)
+                Toast.makeText(context, R.string.applying_config, Toast.LENGTH_SHORT).show()
+            },
             onDismiss = viewModel::hideSmileConfigInput,
             hint = uiState.smileConfigHint,
             errorMessage = uiState.smileConfigError,
+            showQrScannerButton = true,
         )
     }
 

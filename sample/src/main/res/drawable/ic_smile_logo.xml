@@ -1,3 +1,4 @@
+<!-- This is different than si_logo_with_text because of the sizing needed for the splash screen -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="345dp"
     android:height="261dp"

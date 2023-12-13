@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,8 +12,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -22,17 +28,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.sample.R
+import com.smileidentity.sample.compose.components.SmileConfigConfirmationScreen
+import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 
 @Composable
 fun WelcomeScreen(
-    showBottomSheet: () -> Unit,
-    showQRScanner: () -> Unit,
+    partnerId: String,
+    @StringRes errorMessage: Int?,
+    hint: String,
+    showConfirmation: Boolean,
+    onSaveSmileConfig: (updatedConfig: String) -> Unit,
+    onContinue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
+    val options = remember {
+        GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_QR_CODE,
+                Barcode.FORMAT_AZTEC,
+            )
+            .enableAutoZoom()
+            .build()
+    }
+    val scanner = remember(context) { GmsBarcodeScanning.getClient(context, options) }
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    if (showBottomSheet) {
+        SmileConfigModalBottomSheet(
+            onSaveSmileConfig = onSaveSmileConfig,
+            onDismiss = { showBottomSheet = false },
+            errorMessage = errorMessage,
+            showQrScannerButton = false,
+            hint = hint,
+            dismissable = true,
+        )
+    }
+
+    if (showConfirmation) {
+        SmileConfigConfirmationScreen(
+            partnerId = partnerId,
+            onConfirm = onContinue,
+        )
+    }
 
     BottomPinnedColumn(
         modifier = modifier,
@@ -48,7 +93,7 @@ fun WelcomeScreen(
                     fontSize = 32.sp,
                     lineHeight = 40.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = colorResource(R.color.color_digital_blue),
+                    color = colorResource(R.color.si_color_accent),
                 ),
             )
             Spacer(modifier = Modifier.height(46.dp))
@@ -78,7 +123,11 @@ fun WelcomeScreen(
         },
         pinnedContent = {
             Button(
-                onClick = showQRScanner,
+                onClick = {
+                    scanner.startScan().addOnSuccessListener { barcode ->
+                        barcode.rawValue?.let { config -> onSaveSmileConfig(config) }
+                    }
+                },
                 modifier = Modifier.padding(horizontal = 16.dp),
             ) {
                 Text(
@@ -90,7 +139,7 @@ fun WelcomeScreen(
                 )
             }
             OutlinedButton(
-                onClick = showBottomSheet,
+                onClick = { showBottomSheet = true },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
