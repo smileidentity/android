@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 10.0.3
+
+## 10.0.2
+
+### Added
+- Added `allowNewEnroll` on SmartSelfie, BiometricKYC, DocV and EnhancedDocV
+
 ## 10.0.1
 
 ### Fixed

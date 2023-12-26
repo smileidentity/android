@@ -46,6 +46,7 @@ import java.net.URL
  * @param jobId The job ID to associate with the SmartSelfie™ Enrollment. Most often, this
  * will correspond to a unique Job ID within your own system. If not provided, a random job ID
  * will be generated.
+ * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
  * displayed allowing toggling between the back camera and front camera. If not allowed, only the
  * front camera will be used.
@@ -63,6 +64,7 @@ fun SmileID.SmartSelfieEnrollment(
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
@@ -76,6 +78,7 @@ fun SmileID.SmartSelfieEnrollment(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
+            allowNewEnroll = allowNewEnroll,
             isEnroll = true,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
@@ -114,6 +117,7 @@ fun SmileID.SmartSelfieAuthentication(
     userId: String,
     modifier: Modifier = Modifier,
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
@@ -127,6 +131,7 @@ fun SmileID.SmartSelfieAuthentication(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
+            allowNewEnroll = allowNewEnroll,
             isEnroll = false,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
@@ -181,6 +186,7 @@ fun SmileID.DocumentVerification(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
@@ -208,6 +214,7 @@ fun SmileID.DocumentVerification(
                         jobType = JobType.DocumentVerification,
                         userId = userId,
                         jobId = jobId,
+                        allowNewEnroll = allowNewEnroll,
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
@@ -262,6 +269,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
@@ -289,6 +297,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         jobType = JobType.EnhancedDocumentVerification,
                         userId = userId,
                         jobId = jobId,
+                        allowNewEnroll = allowNewEnroll,
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
@@ -330,6 +339,7 @@ fun SmileID.BiometricKYC(
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
@@ -344,6 +354,7 @@ fun SmileID.BiometricKYC(
             idInfo = idInfo,
             userId = userId,
             jobId = jobId,
+            allowNewEnroll = allowNewEnroll,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             showInstructions = showInstructions,

@@ -81,6 +81,7 @@ class SelfieViewModel(
     private val isEnroll: Boolean,
     private val userId: String,
     private val jobId: String,
+    private val allowNewEnroll: Boolean,
     private val skipApiSubmission: Boolean,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
@@ -278,6 +279,8 @@ class SelfieViewModel(
 
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
+                // TODO : Michael will change this to boolean
+                allowNewEnroll = allowNewEnroll.toString(),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )

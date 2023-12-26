@@ -49,6 +49,7 @@ class EnhancedDocumentVerificationViewModelTest {
             jobType = JobType.EnhancedDocumentVerification,
             userId = randomUserId(),
             jobId = randomJobId(),
+            allowNewEnroll = false,
             countryCode = "KE",
             documentType = "ID_CARD",
             selfieFile = selfieFile,

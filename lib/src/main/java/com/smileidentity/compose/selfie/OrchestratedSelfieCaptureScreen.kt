@@ -40,6 +40,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
     skipApiSubmission: Boolean = false,
@@ -52,6 +53,7 @@ internal fun OrchestratedSelfieCaptureScreen(
                 isEnroll = isEnroll,
                 userId = userId,
                 jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
                 skipApiSubmission = skipApiSubmission,
                 extraPartnerParams = extraPartnerParams,
             )

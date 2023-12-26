@@ -71,6 +71,7 @@ class DocumentVerificationFragment : Fragment() {
             documentType: String? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
+            allowNewEnroll: Boolean = false,
             showAttribution: Boolean = true,
             allowAgentMode: Boolean = false,
             allowGalleryUpload: Boolean = false,

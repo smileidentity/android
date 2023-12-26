@@ -75,6 +75,7 @@ class BiometricKYCFragment : Fragment() {
             @DrawableRes partnerIcon: Int,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
+            allowNewEnroll: Boolean = false,
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
@@ -84,6 +85,7 @@ class BiometricKYCFragment : Fragment() {
                 this.idInfo = idInfo
                 this.userId = userId
                 this.jobId = jobId
+                this.allowNewEnroll = allowNewEnroll
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
@@ -109,6 +111,7 @@ class BiometricKYCFragment : Fragment() {
                 idInfo = args.idInfo,
                 userId = args.userId,
                 jobId = args.jobId,
+                allowNewEnroll = args.allowNewEnroll,
                 allowAgentMode = args.allowAgentMode,
                 showAttribution = args.showAttribution,
                 showInstructions = args.showInstructions,
@@ -135,6 +138,11 @@ private const val KEY_JOB_ID = "jobId"
 private var Bundle.jobId: String
     get() = getString(KEY_JOB_ID)!!
     set(value) = putString(KEY_JOB_ID, value)
+
+private const val KEY_ALLOW_NEW_ENROLL = "allowNewEnroll"
+private var Bundle.allowNewEnroll: Boolean
+    get() = getBoolean(KEY_ALLOW_NEW_ENROLL)
+    set(value) = putBoolean(KEY_ALLOW_NEW_ENROLL, value)
 
 private const val KEY_SHOW_ATTRIBUTION = "showAttribution"
 private var Bundle.showAttribution: Boolean
