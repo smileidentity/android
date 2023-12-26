@@ -33,6 +33,7 @@ class BiometricKycViewModel(
     private val idInfo: IdInfo,
     private val userId: String,
     private val jobId: String,
+    private val allowNewEnroll: Boolean,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricKycUiState())
@@ -66,6 +67,8 @@ class BiometricKycViewModel(
 
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
+                // TODO : Michael will change this to boolean
+                allowNewEnroll = allowNewEnroll.toString(),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )

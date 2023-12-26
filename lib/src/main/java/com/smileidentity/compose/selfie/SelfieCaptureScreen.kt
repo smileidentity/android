@@ -56,11 +56,20 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 internal fun SelfieCaptureScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
     skipApiSubmission: Boolean = false,
     viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory { SelfieViewModel(isEnroll, userId, jobId, skipApiSubmission) },
+        factory = viewModelFactory {
+            SelfieViewModel(
+                isEnroll = isEnroll,
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                skipApiSubmission = skipApiSubmission,
+            )
+        },
     ),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value

@@ -46,6 +46,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val jobType: JobType,
     private val userId: String,
     private val jobId: String,
+    private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
     private val captureBothSides: Boolean,
@@ -129,6 +130,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
+                // TODO : Michael will change this to boolean
+                allowNewEnroll = allowNewEnroll.toString(),
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
@@ -212,6 +215,7 @@ internal class DocumentVerificationViewModel(
     jobType: JobType = JobType.DocumentVerification,
     userId: String,
     jobId: String,
+    allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
@@ -221,6 +225,7 @@ internal class DocumentVerificationViewModel(
     jobType = jobType,
     userId = userId,
     jobId = jobId,
+    allowNewEnroll = allowNewEnroll,
     countryCode = countryCode,
     documentType = documentType,
     captureBothSides = captureBothSides,
@@ -253,6 +258,7 @@ internal class EnhancedDocumentVerificationViewModel(
     jobType: JobType = JobType.EnhancedDocumentVerification,
     userId: String,
     jobId: String,
+    allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
@@ -263,6 +269,7 @@ internal class EnhancedDocumentVerificationViewModel(
         jobType = jobType,
         userId = userId,
         jobId = jobId,
+        allowNewEnroll = allowNewEnroll,
         countryCode = countryCode,
         documentType = documentType,
         captureBothSides = captureBothSides,

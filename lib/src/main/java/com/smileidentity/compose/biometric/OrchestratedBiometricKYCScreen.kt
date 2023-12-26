@@ -33,6 +33,7 @@ fun OrchestratedBiometricKYCScreen(
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    allowNewEnroll: Boolean = false,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
@@ -43,6 +44,7 @@ fun OrchestratedBiometricKYCScreen(
                 idInfo = idInfo,
                 userId = userId,
                 jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
                 extraPartnerParams = extraPartnerParams,
             )
         },
