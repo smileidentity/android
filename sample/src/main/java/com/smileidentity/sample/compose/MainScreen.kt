@@ -266,7 +266,7 @@ fun MainScreen(
                     val userId = rememberSaveable { randomUserId() }
                     val jobId = rememberSaveable { randomJobId() }
                     SmileID.DocumentVerification(
-                        userId = "user-3ceeae38-f7fa-4f22-9f2f-bb66112d6f29",
+                        userId = userId,
                         jobId = jobId,
                         countryCode = it.arguments?.getString("countryCode")!!,
                         documentType = it.arguments?.getString("documentType"),
