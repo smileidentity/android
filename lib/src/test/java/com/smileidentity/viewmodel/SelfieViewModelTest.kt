@@ -23,7 +23,13 @@ class SelfieViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = SelfieViewModel(true, randomUserId(), randomJobId(), false)
+        subject = SelfieViewModel(
+            isEnroll = true,
+            userId = randomUserId(),
+            jobId = randomJobId(),
+            allowNewEnroll = false,
+            skipApiSubmission = false,
+        )
     }
 
     @After

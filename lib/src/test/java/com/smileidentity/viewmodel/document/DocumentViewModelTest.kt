@@ -49,6 +49,7 @@ class DocumentViewModelTest {
             jobType = JobType.DocumentVerification,
             userId = randomUserId(),
             jobId = randomJobId(),
+            allowNewEnroll = false,
             countryCode = "KE",
             documentType = "ID_CARD",
             selfieFile = selfieFile,
