@@ -4,6 +4,9 @@
 
 ## 10.0.3
 
+### Fixed
+- Fixed missing `allowNewEnroll` in Document Verification Fragment
+
 ## 10.0.2
 
 ### Added
