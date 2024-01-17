@@ -84,6 +84,7 @@ class DocumentVerificationFragment : Fragment() {
             arguments = Bundle().apply {
                 this.userId = userId
                 this.jobId = jobId
+                this.allowNewEnroll = allowNewEnroll
                 this.showAttribution = showAttribution
                 this.allowAgentMode = allowAgentMode
                 this.allowGalleryUpload = allowGalleryUpload
@@ -117,6 +118,7 @@ class DocumentVerificationFragment : Fragment() {
                 documentType = args.documentType,
                 userId = args.userId,
                 jobId = args.jobId,
+                allowNewEnroll = args.allowNewEnroll,
                 showAttribution = args.showAttribution,
                 allowAgentMode = args.allowAgentMode,
                 allowGalleryUpload = args.allowGalleryUpload,
@@ -141,6 +143,11 @@ private const val KEY_JOB_ID = "jobId"
 private var Bundle.jobId: String
     get() = getString(KEY_JOB_ID)!!
     set(value) = putString(KEY_JOB_ID, value)
+
+private const val KEY_ALLOW_NEW_ENROLL = "allowNewEnroll"
+private var Bundle.allowNewEnroll: Boolean
+    get() = getBoolean(KEY_ALLOW_NEW_ENROLL)
+    set(value) = putBoolean(KEY_ALLOW_NEW_ENROLL, value)
 
 private const val KEY_SHOW_ATTRIBUTION = "showAttribution"
 private var Bundle.showAttribution: Boolean
