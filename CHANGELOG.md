@@ -6,6 +6,9 @@
 ### Added
 - Exposed individual components as Composables
 
+### Fixed
+- Fixed missing `allowNewEnroll` in Document Verification Fragment
+
 ## 10.0.2
 
 ### Added
