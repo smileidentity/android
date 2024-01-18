@@ -35,8 +35,11 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import java.net.URL
 
+/**
+ * Consent screen for SmileID
+ */
 @Composable
-internal fun ConsentScreen(
+fun ConsentScreen(
     partnerIcon: Painter,
     partnerName: String,
     productName: String,

@@ -44,7 +44,7 @@ import com.smileidentity.compose.preview.SmilePreviews
  * @param onRetake The callback to invoke when the user wants to retake the image
  */
 @Composable
-internal fun ImageCaptureConfirmationDialog(
+fun ImageCaptureConfirmationDialog(
     titleText: String,
     subtitleText: String,
     painter: Painter,

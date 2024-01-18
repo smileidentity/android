@@ -52,8 +52,12 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 
+/**
+ * The actual selfie capture screen, which shows the camera preview and the progress indicator
+ */
 @Composable
-internal fun SelfieCaptureScreen(
+fun SelfieCaptureScreen(
+    modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowNewEnroll: Boolean = false,
@@ -72,14 +76,14 @@ internal fun SelfieCaptureScreen(
         },
     ),
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
     val viewfinderZoom = 1.1f
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
     // Force maximum brightness in order to light up the user's face
     ForceBrightness()
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
             cameraState = cameraState,
             camSelector = camSelector,
@@ -128,7 +132,7 @@ internal fun SelfieCaptureScreen(
             )
             if (allowAgentMode) {
                 AgentModeSwitch(
-                    camSelector = camSelector,
+                    isAgentModeEnabled = camSelector == CamSelector.Back,
                     onCamSelectorChange = { camSelector = camSelector.inverse },
                 )
             }
@@ -138,10 +142,9 @@ internal fun SelfieCaptureScreen(
 
 @Composable
 private fun AgentModeSwitch(
-    camSelector: CamSelector,
+    isAgentModeEnabled: Boolean,
     onCamSelectorChange: (Boolean) -> Unit,
 ) {
-    val isAgentModeEnabled = camSelector == CamSelector.Back
     val agentModeBackgroundColor = if (isAgentModeEnabled) {
         MaterialTheme.colorScheme.secondary
     } else {

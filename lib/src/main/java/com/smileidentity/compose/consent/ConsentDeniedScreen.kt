@@ -24,8 +24,11 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * Asks user to confirm that they do actually want to deny consent
+ */
 @Composable
-internal fun ConsentDeniedScreen(
+fun ConsentDeniedScreen(
     onGoBack: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,

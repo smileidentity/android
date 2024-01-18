@@ -19,6 +19,9 @@ import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * Attribution for SmileID
+ */
 @SmileIDOptIn
 @Composable
 fun SmileIDAttribution(modifier: Modifier = Modifier) {
