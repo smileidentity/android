@@ -36,7 +36,7 @@ import kotlinx.collections.immutable.persistentMapOf
  * showing camera view, and displaying processing screen
  */
 @Composable
-internal fun OrchestratedSelfieCaptureScreen(
+fun OrchestratedSelfieCaptureScreen(
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -94,7 +94,7 @@ internal fun OrchestratedSelfieCaptureScreen(
                 continueButtonText = stringResource(R.string.si_continue),
                 onContinue = { viewModel.onFinished(onResult) },
                 retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-                onRetry = { viewModel.onRetry() },
+                onRetry = viewModel::onRetry,
                 closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
                 onClose = { viewModel.onFinished(onResult) },
             )
@@ -110,11 +110,11 @@ internal fun OrchestratedSelfieCaptureScreen(
                 confirmButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_confirm_button,
                 ),
-                onConfirm = { viewModel.submitJob() },
+                onConfirm = viewModel::submitJob,
                 retakeButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_retake_button,
                 ),
-                onRetake = { viewModel.onSelfieRejected() },
+                onRetake = viewModel::onSelfieRejected,
                 scaleFactor = 1.25f,
             )
 

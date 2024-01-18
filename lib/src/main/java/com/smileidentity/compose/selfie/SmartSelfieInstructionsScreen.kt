@@ -25,8 +25,16 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * Displays instructions to the user for how to take a good quality selfie
+ *
+ * @param modifier The modifier to be applied to the layout
+ * @param showAttribution Whether or not to show the SmileID attribution
+ * @param onInstructionsAcknowledged The callback to invoke when the user acknowledges the
+ * instructions
+ */
 @Composable
-internal fun SmartSelfieInstructionsScreen(
+fun SmartSelfieInstructionsScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },

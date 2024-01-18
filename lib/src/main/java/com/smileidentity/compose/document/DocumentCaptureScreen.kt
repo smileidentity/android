@@ -65,7 +65,7 @@ import java.io.File
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
-internal enum class DocumentCaptureSide {
+enum class DocumentCaptureSide {
     Front,
     Back,
 }
@@ -74,7 +74,7 @@ internal enum class DocumentCaptureSide {
  * This handles Instructions + Capture + Confirmation for a single side of a document
  */
 @Composable
-internal fun DocumentCaptureScreen(
+fun DocumentCaptureScreen(
     side: DocumentCaptureSide,
     showInstructions: Boolean,
     showAttribution: Boolean,
