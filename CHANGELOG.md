@@ -3,6 +3,8 @@
 ## Unreleased
 
 ## 10.0.3
+### Added
+- Exposed individual components as Composables
 
 ## 10.0.2
 

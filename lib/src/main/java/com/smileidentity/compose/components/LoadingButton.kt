@@ -15,6 +15,9 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.R
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * A button that shows a loading indicator when [loading] is true
+ */
 @Composable
 internal fun LoadingButton(
     buttonText: String,

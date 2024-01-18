@@ -23,6 +23,9 @@ import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * A column with a pinned footer that is always visible at the bottom of the screen
+ */
 @SmileIDOptIn
 @Composable
 fun BottomPinnedColumn(

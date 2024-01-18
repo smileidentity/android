@@ -28,6 +28,10 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * Instructions for taking a good quality document photo. Optionally, allows user to select a
+ * photo from their gallery.
+ */
 @Composable
 fun DocumentCaptureInstructionsScreen(
     title: String,
