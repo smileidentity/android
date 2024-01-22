@@ -8,7 +8,6 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_STARTED
-import androidx.camera.view.CameraController.TapToFocusStates
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
@@ -170,7 +169,7 @@ class DocumentCaptureViewModel(
         }
     }
 
-    fun onFocusEvent(@TapToFocusStates focusEvent: Int) {
+    fun onFocusEvent(focusEvent: Int) {
         isFocusing = focusEvent == TAP_TO_FOCUS_STARTED || focusEvent == TAP_TO_FOCUS_NOT_FOCUSED
         if (isFocusing) {
             _uiState.update {

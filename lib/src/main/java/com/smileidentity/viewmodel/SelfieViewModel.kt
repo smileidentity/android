@@ -26,7 +26,6 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.util.BitmapUtils
 import com.smileidentity.util.area
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
@@ -193,38 +192,34 @@ class SelfieViewModel(
             previousHeadRotationY = face.headEulerAngleY
             previousHeadRotationZ = face.headEulerAngleZ
 
-            // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap.
-            //  Incorporate once stable
-            BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
-                // All conditions satisfied, capture the image
-                lastAutoCaptureTimeMs = System.currentTimeMillis()
-                if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                    Timber.v("Capturing liveness image")
-                    val livenessFile = createLivenessFile()
-                    postProcessImageBitmap(
-                        bitmap = bitmap,
-                        file = livenessFile,
-                        saveAsGrayscale = false,
-                        compressionQuality = 80,
-                        maxOutputSize = LIVENESS_IMAGE_SIZE,
-                    )
-                    livenessFiles.add(livenessFile)
-                    _uiState.update {
-                        it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat())
-                    }
-                } else {
-                    selfieFile = createSelfieFile()
-                    Timber.v("Capturing selfie image to $selfieFile")
-                    postProcessImageBitmap(
-                        bitmap = bitmap,
-                        file = selfieFile!!,
-                        saveAsGrayscale = false,
-                        compressionQuality = 80,
-                        maxOutputSize = SELFIE_IMAGE_SIZE,
-                    )
-                    shouldAnalyzeImages = false
-                    _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
-                }
+            // All conditions satisfied, capture the image
+
+            val bitmap = imageProxy.toBitmap()
+            lastAutoCaptureTimeMs = System.currentTimeMillis()
+            if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
+                Timber.v("Capturing liveness image")
+                val livenessFile = createLivenessFile()
+                postProcessImageBitmap(
+                    bitmap = bitmap,
+                    file = livenessFile,
+                    saveAsGrayscale = false,
+                    compressionQuality = 80,
+                    maxOutputSize = LIVENESS_IMAGE_SIZE,
+                )
+                livenessFiles.add(livenessFile)
+                _uiState.update { it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat()) }
+            } else {
+                selfieFile = createSelfieFile()
+                Timber.v("Capturing selfie image to $selfieFile")
+                postProcessImageBitmap(
+                    bitmap = bitmap,
+                    file = selfieFile!!,
+                    saveAsGrayscale = false,
+                    compressionQuality = 80,
+                    maxOutputSize = SELFIE_IMAGE_SIZE,
+                )
+                shouldAnalyzeImages = false
+                _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
