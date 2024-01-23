@@ -1,5 +1,7 @@
 package com.smileidentity.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Size
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
@@ -194,7 +196,7 @@ class SelfieViewModel(
 
             // All conditions satisfied, capture the image
 
-            val bitmap = imageProxy.toBitmap()
+            val bitmap = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
             lastAutoCaptureTimeMs = System.currentTimeMillis()
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
                 Timber.v("Capturing liveness image")
@@ -341,5 +343,27 @@ class SelfieViewModel(
 
     fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
         callback(result!!)
+    }
+
+    private fun Bitmap.rotated(
+        rotationDegrees: Int,
+        flipX: Boolean = false,
+        flipY: Boolean = false,
+    ): Bitmap {
+        val matrix = Matrix()
+
+        // Rotate the image back to straight.
+        matrix.postRotate(rotationDegrees.toFloat())
+
+        // Mirror the image along the X or Y axis.
+        matrix.postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
+        val rotatedBitmap =
+            Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+
+        // Recycle the old bitmap if it has changed.
+        if (rotatedBitmap !== this) {
+            recycle()
+        }
+        return rotatedBitmap
     }
 }
