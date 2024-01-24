@@ -1,5 +1,7 @@
 package com.smileidentity.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Size
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
@@ -26,7 +28,6 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.util.BitmapUtils
 import com.smileidentity.util.area
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
@@ -193,38 +194,34 @@ class SelfieViewModel(
             previousHeadRotationY = face.headEulerAngleY
             previousHeadRotationZ = face.headEulerAngleZ
 
-            // TODO: CameraX 1.3.0-alpha04 adds built-in API to convert ImageProxy to Bitmap.
-            //  Incorporate once stable
-            BitmapUtils.getBitmap(imageProxy)?.let { bitmap ->
-                // All conditions satisfied, capture the image
-                lastAutoCaptureTimeMs = System.currentTimeMillis()
-                if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                    Timber.v("Capturing liveness image")
-                    val livenessFile = createLivenessFile()
-                    postProcessImageBitmap(
-                        bitmap = bitmap,
-                        file = livenessFile,
-                        saveAsGrayscale = false,
-                        compressionQuality = 80,
-                        maxOutputSize = LIVENESS_IMAGE_SIZE,
-                    )
-                    livenessFiles.add(livenessFile)
-                    _uiState.update {
-                        it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat())
-                    }
-                } else {
-                    selfieFile = createSelfieFile()
-                    Timber.v("Capturing selfie image to $selfieFile")
-                    postProcessImageBitmap(
-                        bitmap = bitmap,
-                        file = selfieFile!!,
-                        saveAsGrayscale = false,
-                        compressionQuality = 80,
-                        maxOutputSize = SELFIE_IMAGE_SIZE,
-                    )
-                    shouldAnalyzeImages = false
-                    _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
-                }
+            // All conditions satisfied, capture the image
+
+            val bitmap = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
+            lastAutoCaptureTimeMs = System.currentTimeMillis()
+            if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
+                Timber.v("Capturing liveness image")
+                val livenessFile = createLivenessFile()
+                postProcessImageBitmap(
+                    bitmap = bitmap,
+                    file = livenessFile,
+                    saveAsGrayscale = false,
+                    compressionQuality = 80,
+                    maxOutputSize = LIVENESS_IMAGE_SIZE,
+                )
+                livenessFiles.add(livenessFile)
+                _uiState.update { it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat()) }
+            } else {
+                selfieFile = createSelfieFile()
+                Timber.v("Capturing selfie image to $selfieFile")
+                postProcessImageBitmap(
+                    bitmap = bitmap,
+                    file = selfieFile!!,
+                    saveAsGrayscale = false,
+                    compressionQuality = 80,
+                    maxOutputSize = SELFIE_IMAGE_SIZE,
+                )
+                shouldAnalyzeImages = false
+                _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
@@ -346,5 +343,27 @@ class SelfieViewModel(
 
     fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
         callback(result!!)
+    }
+
+    private fun Bitmap.rotated(
+        rotationDegrees: Int,
+        flipX: Boolean = false,
+        flipY: Boolean = false,
+    ): Bitmap {
+        val matrix = Matrix()
+
+        // Rotate the image back to straight.
+        matrix.postRotate(rotationDegrees.toFloat())
+
+        // Mirror the image along the X or Y axis.
+        matrix.postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
+        val rotatedBitmap =
+            Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+
+        // Recycle the old bitmap if it has changed.
+        if (rotatedBitmap !== this) {
+            recycle()
+        }
+        return rotatedBitmap
     }
 }
