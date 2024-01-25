@@ -137,6 +137,12 @@ public class JavaActivity extends FragmentActivity {
                 hideProductFragment();
             }
         );
+
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.fragment_container, documentVerificationFragment)
+            .commit();
+        showProductFragment();
     }
 
     private void doEnhancedDocumentVerification() {
@@ -156,6 +162,12 @@ public class JavaActivity extends FragmentActivity {
                 hideProductFragment();
             }
         );
+
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.fragment_container, enhancedDocVFragment)
+            .commit();
+        showProductFragment();
     }
 
     private void showProductFragment() {
