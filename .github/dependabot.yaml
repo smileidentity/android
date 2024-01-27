@@ -30,7 +30,6 @@ updates:
       interval: "monthly"
       time: "10:00"
       timezone: "America/Los_Angeles"
-      weekday: "monday"
     groups:
       github-actions:
         patterns:
