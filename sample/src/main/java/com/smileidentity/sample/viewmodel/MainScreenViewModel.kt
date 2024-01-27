@@ -96,6 +96,7 @@ class MainScreenViewModel : ViewModel() {
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
                     EnhancedDocumentVerification ->
                         SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
+
                     else -> {
                         Timber.e("Unexpected pending job: $job")
                         throw IllegalStateException("Unexpected pending job: $job")
@@ -172,6 +173,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onHomeSelected() {
+        Timber.v("onHomeSelected")
         _uiState.update {
             it.copy(
                 appBarTitle = R.string.app_name,
@@ -208,12 +210,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieEnrollmentSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.SmartSelfieEnrollment.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
     }
 
     fun onSmartSelfieEnrollmentResult(
@@ -261,12 +258,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieAuthenticationSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.SmartSelfieAuthentication.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
     }
 
     fun onSmartSelfieAuthenticationResult(
@@ -308,12 +300,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onEnhancedKycSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.EnhancedKyc.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedKyc.label) }
     }
 
     fun onEnhancedKycResult(result: SmileIDResult<EnhancedKycResult>) {
@@ -346,12 +333,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onBiometricKycSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.BiometricKyc.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricKyc.label) }
     }
 
     fun onBiometricKycResult(
@@ -389,12 +371,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onDocumentVerificationSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.DocumentVerification.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.DocumentVerification.label) }
     }
 
     fun onDocumentVerificationResult(
@@ -431,33 +408,19 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onBvnConsentSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.BvnConsent.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.BvnConsent.label) }
     }
 
     fun onConsentDenied() {
-        _uiState.update {
-            it.copy(snackbarMessage = "Consent Denied")
-        }
+        _uiState.update { it.copy(snackbarMessage = "Consent Denied") }
     }
 
     fun onSuccessfulBvnConsent() {
-        _uiState.update {
-            it.copy(snackbarMessage = "BVN Consent Successful")
-        }
+        _uiState.update { it.copy(snackbarMessage = "BVN Consent Successful") }
     }
 
     fun onEnhancedDocumentVerificationSelected() {
-        _uiState.update {
-            it.copy(
-                appBarTitle = ProductScreen.EnhancedDocumentVerification.label,
-                bottomNavSelection = BottomNavigationScreen.Home,
-            )
-        }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedDocumentVerification.label) }
     }
 
     fun onEnhancedDocumentVerificationResult(
@@ -491,6 +454,14 @@ class MainScreenViewModel : ViewModel() {
             Timber.e(th, message)
             _uiState.update { it.copy(snackbarMessage = message) }
         }
+    }
+
+    fun onTransactionFraudSelected() {
+        _uiState.update { it.copy(appBarTitle = ProductScreen.TransactionFraud.label) }
+    }
+
+    fun onTransactionFraudResult() {
+        onHomeSelected()
     }
 
     fun clearJobs() {

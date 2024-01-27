@@ -2,15 +2,16 @@ package com.smileidentity.sample
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.Icons.Outlined
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -59,6 +60,11 @@ enum class ProductScreen(
         com.smileidentity.R.string.si_enhanced_docv_product_name,
         com.smileidentity.R.drawable.si_doc_v_instructions_hero,
     ),
+    TransactionFraud(
+        "transaction_fraud",
+        com.smileidentity.R.string.si_transaction_fraud_product_name,
+        R.drawable.transaction_fraud,
+    ),
 }
 
 enum class BottomNavigationScreen(
@@ -76,8 +82,8 @@ enum class BottomNavigationScreen(
     Jobs(
         "jobs",
         R.string.jobs,
-        Filled.List,
-        Outlined.List,
+        Icons.AutoMirrored.Filled.List,
+        Icons.AutoMirrored.Outlined.List,
     ),
     Resources(
         "resources",

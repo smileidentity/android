@@ -101,6 +101,28 @@ internal fun isValidDocumentImage(
     uri: Uri?,
 ) = isImageAtLeast(context, uri, width = 1920, height = 1080)
 
+fun Bitmap.rotated(
+    rotationDegrees: Int,
+    flipX: Boolean = false,
+    flipY: Boolean = false,
+): Bitmap {
+    val matrix = Matrix()
+
+    // Rotate the image back to straight.
+    matrix.postRotate(rotationDegrees.toFloat())
+
+    // Mirror the image along the X or Y axis.
+    matrix.postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
+    val rotatedBitmap =
+        Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+
+    // Recycle the old bitmap if it has changed.
+    if (rotatedBitmap !== this) {
+        recycle()
+    }
+    return rotatedBitmap
+}
+
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
  * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.

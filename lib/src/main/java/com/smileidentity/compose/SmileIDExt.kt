@@ -18,6 +18,7 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.compose.transactionfraud.TransactionFraudScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
@@ -431,6 +432,21 @@ fun SmileID.ConsentScreen(
             onConsentDenied = onConsentDenied,
             modifier = modifier,
             showAttribution = showAttribution,
+        )
+    }
+}
+
+@Composable
+fun SmileID.TransactionFraud(
+    modifier: Modifier = Modifier,
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<Nothing> = {},
+) {
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        TransactionFraudScreen(
+            modifier = modifier,
+            onResult = onResult,
         )
     }
 }
