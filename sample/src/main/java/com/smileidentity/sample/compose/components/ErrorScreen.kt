@@ -35,7 +35,7 @@ fun ErrorScreen(
 
 @Preview
 @Composable
-fun ErrorScreenPreview() {
+private fun ErrorScreenPreview() {
     SmileIDTheme {
         Surface {
             ErrorScreen(onRetry = {})

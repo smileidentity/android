@@ -242,7 +242,7 @@ private fun ColumnScope.IdTypeSelector(
 
 @Preview
 @Composable
-fun DocumentVerificationIdTypeSelectorPreview() {
+private fun DocumentVerificationIdTypeSelectorPreview() {
     SmileIDTheme {
         Surface {
             DocumentVerificationIdTypeSelector(

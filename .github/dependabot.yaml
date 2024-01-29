@@ -24,3 +24,13 @@ updates:
           - "minor"
         patterns:
           - "*"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: "monthly"
+      time: "10:00"
+      timezone: "America/Los_Angeles"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
