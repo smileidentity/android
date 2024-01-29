@@ -102,8 +102,8 @@ fun JobsListScreen(
                     userId = it.userId,
                     jobId = it.jobId,
                     smileJobId = it.smileJobId,
-                    resultCode = it.resultCode?.toString(),
-                    code = it.code?.toString(),
+                    resultCode = it.resultCode,
+                    code = it.code,
                 )
             }
         }
@@ -223,7 +223,7 @@ private fun JobMetadataItem(label: String, value: String?) {
 
 @Composable
 @SmilePreviews
-fun JobListItemPreview() {
+private fun JobListItemPreview(modifier: Modifier = Modifier) {
     SmileIDTheme {
         JobListItem(
             sourceIcon = {
@@ -232,7 +232,7 @@ fun JobListItemPreview() {
                         id = R.drawable.si_smart_selfie_instructions_hero,
                     ),
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp),
+                    modifier = modifier.size(64.dp),
                 )
             },
             timestamp = "7/6/23 12:04 PM",

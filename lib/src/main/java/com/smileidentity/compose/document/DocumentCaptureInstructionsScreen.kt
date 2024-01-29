@@ -133,7 +133,7 @@ fun DocumentCaptureInstructionsScreen(
 
 @SmilePreviews
 @Composable
-fun DocumentCaptureInstructionsScreenPreview() {
+private fun DocumentCaptureInstructionsScreenPreview() {
     Preview {
         Surface {
             DocumentCaptureInstructionsScreen(
