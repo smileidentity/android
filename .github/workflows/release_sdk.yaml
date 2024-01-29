@@ -70,7 +70,7 @@ jobs:
           tag: v${{ steps.read_version.outputs.version }}
           message: Release v${{ steps.read_version.outputs.version }}
       - name: Build, Test, Lint, and Publish
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: lint build assembleRelease publish
         env:
