@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -42,7 +42,7 @@ jobs:
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Assemble
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: bundleRelease
         env:
@@ -58,7 +58,7 @@ jobs:
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
           releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
       - name: Send Slack
-        uses: slackapi/slack-github-action@v1.23.0
+        uses: slackapi/slack-github-action@v1.25.0
         with:
           payload: |
             {
