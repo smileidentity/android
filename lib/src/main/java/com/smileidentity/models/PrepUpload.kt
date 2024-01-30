@@ -28,5 +28,4 @@ data class PrepUploadResponse(
     @Json(name = "ref_id") val refId: String,
     @Json(name = "upload_url") val uploadUrl: String,
     @Json(name = "smile_job_id") val smileJobId: String,
-    @Json(name = "camera_config") val cameraConfig: String?,
 )

@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -47,6 +47,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
 import com.smileidentity.compose.BiometricKYC
@@ -81,23 +83,16 @@ fun MainScreen(
         factory = viewModelFactory { MainScreenViewModel() },
     ),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val privacyPolicy = remember { URL("https://usesmileid.com/privacy-policy") }
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val currentRoute by navController
-        .currentBackStackEntryFlow
-        .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentRoute by navController.currentBackStackEntryAsState()
     val bottomNavSelection = uiState.bottomNavSelection
-
     val bottomNavItems = remember { BottomNavigationScreen.entries.toImmutableList() }
-    // Show up button when not on a BottomNavigationScreen
-    val showUpButton = currentRoute?.destination?.route?.let { route ->
-        bottomNavItems.none { it.route.contains(route) }
-    } ?: false
-
+    val dialogDestinations = remember { listOf(ProductScreen.SmartSelfieAuthentication.route) }
     val clipboardManager = LocalClipboardManager.current
+
     LaunchedEffect(uiState.clipboardText) {
         uiState.clipboardText?.let { text ->
             coroutineScope.launch {
@@ -109,6 +104,10 @@ fun MainScreen(
         modifier = modifier,
         snackbarHost = { Snackbar() },
         topBar = {
+            // Show up button when not on a BottomNavigationScreen
+            val showUpButton = currentRoute?.destination?.route?.let { route ->
+                bottomNavItems.none { it.route.contains(route) }
+            } ?: false
             TopBar(
                 showUpButton = showUpButton,
                 onNavigateUp = navController::navigateUp,
@@ -119,7 +118,13 @@ fun MainScreen(
             // Don't show bottom bar when navigating to any product screens
             val showBottomBar by remember(currentRoute) {
                 derivedStateOf {
-                    bottomNavItems.any { it.route.contains(currentRoute?.destination?.route ?: "") }
+                    val isDirectlyOnBottomNavDestination = bottomNavItems.any {
+                        it.route.contains(currentRoute?.destination?.route ?: "")
+                    }
+                    val isOnDialogDestination = dialogDestinations.any {
+                        it.contains(currentRoute?.destination?.route ?: "")
+                    }
+                    return@derivedStateOf isDirectlyOnBottomNavDestination || isOnDialogDestination
                 }
             }
             if (showBottomBar) {
@@ -175,10 +180,13 @@ fun MainScreen(
                         navController.popBackStack()
                     }
                 }
-                composable(ProductScreen.SmartSelfieAuthentication.route) {
+                dialog(ProductScreen.SmartSelfieAuthentication.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
                     SmartSelfieAuthenticationUserIdInputDialog(
-                        onDismiss = navController::popBackStack,
+                        onDismiss = {
+                            viewModel.onHomeSelected()
+                            navController.popBackStack()
+                        },
                         onConfirm = { userId ->
                             navController.navigate(
                                 "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
@@ -354,7 +362,7 @@ private fun TopBar(
             if (showUpButton) {
                 IconButton(onClick = onNavigateUp) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                     )
                 }

@@ -2,16 +2,15 @@ package com.smileidentity.sample
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.Icons.Outlined
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -77,8 +76,8 @@ enum class BottomNavigationScreen(
     Jobs(
         "jobs",
         R.string.jobs,
-        Icons.AutoMirrored.Filled.List,
-        Icons.AutoMirrored.Outlined.List,
+        Filled.List,
+        Outlined.List,
     ),
     Resources(
         "resources",
