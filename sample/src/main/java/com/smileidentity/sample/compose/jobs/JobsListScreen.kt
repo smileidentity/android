@@ -154,11 +154,11 @@ private fun JobListItem(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     val halfCircleRotationDegrees = 180f
-                    val animatedProgress = animateFloatAsState(
+                    val animatedProgress by animateFloatAsState(
                         targetValue = if (expanded) halfCircleRotationDegrees else 0f,
                         animationSpec = spring(),
                         label = "Dropdown Icon Rotation",
-                    ).value
+                    )
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowDown,
                         contentDescription = null,

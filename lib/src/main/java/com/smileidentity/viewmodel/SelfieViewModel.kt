@@ -1,7 +1,5 @@
 package com.smileidentity.viewmodel
 
-import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.util.Size
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
@@ -33,6 +31,7 @@ import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImageBitmap
+import com.smileidentity.util.rotated
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
@@ -343,27 +342,5 @@ class SelfieViewModel(
 
     fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
         callback(result!!)
-    }
-
-    private fun Bitmap.rotated(
-        rotationDegrees: Int,
-        flipX: Boolean = false,
-        flipY: Boolean = false,
-    ): Bitmap {
-        val matrix = Matrix()
-
-        // Rotate the image back to straight.
-        matrix.postRotate(rotationDegrees.toFloat())
-
-        // Mirror the image along the X or Y axis.
-        matrix.postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
-        val rotatedBitmap =
-            Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
-
-        // Recycle the old bitmap if it has changed.
-        if (rotatedBitmap !== this) {
-            recycle()
-        }
-        return rotatedBitmap
     }
 }
