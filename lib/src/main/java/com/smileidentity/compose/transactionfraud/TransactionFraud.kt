@@ -1,5 +1,6 @@
 package com.smileidentity.compose.transactionfraud
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.OperationCanceledException
 import androidx.annotation.IntRange
@@ -15,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.smileidentity.ml.ImQualCp20
+import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.rotated
@@ -61,7 +61,6 @@ fun TransactionFraudScreen(
     onResult: SmileIDCallback<Nothing> = {},
 ) {
     val context = LocalContext.current
-    val imageQualityModel = remember { ImQualCp20.newInstance(context) }
     // TODO: Request Permissions if not granted
     Dialog(
         onDismissRequest = {
@@ -69,8 +68,9 @@ fun TransactionFraudScreen(
         },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
     ) {
+        // TODO: Fix the Context passing
         TransactionFraudScreen(
-            imageQualityModel = imageQualityModel,
+            context = context,
             onResult = onResult,
             modifier = modifier
                 .height(512.dp)
@@ -81,11 +81,11 @@ fun TransactionFraudScreen(
 
 @Composable
 private fun TransactionFraudScreen(
-    imageQualityModel: ImQualCp20,
+    context: Context,
     modifier: Modifier = Modifier,
     onResult: SmileIDCallback<Nothing> = {},
     viewModel: TransactionFraudViewModel = viewModel(
-        initializer = { TransactionFraudViewModel(imageQualityModel) },
+        initializer = { TransactionFraudViewModel(context) },
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -123,7 +123,7 @@ data class TransactionFraudUiState(
 )
 
 @kotlin.OptIn(FlowPreview::class)
-class TransactionFraudViewModel(private val imageQualityModel: ImQualCp20) : ViewModel() {
+class TransactionFraudViewModel(context: Context) : ViewModel() {
     private val _uiState = MutableStateFlow(TransactionFraudUiState())
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
         viewModelScope,
@@ -139,6 +139,7 @@ class TransactionFraudViewModel(private val imageQualityModel: ImQualCp20) : Vie
     }.build()
 
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
+    private val imageQualityModel = ImQualCp20Optimized.newInstance(context)
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {

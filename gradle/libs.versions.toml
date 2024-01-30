@@ -40,7 +40,6 @@ play-services-mlkit-face-detection = "17.1.0"
 retrofit = "2.9.0"
 sentry = "7.2.0"
 tflite = "2.14.0"
-tflite-gpu = "2.14.0"
 tflite-metadata = "0.4.4"
 tflite-support = "0.4.4"
 timber = "5.0.1"
@@ -110,7 +109,6 @@ sentry = { module = "io.sentry:sentry" }
 sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
 tflite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tflite" }
 tflite-metadata = { group = "org.tensorflow", name = "tensorflow-lite-metadata", version.ref = "tflite-metadata" }
-tflite-gpu = { group = "org.tensorflow", name = "tensorflow-lite-gpu", version.ref = "tflite-gpu" }
 tflite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tflite-support" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }

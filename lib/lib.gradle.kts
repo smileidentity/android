@@ -208,7 +208,6 @@ dependencies {
     implementation(libs.mlkit.obj.detection)
 
     implementation(libs.tflite)
-    implementation(libs.tflite.gpu)
     implementation(libs.tflite.metadata)
     implementation(libs.tflite.support)
 
