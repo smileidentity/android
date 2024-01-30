@@ -8,8 +8,11 @@ import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +58,9 @@ import kotlinx.coroutines.flow.update
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
 import timber.log.Timber
+
+const val historyLength = 10
+const val faceQualityThreshold = 50
 
 @Composable
 fun TransactionFraudScreen(
@@ -102,24 +109,48 @@ private fun TransactionFraudScreen(
             modifier = Modifier.fillMaxSize(),
         )
 
-        val textColor = if (uiState.faceQuality > 50) {
+        val faceQualityTextColor = if (uiState.faceQuality > faceQualityThreshold) {
             MaterialTheme.colorScheme.tertiary
         } else {
             MaterialTheme.colorScheme.error
         }
-        Text(
-            text = "Face Quality\n${uiState.faceQuality}",
-            textAlign = TextAlign.Center,
-            color = animateColorAsState(targetValue = textColor, label = "faceQualityText").value,
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 64.dp),
-        )
+        val avgFaceQualityTextColor = if (uiState.averagedFaceQuality > faceQualityThreshold) {
+            MaterialTheme.colorScheme.tertiary
+        } else {
+            MaterialTheme.colorScheme.error
+        }
+        Column(
+            horizontalAlignment = CenterHorizontally,
+            verticalArrangement = spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 64.dp),
+        ) {
+            Text(
+                text = "Face Quality: ${uiState.faceQuality}",
+                textAlign = TextAlign.Center,
+                color = animateColorAsState(
+                    targetValue = faceQualityTextColor,
+                    label = "faceQualityText",
+                ).value,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "Avg ($historyLength frames): ${uiState.averagedFaceQuality}",
+                textAlign = TextAlign.Center,
+                color = animateColorAsState(
+                    targetValue = avgFaceQualityTextColor,
+                    label = "avgFaceQualityText",
+                ).value,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+        }
     }
 }
 
 data class TransactionFraudUiState(
     @IntRange(0, 100) val faceQuality: Int = 0,
+    @IntRange(0, 100) val averagedFaceQuality: Int = 0,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -140,6 +171,7 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
 
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
     private val imageQualityModel = ImQualCp20Optimized.newInstance(context)
+    private val selfieQualityHistory = mutableListOf<Int>()
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
@@ -154,7 +186,7 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
             // TODO: Add all the protections
             val face = faces.firstOrNull() ?: run {
                 Timber.w("No face detected")
-                _uiState.update { it.copy(faceQuality = 0) }
+                resetFaceQuality()
                 return@addOnSuccessListener
             }
 
@@ -165,7 +197,7 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
                 bBox.top >= 0 && bBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
                 Timber.w("Face bounding box not within image")
-                _uiState.update { it.copy(faceQuality = 0) }
+                resetFaceQuality()
                 return@addOnSuccessListener
             }
 
@@ -213,17 +245,32 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
                 Timber.e("No image quality output")
                 return@addOnSuccessListener
             }
+            val displayedOutput = (output * 100).toInt()
+            selfieQualityHistory.add(displayedOutput)
+            if (selfieQualityHistory.size > historyLength) {
+                selfieQualityHistory.removeAt(0)
+            }
 
             val elapsedTimeMs = (System.nanoTime() - startTime) / 1_000_000
             Timber.d("Face Quality: $output (model inference time: $elapsedTimeMs ms)")
 
-            _uiState.update { it.copy(faceQuality = (output * 100).toInt()) }
+            _uiState.update {
+                it.copy(
+                    faceQuality = displayedOutput,
+                    averagedFaceQuality = selfieQualityHistory.average().toInt(),
+                )
+            }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
-            _uiState.update { it.copy(faceQuality = 0) }
+            resetFaceQuality()
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
         }
+    }
+
+    private fun resetFaceQuality() {
+        selfieQualityHistory.clear()
+        _uiState.update { it.copy(faceQuality = 0, averagedFaceQuality = 0) }
     }
 }
