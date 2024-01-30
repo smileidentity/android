@@ -128,7 +128,6 @@ class DocumentViewModelTest {
             refId = "refId",
             uploadUrl = "uploadUrl",
             smileJobId = "smileJobId",
-            cameraConfig = null,
         )
 
         coEvery { SmileID.api.getDocumentVerificationJobStatus(any()) } returns
@@ -174,7 +173,6 @@ class DocumentViewModelTest {
             refId = "refId",
             uploadUrl = "uploadUrl",
             smileJobId = "smileJobId",
-            cameraConfig = null,
         )
 
         coEvery { SmileID.api.getDocumentVerificationJobStatus(any()) } returns

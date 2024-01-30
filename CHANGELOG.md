@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Bump CameraX to 1.3.0
+- Removed `cameraConfig` from `PrepUploadResponse`
 
 ## 10.0.3
 ### Added

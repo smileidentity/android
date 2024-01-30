@@ -128,7 +128,6 @@ class EnhancedDocumentVerificationViewModelTest {
             refId = "refId",
             uploadUrl = "uploadUrl",
             smileJobId = "smileJobId",
-            cameraConfig = null,
         )
 
         coEvery { SmileID.api.getEnhancedDocumentVerificationJobStatus(any()) } returns
@@ -174,7 +173,6 @@ class EnhancedDocumentVerificationViewModelTest {
             refId = "refId",
             uploadUrl = "uploadUrl",
             smileJobId = "smileJobId",
-            cameraConfig = null,
         )
 
         coEvery { SmileID.api.getEnhancedDocumentVerificationJobStatus(any()) } returns
