@@ -1,11 +1,12 @@
 package com.smileidentity.sample.compose
 
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -74,6 +75,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.net.URL
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -360,7 +362,7 @@ private fun TopBar(
             if (showUpButton) {
                 IconButton(onClick = onNavigateUp) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                     )
                 }
