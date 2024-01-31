@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -372,16 +371,6 @@ private fun TopBar(
             FilterChip(
                 selected = uiState.isProduction,
                 onClick = viewModel::toggleEnvironment,
-                leadingIcon = {
-                    if (uiState.isProduction) {
-                        Icon(
-                            imageVector = Icons.Filled.Warning,
-                            contentDescription = stringResource(
-                                R.string.production,
-                            ),
-                        )
-                    }
-                },
                 label = { Text(stringResource(id = uiState.environmentName)) },
             )
             if (isJobsScreenSelected) {
