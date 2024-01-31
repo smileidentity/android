@@ -77,6 +77,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
+            allowUserToSkipBackCapture: Boolean = true,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = EnhancedDocumentVerificationFragment().apply {
             arguments = Bundle().apply {
@@ -91,6 +92,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.allowUserToSkipBackCapture = allowUserToSkipBackCapture
                 this.extraPartnerParams = extraPartnerParams
             }
         }
@@ -113,6 +115,8 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             SmileID.EnhancedDocumentVerificationScreen(
                 countryCode = args.countryCode,
                 documentType = args.documentType,
+                captureBothSides = args.captureBothSides,
+                allowUserToSkipBackCapture = args.allowUserToSkipBackCapture,
                 userId = args.userId,
                 jobId = args.jobId,
                 allowNewEnroll = args.allowNewEnroll,
@@ -187,6 +191,11 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
+
+private const val KEY_ALLOW_USER_TO_SKIP_BACK_CAPTURE = "allowUserToSkipBackCapture"
+private var Bundle.allowUserToSkipBackCapture: Boolean
+    get() = getBoolean(KEY_ALLOW_USER_TO_SKIP_BACK_CAPTURE)
+    set(value) = putBoolean(KEY_ALLOW_USER_TO_SKIP_BACK_CAPTURE, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private var Bundle.extraPartnerParams: HashMap<String, String>?

@@ -33,6 +33,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     viewModel: OrchestratedDocumentViewModel<T>,
     modifier: Modifier = Modifier,
     captureBothSides: Boolean = true,
+    allowUserToSkipBackCapture: Boolean = true,
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -73,7 +74,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
-                showSkipButton = captureBothSides,
+                showSkipButton = allowUserToSkipBackCapture,
                 instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
                 instructionsSubtitleText = stringResource(
                     id = R.string.si_doc_v_instruction_back_subtitle,

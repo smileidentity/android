@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+- Added a new parameter, `allowUserToSkipBackCapture`, to DocumentVerification and
+  EnhancedDocumentVerification to enforce the user to capture the back of the document. The default 
+  value is `true` (to maintain backward compatibility, since previously the user could always skip).
+  This parameter is only relevant when `captureBothSides` is `true`.
 - Bump CameraX to 1.3.0
 - Removed `cameraConfig` from `PrepUploadResponse`
 

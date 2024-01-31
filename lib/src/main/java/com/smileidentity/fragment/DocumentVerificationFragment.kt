@@ -78,6 +78,7 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
+            allowUserToSkipBackCapture: Boolean = true,
             bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = DocumentVerificationFragment().apply {
@@ -93,6 +94,7 @@ class DocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.allowUserToSkipBackCapture = allowUserToSkipBackCapture
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
@@ -116,6 +118,8 @@ class DocumentVerificationFragment : Fragment() {
             SmileID.DocumentVerification(
                 countryCode = args.countryCode,
                 documentType = args.documentType,
+                captureBothSides = args.captureBothSides,
+                allowUserToSkipBackCapture = args.allowUserToSkipBackCapture,
                 userId = args.userId,
                 jobId = args.jobId,
                 allowNewEnroll = args.allowNewEnroll,
@@ -191,6 +195,11 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
+
+private const val KEY_ALLOW_USER_TO_SKIP_BACK_CAPTURE = "allowUserToSkipBackCapture"
+private var Bundle.allowUserToSkipBackCapture: Boolean
+    get() = getBoolean(KEY_ALLOW_USER_TO_SKIP_BACK_CAPTURE)
+    set(value) = putBoolean(KEY_ALLOW_USER_TO_SKIP_BACK_CAPTURE, value)
 
 private const val KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE = "bypassSelfieCaptureWithFile"
 private var Bundle.bypassSelfieCaptureWithFile: File?

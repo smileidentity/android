@@ -149,11 +149,12 @@ fun SmileID.SmartSelfieAuthentication(
  *
  * @param countryCode The ISO 3166-1 alpha-3 country code of the document
  * @param documentType An optional document type of the document
- * @param captureBothSides Determines if the document has a back side
- * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
- * ratio will attempt to be inferred from the device's camera.
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
  * side will be captured.
+ * @param allowUserToSkipBackCapture Whether to allow the user to skip capturing the back side of
+ * the ID. NB! This is only applicable if [captureBothSides] is true.
+ * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
+ * ratio will attempt to be inferred from the device's camera.
  * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
  * and instead the provided file will be used as the selfie image
  * @param userId The user ID to associate with the Document Verification. Most often, this will
@@ -182,6 +183,7 @@ fun SmileID.DocumentVerification(
     modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
+    allowUserToSkipBackCapture: Boolean = true,
     idAspectRatio: Float? = null,
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
@@ -200,6 +202,7 @@ fun SmileID.DocumentVerification(
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             captureBothSides = captureBothSides,
+            allowUserToSkipBackCapture = allowUserToSkipBackCapture,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
@@ -234,9 +237,10 @@ fun SmileID.DocumentVerification(
  *
  * @param countryCode The ISO 3166-1 alpha-3 country code of the document
  * @param documentType An optional document type of the document
- * @param captureBothSides Determines if the document has a back side
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
  * side will be captured.
+ * @param allowUserToSkipBackCapture Whether to allow the user to skip capturing the back side of
+ * the ID. NB! This is only applicable if [captureBothSides] is true.
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
  * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
  * standard size of ~1.6
@@ -266,6 +270,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
+    allowUserToSkipBackCapture: Boolean = true,
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -283,6 +288,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             captureBothSides = captureBothSides,
+            allowUserToSkipBackCapture = allowUserToSkipBackCapture,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
