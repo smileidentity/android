@@ -71,7 +71,13 @@ object SmileID {
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
+        // Plant a SmileTree if there isn't already a DebugTree (e.g. when Partner also uses Timber)
+        if (Timber.forest().none { it is Timber.DebugTree }) {
+            Timber.plant(SmileTree())
+        }
+
         SmileID.config = config
+
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
             val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
@@ -182,7 +188,13 @@ object SmileID {
                 return@Interceptor chain.proceed(request)
             },
         )
-        addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+        // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the partner
+        // app's debug mode
+        if (BuildConfig.DEBUG) {
+            addInterceptor(
+                HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY },
+            )
+        }
     }
 
     /**
