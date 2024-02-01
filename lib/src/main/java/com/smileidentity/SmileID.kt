@@ -188,13 +188,17 @@ object SmileID {
                 return@Interceptor chain.proceed(request)
             },
         )
-        // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the partner
-        // app's debug mode
-        if (BuildConfig.DEBUG) {
-            addInterceptor(
-                HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY },
-            )
-        }
+        addInterceptor(
+            HttpLoggingInterceptor().apply {
+                // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
+                // partner app's debug mode
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.BASIC
+                }
+            },
+        )
     }
 
     /**
