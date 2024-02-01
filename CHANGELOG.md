@@ -4,6 +4,7 @@
 - Bump CameraX to 1.3.0
 - Removed `cameraConfig` from `PrepUploadResponse`
 - Fixed a bug where, in some cases, logs may not be printed
+- Removed the Skip Button from Back of ID Capture
 
 ## 10.0.3
 ### Added

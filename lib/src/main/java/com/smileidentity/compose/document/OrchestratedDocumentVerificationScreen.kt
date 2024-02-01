@@ -73,7 +73,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
-                showSkipButton = captureBothSides,
+                showSkipButton = false,
                 instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
                 instructionsSubtitleText = stringResource(
                     id = R.string.si_doc_v_instruction_back_subtitle,
