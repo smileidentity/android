@@ -71,16 +71,16 @@ object SmileID {
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
-        // Plant a SmileTree if there isn't already a DebugTree (e.g. when Partner also uses Timber)
-        if (Timber.forest().none { it is Timber.DebugTree }) {
-            Timber.plant(SmileTree())
+        val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
+        // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
+        if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
+            Timber.plant(Timber.DebugTree())
         }
 
         SmileID.config = config
 
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
-            val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
             SmileIDCrashReporting.enable(isInDebugMode)
         }
         requestFaceDetectionModuleInstallation(context)

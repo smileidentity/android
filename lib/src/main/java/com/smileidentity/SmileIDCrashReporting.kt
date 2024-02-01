@@ -31,7 +31,7 @@ private const val TAG_SDK_VERSION = "sdk_version"
  * static Sentry class, and we use our own DSN.
  */
 object SmileIDCrashReporting {
-    internal const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
+    private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
     internal var hub: IHub = NoOpHub.getInstance()
 
     @JvmStatic
