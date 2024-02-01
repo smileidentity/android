@@ -14,6 +14,7 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults.filterChipColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -372,6 +373,9 @@ private fun TopBar(
                 selected = uiState.isProduction,
                 onClick = viewModel::toggleEnvironment,
                 label = { Text(stringResource(id = uiState.environmentName)) },
+                colors = filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.tertiary,
+                ),
             )
             if (isJobsScreenSelected) {
                 PlainTooltipBox(
