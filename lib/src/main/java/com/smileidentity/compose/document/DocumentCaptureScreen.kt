@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -80,6 +81,7 @@ fun DocumentCaptureScreen(
     showAttribution: Boolean,
     allowGallerySelection: Boolean,
     showSkipButton: Boolean,
+    @DrawableRes instructionsHeroImage: Int,
     instructionsTitleText: String,
     instructionsSubtitleText: String,
     captureTitleText: String,
@@ -118,6 +120,7 @@ fun DocumentCaptureScreen(
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
             DocumentCaptureInstructionsScreen(
+                heroImage = instructionsHeroImage,
                 title = instructionsTitleText,
                 subtitle = instructionsSubtitleText,
                 showAttribution = showAttribution,
