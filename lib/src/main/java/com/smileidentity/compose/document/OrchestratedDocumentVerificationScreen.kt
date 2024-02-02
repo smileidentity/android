@@ -56,6 +56,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
                 showSkipButton = false,
+                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
                 instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
                 instructionsSubtitleText = stringResource(
                     id = R.string.si_verify_identity_instruction_subtitle,
@@ -74,6 +75,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
                 showSkipButton = false,
+                instructionsHeroImage = R.drawable.si_doc_v_back_hero,
                 instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
                 instructionsSubtitleText = stringResource(
                     id = R.string.si_doc_v_instruction_back_subtitle,

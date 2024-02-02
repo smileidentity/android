@@ -47,7 +47,7 @@ enum class ProductScreen(
     DocumentVerification(
         "document_verification",
         com.smileidentity.R.string.si_doc_v_product_name,
-        com.smileidentity.R.drawable.si_doc_v_instructions_hero,
+        R.drawable.doc_v,
     ),
     BvnConsent(
         "bvn_consent",
@@ -57,7 +57,7 @@ enum class ProductScreen(
     EnhancedDocumentVerification(
         "enhanced_docv",
         com.smileidentity.R.string.si_enhanced_docv_product_name,
-        com.smileidentity.R.drawable.si_doc_v_instructions_hero,
+        R.drawable.doc_v,
     ),
 }
 

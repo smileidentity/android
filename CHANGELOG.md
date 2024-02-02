@@ -5,6 +5,9 @@
 * Removed `cameraConfig` from `PrepUploadResponse`
 * Fixed a bug where, in some cases, logs may not be printed
 * Removed the Skip Button from Back of ID Capture
+* Added `instructionsHeroImage` as a new parameter to `DocumentCaptureScreen`
+* Added `heroImage` as a new parameter to `DocumentCaptureInstructionsScreen`
+* Updated Document Verification hero images
 
 ## 10.0.3
 
