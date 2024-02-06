@@ -1,6 +1,7 @@
 # Release Notes
 
-## Unreleased
+## 10.0.4
+
 * Bump CameraX to 1.3.0
 * Removed `cameraConfig` from `PrepUploadResponse`
 * Fixed a bug where, in some cases, logs may not be printed
