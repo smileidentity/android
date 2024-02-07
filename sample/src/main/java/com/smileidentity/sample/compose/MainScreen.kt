@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -382,7 +383,15 @@ private fun TopBar(
                 TooltipBox(
                     positionProvider = rememberPlainTooltipPositionProvider(),
                     tooltip = {
-                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                        Text(
+                            stringResource(R.string.jobs_clear_jobs_icon_tooltip),
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                    MaterialTheme.shapes.small,
+                                )
+                                .padding(8.dp),
+                        )
                     },
                     state = rememberTooltipState(),
                 ) {
