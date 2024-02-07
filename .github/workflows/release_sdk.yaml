@@ -95,7 +95,9 @@ jobs:
         uses: actions/create-release@v1
         id: create_release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT instead of GITHUB_TOKEN so that the post-release workflow triggers
+          # https://stackoverflow.com/a/69063453
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         with:
           release_name: v${{ steps.read_version.outputs.version }}
           tag_name: v${{ steps.read_version.outputs.version }}
