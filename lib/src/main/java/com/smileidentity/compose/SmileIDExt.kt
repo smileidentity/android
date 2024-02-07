@@ -199,7 +199,6 @@ fun SmileID.DocumentVerification(
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
-            captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
@@ -282,7 +281,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
-            captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,

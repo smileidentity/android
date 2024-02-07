@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Bump Compose BOM to 2024.02.00
+
 ## 10.0.4
 
 * Bump CameraX to 1.3.0

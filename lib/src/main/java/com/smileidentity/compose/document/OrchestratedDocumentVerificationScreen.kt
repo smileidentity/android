@@ -32,7 +32,6 @@ import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
 internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     viewModel: OrchestratedDocumentViewModel<T>,
     modifier: Modifier = Modifier,
-    captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
