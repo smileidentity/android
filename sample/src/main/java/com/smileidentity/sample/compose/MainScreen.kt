@@ -1,12 +1,13 @@
 package com.smileidentity.sample.compose
 
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.Icons.AutoMirrored
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
@@ -22,13 +23,15 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -75,7 +78,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.net.URL
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -362,7 +364,7 @@ private fun TopBar(
             if (showUpButton) {
                 IconButton(onClick = onNavigateUp) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                     )
                 }
@@ -378,15 +380,22 @@ private fun TopBar(
                 ),
             )
             if (isJobsScreenSelected) {
-                PlainTooltipBox(
+                TooltipBox(
+                    positionProvider = rememberPlainTooltipPositionProvider(),
                     tooltip = {
-                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                        Text(
+                            stringResource(R.string.jobs_clear_jobs_icon_tooltip),
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                    MaterialTheme.shapes.small,
+                                )
+                                .padding(8.dp),
+                        )
                     },
+                    state = rememberTooltipState(),
                 ) {
-                    IconButton(
-                        onClick = viewModel::clearJobs,
-                        modifier = Modifier.tooltipAnchor(),
-                    ) {
+                    IconButton(onClick = viewModel::clearJobs) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = null,
@@ -399,7 +408,6 @@ private fun TopBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BottomBar(
     bottomNavItems: ImmutableList<BottomNavigationScreen>,
