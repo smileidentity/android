@@ -114,7 +114,7 @@ private fun ProductCell(
                 ),
                 modifier = Modifier.size(64.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(stringResource(productScreen.label), textAlign = TextAlign.Center)
         }
     }
