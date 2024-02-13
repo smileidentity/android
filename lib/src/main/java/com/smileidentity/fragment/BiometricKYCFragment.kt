@@ -13,6 +13,10 @@ import com.smileidentity.fragment.BiometricKYCFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.newInstance
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.resultFromBundle
+import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDResult
@@ -65,7 +69,12 @@ import kotlinx.collections.immutable.toImmutableMap
 class BiometricKYCFragment : Fragment() {
     companion object {
         const val KEY_REQUEST = "BiometricKYCRequest"
-        const val KEY_RESULT = "BiometricKYCResult"
+
+        /**
+         * This is internal to prevent partners from accidentally using the wrong key. They only
+         * need [KEY_REQUEST]. Partners should use [resultFromBundle] to extract the result.
+         */
+        internal const val KEY_RESULT = "BiometricKYCResult"
 
         @JvmStatic
         @JvmOverloads
