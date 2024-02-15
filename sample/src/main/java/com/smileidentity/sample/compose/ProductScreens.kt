@@ -2,6 +2,7 @@ package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -22,14 +23,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
@@ -37,15 +37,8 @@ import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.Screen
 
-val products = listOf(
-    ProductScreen.SmartSelfieEnrollment,
-    ProductScreen.SmartSelfieAuthentication,
-    ProductScreen.EnhancedKyc,
-    ProductScreen.BiometricKyc,
-    ProductScreen.BvnConsent,
-    ProductScreen.DocumentVerification,
-    ProductScreen.EnhancedDocumentVerification,
-)
+private val products = ProductScreen.entries
+private val roundedCornerShape = RoundedCornerShape(16.dp)
 
 @Composable
 fun ProductSelectionScreen(
@@ -58,17 +51,30 @@ fun ProductSelectionScreen(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .padding(16.dp)
+                .padding(start = 16.dp, end = 16.dp, bottom = 2.dp)
                 .weight(1f),
         ) {
             Text(
                 stringResource(R.string.test_our_products),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 8.dp),
             )
-            ProductsGrid(onProductSelected)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = spacedBy(8.dp),
+                horizontalArrangement = spacedBy(8.dp),
+                modifier = Modifier.clip(roundedCornerShape),
+            ) {
+                items(products) {
+                    ProductCell(
+                        productScreen = it,
+                        onProductSelected = onProductSelected,
+                        modifier = Modifier.defaultMinSize(minHeight = 164.dp),
+                    )
+                }
+            }
         }
         SelectionContainer {
             Text(
@@ -79,64 +85,26 @@ fun ProductSelectionScreen(
                 ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
-                modifier = Modifier.padding(12.dp),
+                modifier = Modifier.padding(bottom = 2.dp),
             )
         }
     }
 }
 
-/**
- * We'd like each product cell to be the same height. However, we don't know the height of the
- * tallest cell until we've measured them all. So we need to measure them all twice. Once to find
- * the tallest cell, and again to actually lay them out.
- *
- * We do this by using a [SubcomposeLayout] with 2 subcompositions. The first one measures each cell
- * and returns the tallest height. The second subcomposition creates the actual grid layout.
- */
-@Composable
-private fun ProductsGrid(onProductSelected: (Screen) -> Unit) {
-    SubcomposeLayout { constraints ->
-        // The true/false passed to subcompose is merely because we need 2 unique keys
-        val maxHeight = subcompose(true) {
-            products.map { ProductCell(it, onProductSelected, 0.dp) }
-        }.maxOf { it.measure(constraints).measuredHeight.toDp() }
-
-        val contentPlaceable = subcompose(false) {
-            LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                items(products) {
-                    ProductCell(it, onProductSelected, maxHeight)
-                }
-            }
-        }.first().measure(constraints)
-
-        layout(contentPlaceable.measuredWidth, maxHeight.roundToPx()) {
-            contentPlaceable.place(0, 0)
-        }
-    }
-}
-
-/**
- * [minHeight] is used so that 0.dp can be passed to the [ProductCell] composable as part of an
- * initial pass to measure the final max height. Once a max height is determined, the minHeight
- * is guaranteed to be greater than 0.dp
- */
 @Composable
 private fun ProductCell(
     productScreen: ProductScreen,
     onProductSelected: (Screen) -> Unit,
-    minHeight: Dp,
+    modifier: Modifier = Modifier,
 ) {
     FilledTonalButton(
         onClick = { onProductSelected(productScreen) },
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
+        shape = roundedCornerShape,
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.defaultMinSize(minHeight = minHeight),
         ) {
             Image(
                 painterResource(productScreen.icon),
@@ -146,7 +114,7 @@ private fun ProductCell(
                 ),
                 modifier = Modifier.size(64.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(stringResource(productScreen.label), textAlign = TextAlign.Center)
         }
     }

@@ -75,7 +75,7 @@ fun JobsListScreen(
             val iconRes = when (it.jobType) {
                 SmartSelfieEnrollment -> R.drawable.si_smart_selfie_instructions_hero
                 SmartSelfieAuthentication -> R.drawable.si_smart_selfie_instructions_hero
-                DocumentVerification -> R.drawable.si_doc_v_instructions_hero
+                DocumentVerification -> com.smileidentity.sample.R.drawable.doc_v
                 BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
                 BVN -> com.smileidentity.sample.R.drawable.biometric_kyc
@@ -154,11 +154,11 @@ private fun JobListItem(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     val halfCircleRotationDegrees = 180f
-                    val animatedProgress = animateFloatAsState(
+                    val animatedProgress by animateFloatAsState(
                         targetValue = if (expanded) halfCircleRotationDegrees else 0f,
                         animationSpec = spring(),
                         label = "Dropdown Icon Rotation",
-                    ).value
+                    )
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowDown,
                         contentDescription = null,

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.smileidentity.R
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -27,6 +28,7 @@ class DocumentCaptureInstructionScreenTest {
         composeTestRule.setContent {
             DocumentCaptureInstructionsScreen(
                 onInstructionsAcknowledgedTakePhoto = onTakePhoto,
+                heroImage = R.drawable.si_doc_v_front_hero,
                 title = titleText,
                 subtitle = subtitleText,
             )
@@ -53,6 +55,7 @@ class DocumentCaptureInstructionScreenTest {
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedSelectFromGallery = onUploadPhoto,
                 onInstructionsAcknowledgedTakePhoto = { },
+                heroImage = R.drawable.si_doc_v_front_hero,
                 title = titleText,
                 subtitle = subtitleText,
             )
@@ -77,6 +80,7 @@ class DocumentCaptureInstructionScreenTest {
             DocumentCaptureInstructionsScreen(
                 allowPhotoFromGallery = false,
                 onInstructionsAcknowledgedTakePhoto = { },
+                heroImage = R.drawable.si_doc_v_front_hero,
                 title = titleText,
                 subtitle = subtitleText,
             )
@@ -98,6 +102,7 @@ class DocumentCaptureInstructionScreenTest {
             DocumentCaptureInstructionsScreen(
                 allowPhotoFromGallery = true,
                 onInstructionsAcknowledgedTakePhoto = { },
+                heroImage = R.drawable.si_doc_v_front_hero,
                 title = titleText,
                 subtitle = subtitleText,
             )

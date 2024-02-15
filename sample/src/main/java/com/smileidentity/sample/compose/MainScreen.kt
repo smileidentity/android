@@ -1,20 +1,21 @@
 package com.smileidentity.sample.compose
 
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.AutoMirrored
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults.filterChipColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +23,15 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -47,6 +50,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
 import com.smileidentity.compose.BiometricKYC
@@ -73,7 +78,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.net.URL
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -81,23 +85,16 @@ fun MainScreen(
         factory = viewModelFactory { MainScreenViewModel() },
     ),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val privacyPolicy = remember { URL("https://usesmileid.com/privacy-policy") }
     val coroutineScope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val currentRoute by navController
-        .currentBackStackEntryFlow
-        .collectAsStateWithLifecycle(initialValue = navController.currentBackStackEntry)
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentRoute by navController.currentBackStackEntryAsState()
     val bottomNavSelection = uiState.bottomNavSelection
-
     val bottomNavItems = remember { BottomNavigationScreen.entries.toImmutableList() }
-    // Show up button when not on a BottomNavigationScreen
-    val showUpButton = currentRoute?.destination?.route?.let { route ->
-        bottomNavItems.none { it.route.contains(route) }
-    } ?: false
-
+    val dialogDestinations = remember { listOf(ProductScreen.SmartSelfieAuthentication.route) }
     val clipboardManager = LocalClipboardManager.current
+
     LaunchedEffect(uiState.clipboardText) {
         uiState.clipboardText?.let { text ->
             coroutineScope.launch {
@@ -109,6 +106,10 @@ fun MainScreen(
         modifier = modifier,
         snackbarHost = { Snackbar() },
         topBar = {
+            // Show up button when not on a BottomNavigationScreen
+            val showUpButton = currentRoute?.destination?.route?.let { route ->
+                bottomNavItems.none { it.route.contains(route) }
+            } ?: false
             TopBar(
                 showUpButton = showUpButton,
                 onNavigateUp = navController::navigateUp,
@@ -119,7 +120,13 @@ fun MainScreen(
             // Don't show bottom bar when navigating to any product screens
             val showBottomBar by remember(currentRoute) {
                 derivedStateOf {
-                    bottomNavItems.any { it.route.contains(currentRoute?.destination?.route ?: "") }
+                    val isDirectlyOnBottomNavDestination = bottomNavItems.any {
+                        it.route.contains(currentRoute?.destination?.route ?: "")
+                    }
+                    val isOnDialogDestination = dialogDestinations.any {
+                        it.contains(currentRoute?.destination?.route ?: "")
+                    }
+                    return@derivedStateOf isDirectlyOnBottomNavDestination || isOnDialogDestination
                 }
             }
             if (showBottomBar) {
@@ -175,10 +182,13 @@ fun MainScreen(
                         navController.popBackStack()
                     }
                 }
-                composable(ProductScreen.SmartSelfieAuthentication.route) {
+                dialog(ProductScreen.SmartSelfieAuthentication.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
                     SmartSelfieAuthenticationUserIdInputDialog(
-                        onDismiss = navController::popBackStack,
+                        onDismiss = {
+                            viewModel.onHomeSelected()
+                            navController.popBackStack()
+                        },
                         onConfirm = { userId ->
                             navController.navigate(
                                 "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
@@ -354,7 +364,7 @@ private fun TopBar(
             if (showUpButton) {
                 IconButton(onClick = onNavigateUp) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                     )
                 }
@@ -364,28 +374,28 @@ private fun TopBar(
             FilterChip(
                 selected = uiState.isProduction,
                 onClick = viewModel::toggleEnvironment,
-                leadingIcon = {
-                    if (uiState.isProduction) {
-                        Icon(
-                            imageVector = Icons.Filled.Warning,
-                            contentDescription = stringResource(
-                                R.string.production,
-                            ),
-                        )
-                    }
-                },
                 label = { Text(stringResource(id = uiState.environmentName)) },
+                colors = filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.tertiary,
+                ),
             )
             if (isJobsScreenSelected) {
-                PlainTooltipBox(
+                TooltipBox(
+                    positionProvider = rememberPlainTooltipPositionProvider(),
                     tooltip = {
-                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                        Text(
+                            stringResource(R.string.jobs_clear_jobs_icon_tooltip),
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                    MaterialTheme.shapes.small,
+                                )
+                                .padding(8.dp),
+                        )
                     },
+                    state = rememberTooltipState(),
                 ) {
-                    IconButton(
-                        onClick = viewModel::clearJobs,
-                        modifier = Modifier.tooltipAnchor(),
-                    ) {
+                    IconButton(onClick = viewModel::clearJobs) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = null,
@@ -398,7 +408,6 @@ private fun TopBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BottomBar(
     bottomNavItems: ImmutableList<BottomNavigationScreen>,

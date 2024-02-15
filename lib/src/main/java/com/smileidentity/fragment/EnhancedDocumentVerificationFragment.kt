@@ -13,6 +13,8 @@ import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.newInstance
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
@@ -61,7 +63,12 @@ import kotlinx.collections.immutable.toImmutableMap
 class EnhancedDocumentVerificationFragment : Fragment() {
     companion object {
         const val KEY_REQUEST = "EnhancedDocumentVerificationRequest"
-        const val KEY_RESULT = "EnhancedDocumentVerificationResult"
+
+        /**
+         * This is internal to prevent partners from accidentally using the wrong key. They only
+         * need [KEY_REQUEST]. Partners should use [resultFromBundle] to extract the result.
+         */
+        internal const val KEY_RESULT = "EnhancedDocumentVerificationResult"
 
         @JvmStatic
         @JvmOverloads

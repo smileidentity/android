@@ -13,6 +13,10 @@ import com.smileidentity.fragment.DocumentVerificationFragment.Companion.KEY_REQ
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.newInstance
 import com.smileidentity.fragment.DocumentVerificationFragment.Companion.resultFromBundle
+import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
@@ -62,7 +66,12 @@ import java.io.File
 class DocumentVerificationFragment : Fragment() {
     companion object {
         const val KEY_REQUEST = "DocumentVerificationRequest"
-        const val KEY_RESULT = "DocumentVerificationResult"
+
+        /**
+         * This is internal to prevent partners from accidentally using the wrong key. They only
+         * need [KEY_REQUEST]. Partners should use [resultFromBundle] to extract the result.
+         */
+        internal const val KEY_RESULT = "DocumentVerificationResult"
 
         @JvmStatic
         @JvmOverloads

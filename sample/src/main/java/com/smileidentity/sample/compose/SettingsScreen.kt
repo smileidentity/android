@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons.AutoMirrored
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -68,10 +69,10 @@ fun SettingsScreen(
                 ListItem(
                     headlineContent = { Text(stringResource(it.first)) },
                     leadingContent = { Icon(it.second, null) },
-                    trailingContent = { Icon(Icons.AutoMirrored.Filled.ArrowForward, null) },
+                    trailingContent = { Icon(AutoMirrored.Filled.ArrowForward, null) },
                     modifier = Modifier.clickable(onClick = it.third),
                 )
-                Divider()
+                HorizontalDivider()
             }
         },
         pinnedContent = {
