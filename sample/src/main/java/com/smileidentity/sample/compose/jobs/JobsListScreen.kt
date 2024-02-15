@@ -58,10 +58,7 @@ import kotlinx.collections.immutable.ImmutableList
 import timber.log.Timber
 
 @Composable
-fun JobsListScreen(
-    jobs: ImmutableList<Job>,
-    modifier: Modifier = Modifier,
-) {
+fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
     if (jobs.isEmpty()) {
         ErrorScreen(
             errorText = stringResource(com.smileidentity.sample.R.string.jobs_no_jobs_found),

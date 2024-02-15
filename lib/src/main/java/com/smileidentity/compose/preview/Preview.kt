@@ -7,9 +7,7 @@ import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 
 @Composable
-internal fun Preview(
-    content: @Composable () -> Unit,
-) {
+internal fun Preview(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
         content()
     }
