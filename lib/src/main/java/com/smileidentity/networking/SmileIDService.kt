@@ -2,6 +2,7 @@
 
 package com.smileidentity.networking
 
+import com.smileidentity.BuildConfig
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
@@ -16,11 +17,13 @@ import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.ServicesResponse
+import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
@@ -30,9 +33,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Url
+import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,6 +65,16 @@ interface SmileIDService {
      */
     @PUT
     suspend fun upload(@Url url: String, @Body request: UploadRequest)
+
+    @Multipart
+    @POST("/v1/biometric_authentication")
+    suspend fun doBiometricAuthentication(
+        @Part("image") selfieImage: File,
+        @Part("liveness_sequence") livenessImages: List<File>,
+        @Part("partner_params") partnerParams: PartnerParams,
+        @Part("source_sdk") sourceSdk: String = "android",
+        @Part("source_sdk_version") sourceSdkVersion: String = BuildConfig.VERSION_NAME,
+    ): SmartSelfieJobResult.Entry
 
     /**
      * Query the Identity Information of an individual using their ID number from a supported ID
