@@ -26,10 +26,13 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.FileType
 import com.smileidentity.util.area
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.moveJobToComplete
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
 import kotlinx.collections.immutable.ImmutableMap
@@ -199,7 +202,7 @@ class SelfieViewModel(
             lastAutoCaptureTimeMs = System.currentTimeMillis()
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
                 Timber.v("Capturing liveness image")
-                val livenessFile = createLivenessFile()
+                val livenessFile = createLivenessFile(jobId)
                 postProcessImageBitmap(
                     bitmap = bitmap,
                     file = livenessFile,
@@ -210,7 +213,7 @@ class SelfieViewModel(
                 livenessFiles.add(livenessFile)
                 _uiState.update { it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat()) }
             } else {
-                selfieFile = createSelfieFile()
+                selfieFile = createSelfieFile(jobId)
                 Timber.v("Capturing selfie image to $selfieFile")
                 postProcessImageBitmap(
                     bitmap = bitmap,
@@ -296,10 +299,19 @@ class SelfieViewModel(
             )
 
             val jobStatusResponse = SmileID.api.getSmartSelfieJobStatus(jobStatusRequest)
+            var selfieFileResult = selfieFile
+            var livenessFilesResult = livenessFiles
+            // if we've gotten this far we move files
+            // to complete from pending
+            val copySuccess = moveJobToComplete(jobId)
+            if (copySuccess) {
+                selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+                livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+            }
             result = SmileIDResult.Success(
                 SmartSelfieResult(
-                    selfieFile,
-                    livenessFiles,
+                    selfieFileResult,
+                    livenessFilesResult,
                     jobStatusResponse,
                 ),
             )

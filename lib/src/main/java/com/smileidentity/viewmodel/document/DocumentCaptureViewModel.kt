@@ -61,6 +61,7 @@ class DocumentCaptureViewModel(
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
             .build(),
     ),
+    private val jobId: String,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
@@ -127,7 +128,7 @@ class DocumentCaptureViewModel(
         _uiState.update {
             it.copy(showCaptureInProgress = true, directive = DocumentDirective.Capturing)
         }
-        val documentFile = createDocumentFile()
+        val documentFile = createDocumentFile(jobId)
         cameraState.takePicture(documentFile) { result ->
             isCapturing = false
             when (result) {

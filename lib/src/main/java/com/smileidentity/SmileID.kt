@@ -19,6 +19,8 @@ import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
+import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.listJobIds
 import com.squareup.moshi.Moshi
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -49,6 +51,9 @@ object SmileID {
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
+
+    internal var allowOfflineMode: Boolean = false
+        private set
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
@@ -99,6 +104,11 @@ object SmileID {
 
         // Usually looks like: /data/user/0/<package name>/app_SmileID
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
+    }
+
+    @JvmStatic
+    fun setAllowOfflineMode(allowOfflineMode: Boolean) {
+        SmileID.allowOfflineMode = allowOfflineMode
     }
 
     /**
@@ -157,6 +167,51 @@ object SmileID {
     fun setCallbackUrl(callbackUrl: URL?) {
         SmileID.callbackUrl = callbackUrl?.toString() ?: ""
     }
+
+    /**
+     * Retrieves a list of submitted job IDs.
+     * This method filters the job IDs to include only those that have been completed (submitted),
+     * excluding any pending jobs.
+     *
+     * @return A list of strings representing the IDs of submitted jobs.
+     */
+    @JvmStatic
+    internal fun getSubmittedJobs(): List<String> = listJobIds(
+        includeCompleted = true,
+        includePending = false,
+    )
+
+    /**
+     * Retrieves a list of unsubmitted job IDs.
+     * This method filters the job IDs to include only those that are still pending,
+     * excluding any completed (submitted) jobs.
+     *
+     * @return A list of strings representing the IDs of unsubmitted jobs.
+     */
+    @JvmStatic
+    fun getUnSubmittedJobs(): List<String> = listJobIds(
+        includeCompleted = false,
+        includePending = true,
+    )
+
+    /**j
+     * Initiates the cleanup process for a single job by its ID.
+     * This is a convenience method that wraps the cleanup process, allowing for a single job ID
+     * to be specified for cleanup.
+     *
+     * @param jobId The ID of the job to clean up.
+     */
+    fun cleanup(jobId: String) = cleanupJobs(jobIds = listOf(jobId))
+
+    /**
+     * Initiates the cleanup process for multiple jobs by their IDs.
+     * If no IDs are provided, a default cleanup process is initiated that may target
+     * specific jobs based on the implementation in com.smileidentity.util.cleanup.
+     *
+     * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
+     * a predefined cleanup process.
+     */
+    fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
 
     /**
      * Returns an [OkHttpClient.Builder] optimized for low bandwidth conditions. Use it as a

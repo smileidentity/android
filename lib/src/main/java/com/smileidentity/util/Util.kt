@@ -12,7 +12,10 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import android.os.Bundle
@@ -25,7 +28,6 @@ import androidx.camera.core.impl.utils.Exif
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.R
-import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
@@ -244,19 +246,6 @@ internal fun postProcessImage(
 }
 
 /**
- * Save to temporary file, which does not require any storage permissions. It will be saved to the
- * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
- * format `si_${imageType}_<timestamp>.jpg`
- */
-internal fun createSmileTempFile(imageType: String, savePath: String = SmileID.fileSavePath): File {
-    return File(savePath, "si_${imageType}_${System.currentTimeMillis()}.jpg")
-}
-
-internal fun createLivenessFile() = createSmileTempFile("liveness")
-internal fun createSelfieFile() = createSmileTempFile("selfie")
-internal fun createDocumentFile() = createSmileTempFile("document")
-
-/**
  * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
  * [SmileIDException] if it is an [HttpException] (this may not always be possible, i.e. if we get
  * an error during S3 upload, or if we get an unconventional 500 error from the API). Otherwise, the
@@ -361,6 +350,36 @@ private fun getDataColumn(
         cursor?.close()
     }
     return null
+}
+
+// From https://stackoverflow.com/a/70510760
+fun Context.isInternetAvailable(): Boolean {
+    var result = false
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val networkCapabilities = connectivityManager.activeNetwork ?: return false
+        val actNw =
+            connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+        result = when {
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
+    } else {
+        connectivityManager.run {
+            @Suppress("DEPRECATION")
+            connectivityManager.activeNetworkInfo?.run {
+                result = when (type) {
+                    ConnectivityManager.TYPE_WIFI -> true
+                    ConnectivityManager.TYPE_MOBILE -> true
+                    ConnectivityManager.TYPE_ETHERNET -> true
+                    else -> false
+                }
+            }
+        }
+    }
+    return result
 }
 
 /**

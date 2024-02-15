@@ -318,7 +318,12 @@ class MainScreenViewModel : ViewModel() {
 
     fun onEnhancedKycResult(result: SmileIDResult<EnhancedKycResult>) {
         if (result is SmileIDResult.Success) {
-            val resultData = result.data.response
+            val resultData = result.data.response ?: run {
+                val errorMessage = "Enhanced KYC jobStatusResponse is null"
+                Timber.e(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val message = jobResultMessageBuilder(
                 jobName = "Enhanced KYC",
                 jobComplete = true,
@@ -360,7 +365,12 @@ class MainScreenViewModel : ViewModel() {
         result: SmileIDResult<BiometricKycResult>,
     ) {
         if (result is SmileIDResult.Success) {
-            val response = result.data.jobStatusResponse
+            val response = result.data.jobStatusResponse ?: run {
+                val errorMessage = "Biometric KYC jobStatusResponse is null"
+                Timber.e(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val actualResult = response.result as? BiometricKycJobResult.Entry
             Timber.d("Biometric KYC Result: $result")
             val message = jobResultMessageBuilder(
@@ -403,7 +413,12 @@ class MainScreenViewModel : ViewModel() {
         result: SmileIDResult<DocumentVerificationResult>,
     ) {
         if (result is SmileIDResult.Success) {
-            val response = result.data.jobStatusResponse
+            val response = result.data.jobStatusResponse ?: run {
+                val errorMessage = "Document verification jobStatusResponse is null"
+                Timber.e(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val actualResult = response.result as? DocumentVerificationJobResult.Entry
             val message = jobResultMessageBuilder(
                 jobName = "Document Verification",
@@ -466,7 +481,12 @@ class MainScreenViewModel : ViewModel() {
         result: SmileIDResult<EnhancedDocumentVerificationResult>,
     ) {
         if (result is SmileIDResult.Success) {
-            val response = result.data.jobStatusResponse
+            val response = result.data.jobStatusResponse ?: run {
+                val errorMessage = "Enhanced Document verification jobStatusResponse is null"
+                Timber.e(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val actualResult = response.result as? EnhancedDocumentVerificationJobResult.Entry
             val message = jobResultMessageBuilder(
                 jobName = "Enhanced Document Verification",

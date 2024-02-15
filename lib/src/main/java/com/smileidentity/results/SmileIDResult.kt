@@ -69,7 +69,7 @@ data class SmartSelfieResult(
 @JsonClass(generateAdapter = true)
 data class EnhancedKycResult(
     val request: EnhancedKycRequest,
-    val response: EnhancedKycResponse,
+    val response: EnhancedKycResponse?,
 ) : Parcelable
 
 /**
@@ -85,7 +85,7 @@ data class DocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
     val documentBackFile: File? = null,
-    val jobStatusResponse: DocumentVerificationJobStatusResponse,
+    val jobStatusResponse: DocumentVerificationJobStatusResponse?,
 ) : Parcelable
 
 /**
@@ -102,7 +102,7 @@ data class EnhancedDocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
     val documentBackFile: File? = null,
-    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse,
+    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse?,
 ) : Parcelable
 
 /**
@@ -117,5 +117,5 @@ data class EnhancedDocumentVerificationResult(
 data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: BiometricKycJobStatusResponse,
+    val jobStatusResponse: BiometricKycJobStatusResponse?,
 ) : Parcelable

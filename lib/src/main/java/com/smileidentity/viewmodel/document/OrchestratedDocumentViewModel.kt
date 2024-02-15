@@ -23,7 +23,10 @@ import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.FileType
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.moveJobToComplete
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +48,7 @@ internal data class OrchestratedDocumentUiState(
 internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val jobType: JobType,
     private val userId: String,
-    private val jobId: String,
+    val jobId: String,
     private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
@@ -242,11 +245,22 @@ internal class DocumentVerificationViewModel(
         viewModelScope.launch {
             val jobStatusResponse =
                 SmileID.api.getDocumentVerificationJobStatus(jobStatusRequest)
+            var selfieFileResult = selfieImage
+            var documentFrontFileResult = documentFrontFile
+            var documentBackFileResult = documentBackFile
+            // if we've gotten this far we move files
+            // to complete from pending
+            val copySuccess = moveJobToComplete(jobId)
+            if (copySuccess) {
+                selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+                documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
+                documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+            }
             result = SmileIDResult.Success(
                 DocumentVerificationResult(
-                    selfieFile = selfieImage,
-                    documentFrontFile = documentFrontFile,
-                    documentBackFile = documentBackFile,
+                    selfieFile = selfieFileResult,
+                    documentFrontFile = documentFrontFileResult,
+                    documentBackFile = documentBackFileResult,
                     jobStatusResponse = jobStatusResponse,
                 ),
             )
@@ -287,11 +301,22 @@ internal class EnhancedDocumentVerificationViewModel(
             val jobStatusResponse = SmileID.api.getEnhancedDocumentVerificationJobStatus(
                 jobStatusRequest,
             )
+            var selfieFileResult = selfieImage
+            var documentFrontFileResult = documentFrontFile
+            var documentBackFileResult = documentBackFile
+            // if we've gotten this far we move files
+            // to complete from pending
+            val copySuccess = moveJobToComplete(jobId)
+            if (copySuccess) {
+                selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+                documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
+                documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+            }
             result = SmileIDResult.Success(
                 EnhancedDocumentVerificationResult(
-                    selfieFile = selfieImage,
-                    documentFrontFile = documentFrontFile,
-                    documentBackFile = documentBackFile,
+                    selfieFile = selfieFileResult,
+                    documentFrontFile = documentFrontFileResult,
+                    documentBackFile = documentBackFileResult,
                     jobStatusResponse = jobStatusResponse,
                 ),
             )

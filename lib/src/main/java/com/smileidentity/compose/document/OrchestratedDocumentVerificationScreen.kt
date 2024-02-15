@@ -50,6 +50,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     ) {
         when (val currentStep = uiState.currentStep) {
             DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
+                jobId = jobId,
                 side = DocumentCaptureSide.Front,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
@@ -69,6 +70,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             )
 
             DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
+                jobId = jobId,
                 side = DocumentCaptureSide.Back,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,

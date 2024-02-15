@@ -15,7 +15,10 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.FileType
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.moveJobToComplete
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -91,10 +94,19 @@ class BiometricKycViewModel(
             )
 
             val jobStatusResponse = SmileID.api.getBiometricKycJobStatus(jobStatusRequest)
+            var selfieFileResult = selfieFile
+            var livenessFilesResult = livenessFiles
+            // if we've gotten this far we move files
+            // to complete from pending
+            val copySuccess = moveJobToComplete(jobId)
+            if (copySuccess) {
+                selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+                livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+            }
             result = SmileIDResult.Success(
                 BiometricKycResult(
-                    selfieFile,
-                    livenessFiles,
+                    selfieFileResult,
+                    livenessFilesResult,
                     jobStatusResponse,
                 ),
             )
