@@ -73,10 +73,10 @@ import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.viewModelFactory
+import java.net.URL
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import java.net.URL
 
 @Composable
 fun MainScreen(

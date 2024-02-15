@@ -146,7 +146,7 @@ object DataStoreRepository {
         mutex.withLock {
             val pendingJobs = dataStore.data.first()[Keys.pendingJobs] ?: emptySet()
             val completedJobs = dataStore.data.first()[Keys.completedJobs] ?: emptySet()
-            val pendingJob = pendingJobs.firstOrNull() { it.contains(completedJob.jobId) }
+            val pendingJob = pendingJobs.firstOrNull { it.contains(completedJob.jobId) }
             dataStore.edit {
                 if (pendingJob != null) {
                     it[Keys.pendingJobs] = pendingJobs - pendingJob

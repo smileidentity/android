@@ -10,13 +10,13 @@ import java.io.IOException
  * The path where unsubmitted (pending) job files are stored.
  * Files in this directory are considered in-progress or awaiting submission.
  */
-private const val unSubmittedPath = "/pending"
+private const val UN_SUBMITTED_PATH = "/pending"
 
 /**
  * The path where submitted (completed) job files are stored.
  * Files in this directory have been processed or marked as completed.
  */
-private const val submittedPath = "/complete"
+private const val SUBMITTED_PATH = "/complete"
 
 // Enum defining the types of files managed within the job processing system.
 // This categorization helps in filtering and processing files based on their content or purpose.
@@ -29,7 +29,9 @@ private const val submittedPath = "/complete"
  * - DOCUMENT:Refers to document capture files captured that is pertinent to the job
  */
 enum class FileType {
-    SELFIE, LIVENESS, DOCUMENT
+    SELFIE,
+    LIVENESS,
+    DOCUMENT,
 }
 
 /**
@@ -64,8 +66,8 @@ internal fun cleanupJobs(
     if (jobIds != null && jobIds.isEmpty()) return
 
     val pathsToClean = mutableListOf<String>()
-    if (deleteCompletedJobs) pathsToClean.add(submittedPath)
-    if (deletePendingJobs) pathsToClean.add(unSubmittedPath)
+    if (deleteCompletedJobs) pathsToClean.add(SUBMITTED_PATH)
+    if (deletePendingJobs) pathsToClean.add(UN_SUBMITTED_PATH)
 
     if (jobIds == null) {
         // Nuke all files in specified paths
@@ -144,10 +146,10 @@ internal fun listJobIds(
 ): List<String> {
     val jobIds = mutableListOf<String>()
     if (includeCompleted) {
-        jobIds.addAll(File(submittedPath).list().orEmpty().toList())
+        jobIds.addAll(File(SUBMITTED_PATH).list().orEmpty().toList())
     }
     if (includePending) {
-        jobIds.addAll(File(unSubmittedPath).list().orEmpty().toList())
+        jobIds.addAll(File(UN_SUBMITTED_PATH).list().orEmpty().toList())
     }
     return jobIds
 }
@@ -175,7 +177,7 @@ fun getFilesByType(
     savePath: String = SmileID.fileSavePath,
     submitted: Boolean = true,
 ): List<File> {
-    val stateDirectory = if (submitted) submittedPath else unSubmittedPath
+    val stateDirectory = if (submitted) SUBMITTED_PATH else UN_SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() || !directory.isDirectory) {
@@ -209,7 +211,7 @@ internal fun createSmileTempFile(
     state: Boolean = true,
     savePath: String = SmileID.fileSavePath,
 ): File {
-    val stateDirectory = if (state) unSubmittedPath else submittedPath
+    val stateDirectory = if (state) UN_SUBMITTED_PATH else SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
     if (!directory.exists()) {
         directory.mkdirs()
@@ -229,8 +231,8 @@ internal fun moveJobToComplete(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
 ): Boolean {
-    val pendingPath = File(savePath, "$unSubmittedPath/$folderName")
-    val completePath = File(savePath, "$submittedPath/$folderName")
+    val pendingPath = File(savePath, "$UN_SUBMITTED_PATH/$folderName")
+    val completePath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
     if (!pendingPath.exists() || !pendingPath.isDirectory) {
         println("Source directory does not exist or is not a directory")

@@ -141,10 +141,7 @@ fun SelfieCaptureScreen(
 }
 
 @Composable
-private fun AgentModeSwitch(
-    isAgentModeEnabled: Boolean,
-    onCamSelectorChange: (Boolean) -> Unit,
-) {
+private fun AgentModeSwitch(isAgentModeEnabled: Boolean, onCamSelectorChange: (Boolean) -> Unit) {
     val agentModeBackgroundColor = if (isAgentModeEnabled) {
         MaterialTheme.colorScheme.secondary
     } else {

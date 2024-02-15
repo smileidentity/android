@@ -7,8 +7,8 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import kotlinx.parcelize.Parcelize
 import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
 @Parcelize

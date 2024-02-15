@@ -27,6 +27,7 @@ import com.smileidentity.util.FileType
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.moveJobToComplete
+import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,

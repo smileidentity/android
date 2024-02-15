@@ -8,8 +8,8 @@ import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.squareup.moshi.JsonClass
-import kotlinx.parcelize.Parcelize
 import java.io.File
+import kotlinx.parcelize.Parcelize
 
 /**
  * This callback is only consumed from Kotlin code, so typealias is fine. Java code will use the

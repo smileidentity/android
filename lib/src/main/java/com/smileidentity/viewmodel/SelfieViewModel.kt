@@ -35,6 +35,9 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.moveJobToComplete
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
+import java.io.File
+import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
@@ -46,9 +49,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
-import kotlin.math.absoluteValue
-import kotlin.time.Duration.Companion.milliseconds
 
 private val UI_DEBOUNCE_DURATION = 250.milliseconds
 private const val INTRA_IMAGE_MIN_DELAY_MS = 350

@@ -20,15 +20,15 @@ import com.smileidentity.util.postProcessImage
 import com.smileidentity.util.toByteArray
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
+import java.io.File
+import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
-import kotlin.math.abs
-import kotlin.time.Duration.Companion.seconds
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
 private const val LUMINANCE_THRESHOLD = 35

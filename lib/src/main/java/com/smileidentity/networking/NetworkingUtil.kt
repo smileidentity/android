@@ -5,13 +5,13 @@ import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.ImageType
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
-import okio.ByteString.Companion.encode
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipOutputStream
+import okio.ByteString.Companion.encode
 
 fun calculateSignature(timestamp: String): String {
     val apiKey = SmileID.apiKey ?: throw IllegalStateException(

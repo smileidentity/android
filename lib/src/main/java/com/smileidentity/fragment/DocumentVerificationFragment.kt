@@ -23,8 +23,8 @@ import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
-import kotlinx.collections.immutable.toImmutableMap
 import java.io.File
+import kotlinx.collections.immutable.toImmutableMap
 
 /**
  * Perform a Document Verification

@@ -19,11 +19,7 @@ import com.smileidentity.util.toast
 @SmileIDOptIn
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraPermissionButton(
-    text: String,
-    modifier: Modifier = Modifier,
-    onGranted: () -> Unit,
-) {
+fun CameraPermissionButton(text: String, modifier: Modifier = Modifier, onGranted: () -> Unit) {
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
         if (granted) {

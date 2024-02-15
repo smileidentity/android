@@ -16,12 +16,12 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.sample.repo.DataStoreRepository
 import com.squareup.moshi.JsonClass
-import timber.log.Timber
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import timber.log.Timber
 
 /**
  * This class is used by the [DataStoreRepository] to store Preferences/to be shown on the Jobs
@@ -104,11 +104,7 @@ fun EnhancedDocumentVerificationJobStatusResponse.toJob(userId: String, jobId: S
     jobType = EnhancedDocumentVerification,
 )
 
-fun JobStatusResponse.toJob(
-    userId: String,
-    jobId: String,
-    jobType: JobType,
-) = Job(
+fun JobStatusResponse.toJob(userId: String, jobId: String, jobType: JobType) = Job(
     jobType = jobType,
     timestamp = toHumanReadableTimestamp(timestamp),
     userId = userId,
