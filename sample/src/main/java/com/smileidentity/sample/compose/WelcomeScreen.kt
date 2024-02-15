@@ -116,7 +116,7 @@ fun WelcomeScreen(
                         start = offset,
                         end = offset,
                     ).firstOrNull()?.let {
-                        uriHandler.openUri("https://portal.smileidentity.com/sdk")
+                        uriHandler.openUri("https://portal.usesmileid.com/sdk")
                     }
                 },
             )
