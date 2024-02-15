@@ -43,8 +43,8 @@ import com.smileidentity.sample.R
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.IdTypeSelectorAndFieldInputViewModel
 import com.smileidentity.viewmodel.viewModelFactory
-import timber.log.Timber
 import java.net.URL
+import timber.log.Timber
 
 @Composable
 fun IdTypeSelectorAndFieldInputScreen(

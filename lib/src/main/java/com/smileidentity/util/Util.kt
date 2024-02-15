@@ -33,13 +33,13 @@ import com.smileidentity.models.BvnVerificationMode
 import com.smileidentity.models.SmileIDException
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
+import java.io.File
+import java.io.Serializable
+import java.nio.ByteBuffer
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 import timber.log.Timber
-import java.io.File
-import java.io.Serializable
-import java.nio.ByteBuffer
 
 internal fun createBvnOtpVerificationModes(maps: List<BvnVerificationMode>) = maps.flatMap {
     it.entries.map { (mode, value) ->
@@ -96,16 +96,10 @@ internal fun isImageAtLeast(
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
 }
 
-internal fun isValidDocumentImage(
-    context: Context,
-    uri: Uri?,
-) = isImageAtLeast(context, uri, width = 1920, height = 1080)
+internal fun isValidDocumentImage(context: Context, uri: Uri?) =
+    isImageAtLeast(context, uri, width = 1920, height = 1080)
 
-fun Bitmap.rotated(
-    rotationDegrees: Int,
-    flipX: Boolean = false,
-    flipY: Boolean = false,
-): Bitmap {
+fun Bitmap.rotated(rotationDegrees: Int, flipX: Boolean = false, flipY: Boolean = false): Bitmap {
     val matrix = Matrix()
 
     // Rotate the image back to straight.
@@ -306,18 +300,15 @@ fun randomJobId() = randomId("job")
  *  @param uri a URI
  *  @param context Android Context
  */
-internal fun generateFileFromUri(
-    uri: Uri,
-    context: Context,
-): File? = uri.getFilePath(context = context)?.let { File(it) }
+internal fun generateFileFromUri(uri: Uri, context: Context): File? =
+    uri.getFilePath(context = context)?.let { File(it) }
 
 /**
  * Get path from a URI
  *
  * @param context Android context
  */
-private fun Uri.getFilePath(context: Context): String? =
-    getImagePath(context, this)
+private fun Uri.getFilePath(context: Context): String? = getImagePath(context, this)
 
 /**
  * Borrowed here - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
@@ -343,10 +334,7 @@ private fun getImagePath(context: Context, uri: Uri): String? =
  * @param uri           The Uri to query.
  * @return The value of the _data column, which is typically a file path.
  */
-private fun getDataColumn(
-    context: Context,
-    uri: Uri?,
-): String? {
+private fun getDataColumn(context: Context, uri: Uri?): String? {
     var cursor: Cursor? = null
     val column = "_data"
     val projection = arrayOf(column)

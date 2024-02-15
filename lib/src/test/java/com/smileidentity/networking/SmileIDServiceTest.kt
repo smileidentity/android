@@ -3,6 +3,9 @@ package com.smileidentity.networking
 import com.smileidentity.models.JobStatusResponse
 import io.mockk.every
 import io.mockk.mockk
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -10,9 +13,6 @@ import kotlinx.coroutines.test.testTimeSource
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 class SmileIDServiceTest {
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)

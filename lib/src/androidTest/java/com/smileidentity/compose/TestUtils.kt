@@ -43,13 +43,12 @@ internal fun denyPermissionInDialog(
     permissionButton.clickForPermission(instrumentation)
 }
 
-private fun UiDevice.findPermissionButton(text: String): UiObject =
-    findObject(
-        UiSelector()
-            .textMatches(text)
-            .clickable(true)
-            .className("android.widget.Button"),
-    )
+private fun UiDevice.findPermissionButton(text: String): UiObject = findObject(
+    UiSelector()
+        .textMatches(text)
+        .clickable(true)
+        .className("android.widget.Button"),
+)
 
 private fun UiObject.clickForPermission(
     instrumentation: Instrumentation = InstrumentationRegistry.getInstrumentation(),
