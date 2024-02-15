@@ -1,9 +1,9 @@
 package com.smileidentity.networking
 
 import com.squareup.moshi.Moshi
+import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.io.File
 
 class FileAdapterTest {
     private val adapter = Moshi.Builder()

@@ -110,11 +110,7 @@ class IdTypeSelectorAndFieldInputViewModel(
         }
     }
 
-    fun loadConsent(
-        userId: String,
-        jobId: String,
-        idInfo: IdInfo,
-    ) {
+    fun loadConsent(userId: String, jobId: String, idInfo: IdInfo) {
         // Check whether consent is required (returned in the auth smile response)
         // on error, fall back to showing consent
         val proxy = { e: Throwable ->

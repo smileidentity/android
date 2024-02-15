@@ -61,8 +61,8 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import timber.log.Timber
 import java.io.File
+import timber.log.Timber
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
@@ -272,10 +272,7 @@ private fun CaptureScreenContent(
 }
 
 @Composable
-private fun CaptureDocumentButton(
-    modifier: Modifier = Modifier,
-    onCaptureClicked: () -> Unit,
-) {
+private fun CaptureDocumentButton(modifier: Modifier = Modifier, onCaptureClicked: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.si_camera_capture),
         contentDescription = "smile_camera_capture",

@@ -26,6 +26,8 @@ import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
 import retrofit2.http.Body
@@ -33,8 +35,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Url
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 interface SmileIDService {
     /**
@@ -246,9 +246,7 @@ internal fun <T : JobStatusResponse> poll(
     action: suspend (attempt: Int) -> T,
 ) = channelFlow {
     var latestError: Exception? = null
-    // TODO: Replace `until` with `..<` once ktlint-gradle plugin stops throwing an exception for it
-    //  see: https://github.com/JLLeitschuh/ktlint-gradle/issues/692
-    for (attempt in 0 until numAttempts) {
+    for (attempt in 0..<numAttempts) {
         try {
             val response = action(attempt)
             send(response)

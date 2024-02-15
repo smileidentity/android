@@ -5,8 +5,8 @@ package com.smileidentity.models
 import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import kotlinx.parcelize.Parcelize
 import java.io.File
+import kotlinx.parcelize.Parcelize
 
 /**
  * This class represents info.json

@@ -14,13 +14,13 @@ import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import java.io.File
+import java.lang.reflect.Type
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Converter
 import retrofit2.Retrofit
-import java.io.File
-import java.lang.reflect.Type
 
 @Suppress("unused")
 object JobTypeAdapter {
@@ -116,14 +116,12 @@ object JobResultAdapter {
 @Suppress("unused")
 object SmartSelfieJobResultAdapter {
     @FromJson
-    fun fromJson(
-        reader: JsonReader,
-        delegate: JsonAdapter<SmartSelfieJobResult.Entry>,
-    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-        delegate.fromJson(reader)!!
-    } else {
-        JobResult.Freeform(reader.nextString())
-    }
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<SmartSelfieJobResult.Entry>) =
+        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+            delegate.fromJson(reader)!!
+        } else {
+            JobResult.Freeform(reader.nextString())
+        }
 
     @ToJson
     fun toJson(
@@ -141,14 +139,12 @@ object SmartSelfieJobResultAdapter {
 @Suppress("unused")
 object DocumentVerificationJobResultAdapter {
     @FromJson
-    fun fromJson(
-        reader: JsonReader,
-        delegate: JsonAdapter<DocumentVerificationJobResult.Entry>,
-    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-        delegate.fromJson(reader)!!
-    } else {
-        JobResult.Freeform(reader.nextString())
-    }
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<DocumentVerificationJobResult.Entry>) =
+        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+            delegate.fromJson(reader)!!
+        } else {
+            JobResult.Freeform(reader.nextString())
+        }
 
     @ToJson
     fun toJson(
@@ -166,14 +162,12 @@ object DocumentVerificationJobResultAdapter {
 @Suppress("unused")
 object BiometricKycJobResultAdapter {
     @FromJson
-    fun fromJson(
-        reader: JsonReader,
-        delegate: JsonAdapter<BiometricKycJobResult.Entry>,
-    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-        delegate.fromJson(reader)!!
-    } else {
-        JobResult.Freeform(reader.nextString())
-    }
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<BiometricKycJobResult.Entry>) =
+        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+            delegate.fromJson(reader)!!
+        } else {
+            JobResult.Freeform(reader.nextString())
+        }
 
     @ToJson
     fun toJson(

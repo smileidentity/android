@@ -31,9 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.smileidentity.sample.R
 
 @Composable
-fun ResourcesScreen(
-    modifier: Modifier = Modifier,
-) {
+fun ResourcesScreen(modifier: Modifier = Modifier) {
     var shouldShowWhoWeAreDialog by rememberSaveable { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val resources = listOf(
