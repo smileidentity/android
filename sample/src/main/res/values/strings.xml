@@ -45,7 +45,7 @@
 
     <!--  Root Screen  -->
     <string name="root_welcome">Welcome to our Sample App!</string>
-    <string name="root_description">To begin testing on this app, you need to add a configuration from Smile Portal. \n\nSee link here: \n<annotation is_url="true">portal.smileidentity.com/sdk</annotation></string>
+    <string name="root_description">To begin testing on this app, you need to add a configuration from Smile Portal. \n\nSee link here: \n<annotation is_url="true">portal.usesmileid.com/sdk</annotation></string>
     <string name="root_scan_qr">Scan Configuration QR</string>
     <string name="root_add_config">Add Config manually</string>
     <string name="root_config_added">Configuration Added</string>

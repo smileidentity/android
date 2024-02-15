@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.smileidentity.SmileID;
 import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
@@ -35,6 +36,7 @@ public class JavaActivity extends FragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SmileID.initialize(this);
         setContentView(R.layout.activity_java);
         Toast.makeText(this, "Java Activity", Toast.LENGTH_LONG).show();
         productFragmentContainer = findViewById(R.id.fragment_container);

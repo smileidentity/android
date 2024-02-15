@@ -58,7 +58,12 @@ import kotlinx.collections.immutable.toImmutableMap
 class SmartSelfieEnrollmentFragment : Fragment() {
     companion object {
         const val KEY_REQUEST = "SmartSelfieEnrollmentRequest"
-        const val KEY_RESULT = "SmartSelfieEnrollmentResult"
+
+        /**
+         * This is internal to prevent partners from accidentally using the wrong key. They only
+         * need [KEY_REQUEST]. Partners should use [resultFromBundle] to extract the result.
+         */
+        internal const val KEY_RESULT = "SmartSelfieEnrollmentResult"
 
         /**
          * Creates a new instance of [SmartSelfieEnrollmentFragment] which wraps the
