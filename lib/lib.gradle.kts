@@ -117,7 +117,7 @@ mavenPublishing {
             developer {
                 id = "vanshg"
                 name = "Vansh Gandhi"
-                email = "vansh@smileidentity.com"
+                email = "vansh@usesmileid.com "
                 url = "https://github.com/vanshg"
                 organization = "Smile ID"
                 organizationUrl = "https://usesmileid.com"
@@ -125,7 +125,7 @@ mavenPublishing {
             developer {
                 id = "JNdhlovu"
                 name = "Japhet Ndhlovu"
-                email = "japhet@smileidentity.com"
+                email = "japhet@usesmileid.com "
                 url = "https://github.com/jndhlovu"
                 organization = "Smile ID"
                 organizationUrl = "https://usesmileid.com"
@@ -133,7 +133,7 @@ mavenPublishing {
             developer {
                 id = "jumaallan"
                 name = "Juma Allan"
-                email = "juma@smileidentity.com"
+                email = "juma@usesmileid.com "
                 url = "https://github.com/jumaallan"
                 organization = "Smile ID"
                 organizationUrl = "https://usesmileid.com"
