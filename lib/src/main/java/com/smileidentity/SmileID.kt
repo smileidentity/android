@@ -194,7 +194,7 @@ object SmileID {
         includePending = true,
     )
 
-    /**j
+    /**
      * Initiates the cleanup process for a single job by its ID.
      * This is a convenience method that wraps the cleanup process, allowing for a single job ID
      * to be specified for cleanup.
