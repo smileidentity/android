@@ -28,8 +28,9 @@ We use [ktlint](https://github.com/pinterest/ktlint) via
 
 To run the linter, run `./gradlew ktlintCheck`. To run the formatter, run `./gradlew ktlintFormat`
 
-The codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce the code style
-(taken from https://pinterest.github.io/ktlint/rules/configuration-intellij-idea/)
+ktLint uses the `.editorconfig` file to enforce code style. 
+In addition, the codeStyles found in `.idea/codeStyles` are used by Android Studio to enforce the
+code style (https://pinterest.github.io/ktlint/1.1.1/rules/configuration-intellij-idea/)
 
 ## Releasing
 
