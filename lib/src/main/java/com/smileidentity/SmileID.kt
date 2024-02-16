@@ -45,15 +45,13 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
+    internal var allowOfflineMode: Boolean = false
     var callbackUrl: String = ""
         private set
 
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
-
-    internal var allowOfflineMode: Boolean = false
-        private set
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
@@ -104,11 +102,6 @@ object SmileID {
 
         // Usually looks like: /data/user/0/<package name>/app_SmileID
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
-    }
-
-    @JvmStatic
-    fun setAllowOfflineMode(allowOfflineMode: Boolean) {
-        SmileID.allowOfflineMode = allowOfflineMode
     }
 
     /**
@@ -169,10 +162,28 @@ object SmileID {
     }
 
     /**
+     * Sets the state of offline mode for the SDK.
+     *
+     * This function enables or disables the SDK's ability to operate in offline mode,
+     * where it can continue functioning without an active internet connection. When offline mode
+     * is enabled (allowOfflineMode = true), the SDK will attempt to use capture and cache
+     * images in local file storage and will not attempt to submit the job. Conversely, when offline
+     * mode is disabled (allowOfflineMode = false), the application will require an active internet
+     * connection for all operations that involve data fetching or submission.
+     *
+     * @param allowOfflineMode A Boolean value indicating whether offline mode should be enabled (true)
+     *                         or disabled (false).
+     */
+    @JvmStatic
+    fun setAllowOfflineMode(allowOfflineMode: Boolean) {
+        SmileID.allowOfflineMode = allowOfflineMode
+    }
+
+    /**
      * Retrieves a list of submitted job IDs.
      * This method filters the job IDs to include only those that have been completed (submitted),
      * excluding any pending jobs.
-     *
+     *j
      * @return A list of strings representing the IDs of submitted jobs.
      */
     @JvmStatic
