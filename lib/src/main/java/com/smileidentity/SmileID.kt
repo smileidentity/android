@@ -176,7 +176,7 @@ object SmileID {
      * @return A list of strings representing the IDs of submitted jobs.
      */
     @JvmStatic
-    internal fun getSubmittedJobs(): List<String> = listJobIds(
+    fun getSubmittedJobs(): List<String> = listJobIds(
         includeCompleted = true,
         includePending = false,
     )
