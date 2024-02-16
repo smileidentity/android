@@ -4,6 +4,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
@@ -74,6 +75,7 @@ interface SmileIDService {
     //  the request body.
     @Multipart
     @POST("/v1/biometric_authentication")
+    @SmileIDOptIn
     suspend fun doBiometricAuthentication(
         @Header("SmileID-Timestamp") timestamp: String,
         @Header("SmileID-Request-Signature") signature: String,
