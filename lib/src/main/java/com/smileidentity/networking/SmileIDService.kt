@@ -3,6 +3,7 @@
 package com.smileidentity.networking
 
 import com.smileidentity.BuildConfig
+import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
@@ -33,8 +34,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -65,11 +68,18 @@ interface SmileIDService {
     @PUT
     suspend fun upload(@Url url: String, @Body request: UploadRequest)
 
+    // TODO: Once the API no longer requires the filename to be sent, change selfieImage and
+    //  livenessImages to be List<File> and use a File to RequestBody converter instead. This will
+    //  allow us to specify the Part name on the API/service definition rather than when creating
+    //  the request body.
     @Multipart
     @POST("/v1/biometric_authentication")
     suspend fun doBiometricAuthentication(
-        @Part("image") selfieImage: File,
-        @Part("liveness_sequence") livenessImages: List<File>,
+        @Header("SmileID-Timestamp") timestamp: String,
+        @Header("SmileID-Request-Signature") signature: String,
+        @Header("SmileID-Partner-ID") partnerId: String = SmileID.config.partnerId,
+        @Part selfieImage: MultipartBody.Part,
+        @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
         @Part("partner_params") partnerParams: PartnerParams,
         @Part("source_sdk") sourceSdk: String = "android",
         @Part("source_sdk_version") sourceSdkVersion: String = BuildConfig.VERSION_NAME,
