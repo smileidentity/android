@@ -10,8 +10,8 @@ import org.junit.Test
 
 class FileUtilsTest {
     private lateinit var testDir: File
-    private val submittedPath = "complete"
-    private val unSubmittedPath = "pending"
+    private val submittedPath = "/complete"
+    private val unSubmittedPath = "/pending"
 
     @Before
     fun setup() {
@@ -37,7 +37,12 @@ class FileUtilsTest {
 
     @Test
     fun `should not clean up all jobs if list is empty`() {
-        cleanupJobs(deleteCompletedJobs = true, deletePendingJobs = true, jobIds = listOf())
+        cleanupJobs(
+            deleteCompletedJobs = true,
+            deletePendingJobs = true,
+            jobIds = listOf(),
+            savePath = testDir.absolutePath,
+        )
         // Assert no files are deleted when jobIds is empty
         assertTrue(File(testDir, submittedPath).list()?.isNotEmpty() ?: false)
         assertTrue(File(testDir, unSubmittedPath).list()?.isNotEmpty() ?: false)
@@ -45,7 +50,7 @@ class FileUtilsTest {
 
     @Test
     fun `should clean up all completed jobs if deleteCompletedJobs is true`() {
-        cleanupJobs(deleteCompletedJobs = true, jobIds = null)
+        cleanupJobs(deleteCompletedJobs = true, jobIds = null, savePath = testDir.absolutePath)
         // Assert all files in submitted are deleted
         assertTrue(File(testDir, submittedPath).list()?.isEmpty() ?: true)
         // Assert unsubmitted files are untouched
@@ -54,7 +59,7 @@ class FileUtilsTest {
 
     @Test
     fun `should clean up all pending jobs if deletePendingJobs is true`() {
-        cleanupJobs(deletePendingJobs = true, jobIds = null)
+        cleanupJobs(deletePendingJobs = true, jobIds = null, savePath = testDir.absolutePath)
         // Assert all files in unsubmitted are deleted
         assertTrue(File(testDir, unSubmittedPath).list()?.isEmpty() ?: true)
         // Assert submitted files are untouched
@@ -64,7 +69,12 @@ class FileUtilsTest {
     @Test
     fun `should clean up all jobs using job ids`() {
         val jobIds = listOf("job_1", "job_2")
-        cleanupJobs(deleteCompletedJobs = true, deletePendingJobs = true, jobIds = jobIds)
+        cleanupJobs(
+            deleteCompletedJobs = true,
+            deletePendingJobs = true,
+            jobIds = jobIds,
+            savePath = testDir.absolutePath,
+        )
         // Assert specified jobs are deleted from both submitted and unsubmitted
         assertFalse(File(testDir, "$submittedPath/job_1").exists())
         assertFalse(File(testDir, "$submittedPath/job_2").exists())
@@ -77,7 +87,12 @@ class FileUtilsTest {
 
     @Test
     fun `should not clean up all jobs flags are false`() {
-        cleanupJobs(deleteCompletedJobs = false, deletePendingJobs = false, jobIds = null)
+        cleanupJobs(
+            deleteCompletedJobs = false,
+            deletePendingJobs = false,
+            jobIds = null,
+            savePath = testDir.absolutePath,
+        )
         // Assert no files are deleted when both flags are false
         File(testDir, submittedPath).list()?.let { assertTrue(it.isNotEmpty()) }
         File(testDir, unSubmittedPath).list()?.let { assertTrue(it.isNotEmpty()) }

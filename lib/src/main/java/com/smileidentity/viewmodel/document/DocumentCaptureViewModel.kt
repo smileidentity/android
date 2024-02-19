@@ -55,13 +55,13 @@ enum class DocumentDirective(@StringRes val displayText: Int) {
 }
 
 class DocumentCaptureViewModel(
+    private val jobId: String,
     private val knownAspectRatio: Float?,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
             .build(),
     ),
-    private val jobId: String,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()

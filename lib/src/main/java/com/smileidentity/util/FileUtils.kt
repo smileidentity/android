@@ -1,6 +1,8 @@
 package com.smileidentity.util
 
 import com.smileidentity.SmileID
+import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.PrepUploadRequest
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -57,17 +59,18 @@ enum class FileType {
  * with the targeted jobs. It's designed to facilitate efficient storage management and job lifecycle
  * maintenance within the system, ensuring that resources are allocated and used effectively.
  */
-
 internal fun cleanupJobs(
     deleteCompletedJobs: Boolean = false,
     deletePendingJobs: Boolean = false,
     jobIds: List<String>? = null,
+    // Default to the base save path used by createSmileTempFile
+    savePath: String = SmileID.fileSavePath,
 ) {
     if (jobIds != null && jobIds.isEmpty()) return
 
     val pathsToClean = mutableListOf<String>()
-    if (deleteCompletedJobs) pathsToClean.add(SUBMITTED_PATH)
-    if (deletePendingJobs) pathsToClean.add(UN_SUBMITTED_PATH)
+    if (deleteCompletedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
+    if (deletePendingJobs) pathsToClean.add("$savePath/$UN_SUBMITTED_PATH")
 
     if (jobIds == null) {
         // Nuke all files in specified paths
@@ -75,10 +78,14 @@ internal fun cleanupJobs(
             File(path).deleteRecursively()
         }
     } else {
-        // Delete only specified jobIds
+        // Delete only specified jobIds within each folder inside the base paths
         pathsToClean.forEach { basePath ->
-            jobIds.forEach { jobId ->
-                File("$basePath/$jobId").deleteRecursively()
+            File(basePath).walk().forEach { folder ->
+                if (folder.isDirectory) {
+                    jobIds.forEach { jobId ->
+                        File(folder, jobId).deleteRecursively()
+                    }
+                }
             }
         }
     }
@@ -209,6 +216,7 @@ internal fun createSmileTempFile(
     imageType: String,
     folderName: String,
     state: Boolean = true,
+    fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
 ): File {
     val stateDirectory = if (state) UN_SUBMITTED_PATH else SUBMITTED_PATH
@@ -216,7 +224,16 @@ internal fun createSmileTempFile(
     if (!directory.exists()) {
         directory.mkdirs()
     }
-    return File(directory, "si_${imageType}_${System.currentTimeMillis()}.jpg")
+    return File(directory, "si_${imageType}_${System.currentTimeMillis()}.$fileExt")
+}
+
+internal fun createSmileImageFile(imageType: String, folderName: String): File {
+    val fileName = "si_${imageType}_${System.currentTimeMillis()}"
+    return createSmileTempFile(fileName, folderName)
+}
+
+internal fun createSmileJsonFile(fileName: String, folderName: String): File {
+    return createSmileTempFile(fileName, folderName, fileExt = "json")
 }
 
 /**
@@ -289,8 +306,69 @@ private fun File.copyTo(target: File, overwrite: Boolean) {
     }
 }
 
-internal fun createLivenessFile(jobId: String) = createSmileTempFile("liveness", jobId)
-internal fun createSelfieFile(jobId: String) = createSmileTempFile("selfie", jobId)
-internal fun createDocumentFile(jobId: String) = createSmileTempFile("document", jobId)
+internal fun createLivenessFile(jobId: String) = createSmileImageFile("liveness", jobId)
+internal fun createSelfieFile(jobId: String) = createSmileImageFile("selfie", jobId)
+internal fun createDocumentFile(jobId: String) = createSmileImageFile("document", jobId)
+
+/**
+ * Creates a pre-upload file for a specific job and partner parameters.
+ *
+ * This function generates a file intended to be uploaded before the main job submission.
+ * It encapsulates necessary details such as partner parameters and whether new enrollments
+ * are allowed. The generated file is stored in a predefined directory structure based on the
+ * job's unique identifier (jobId), ensuring each job's pre-upload file is uniquely identifiable
+ * and accessible.
+ *
+ * @param jobId A unique identifier for the job. This is used to determine the storage location
+ *              of the pre-upload file and ensure it is associated with the correct job.
+ * @param prepUploadRequest An instance of PrepUploadRequest containing the partner parameters
+ *             and enrollment allowance flag. This information is serialized and stored in the
+ *             pre-upload file for later use during the job submission process.
+ * @return A File object pointing to the newly created pre-upload file. The file contains the
+ *         serialized partner parameters and enrollment allowance flag, ready for upload or
+ *         further processing.
+ */
+internal fun createPreUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
+    val file = createSmileJsonFile("preupload", jobId)
+    file.writeBytes(
+        SmileID.moshi.adapter(PrepUploadRequest::class.java)
+            .toJson(prepUploadRequest).toByteArray(),
+    )
+    return file
+}
+
+/**
+ * Creates an authentication request file for a specific job, incorporating user and job details.
+ *
+ * This function is responsible for generating a file that contains the authentication request
+ * details necessary for processing a job. The request includes information about the job type,
+ * whether the job involves enrollment, and identifiers for both the job and the user. The
+ * generated file serves as a structured way to encapsulate and transmit authentication details
+ * required for job processing.
+ *
+ * @param jobId A unique identifier for the job. This ID is used to associate the authentication
+ *              request file with its corresponding job, ensuring that the authentication
+ *              process is tied to the correct job context.
+ * @param authRequest A populated instance of AuthenticationRequest containing the necessary
+ *              details for the job. This includes the job type, user ID, and other relevant information
+ * @return A File object that points to the newly created authentication request file. This file
+ *         is structured to include all necessary details for processing the authentication
+ *         request and is ready for submission or further action as required by the job's
+ *         processing workflow.
+ */
+internal fun createAuthenticationRequestFile(
+    jobId: String,
+    authRequest: AuthenticationRequest,
+): File {
+    authRequest.apply {
+        authToken = "" // Remove this so it is not stored offline
+    }
+    val file = createSmileJsonFile("authenticationrequest", jobId)
+    file.writeBytes(
+        SmileID.moshi.adapter(AuthenticationRequest::class.java)
+            .toJson(authRequest).toByteArray(),
+    )
+    return file
+}
 
 enum class DeleteScope { PendingJobs, CompletedJobs, AllJobs }

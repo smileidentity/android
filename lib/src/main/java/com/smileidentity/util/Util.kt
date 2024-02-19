@@ -40,6 +40,7 @@ import java.io.Serializable
 import java.nio.ByteBuffer
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
+import okio.IOException
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -369,6 +370,22 @@ fun Context.isInternetAvailable(): Boolean {
     }
     return result
 }
+
+/**
+ * Checks if the given exception is a result of a network failure.
+ *
+ * This method considers an exception to be a network failure if it is either
+ * an [IOException] or an [InterruptedException]. [IOException] typically indicates
+ * an issue with network connectivity, such as a timeout or unreachable server.
+ * [InterruptedException] is included as a network failure condition here because
+ * network operations can be interrupted, especially in a multithreaded context or
+ * when a coroutine is cancelled.
+ *
+ * @param e The exception to check for being indicative of a network failure.
+ * @return [Boolean] `true` if the exception is related to a network failure,
+ *         `false` otherwise.
+ */
+internal fun isNetworkFailure(e: Throwable): Boolean = e is IOException || e is InterruptedException
 
 /**
  * @param uri The Uri to check.
