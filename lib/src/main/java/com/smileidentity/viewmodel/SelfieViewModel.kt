@@ -17,8 +17,10 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
+import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -28,10 +30,13 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.area
+import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
+import com.smileidentity.util.createPreUploadFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToComplete
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
@@ -256,12 +261,24 @@ class SelfieViewModel(
             return
         }
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
-        val proxy = { e: Throwable ->
+
+        val proxy = fun(e: Throwable) {
+            val errorMessage = if (isNetworkFailure(
+                    e,
+                )
+            ) {
+                R.string.si_offline_message
+            } else {
+                R.string.si_processing_error_subtitle
+            }
+            if (!(SmileID.allowOfflineMode && isNetworkFailure(e))) {
+                moveJobToComplete(jobId)
+            }
             result = SmileIDResult.Error(e)
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_processing_error_subtitle,
+                    errorMessage = errorMessage,
                 )
             }
         }
@@ -273,6 +290,21 @@ class SelfieViewModel(
                 userId = userId,
                 jobId = jobId,
             )
+
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+                val prepUploadRequest = PrepUploadRequest(
+                    partnerParams = PartnerParams(
+                        jobId = jobId,
+                        jobType = JobType.BiometricKyc,
+                        userId = userId,
+                        extras = extraPartnerParams,
+                    ),
+                    // TODO - Adjust according to backend changes
+                    allowNewEnroll = allowNewEnroll.toString(),
+                )
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
 
             val authResponse = SmileID.api.authenticate(authRequest)
 

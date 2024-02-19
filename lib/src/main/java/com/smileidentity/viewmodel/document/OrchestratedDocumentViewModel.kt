@@ -12,6 +12,7 @@ import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentBackImage
@@ -24,8 +25,11 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.createAuthenticationRequestFile
+import com.smileidentity.util.createPreUploadFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToComplete
 import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
@@ -48,12 +52,12 @@ internal data class OrchestratedDocumentUiState(
 internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val jobType: JobType,
     private val userId: String,
-    val jobId: String,
+    private val jobId: String,
     private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
     private val captureBothSides: Boolean,
-    private var selfieFile: File? = null,
+    protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
@@ -61,9 +65,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     var result: SmileIDResult<T> = SmileIDResult.Error(
         IllegalStateException("Document Capture incomplete"),
     )
-    private var documentFrontFile: File? = null
-    private var documentBackFile: File? = null
-    private var livenessFiles: List<File>? = null
+    protected var documentFrontFile: File? = null
+    protected var documentBackFile: File? = null
+    protected var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
@@ -102,6 +106,13 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
+    protected fun sendResult(result: SmileIDResult<T>) {
+        this.result = result
+        _uiState.update {
+            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
+        }
+    }
+
     fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
         selfieFile = it.data.selfieFile
         livenessFiles = it.data.livenessFiles
@@ -121,6 +132,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
         }
+
         viewModelScope.launch(getExceptionHandler(::onError)) {
             val authRequest = AuthenticationRequest(
                 jobType = jobType,
@@ -128,6 +140,21 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 userId = userId,
                 jobId = jobId,
             )
+
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+                val prepUploadRequest = PrepUploadRequest(
+                    partnerParams = PartnerParams(
+                        jobId = jobId,
+                        jobType = JobType.BiometricKyc,
+                        userId = userId,
+                        extras = extraPartnerParams,
+                    ),
+                    // TODO - Adjust according to backend changes
+                    allowNewEnroll = allowNewEnroll.toString(),
+                )
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
 
             val authResponse = SmileID.api.authenticate(authRequest)
 
@@ -182,11 +209,19 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
+        val errorMessage = if (isNetworkFailure(throwable)) {
+            R.string.si_offline_message
+        } else {
+            R.string.si_processing_error_subtitle
+        }
+        if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
+            moveJobToComplete(jobId)
+        }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
             it.copy(
                 currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                errorMessage = R.string.si_processing_error_subtitle,
+                errorMessage = errorMessage,
             )
         }
         Timber.w(throwable, "Error in $stepToRetry")
@@ -217,7 +252,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 internal class DocumentVerificationViewModel(
     jobType: JobType = JobType.DocumentVerification,
     userId: String,
-    jobId: String,
+    val jobId: String,
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
@@ -271,25 +306,24 @@ internal class DocumentVerificationViewModel(
 internal class EnhancedDocumentVerificationViewModel(
     jobType: JobType = JobType.EnhancedDocumentVerification,
     userId: String,
-    jobId: String,
+    val jobId: String,
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-) :
-    OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
-        jobType = jobType,
-        userId = userId,
-        jobId = jobId,
-        allowNewEnroll = allowNewEnroll,
-        countryCode = countryCode,
-        documentType = documentType,
-        captureBothSides = captureBothSides,
-        selfieFile = selfieFile,
-        extraPartnerParams = extraPartnerParams,
-    ) {
+) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
+    jobType = jobType,
+    userId = userId,
+    jobId = jobId,
+    allowNewEnroll = allowNewEnroll,
+    countryCode = countryCode,
+    documentType = documentType,
+    captureBothSides = captureBothSides,
+    selfieFile = selfieFile,
+    extraPartnerParams = extraPartnerParams,
+) {
 
     override fun getJobStatus(
         jobStatusRequest: JobStatusRequest,

@@ -1,13 +1,16 @@
 package com.smileidentity.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -16,8 +19,11 @@ import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.createAuthenticationRequestFile
+import com.smileidentity.util.createPreUploadFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToComplete
 import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
@@ -30,6 +36,7 @@ import timber.log.Timber
 
 data class BiometricKycUiState(
     val processingState: ProcessingState? = null,
+    @StringRes val errorMessage: Int? = null,
 )
 
 class BiometricKycViewModel(
@@ -54,10 +61,26 @@ class BiometricKycViewModel(
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
-        val proxy = { e: Throwable ->
+        val proxy = fun(e: Throwable) {
             Timber.e(e)
+            val errorMessage = if (isNetworkFailure(
+                    e,
+                )
+            ) {
+                R.string.si_offline_message
+            } else {
+                R.string.si_processing_error_subtitle
+            }
+            if (!(SmileID.allowOfflineMode && isNetworkFailure(e))) {
+                moveJobToComplete(jobId)
+            }
             result = SmileIDResult.Error(e)
-            _uiState.update { it.copy(processingState = ProcessingState.Error) }
+            _uiState.update {
+                it.copy(
+                    processingState = ProcessingState.Error,
+                    errorMessage = errorMessage,
+                )
+            }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
@@ -65,6 +88,21 @@ class BiometricKycViewModel(
                 userId = userId,
                 jobId = jobId,
             )
+
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+                val prepUploadRequest = PrepUploadRequest(
+                    partnerParams = PartnerParams(
+                        jobId = jobId,
+                        jobType = JobType.BiometricKyc,
+                        userId = userId,
+                        extras = extraPartnerParams,
+                    ),
+                    // TODO - Adjust according to backend changes
+                    allowNewEnroll = allowNewEnroll.toString(),
+                )
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
 
             val authResponse = SmileID.api.authenticate(authRequest)
 
