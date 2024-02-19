@@ -263,10 +263,7 @@ class SelfieViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
 
         val proxy = fun(e: Throwable) {
-            val errorMessage = if (isNetworkFailure(
-                    e,
-                )
-            ) {
+            val errorMessage = if (isNetworkFailure(e)) {
                 R.string.si_offline_message
             } else {
                 R.string.si_processing_error_subtitle
