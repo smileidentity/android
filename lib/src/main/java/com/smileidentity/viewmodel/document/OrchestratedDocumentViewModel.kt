@@ -52,7 +52,7 @@ internal data class OrchestratedDocumentUiState(
 internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val jobType: JobType,
     private val userId: String,
-    private val jobId: String,
+    protected val jobId: String,
     private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
@@ -65,9 +65,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     var result: SmileIDResult<T> = SmileIDResult.Error(
         IllegalStateException("Document Capture incomplete"),
     )
-    protected var documentFrontFile: File? = null
-    protected var documentBackFile: File? = null
-    protected var livenessFiles: List<File>? = null
+    private var documentFrontFile: File? = null
+    private var documentBackFile: File? = null
+    private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
@@ -103,13 +103,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             }
         } else {
             submitJob()
-        }
-    }
-
-    protected fun sendResult(result: SmileIDResult<T>) {
-        this.result = result
-        _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
         }
     }
 
@@ -252,7 +245,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 internal class DocumentVerificationViewModel(
     jobType: JobType = JobType.DocumentVerification,
     userId: String,
-    val jobId: String,
+    jobId: String,
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
@@ -306,7 +299,7 @@ internal class DocumentVerificationViewModel(
 internal class EnhancedDocumentVerificationViewModel(
     jobType: JobType = JobType.EnhancedDocumentVerification,
     userId: String,
-    val jobId: String,
+    jobId: String,
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,

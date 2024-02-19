@@ -227,11 +227,49 @@ internal fun createSmileTempFile(
     return File(directory, "si_${imageType}_${System.currentTimeMillis()}.$fileExt")
 }
 
+/**
+ * Creates a new image file within a specified folder. The file is intended
+ * for storing an image of a specified type, such as "jpg" or "png".
+ *
+ * The function constructs a uniquely named file to avoid naming conflicts
+ * and places it within a folder named according to the `folderName` parameter.
+ * This is particularly useful for organizing images by type or purpose,
+ * facilitating easier management and retrieval of image files.
+ *
+ * @param imageType The type of the image (e.g., "jpg", "png") which may influence
+ *                  the naming convention or processing of the image file.
+ * @param folderName The name of the folder in which the new image file will be created.
+ *                   This folder is typically a subdirectory of a larger directory
+ *                   designated for storing such files.
+ * @return [File] An instance of the newly created image file, ready for writing
+ *                image data.
+ * @throws IOException If an error occurs during file creation, such as insufficient
+ *                     permissions or disk space.
+ */
 internal fun createSmileImageFile(imageType: String, folderName: String): File {
     val fileName = "si_${imageType}_${System.currentTimeMillis()}"
     return createSmileTempFile(fileName, folderName)
 }
 
+/**
+ * Creates a new JSON file with the specified name within a designated folder. This function
+ * is aimed at facilitating the storage of JSON-formatted data, ensuring organized and
+ * accessible file management within the application. The use of this function is intended
+ * for scenarios where JSON data needs to be persisted locally, such as for configuration
+ * settings, user data, or application state.
+ *
+ * @param fileName The name of the JSON file to be created. This name should include the ".json"
+ *                 file extension to indicate the file type clearly.
+ * @param folderName The name of the folder within which the JSON file will be created. This
+ *                   allows for categorizing and organizing JSON files into specific directories,
+ *                   aiding in file management and retrieval.
+ * @return [File] An instance of the newly created JSON file, ready for data to be written to.
+ *                The returned file object can be used to write JSON data immediately following
+ *                file creation.
+ * @throws IOException If the file creation process encounters any issues, such as if the
+ *                     folder does not exist and cannot be created, or if there is insufficient
+ *                     permission to write to the specified directory.
+ */
 internal fun createSmileJsonFile(fileName: String, folderName: String): File {
     return createSmileTempFile(fileName, folderName, fileExt = "json")
 }
