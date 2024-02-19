@@ -213,8 +213,8 @@ fun getFilesByType(
  * @return The File object pointing to the newly created file.
  */
 internal fun createSmileTempFile(
-    imageType: String,
     folderName: String,
+    fileName: String,
     state: Boolean = true,
     fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
@@ -224,7 +224,49 @@ internal fun createSmileTempFile(
     if (!directory.exists()) {
         directory.mkdirs()
     }
-    return File(directory, "si_${imageType}_${System.currentTimeMillis()}.$fileExt")
+    return File(directory, "si_$fileName.$fileExt")
+}
+
+/**
+* Constructs a `File` object for a temporary file, ensuring the path and file name adhere to
+* expected formats and conditions. This method attempts to address potential edge cases
+* related to file path construction and directory accessibility.
+*
+* @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
+* @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
+* @param state Indicates the state directory where the file is stored. True for UN_SUBMITTED_PATH, false for SUBMITTED_PATH.
+* @param fileExt The extension of the file, without the leading dot. Defaults to "jpg".
+* @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
+* @return The `File` object representing the exact file.
+* @throws IllegalArgumentException If any input parameters are invalid.
+* @throws IOException If the directory cannot be created or is not writable.
+*/
+internal fun getSmileTempFile(
+    folderName: String,
+    fileName: String,
+    state: Boolean = true,
+    fileExt: String = "jpg",
+    savePath: String = SmileID.fileSavePath,
+): File {
+    if (folderName.isBlank() || fileName.isBlank() || fileExt.isBlank()) {
+        throw IllegalArgumentException(
+            "Folder name, file name, and file extension must not be blank.",
+        )
+    }
+
+    val stateDirectory = if (state) UN_SUBMITTED_PATH else SUBMITTED_PATH
+    val directory = File(savePath, "$stateDirectory/$folderName")
+
+    if (!directory.exists() && !directory.mkdirs()) {
+        throw IllegalArgumentException("Invalid jobId or not found")
+    }
+
+    val fullPath = File(directory, "si_$fileName.$fileExt")
+
+    if (!fullPath.exists()) {
+        throw IllegalArgumentException("Invalid file name or not found")
+    }
+    return fullPath
 }
 
 /**
@@ -271,7 +313,7 @@ internal fun createSmileImageFile(imageType: String, folderName: String): File {
  *                     permission to write to the specified directory.
  */
 internal fun createSmileJsonFile(fileName: String, folderName: String): File {
-    return createSmileTempFile(fileName, folderName, fileExt = "json")
+    return createSmileTempFile("si_$fileName", folderName, fileExt = "json")
 }
 
 /**

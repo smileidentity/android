@@ -18,13 +18,24 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.UploadRequest
+import com.smileidentity.networking.asDocumentBackImage
+import com.smileidentity.networking.asDocumentFrontImage
+import com.smileidentity.networking.asLivenessImage
+import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.util.FileType
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.getSmileTempFile
+import com.smileidentity.util.listJobIds
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
@@ -34,6 +45,7 @@ import java.io.File
 import java.net.URL
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import timber.log.Timber
 
 /**
  * Perform a SmartSelfie™ Enrollment
@@ -431,4 +443,61 @@ fun SmileID.ConsentScreen(
             showAttribution = showAttribution,
         )
     }
+}
+
+suspend fun SmileID.submitJob(jobId: String) {
+    val jobIds = listJobIds()
+    if (jobId !in jobIds) {
+        throw IllegalArgumentException("Invalid jobId or not found")
+    }
+    val authRequestFile = getSmileTempFile(
+        jobId,
+        "authenticationrequest",
+        true,
+        "json",
+    )
+    val authRequestJsonString = authRequestFile.readText()
+    val authRequest = moshi.adapter(AuthenticationRequest::class.java)
+        .fromJson(authRequestJsonString)
+        ?: throw IllegalArgumentException("Invalid jobId information")
+
+    val authResponse = api.authenticate(authRequest)
+
+    val prepUploadRequestFile = getSmileTempFile(
+        jobId,
+        "preupload",
+        true,
+        "json",
+    )
+    val prepUploadRequestJsonString = prepUploadRequestFile.readText()
+    val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
+        .fromJson(prepUploadRequestJsonString)
+        ?: throw IllegalArgumentException("Invalid jobId information")
+
+    val prepUploadRequest = savedPrepUploadRequest.copy(
+        timestamp = authResponse.timestamp,
+        signature = authResponse.signature,
+    )
+
+    val prepUploadResponse = api.prepUpload(prepUploadRequest)
+
+    val selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+    val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+    val documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
+    val documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+
+    val selfieImageInfo = selfieFileResult.asSelfieImage()
+    val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
+    val frontImageInfo = documentFrontFileResult.asDocumentFrontImage()
+    val backImageInfo = documentBackFileResult.asDocumentBackImage()
+
+    val uploadRequest = UploadRequest(
+        images = listOfNotNull(
+            frontImageInfo,
+            backImageInfo,
+            selfieImageInfo,
+        ) + livenessImageInfo,
+    )
+    api.upload(prepUploadResponse.uploadUrl, uploadRequest)
+    Timber.d("Upload finished")
 }
