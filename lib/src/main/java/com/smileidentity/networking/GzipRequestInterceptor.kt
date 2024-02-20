@@ -17,13 +17,14 @@ import timber.log.Timber
 internal class GzipRequestInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest: Request = chain.request()
-        if (originalRequest.body == null || originalRequest.header("Content-Encoding") != null) {
+        val body = originalRequest.body
+        if (body == null || originalRequest.header("Content-Encoding") != null) {
             return chain.proceed(originalRequest)
         }
 
         val compressedRequest: Request = originalRequest.newBuilder()
             .header("Content-Encoding", "gzip")
-            .method(originalRequest.method, gzip(originalRequest.body!!))
+            .method(originalRequest.method, gzip(body))
             .build()
         return chain.proceed(compressedRequest)
     }
