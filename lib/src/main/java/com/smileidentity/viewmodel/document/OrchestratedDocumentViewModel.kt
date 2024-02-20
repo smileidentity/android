@@ -12,7 +12,6 @@ import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
-import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentBackImage
@@ -133,20 +132,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 userId = userId,
                 jobId = jobId,
             )
-
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
-                val prepUploadRequest = PrepUploadRequest(
-                    partnerParams = PartnerParams(
-                        jobId = jobId,
-                        jobType = JobType.BiometricKyc,
-                        userId = userId,
-                        extras = extraPartnerParams,
-                    ),
-                    // TODO - Adjust according to backend changes
-                    allowNewEnroll = allowNewEnroll.toString(),
-                )
-                createPreUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -158,6 +145,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
+            if (SmileID.allowOfflineMode) {
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val frontImageInfo = documentFrontFile.asDocumentFrontImage()
             val backImageInfo = documentBackFile?.asDocumentBackImage()
@@ -202,7 +192,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
-        val errorMessage = if (isNetworkFailure(throwable)) {
+        val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
             R.string.si_offline_message
         } else {
             R.string.si_processing_error_subtitle

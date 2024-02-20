@@ -10,7 +10,6 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
-import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -63,10 +62,7 @@ class BiometricKycViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = fun(e: Throwable) {
             Timber.e(e)
-            val errorMessage = if (isNetworkFailure(
-                    e,
-                )
-            ) {
+            val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 R.string.si_offline_message
             } else {
                 R.string.si_processing_error_subtitle
@@ -91,17 +87,6 @@ class BiometricKycViewModel(
 
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
-                val prepUploadRequest = PrepUploadRequest(
-                    partnerParams = PartnerParams(
-                        jobId = jobId,
-                        jobType = JobType.BiometricKyc,
-                        userId = userId,
-                        extras = extraPartnerParams,
-                    ),
-                    // TODO - Adjust according to backend changes
-                    allowNewEnroll = allowNewEnroll.toString(),
-                )
-                createPreUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -113,6 +98,9 @@ class BiometricKycViewModel(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
+            if (SmileID.allowOfflineMode) {
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()

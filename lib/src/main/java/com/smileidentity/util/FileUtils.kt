@@ -290,7 +290,7 @@ internal fun getSmileTempFile(
  */
 internal fun createSmileImageFile(imageType: String, folderName: String): File {
     val fileName = "si_${imageType}_${System.currentTimeMillis()}"
-    return createSmileTempFile(fileName, folderName)
+    return createSmileTempFile(folderName, fileName)
 }
 
 /**
@@ -313,7 +313,7 @@ internal fun createSmileImageFile(imageType: String, folderName: String): File {
  *                     permission to write to the specified directory.
  */
 internal fun createSmileJsonFile(fileName: String, folderName: String): File {
-    return createSmileTempFile("si_$fileName", folderName, fileExt = "json")
+    return createSmileTempFile(folderName, "si_$fileName", fileExt = "json")
 }
 
 /**
@@ -440,13 +440,11 @@ internal fun createAuthenticationRequestFile(
     jobId: String,
     authRequest: AuthenticationRequest,
 ): File {
-    authRequest.apply {
-        authToken = "" // Remove this so it is not stored offline
-    }
+    val sanitiazedAuthRequest = authRequest.copy(authToken = "")
     val file = createSmileJsonFile("authenticationrequest", jobId)
     file.writeBytes(
         SmileID.moshi.adapter(AuthenticationRequest::class.java)
-            .toJson(authRequest).toByteArray(),
+            .toJson(sanitiazedAuthRequest).toByteArray(),
     )
     return file
 }

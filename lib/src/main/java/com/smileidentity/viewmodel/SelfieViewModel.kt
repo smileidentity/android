@@ -17,10 +17,8 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
-import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
-import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -263,7 +261,7 @@ class SelfieViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
 
         val proxy = fun(e: Throwable) {
-            val errorMessage = if (isNetworkFailure(e)) {
+            val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 R.string.si_offline_message
             } else {
                 R.string.si_processing_error_subtitle
@@ -287,20 +285,8 @@ class SelfieViewModel(
                 userId = userId,
                 jobId = jobId,
             )
-
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
-                val prepUploadRequest = PrepUploadRequest(
-                    partnerParams = PartnerParams(
-                        jobId = jobId,
-                        jobType = JobType.BiometricKyc,
-                        userId = userId,
-                        extras = extraPartnerParams,
-                    ),
-                    // TODO - Adjust according to backend changes
-                    allowNewEnroll = allowNewEnroll.toString(),
-                )
-                createPreUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -312,6 +298,9 @@ class SelfieViewModel(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
+            if (SmileID.allowOfflineMode) {
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()
