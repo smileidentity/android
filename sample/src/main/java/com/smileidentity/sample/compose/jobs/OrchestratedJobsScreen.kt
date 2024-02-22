@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,8 +23,8 @@ fun OrchestratedJobsScreen(
         factory = viewModelFactory { JobsViewModel(isProduction) },
     ),
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val jobs = viewModel.jobs.collectAsStateWithLifecycle().value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val jobs by viewModel.jobs.collectAsStateWithLifecycle()
     Box(
         contentAlignment = Center,
         modifier = modifier

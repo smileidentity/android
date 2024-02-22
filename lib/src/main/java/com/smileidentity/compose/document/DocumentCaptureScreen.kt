@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -60,8 +61,8 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import timber.log.Timber
 import java.io.File
+import timber.log.Timber
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
@@ -80,6 +81,7 @@ fun DocumentCaptureScreen(
     showAttribution: Boolean,
     allowGallerySelection: Boolean,
     showSkipButton: Boolean,
+    @DrawableRes instructionsHeroImage: Int,
     instructionsTitleText: String,
     instructionsSubtitleText: String,
     captureTitleText: String,
@@ -118,6 +120,7 @@ fun DocumentCaptureScreen(
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
             DocumentCaptureInstructionsScreen(
+                heroImage = instructionsHeroImage,
                 title = instructionsTitleText,
                 subtitle = instructionsSubtitleText,
                 showAttribution = showAttribution,
@@ -269,10 +272,7 @@ private fun CaptureScreenContent(
 }
 
 @Composable
-private fun CaptureDocumentButton(
-    modifier: Modifier = Modifier,
-    onCaptureClicked: () -> Unit,
-) {
+private fun CaptureDocumentButton(modifier: Modifier = Modifier, onCaptureClicked: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.si_camera_capture),
         contentDescription = "smile_camera_capture",

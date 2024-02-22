@@ -31,10 +31,10 @@ import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
 import com.smileidentity.viewmodel.viewModelFactory
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
 import java.io.File
 import java.net.URL
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 
 /**
  * Perform a SmartSelfie™ Enrollment
@@ -200,7 +200,6 @@ fun SmileID.DocumentVerification(
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
-            captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,
@@ -283,7 +282,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
-            captureBothSides = captureBothSides,
             userId = userId,
             jobId = jobId,
             showAttribution = showAttribution,

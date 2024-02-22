@@ -58,10 +58,7 @@ import kotlinx.collections.immutable.ImmutableList
 import timber.log.Timber
 
 @Composable
-fun JobsListScreen(
-    jobs: ImmutableList<Job>,
-    modifier: Modifier = Modifier,
-) {
+fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
     if (jobs.isEmpty()) {
         ErrorScreen(
             errorText = stringResource(com.smileidentity.sample.R.string.jobs_no_jobs_found),
@@ -75,7 +72,7 @@ fun JobsListScreen(
             val iconRes = when (it.jobType) {
                 SmartSelfieEnrollment -> R.drawable.si_smart_selfie_instructions_hero
                 SmartSelfieAuthentication -> R.drawable.si_smart_selfie_instructions_hero
-                DocumentVerification -> R.drawable.si_doc_v_instructions_hero
+                DocumentVerification -> com.smileidentity.sample.R.drawable.doc_v
                 BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
                 BVN -> com.smileidentity.sample.R.drawable.biometric_kyc

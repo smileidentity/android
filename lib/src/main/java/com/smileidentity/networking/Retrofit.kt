@@ -14,13 +14,14 @@ import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import java.io.File
+import java.lang.reflect.Type
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Converter
 import retrofit2.Retrofit
-import java.io.File
-import java.lang.reflect.Type
 
 @Suppress("unused")
 object JobTypeAdapter {
@@ -80,6 +81,40 @@ object UploadRequestConverterFactory : Converter.Factory() {
     }
 }
 
+/**
+ * Converts a [File] to a [MultipartBody.Part] with the given [partName] and [mediaType].
+ *
+ * @param partName The form data key name
+ * @param mediaType The media type of the file (e.g. "image/jpeg")
+ */
+// TODO: Get rid of this once API does not require the filename to be sent
+//  at that point, we can just use a default converter from File to RequestBody, and that would
+//  allow us to specify the Part name on the API/service definition rather than when creating the
+//  request body
+fun File.asFormDataPart(partName: String, mediaType: String? = null): MultipartBody.Part =
+    MultipartBody.Part.createFormData(
+        partName,
+        // name is the filename
+        name,
+        asRequestBody(mediaType?.toMediaType()),
+    )
+
+/**
+ * Converts a list of [File]s to a list of [MultipartBody.Part]s with the given [partName] and
+ * [mediaType]. This assumes you want to use the same key name for all the files (i.e. an array)
+ *
+ * @param partName The form data key name
+ * @param mediaType The media type of the file (e.g. "image/jpeg")
+ */
+// TODO: Get rid of this once API does not require the filename to be sent
+//  at that point, we can just use a default converter from File to RequestBody, and that would
+//  allow us to specify the Part name on the API/service definition rather than when creating the
+//  request body
+fun List<File>.asFormDataParts(
+    partName: String,
+    mediaType: String? = null,
+): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
+
 @Suppress("unused", "UNUSED_PARAMETER")
 object FileAdapter {
     @ToJson
@@ -116,14 +151,12 @@ object JobResultAdapter {
 @Suppress("unused")
 object SmartSelfieJobResultAdapter {
     @FromJson
-    fun fromJson(
-        reader: JsonReader,
-        delegate: JsonAdapter<SmartSelfieJobResult.Entry>,
-    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-        delegate.fromJson(reader)!!
-    } else {
-        JobResult.Freeform(reader.nextString())
-    }
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<SmartSelfieJobResult.Entry>) =
+        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+            delegate.fromJson(reader)!!
+        } else {
+            JobResult.Freeform(reader.nextString())
+        }
 
     @ToJson
     fun toJson(
@@ -141,14 +174,12 @@ object SmartSelfieJobResultAdapter {
 @Suppress("unused")
 object DocumentVerificationJobResultAdapter {
     @FromJson
-    fun fromJson(
-        reader: JsonReader,
-        delegate: JsonAdapter<DocumentVerificationJobResult.Entry>,
-    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-        delegate.fromJson(reader)!!
-    } else {
-        JobResult.Freeform(reader.nextString())
-    }
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<DocumentVerificationJobResult.Entry>) =
+        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+            delegate.fromJson(reader)!!
+        } else {
+            JobResult.Freeform(reader.nextString())
+        }
 
     @ToJson
     fun toJson(
@@ -166,14 +197,12 @@ object DocumentVerificationJobResultAdapter {
 @Suppress("unused")
 object BiometricKycJobResultAdapter {
     @FromJson
-    fun fromJson(
-        reader: JsonReader,
-        delegate: JsonAdapter<BiometricKycJobResult.Entry>,
-    ) = if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
-        delegate.fromJson(reader)!!
-    } else {
-        JobResult.Freeform(reader.nextString())
-    }
+    fun fromJson(reader: JsonReader, delegate: JsonAdapter<BiometricKycJobResult.Entry>) =
+        if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
+            delegate.fromJson(reader)!!
+        } else {
+            JobResult.Freeform(reader.nextString())
+        }
 
     @ToJson
     fun toJson(

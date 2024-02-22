@@ -32,7 +32,6 @@ import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
 internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     viewModel: OrchestratedDocumentViewModel<T>,
     modifier: Modifier = Modifier,
-    captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -56,6 +55,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
                 showSkipButton = false,
+                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
                 instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
                 instructionsSubtitleText = stringResource(
                     id = R.string.si_verify_identity_instruction_subtitle,
@@ -73,7 +73,8 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
-                showSkipButton = captureBothSides,
+                showSkipButton = false,
+                instructionsHeroImage = R.drawable.si_doc_v_back_hero,
                 instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
                 instructionsSubtitleText = stringResource(
                     id = R.string.si_doc_v_instruction_back_subtitle,

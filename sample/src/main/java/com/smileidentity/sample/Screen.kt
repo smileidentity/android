@@ -2,15 +2,16 @@ package com.smileidentity.sample
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.material.icons.Icons.AutoMirrored
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.Icons.Outlined
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -32,7 +33,7 @@ enum class ProductScreen(
     SmartSelfieAuthentication(
         "smart_selfie_authentication",
         com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
-        com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+        R.drawable.smart_selfie_authentication,
     ),
     EnhancedKyc(
         "enhanced_kyc",
@@ -47,17 +48,17 @@ enum class ProductScreen(
     DocumentVerification(
         "document_verification",
         com.smileidentity.R.string.si_doc_v_product_name,
-        com.smileidentity.R.drawable.si_doc_v_instructions_hero,
+        R.drawable.doc_v,
     ),
     BvnConsent(
         "bvn_consent",
         com.smileidentity.R.string.si_bvn_product_name,
-        R.drawable.biometric_kyc,
+        R.drawable.bvn_consent,
     ),
     EnhancedDocumentVerification(
         "enhanced_docv",
         com.smileidentity.R.string.si_enhanced_docv_product_name,
-        com.smileidentity.R.drawable.si_doc_v_instructions_hero,
+        R.drawable.enhanced_doc_v,
     ),
     TransactionFraud(
         "transaction_fraud",
@@ -81,8 +82,8 @@ enum class BottomNavigationScreen(
     Jobs(
         "jobs",
         R.string.jobs,
-        Filled.List,
-        Outlined.List,
+        AutoMirrored.Filled.List,
+        AutoMirrored.Outlined.List,
     ),
     Resources(
         "resources",

@@ -6,10 +6,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smileidentity.R
+import java.net.URL
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import java.net.URL
 
 class OrchestratedConsentScreenTest {
     @get:Rule

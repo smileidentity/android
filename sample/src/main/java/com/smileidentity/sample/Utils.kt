@@ -94,16 +94,17 @@ fun jobResultMessageBuilder(
     return message.toString()
 }
 
+@Suppress("ktlint:standard:max-line-length")
 val JobType.label: Int
     @StringRes
     get() = when (this) {
-        JobType.SmartSelfieEnrollment -> com.smileidentity.R.string.si_smart_selfie_enrollment_product_name // ktlint-disable max-line-length
-        JobType.SmartSelfieAuthentication -> com.smileidentity.R.string.si_smart_selfie_authentication_product_name // ktlint-disable max-line-length
+        JobType.SmartSelfieEnrollment -> com.smileidentity.R.string.si_smart_selfie_enrollment_product_name
+        JobType.SmartSelfieAuthentication -> com.smileidentity.R.string.si_smart_selfie_authentication_product_name
         JobType.EnhancedKyc -> R.string.enhanced_kyc_product_name
         JobType.BiometricKyc -> com.smileidentity.R.string.si_biometric_kyc_product_name
         JobType.DocumentVerification -> com.smileidentity.R.string.si_doc_v_product_name
         JobType.BVN -> com.smileidentity.R.string.si_bvn_product_name
-        JobType.EnhancedDocumentVerification -> com.smileidentity.R.string.si_enhanced_docv_product_name // ktlint-disable max-line-length
+        JobType.EnhancedDocumentVerification -> com.smileidentity.R.string.si_enhanced_docv_product_name
         JobType.Unknown -> -1
     }
 

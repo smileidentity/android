@@ -1,5 +1,6 @@
 package com.smileidentity.compose.document
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import com.smileidentity.compose.preview.SmilePreviews
  */
 @Composable
 fun DocumentCaptureInstructionsScreen(
+    @DrawableRes heroImage: Int,
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
@@ -47,10 +49,10 @@ fun DocumentCaptureInstructionsScreen(
     BottomPinnedColumn(
         scrollableContent = {
             Image(
-                painter = painterResource(id = R.drawable.si_doc_v_instructions_hero),
+                painter = painterResource(id = heroImage),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(128.dp)
+                    .size(192.dp)
                     .padding(top = 8.dp),
             )
             Text(
@@ -137,6 +139,7 @@ private fun DocumentCaptureInstructionsScreenPreview() {
     Preview {
         Surface {
             DocumentCaptureInstructionsScreen(
+                heroImage = R.drawable.si_doc_v_front_hero,
                 title = stringResource(R.string.si_doc_v_instruction_title),
                 subtitle = stringResource(R.string.si_verify_identity_instruction_subtitle),
                 showAttribution = true,

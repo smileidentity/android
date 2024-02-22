@@ -1,20 +1,21 @@
 package com.smileidentity.sample.compose
 
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.Icons.AutoMirrored
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults.filterChipColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +23,15 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -71,12 +74,11 @@ import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.viewModelFactory
+import java.net.URL
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import java.net.URL
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -372,7 +374,7 @@ private fun TopBar(
             if (showUpButton) {
                 IconButton(onClick = onNavigateUp) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                     )
                 }
@@ -382,28 +384,28 @@ private fun TopBar(
             FilterChip(
                 selected = uiState.isProduction,
                 onClick = viewModel::toggleEnvironment,
-                leadingIcon = {
-                    if (uiState.isProduction) {
-                        Icon(
-                            imageVector = Icons.Filled.Warning,
-                            contentDescription = stringResource(
-                                R.string.production,
-                            ),
-                        )
-                    }
-                },
                 label = { Text(stringResource(id = uiState.environmentName)) },
+                colors = filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.tertiary,
+                ),
             )
             if (isJobsScreenSelected) {
-                PlainTooltipBox(
+                TooltipBox(
+                    positionProvider = rememberPlainTooltipPositionProvider(),
                     tooltip = {
-                        Text(stringResource(R.string.jobs_clear_jobs_icon_tooltip))
+                        Text(
+                            stringResource(R.string.jobs_clear_jobs_icon_tooltip),
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                    MaterialTheme.shapes.small,
+                                )
+                                .padding(8.dp),
+                        )
                     },
+                    state = rememberTooltipState(),
                 ) {
-                    IconButton(
-                        onClick = viewModel::clearJobs,
-                        modifier = Modifier.tooltipAnchor(),
-                    ) {
+                    IconButton(onClick = viewModel::clearJobs) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = null,
@@ -416,7 +418,6 @@ private fun TopBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BottomBar(
     bottomNavItems: ImmutableList<BottomNavigationScreen>,

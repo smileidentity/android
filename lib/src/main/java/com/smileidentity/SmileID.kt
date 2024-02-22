@@ -12,6 +12,7 @@ import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
 import com.smileidentity.networking.FileAdapter
+import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
@@ -20,14 +21,14 @@ import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
 import com.squareup.moshi.Moshi
+import java.net.URL
+import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
-import java.net.URL
-import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 object SmileID {
@@ -71,10 +72,16 @@ object SmileID {
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ) {
+        val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
+        // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
+        if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
+            Timber.plant(Timber.DebugTree())
+        }
+
         SmileID.config = config
+
         // Enable crash reporting as early as possible (the pre-req is that the config is loaded)
         if (enableCrashReporting) {
-            val isInDebugMode = context.applicationInfo.flags and FLAG_DEBUGGABLE != 0
             SmileIDCrashReporting.enable(isInDebugMode)
         }
         requestFaceDetectionModuleInstallation(context)
@@ -182,7 +189,23 @@ object SmileID {
                 return@Interceptor chain.proceed(request)
             },
         )
-        addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+        addInterceptor(
+            HttpLoggingInterceptor().apply {
+                // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
+                // partner app's debug mode
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.BASIC
+                }
+            },
+        )
+
+        // NB! This is the last interceptor so that the logging interceptors come before the request
+        //  is gzipped
+        // We gzip all requests by default. While supported for Smile ID, it may not be supported by
+        //  all servers
+        addInterceptor(GzipRequestInterceptor())
     }
 
     /**

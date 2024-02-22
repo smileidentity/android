@@ -41,10 +41,7 @@ private val products = ProductScreen.entries
 private val roundedCornerShape = RoundedCornerShape(16.dp)
 
 @Composable
-fun ProductSelectionScreen(
-    onProductSelected: (Screen) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ProductSelectionScreen(onProductSelected: (Screen) -> Unit, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize(),
@@ -114,7 +111,7 @@ private fun ProductCell(
                 ),
                 modifier = Modifier.size(64.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(stringResource(productScreen.label), textAlign = TextAlign.Center)
         }
     }

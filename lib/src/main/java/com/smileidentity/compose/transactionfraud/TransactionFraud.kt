@@ -59,8 +59,8 @@ import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
 import timber.log.Timber
 
-const val historyLength = 10
-const val faceQualityThreshold = 50
+const val HISTORY_LENGTH = 10
+const val FACE_QUALITY_THRESHOLD = 50
 
 @Composable
 fun TransactionFraudScreen(
@@ -109,12 +109,12 @@ private fun TransactionFraudScreen(
             modifier = Modifier.fillMaxSize(),
         )
 
-        val faceQualityTextColor = if (uiState.faceQuality > faceQualityThreshold) {
+        val faceQualityTextColor = if (uiState.faceQuality > FACE_QUALITY_THRESHOLD) {
             MaterialTheme.colorScheme.tertiary
         } else {
             MaterialTheme.colorScheme.error
         }
-        val avgFaceQualityTextColor = if (uiState.averagedFaceQuality > faceQualityThreshold) {
+        val avgFaceQualityTextColor = if (uiState.averagedFaceQuality > FACE_QUALITY_THRESHOLD) {
             MaterialTheme.colorScheme.tertiary
         } else {
             MaterialTheme.colorScheme.error
@@ -135,7 +135,7 @@ private fun TransactionFraudScreen(
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Avg ($historyLength frames): ${uiState.averagedFaceQuality}",
+                text = "Avg ($HISTORY_LENGTH frames): ${uiState.averagedFaceQuality}",
                 textAlign = TextAlign.Center,
                 color = animateColorAsState(
                     targetValue = avgFaceQualityTextColor,
@@ -247,7 +247,7 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
             }
             val displayedOutput = (output * 100).toInt()
             selfieQualityHistory.add(displayedOutput)
-            if (selfieQualityHistory.size > historyLength) {
+            if (selfieQualityHistory.size > HISTORY_LENGTH) {
                 selfieQualityHistory.removeAt(0)
             }
 
