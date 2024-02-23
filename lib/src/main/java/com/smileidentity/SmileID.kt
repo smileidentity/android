@@ -243,7 +243,7 @@ object SmileID {
      * @param jobId The unique identifier for the job to be submitted. This ID should be obtained
      *              through the appropriate SmileID service mechanism and is used to track and
      *              manage the job within SmileID's processing system. Helpful methods for obtaining job
-     *              IDs include: [getSubmittedJobs] [getUnSubmittedJobs]
+     *              IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
      *
      * Usage:
      * To use this function, ensure you are calling it from a coroutine scope or another suspend function.
