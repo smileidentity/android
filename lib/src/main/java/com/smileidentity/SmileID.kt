@@ -251,8 +251,7 @@ object SmileID {
      *
      * ```kotlin
      * coroutineScope {
-     *     val smileID = SmileID()
-     *     smileID.submitJob("your_job_id")
+     *     SmileID.submitJob("your_job_id")
      * }
      * ```
      * Note: Ensure that the jobId provided is valid and that your environment is properly set up
