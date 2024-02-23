@@ -1,5 +1,6 @@
 package com.smileidentity.compose.transactionfraud
 
+import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.OperationCanceledException
@@ -8,6 +9,7 @@ import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,8 @@ import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,6 +38,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -62,12 +68,16 @@ import timber.log.Timber
 const val HISTORY_LENGTH = 10
 const val FACE_QUALITY_THRESHOLD = 50
 
+@kotlin.OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TransactionFraudScreen(
     modifier: Modifier = Modifier,
     onResult: SmileIDCallback<Nothing> = {},
 ) {
     val context = LocalContext.current
+    val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
+        // TODO: Handle denied state
+    }
     // TODO: Request Permissions if not granted
     Dialog(
         onDismissRequest = {
@@ -108,6 +118,19 @@ private fun TransactionFraudScreen(
             isImageAnalysisEnabled = true,
             modifier = Modifier.fillMaxSize(),
         )
+        // Overlay
+        // When conditions are *not* met:
+        // - Show white corners
+        // - Show extra dimmed overlay on top
+
+        // When conditions *are* met:
+        // - show orange corners
+        // - transition to circle (under what condition?)
+
+
+        // Overlay shows white corners when face is not detected/conditions are not met
+        // Should switch to orange corners when conditions *are* met
+
 
         val faceQualityTextColor = if (uiState.faceQuality > FACE_QUALITY_THRESHOLD) {
             MaterialTheme.colorScheme.tertiary
@@ -122,7 +145,9 @@ private fun TransactionFraudScreen(
         Column(
             horizontalAlignment = CenterHorizontally,
             verticalArrangement = spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 64.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 64.dp),
         ) {
             Text(
                 text = "Face Quality: ${uiState.faceQuality}",
@@ -145,6 +170,32 @@ private fun TransactionFraudScreen(
                 fontWeight = FontWeight.Bold,
             )
         }
+    }
+}
+
+/**
+ * This component serves as an overlay over the main Camera UI component. It takes in various
+ * parameters related to the state of detection and provides a purely visual feedback in the overlay
+ *
+ * The overlay and feedback is dynamic/there may be multiple states. For example, we may have
+ * a square cutout or circle. the corner borders may be white or orange.
+ *
+ * There may be animations overlaid
+ */
+@Composable
+private fun FeedbackOverlay(
+    backgroundOpacity: Float,
+    cutoutOpacity: Float,
+    // cutoutShape: Shape,
+    hintAnimation: Painter, // TODO: Make this a Lottie animation
+    // border: BorderStroke,
+    modifier: Modifier = Modifier,
+) {
+    Canvas(modifier = modifier.fillMaxSize()) {
+        val path = Path().apply {
+            // addRoundRect(RoundRect())
+        }
+        // clipPath()
     }
 }
 
