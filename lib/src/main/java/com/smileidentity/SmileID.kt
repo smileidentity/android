@@ -221,7 +221,7 @@ object SmileID {
      * to be specified for cleanup.
      *
      * @param jobId The ID of the job to clean up.Helpful methods for obtaining job
-     *  *              IDs include: [getSubmittedJobs] [getUnSubmittedJobs]
+     *  *              IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobId: String) = cleanupJobs(jobIds = listOf(jobId))
