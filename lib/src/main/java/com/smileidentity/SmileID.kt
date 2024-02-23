@@ -232,7 +232,7 @@ object SmileID {
      * specific jobs based on the implementation in com.smileidentity.util.cleanup.
      *
      * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
-     * a predefined cleanup process.  Helpful methods for obtaining job IDs include:[getSubmittedJobs], [getUnSubmittedJobs]
+     * a predefined cleanup process.  Helpful methods for obtaining job IDs include:[getSubmittedJobs], [getUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
