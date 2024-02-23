@@ -210,7 +210,7 @@ object SmileID {
      * @return A list of strings representing the IDs of unsubmitted jobs.
      */
     @JvmStatic
-    fun SmileID.getUnSubmittedJobs(): List<String> = listJobIds(
+    fun SmileID.getUnsubmittedJobs(): List<String> = listJobIds(
         includeCompleted = false,
         includePending = true,
     )
