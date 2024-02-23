@@ -409,7 +409,7 @@ internal fun createDocumentFile(jobId: String) = createSmileImageFile("document"
  *         further processing.
  */
 internal fun createPreUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
-    val file = createSmileJsonFile("preupload", jobId)
+    val file = createSmileJsonFile("prep_upload", jobId)
     file.writeBytes(
         SmileID.moshi.adapter(PrepUploadRequest::class.java)
             .toJson(prepUploadRequest).toByteArray(),
