@@ -441,7 +441,7 @@ internal fun createAuthenticationRequestFile(
     authRequest: AuthenticationRequest,
 ): File {
     val sanitiazedAuthRequest = authRequest.copy(authToken = "")
-    val file = createSmileJsonFile("authenticationrequest", jobId)
+    val file = createSmileJsonFile("authentication_request", jobId)
     file.writeBytes(
         SmileID.moshi.adapter(AuthenticationRequest::class.java)
             .toJson(sanitiazedAuthRequest).toByteArray(),
