@@ -31,6 +31,9 @@ import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToComplete
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
@@ -215,7 +218,17 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             R.string.si_processing_error_subtitle
         }
         if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
-            moveJobToComplete(jobId)
+            val complete = moveJobToComplete(jobId)
+            if (!complete) {
+                Timber.w("Failed to move job $jobId to complete")
+                Sentry.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
+            }
         }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
@@ -290,6 +303,15 @@ internal class DocumentVerificationViewModel(
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
                 documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
                 documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+            } else {
+                Timber.w("Failed to move job $jobId to complete")
+                Sentry.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
             }
             result = SmileIDResult.Success(
                 DocumentVerificationResult(
@@ -345,6 +367,15 @@ internal class EnhancedDocumentVerificationViewModel(
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
                 documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
                 documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+            } else {
+                Timber.w("Failed to move job $jobId to complete")
+                Sentry.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
             }
             result = SmileIDResult.Success(
                 EnhancedDocumentVerificationResult(
