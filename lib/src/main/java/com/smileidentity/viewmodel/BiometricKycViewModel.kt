@@ -24,6 +24,9 @@ import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToComplete
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
@@ -68,7 +71,17 @@ class BiometricKycViewModel(
                 R.string.si_processing_error_subtitle
             }
             if (!(SmileID.allowOfflineMode && isNetworkFailure(e))) {
-                moveJobToComplete(jobId)
+                val complete = moveJobToComplete(jobId)
+                if (!complete) {
+                    Timber.w("Failed to move job $jobId to complete")
+                    Sentry.addBreadcrumb(
+                        Breadcrumb().apply {
+                            category = "Offline Mode"
+                            message = "Failed to move job $jobId to complete"
+                            level = SentryLevel.INFO
+                        },
+                    )
+                }
             }
             result = SmileIDResult.Error(e)
             _uiState.update {
@@ -128,6 +141,15 @@ class BiometricKycViewModel(
             if (copySuccess) {
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
                 livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+            } else {
+                Timber.w("Failed to move job $jobId to complete")
+                Sentry.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
             }
             result = SmileIDResult.Success(
                 BiometricKycResult(
