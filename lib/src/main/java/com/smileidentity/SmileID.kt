@@ -26,7 +26,9 @@ import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
+import com.smileidentity.util.PRE_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
@@ -265,7 +267,7 @@ object SmileID {
         }
         val authRequestFile = getSmileTempFile(
             jobId,
-            "authenticationrequest",
+            AUTH_REQUEST_FILE,
             true,
             "json",
         )
@@ -278,7 +280,7 @@ object SmileID {
 
         val prepUploadRequestFile = getSmileTempFile(
             jobId,
-            "preupload",
+            PRE_UPLOAD_REQUEST_FILE,
             true,
             "json",
         )

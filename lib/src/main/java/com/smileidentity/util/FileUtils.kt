@@ -7,18 +7,24 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import okio.buffer
+import okio.sink
 
 /**
  * The path where unsubmitted (pending) job files are stored.
  * Files in this directory are considered in-progress or awaiting submission.
  */
-private const val UN_SUBMITTED_PATH = "/pending"
+private const val UN_SUBMITTED_PATH = "/unsubmitted"
 
 /**
  * The path where submitted (completed) job files are stored.
  * Files in this directory have been processed or marked as completed.
  */
-private const val SUBMITTED_PATH = "/complete"
+private const val SUBMITTED_PATH = "/submitted"
+
+// File names
+const val AUTH_REQUEST_FILE = "authentication_request"
+const val PRE_UPLOAD_REQUEST_FILE = "pre_upload"
 
 // Enum defining the types of files managed within the job processing system.
 // This categorization helps in filtering and processing files based on their content or purpose.
@@ -205,7 +211,7 @@ fun getFilesByType(
  * Save to a file within the app's specific directory under either 'pending' or 'complete' folder.
  * The file format is `si_${imageType}_<timestamp>.jpg` and is saved within a directory named
  * by the jobId.
- * @param imageType The type of the image being saved.
+ * @param fileName The type of the image being saved.
  * @param folderName The id of the job, used to create a sub-directory.
  * @param state The state of the job by default all jobs will go into pending, determining whether
  * to save in 'pending' or 'complete'.
@@ -409,11 +415,9 @@ internal fun createDocumentFile(jobId: String) = createSmileImageFile("document"
  *         further processing.
  */
 internal fun createPreUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
-    val file = createSmileJsonFile("prep_upload", jobId)
-    file.writeBytes(
-        SmileID.moshi.adapter(PrepUploadRequest::class.java)
-            .toJson(prepUploadRequest).toByteArray(),
-    )
+    val file = createSmileJsonFile(PRE_UPLOAD_REQUEST_FILE, jobId)
+    SmileID.moshi.adapter(PrepUploadRequest::class.java)
+        .toJson(file.sink().buffer(), prepUploadRequest)
     return file
 }
 
@@ -440,12 +444,9 @@ internal fun createAuthenticationRequestFile(
     jobId: String,
     authRequest: AuthenticationRequest,
 ): File {
-    val sanitiazedAuthRequest = authRequest.copy(authToken = "")
-    val file = createSmileJsonFile("authentication_request", jobId)
-    file.writeBytes(
-        SmileID.moshi.adapter(AuthenticationRequest::class.java)
-            .toJson(sanitiazedAuthRequest).toByteArray(),
-    )
+    val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
+    SmileID.moshi.adapter(AuthenticationRequest::class.java)
+        .toJson(file.sink().buffer(), authRequest.copy(authToken = ""))
     return file
 }
 
