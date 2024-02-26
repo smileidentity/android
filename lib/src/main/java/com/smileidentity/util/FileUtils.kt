@@ -7,7 +7,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 /**
- * The path where unsubmitted (pending) job files are stored.
+ * The path where unsubmitted job files are stored.
  * Files in this directory are considered in-progress or awaiting submission.
  */
 private const val UN_SUBMITTED_PATH = "/pending"
