@@ -260,6 +260,7 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
 
             // Report the *conversion* error to Sentry, rather than the original error
             SmileIDCrashReporting.hub.captureException(e)
+            throwable.addSuppressed(e)
 
             // More informative to pass back the original exception than the conversion error
             throwable

@@ -43,7 +43,8 @@ data class AuthenticationRequest(
     @Json(name = "signature") val signature: Boolean = true,
     @Json(name = "production") val production: Boolean = !SmileID.useSandbox,
     @Json(name = "partner_id") val partnerId: String = SmileID.config.partnerId,
-    @Json(name = "auth_token") val authToken: String = SmileID.config.authToken,
+    // we'd like to remove this when writing to the file system in offline mode
+    @Json(name = "auth_token") var authToken: String = SmileID.config.authToken,
 ) : Parcelable
 
 /**

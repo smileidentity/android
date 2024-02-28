@@ -17,8 +17,10 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
+import com.smileidentity.models.JobType
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -300,6 +302,21 @@ class SelfieViewModel(
             )
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
+            }
+
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+                val prepUploadRequest = PrepUploadRequest(
+                    partnerParams = PartnerParams(
+                        jobId = jobId,
+                        jobType = JobType.BiometricKyc,
+                        userId = userId,
+                        extras = extraPartnerParams,
+                    ),
+                    // TODO - Adjust according to backend changes
+                    allowNewEnroll = allowNewEnroll.toString(),
+                )
+                createPreUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)

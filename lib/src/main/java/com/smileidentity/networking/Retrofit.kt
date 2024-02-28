@@ -17,6 +17,7 @@ import com.squareup.moshi.ToJson
 import java.io.File
 import java.lang.reflect.Type
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Converter
@@ -79,6 +80,40 @@ object UploadRequestConverterFactory : Converter.Factory() {
         }
     }
 }
+
+/**
+ * Converts a [File] to a [MultipartBody.Part] with the given [partName] and [mediaType].
+ *
+ * @param partName The form data key name
+ * @param mediaType The media type of the file (e.g. "image/jpeg")
+ */
+// TODO: Get rid of this once API does not require the filename to be sent
+//  at that point, we can just use a default converter from File to RequestBody, and that would
+//  allow us to specify the Part name on the API/service definition rather than when creating the
+//  request body
+fun File.asFormDataPart(partName: String, mediaType: String? = null): MultipartBody.Part =
+    MultipartBody.Part.createFormData(
+        partName,
+        // name is the filename
+        name,
+        asRequestBody(mediaType?.toMediaType()),
+    )
+
+/**
+ * Converts a list of [File]s to a list of [MultipartBody.Part]s with the given [partName] and
+ * [mediaType]. This assumes you want to use the same key name for all the files (i.e. an array)
+ *
+ * @param partName The form data key name
+ * @param mediaType The media type of the file (e.g. "image/jpeg")
+ */
+// TODO: Get rid of this once API does not require the filename to be sent
+//  at that point, we can just use a default converter from File to RequestBody, and that would
+//  allow us to specify the Part name on the API/service definition rather than when creating the
+//  request body
+fun List<File>.asFormDataParts(
+    partName: String,
+    mediaType: String? = null,
+): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
 
 @Suppress("unused", "UNUSED_PARAMETER")
 object FileAdapter {
