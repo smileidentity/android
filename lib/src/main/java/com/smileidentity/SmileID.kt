@@ -12,6 +12,7 @@ import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
 import com.smileidentity.networking.FileAdapter
+import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
@@ -265,6 +266,12 @@ object SmileID {
                 }
             },
         )
+
+        // NB! This is the last interceptor so that the logging interceptors come before the request
+        //  is gzipped
+        // We gzip all requests by default. While supported for Smile ID, it may not be supported by
+        //  all servers
+        addInterceptor(GzipRequestInterceptor())
     }
 
     /**
