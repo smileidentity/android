@@ -44,7 +44,7 @@ tflite-metadata = "0.4.4"
 tflite-support = "0.4.4"
 timber = "5.0.1"
 truth = "1.4.1"
-uiautomator = "2.3.0-rc01"
+uiautomator = "2.3.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
