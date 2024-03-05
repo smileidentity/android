@@ -4,32 +4,33 @@ import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.OperationCanceledException
+import androidx.annotation.ColorInt
 import androidx.annotation.IntRange
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.times
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.PathEffect.Companion.dashPathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -118,6 +119,9 @@ private fun TransactionFraudScreen(
             isImageAnalysisEnabled = true,
             modifier = Modifier.fillMaxSize(),
         )
+        FeedbackOverlay(
+            backgroundOpacity = 0.8f,
+        )
         // Overlay
         // When conditions are *not* met:
         // - Show white corners
@@ -132,44 +136,44 @@ private fun TransactionFraudScreen(
         // Should switch to orange corners when conditions *are* met
 
 
-        val faceQualityTextColor = if (uiState.faceQuality > FACE_QUALITY_THRESHOLD) {
-            MaterialTheme.colorScheme.tertiary
-        } else {
-            MaterialTheme.colorScheme.error
-        }
-        val avgFaceQualityTextColor = if (uiState.averagedFaceQuality > FACE_QUALITY_THRESHOLD) {
-            MaterialTheme.colorScheme.tertiary
-        } else {
-            MaterialTheme.colorScheme.error
-        }
-        Column(
-            horizontalAlignment = CenterHorizontally,
-            verticalArrangement = spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 64.dp),
-        ) {
-            Text(
-                text = "Face Quality: ${uiState.faceQuality}",
-                textAlign = TextAlign.Center,
-                color = animateColorAsState(
-                    targetValue = faceQualityTextColor,
-                    label = "faceQualityText",
-                ).value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = "Avg ($HISTORY_LENGTH frames): ${uiState.averagedFaceQuality}",
-                textAlign = TextAlign.Center,
-                color = animateColorAsState(
-                    targetValue = avgFaceQualityTextColor,
-                    label = "avgFaceQualityText",
-                ).value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+        // val faceQualityTextColor = if (uiState.faceQuality > FACE_QUALITY_THRESHOLD) {
+        //     MaterialTheme.colorScheme.tertiary
+        // } else {
+        //     MaterialTheme.colorScheme.error
+        // }
+        // val avgFaceQualityTextColor = if (uiState.averagedFaceQuality > FACE_QUALITY_THRESHOLD) {
+        //     MaterialTheme.colorScheme.tertiary
+        // } else {
+        //     MaterialTheme.colorScheme.error
+        // }
+        // Column(
+        //     horizontalAlignment = CenterHorizontally,
+        //     verticalArrangement = spacedBy(16.dp),
+        //     modifier = Modifier
+        //         .fillMaxWidth()
+        //         .padding(horizontal = 16.dp, vertical = 64.dp),
+        // ) {
+        //     Text(
+        //         text = "Face Quality: ${uiState.faceQuality}",
+        //         textAlign = TextAlign.Center,
+        //         color = animateColorAsState(
+        //             targetValue = faceQualityTextColor,
+        //             label = "faceQualityText",
+        //         ).value,
+        //         style = MaterialTheme.typography.headlineSmall,
+        //         fontWeight = FontWeight.Bold,
+        //     )
+        //     Text(
+        //         text = "Avg ($HISTORY_LENGTH frames): ${uiState.averagedFaceQuality}",
+        //         textAlign = TextAlign.Center,
+        //         color = animateColorAsState(
+        //             targetValue = avgFaceQualityTextColor,
+        //             label = "avgFaceQualityText",
+        //         ).value,
+        //         style = MaterialTheme.typography.headlineSmall,
+        //         fontWeight = FontWeight.Bold,
+        //     )
+        // }
     }
 }
 
@@ -185,23 +189,65 @@ private fun TransactionFraudScreen(
 @Composable
 private fun FeedbackOverlay(
     backgroundOpacity: Float,
-    cutoutOpacity: Float,
-    // cutoutShape: Shape,
-    hintAnimation: Painter, // TODO: Make this a Lottie animation
-    // border: BorderStroke,
+    // cutoutOpacity: Float,
+    // // cutoutShape: Shape,
+    // hintAnimation: Painter, // TODO: Make this a Lottie animation
+    // // border: BorderStroke,
     modifier: Modifier = Modifier,
 ) {
-    Canvas(modifier = modifier.fillMaxSize()) {
-        val path = Path().apply {
-            // addRoundRect(RoundRect())
-        }
-        // clipPath()
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
+    ) {
+        val padding = 16.dp.toPx()
+        drawRect(Color.Black.copy(alpha = backgroundOpacity))
+        // drawCircle(
+        //     Color.Transparent,
+        //     style = Fill,
+        //     blendMode = BlendMode.Clear,
+        //     radius = (size.minDimension / 2.0f) - padding,
+        // )
+        drawRoundRect(
+            Color.Transparent,
+            style = Fill,
+            blendMode = BlendMode.Clear,
+            size = 0.8f * size,
+            // topLeft position such that the entire cutout is centered
+            topLeft = Offset(
+                (0.2f * size.width) / 2.0f,
+                (0.2f * size.height) / 2.0f,
+            ),
+            cornerRadius = CornerRadius(padding),
+        )
+        val cornerLength = 2 * padding
+        drawRoundRect(
+            Color.White,
+            style = Stroke(
+                width = 4.dp.toPx(),
+                // pathEffect = cornerPathEffect(radius = padding),
+                pathEffect = dashPathEffect(floatArrayOf(cornerLength, 300f), 0f),
+                cap = StrokeCap.Round,
+            ),
+            size = 0.8f * size,
+            // topLeft position such that the entire cutout is centered
+            topLeft = Offset(
+                (0.2f * size.width) / 2.0f,
+                (0.2f * size.height) / 2.0f,
+            ),
+            cornerRadius = CornerRadius(padding),
+        )
     }
 }
 
 data class TransactionFraudUiState(
     @IntRange(0, 100) val faceQuality: Int = 0,
     @IntRange(0, 100) val averagedFaceQuality: Int = 0,
+    val backgroundOpacity: Float = 0f,
+    val cutoutOpacity: Float = 0f,
+    @ColorInt val borderColor: Int = 0,
+    val cutoutIsCircleForConfirmation: Boolean = false, // todo: better name for this?
+    val showCompletion: Boolean = false,
 )
 
 @kotlin.OptIn(FlowPreview::class)
