@@ -10,8 +10,8 @@ import org.junit.Test
 
 class FileUtilsTest {
     private lateinit var testDir: File
-    private val submittedPath = "/complete"
-    private val unSubmittedPath = "/pending"
+    private val unSubmittedPath = "/unsubmitted"
+    private val submittedPath = "/submitted"
 
     @Before
     fun setup() {

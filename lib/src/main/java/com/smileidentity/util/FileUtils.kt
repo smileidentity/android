@@ -7,18 +7,24 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import okio.buffer
+import okio.sink
 
 /**
  * The path where unsubmitted job files are stored.
  * Files in this directory are considered in-progress or awaiting submission.
  */
-private const val UN_SUBMITTED_PATH = "/pending"
+private const val UN_SUBMITTED_PATH = "/unsubmitted"
 
 /**
  * The path where submitted (completed) job files are stored.
  * Files in this directory have been processed or marked as completed.
  */
-private const val SUBMITTED_PATH = "/complete"
+private const val SUBMITTED_PATH = "/submitted"
+
+// File names
+const val AUTH_REQUEST_FILE = "authentication_request"
+const val PRE_UPLOAD_REQUEST_FILE = "pre_upload"
 
 // Enum defining the types of files managed within the job processing system.
 // This categorization helps in filtering and processing files based on their content or purpose.
@@ -205,7 +211,7 @@ fun getFilesByType(
  * Save to a file within the app's specific directory under either 'pending' or 'complete' folder.
  * The file format is `si_${imageType}_<timestamp>.jpg` and is saved within a directory named
  * by the jobId.
- * @param imageType The type of the image being saved.
+ * @param fileName The type of the image being saved.
  * @param folderName The id of the job, used to create a sub-directory.
  * @param state The state of the job by default all jobs will go into pending, determining whether
  * to save in 'pending' or 'complete'.
@@ -213,8 +219,8 @@ fun getFilesByType(
  * @return The File object pointing to the newly created file.
  */
 internal fun createSmileTempFile(
-    imageType: String,
     folderName: String,
+    fileName: String,
     state: Boolean = true,
     fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
@@ -224,16 +230,96 @@ internal fun createSmileTempFile(
     if (!directory.exists()) {
         directory.mkdirs()
     }
-    return File(directory, "si_${imageType}_${System.currentTimeMillis()}.$fileExt")
+    return File(directory, "si_$fileName.$fileExt")
 }
 
+/**
+* Constructs a `File` object for a temporary file, ensuring the path and file name adhere to
+* expected formats and conditions. This method attempts to address potential edge cases
+* related to file path construction and directory accessibility.
+*
+* @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
+* @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
+* @param state Indicates the state directory where the file is stored. True for UN_SUBMITTED_PATH, false for SUBMITTED_PATH.
+* @param fileExt The extension of the file, without the leading dot. Defaults to "jpg".
+* @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
+* @return The `File` object representing the exact file.
+* @throws IllegalArgumentException If any input parameters are invalid.
+* @throws IOException If the directory cannot be created or is not writable.
+*/
+internal fun getSmileTempFile(
+    folderName: String,
+    fileName: String,
+    state: Boolean = true,
+    fileExt: String = "jpg",
+    savePath: String = SmileID.fileSavePath,
+): File {
+    if (folderName.isBlank() || fileName.isBlank() || fileExt.isBlank()) {
+        throw IllegalArgumentException(
+            "Folder name, file name, and file extension must not be blank.",
+        )
+    }
+
+    val stateDirectory = if (state) UN_SUBMITTED_PATH else SUBMITTED_PATH
+    val directory = File(savePath, "$stateDirectory/$folderName")
+
+    if (!directory.exists() && !directory.mkdirs()) {
+        throw IllegalArgumentException("Invalid jobId or not found")
+    }
+
+    val fullPath = File(directory, "si_$fileName.$fileExt")
+
+    if (!fullPath.exists()) {
+        throw IllegalArgumentException("Invalid file name or not found")
+    }
+    return fullPath
+}
+
+/**
+ * Creates a new image file within a specified folder. The file is intended
+ * for storing an image of a specified type, such as "jpg" or "png".
+ *
+ * The function constructs a uniquely named file to avoid naming conflicts
+ * and places it within a folder named according to the `folderName` parameter.
+ * This is particularly useful for organizing images by type or purpose,
+ * facilitating easier management and retrieval of image files.
+ *
+ * @param imageType The type of the image (e.g., "jpg", "png") which may influence
+ *                  the naming convention or processing of the image file.
+ * @param folderName The name of the folder in which the new image file will be created.
+ *                   This folder is typically a subdirectory of a larger directory
+ *                   designated for storing such files.
+ * @return [File] An instance of the newly created image file, ready for writing
+ *                image data.
+ * @throws IOException If an error occurs during file creation, such as insufficient
+ *                     permissions or disk space.
+ */
 internal fun createSmileImageFile(imageType: String, folderName: String): File {
     val fileName = "si_${imageType}_${System.currentTimeMillis()}"
-    return createSmileTempFile(fileName, folderName)
+    return createSmileTempFile(folderName, fileName)
 }
 
+/**
+ * Creates a new JSON file with the specified name within a designated folder. This function
+ * is aimed at facilitating the storage of JSON-formatted data, ensuring organized and
+ * accessible file management within the application. The use of this function is intended
+ * for scenarios where JSON data needs to be persisted locally, such as for configuration
+ * settings, user data, or application state.
+ *
+ * @param fileName The name of the JSON file to be created. This name should include the ".json"
+ *                 file extension to indicate the file type clearly.
+ * @param folderName The name of the folder within which the JSON file will be created. This
+ *                   allows for categorizing and organizing JSON files into specific directories,
+ *                   aiding in file management and retrieval.
+ * @return [File] An instance of the newly created JSON file, ready for data to be written to.
+ *                The returned file object can be used to write JSON data immediately following
+ *                file creation.
+ * @throws IOException If the file creation process encounters any issues, such as if the
+ *                     folder does not exist and cannot be created, or if there is insufficient
+ *                     permission to write to the specified directory.
+ */
 internal fun createSmileJsonFile(fileName: String, folderName: String): File {
-    return createSmileTempFile(fileName, folderName, fileExt = "json")
+    return createSmileTempFile(folderName, "si_$fileName", fileExt = "json")
 }
 
 /**
@@ -329,11 +415,9 @@ internal fun createDocumentFile(jobId: String) = createSmileImageFile("document"
  *         further processing.
  */
 internal fun createPreUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
-    val file = createSmileJsonFile("preupload", jobId)
-    file.writeBytes(
-        SmileID.moshi.adapter(PrepUploadRequest::class.java)
-            .toJson(prepUploadRequest).toByteArray(),
-    )
+    val file = createSmileJsonFile(PRE_UPLOAD_REQUEST_FILE, jobId)
+    SmileID.moshi.adapter(PrepUploadRequest::class.java)
+        .toJson(file.sink().buffer(), prepUploadRequest)
     return file
 }
 
@@ -360,14 +444,9 @@ internal fun createAuthenticationRequestFile(
     jobId: String,
     authRequest: AuthenticationRequest,
 ): File {
-    authRequest.apply {
-        authToken = "" // Remove this so it is not stored offline
-    }
-    val file = createSmileJsonFile("authenticationrequest", jobId)
-    file.writeBytes(
-        SmileID.moshi.adapter(AuthenticationRequest::class.java)
-            .toJson(authRequest).toByteArray(),
-    )
+    val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
+    SmileID.moshi.adapter(AuthenticationRequest::class.java)
+        .toJson(file.sink().buffer(), authRequest.copy(authToken = ""))
     return file
 }
 

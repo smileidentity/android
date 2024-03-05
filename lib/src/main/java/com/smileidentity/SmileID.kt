@@ -7,7 +7,10 @@ import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
+import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -20,7 +23,16 @@ import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
+import com.smileidentity.networking.asDocumentBackImage
+import com.smileidentity.networking.asDocumentFrontImage
+import com.smileidentity.networking.asLivenessImage
+import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.util.AUTH_REQUEST_FILE
+import com.smileidentity.util.FileType
+import com.smileidentity.util.PRE_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.getSmileTempFile
 import com.smileidentity.util.listJobIds
 import com.squareup.moshi.Moshi
 import java.net.URL
@@ -211,8 +223,10 @@ object SmileID {
      * This is a convenience method that wraps the cleanup process, allowing for a single job ID
      * to be specified for cleanup.
      *
-     * @param jobId The ID of the job to clean up.
+     * @param jobId The ID of the job to clean up.Helpful methods for obtaining job
+     *  *              IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
      */
+    @JvmStatic
     fun cleanup(jobId: String) = cleanupJobs(jobIds = listOf(jobId))
 
     /**
@@ -221,9 +235,88 @@ object SmileID {
      * specific jobs based on the implementation in com.smileidentity.util.cleanup.
      *
      * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
-     * a predefined cleanup process.
+     * a predefined cleanup process.  Helpful methods for obtaining job IDs include:[getSubmittedJobs], [getUnsubmittedJobs]
      */
+    @JvmStatic
     fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
+
+    /**
+     * Submits a previously captured job to SmileID for processing.
+     *
+     * @param jobId The unique identifier for the job to be submitted. This ID should be obtained
+     *              through the appropriate SmileID service mechanism and is used to track and
+     *              manage the job within SmileID's processing system. Helpful methods for obtaining job
+     *              IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
+     *
+     * Usage:
+     * To use this function, ensure you are calling it from a coroutine scope or another suspend function.
+     * For example, in a coroutine scope:
+     *
+     * ```kotlin
+     * coroutineScope {
+     *     SmileID.submitJob("your_job_id")
+     * }
+     * ```
+     * Note: Ensure that the jobId provided is valid and that your environment is properly set up
+     * to handle potential network responses, including success, failure, or error cases.
+     */
+    @JvmStatic
+    suspend fun submitJob(jobId: String) {
+        val jobIds = listJobIds()
+        if (jobId !in jobIds) {
+            throw IllegalArgumentException("Invalid jobId or not found")
+        }
+        val authRequestFile = getSmileTempFile(
+            jobId,
+            AUTH_REQUEST_FILE,
+            true,
+            "json",
+        )
+        val authRequestJsonString = authRequestFile.readText()
+        val authRequest = moshi.adapter(AuthenticationRequest::class.java)
+            .fromJson(authRequestJsonString)
+            ?: throw IllegalArgumentException("Invalid jobId information")
+
+        val authResponse = api.authenticate(authRequest)
+
+        val prepUploadRequestFile = getSmileTempFile(
+            jobId,
+            PRE_UPLOAD_REQUEST_FILE,
+            true,
+            "json",
+        )
+        val prepUploadRequestJsonString = prepUploadRequestFile.readText()
+        val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
+            .fromJson(prepUploadRequestJsonString)
+            ?: throw IllegalArgumentException("Invalid jobId information")
+
+        val prepUploadRequest = savedPrepUploadRequest.copy(
+            timestamp = authResponse.timestamp,
+            signature = authResponse.signature,
+        )
+
+        val prepUploadResponse = api.prepUpload(prepUploadRequest)
+
+        val selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+        val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+        val documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
+        val documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+
+        val selfieImageInfo = selfieFileResult.asSelfieImage()
+        val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
+        val frontImageInfo = documentFrontFileResult.asDocumentFrontImage()
+        val backImageInfo = documentBackFileResult.asDocumentBackImage()
+
+        val uploadRequest = UploadRequest(
+            images = listOfNotNull(
+                frontImageInfo,
+                backImageInfo,
+                selfieImageInfo,
+            ) + livenessImageInfo,
+        )
+        api.upload(prepUploadResponse.uploadUrl, uploadRequest)
+        Timber.d("Upload finished")
+    }
 
     /**
      * Returns an [OkHttpClient.Builder] optimized for low bandwidth conditions. Use it as a

@@ -61,6 +61,8 @@ fun RootScreen(
                         okHttpClient = client,
                     )
                     initialized = true
+                    // testing offline mode
+                    SmileID.setAllowOfflineMode(true)
                 }
             } else if (context.isConfigDefineInAssets()) {
                 // Otherwise, fallback to the config defined in assets

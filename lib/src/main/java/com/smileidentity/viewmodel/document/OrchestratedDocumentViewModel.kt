@@ -55,7 +55,7 @@ internal data class OrchestratedDocumentUiState(
 internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val jobType: JobType,
     private val userId: String,
-    private val jobId: String,
+    protected val jobId: String,
     private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
@@ -109,13 +109,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
-    protected fun sendResult(result: SmileIDResult<T>) {
-        this.result = result
-        _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
-        }
-    }
-
     fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
         selfieFile = it.data.selfieFile
         livenessFiles = it.data.livenessFiles
@@ -143,6 +136,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 userId = userId,
                 jobId = jobId,
             )
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+            }
 
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
@@ -168,6 +164,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
+            if (SmileID.allowOfflineMode) {
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val frontImageInfo = documentFrontFile.asDocumentFrontImage()
             val backImageInfo = documentBackFile?.asDocumentBackImage()
@@ -212,7 +211,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
-        val errorMessage = if (isNetworkFailure(throwable)) {
+        val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
             R.string.si_offline_message
         } else {
             R.string.si_processing_error_subtitle
@@ -265,7 +264,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 internal class DocumentVerificationViewModel(
     jobType: JobType = JobType.DocumentVerification,
     userId: String,
-    val jobId: String,
+    jobId: String,
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
@@ -328,7 +327,7 @@ internal class DocumentVerificationViewModel(
 internal class EnhancedDocumentVerificationViewModel(
     jobType: JobType = JobType.EnhancedDocumentVerification,
     userId: String,
-    val jobId: String,
+    jobId: String,
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,

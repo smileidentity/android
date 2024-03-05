@@ -266,10 +266,7 @@ class SelfieViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
 
         val proxy = fun(e: Throwable) {
-            val errorMessage = if (isNetworkFailure(
-                    e,
-                )
-            ) {
+            val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 R.string.si_offline_message
             } else {
                 R.string.si_processing_error_subtitle
@@ -303,6 +300,9 @@ class SelfieViewModel(
                 userId = userId,
                 jobId = jobId,
             )
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+            }
 
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
@@ -328,6 +328,9 @@ class SelfieViewModel(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
+            if (SmileID.allowOfflineMode) {
+                createPreUploadFile(jobId, prepUploadRequest)
+            }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()
