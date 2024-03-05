@@ -4,12 +4,16 @@ import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.OperationCanceledException
-import androidx.annotation.ColorInt
-import androidx.annotation.IntRange
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -17,20 +21,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.times
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.PathEffect.Companion.dashPathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -44,6 +54,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.smileidentity.R
+import com.smileidentity.SmileID
+import com.smileidentity.compose.theme.colorScheme
+import com.smileidentity.compose.theme.typography
 import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -119,61 +133,24 @@ private fun TransactionFraudScreen(
             isImageAnalysisEnabled = true,
             modifier = Modifier.fillMaxSize(),
         )
+        val borderColor = if (uiState.showBorderHighlight) Color.Yellow else Color.White
         FeedbackOverlay(
-            backgroundOpacity = 0.8f,
+            backgroundOpacity = animateFloatAsState(
+                targetValue = uiState.backgroundOpacity,
+                label = "backgroundOpacity",
+            ).value,
+            cutoutOpacity = animateFloatAsState(
+                targetValue = uiState.cutoutOpacity,
+                label = "cutoutOpacity",
+                animationSpec = tween(durationMillis = 500),
+            ).value,
+            cornerBorderColor = animateColorAsState(
+                targetValue = borderColor,
+                label = "cornerBorderColor",
+            ).value,
+            showCircle = uiState.cutoutIsCircleForConfirmation,
+            overlayImage = if (uiState.showCompletion) painterResource(R.drawable.si_processing_success) else null,
         )
-        // Overlay
-        // When conditions are *not* met:
-        // - Show white corners
-        // - Show extra dimmed overlay on top
-
-        // When conditions *are* met:
-        // - show orange corners
-        // - transition to circle (under what condition?)
-
-
-        // Overlay shows white corners when face is not detected/conditions are not met
-        // Should switch to orange corners when conditions *are* met
-
-
-        // val faceQualityTextColor = if (uiState.faceQuality > FACE_QUALITY_THRESHOLD) {
-        //     MaterialTheme.colorScheme.tertiary
-        // } else {
-        //     MaterialTheme.colorScheme.error
-        // }
-        // val avgFaceQualityTextColor = if (uiState.averagedFaceQuality > FACE_QUALITY_THRESHOLD) {
-        //     MaterialTheme.colorScheme.tertiary
-        // } else {
-        //     MaterialTheme.colorScheme.error
-        // }
-        // Column(
-        //     horizontalAlignment = CenterHorizontally,
-        //     verticalArrangement = spacedBy(16.dp),
-        //     modifier = Modifier
-        //         .fillMaxWidth()
-        //         .padding(horizontal = 16.dp, vertical = 64.dp),
-        // ) {
-        //     Text(
-        //         text = "Face Quality: ${uiState.faceQuality}",
-        //         textAlign = TextAlign.Center,
-        //         color = animateColorAsState(
-        //             targetValue = faceQualityTextColor,
-        //             label = "faceQualityText",
-        //         ).value,
-        //         style = MaterialTheme.typography.headlineSmall,
-        //         fontWeight = FontWeight.Bold,
-        //     )
-        //     Text(
-        //         text = "Avg ($HISTORY_LENGTH frames): ${uiState.averagedFaceQuality}",
-        //         textAlign = TextAlign.Center,
-        //         color = animateColorAsState(
-        //             targetValue = avgFaceQualityTextColor,
-        //             label = "avgFaceQualityText",
-        //         ).value,
-        //         style = MaterialTheme.typography.headlineSmall,
-        //         fontWeight = FontWeight.Bold,
-        //     )
-        // }
     }
 }
 
@@ -189,63 +166,141 @@ private fun TransactionFraudScreen(
 @Composable
 private fun FeedbackOverlay(
     backgroundOpacity: Float,
-    // cutoutOpacity: Float,
-    // // cutoutShape: Shape,
-    // hintAnimation: Painter, // TODO: Make this a Lottie animation
-    // // border: BorderStroke,
+    cutoutOpacity: Float,
+    showCircle: Boolean,
+    cornerBorderColor: Color,
+    overlayImage: Painter?,
+    // animatedOverlayImage: Boolean, // TODO
     modifier: Modifier = Modifier,
-) {
+) = Box(modifier = modifier, contentAlignment = Center) {
     Canvas(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
     ) {
-        val padding = 16.dp.toPx()
         drawRect(Color.Black.copy(alpha = backgroundOpacity))
-        // drawCircle(
-        //     Color.Transparent,
-        //     style = Fill,
-        //     blendMode = BlendMode.Clear,
-        //     radius = (size.minDimension / 2.0f) - padding,
-        // )
-        drawRoundRect(
-            Color.Transparent,
-            style = Fill,
-            blendMode = BlendMode.Clear,
-            size = 0.8f * size,
-            // topLeft position such that the entire cutout is centered
-            topLeft = Offset(
-                (0.2f * size.width) / 2.0f,
-                (0.2f * size.height) / 2.0f,
-            ),
-            cornerRadius = CornerRadius(padding),
-        )
-        val cornerLength = 2 * padding
-        drawRoundRect(
-            Color.White,
-            style = Stroke(
-                width = 4.dp.toPx(),
-                // pathEffect = cornerPathEffect(radius = padding),
-                pathEffect = dashPathEffect(floatArrayOf(cornerLength, 300f), 0f),
-                cap = StrokeCap.Round,
-            ),
-            size = 0.8f * size,
-            // topLeft position such that the entire cutout is centered
-            topLeft = Offset(
-                (0.2f * size.width) / 2.0f,
-                (0.2f * size.height) / 2.0f,
-            ),
-            cornerRadius = CornerRadius(padding),
-        )
+        if (showCircle) {
+            val padding = 16.dp.toPx()
+            drawCircle(
+                Color.Transparent,
+                style = Fill,
+                blendMode = BlendMode.Clear,
+                radius = (size.minDimension / 2.0f) - padding,
+            )
+        } else {
+            val radius = 16.dp.toPx()
+            // Calculate the width of the non-corner part of the rounded rectangle
+            val roundedRectSize = 0.8f * size
+
+            // Draw the rounded rectangle cutout
+            drawRoundRect(
+                color = Color.Black.copy(alpha = cutoutOpacity),
+                style = Fill,
+                blendMode = BlendMode.SrcIn,
+                size = roundedRectSize,
+                // topLeft position such that the entire cutout is centered
+                topLeft = Offset(
+                    (0.2f * size.width) / 2.0f,
+                    (0.2f * size.height) / 2.0f,
+                ),
+                cornerRadius = CornerRadius(radius),
+            )
+
+            // Draw the corner borders
+            drawRoundRect(
+                color = cornerBorderColor,
+                style = Stroke(
+                    width = 4.dp.toPx(),
+                    // pathEffect = cornerPathEffect(radius = padding),
+                    pathEffect = roundedRectCornerDashPathEffect(
+                        cornerRadius = radius,
+                        roundedRectSize = roundedRectSize,
+                        extendCornerBy = 16.dp.toPx(),
+                    ),
+                    cap = StrokeCap.Round,
+                ),
+                size = roundedRectSize,
+                // topLeft position such that the entire cutout is centered
+                topLeft = Offset(
+                    (0.2f * size.width) / 2.0f,
+                    (0.2f * size.height) / 2.0f,
+                ),
+                cornerRadius = CornerRadius(radius),
+            )
+        }
+    }
+    AnimatedVisibility(visible = overlayImage != null) {
+        overlayImage?.let {
+            Image(
+                painter = overlayImage,
+                contentDescription = null,
+            )
+        }
+    }
+}
+
+/**
+ * Returns a [PathEffect] that draws a dashed line around the corners of a rounded rectangle
+ *
+ * @param cornerRadius The radius of the rounded corners
+ * @param roundedRectSize The size of the rounded rectangle
+ * @param extendCornerBy The amount to extend the corner dashes by. This will be distributed evenly
+ * on both ends of each corner
+ */
+fun roundedRectCornerDashPathEffect(
+    cornerRadius: Float,
+    roundedRectSize: Size,
+    extendCornerBy: Float = 0f,
+): PathEffect {
+    // Each corner's length is a quarter circle
+    val cornerLength = (2 * Math.PI * cornerRadius / 4f).toFloat() + extendCornerBy
+
+    // There are 2 corners, so we subtract 2 * radius from the width (same goes for height)
+    val cornerHeight = cornerRadius + (extendCornerBy / 2)
+    val roundedRectWidthExcludingCorners = roundedRectSize.width - (2 * cornerHeight)
+    val roundedRectHeightExcludingCorners = roundedRectSize.height - (2 * cornerHeight)
+
+    return dashPathEffect(
+        intervals = floatArrayOf(
+            cornerLength,
+            roundedRectWidthExcludingCorners,
+            cornerLength,
+            roundedRectHeightExcludingCorners,
+            cornerLength,
+            roundedRectWidthExcludingCorners,
+            cornerLength,
+            roundedRectHeightExcludingCorners,
+        ),
+        phase = cornerLength - (extendCornerBy / 2),
+    )
+}
+
+
+@Preview
+@Composable
+private fun PreviewFeedbackOverlay() {
+    MaterialTheme(colorScheme = SmileID.colorScheme, typography = SmileID.typography) {
+        Box(modifier = Modifier.background(Color.Gray)) {
+            Image(
+                painter = painterResource(R.drawable.si_logo_with_text),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+            )
+            FeedbackOverlay(
+                backgroundOpacity = 0.8f,
+                cutoutOpacity = 0f,
+                cornerBorderColor = Color.Yellow,
+                showCircle = false,
+                overlayImage = null,
+            )
+        }
     }
 }
 
 data class TransactionFraudUiState(
-    @IntRange(0, 100) val faceQuality: Int = 0,
-    @IntRange(0, 100) val averagedFaceQuality: Int = 0,
-    val backgroundOpacity: Float = 0f,
+    val backgroundOpacity: Float = 0.8f,
     val cutoutOpacity: Float = 0f,
-    @ColorInt val borderColor: Int = 0,
+    val showBorderHighlight: Boolean = false,
     val cutoutIsCircleForConfirmation: Boolean = false, // todo: better name for this?
     val showCompletion: Boolean = false,
 )
@@ -272,9 +327,23 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
+
+        // When conditions are *not* met:
+        // - Show white corners
+        // - Show extra dimmed overlay on top
+
+        // When conditions *are* met:
+        // - show orange corners
+        // - transition to circle (under what condition?)
+
+
+        // Overlay shows white corners when face is not detected/conditions are not met
+        // Should switch to orange corners when conditions *are* met
+
         val image = imageProxy.image ?: run {
             Timber.w("ImageProxy has no image")
             imageProxy.close()
+            _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
             return
         }
 
@@ -313,13 +382,13 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
             val bitmap = with(imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)) {
                 if (bBox.left + bBox.width() > this.width) {
                     Timber.w("Face bounding box width is greater than image width")
-                    _uiState.update { it.copy(faceQuality = 0) }
+                    resetFaceQuality()
                     return@addOnSuccessListener
                 }
 
                 if (bBox.top + bBox.height() > this.height) {
                     Timber.w("Face bounding box height is greater than image height")
-                    _uiState.update { it.copy(faceQuality = 0) }
+                    resetFaceQuality()
                     return@addOnSuccessListener
                 }
 
@@ -340,6 +409,7 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
             val outputs = imageQualityModel.process(input.tensorBuffer)
             val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
                 Timber.e("No image quality output")
+                resetFaceQuality()
                 return@addOnSuccessListener
             }
             val displayedOutput = (output * 100).toInt()
@@ -349,14 +419,13 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
             }
 
             val elapsedTimeMs = (System.nanoTime() - startTime) / 1_000_000
-            Timber.d("Face Quality: $output (model inference time: $elapsedTimeMs ms)")
+            Timber.v("FaceQuality=$displayedOutput")
+            Timber.v("AveragedFaceQuality=${selfieQualityHistory.average().toInt()}")
+            Timber.v("ModelInferenceTime=$elapsedTimeMs ms")
 
-            _uiState.update {
-                it.copy(
-                    faceQuality = displayedOutput,
-                    averagedFaceQuality = selfieQualityHistory.average().toInt(),
-                )
-            }
+            _uiState.update { it.copy(showBorderHighlight = true, cutoutOpacity = 0f) }
+
+            // TODO: Once all liveness are captured, show circle instead of square for selfie capture
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
             resetFaceQuality()
@@ -368,6 +437,6 @@ class TransactionFraudViewModel(context: Context) : ViewModel() {
 
     private fun resetFaceQuality() {
         selfieQualityHistory.clear()
-        _uiState.update { it.copy(faceQuality = 0, averagedFaceQuality = 0) }
+        _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
     }
 }
