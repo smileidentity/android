@@ -87,7 +87,7 @@ fun OrchestratedTransactionFraudScreen(
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
-    viewModel: TransactionFraudViewModel = viewModel(
+    @Suppress("UNUSED_PARAMETER") viewModel: TransactionFraudViewModel = viewModel(
         initializer = {
             TransactionFraudViewModel(
                 userId = userId,
@@ -124,7 +124,6 @@ fun OrchestratedTransactionFraudScreen(
             // securePolicy = SecureFlagPolicy.SecureOn,
         ),
     ) {
-        // TODO: Fix the Context passing
         TransactionFraudScreen(
             modifier = modifier
                 .height(512.dp)

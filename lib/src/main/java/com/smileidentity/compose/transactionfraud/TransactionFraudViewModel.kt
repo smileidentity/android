@@ -121,7 +121,6 @@ class TransactionFraudViewModel(
 
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
-            // TODO: Add all the protections
             val face = faces.firstOrNull() ?: run {
                 Timber.d("No face detected")
                 // TODO: Show face searching animation
