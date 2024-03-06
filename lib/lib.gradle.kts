@@ -148,6 +148,7 @@ dependencies {
     api(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit.converter.scalars)
     implementation(libs.okhttp.logging.interceptor)
 
     // Moshi is exposed in public SmileID interface, hence "api" vs "implementation"
