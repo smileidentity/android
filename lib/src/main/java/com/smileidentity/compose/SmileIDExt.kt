@@ -21,6 +21,7 @@ import com.smileidentity.compose.theme.typography
 import com.smileidentity.compose.transactionfraud.TransactionFraudScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -436,14 +437,20 @@ fun SmileID.ConsentScreen(
 
 @Composable
 fun SmileID.TransactionFraud(
+    userId: String,
     modifier: Modifier = Modifier,
+    jobId: String = rememberSaveable { randomJobId() },
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
-    onResult: SmileIDCallback<Nothing> = {},
+    onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         TransactionFraudScreen(
+            userId = userId,
+            jobId = jobId,
             modifier = modifier,
+            extraPartnerParams = extraPartnerParams,
             onResult = onResult,
         )
     }

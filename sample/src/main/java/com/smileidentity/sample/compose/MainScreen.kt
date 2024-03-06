@@ -349,8 +349,23 @@ fun MainScreen(
                 }
                 dialog(ProductScreen.TransactionFraud.route) {
                     LaunchedEffect(Unit) { viewModel.onTransactionFraudSelected() }
-                    SmileID.TransactionFraud {
-                        viewModel.onTransactionFraudResult()
+                    SmartSelfieAuthenticationUserIdInputDialog(
+                        onDismiss = {
+                            viewModel.onHomeSelected()
+                            navController.popBackStack()
+                        },
+                        onConfirm = { userId ->
+                            navController.navigate(
+                                "${ProductScreen.TransactionFraud.route}/$userId",
+                            ) { popUpTo(BottomNavigationScreen.Home.route) }
+                        },
+                    )
+                }
+                dialog(ProductScreen.TransactionFraud.route + "/{userId}") {
+                    LaunchedEffect(Unit) { viewModel.onTransactionFraudSelected() }
+                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                    SmileID.TransactionFraud(userId = userId) { result ->
+                        viewModel.onTransactionFraudResult(result)
                         navController.popBackStack()
                     }
                 }

@@ -30,8 +30,10 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.jobResultMessageBuilder
+import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -459,8 +461,44 @@ class MainScreenViewModel : ViewModel() {
         _uiState.update { it.copy(appBarTitle = ProductScreen.TransactionFraud.label) }
     }
 
-    fun onTransactionFraudResult() {
-        onHomeSelected()
+    fun onTransactionFraudResult(result: SmileIDResult<SmartSelfieJobResult.Entry>) {
+        if (result is SmileIDResult.Success) {
+            val response = result.data
+            val message = jobResultMessageBuilder(
+                jobName = "Transaction Fraud",
+                jobComplete = true,
+                jobSuccess = true,
+                code = null,
+                resultCode = response.resultCode,
+                resultText = response.resultText,
+            )
+            Timber.d("$message: $result")
+            _uiState.update { it.copy(snackbarMessage = message) }
+            viewModelScope.launch {
+                DataStoreRepository.addPendingJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = response.partnerParams.jobType!!,
+                        timestamp = Date().toString(),
+                        userId = response.partnerParams.userId,
+                        jobId = response.partnerParams.jobId,
+                        jobComplete = true,
+                        jobSuccess = true,
+                        code = null,
+                        resultCode = response.resultCode,
+                        smileJobId = response.smileJobId,
+                        resultText = response.resultText,
+                        selfieImageUrl = null,
+                    ),
+                )
+            }
+        } else if (result is SmileIDResult.Error) {
+            val th = result.throwable
+            val message = "Transaction Fraud error: ${th.message}"
+            Timber.e(th, message)
+            _uiState.update { it.copy(snackbarMessage = message) }
+        }
     }
 
     fun clearJobs() {
