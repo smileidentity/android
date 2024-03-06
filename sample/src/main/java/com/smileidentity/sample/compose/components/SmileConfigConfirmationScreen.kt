@@ -54,8 +54,8 @@ fun SmileConfigConfirmationScreen(
             ) { Text(text = stringResource(id = R.string.cont)) }
         },
         dismissButton = {},
-        onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        onDismissRequest = onConfirm,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true),
         modifier = modifier,
     )
 }

@@ -192,8 +192,8 @@ internal fun ProcessingSuccessScreen(
                     .fillMaxWidth(),
             ) { Text(text = continueButtonText) }
         },
-        onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        onDismissRequest = onContinue,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true),
         modifier = Modifier.testTag("processing_screen_success"),
     )
 }
@@ -243,8 +243,8 @@ internal fun ProcessingErrorScreen(
                     .fillMaxWidth(),
             ) { Text(text = closeButtonText) }
         },
-        onDismissRequest = { /* Do nothing since we have disabled back press and click outside */ },
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        onDismissRequest = onClose,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         modifier = Modifier.testTag("processing_screen_error"),
     )
 }
