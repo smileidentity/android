@@ -198,8 +198,8 @@ class SelfieViewModel(
             val bitmap = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
             lastAutoCaptureTimeMs = System.currentTimeMillis()
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                Timber.v("Capturing liveness image")
                 val livenessFile = createLivenessFile()
+                Timber.v("Capturing liveness image to $livenessFile")
                 postProcessImageBitmap(
                     bitmap = bitmap,
                     file = livenessFile,

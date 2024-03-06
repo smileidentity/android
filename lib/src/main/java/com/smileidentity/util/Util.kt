@@ -21,6 +21,7 @@ import android.util.Size
 import android.widget.Toast
 import androidx.annotation.IntRange
 import androidx.annotation.StringRes
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
@@ -94,6 +95,13 @@ internal fun isImageAtLeast(
     val imageHeight = options.outHeight
     val imageWidth = options.outWidth
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
+}
+
+fun calculateLuminance(imageProxy: ImageProxy): Double {
+    // planes[0] is the Y plane aka "luma"
+    val data = imageProxy.planes[0].buffer.toByteArray()
+    val pixels = data.map { it.toInt() and 0xFF }
+    return pixels.average()
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
