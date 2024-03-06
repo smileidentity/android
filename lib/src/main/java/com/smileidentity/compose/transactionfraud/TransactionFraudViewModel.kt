@@ -1,6 +1,5 @@
 package com.smileidentity.compose.transactionfraud
 
-import android.content.Context
 import android.graphics.Bitmap
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
@@ -10,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.SmileID
 import com.smileidentity.ml.ImQualCp20Optimized
@@ -66,10 +66,18 @@ data class TransactionFraudUiState(
 
 @kotlin.OptIn(FlowPreview::class)
 class TransactionFraudViewModel(
-    context: Context,
     private val userId: String,
     private val jobId: String,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private val imageQualityModel: ImQualCp20Optimized,
+    private val faceDetector: FaceDetector = FaceDetection.getClient(
+        FaceDetectorOptions.Builder().apply {
+            setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+            setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+            setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+        }.build(),
+    ),
     private val onResult: SmileIDCallback<SmartSelfieJobResult.Entry>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransactionFraudUiState())
@@ -83,15 +91,6 @@ class TransactionFraudViewModel(
     private var lastAutoCaptureTimeMs = 0L
     private var shouldAnalyzeImages = true
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
-    private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
-        setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-        setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
-        setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
-        setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-    }.build()
-
-    private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
-    private val imageQualityModel = ImQualCp20Optimized.newInstance(context)
     private val selfieQualityHistory = mutableListOf<Float>()
 
     @OptIn(ExperimentalGetImage::class)
@@ -267,7 +266,7 @@ class TransactionFraudViewModel(
                 _uiState.update {
                     it.copy(
                         showLoading = true,
-                        backgroundOpacity = 0.98f,
+                        backgroundOpacity = 0.99f,
                         showBorderHighlight = false,
                     )
                 }

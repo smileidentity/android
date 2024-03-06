@@ -462,6 +462,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onTransactionFraudResult(result: SmileIDResult<SmartSelfieJobResult.Entry>) {
+        onHomeSelected()
         if (result is SmileIDResult.Success) {
             val response = result.data
             val message = jobResultMessageBuilder(

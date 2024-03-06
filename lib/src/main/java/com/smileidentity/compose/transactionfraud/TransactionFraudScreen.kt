@@ -1,7 +1,6 @@
 package com.smileidentity.compose.transactionfraud
 
 import android.Manifest
-import android.content.Context
 import android.os.OperationCanceledException
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -62,6 +61,7 @@ import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.roundedRectCornerDashPathEffect
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -80,12 +80,24 @@ const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun TransactionFraudScreen(
+fun OrchestratedTransactionFraudScreen(
     userId: String,
     jobId: String,
+    imageQualityModel: ImQualCp20Optimized,
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
+    viewModel: TransactionFraudViewModel = viewModel(
+        initializer = {
+            TransactionFraudViewModel(
+                userId = userId,
+                jobId = jobId,
+                extraPartnerParams = extraPartnerParams,
+                imageQualityModel = imageQualityModel,
+                onResult = onResult,
+            )
+        },
+    ),
 ) {
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
@@ -93,9 +105,7 @@ fun TransactionFraudScreen(
             // We don't show jump to the settings screen here (unlike in CameraPermissionButton)
             // because it would cause an infinite loop of permission requests due to the
             // LaunchedEffect requesting the permission again.
-            onResult(
-                SmileIDResult.Error(OperationCanceledException("User Denied Camera Permission")),
-            )
+            onResult(SmileIDResult.Error(OperationCanceledException("Camera Permission Denied")))
         }
     }
     LaunchedEffect(key1 = Unit) {
@@ -116,11 +126,6 @@ fun TransactionFraudScreen(
     ) {
         // TODO: Fix the Context passing
         TransactionFraudScreen(
-            context = context,
-            userId = userId,
-            jobId = jobId,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
             modifier = modifier
                 .height(512.dp)
                 .clip(MaterialTheme.shapes.large),
@@ -130,23 +135,8 @@ fun TransactionFraudScreen(
 
 @Composable
 private fun TransactionFraudScreen(
-    context: Context,
-    userId: String,
-    jobId: String,
     modifier: Modifier = Modifier,
-    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
-    viewModel: TransactionFraudViewModel = viewModel(
-        initializer = {
-            TransactionFraudViewModel(
-                context = context,
-                userId = userId,
-                jobId = jobId,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        },
-    ),
+    viewModel: TransactionFraudViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()
@@ -181,10 +171,10 @@ private fun TransactionFraudScreen(
             val infiniteTransition = rememberInfiniteTransition(label = "infiniteTransition")
             infiniteTransition.animateFloat(
                 initialValue = DEFAULT_CUTOUT_PROPORTION,
-                targetValue = DEFAULT_CUTOUT_PROPORTION - 0.05f,
+                targetValue = DEFAULT_CUTOUT_PROPORTION - 0.04f,
                 label = "breathingCutoutProportion",
                 animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1200, easing = FastOutLinearInEasing),
+                    animation = tween(durationMillis = 1500, easing = FastOutLinearInEasing),
                     repeatMode = RepeatMode.Reverse,
                 ),
             )
@@ -224,13 +214,9 @@ private fun TransactionFraudScreen(
 }
 
 /**
- * This component serves as an overlay over the main Camera UI component. It takes in various
- * parameters related to the state of detection and provides a purely visual feedback in the overlay
- *
- * The overlay and feedback is dynamic/there may be multiple states. For example, we may have
- * a square cutout or circle. the corner borders may be white or orange.
- *
- * There may be animations overlaid
+ * This component is meant to be overlaid over a Camera Preview. The changes in the overlay are
+ * meant to provide hints to the user about the status of their selfie capture using color and
+ * animation and without using text.
  */
 @Composable
 private fun FeedbackOverlay(

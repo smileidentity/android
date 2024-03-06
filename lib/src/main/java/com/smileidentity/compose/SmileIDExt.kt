@@ -6,9 +6,11 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
@@ -18,7 +20,8 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.compose.transactionfraud.TransactionFraudScreen
+import com.smileidentity.compose.transactionfraud.OrchestratedTransactionFraudScreen
+import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.SmartSelfieJobResult
@@ -445,12 +448,15 @@ fun SmileID.TransactionFraud(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
 ) {
+    val context = LocalContext.current
+    val imageQualityModel = remember { ImQualCp20Optimized.newInstance(context) }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        TransactionFraudScreen(
+        OrchestratedTransactionFraudScreen(
             userId = userId,
             jobId = jobId,
-            modifier = modifier,
+            imageQualityModel = imageQualityModel,
             extraPartnerParams = extraPartnerParams,
+            modifier = modifier,
             onResult = onResult,
         )
     }
