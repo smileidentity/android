@@ -208,6 +208,7 @@ private fun TransactionFraudScreen(
                     )
                 }
                 LaunchedEffect(selfieHint) {
+                    // This is how you start the animation
                     atEnd = !atEnd
                 }
                 painter
@@ -248,7 +249,6 @@ private fun FeedbackOverlay(
     cutoutOpacity: Float,
     cutoutProportion: Float,
     cornerBorderColor: Color,
-    // TODO: animate the overlay image
     overlayImage: Painter?,
     modifier: Modifier = Modifier,
 ) = Box(modifier = modifier, contentAlignment = Center) {
