@@ -48,7 +48,7 @@ enum class FileType {
  * cleanup process, enabling targeted deletion operations based on the job's completion status and
  * optionally, specific job IDs.
  *
- * @param deleteCompletedJobs When set to true, the function targets files associated with completed
+ * @param deleteSubmittedJobs When set to true, the function targets files associated with completed
  * jobs for deletion. This enables clearing out space or managing files that are no longer needed
  * after job completion. Defaults to false to prevent accidental deletion of completed jobs.
  *
@@ -66,7 +66,7 @@ enum class FileType {
  * maintenance within the system, ensuring that resources are allocated and used effectively.
  */
 internal fun cleanupJobs(
-    deleteCompletedJobs: Boolean = false,
+    deleteSubmittedJobs: Boolean = false,
     deleteUnsubmittedJobs: Boolean = false,
     jobIds: List<String>? = null,
     // Default to the base save path used by createSmileTempFile
@@ -77,8 +77,8 @@ internal fun cleanupJobs(
     }
 
     val pathsToClean = mutableListOf<String>()
-    if (deleteCompletedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
-    if (deletePendingJobs) pathsToClean.add("$savePath/$UN_SUBMITTED_PATH")
+    if (deleteSubmittedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
+    if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UN_SUBMITTED_PATH")
 
     if (jobIds == null) {
         // Nuke all files in specified paths
@@ -122,18 +122,20 @@ internal fun cleanupJobs(
 ) {
     when (scope) {
         DeleteScope.AllJobs -> cleanupJobs(
-            deleteCompletedJobs = true,
-            deletePendingJobs = true,
+            deleteSubmittedJobs = false,
+            deleteUnsubmittedJobs = false,
             jobIds = jobIds,
         )
+
         DeleteScope.CompletedJobs -> cleanupJobs(
-            deleteCompletedJobs = true,
-            deletePendingJobs = false,
+            deleteSubmittedJobs = true,
+            deleteUnsubmittedJobs = false,
             jobIds = jobIds,
         )
+
         DeleteScope.PendingJobs -> cleanupJobs(
-            deleteCompletedJobs = false,
-            deletePendingJobs = true,
+            deleteSubmittedJobs = false,
+            deleteUnsubmittedJobs = true,
             jobIds = jobIds,
         )
     }
@@ -144,9 +146,9 @@ internal fun cleanupJobs(
  * completed and pending categories, depending on the parameters provided. It allows for flexible retrieval,
  * making it suitable for scenarios where either one or both types of job statuses are of interest.
  *
- * @param includeCompleted A boolean flag that, when set to true, includes the IDs of completed jobs
+ * @param includeSubmitted A boolean flag that, when set to true, includes the IDs of completed jobs
  * in the returned list. Defaults to true to ensure completed jobs are included unless explicitly excluded.
- * @param includePending A boolean flag that, when set to true, includes the IDs of pending jobs
+ * @param includeUnsubmitted A boolean flag that, when set to true, includes the IDs of pending jobs
  * in the returned list. Defaults to false, focusing the function on completed jobs unless pending jobs
  * are explicitly requested.
  *
@@ -156,14 +158,14 @@ internal fun cleanupJobs(
  */
 
 internal fun listJobIds(
-    includeCompleted: Boolean = true,
-    includePending: Boolean = false,
+    includeSubmitted: Boolean = true,
+    includeUnsubmitted: Boolean = false,
 ): List<String> {
     val jobIds = mutableListOf<String>()
-    if (includeCompleted) {
+    if (includeSubmitted) {
         jobIds.addAll(File(SUBMITTED_PATH).list().orEmpty().toList())
     }
-    if (includePending) {
+    if (includeUnsubmitted) {
         jobIds.addAll(File(UN_SUBMITTED_PATH).list().orEmpty().toList())
     }
     return jobIds
@@ -236,19 +238,19 @@ internal fun createSmileTempFile(
 }
 
 /**
-* Constructs a `File` object for a temporary file, ensuring the path and file name adhere to
-* expected formats and conditions. This method attempts to address potential edge cases
-* related to file path construction and directory accessibility.
-*
-* @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
-* @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
-* @param state Indicates the state directory where the file is stored. True for UN_SUBMITTED_PATH, false for SUBMITTED_PATH.
-* @param fileExt The extension of the file, without the leading dot. Defaults to "jpg".
-* @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
-* @return The `File` object representing the exact file.
-* @throws IllegalArgumentException If any input parameters are invalid.
-* @throws IOException If the directory cannot be created or is not writable.
-*/
+ * Constructs a `File` object for a temporary file, ensuring the path and file name adhere to
+ * expected formats and conditions. This method attempts to address potential edge cases
+ * related to file path construction and directory accessibility.
+ *
+ * @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
+ * @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
+ * @param state Indicates the state directory where the file is stored. True for UN_SUBMITTED_PATH, false for SUBMITTED_PATH.
+ * @param fileExt The extension of the file, without the leading dot. Defaults to "jpg".
+ * @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
+ * @return The `File` object representing the exact file.
+ * @throws IllegalArgumentException If any input parameters are invalid.
+ * @throws IOException If the directory cannot be created or is not writable.
+ */
 internal fun getSmileTempFile(
     folderName: String,
     fileName: String,
@@ -332,44 +334,27 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
  * located, defaulting to SmileID.fileSavePath.
  * @return A Boolean indicating whether the move operation was successful.
  */
-internal fun moveJobToComplete(
+internal fun moveJobToSubmitted(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
 ): Boolean {
-    val pendingPath = File(savePath, "$UN_SUBMITTED_PATH/$folderName")
-    val completePath = File(savePath, "$SUBMITTED_PATH/$folderName")
+    val unSubmittedPath = File(savePath, "$UN_SUBMITTED_PATH/$folderName")
+    val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
-    if (!pendingPath.exists() || !pendingPath.isDirectory) {
+    if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
         println("Source directory does not exist or is not a directory")
         return false
     }
 
-    if (!completePath.exists() && !completePath.mkdirs()) {
-        println("Failed to create target directory")
-        return false
-    }
-
     try {
-        pendingPath.walk().forEach { sourceFile ->
-            val relativePath = sourceFile.toRelativeString(pendingPath)
-            val targetFile = File(completePath, relativePath)
-
-            if (sourceFile.isDirectory) {
-                if (!targetFile.exists() && !targetFile.mkdirs()) {
-                    throw IOException("Failed to create directory ${targetFile.path}")
-                }
-            } else {
-                sourceFile.copyTo(targetFile, true)
-                if (!sourceFile.delete()) {
-                    throw IOException(
-                        "Failed to delete original file ${sourceFile.path} after copy",
-                    )
-                }
+        // Use copyRecursively to copy the directory and its contents
+        if (unSubmittedPath.copyRecursively(submittedPath, overwrite = true)) {
+            // After successful copy, delete the original directory
+            if (!unSubmittedPath.deleteRecursively()) {
+                throw IOException("Failed to delete the source directory ${unSubmittedPath.path}")
             }
-        }
-        // Check and delete the now-empty source directory
-        if (!pendingPath.deleteRecursively()) {
-            throw IOException("Failed to delete the source directory ${pendingPath.path}")
+        } else {
+            throw IOException("Failed to copy files to the target directory ${submittedPath.path}")
         }
     } catch (e: IOException) {
         e.printStackTrace()

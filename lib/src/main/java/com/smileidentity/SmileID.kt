@@ -201,8 +201,8 @@ object SmileID {
      */
     @JvmStatic
     fun getSubmittedJobs(): List<String> = listJobIds(
-        includeCompleted = true,
-        includePending = false,
+        includeSubmitted = true,
+        includeUnsubmitted = false,
     )
 
     /**
@@ -214,8 +214,8 @@ object SmileID {
      */
     @JvmStatic
     fun getUnsubmittedJobs(): List<String> = listJobIds(
-        includeCompleted = false,
-        includePending = true,
+        includeSubmitted = false,
+        includeUnsubmitted = true,
     )
 
     /**

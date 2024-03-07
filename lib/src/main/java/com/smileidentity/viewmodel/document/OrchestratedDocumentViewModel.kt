@@ -30,7 +30,7 @@ import com.smileidentity.util.createPreUploadFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
-import com.smileidentity.util.moveJobToComplete
+import com.smileidentity.util.moveJobToSubmitted
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -217,7 +217,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             R.string.si_processing_error_subtitle
         }
         if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
-            val complete = moveJobToComplete(jobId)
+            val complete = moveJobToSubmitted(jobId)
             if (!complete) {
                 Timber.w("Failed to move job $jobId to complete")
                 Sentry.addBreadcrumb(
@@ -297,7 +297,7 @@ internal class DocumentVerificationViewModel(
             var documentBackFileResult = documentBackFile
             // if we've gotten this far we move files
             // to complete from pending
-            val copySuccess = moveJobToComplete(jobId)
+            val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
                 documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
@@ -361,7 +361,7 @@ internal class EnhancedDocumentVerificationViewModel(
             var documentBackFileResult = documentBackFile
             // if we've gotten this far we move files
             // to complete from pending
-            val copySuccess = moveJobToComplete(jobId)
+            val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
                 documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()

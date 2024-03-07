@@ -37,7 +37,7 @@ import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
-import com.smileidentity.util.moveJobToComplete
+import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
 import io.sentry.Breadcrumb
@@ -272,7 +272,7 @@ class SelfieViewModel(
                 R.string.si_processing_error_subtitle
             }
             if (!(SmileID.allowOfflineMode && isNetworkFailure(e))) {
-                val complete = moveJobToComplete(jobId)
+                val complete = moveJobToSubmitted(jobId)
                 if (!complete) {
                     Timber.w("Failed to move job $jobId to complete")
                     Sentry.addBreadcrumb(
@@ -351,7 +351,7 @@ class SelfieViewModel(
             var livenessFilesResult = livenessFiles
             // if we've gotten this far we move files
             // to complete from pending
-            val copySuccess = moveJobToComplete(jobId)
+            val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
                 livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)

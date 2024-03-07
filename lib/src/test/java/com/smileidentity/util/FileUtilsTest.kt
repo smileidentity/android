@@ -50,7 +50,7 @@ class FileUtilsTest {
 
     @Test
     fun `should clean up all completed jobs if deleteCompletedJobs is true`() {
-        cleanupJobs(deleteCompletedJobs = true, jobIds = null, savePath = testDir.absolutePath)
+        cleanupJobs(deleteSubmittedJobs = true, jobIds = null, savePath = testDir.absolutePath)
         // Assert all files in submitted are deleted
         assertTrue(File(testDir, submittedPath).list()?.isEmpty() ?: true)
         // Assert unsubmitted files are untouched
