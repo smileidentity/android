@@ -1,6 +1,7 @@
 package com.smileidentity.sample.compose.jobs
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
@@ -120,12 +122,8 @@ private fun JobListItem(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        onClick = {
-            expanded = !expanded
-            Timber.d("Expanded: $expanded")
-        },
+        onClick = { expanded = !expanded },
         modifier = modifier
-            .animateContentSize()
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
@@ -138,8 +136,10 @@ private fun JobListItem(
                     if (resultText != null) {
                         Text(resultText, style = MaterialTheme.typography.labelLarge)
                     }
-                    if (expanded) {
-                        expandedContent()
+                    AnimatedVisibility(visible = expanded) {
+                        Column(modifier = Modifier.animateContentSize()) {
+                            expandedContent()
+                        }
                     }
                     if (isProcessing) {
                         Spacer(modifier = Modifier.size(4.dp))
@@ -188,7 +188,6 @@ private fun ColumnScope.JobListItemAdditionalDetails(
     resultCode: String?,
     code: String?,
 ) {
-    // TODO: Add Actions support
     JobMetadataItem(
         label = stringResource(com.smileidentity.sample.R.string.jobs_detail_user_id_label),
         value = userId,
@@ -218,7 +217,9 @@ private fun JobMetadataItem(label: String, value: String?) {
             Spacer(modifier = Modifier.size(8.dp))
             Text(text = label, style = MaterialTheme.typography.labelMedium)
             Spacer(modifier = Modifier.size(2.dp))
-            Text(value, style = MaterialTheme.typography.bodySmall)
+            SelectionContainer {
+                Text(value, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
