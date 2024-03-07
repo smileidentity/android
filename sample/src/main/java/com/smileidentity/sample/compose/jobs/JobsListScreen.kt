@@ -134,7 +134,9 @@ private fun JobListItem(
             supportingContent = {
                 Column {
                     if (resultText != null) {
-                        Text(resultText, style = MaterialTheme.typography.labelLarge)
+                        SelectionContainer {
+                            Text(resultText, style = MaterialTheme.typography.labelLarge)
+                        }
                     }
                     AnimatedVisibility(visible = expanded) {
                         Column(modifier = Modifier.animateContentSize()) {

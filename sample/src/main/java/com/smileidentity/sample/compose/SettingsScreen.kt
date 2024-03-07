@@ -85,7 +85,7 @@ fun SettingsScreen(
                     ),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.typography.labelMedium.color.copy(alpha = .5f),
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(2.dp),
                 )
             }
         },
