@@ -17,7 +17,7 @@ import okio.sink
 private const val UN_SUBMITTED_PATH = "/unsubmitted"
 
 /**
- * The path where submitted (completed) job files are stored.
+ * The path where submitted job files are stored.
  * Files in this directory have been processed or marked as completed.
  */
 private const val SUBMITTED_PATH = "/submitted"
