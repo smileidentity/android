@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -115,7 +116,7 @@ fun OrchestratedTransactionFraudScreen(
             onResult(SmileIDResult.Error(OperationCanceledException("Camera Permission Denied")))
         }
     }
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         permissionState.launchPermissionRequest()
         if (permissionState.status.shouldShowRationale) {
             context.toast(R.string.si_camera_permission_rationale)
@@ -128,7 +129,6 @@ fun OrchestratedTransactionFraudScreen(
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = false,
-            // securePolicy = SecureFlagPolicy.SecureOn,
         ),
     ) {
         TransactionFraudScreen(
@@ -178,7 +178,7 @@ private fun TransactionFraudScreen(
             val infiniteTransition = rememberInfiniteTransition(label = "infiniteTransition")
             infiniteTransition.animateFloat(
                 initialValue = DEFAULT_CUTOUT_PROPORTION,
-                targetValue = DEFAULT_CUTOUT_PROPORTION - 0.04f,
+                targetValue = DEFAULT_CUTOUT_PROPORTION - 0.03f,
                 label = "breathingCutoutProportion",
                 animationSpec = infiniteRepeatable(
                     animation = tween(durationMillis = 1500, easing = EaseInOut),
@@ -197,12 +197,16 @@ private fun TransactionFraudScreen(
             uiState.showCompletion -> painterResource(R.drawable.si_processing_success)
             selfieHint != null -> {
                 var atEnd by remember(selfieHint) { mutableStateOf(false) }
-                val painter = rememberAnimatedVectorPainter(
-                    animatedImageVector = AnimatedImageVector.animatedVectorResource(
-                        selfieHint.animation,
-                    ),
-                    atEnd = atEnd,
-                )
+                // The extra key() is needed otherwise there are weird artifacts
+                // see: https://stackoverflow.com/a/71123697
+                val painter = key(selfieHint) {
+                    rememberAnimatedVectorPainter(
+                        animatedImageVector = AnimatedImageVector.animatedVectorResource(
+                            selfieHint.animation,
+                        ),
+                        atEnd = atEnd,
+                    )
+                }
                 LaunchedEffect(selfieHint) {
                     atEnd = !atEnd
                 }
@@ -302,7 +306,9 @@ private fun FeedbackOverlay(
     ) {
         overlayImage?.let {
             Image(
-                painter = overlayImage,
+                // The extra key() is needed otherwise there are weird artifacts
+                // see: https://stackoverflow.com/a/71123697
+                painter = key(overlayImage) { overlayImage },
                 contentDescription = null,
             )
         }

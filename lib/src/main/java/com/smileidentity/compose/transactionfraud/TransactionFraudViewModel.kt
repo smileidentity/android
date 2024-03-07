@@ -1,6 +1,7 @@
 package com.smileidentity.compose.transactionfraud
 
 import android.graphics.Bitmap
+import android.graphics.ImageFormat.YUV_420_888
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
@@ -14,6 +15,7 @@ import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType
@@ -23,6 +25,7 @@ import com.smileidentity.networking.asFormDataParts
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.area
+import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
@@ -53,13 +56,14 @@ private val SELFIE_IMAGE_SIZE = android.util.Size(640, 640)
 private const val FACE_QUALITY_THRESHOLD = 0.5f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
 private const val MAX_FACE_AREA_THRESHOLD = 0.25f
-private const val LUMINANCE_THRESHOLD = 35
+private const val LUMINANCE_THRESHOLD = 50
 private const val MAX_FACE_PITCH_THRESHOLD = 40
 private const val MAX_FACE_YAW_THRESHOLD = 30
 private const val MAX_FACE_ROLL_THRESHOLD = 40
 
 enum class SelfieHint(@DrawableRes val animation: Int) {
     SearchingForFace(R.drawable.si_tf_face_search),
+    NeedLight(R.drawable.si_tf_light_flash),
 }
 
 data class TransactionFraudUiState(
@@ -111,20 +115,26 @@ class TransactionFraudViewModel(
 
         val image = imageProxy.image ?: run {
             Timber.w("ImageProxy has no image")
+            SmileIDCrashReporting.hub.addBreadcrumb("ImageProxy has no image")
             imageProxy.close()
             return
         }
 
         // YUV_420_888 is the format produced by CameraX and needed for Luminance calculation
-        // check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
-        // val luminance = calculateLuminance(imageProxy)
-        // if (luminance < LUMINANCE_THRESHOLD) {
-        //     Timber.d("Low luminance detected")
-        //     // TODO: Show lighting animation
-        //     _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 1f) }
-        //     imageProxy.close()
-        //     return
-        // }
+        check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
+        val luminance = calculateLuminance(imageProxy)
+        if (luminance < LUMINANCE_THRESHOLD) {
+            Timber.d("Low luminance detected")
+            _uiState.update {
+                it.copy(
+                    showBorderHighlight = false,
+                    cutoutOpacity = 1f,
+                    selfieHint = SelfieHint.NeedLight,
+                )
+            }
+            imageProxy.close()
+            return
+        }
 
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
