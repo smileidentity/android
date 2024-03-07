@@ -1,6 +1,7 @@
 package com.smileidentity.compose.transactionfraud
 
 import android.graphics.Bitmap
+import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
@@ -11,6 +12,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.models.AuthenticationRequest
@@ -56,10 +58,15 @@ private const val MAX_FACE_PITCH_THRESHOLD = 40
 private const val MAX_FACE_YAW_THRESHOLD = 30
 private const val MAX_FACE_ROLL_THRESHOLD = 40
 
+enum class SelfieHint(@DrawableRes val animation: Int) {
+    SearchingForFace(R.drawable.si_tf_face_search),
+}
+
 data class TransactionFraudUiState(
     val backgroundOpacity: Float = 0.8f,
     val cutoutOpacity: Float = 0.8f,
     val showBorderHighlight: Boolean = false,
+    val selfieHint: SelfieHint? = SelfieHint.SearchingForFace,
     val showLoading: Boolean = false,
     val showCompletion: Boolean = false,
 )
@@ -123,14 +130,12 @@ class TransactionFraudViewModel(
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
             val face = faces.firstOrNull() ?: run {
                 Timber.d("No face detected")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
 
             if (faces.size > 1) {
                 Timber.d("More than one face detected")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
@@ -142,7 +147,6 @@ class TransactionFraudViewModel(
                 bBox.top >= 0 && bBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
                 Timber.d("Face bounding box not within image")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
@@ -151,7 +155,6 @@ class TransactionFraudViewModel(
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
             if (faceFillRatio < MIN_FACE_AREA_THRESHOLD) {
                 Timber.d("Face not close enough to camera")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
@@ -159,7 +162,6 @@ class TransactionFraudViewModel(
             // Check that the face is not too close to the camera
             if (faceFillRatio > MAX_FACE_AREA_THRESHOLD) {
                 Timber.d("Face too close to camera")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
@@ -177,13 +179,11 @@ class TransactionFraudViewModel(
             val fullSelfieBmp = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
             if (bBox.left + bBox.width() > fullSelfieBmp.width) {
                 Timber.d("Face bounding box width is greater than image width")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
             if (bBox.top + bBox.height() > fullSelfieBmp.height) {
                 Timber.d("Face bounding box height is greater than image height")
-                // TODO: Show face searching animation
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
@@ -205,11 +205,10 @@ class TransactionFraudViewModel(
                 ).scale(modelInputSize[1], modelInputSize[2], false)
                 load(modelInputBmp)
             }
-            val modelStartTime = System.nanoTime()
+            // val modelStartTime = System.nanoTime()
             val outputs = imageQualityModel.process(input.tensorBuffer)
             // val modelElapsedTimeMs = (System.nanoTime() - modelStartTime) / 1_000_000
             val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
-                // TODO: Show face searching animation
                 Timber.w("No image quality output")
                 resetFaceQuality()
                 return@addOnSuccessListener
@@ -231,7 +230,9 @@ class TransactionFraudViewModel(
                 _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
                 return@addOnSuccessListener
             }
-            _uiState.update { it.copy(showBorderHighlight = true, cutoutOpacity = 0f) }
+            _uiState.update {
+                it.copy(showBorderHighlight = true, cutoutOpacity = 0f, selfieHint = null)
+            }
             lastAutoCaptureTimeMs = System.currentTimeMillis()
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
                 val livenessFile = createLivenessFile()
@@ -302,7 +303,13 @@ class TransactionFraudViewModel(
     }
 
     private fun resetFaceQuality() {
-        _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
+        _uiState.update {
+            it.copy(
+                showBorderHighlight = false,
+                cutoutOpacity = 0.8f,
+                selfieHint = SelfieHint.SearchingForFace,
+            )
+        }
         selfieQualityHistory.clear()
         livenessFiles.removeAll { it.delete() }
         selfieFile?.delete()

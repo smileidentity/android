@@ -4,7 +4,7 @@ import android.Manifest
 import android.os.OperationCanceledException
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -13,6 +13,10 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +29,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -132,6 +139,7 @@ fun OrchestratedTransactionFraudScreen(
     }
 }
 
+@OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 private fun TransactionFraudScreen(
     modifier: Modifier = Modifier,
@@ -173,7 +181,7 @@ private fun TransactionFraudScreen(
                 targetValue = DEFAULT_CUTOUT_PROPORTION - 0.04f,
                 label = "breathingCutoutProportion",
                 animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1500, easing = FastOutLinearInEasing),
+                    animation = tween(durationMillis = 1500, easing = EaseInOut),
                     repeatMode = RepeatMode.Reverse,
                 ),
             )
@@ -184,7 +192,24 @@ private fun TransactionFraudScreen(
                 animationSpec = tween(durationMillis = 500),
             )
         }
-
+        val selfieHint = uiState.selfieHint
+        val overlayImage = when {
+            uiState.showCompletion -> painterResource(R.drawable.si_processing_success)
+            selfieHint != null -> {
+                var atEnd by remember(selfieHint) { mutableStateOf(false) }
+                val painter = rememberAnimatedVectorPainter(
+                    animatedImageVector = AnimatedImageVector.animatedVectorResource(
+                        selfieHint.animation,
+                    ),
+                    atEnd = atEnd,
+                )
+                LaunchedEffect(selfieHint) {
+                    atEnd = !atEnd
+                }
+                painter
+            }
+            else -> null
+        }
         FeedbackOverlay(
             backgroundOpacity = animateFloatAsState(
                 targetValue = uiState.backgroundOpacity,
@@ -200,11 +225,7 @@ private fun TransactionFraudScreen(
                 targetValue = borderColor,
                 label = "cornerBorderColor",
             ).value,
-            overlayImage = if (uiState.showCompletion) {
-                painterResource(R.drawable.si_processing_success)
-            } else {
-                null
-            },
+            overlayImage = overlayImage,
         )
         if (uiState.showLoading) {
             CircularProgressIndicator()
