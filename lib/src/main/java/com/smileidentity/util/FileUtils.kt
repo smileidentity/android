@@ -325,7 +325,7 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
 }
 
 /**
- * Moves a folder from 'pending' to 'complete' within the app's specific directory, handling all
+ * Moves a folder from 'unsubmitted' to 'submitted' within the app's specific directory, handling all
  * edge cases.
  * @param folderName The name of the job or operation, corresponding to the folder to be moved.
  * @param savePath The base path where the 'pending' and 'complete' folders are
