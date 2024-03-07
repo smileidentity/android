@@ -94,7 +94,10 @@ fun MainScreen(
     val bottomNavSelection = uiState.bottomNavSelection
     val bottomNavItems = remember { BottomNavigationScreen.entries.toImmutableList() }
     val dialogDestinations = remember {
-        listOf(ProductScreen.SmartSelfieAuthentication.route, ProductScreen.TransactionFraud.route)
+        listOf(
+            "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
+            "^${ProductScreen.TransactionFraud.route}.*$".toRegex(),
+        )
     }
     val clipboardManager = LocalClipboardManager.current
 
@@ -123,12 +126,11 @@ fun MainScreen(
             // Don't show bottom bar when navigating to any product screens
             val showBottomBar by remember(currentRoute) {
                 derivedStateOf {
+                    val routeString = currentRoute?.destination?.route ?: ""
                     val isDirectlyOnBottomNavDestination = bottomNavItems.any {
-                        it.route.contains(currentRoute?.destination?.route ?: "")
+                        it.route.contains(routeString)
                     }
-                    val isOnDialogDestination = dialogDestinations.any {
-                        it.contains(currentRoute?.destination?.route ?: "")
-                    }
+                    val isOnDialogDestination = dialogDestinations.any { it matches routeString }
                     return@derivedStateOf isDirectlyOnBottomNavDestination || isOnDialogDestination
                 }
             }
