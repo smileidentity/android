@@ -1,4 +1,4 @@
-package com.smileidentity.compose.transactionfraud
+package com.smileidentity.compose.biometricauthentication
 
 import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
@@ -66,7 +66,7 @@ enum class SelfieHint(@DrawableRes val animation: Int) {
     NeedLight(R.drawable.si_tf_light_flash),
 }
 
-data class TransactionFraudUiState(
+data class BiometricAuthenticationUiState(
     val backgroundOpacity: Float = 0.8f,
     val cutoutOpacity: Float = 0.8f,
     val showBorderHighlight: Boolean = false,
@@ -76,7 +76,7 @@ data class TransactionFraudUiState(
 )
 
 @kotlin.OptIn(FlowPreview::class)
-class TransactionFraudViewModel(
+class BiometricAuthenticationViewModel(
     private val userId: String,
     private val jobId: String,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
@@ -91,11 +91,11 @@ class TransactionFraudViewModel(
     ),
     private val onResult: SmileIDCallback<SmartSelfieJobResult.Entry>,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(TransactionFraudUiState())
+    private val _uiState = MutableStateFlow(BiometricAuthenticationUiState())
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        TransactionFraudUiState(),
+        BiometricAuthenticationUiState(),
     )
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null

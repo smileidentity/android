@@ -54,13 +54,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
+import com.smileidentity.compose.BiometricAuthentication
 import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.compose.TransactionFraud
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -96,7 +96,7 @@ fun MainScreen(
     val dialogDestinations = remember {
         listOf(
             "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
-            "^${ProductScreen.TransactionFraud.route}.*$".toRegex(),
+            "^${ProductScreen.BiometricAuthentication.route}.*$".toRegex(),
         )
     }
     val clipboardManager = LocalClipboardManager.current
@@ -349,8 +349,8 @@ fun MainScreen(
                         },
                     )
                 }
-                dialog(ProductScreen.TransactionFraud.route) {
-                    LaunchedEffect(Unit) { viewModel.onTransactionFraudSelected() }
+                dialog(ProductScreen.BiometricAuthentication.route) {
+                    LaunchedEffect(Unit) { viewModel.onBiometricAuthenticationSelected() }
                     SmartSelfieAuthenticationUserIdInputDialog(
                         onDismiss = {
                             viewModel.onHomeSelected()
@@ -358,16 +358,16 @@ fun MainScreen(
                         },
                         onConfirm = { userId ->
                             navController.navigate(
-                                "${ProductScreen.TransactionFraud.route}/$userId",
+                                "${ProductScreen.BiometricAuthentication.route}/$userId",
                             ) { popUpTo(BottomNavigationScreen.Home.route) }
                         },
                     )
                 }
-                dialog(ProductScreen.TransactionFraud.route + "/{userId}") {
-                    LaunchedEffect(Unit) { viewModel.onTransactionFraudSelected() }
+                dialog(ProductScreen.BiometricAuthentication.route + "/{userId}") {
+                    LaunchedEffect(Unit) { viewModel.onBiometricAuthenticationSelected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.TransactionFraud(userId = userId) { result ->
-                        viewModel.onTransactionFraudResult(result)
+                    SmileID.BiometricAuthentication(userId = userId) { result ->
+                        viewModel.onBiometricAuthenticationResult(result)
                         navController.popBackStack()
                     }
                 }

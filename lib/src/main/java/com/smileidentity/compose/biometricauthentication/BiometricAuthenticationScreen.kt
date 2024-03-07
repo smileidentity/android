@@ -1,4 +1,4 @@
-package com.smileidentity.compose.transactionfraud
+package com.smileidentity.compose.biometricauthentication
 
 import android.Manifest
 import android.os.OperationCanceledException
@@ -88,16 +88,16 @@ const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun OrchestratedTransactionFraudScreen(
+fun OrchestratedBiometricAuthenticationScreen(
     userId: String,
     jobId: String,
     imageQualityModel: ImQualCp20Optimized,
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
-    @Suppress("UNUSED_PARAMETER") viewModel: TransactionFraudViewModel = viewModel(
+    @Suppress("UNUSED_PARAMETER") viewModel: BiometricAuthenticationViewModel = viewModel(
         initializer = {
-            TransactionFraudViewModel(
+            BiometricAuthenticationViewModel(
                 userId = userId,
                 jobId = jobId,
                 extraPartnerParams = extraPartnerParams,
@@ -131,7 +131,7 @@ fun OrchestratedTransactionFraudScreen(
             dismissOnClickOutside = false,
         ),
     ) {
-        TransactionFraudScreen(
+        BiometricAuthenticationScreen(
             modifier = modifier
                 .height(512.dp)
                 .clip(MaterialTheme.shapes.large),
@@ -141,9 +141,9 @@ fun OrchestratedTransactionFraudScreen(
 
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
-private fun TransactionFraudScreen(
+private fun BiometricAuthenticationScreen(
     modifier: Modifier = Modifier,
-    viewModel: TransactionFraudViewModel = viewModel(),
+    viewModel: BiometricAuthenticationViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()

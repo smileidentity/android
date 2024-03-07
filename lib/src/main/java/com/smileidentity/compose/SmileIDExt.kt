@@ -14,13 +14,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.biometricauthentication.OrchestratedBiometricAuthenticationScreen
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.compose.transactionfraud.OrchestratedTransactionFraudScreen
 import com.smileidentity.ml.ImQualCp20Optimized
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
@@ -439,7 +439,7 @@ fun SmileID.ConsentScreen(
 }
 
 @Composable
-fun SmileID.TransactionFraud(
+fun SmileID.BiometricAuthentication(
     userId: String,
     modifier: Modifier = Modifier,
     jobId: String = rememberSaveable { randomJobId() },
@@ -451,7 +451,7 @@ fun SmileID.TransactionFraud(
     val context = LocalContext.current
     val imageQualityModel = remember { ImQualCp20Optimized.newInstance(context) }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedTransactionFraudScreen(
+        OrchestratedBiometricAuthenticationScreen(
             userId = userId,
             jobId = jobId,
             imageQualityModel = imageQualityModel,

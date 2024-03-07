@@ -457,16 +457,16 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onTransactionFraudSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.TransactionFraud.label) }
+    fun onBiometricAuthenticationSelected() {
+        _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricAuthentication.label) }
     }
 
-    fun onTransactionFraudResult(result: SmileIDResult<SmartSelfieJobResult.Entry>) {
+    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieJobResult.Entry>) {
         onHomeSelected()
         if (result is SmileIDResult.Success) {
             val response = result.data
             val message = jobResultMessageBuilder(
-                jobName = "Transaction Fraud",
+                jobName = "Biometric Authentication",
                 jobComplete = true,
                 jobSuccess = true,
                 code = null,
@@ -476,7 +476,7 @@ class MainScreenViewModel : ViewModel() {
             Timber.d("$message: $result")
             _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
-                DataStoreRepository.addPendingJob(
+                DataStoreRepository.addCompletedJob(
                     partnerId = SmileID.config.partnerId,
                     isProduction = uiState.value.isProduction,
                     job = Job(
@@ -496,7 +496,7 @@ class MainScreenViewModel : ViewModel() {
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
-            val message = "Transaction Fraud error: ${th.message}"
+            val message = "Biometric Authentication error: ${th.message}"
             Timber.e(th, message)
             _uiState.update { it.copy(snackbarMessage = message) }
         }
