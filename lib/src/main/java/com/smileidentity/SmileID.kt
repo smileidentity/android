@@ -275,7 +275,10 @@ object SmileID {
         val authRequestJsonString = authRequestFile.readText()
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)
-            ?: throw IllegalArgumentException("Invalid jobId information")
+            ?: run { 
+                Timber.v("Error decoding AuthenticationRequest JSON to class: $authRequestJsonString")
+                throw IllegalArgumentException("Invalid jobId information")
+             }
 
         val authResponse = api.authenticate(authRequest)
 
