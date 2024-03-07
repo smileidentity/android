@@ -57,9 +57,9 @@ private const val FACE_QUALITY_THRESHOLD = 0.5f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
 private const val MAX_FACE_AREA_THRESHOLD = 0.25f
 private const val LUMINANCE_THRESHOLD = 50
-private const val MAX_FACE_PITCH_THRESHOLD = 40
-private const val MAX_FACE_YAW_THRESHOLD = 30
-private const val MAX_FACE_ROLL_THRESHOLD = 40
+private const val MAX_FACE_PITCH_THRESHOLD = 30
+private const val MAX_FACE_YAW_THRESHOLD = 15
+private const val MAX_FACE_ROLL_THRESHOLD = 30
 
 enum class SelfieHint(@DrawableRes val animation: Int) {
     SearchingForFace(R.drawable.si_tf_face_search),
