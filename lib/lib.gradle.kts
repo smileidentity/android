@@ -189,6 +189,7 @@ dependencies {
     // Jetpack Compose UI
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.compose.animation)
     // Android Studio Preview support
     implementation(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support
