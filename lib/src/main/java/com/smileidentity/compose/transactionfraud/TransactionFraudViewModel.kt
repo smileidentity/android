@@ -264,8 +264,6 @@ class TransactionFraudViewModel(
                 maxOutputSize = SELFIE_IMAGE_SIZE,
             )
 
-            // When showCompletion is true, stop the camera feed and show the completion animation
-            // TODO: show error on dialog itself?
             val proxy = { e: Throwable -> onResult(SmileIDResult.Error(e)) }
             viewModelScope.launch(getExceptionHandler(proxy)) {
                 _uiState.update {
@@ -281,7 +279,8 @@ class TransactionFraudViewModel(
                 onResult(SmileIDResult.Success(result))
             }
         }.addOnFailureListener { exception ->
-            Timber.e(exception, "Error detecting faces")
+            Timber.e(exception, "Error analyzing image")
+            SmileIDCrashReporting.hub.addBreadcrumb("Error analyzing image")
             onResult(SmileIDResult.Error(exception))
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
