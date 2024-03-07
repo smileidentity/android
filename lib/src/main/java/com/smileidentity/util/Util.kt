@@ -36,7 +36,6 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
-import java.nio.ByteBuffer
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
@@ -99,9 +98,12 @@ internal fun isImageAtLeast(
 
 fun calculateLuminance(imageProxy: ImageProxy): Double {
     // planes[0] is the Y plane aka "luma"
-    val data = imageProxy.planes[0].buffer.toByteArray()
-    val pixels = data.map { it.toInt() and 0xFF }
-    return pixels.average()
+    val data = imageProxy.planes[0].buffer.apply { rewind() }
+    var sum = 0.0
+    while (data.hasRemaining()) {
+        sum += data.get().toInt() and 0xFF
+    }
+    return sum / data.limit()
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
@@ -400,11 +402,4 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
-}
-
-internal fun ByteBuffer.toByteArray(): ByteArray {
-    rewind()
-    val data = ByteArray(remaining())
-    get(data)
-    return data
 }
