@@ -52,7 +52,7 @@ enum class FileType {
  * jobs for deletion. This enables clearing out space or managing files that are no longer needed
  * after job completion. Defaults to false to prevent accidental deletion of completed jobs.
  *
- * @param deletePendingJobs When set to true, the function targets files associated with pending
+ * @param deleteUnsubmittedJobs When set to true, the function targets files associated with unsubmitted
  * jobs for deletion. Useful for resetting or clearing jobs that have not been completed or are
  * no longer needed. Defaults to false to protect ongoing or queued jobs from unintended deletion.
  *
