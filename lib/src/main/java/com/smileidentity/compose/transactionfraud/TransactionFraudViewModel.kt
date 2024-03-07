@@ -215,9 +215,7 @@ class TransactionFraudViewModel(
                 ).scale(modelInputSize[1], modelInputSize[2], false)
                 load(modelInputBmp)
             }
-            // val modelStartTime = System.nanoTime()
             val outputs = imageQualityModel.process(input.tensorBuffer)
-            // val modelElapsedTimeMs = (System.nanoTime() - modelStartTime) / 1_000_000
             val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
                 Timber.w("No image quality output")
                 resetFaceQuality()
@@ -230,9 +228,6 @@ class TransactionFraudViewModel(
             }
 
             val averageFaceQuality = selfieQualityHistory.average()
-            // Timber.v("FaceQuality=$output")
-            // Timber.v("AveragedFaceQuality=$averageFaceQuality")
-            // Timber.v("ModelInferenceTime=$modelElapsedTimeMs ms")
 
             if (averageFaceQuality < FACE_QUALITY_THRESHOLD) {
                 // We don't want to reset the history here, since the model output is noisy
