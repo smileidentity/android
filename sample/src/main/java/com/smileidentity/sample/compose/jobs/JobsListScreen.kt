@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
@@ -71,12 +70,14 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
             @DrawableRes
             val iconRes = when (it.jobType) {
                 SmartSelfieEnrollment -> R.drawable.si_smart_selfie_instructions_hero
-                SmartSelfieAuthentication -> R.drawable.si_smart_selfie_instructions_hero
+                SmartSelfieAuthentication ->
+                    com.smileidentity.sample.R.drawable.smart_selfie_authentication
+
                 DocumentVerification -> com.smileidentity.sample.R.drawable.doc_v
+                EnhancedDocumentVerification -> R.drawable.si_smart_selfie_instructions_hero
                 BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
                 BVN -> com.smileidentity.sample.R.drawable.biometric_kyc
-                EnhancedDocumentVerification -> R.drawable.si_smart_selfie_instructions_hero
                 JobType.Unknown -> {
                     Timber.e("Unknown job type")
                     R.drawable.si_smart_selfie_instructions_hero
@@ -85,7 +86,7 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
             JobListItem(
                 sourceIcon = {
                     Image(
-                        painter = painterResource(id = iconRes),
+                        painter = painterResource(iconRes),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                     )
@@ -107,7 +108,6 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun JobListItem(
     sourceIcon: @Composable () -> Unit,
@@ -120,7 +120,10 @@ private fun JobListItem(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        onClick = { expanded = !expanded },
+        onClick = {
+            expanded = !expanded
+            Timber.d("Expanded: $expanded")
+        },
         modifier = modifier
             .animateContentSize()
             .fillMaxWidth()
@@ -131,15 +134,17 @@ private fun JobListItem(
             overlineContent = { Text(timestamp) },
             headlineContent = { Text(jobType) },
             supportingContent = {
-                if (resultText != null) {
-                    Text(resultText, style = MaterialTheme.typography.labelLarge)
-                }
-                if (expanded) {
-                    expandedContent()
-                }
-                if (isProcessing) {
-                    Spacer(modifier = Modifier.size(4.dp))
-                    LinearProgressIndicator(strokeCap = StrokeCap.Round)
+                Column {
+                    if (resultText != null) {
+                        Text(resultText, style = MaterialTheme.typography.labelLarge)
+                    }
+                    if (expanded) {
+                        expandedContent()
+                    }
+                    if (isProcessing) {
+                        Spacer(modifier = Modifier.size(4.dp))
+                        LinearProgressIndicator(strokeCap = StrokeCap.Round)
+                    }
                 }
             },
             trailingContent = {
