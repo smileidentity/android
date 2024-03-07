@@ -72,7 +72,9 @@ internal fun cleanupJobs(
     // Default to the base save path used by createSmileTempFile
     savePath: String = SmileID.fileSavePath,
 ) {
-    if (jobIds != null && jobIds.isEmpty()) return
+    if (jobIds.isNullOrEmpty()) {
+        return
+    }
 
     val pathsToClean = mutableListOf<String>()
     if (deleteCompletedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
