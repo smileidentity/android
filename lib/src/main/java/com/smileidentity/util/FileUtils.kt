@@ -67,7 +67,7 @@ enum class FileType {
  */
 internal fun cleanupJobs(
     deleteCompletedJobs: Boolean = false,
-    deletePendingJobs: Boolean = false,
+    deleteUnsubmittedJobs: Boolean = false,
     jobIds: List<String>? = null,
     // Default to the base save path used by createSmileTempFile
     savePath: String = SmileID.fileSavePath,
