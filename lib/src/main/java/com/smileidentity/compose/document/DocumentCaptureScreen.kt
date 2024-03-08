@@ -92,7 +92,7 @@ fun DocumentCaptureScreen(
     modifier: Modifier = Modifier,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
-        factory = viewModelFactory { DocumentCaptureViewModel(jobId, knownIdAspectRatio) },
+        factory = viewModelFactory { DocumentCaptureViewModel(jobId, side, knownIdAspectRatio) },
         key = side.name,
     ),
 ) {

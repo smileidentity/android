@@ -9,6 +9,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import okio.buffer
 import okio.sink
+import timber.log.Timber
 
 /**
  * The path where unsubmitted job files are stored.
@@ -36,10 +37,16 @@ const val PRE_UPLOAD_REQUEST_FILE = "pre_upload"
  * - LIVENESS: Refers to liveness images captured file captured that is pertinent to the job
  * - DOCUMENT:Refers to document capture files captured that is pertinent to the job
  */
-enum class FileType {
-    SELFIE,
-    LIVENESS,
-    DOCUMENT,
+enum class FileType(val fileType: String) {
+    SELFIE("si_selfie_"),
+    LIVENESS("si_liveness_"),
+    DOCUMENT_FRONT("si_document_front_"),
+    DOCUMENT_BACK("si_document_back_"),
+    ;
+
+    override fun toString(): String {
+        return fileType
+    }
 }
 
 /**
@@ -198,17 +205,11 @@ fun getFilesByType(
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() || !directory.isDirectory) {
+        Timber.w("The path provided is not a valid directory.")
         throw IllegalArgumentException("The path provided is not a valid directory.")
     }
-
-    val prefix = when (fileType) {
-        FileType.SELFIE -> "si_selfie_"
-        FileType.LIVENESS -> "si_liveness_"
-        FileType.DOCUMENT -> "si_document_"
-    }
-
     val files = directory.listFiles() ?: emptyArray()
-    return files.filter { it.name.startsWith(prefix) }.sortedBy { it.name }
+    return files.filter { it.name.startsWith(fileType.fileType) }.sortedBy { it.name }
 }
 
 /**
@@ -298,8 +299,8 @@ internal fun getSmileTempFile(
  * @throws IOException If an error occurs during file creation, such as insufficient
  *                     permissions or disk space.
  */
-internal fun createSmileImageFile(imageType: String, folderName: String): File {
-    val fileName = "si_${imageType}_${System.currentTimeMillis()}"
+internal fun createSmileImageFile(imageType: FileType, folderName: String): File {
+    val fileName = "${imageType}${System.currentTimeMillis()}"
     return createSmileTempFile(folderName, fileName)
 }
 
@@ -379,9 +380,16 @@ private fun File.copyTo(target: File, overwrite: Boolean) {
     }
 }
 
-internal fun createLivenessFile(jobId: String) = createSmileImageFile("liveness", jobId)
-internal fun createSelfieFile(jobId: String) = createSmileImageFile("selfie", jobId)
-internal fun createDocumentFile(jobId: String) = createSmileImageFile("document", jobId)
+internal fun createLivenessFile(jobId: String) = createSmileImageFile(FileType.LIVENESS, jobId)
+internal fun createSelfieFile(jobId: String) = createSmileImageFile(FileType.SELFIE, jobId)
+internal fun createDocumentFile(jobId: String, isFront: Boolean) = createSmileImageFile(
+    if (isFront) {
+        FileType.DOCUMENT_FRONT
+    } else {
+        FileType.DOCUMENT_BACK
+    },
+    jobId,
+)
 
 /**
  * Creates a pre-upload file for a specific job and partner parameters.

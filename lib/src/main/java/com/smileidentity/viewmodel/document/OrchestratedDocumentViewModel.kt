@@ -13,7 +13,6 @@ import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
-import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentBackImage
@@ -138,21 +137,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
-            }
-
-            if (SmileID.allowOfflineMode) {
-                createAuthenticationRequestFile(jobId, authRequest)
-                val prepUploadRequest = PrepUploadRequest(
-                    partnerParams = PartnerParams(
-                        jobId = jobId,
-                        jobType = JobType.BiometricKyc,
-                        userId = userId,
-                        extras = extraPartnerParams,
-                    ),
-                    // TODO - Adjust according to backend changes
-                    allowNewEnroll = allowNewEnroll.toString(),
-                )
-                createPrepUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -300,8 +284,8 @@ internal class DocumentVerificationViewModel(
             val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
-                documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
-                documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+                documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT_FRONT).first()
+                documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT_BACK).first()
             } else {
                 Timber.w("Failed to move job $jobId to complete")
                 SmileIDCrashReporting.hub.addBreadcrumb(
@@ -364,8 +348,8 @@ internal class EnhancedDocumentVerificationViewModel(
             val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
                 selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
-                documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
-                documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+                documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT_FRONT).first()
+                documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT_BACK).first()
             } else {
                 Timber.w("Failed to move job $jobId to complete")
                 SmileIDCrashReporting.hub.addBreadcrumb(

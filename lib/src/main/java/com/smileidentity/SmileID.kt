@@ -313,13 +313,13 @@ object SmileID {
 
         val selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
         val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
-        val documentFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT).first()
-        val documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
+        val documentFRONTFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT_FRONT).first()
+        val documentFRONTBackFileResult = getFilesByType(jobId, FileType.DOCUMENT_BACK).first()
 
         val selfieImageInfo = selfieFileResult.asSelfieImage()
         val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
-        val frontImageInfo = documentFrontFileResult.asDocumentFrontImage()
-        val backImageInfo = documentBackFileResult.asDocumentBackImage()
+        val frontImageInfo = documentFRONTFrontFileResult.asDocumentFrontImage()
+        val backImageInfo = documentFRONTBackFileResult.asDocumentBackImage()
 
         val uploadRequest = UploadRequest(
             images = listOfNotNull(
