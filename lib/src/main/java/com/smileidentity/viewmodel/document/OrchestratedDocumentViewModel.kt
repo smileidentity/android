@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.DocumentCaptureFlow
@@ -32,7 +33,6 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
 import io.sentry.Breadcrumb
-import io.sentry.Sentry
 import io.sentry.SentryLevel
 import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
@@ -220,7 +220,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             val complete = moveJobToSubmitted(jobId)
             if (!complete) {
                 Timber.w("Failed to move job $jobId to complete")
-                Sentry.addBreadcrumb(
+                SmileIDCrashReporting.hub.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"
@@ -304,7 +304,7 @@ internal class DocumentVerificationViewModel(
                 documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
             } else {
                 Timber.w("Failed to move job $jobId to complete")
-                Sentry.addBreadcrumb(
+                SmileIDCrashReporting.hub.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"
@@ -368,7 +368,7 @@ internal class EnhancedDocumentVerificationViewModel(
                 documentBackFileResult = getFilesByType(jobId, FileType.DOCUMENT).last()
             } else {
                 Timber.w("Failed to move job $jobId to complete")
-                Sentry.addBreadcrumb(
+                SmileIDCrashReporting.hub.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"

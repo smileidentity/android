@@ -14,6 +14,7 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
@@ -41,7 +42,6 @@ import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
 import io.sentry.Breadcrumb
-import io.sentry.Sentry
 import io.sentry.SentryLevel
 import java.io.File
 import kotlin.math.absoluteValue
@@ -275,7 +275,7 @@ class SelfieViewModel(
                 val complete = moveJobToSubmitted(jobId)
                 if (!complete) {
                     Timber.w("Failed to move job $jobId to complete")
-                    Sentry.addBreadcrumb(
+                    SmileIDCrashReporting.hub.addBreadcrumb(
                         Breadcrumb().apply {
                             category = "Offline Mode"
                             message = "Failed to move job $jobId to complete"
@@ -357,7 +357,7 @@ class SelfieViewModel(
                 livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
             } else {
                 Timber.w("Failed to move job $jobId to complete")
-                Sentry.addBreadcrumb(
+                SmileIDCrashReporting.hub.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"
