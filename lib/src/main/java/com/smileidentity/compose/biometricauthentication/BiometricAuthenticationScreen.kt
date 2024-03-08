@@ -62,7 +62,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.roundedRectCornerDashPathEffect
-import com.smileidentity.ml.ImQualCp20Optimized
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -84,7 +84,7 @@ const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 fun OrchestratedBiometricAuthenticationScreen(
     userId: String,
     jobId: String,
-    imageQualityModel: ImQualCp20Optimized,
+    selfieQualityModel: SelfieQualityModel,
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
@@ -94,7 +94,7 @@ fun OrchestratedBiometricAuthenticationScreen(
                 userId = userId,
                 jobId = jobId,
                 extraPartnerParams = extraPartnerParams,
-                imageQualityModel = imageQualityModel,
+                selfieQualityModel = selfieQualityModel,
                 onResult = onResult,
             )
         },

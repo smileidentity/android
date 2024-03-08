@@ -16,7 +16,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.ml.ImQualCp20Optimized
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.SmartSelfieJobResult
@@ -80,7 +80,7 @@ class BiometricAuthenticationViewModel(
     private val userId: String,
     private val jobId: String,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    private val imageQualityModel: ImQualCp20Optimized,
+    private val selfieQualityModel: SelfieQualityModel,
     private val faceDetector: FaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder().apply {
             setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -215,7 +215,7 @@ class BiometricAuthenticationViewModel(
                 ).scale(modelInputSize[1], modelInputSize[2], false)
                 load(modelInputBmp)
             }
-            val outputs = imageQualityModel.process(input.tensorBuffer)
+            val outputs = selfieQualityModel.process(input.tensorBuffer)
             val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
                 Timber.w("No image quality output")
                 resetFaceQuality()

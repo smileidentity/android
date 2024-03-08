@@ -21,7 +21,7 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.ml.ImQualCp20Optimized
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.SmartSelfieJobResult
@@ -449,12 +449,12 @@ fun SmileID.BiometricAuthentication(
     onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
 ) {
     val context = LocalContext.current
-    val imageQualityModel = remember { ImQualCp20Optimized.newInstance(context) }
+    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBiometricAuthenticationScreen(
             userId = userId,
             jobId = jobId,
-            imageQualityModel = imageQualityModel,
+            selfieQualityModel = selfieQualityModel,
             extraPartnerParams = extraPartnerParams,
             modifier = modifier,
             onResult = onResult,
