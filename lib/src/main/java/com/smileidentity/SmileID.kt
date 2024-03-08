@@ -37,6 +37,10 @@ import com.smileidentity.util.listJobIds
 import com.squareup.moshi.Moshi
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -262,7 +266,10 @@ object SmileID {
      * to handle potential network responses, including success, failure, or error cases.
      */
     @JvmStatic
-    suspend fun submitJob(jobId: String) {
+    suspend fun submitJob(
+        jobId: String,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
+    ): Job = scope.launch {
         val jobIds = listJobIds()
         if (jobId !in jobIds) {
             Timber.v("Invalid jobId or not found")
@@ -272,7 +279,6 @@ object SmileID {
             jobId,
             AUTH_REQUEST_FILE,
             true,
-            "json",
         )
         val authRequestJsonString = authRequestFile.readText()
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
@@ -291,7 +297,6 @@ object SmileID {
             jobId,
             PRE_UPLOAD_REQUEST_FILE,
             true,
-            "json",
         )
         val prepUploadRequestJsonString = prepUploadRequestFile.readText()
         val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)

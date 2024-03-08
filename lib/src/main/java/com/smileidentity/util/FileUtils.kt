@@ -24,8 +24,8 @@ private const val UNSUBMITTED = "/unsubmitted"
 private const val SUBMITTED_PATH = "/submitted"
 
 // File names
-const val AUTH_REQUEST_FILE = "authentication_request"
-const val PRE_UPLOAD_REQUEST_FILE = "pre_upload"
+const val AUTH_REQUEST_FILE = "authentication_request.json"
+const val PRE_UPLOAD_REQUEST_FILE = "pre_upload.json"
 
 // Enum defining the types of files managed within the job processing system.
 // This categorization helps in filtering and processing files based on their content or purpose.
@@ -79,15 +79,11 @@ internal fun cleanupJobs(
     // Default to the base save path used by createSmileTempFile
     savePath: String = SmileID.fileSavePath,
 ) {
-    if (jobIds.isNullOrEmpty()) {
-        return
-    }
-
     val pathsToClean = mutableListOf<String>()
     if (deleteSubmittedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
     if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UNSUBMITTED")
 
-    if (jobIds == null) {
+    if (jobIds.isNullOrEmpty()) {
         // Nuke all files in specified paths
         pathsToClean.forEach { path ->
             File(path).deleteRecursively()
@@ -246,7 +242,6 @@ internal fun createSmileTempFile(
  * @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
  * @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
  * @param state Indicates the state directory where the file is stored. True for UN_SUBMITTED_PATH, false for SUBMITTED_PATH.
- * @param fileExt The extension of the file, without the leading dot. Defaults to "jpg".
  * @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
  * @return The `File` object representing the exact file.
  * @throws IllegalArgumentException If any input parameters are invalid.
@@ -256,10 +251,9 @@ internal fun getSmileTempFile(
     folderName: String,
     fileName: String,
     state: Boolean = true,
-    fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
 ): File {
-    if (folderName.isBlank() || fileName.isBlank() || fileExt.isBlank()) {
+    if (folderName.isBlank() || fileName.isBlank()) {
         throw IllegalArgumentException(
             "Folder name, file name, and file extension must not be blank.",
         )
@@ -272,7 +266,7 @@ internal fun getSmileTempFile(
         throw IllegalArgumentException("Invalid jobId or not found")
     }
 
-    val fullPath = File(directory, "si_$fileName.$fileExt")
+    val fullPath = File(directory, "si_$fileName")
 
     if (!fullPath.exists()) {
         throw IllegalArgumentException("Invalid file name or not found")
