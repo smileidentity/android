@@ -19,7 +19,7 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.createAuthenticationRequestFile
-import com.smileidentity.util.createPreUploadFile
+import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
@@ -112,7 +112,7 @@ class BiometricKycViewModel(
                 timestamp = authResponse.timestamp,
             )
             if (SmileID.allowOfflineMode) {
-                createPreUploadFile(jobId, prepUploadRequest)
+                createPrepUploadFile(jobId, prepUploadRequest)
             }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }

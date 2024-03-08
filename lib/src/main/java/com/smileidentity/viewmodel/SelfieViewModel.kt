@@ -32,7 +32,7 @@ import com.smileidentity.util.FileType
 import com.smileidentity.util.area
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
-import com.smileidentity.util.createPreUploadFile
+import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
@@ -316,7 +316,7 @@ class SelfieViewModel(
                     // TODO - Adjust according to backend changes
                     allowNewEnroll = allowNewEnroll.toString(),
                 )
-                createPreUploadFile(jobId, prepUploadRequest)
+                createPrepUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -329,7 +329,7 @@ class SelfieViewModel(
                 timestamp = authResponse.timestamp,
             )
             if (SmileID.allowOfflineMode) {
-                createPreUploadFile(jobId, prepUploadRequest)
+                createPrepUploadFile(jobId, prepUploadRequest)
             }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }

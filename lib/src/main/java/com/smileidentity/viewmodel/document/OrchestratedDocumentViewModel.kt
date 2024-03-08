@@ -26,7 +26,7 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.createAuthenticationRequestFile
-import com.smileidentity.util.createPreUploadFile
+import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
@@ -152,7 +152,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     // TODO - Adjust according to backend changes
                     allowNewEnroll = allowNewEnroll.toString(),
                 )
-                createPreUploadFile(jobId, prepUploadRequest)
+                createPrepUploadFile(jobId, prepUploadRequest)
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -165,7 +165,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 timestamp = authResponse.timestamp,
             )
             if (SmileID.allowOfflineMode) {
-                createPreUploadFile(jobId, prepUploadRequest)
+                createPrepUploadFile(jobId, prepUploadRequest)
             }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val frontImageInfo = documentFrontFile.asDocumentFrontImage()

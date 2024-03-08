@@ -235,7 +235,8 @@ object SmileID {
      * specific jobs based on the implementation in com.smileidentity.util.cleanup.
      *
      * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
-     * a predefined cleanup process.  Helpful methods for obtaining job IDs include:[getSubmittedJobs], [getUnsubmittedJobs]
+     * a predefined cleanup process.  Helpful methods for obtaining
+     * job IDs include:[getSubmittedJobs], [getUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
@@ -245,12 +246,12 @@ object SmileID {
      *
      * @param jobId The unique identifier for the job to be submitted. This ID should be obtained
      *              through the appropriate SmileID service mechanism and is used to track and
-     *              manage the job within SmileID's processing system. Helpful methods for obtaining job
-     *              IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
+     *              manage the job within SmileID's processing system. Helpful methods for
+     *              obtaining job  IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
      *
      * Usage:
-     * To use this function, ensure you are calling it from a coroutine scope or another suspend function.
-     * For example, in a coroutine scope:
+     * To use this function, ensure you are calling it from a coroutine scope or
+     * another suspend function. For example, in a coroutine scope:
      *
      * ```kotlin
      * coroutineScope {
@@ -264,6 +265,7 @@ object SmileID {
     suspend fun submitJob(jobId: String) {
         val jobIds = listJobIds()
         if (jobId !in jobIds) {
+            Timber.v("Invalid jobId or not found")
             throw IllegalArgumentException("Invalid jobId or not found")
         }
         val authRequestFile = getSmileTempFile(
@@ -275,10 +277,13 @@ object SmileID {
         val authRequestJsonString = authRequestFile.readText()
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)
-            ?: run { 
-                Timber.v("Error decoding AuthenticationRequest JSON to class: $authRequestJsonString")
+            ?: run {
+                Timber.v(
+                    "Error decoding AuthenticationRequest JSON to class: " +
+                        authRequestJsonString,
+                )
                 throw IllegalArgumentException("Invalid jobId information")
-             }
+            }
 
         val authResponse = api.authenticate(authRequest)
 
@@ -291,7 +296,13 @@ object SmileID {
         val prepUploadRequestJsonString = prepUploadRequestFile.readText()
         val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
             .fromJson(prepUploadRequestJsonString)
-            ?: throw IllegalArgumentException("Invalid jobId information")
+            ?: run {
+                Timber.v(
+                    "Error decoding AuthenticationRequest JSON to class: " +
+                        authRequestJsonString,
+                )
+                throw IllegalArgumentException("Invalid jobId information")
+            }
 
         val prepUploadRequest = savedPrepUploadRequest.copy(
             timestamp = authResponse.timestamp,

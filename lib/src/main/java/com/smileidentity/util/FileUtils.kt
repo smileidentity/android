@@ -14,7 +14,7 @@ import okio.sink
  * The path where unsubmitted job files are stored.
  * Files in this directory are considered in-progress or awaiting submission.
  */
-private const val UN_SUBMITTED_PATH = "/unsubmitted"
+private const val UNSUBMITTED = "/unsubmitted"
 
 /**
  * The path where submitted job files are stored.
@@ -78,7 +78,7 @@ internal fun cleanupJobs(
 
     val pathsToClean = mutableListOf<String>()
     if (deleteSubmittedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
-    if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UN_SUBMITTED_PATH")
+    if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UNSUBMITTED")
 
     if (jobIds == null) {
         // Nuke all files in specified paths
@@ -166,7 +166,7 @@ internal fun listJobIds(
         jobIds.addAll(File(SUBMITTED_PATH).list().orEmpty().toList())
     }
     if (includeUnsubmitted) {
-        jobIds.addAll(File(UN_SUBMITTED_PATH).list().orEmpty().toList())
+        jobIds.addAll(File(UNSUBMITTED).list().orEmpty().toList())
     }
     return jobIds
 }
@@ -194,7 +194,7 @@ fun getFilesByType(
     savePath: String = SmileID.fileSavePath,
     submitted: Boolean = true,
 ): List<File> {
-    val stateDirectory = if (submitted) SUBMITTED_PATH else UN_SUBMITTED_PATH
+    val stateDirectory = if (submitted) SUBMITTED_PATH else UNSUBMITTED
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() || !directory.isDirectory) {
@@ -229,7 +229,7 @@ internal fun createSmileTempFile(
     fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
 ): File {
-    val stateDirectory = if (state) UN_SUBMITTED_PATH else SUBMITTED_PATH
+    val stateDirectory = if (state) UNSUBMITTED else SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
     if (!directory.exists()) {
         directory.mkdirs()
@@ -264,7 +264,7 @@ internal fun getSmileTempFile(
         )
     }
 
-    val stateDirectory = if (state) UN_SUBMITTED_PATH else SUBMITTED_PATH
+    val stateDirectory = if (state) UNSUBMITTED else SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() && !directory.mkdirs()) {
@@ -338,7 +338,7 @@ internal fun moveJobToSubmitted(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
 ): Boolean {
-    val unSubmittedPath = File(savePath, "$UN_SUBMITTED_PATH/$folderName")
+    val unSubmittedPath = File(savePath, "$UNSUBMITTED/$folderName")
     val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
     if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
@@ -401,7 +401,7 @@ internal fun createDocumentFile(jobId: String) = createSmileImageFile("document"
  *         serialized partner parameters and enrollment allowance flag, ready for upload or
  *         further processing.
  */
-internal fun createPreUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
+internal fun createPrepUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
     val file = createSmileJsonFile(PRE_UPLOAD_REQUEST_FILE, jobId)
     SmileID.moshi.adapter(PrepUploadRequest::class.java)
         .toJson(file.sink().buffer(), prepUploadRequest)
