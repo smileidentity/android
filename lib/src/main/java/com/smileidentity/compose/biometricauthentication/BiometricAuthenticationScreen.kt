@@ -103,7 +103,7 @@ fun OrchestratedBiometricAuthenticationScreen(
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
         if (!granted) {
-            // We don't show jump to the settings screen here (unlike in CameraPermissionButton)
+            // We don't jump to the settings screen here (unlike in CameraPermissionButton)
             // because it would cause an infinite loop of permission requests due to the
             // LaunchedEffect requesting the permission again.
             onResult(SmileIDResult.Error(OperationCanceledException("Camera Permission Denied")))
@@ -210,7 +210,6 @@ private fun BiometricAuthenticationScreen(
                 }
                 painter
             }
-
             else -> null
         }
         val backgroundOpacity by animateFloatAsState(
@@ -229,7 +228,7 @@ private fun BiometricAuthenticationScreen(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                // This is allows the cutout to subtract properly
+                // This is what allows the cutout to subtract properly
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
         ) {
             // The main background
@@ -242,7 +241,7 @@ private fun BiometricAuthenticationScreen(
                 y = (size.height - roundedRectSize.height) / 2.0f,
             )
 
-            // Draw the rounded rectangle cutout
+            // Draw the cutout
             drawRoundRect(
                 cornerRadius = radius,
                 size = roundedRectSize,

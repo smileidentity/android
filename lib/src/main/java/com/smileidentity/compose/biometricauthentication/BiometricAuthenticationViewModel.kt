@@ -254,11 +254,13 @@ class BiometricAuthenticationViewModel(
             }
             shouldAnalyzeImages = false
 
-            selfieFile = createSelfieFile()
+            // local variable is for null type safety purposes
+            val selfieFile = createSelfieFile()
+            this.selfieFile = selfieFile
             Timber.v("Capturing selfie image to $selfieFile")
             postProcessImageBitmap(
                 bitmap = fullSelfieBmp,
-                file = selfieFile!!,
+                file = selfieFile,
                 saveAsGrayscale = false,
                 compressionQuality = 80,
                 maxOutputSize = SELFIE_IMAGE_SIZE,
@@ -273,7 +275,7 @@ class BiometricAuthenticationViewModel(
                         showBorderHighlight = false,
                     )
                 }
-                val result = submitJob()
+                val result = submitJob(selfieFile, livenessFiles)
                 _uiState.update { it.copy(showLoading = false, showCompletion = true) }
                 delay(2500)
                 onResult(SmileIDResult.Success(result))
@@ -288,7 +290,10 @@ class BiometricAuthenticationViewModel(
         }
     }
 
-    private suspend fun submitJob(): SmartSelfieJobResult.Entry {
+    private suspend fun submitJob(
+        selfieFile: File,
+        livenessFiles: List<File>,
+    ): SmartSelfieJobResult.Entry {
         val authResponse = SmileID.api.authenticate(
             AuthenticationRequest(
                 jobType = JobType.SmartSelfieAuthentication,
@@ -301,7 +306,7 @@ class BiometricAuthenticationViewModel(
             timestamp = authResponse.timestamp,
             signature = authResponse.signature,
             partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-            selfieImage = selfieFile!!.asFormDataPart("image", "image/jpeg"),
+            selfieImage = selfieFile.asFormDataPart("image", "image/jpeg"),
             livenessImages = livenessFiles.asFormDataParts("liveness_sequence", "image/jpeg"),
         )
     }
