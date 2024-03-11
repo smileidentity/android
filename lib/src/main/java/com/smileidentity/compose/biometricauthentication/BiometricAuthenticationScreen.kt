@@ -67,6 +67,7 @@ import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
+import com.smileidentity.viewmodel.BiometricAuthenticationViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ImplementationMode

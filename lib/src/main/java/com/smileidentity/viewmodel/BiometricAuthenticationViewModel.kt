@@ -1,4 +1,4 @@
-package com.smileidentity.compose.biometricauthentication
+package com.smileidentity.viewmodel
 
 import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
@@ -56,8 +56,8 @@ private const val NUM_LIVENESS_IMAGES = 4
 private val LIVENESS_IMAGE_SIZE = android.util.Size(320, 320)
 private val SELFIE_IMAGE_SIZE = android.util.Size(640, 640)
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val MIN_FACE_AREA_THRESHOLD = 0.15f
-private const val MAX_FACE_AREA_THRESHOLD = 0.25f
+private const val MIN_FACE_FILL_THRESHOLD = 0.15f
+private const val MAX_FACE_FILL_THRESHOLD = 0.25f
 private const val LUMINANCE_THRESHOLD = 50
 private const val MAX_FACE_PITCH_THRESHOLD = 30
 private const val MAX_FACE_YAW_THRESHOLD = 15
@@ -165,14 +165,14 @@ class BiometricAuthenticationViewModel(
 
             // Check that the face is close enough to the camera
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
-            if (faceFillRatio < MIN_FACE_AREA_THRESHOLD) {
+            if (faceFillRatio < MIN_FACE_FILL_THRESHOLD) {
                 Timber.d("Face not close enough to camera")
                 resetFaceQuality()
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
-            if (faceFillRatio > MAX_FACE_AREA_THRESHOLD) {
+            if (faceFillRatio > MAX_FACE_FILL_THRESHOLD) {
                 Timber.d("Face too close to camera")
                 resetFaceQuality()
                 return@addOnSuccessListener
