@@ -36,6 +36,8 @@ import kotlin.math.absoluteValue
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -268,17 +270,38 @@ class BiometricAuthenticationViewModel(
 
             val proxy = { e: Throwable -> onResult(SmileIDResult.Error(e)) }
             viewModelScope.launch(getExceptionHandler(proxy)) {
-                _uiState.update {
-                    it.copy(
-                        showLoading = true,
-                        backgroundOpacity = 0.99f,
-                        showBorderHighlight = false,
-                    )
-                }
-                val result = submitJob(selfieFile, livenessFiles)
-                _uiState.update { it.copy(showLoading = false, showCompletion = true) }
-                delay(2500)
-                onResult(SmileIDResult.Success(result))
+                var done = false
+                // Start submitting the job right away, but show the spinner after a small delay
+                // to make it feel like the API call is a bit faster
+                awaitAll(
+                    async {
+                        val result = submitJob(selfieFile, livenessFiles)
+                        done = true
+                        _uiState.update {
+                            it.copy(
+                                showLoading = false,
+                                showCompletion = true,
+                                backgroundOpacity = 0.99f,
+                                showBorderHighlight = false,
+                            )
+                        }
+                        // Delay to ensure the completion icon is shown for a little bit
+                        delay(2500)
+                        onResult(SmileIDResult.Success(result))
+                    },
+                    async {
+                        delay(1500)
+                        if (!done) {
+                            _uiState.update {
+                                it.copy(
+                                    showLoading = true,
+                                    backgroundOpacity = 0.99f,
+                                    showBorderHighlight = false,
+                                )
+                            }
+                        }
+                    },
+                )
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error analyzing image")
