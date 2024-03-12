@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-* Bump Compose BOM to 2024.02.00
+* Bump Compose BOM to 2024.02.02
 * Made `KEY_RESULT` constants in `Fragment`s `internal` to remove a footgun where the constant was easily confused with `KEY_REQUEST`
+* Improved back button behavior on image confirmation and processing dialogs
 
 ## 10.0.4
 

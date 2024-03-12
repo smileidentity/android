@@ -28,6 +28,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 
 @Suppress("unused")
@@ -93,6 +94,8 @@ object SmileID {
             .baseUrl(url)
             .client(okHttpClient)
             .addConverterFactory(UploadRequestConverterFactory)
+            // Needed for String form data. Otherwise the Moshi adapter adds extraneous quotations
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
 

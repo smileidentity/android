@@ -6,21 +6,25 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.biometricauthentication.OrchestratedBiometricAuthenticationScreen
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.compose.transactionfraud.TransactionFraudScreen
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -435,14 +439,23 @@ fun SmileID.ConsentScreen(
 }
 
 @Composable
-fun SmileID.TransactionFraud(
+fun SmileID.BiometricAuthentication(
+    userId: String,
     modifier: Modifier = Modifier,
+    jobId: String = rememberSaveable { randomJobId() },
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
-    onResult: SmileIDCallback<Nothing> = {},
+    onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
 ) {
+    val context = LocalContext.current
+    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        TransactionFraudScreen(
+        OrchestratedBiometricAuthenticationScreen(
+            userId = userId,
+            jobId = jobId,
+            selfieQualityModel = selfieQualityModel,
+            extraPartnerParams = extraPartnerParams,
             modifier = modifier,
             onResult = onResult,
         )

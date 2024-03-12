@@ -30,8 +30,10 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.jobResultMessageBuilder
+import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -455,12 +457,49 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
-    fun onTransactionFraudSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.TransactionFraud.label) }
+    fun onBiometricAuthenticationSelected() {
+        _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricAuthentication.label) }
     }
 
-    fun onTransactionFraudResult() {
+    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieJobResult.Entry>) {
         onHomeSelected()
+        if (result is SmileIDResult.Success) {
+            val response = result.data
+            val message = jobResultMessageBuilder(
+                jobName = "Biometric Authentication",
+                jobComplete = true,
+                jobSuccess = true,
+                code = null,
+                resultCode = response.resultCode,
+                resultText = response.resultText,
+            )
+            Timber.d("$message: $result")
+            _uiState.update { it.copy(snackbarMessage = message) }
+            viewModelScope.launch {
+                DataStoreRepository.addCompletedJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = response.partnerParams.jobType!!,
+                        timestamp = Date().toString(),
+                        userId = response.partnerParams.userId,
+                        jobId = response.partnerParams.jobId,
+                        jobComplete = true,
+                        jobSuccess = true,
+                        code = null,
+                        resultCode = response.resultCode,
+                        smileJobId = response.smileJobId,
+                        resultText = response.resultText,
+                        selfieImageUrl = null,
+                    ),
+                )
+            }
+        } else if (result is SmileIDResult.Error) {
+            val th = result.throwable
+            val message = "Biometric Authentication error: ${th.message}"
+            Timber.e(th, message)
+            _uiState.update { it.copy(snackbarMessage = message) }
+        }
     }
 
     fun clearJobs() {

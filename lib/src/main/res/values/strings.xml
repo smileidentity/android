@@ -151,8 +151,8 @@
     <!--  Enhanced DocV Screen  -->
     <string name="si_enhanced_docv_product_name">Enhanced Document Verification</string>
 
-    <!--  Transaction Fraud  -->
-    <string name="si_transaction_fraud_product_name">Transaction Fraud</string>
+    <!--  Biometric Authentication  -->
+    <string name="si_biometric_authentication_product_name">Biometric Authentication</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>

@@ -18,7 +18,8 @@ internal class GzipRequestInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest: Request = chain.request()
         val body = originalRequest.body
-        if (body == null || originalRequest.header("Content-Encoding") != null) {
+        val isValidHost = originalRequest.url.host.contains("api.smileidentity.com")
+        if (body == null || originalRequest.header("Content-Encoding") != null || !isValidHost) {
             return chain.proceed(originalRequest)
         }
 

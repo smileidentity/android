@@ -54,13 +54,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
+import com.smileidentity.compose.BiometricAuthentication
 import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.compose.TransactionFraud
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -94,7 +94,10 @@ fun MainScreen(
     val bottomNavSelection = uiState.bottomNavSelection
     val bottomNavItems = remember { BottomNavigationScreen.entries.toImmutableList() }
     val dialogDestinations = remember {
-        listOf(ProductScreen.SmartSelfieAuthentication.route, ProductScreen.TransactionFraud.route)
+        listOf(
+            "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
+            "^${ProductScreen.BiometricAuthentication.route}.*$".toRegex(),
+        )
     }
     val clipboardManager = LocalClipboardManager.current
 
@@ -123,12 +126,11 @@ fun MainScreen(
             // Don't show bottom bar when navigating to any product screens
             val showBottomBar by remember(currentRoute) {
                 derivedStateOf {
+                    val routeString = currentRoute?.destination?.route ?: ""
                     val isDirectlyOnBottomNavDestination = bottomNavItems.any {
-                        it.route.contains(currentRoute?.destination?.route ?: "")
+                        it.route.contains(routeString)
                     }
-                    val isOnDialogDestination = dialogDestinations.any {
-                        it.contains(currentRoute?.destination?.route ?: "")
-                    }
+                    val isOnDialogDestination = dialogDestinations.any { it matches routeString }
                     return@derivedStateOf isDirectlyOnBottomNavDestination || isOnDialogDestination
                 }
             }
@@ -347,10 +349,25 @@ fun MainScreen(
                         },
                     )
                 }
-                dialog(ProductScreen.TransactionFraud.route) {
-                    LaunchedEffect(Unit) { viewModel.onTransactionFraudSelected() }
-                    SmileID.TransactionFraud {
-                        viewModel.onTransactionFraudResult()
+                dialog(ProductScreen.BiometricAuthentication.route) {
+                    LaunchedEffect(Unit) { viewModel.onBiometricAuthenticationSelected() }
+                    SmartSelfieAuthenticationUserIdInputDialog(
+                        onDismiss = {
+                            viewModel.onHomeSelected()
+                            navController.popBackStack()
+                        },
+                        onConfirm = { userId ->
+                            navController.navigate(
+                                "${ProductScreen.BiometricAuthentication.route}/$userId",
+                            ) { popUpTo(BottomNavigationScreen.Home.route) }
+                        },
+                    )
+                }
+                dialog(ProductScreen.BiometricAuthentication.route + "/{userId}") {
+                    LaunchedEffect(Unit) { viewModel.onBiometricAuthenticationSelected() }
+                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                    SmileID.BiometricAuthentication(userId = userId) { result ->
+                        viewModel.onBiometricAuthenticationResult(result)
                         navController.popBackStack()
                     }
                 }

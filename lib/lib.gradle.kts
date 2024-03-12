@@ -148,6 +148,7 @@ dependencies {
     api(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit.converter.scalars)
     implementation(libs.okhttp.logging.interceptor)
 
     // Moshi is exposed in public SmileID interface, hence "api" vs "implementation"
@@ -188,6 +189,7 @@ dependencies {
     // Jetpack Compose UI
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.compose.animation)
     // Android Studio Preview support
     implementation(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support

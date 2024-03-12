@@ -14,7 +14,6 @@ class ImageCaptureConfirmationDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    @Suppress("MoveLambdaOutsideParentheses")
     fun shouldInvokeConfirmationCallbackOnConfirmButtonClick() {
         // given
         var callbackInvoked = false
