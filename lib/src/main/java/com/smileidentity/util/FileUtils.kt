@@ -15,7 +15,7 @@ import timber.log.Timber
  * The path where unsubmitted job files are stored.
  * Files in this directory are considered in-progress or awaiting submission.
  */
-private const val UNSUBMITTED = "/unsubmitted"
+private const val UNSUBMITTED_PATH = "/unsubmitted"
 
 /**
  * The path where submitted job files are stored.
@@ -81,7 +81,7 @@ internal fun cleanupJobs(
 ) {
     val pathsToClean = mutableListOf<String>()
     if (deleteSubmittedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
-    if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UNSUBMITTED")
+    if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UNSUBMITTED_PATH")
 
     if (jobIds.isNullOrEmpty()) {
         // Nuke all files in specified paths
@@ -119,24 +119,21 @@ internal fun cleanupJobs(
  * the specified jobs. It's designed for internal use within the system to maintain cleanliness and manage storage efficiently.
  */
 
-internal fun cleanupJobs(
-    scope: DeleteScope = DeleteScope.CompletedJobs,
-    jobIds: List<String>? = null,
-) {
+internal fun cleanupJobs(scope: DeleteScope = DeleteScope.All, jobIds: List<String>? = null) {
     when (scope) {
-        DeleteScope.AllJobs -> cleanupJobs(
-            deleteSubmittedJobs = false,
-            deleteUnsubmittedJobs = false,
+        DeleteScope.All -> cleanupJobs(
+            deleteSubmittedJobs = true,
+            deleteUnsubmittedJobs = true,
             jobIds = jobIds,
         )
 
-        DeleteScope.CompletedJobs -> cleanupJobs(
+        DeleteScope.Submitted -> cleanupJobs(
             deleteSubmittedJobs = true,
             deleteUnsubmittedJobs = false,
             jobIds = jobIds,
         )
 
-        DeleteScope.PendingJobs -> cleanupJobs(
+        DeleteScope.Unsubmitted -> cleanupJobs(
             deleteSubmittedJobs = false,
             deleteUnsubmittedJobs = true,
             jobIds = jobIds,
@@ -169,7 +166,7 @@ internal fun listJobIds(
         jobIds.addAll(File(SUBMITTED_PATH).list().orEmpty().toList())
     }
     if (includeUnsubmitted) {
-        jobIds.addAll(File(UNSUBMITTED).list().orEmpty().toList())
+        jobIds.addAll(File(UNSUBMITTED_PATH).list().orEmpty().toList())
     }
     return jobIds
 }
@@ -197,7 +194,7 @@ fun getFilesByType(
     savePath: String = SmileID.fileSavePath,
     submitted: Boolean = true,
 ): List<File> {
-    val stateDirectory = if (submitted) SUBMITTED_PATH else UNSUBMITTED
+    val stateDirectory = if (submitted) SUBMITTED_PATH else UNSUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() || !directory.isDirectory) {
@@ -226,7 +223,7 @@ internal fun createSmileTempFile(
     fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
 ): File {
-    val stateDirectory = if (state) UNSUBMITTED else SUBMITTED_PATH
+    val stateDirectory = if (state) UNSUBMITTED_PATH else SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
     if (!directory.exists()) {
         directory.mkdirs()
@@ -241,7 +238,7 @@ internal fun createSmileTempFile(
  *
  * @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
  * @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
- * @param state Indicates the state directory where the file is stored. True for UN_SUBMITTED_PATH, false for SUBMITTED_PATH.
+ * @param state Indicates the state directory where the file is stored. True for UNSUBMITTED_PATH, false for SUBMITTED_PATH.
  * @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
  * @return The `File` object representing the exact file.
  * @throws IllegalArgumentException If any input parameters are invalid.
@@ -259,7 +256,7 @@ internal fun getSmileTempFile(
         )
     }
 
-    val stateDirectory = if (state) UNSUBMITTED else SUBMITTED_PATH
+    val stateDirectory = if (state) UNSUBMITTED_PATH else SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() && !directory.mkdirs()) {
@@ -333,7 +330,7 @@ internal fun moveJobToSubmitted(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
 ): Boolean {
-    val unSubmittedPath = File(savePath, "$UNSUBMITTED/$folderName")
+    val unSubmittedPath = File(savePath, "$UNSUBMITTED_PATH/$folderName")
     val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
     if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
@@ -439,4 +436,4 @@ internal fun createAuthenticationRequestFile(
     return file
 }
 
-enum class DeleteScope { PendingJobs, CompletedJobs, AllJobs }
+enum class DeleteScope { Unsubmitted, Submitted, All }

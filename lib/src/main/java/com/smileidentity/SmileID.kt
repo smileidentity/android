@@ -275,12 +275,11 @@ object SmileID {
             Timber.v("Invalid jobId or not found")
             throw IllegalArgumentException("Invalid jobId or not found")
         }
-        val authRequestFile = getSmileTempFile(
+        val authRequestJsonString = getSmileTempFile(
             jobId,
             AUTH_REQUEST_FILE,
             true,
-        )
-        val authRequestJsonString = authRequestFile.readText()
+        ).useLines { it.joinToString("\n") }
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)
             ?: run {
@@ -293,12 +292,11 @@ object SmileID {
 
         val authResponse = api.authenticate(authRequest)
 
-        val prepUploadRequestFile = getSmileTempFile(
+        val prepUploadRequestJsonString = getSmileTempFile(
             jobId,
             PRE_UPLOAD_REQUEST_FILE,
             true,
-        )
-        val prepUploadRequestJsonString = prepUploadRequestFile.readText()
+        ).useLines { it.joinToString("\n") }
         val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
             .fromJson(prepUploadRequestJsonString)
             ?: run {

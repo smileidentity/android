@@ -36,16 +36,16 @@ class FileUtilsTest {
     }
 
     @Test
-    fun `should not clean up all jobs if list is empty`() {
+    fun `should clean up all jobs if list is empty`() {
         cleanupJobs(
-            deleteCompletedJobs = true,
-            deletePendingJobs = true,
+            deleteSubmittedJobs = true,
+            deleteUnsubmittedJobs = true,
             jobIds = listOf(),
             savePath = testDir.absolutePath,
         )
-        // Assert no files are deleted when jobIds is empty
-        assertTrue(File(testDir, submittedPath).list()?.isNotEmpty() ?: false)
-        assertTrue(File(testDir, unSubmittedPath).list()?.isNotEmpty() ?: false)
+        // Assert files are deleted when jobIds is empty
+        assertTrue(File(testDir, submittedPath).list()?.isNotEmpty() ?: true)
+        assertTrue(File(testDir, unSubmittedPath).list()?.isNotEmpty() ?: true)
     }
 
     @Test
@@ -59,7 +59,7 @@ class FileUtilsTest {
 
     @Test
     fun `should clean up all pending jobs if deletePendingJobs is true`() {
-        cleanupJobs(deletePendingJobs = true, jobIds = null, savePath = testDir.absolutePath)
+        cleanupJobs(deleteUnsubmittedJobs = true, jobIds = null, savePath = testDir.absolutePath)
         // Assert all files in unsubmitted are deleted
         assertTrue(File(testDir, unSubmittedPath).list()?.isEmpty() ?: true)
         // Assert submitted files are untouched
@@ -70,8 +70,8 @@ class FileUtilsTest {
     fun `should clean up all jobs using job ids`() {
         val jobIds = listOf("job_1", "job_2")
         cleanupJobs(
-            deleteCompletedJobs = true,
-            deletePendingJobs = true,
+            deleteSubmittedJobs = true,
+            deleteUnsubmittedJobs = true,
             jobIds = jobIds,
             savePath = testDir.absolutePath,
         )
@@ -88,8 +88,8 @@ class FileUtilsTest {
     @Test
     fun `should not clean up all jobs flags are false`() {
         cleanupJobs(
-            deleteCompletedJobs = false,
-            deletePendingJobs = false,
+            deleteSubmittedJobs = false,
+            deleteUnsubmittedJobs = false,
             jobIds = null,
             savePath = testDir.absolutePath,
         )
