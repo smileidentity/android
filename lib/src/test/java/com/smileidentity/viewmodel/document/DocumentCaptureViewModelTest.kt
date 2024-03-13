@@ -32,8 +32,8 @@ class DocumentCaptureViewModelTest {
         SmileID.fileSavePath = "."
         val objectDetector: ObjectDetector = mockk()
         subject = DocumentCaptureViewModel(
-            "jobId", knownAspectRatio = null,
-            side = DocumentCaptureSide.Front, objectDetector = objectDetector,
+            "jobId", side = DocumentCaptureSide.Front,
+            knownAspectRatio = null, objectDetector = objectDetector,
         )
     }
 
