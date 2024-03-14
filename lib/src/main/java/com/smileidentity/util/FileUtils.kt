@@ -172,6 +172,37 @@ internal fun listJobIds(
 }
 
 /**
+ * Retrieves a file of a specified type from a given folder, either from the submitted or unsubmitted directory.
+ * This function filters files based on their prefix which indicates the file type (e.g., "si_selfie_" for selfies),
+ * allowing for selective retrieval based on the file's purpose or content.
+ *
+ * @param folderName The name of the subfolder within the base save path from which to retrieve files. This allows for
+ * organization of files by job or category within the broader submitted or unsubmitted directories.
+ * @param fileType The type of file to retrieve, specified by the FileType enum. This parameter determines the prefix
+ * used to filter files in the directory (SELFIE, LIVENESS, DOCUMENT).
+ * @param savePath The base path where files are stored. Defaults to SmileID.fileSavePath, but can be overridden to
+ * target different storage locations. Useful for accessing files in environments with multiple storage directories.
+ * @param submitted A boolean flag indicating whether to retrieve files from the submitted (true) or unsubmitted (false)
+ * directory. This allows the function to adapt based on the processing stage of the files.
+ *
+ * @return A File object that matches the specified type and submission status within the specified folder.
+ * The file is filtered and sorted by name to ensure consistent ordering.
+ */
+fun getFileByType(
+    folderName: String,
+    fileType: FileType,
+    savePath: String = SmileID.fileSavePath,
+    submitted: Boolean = true,
+): File? {
+    return getFilesByType(
+        folderName,
+        fileType,
+        savePath,
+        submitted,
+    ).firstOrNull()
+}
+
+/**
  * Retrieves a list of files of a specified type from a given folder, either from submitted or unsubmitted directories.
  * This function filters files based on their prefix which indicates the file type (e.g., "si_selfie_" for selfies),
  * allowing for selective retrieval based on the file's purpose or content.

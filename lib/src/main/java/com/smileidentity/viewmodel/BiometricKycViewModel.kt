@@ -22,6 +22,7 @@ import com.smileidentity.util.FileType
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
@@ -139,7 +140,10 @@ class BiometricKycViewModel(
             // to complete from pending
             val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
-                selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+                selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+                    Timber.w("Selfie file not found for job ID: $jobId")
+                    throw Exception("Selfie file not found for job ID: $jobId")
+                }
                 livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
             } else {
                 Timber.w("Failed to move job $jobId to complete")

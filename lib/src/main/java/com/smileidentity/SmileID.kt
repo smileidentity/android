@@ -31,6 +31,7 @@ import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
 import com.smileidentity.util.PRE_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
 import com.smileidentity.util.listJobIds
@@ -315,15 +316,15 @@ object SmileID {
 
         val prepUploadResponse = api.prepUpload(prepUploadRequest)
 
-        val selfieFileResult = getFilesByType(jobId, FileType.SELFIE).first()
+        val selfieFileResult = getFileByType(jobId, FileType.SELFIE)
         val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
-        val documentFRONTFrontFileResult = getFilesByType(jobId, FileType.DOCUMENT_FRONT).first()
-        val documentFRONTBackFileResult = getFilesByType(jobId, FileType.DOCUMENT_BACK).first()
+        val documentFRONTFrontFileResult = getFileByType(jobId, FileType.DOCUMENT_FRONT)
+        val documentFRONTBackFileResult = getFileByType(jobId, FileType.DOCUMENT_BACK)
 
-        val selfieImageInfo = selfieFileResult.asSelfieImage()
+        val selfieImageInfo = selfieFileResult?.asSelfieImage()
         val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
-        val frontImageInfo = documentFRONTFrontFileResult.asDocumentFrontImage()
-        val backImageInfo = documentFRONTBackFileResult.asDocumentBackImage()
+        val frontImageInfo = documentFRONTFrontFileResult?.asDocumentFrontImage()
+        val backImageInfo = documentFRONTBackFileResult?.asDocumentBackImage()
 
         val uploadRequest = UploadRequest(
             images = listOfNotNull(

@@ -60,6 +60,7 @@ fun RootScreen(
                         enableCrashReporting = !BuildConfig.DEBUG,
                         okHttpClient = client,
                     )
+                    SmileID.setAllowOfflineMode(true)
                     initialized = true
                 }
             } else if (context.isConfigDefineInAssets()) {
