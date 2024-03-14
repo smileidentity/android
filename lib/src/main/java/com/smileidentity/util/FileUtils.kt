@@ -228,7 +228,7 @@ internal fun createSmileTempFile(
     if (!directory.exists()) {
         directory.mkdirs()
     }
-    return File(directory, "si_$fileName.$fileExt")
+    return File(directory, "$fileName.$fileExt")
 }
 
 /**
@@ -263,7 +263,7 @@ internal fun getSmileTempFile(
         throw IllegalArgumentException("Invalid jobId or not found")
     }
 
-    val fullPath = File(directory, "si_$fileName")
+    val fullPath = File(directory, fileName)
 
     if (!fullPath.exists()) {
         throw IllegalArgumentException("Invalid file name or not found")
@@ -291,7 +291,7 @@ internal fun getSmileTempFile(
  *                     permissions or disk space.
  */
 internal fun createSmileImageFile(imageType: FileType, folderName: String): File {
-    val fileName = "${imageType}${System.currentTimeMillis()}"
+    val fileName = "${imageType.fileType}${System.currentTimeMillis()}"
     return createSmileTempFile(folderName, fileName)
 }
 
@@ -315,7 +315,7 @@ internal fun createSmileImageFile(imageType: FileType, folderName: String): File
  *                     permission to write to the specified directory.
  */
 internal fun createSmileJsonFile(fileName: String, folderName: String): File {
-    return createSmileTempFile(folderName, "si_$fileName", fileExt = "json")
+    return createSmileTempFile(folderName, fileName, fileExt = "json")
 }
 
 /**

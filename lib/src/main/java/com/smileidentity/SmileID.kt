@@ -62,7 +62,8 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
-    internal var allowOfflineMode: Boolean = false
+    var allowOfflineMode: Boolean = false
+        private set
     var callbackUrl: String = ""
         private set
 
