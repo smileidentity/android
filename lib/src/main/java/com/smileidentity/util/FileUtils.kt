@@ -354,7 +354,7 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
  * located, defaulting to SmileID.fileSavePath.
  * @return A Boolean indicating whether the move operation was successful.
  */
-//TODO: cleanup json files here
+// TODO: cleanup json files here
 internal fun moveJobToSubmitted(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
@@ -447,7 +447,9 @@ internal fun createAuthenticationRequestFile(
 ): File {
     val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
     file.sink().buffer().use { sink ->
-        SmileID.moshi.adapter(AuthenticationRequest::class.java).toJson(sink, authRequest.copy(authToken = ""))
+        SmileID.moshi.adapter(
+            AuthenticationRequest::class.java,
+        ).toJson(sink, authRequest.copy(authToken = ""))
     }
     return file
 }
