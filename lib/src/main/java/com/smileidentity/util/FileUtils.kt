@@ -4,8 +4,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.PrepUploadRequest
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import okio.buffer
 import okio.sink
@@ -251,7 +249,6 @@ internal fun createSmileTempFile(
     folderName: String,
     fileName: String,
     state: Boolean = true,
-    fileExt: String = "jpg",
     savePath: String = SmileID.fileSavePath,
 ): File {
     val stateDirectory = if (state) UNSUBMITTED_PATH else SUBMITTED_PATH
@@ -259,7 +256,7 @@ internal fun createSmileTempFile(
     if (!directory.exists()) {
         directory.mkdirs()
     }
-    return File(directory, "$fileName.$fileExt")
+    return File(directory, fileName)
 }
 
 /**
@@ -322,7 +319,7 @@ internal fun getSmileTempFile(
  *                     permissions or disk space.
  */
 internal fun createSmileImageFile(imageType: FileType, folderName: String): File {
-    val fileName = "${imageType.fileType}${System.currentTimeMillis()}"
+    val fileName = "${imageType.fileType}${System.currentTimeMillis()}.jpg"
     return createSmileTempFile(folderName, fileName)
 }
 
@@ -346,7 +343,7 @@ internal fun createSmileImageFile(imageType: FileType, folderName: String): File
  *                     permission to write to the specified directory.
  */
 internal fun createSmileJsonFile(fileName: String, folderName: String): File {
-    return createSmileTempFile(folderName, fileName, fileExt = "json")
+    return createSmileTempFile(folderName, fileName)
 }
 
 /**
@@ -357,6 +354,7 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
  * located, defaulting to SmileID.fileSavePath.
  * @return A Boolean indicating whether the move operation was successful.
  */
+//TODO: cleanup json files here
 internal fun moveJobToSubmitted(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
@@ -385,21 +383,6 @@ internal fun moveJobToSubmitted(
     }
 
     return true
-}
-
-/**
- * Utility method to copy a file using FileChannel for efficiency.
- */
-private fun File.copyTo(target: File, overwrite: Boolean) {
-    if (!overwrite && target.exists()) {
-        throw IOException("File ${target.path} already exists and overwrite is false")
-    }
-
-    FileInputStream(this).channel.use { sourceChannel ->
-        FileOutputStream(target).channel.use { targetChannel ->
-            sourceChannel.transferTo(0, sourceChannel.size(), targetChannel)
-        }
-    }
 }
 
 internal fun createLivenessFile(jobId: String) = createSmileImageFile(FileType.LIVENESS, jobId)
@@ -432,9 +415,10 @@ internal fun createDocumentFile(jobId: String, isFront: Boolean) = createSmileIm
  *         further processing.
  */
 internal fun createPrepUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
-    val file = createSmileJsonFile(PRE_UPLOAD_REQUEST_FILE, jobId)
-    SmileID.moshi.adapter(PrepUploadRequest::class.java)
-        .toJson(file.sink().buffer(), prepUploadRequest)
+    val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
+    file.sink().buffer().use { sink ->
+        SmileID.moshi.adapter(PrepUploadRequest::class.java).toJson(sink, prepUploadRequest)
+    }
     return file
 }
 
@@ -462,8 +446,9 @@ internal fun createAuthenticationRequestFile(
     authRequest: AuthenticationRequest,
 ): File {
     val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
-    SmileID.moshi.adapter(AuthenticationRequest::class.java)
-        .toJson(file.sink().buffer(), authRequest.copy(authToken = ""))
+    file.sink().buffer().use { sink ->
+        SmileID.moshi.adapter(AuthenticationRequest::class.java).toJson(sink, authRequest.copy(authToken = ""))
+    }
     return file
 }
 

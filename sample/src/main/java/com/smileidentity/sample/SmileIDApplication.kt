@@ -2,6 +2,7 @@ package com.smileidentity.sample
 
 import android.app.Application
 import android.content.Context
+import com.smileidentity.SmileID
 import com.smileidentity.sample.repo.DataStoreRepository
 import timber.log.Timber
 
@@ -15,6 +16,7 @@ class SmileIDApplication : Application() {
         // *****Note to Partners*****
         // The line below is how you should initialize the SmileID SDK
         // SmileID.initialize(this)
+        SmileID.setAllowOfflineMode(true)
     }
 
     companion object {
