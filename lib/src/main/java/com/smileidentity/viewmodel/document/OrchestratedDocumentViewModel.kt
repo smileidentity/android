@@ -13,6 +13,7 @@ import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentBackImage
@@ -27,6 +28,7 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
+import com.smileidentity.util.createUploadRequestFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.isNetworkFailure
@@ -135,23 +137,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 userId = userId,
                 jobId = jobId,
             )
-            if (SmileID.allowOfflineMode) {
-                createAuthenticationRequestFile(jobId, authRequest)
-            }
-
-            val authResponse = SmileID.api.authenticate(authRequest)
-
-            val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-                // TODO : Michael will change this to boolean
-                allowNewEnroll = allowNewEnroll.toString(),
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
-            if (SmileID.allowOfflineMode) {
-                createPrepUploadFile(jobId, prepUploadRequest)
-            }
-            val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val frontImageInfo = documentFrontFile.asDocumentFrontImage()
             val backImageInfo = documentBackFile?.asDocumentBackImage()
             val selfieImageInfo = selfieFile?.asSelfieImage() ?: throw IllegalStateException(
@@ -167,6 +152,40 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 ) + livenessImageInfo,
                 idInfo = IdInfo(countryCode, documentType),
             )
+
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+                createPrepUploadFile(
+                    jobId,
+                    PrepUploadRequest(
+                        partnerParams = PartnerParams(
+                            jobType = jobType,
+                            jobId = jobId,
+                            userId = userId,
+                            extras = extraPartnerParams,
+                        ),
+                        allowNewEnroll = allowNewEnroll.toString(),
+                        timestamp = "",
+                        signature = "",
+                    ),
+                )
+                createUploadRequestFile(
+                    jobId,
+                    uploadRequest,
+                )
+            }
+
+            val authResponse = SmileID.api.authenticate(authRequest)
+
+            val prepUploadRequest = PrepUploadRequest(
+                partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
+                // TODO : Michael will change this to boolean
+                allowNewEnroll = allowNewEnroll.toString(),
+                signature = authResponse.signature,
+                timestamp = authResponse.timestamp,
+            )
+
+            val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             val jobStatusRequest = JobStatusRequest(

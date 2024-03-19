@@ -11,6 +11,7 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -21,6 +22,7 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
+import com.smileidentity.util.createUploadRequestFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
@@ -101,6 +103,28 @@ class BiometricKycViewModel(
 
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
+                createPrepUploadFile(
+                    jobId,
+                    PrepUploadRequest(
+                        partnerParams = PartnerParams(
+                            jobType = JobType.BiometricKyc,
+                            jobId = jobId,
+                            userId = userId,
+                            extras = extraPartnerParams,
+                        ),
+                        allowNewEnroll = allowNewEnroll.toString(),
+                        timestamp = "",
+                        signature = "",
+                    ),
+                )
+                createUploadRequestFile(
+                    jobId,
+                    UploadRequest(
+                        images = livenessFiles.map { it.asLivenessImage() } +
+                            selfieFile.asSelfieImage(),
+                        idInfo = idInfo.copy(entered = true),
+                    ),
+                )
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -112,9 +136,7 @@ class BiometricKycViewModel(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
-            if (SmileID.allowOfflineMode) {
-                createPrepUploadFile(jobId, prepUploadRequest)
-            }
+
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()

@@ -3,11 +3,12 @@ package com.smileidentity
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.Config
+import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.util.AUTH_REQUEST_FILE
-import com.smileidentity.util.PRE_UPLOAD_REQUEST_FILE
+import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
@@ -39,12 +40,13 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class SmileIDTest {
     private val moshi = mockk<Moshi>()
+    private val testPath = "some/valid/path"
 
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         mockkObject(SmileID)
-        every { SmileID.fileSavePath } returns "some/valid/path"
+        every { SmileID.fileSavePath } returns testPath
         mockkStatic("com.smileidentity.util.FileUtilsKt")
         SmileID.config = Config(
             partnerId = "partnerId",
@@ -68,18 +70,20 @@ class SmileIDTest {
 
     @Test
     fun `Should list unsubmitted job ids`() {
-        // when
+        every { listJobIds(any(), any(), any()) } returns listOf("job1", "job2")
+
         SmileID.getUnsubmittedJobs()
-        // then
-        verify { listJobIds(includeSubmitted = false, includeUnsubmitted = true) }
+
+        verify { listJobIds(includeSubmitted = false, includeUnsubmitted = true, testPath) }
     }
 
     @Test
     fun `Should list submitted job ids`() {
-        // when
+        every { listJobIds(any(), any(), any()) } returns listOf("job1", "job2")
+
         SmileID.getSubmittedJobs()
-        // then
-        verify { listJobIds(includeSubmitted = true, includeUnsubmitted = false) }
+
+        verify { listJobIds(includeSubmitted = true, includeUnsubmitted = false, testPath) }
     }
 
     @Test
@@ -148,7 +152,7 @@ class SmileIDTest {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             runTest {
                 val jobId = "validJobId"
-                every { listJobIds(any(), any()) } returns listOf("validJobId")
+                every { listJobIds(any(), any(), any()) } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
                         jobId,
@@ -168,11 +172,11 @@ class SmileIDTest {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             runTest {
                 val jobId = "validJobId"
-                every { listJobIds(any(), any()) } returns listOf("validJobId")
+                every { listJobIds(any(), any(), any()) } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
                         jobId,
-                        PRE_UPLOAD_REQUEST_FILE,
+                        PREP_UPLOAD_REQUEST_FILE,
                         any(),
                         any(),
                     )
@@ -198,8 +202,8 @@ class SmileIDTest {
         every { getFilesByType(any(), any(), any(), any()) } returns listOf(file)
         every { SmileID.moshi } returns moshi // Corrected parameters
 
-        val jobId = "validJobId"
-        every { listJobIds() } returns listOf(jobId)
+        val jobId = "jobId"
+        every { listJobIds(any(), any(), any()) } returns listOf(jobId)
 
         // Mock API responses
         val authResponse = mockk<AuthenticationResponse> {
@@ -212,7 +216,10 @@ class SmileIDTest {
         val prepUploadRequest = mockk<PrepUploadRequest>()
         val authRequestAdapter = mockk<JsonAdapter<AuthenticationRequest>>()
         every { moshi.adapter(AuthenticationRequest::class.java) } returns authRequestAdapter
-        every { authRequestAdapter.fromJson(any<String>()) } returns mockk<AuthenticationRequest>()
+        val mockAuthRequest: AuthenticationRequest = mockk<AuthenticationRequest>()
+        every { mockAuthRequest.authToken = any() } just Runs
+        every { mockAuthRequest.jobType } returns JobType.SmartSelfieEnrollment
+        every { authRequestAdapter.fromJson(any<String>()) } returns mockAuthRequest
 
         val prepUploadRequestAdapter = mockk<JsonAdapter<PrepUploadRequest>>()
         every { moshi.adapter(PrepUploadRequest::class.java) } returns prepUploadRequestAdapter

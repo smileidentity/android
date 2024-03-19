@@ -20,6 +20,7 @@ import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -301,6 +302,20 @@ class SelfieViewModel(
             )
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
+                createPrepUploadFile(
+                    jobId,
+                    PrepUploadRequest(
+                        partnerParams = PartnerParams(
+                            jobType = jobType,
+                            jobId = jobId,
+                            userId = userId,
+                            extras = extraPartnerParams,
+                        ),
+                        allowNewEnroll = allowNewEnroll.toString(),
+                        timestamp = "",
+                        signature = "",
+                    ),
+                )
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
@@ -313,9 +328,6 @@ class SelfieViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            if (SmileID.allowOfflineMode) {
-                createPrepUploadFile(jobId, prepUploadRequest)
-            }
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()

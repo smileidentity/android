@@ -3,6 +3,7 @@ package com.smileidentity.util
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.UploadRequest
 import java.io.File
 import java.io.IOException
 import okio.buffer
@@ -23,7 +24,8 @@ private const val SUBMITTED_PATH = "/submitted"
 
 // File names
 const val AUTH_REQUEST_FILE = "authentication_request.json"
-const val PRE_UPLOAD_REQUEST_FILE = "pre_upload.json"
+const val PREP_UPLOAD_REQUEST_FILE = "prep_upload.json"
+const val UPLOAD_REQUEST_FILE = "info.json"
 
 // Enum defining the types of files managed within the job processing system.
 // This categorization helps in filtering and processing files based on their content or purpose.
@@ -140,6 +142,22 @@ internal fun cleanupJobs(scope: DeleteScope = DeleteScope.All, jobIds: List<Stri
 }
 
 /**
+ * Lists only the subdirectories of a given directory.
+ *
+ * @param rootDir The root directory to walk through.
+ * @return A list of File objects representing the subdirectories.
+ */
+private fun listSubdirectories(rootDir: File): List<File> {
+    // Check if rootDir is a directory
+    if (!rootDir.isDirectory) {
+        throw IllegalArgumentException("The provided path is not a directory.")
+    }
+
+    // Filter only directories
+    return rootDir.listFiles { file -> file.isDirectory }.orEmpty().toList()
+}
+
+/**
  * Lists the job IDs based on their completion status. This function can retrieve job IDs from both
  * completed and pending categories, depending on the parameters provided. It allows for flexible retrieval,
  * making it suitable for scenarios where either one or both types of job statuses are of interest.
@@ -154,19 +172,26 @@ internal fun cleanupJobs(scope: DeleteScope = DeleteScope.All, jobIds: List<Stri
  * or pending categories, or both, based on the flags provided. The order of IDs in the list is determined
  * by the file system's enumeration order and is not guaranteed to follow any specific sorting.
  */
-
 internal fun listJobIds(
     includeSubmitted: Boolean = true,
     includeUnsubmitted: Boolean = false,
+    savePath: String = SmileID.fileSavePath,
 ): List<String> {
     val jobIds = mutableListOf<String>()
-    if (includeSubmitted) {
-        jobIds.addAll(File(SUBMITTED_PATH).list().orEmpty().toList())
+    val pathsToInclude = mutableListOf<String>()
+
+    if (includeSubmitted) pathsToInclude.add("$savePath/$SUBMITTED_PATH")
+    if (includeUnsubmitted) pathsToInclude.add("$savePath/$UNSUBMITTED_PATH")
+
+    pathsToInclude.forEach { path ->
+        val dir = File(path)
+        if (dir.exists() && dir.isDirectory) {
+            val names = dir.list()?.toList().orEmpty()
+            jobIds.addAll(names)
+        }
     }
-    if (includeUnsubmitted) {
-        jobIds.addAll(File(UNSUBMITTED_PATH).list().orEmpty().toList())
-    }
-    return jobIds
+
+    return jobIds.distinct()
 }
 
 /**
@@ -354,7 +379,6 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
  * located, defaulting to SmileID.fileSavePath.
  * @return A Boolean indicating whether the move operation was successful.
  */
-// TODO: cleanup json files here
 internal fun moveJobToSubmitted(
     folderName: String,
     savePath: String = SmileID.fileSavePath,
@@ -368,11 +392,18 @@ internal fun moveJobToSubmitted(
     }
 
     try {
-        // Use copyRecursively to copy the directory and its contents
+        unSubmittedPath.walk().filter { it.isFile && it.extension == "json" }.forEach { file ->
+            if (!file.delete()) {
+                throw IOException("Failed to delete JSON file ${file.path}")
+            }
+        }
         if (unSubmittedPath.copyRecursively(submittedPath, overwrite = true)) {
-            // After successful copy, delete the original directory
+            // After successfully deleting JSON files, delete the original directory if empty or any remaining files
             if (!unSubmittedPath.deleteRecursively()) {
-                throw IOException("Failed to delete the source directory ${unSubmittedPath.path}")
+                throw IOException(
+                    "Failed to delete the source directory or " +
+                        "some files within it ${unSubmittedPath.path}",
+                )
             }
         } else {
             throw IOException("Failed to copy files to the target directory ${submittedPath.path}")
@@ -415,9 +446,17 @@ internal fun createDocumentFile(jobId: String, isFront: Boolean) = createSmileIm
  *         further processing.
  */
 internal fun createPrepUploadFile(jobId: String, prepUploadRequest: PrepUploadRequest): File {
-    val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
+    val file = createSmileJsonFile(PREP_UPLOAD_REQUEST_FILE, jobId)
     file.sink().buffer().use { sink ->
         SmileID.moshi.adapter(PrepUploadRequest::class.java).toJson(sink, prepUploadRequest)
+    }
+    return file
+}
+
+internal fun createUploadRequestFile(jobId: String, uploadRequest: UploadRequest): File {
+    val file = createSmileJsonFile(UPLOAD_REQUEST_FILE, jobId)
+    file.sink().buffer().use { sink ->
+        SmileID.moshi.adapter(UploadRequest::class.java).toJson(sink, uploadRequest)
     }
     return file
 }
