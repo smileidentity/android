@@ -34,10 +34,11 @@ import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
-import com.smileidentity.util.isNetworkFailure
+import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.listJobIds
 import com.smileidentity.util.moveJobToSubmitted
 import com.squareup.moshi.Moshi
@@ -279,134 +280,117 @@ object SmileID {
         jobId: String,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         exceptionHandler: ((Throwable) -> Unit)? = null,
-    ): Job = scope.launch {
-        try {
-            val jobIds = listJobIds(includeSubmitted = false, includeUnsubmitted = true)
-            if (jobId !in jobIds) {
-                Timber.v("Invalid jobId or not found")
-                throw IllegalArgumentException("Invalid jobId or not found")
+    ): Job = scope.launch(
+        getExceptionHandler { throwable ->
+            handleOfflineJobFailure(jobId, throwable, exceptionHandler)
+        },
+    ) {
+        val jobIds = listJobIds(includeSubmitted = false, includeUnsubmitted = true)
+        if (jobId !in jobIds) {
+            Timber.v("Invalid jobId or not found")
+            throw IllegalArgumentException("Invalid jobId or not found")
+        }
+        val authRequestJsonString = getSmileTempFile(
+            jobId,
+            AUTH_REQUEST_FILE,
+            true,
+        ).useLines { it.joinToString("\n") }
+        val authRequest = moshi.adapter(AuthenticationRequest::class.java)
+            .fromJson(authRequestJsonString)?.apply {
+                authToken = config.authToken
             }
-            val authRequestJsonString = getSmileTempFile(
+            ?: run {
+                Timber.v(
+                    "Error decoding AuthenticationRequest JSON to class: " +
+                        authRequestJsonString,
+                )
+                throw IllegalArgumentException("Invalid jobId information")
+            }
+
+        val authResponse = api.authenticate(authRequest)
+
+        val prepUploadRequestJsonString = getSmileTempFile(
+            jobId,
+            PREP_UPLOAD_REQUEST_FILE,
+            true,
+        ).useLines { it.joinToString("\n") }
+        val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
+            .fromJson(prepUploadRequestJsonString)
+            ?: run {
+                Timber.v(
+                    "Error decoding PrepUploadRequest JSON to class: " +
+                        prepUploadRequestJsonString,
+                )
+                throw IllegalArgumentException("Invalid jobId information")
+            }
+
+        val prepUploadRequest = savedPrepUploadRequest.copy(
+            timestamp = authResponse.timestamp,
+            signature = authResponse.signature,
+        )
+
+        val prepUploadResponse = api.prepUpload(prepUploadRequest)
+
+        val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
+        val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
+        val documentFrontFileResult =
+            getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
+        val documentBackFileResult =
+            getFileByType(jobId, FileType.DOCUMENT_BACK, submitted = false)
+
+        val selfieImageInfo = selfieFileResult?.asSelfieImage()
+        val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
+        val frontImageInfo = documentFrontFileResult?.asDocumentFrontImage()
+        val backImageInfo = documentBackFileResult?.asDocumentBackImage()
+
+        var idInfo: IdInfo? = null
+        try {
+            val uploadRequestJson = getSmileTempFile(
                 jobId,
-                AUTH_REQUEST_FILE,
+                UPLOAD_REQUEST_FILE,
                 true,
             ).useLines { it.joinToString("\n") }
-            val authRequest = moshi.adapter(AuthenticationRequest::class.java)
-                .fromJson(authRequestJsonString)?.apply {
-                    authToken = config.authToken
-                }
+            val savedUploadRequestJson = moshi.adapter(UploadRequest::class.java)
+                .fromJson(uploadRequestJson)
                 ?: run {
                     Timber.v(
                         "Error decoding AuthenticationRequest JSON to class: " +
-                            authRequestJsonString,
+                            uploadRequestJson,
                     )
                     throw IllegalArgumentException("Invalid jobId information")
                 }
-
-            val authResponse = api.authenticate(authRequest)
-
-            val prepUploadRequestJsonString = getSmileTempFile(
-                jobId,
-                PREP_UPLOAD_REQUEST_FILE,
-                true,
-            ).useLines { it.joinToString("\n") }
-            val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
-                .fromJson(prepUploadRequestJsonString)
-                ?: run {
-                    Timber.v(
-                        "Error decoding PrepUploadRequest JSON to class: " +
-                            prepUploadRequestJsonString,
-                    )
-                    throw IllegalArgumentException("Invalid jobId information")
-                }
-
-            val prepUploadRequest = savedPrepUploadRequest.copy(
-                timestamp = authResponse.timestamp,
-                signature = authResponse.signature,
-            )
-
-            val prepUploadResponse = api.prepUpload(prepUploadRequest)
-
-            val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
-            val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
-            val documentFRONTFrontFileResult =
-                getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
-            val documentFRONTBackFileResult =
-                getFileByType(jobId, FileType.DOCUMENT_BACK, submitted = false)
-
-            val selfieImageInfo = selfieFileResult?.asSelfieImage()
-            val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
-            val frontImageInfo = documentFRONTFrontFileResult?.asDocumentFrontImage()
-            val backImageInfo = documentFRONTBackFileResult?.asDocumentBackImage()
-
-            var idInfo: IdInfo? = null
-            try {
-                val uploadRequestJson = getSmileTempFile(
-                    jobId,
-                    UPLOAD_REQUEST_FILE,
-                    true,
-                ).useLines { it.joinToString("\n") }
-                val savedUploadRequestJson = moshi.adapter(UploadRequest::class.java)
-                    .fromJson(uploadRequestJson)
-                    ?: run {
-                        Timber.v(
-                            "Error decoding AuthenticationRequest JSON to class: " +
-                                uploadRequestJson,
-                        )
-                        throw IllegalArgumentException("Invalid jobId information")
-                    }
-                idInfo = savedUploadRequestJson.idInfo
-            } catch (ex: Exception) {
-                if (authRequest.jobType == JobType.BiometricKyc ||
-                    authRequest.jobType == JobType.DocumentVerification ||
-                    authRequest.jobType == JobType.EnhancedDocumentVerification
-                ) {
-                    Timber.e(ex, "Error decoding UploadRequest JSON to class")
-                    throw ex
-                }
+            idInfo = savedUploadRequestJson.idInfo
+        } catch (ex: Exception) {
+            if (authRequest.jobType == JobType.BiometricKyc ||
+                authRequest.jobType == JobType.DocumentVerification ||
+                authRequest.jobType == JobType.EnhancedDocumentVerification
+            ) {
+                Timber.e(ex, "Error decoding UploadRequest JSON to class")
+                throw ex
             }
-
-            val uploadRequest = UploadRequest(
-                images = listOfNotNull(
-                    frontImageInfo,
-                    backImageInfo,
-                    selfieImageInfo,
-                ) + livenessImageInfo,
-                idInfo = idInfo,
-            )
-            api.upload(prepUploadResponse.uploadUrl, uploadRequest)
-            val copySuccess = moveJobToSubmitted(jobId)
-            if (!copySuccess) {
-                Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.hub.addBreadcrumb(
-                    Breadcrumb().apply {
-                        category = "Offline Mode"
-                        message = "Failed to move job $jobId to complete"
-                        level = SentryLevel.INFO
-                    },
-                )
-            }
-            Timber.d("Upload finished")
-        } catch (e: Throwable) {
-            Timber.e(e, "Error in submitJob for jobId: $jobId")
-            if (!(allowOfflineMode && isNetworkFailure(e))) {
-                val complete = moveJobToSubmitted(jobId)
-                if (!complete) {
-                    Timber.w("Failed to move job $jobId to complete")
-                    SmileIDCrashReporting.hub.addBreadcrumb(
-                        Breadcrumb().apply {
-                            category = "Offline Mode"
-                            message = "Failed to move job $jobId to complete"
-                            level = SentryLevel.INFO
-                        },
-                    )
-                }
-            }
-            exceptionHandler?.invoke(e) ?: run {
-                Timber.e(e, "Exception occurred in submitJob")
-            }
-            throw e
         }
+
+        val uploadRequest = UploadRequest(
+            images = listOfNotNull(
+                frontImageInfo,
+                backImageInfo,
+                selfieImageInfo,
+            ) + livenessImageInfo,
+            idInfo = idInfo,
+        )
+        api.upload(prepUploadResponse.uploadUrl, uploadRequest)
+        val copySuccess = moveJobToSubmitted(jobId)
+        if (!copySuccess) {
+            Timber.w("Failed to move job $jobId to complete")
+            SmileIDCrashReporting.hub.addBreadcrumb(
+                Breadcrumb().apply {
+                    category = "Offline Mode"
+                    message = "Failed to move job $jobId to complete"
+                    level = SentryLevel.INFO
+                },
+            )
+        }
+        Timber.d("Upload finished")
     }
 
     /**

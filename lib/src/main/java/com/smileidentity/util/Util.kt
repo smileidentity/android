@@ -12,10 +12,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import android.os.Bundle
@@ -28,6 +25,7 @@ import androidx.camera.core.impl.utils.Exif
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.R
+import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.consent.bvn.BvnOtpVerificationMode
@@ -276,6 +274,30 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
     proxy(converted)
 }
 
+fun handleOfflineJobFailure(
+    jobId: String,
+    throwable: Throwable,
+    exceptionHandler: (
+        (Throwable) -> Unit
+    )? = null,
+) {
+    Timber.e(throwable, "Error in submitJob for jobId: $jobId")
+    if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
+        val complete = moveJobToSubmitted(jobId)
+        if (!complete) {
+            Timber.w("Failed to move job $jobId to complete")
+            SmileIDCrashReporting.hub.addBreadcrumb(
+                Breadcrumb().apply {
+                    category = "Offline Mode"
+                    message = "Failed to move job $jobId to complete"
+                    level = SentryLevel.INFO
+                },
+            )
+        }
+    }
+    exceptionHandler?.let { it(throwable) }
+}
+
 fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
 fun randomUserId() = randomId("user")
 fun randomJobId() = randomId("job")
@@ -340,36 +362,6 @@ private fun getDataColumn(context: Context, uri: Uri?): String? {
         cursor?.close()
     }
     return null
-}
-
-// From https://stackoverflow.com/a/70510760
-fun Context.isInternetAvailable(): Boolean {
-    var result = false
-    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        val networkCapabilities = connectivityManager.activeNetwork ?: return false
-        val actNw =
-            connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
-        result = when {
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-            else -> false
-        }
-    } else {
-        connectivityManager.run {
-            @Suppress("DEPRECATION")
-            connectivityManager.activeNetworkInfo?.run {
-                result = when (type) {
-                    ConnectivityManager.TYPE_WIFI -> true
-                    ConnectivityManager.TYPE_MOBILE -> true
-                    ConnectivityManager.TYPE_ETHERNET -> true
-                    else -> false
-                }
-            }
-        }
-    }
-    return result
 }
 
 /**

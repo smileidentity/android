@@ -26,6 +26,7 @@ import com.smileidentity.util.createUploadRequestFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
 import io.sentry.Breadcrumb
@@ -73,19 +74,7 @@ class BiometricKycViewModel(
             } else {
                 R.string.si_processing_error_subtitle
             }
-            if (!(SmileID.allowOfflineMode && isNetworkFailure(e))) {
-                val complete = moveJobToSubmitted(jobId)
-                if (!complete) {
-                    Timber.w("Failed to move job $jobId to complete")
-                    SmileIDCrashReporting.hub.addBreadcrumb(
-                        Breadcrumb().apply {
-                            category = "Offline Mode"
-                            message = "Failed to move job $jobId to complete"
-                            level = SentryLevel.INFO
-                        },
-                    )
-                }
-            }
+            handleOfflineJobFailure(jobId, e)
             result = SmileIDResult.Error(e)
             _uiState.update {
                 it.copy(

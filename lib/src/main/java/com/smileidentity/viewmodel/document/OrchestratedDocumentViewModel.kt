@@ -31,6 +31,7 @@ import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.createUploadRequestFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
+import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
 import io.sentry.Breadcrumb
@@ -219,20 +220,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         } else {
             R.string.si_processing_error_subtitle
         }
-        if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
-            val complete = moveJobToSubmitted(jobId)
-            if (!complete) {
-                Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.hub.addBreadcrumb(
-                    Breadcrumb().apply {
-                        category = "Offline Mode"
-                        message = "Failed to move job $jobId to complete"
-                        level = SentryLevel.INFO
-                    },
-                )
-            }
-            // TODO: make this a success
-        }
+        handleOfflineJobFailure(jobId, throwable)
         stepToRetry = uiState.value.currentStep
         _uiState.update {
             it.copy(

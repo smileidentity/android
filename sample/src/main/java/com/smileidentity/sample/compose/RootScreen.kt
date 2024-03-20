@@ -21,9 +21,9 @@ import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.SmileIDApplication
+import com.smileidentity.sample.isInternetAvailable
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.RootViewModel
-import com.smileidentity.util.isInternetAvailable
 import com.smileidentity.viewmodel.viewModelFactory
 
 /**
