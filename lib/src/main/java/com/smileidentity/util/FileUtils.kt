@@ -83,7 +83,7 @@ internal fun cleanupJobs(
     if (deleteSubmittedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
     if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UNSUBMITTED_PATH")
 
-    if (jobIds.isNullOrEmpty()) {
+    if (jobIds == null) {
         // Nuke all files in specified paths
         pathsToClean.forEach { path ->
             File(path).deleteRecursively()
