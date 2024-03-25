@@ -34,12 +34,13 @@ import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.doGetSubmittedJobs
+import com.smileidentity.util.doGetUnsubmittedJobs
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
 import com.smileidentity.util.handleOfflineJobFailure
-import com.smileidentity.util.listJobIds
 import com.smileidentity.util.moveJobToSubmitted
 import com.squareup.moshi.Moshi
 import io.sentry.Breadcrumb
@@ -214,10 +215,7 @@ object SmileID {
      * @return A list of strings representing the IDs of submitted jobs.
      */
     @JvmStatic
-    fun getSubmittedJobs(): List<String> = listJobIds(
-        includeSubmitted = true,
-        includeUnsubmitted = false,
-    )
+    fun getSubmittedJobs(): List<String> = doGetSubmittedJobs()
 
     /**
      * Retrieves a list of unsubmitted job IDs.
@@ -227,10 +225,7 @@ object SmileID {
      * @return A list of strings representing the IDs of unsubmitted jobs.
      */
     @JvmStatic
-    fun getUnsubmittedJobs(): List<String> = listJobIds(
-        includeSubmitted = false,
-        includeUnsubmitted = true,
-    )
+    fun getUnsubmittedJobs(): List<String> = doGetUnsubmittedJobs()
 
     /**
      * Initiates the cleanup process for a single job by its ID.
@@ -238,7 +233,7 @@ object SmileID {
      * to be specified for cleanup.
      *
      * @param jobId The ID of the job to clean up.Helpful methods for obtaining job
-     *  *              IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
+     *  *              IDs include: [doGetSubmittedJobs] [doGetUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobId: String) = cleanupJobs(jobIds = listOf(jobId))
@@ -250,7 +245,7 @@ object SmileID {
      *
      * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
      * a predefined cleanup process.  Helpful methods for obtaining
-     * job IDs include:[getSubmittedJobs], [getUnsubmittedJobs]
+     * job IDs include:[doGetSubmittedJobs], [doGetUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
@@ -278,6 +273,7 @@ object SmileID {
     @JvmStatic
     suspend fun submitJob(
         jobId: String,
+        deleteFilesOnSuccess: Boolean,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         exceptionHandler: ((Throwable) -> Unit)? = null,
     ): Job = scope.launch(
@@ -285,7 +281,7 @@ object SmileID {
             handleOfflineJobFailure(jobId, throwable, exceptionHandler)
         },
     ) {
-        val jobIds = listJobIds(includeSubmitted = false, includeUnsubmitted = true)
+        val jobIds = doGetSubmittedJobs()
         if (jobId !in jobIds) {
             Timber.v("Invalid jobId or not found")
             throw IllegalArgumentException("Invalid jobId or not found")
@@ -344,7 +340,10 @@ object SmileID {
         val backImageInfo = documentBackFileResult?.asDocumentBackImage()
 
         var idInfo: IdInfo? = null
-        try {
+        if (authRequest.jobType == JobType.BiometricKyc ||
+            authRequest.jobType == JobType.DocumentVerification ||
+            authRequest.jobType == JobType.EnhancedDocumentVerification
+        ) {
             val uploadRequestJson = getSmileTempFile(
                 jobId,
                 UPLOAD_REQUEST_FILE,
@@ -354,20 +353,12 @@ object SmileID {
                 .fromJson(uploadRequestJson)
                 ?: run {
                     Timber.v(
-                        "Error decoding AuthenticationRequest JSON to class: " +
+                        "Error decoding UploadRequest JSON to class: " +
                             uploadRequestJson,
                     )
                     throw IllegalArgumentException("Invalid jobId information")
                 }
             idInfo = savedUploadRequestJson.idInfo
-        } catch (ex: Exception) {
-            if (authRequest.jobType == JobType.BiometricKyc ||
-                authRequest.jobType == JobType.DocumentVerification ||
-                authRequest.jobType == JobType.EnhancedDocumentVerification
-            ) {
-                Timber.e(ex, "Error decoding UploadRequest JSON to class")
-                throw ex
-            }
         }
 
         val uploadRequest = UploadRequest(
@@ -389,6 +380,9 @@ object SmileID {
                     level = SentryLevel.INFO
                 },
             )
+        }
+        if (deleteFilesOnSuccess) {
+            cleanup(jobId)
         }
         Timber.d("Upload finished")
     }

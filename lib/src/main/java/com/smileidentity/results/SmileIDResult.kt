@@ -26,8 +26,7 @@ typealias SmileIDCallback<T> = (SmileIDResult<T>) -> Unit
  * (We don't use [kotlin.Result] because we want the result to be Parcelable)
  */
 sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
-    /**
-     * The flow was successful. The result is the value of type [T].
+    /*** The flow was successful. The result is the value of type [T].
      *
      * NB! The Job itself may or may not be complete yet. This can be checked with
      * [com.smileidentity.models.SmartSelfieJobStatusResponse.jobComplete]. If not yet complete, the
@@ -59,7 +58,7 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
 data class SmartSelfieResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: SmartSelfieJobStatusResponse?,
+    val didSubmitSmartSelfieJob: Boolean,
 ) : Parcelable
 
 /**
@@ -84,8 +83,9 @@ data class EnhancedKycResult(
 data class DocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
+    val livenessFiles: List<File>? = null,
     val documentBackFile: File? = null,
-    val jobStatusResponse: DocumentVerificationJobStatusResponse?,
+    val didSubmitDocumentVerificationJob: Boolean,
 ) : Parcelable
 
 /**
@@ -101,8 +101,9 @@ data class DocumentVerificationResult(
 data class EnhancedDocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
+    val livenessFiles: List<File>? = null,
     val documentBackFile: File? = null,
-    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse?,
+    val didSubmitEnhancedDocVJob: Boolean,
 ) : Parcelable
 
 /**
@@ -117,5 +118,5 @@ data class EnhancedDocumentVerificationResult(
 data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: BiometricKycJobStatusResponse?,
+    val didSubmitBiometricJob: Boolean,
 ) : Parcelable

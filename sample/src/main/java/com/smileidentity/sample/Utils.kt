@@ -65,6 +65,18 @@ fun SnackbarHostState.showSnackbar(
     }
 }
 
+fun jobResultMessageBuilder(jobName: String, didSubmitJob: Boolean): String {
+    return jobResultMessageBuilder(
+        jobName,
+        didSubmitJob,
+        jobComplete = false,
+        jobSuccess = false,
+        code = null,
+        resultCode = null,
+        resultText = null,
+    )
+}
+
 /**
  * Builds a display message for a job result. Since each job type has a different response type,
  * we need the individual fields rather than the overarching response type. Not all job types return
@@ -72,6 +84,7 @@ fun SnackbarHostState.showSnackbar(
  */
 fun jobResultMessageBuilder(
     jobName: String,
+    didSubmitJob: Boolean? = true,
     jobComplete: Boolean?,
     jobSuccess: Boolean?,
     code: String?,
@@ -80,6 +93,11 @@ fun jobResultMessageBuilder(
     suffix: String? = null,
 ): String {
     val message = StringBuilder("$jobName ")
+    if (didSubmitJob == true) {
+        message.append("was submitted ")
+    } else {
+        message.append("saved offline ")
+    }
     if (jobComplete == true) {
         if (jobSuccess == true) {
             message.append("completed successfully")
