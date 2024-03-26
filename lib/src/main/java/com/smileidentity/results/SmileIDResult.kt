@@ -1,12 +1,8 @@
 package com.smileidentity.results
 
 import android.os.Parcelable
-import com.smileidentity.models.BiometricKycJobStatusResponse
-import com.smileidentity.models.DocumentVerificationJobStatusResponse
-import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
-import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.squareup.moshi.JsonClass
 import java.io.File
 import kotlinx.parcelize.Parcelize
@@ -26,8 +22,7 @@ typealias SmileIDCallback<T> = (SmileIDResult<T>) -> Unit
  * (We don't use [kotlin.Result] because we want the result to be Parcelable)
  */
 sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
-    /**
-     * The flow was successful. The result is the value of type [T].
+    /*** The flow was successful. The result is the value of type [T].
      *
      * NB! The Job itself may or may not be complete yet. This can be checked with
      * [com.smileidentity.models.SmartSelfieJobStatusResponse.jobComplete]. If not yet complete, the
@@ -46,20 +41,19 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
 }
 
 /**
- * The result of a SmartSelfie capture and submission to the Smile ID API. Indicates that the selfie
- * capture and network requests were successful. The Job itself may or may not be complete yet. This
- * can be checked with [SmartSelfieJobStatusResponse.jobComplete]. If not yet complete, the job
- * status will need to be fetched again later. If the job is complete, the final job success can be
- * checked with [SmartSelfieJobStatusResponse.jobSuccess].
- *
- * If [jobStatusResponse] is null, that means submission to the API was skipped
+ * The result of a smartselfie verification which consist of
+ *  @param selfieFile the captured selfie file
+ *  @param livenessFiles optional selfie liveness files
+ *  @param didSubmitSmartSelfieJob true if the job has been
+ *  submitted to the SmileID apis and false if offline is enabled and the
+ *  network request failed
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class SmartSelfieResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: SmartSelfieJobStatusResponse?,
+    val didSubmitSmartSelfieJob: Boolean,
 ) : Parcelable
 
 /**
@@ -73,49 +67,57 @@ data class EnhancedKycResult(
 ) : Parcelable
 
 /**
- * The result of a Document Verification capture and submission to the Smile ID API. Indicates that
- * the capture and network requests were successful. The Job itself may or may not be complete yet.
- * This can be checked with [DocumentVerificationJobStatusResponse.jobComplete]. If not yet
- * complete, the job status will need to be fetched again later. If the job is complete, the final
- * job success can be checked with [DocumentVerificationJobStatusResponse.jobSuccess].
+ * The result of a document verification which consist of
+ *  @param selfieFile the captured selfie file
+ *  @param documentFrontFile the captured front of document file
+ *  @param livenessFiles optional selfie liveness files
+ *  @param documentBackFile optional back of document file
+ *  @param didSubmitDocumentVerificationJob true if the job has been
+ *  submitted to the SmileID apis and false if offline is enabled and the
+ *  network request failed
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class DocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
+    val livenessFiles: List<File>? = null,
     val documentBackFile: File? = null,
-    val jobStatusResponse: DocumentVerificationJobStatusResponse?,
+    val didSubmitDocumentVerificationJob: Boolean,
 ) : Parcelable
 
 /**
- * The result of Enhanced Document Verification capture and submission to the Smile ID API.
- * Indicates that the capture and network requests were successful. The Job itself may or may not
- * be complete yet.
- * This can be checked with [EnhancedDocumentVerificationJobStatusResponse.jobComplete]. If not yet
- * complete, the job status will need to be fetched again later. If the job is complete, the final
- * job success can be checked with [EnhancedDocumentVerificationJobStatusResponse.jobSuccess].
+ * The result of a enhanced document verification which consist of
+ *  @param selfieFile the captured selfie file
+ *  @param documentFrontFile the captured front of document file
+ *  @param livenessFiles optional selfie liveness files
+ *  @param documentBackFile optional back of document file
+ *  @param didSubmitEnhancedDocVJob true if the job has been
+ *  submitted to the SmileID apis and false if offline is enabled and the
+ *  network request failed
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class EnhancedDocumentVerificationResult(
     val selfieFile: File,
     val documentFrontFile: File,
+    val livenessFiles: List<File>? = null,
     val documentBackFile: File? = null,
-    val jobStatusResponse: EnhancedDocumentVerificationJobStatusResponse?,
+    val didSubmitEnhancedDocVJob: Boolean,
 ) : Parcelable
 
 /**
- * The result of a Biometric KYC capture and submission to the Smile ID API. Indicates that the
- * capture and network requests were successful. The Job itself may or may not be complete yet. This
- * can be checked with [BiometricKycJobStatusResponse.jobComplete]. If not yet complete, the job
- * status will need to be fetched again later. If the job is complete, the final job success can be
- * checked with [BiometricKycJobStatusResponse.jobSuccess].
+ * The result of a biometric kyc verification which consist of
+ *  @param selfieFile the captured selfie file
+ *  @param livenessFiles optional selfie liveness files
+ *  @param didSubmitBiometricKycJob true if the job has been
+ *  submitted to the SmileID apis and false if offline is enabled and the
+ *  network request failed
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class BiometricKycResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val jobStatusResponse: BiometricKycJobStatusResponse?,
+    val didSubmitBiometricKycJob: Boolean,
 ) : Parcelable

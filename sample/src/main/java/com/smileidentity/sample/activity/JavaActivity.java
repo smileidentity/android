@@ -64,16 +64,12 @@ public class JavaActivity extends FragmentActivity {
                 if (smartSelfieResult instanceof SmileIDResult.Success<SmartSelfieResult> successResult) {
                     File selfieFile = successResult.getData().getSelfieFile();
                     List<File> livenessFiles = successResult.getData().getLivenessFiles();
-                    SmartSelfieJobStatusResponse jobStatusResponse = successResult.getData().getJobStatusResponse();
-                    // Note: Although the API submission is successful, the job status response
-                    // may indicate that the job is still in progress or failed. You should
-                    // check the job status response to determine the final status of the job.
-                    if (jobStatusResponse.getJobSuccess()) {
-                        Timber.v("SmartSelfieEnrollment Job Success");
-                    } else if (!jobStatusResponse.getJobComplete()) {
-                        Timber.v("SmartSelfieEnrollment Job Not Complete");
+                    boolean jobSubmitted = successResult.getData().getDidSubmitSmartSelfieJob();
+                    // When offline mode is enabled, the job is saved offline and can be submitted later.
+                    if (jobSubmitted) {
+                        Timber.v("SmartSelfieEnrollment Job Submitted");
                     } else {
-                        Timber.v("SmartSelfieEnrollment Job Failed");
+                        Timber.v("SmartSelfieEnrollment Job saved offline.");
                     }
                 } else if (smartSelfieResult instanceof SmileIDResult.Error error) {
                     Throwable throwable = error.getThrowable();

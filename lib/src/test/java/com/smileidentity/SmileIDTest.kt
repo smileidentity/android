@@ -10,9 +10,10 @@ import com.smileidentity.networking.SmileIDService
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.doGetSubmittedJobs
+import com.smileidentity.util.doGetUnsubmittedJobs
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
-import com.smileidentity.util.listJobIds
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.Runs
@@ -70,20 +71,20 @@ class SmileIDTest {
 
     @Test
     fun `Should list unsubmitted job ids`() {
-        every { listJobIds(any(), any(), any()) } returns listOf("job1", "job2")
+        every { doGetUnsubmittedJobs() } returns listOf("job1", "job2")
 
         SmileID.getUnsubmittedJobs()
 
-        verify { listJobIds(includeSubmitted = false, includeUnsubmitted = true, testPath) }
+        verify { doGetUnsubmittedJobs() }
     }
 
     @Test
     fun `Should list submitted job ids`() {
-        every { listJobIds(any(), any(), any()) } returns listOf("job1", "job2")
+        every { doGetSubmittedJobs() } returns listOf("job1", "job2")
 
         SmileID.getSubmittedJobs()
 
-        verify { listJobIds(includeSubmitted = true, includeUnsubmitted = false, testPath) }
+        verify { doGetSubmittedJobs() }
     }
 
     @Test
@@ -139,9 +140,9 @@ class SmileIDTest {
     fun `submitJob should throw IllegalArgumentException when jobId is invalid`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             val invalidJobId = "invalidJobId"
-            every { listJobIds(any(), any()) } returns listOf("jobId1", "jobId2")
+            every { doGetUnsubmittedJobs() } returns listOf("jobId1", "jobId2")
             runTest {
-                SmileID.submitJob(invalidJobId, this).join()
+                SmileID.submitJob(invalidJobId, true, this).join()
             }
         }
         assertEquals("Invalid jobId or not found", exception.message)
@@ -152,7 +153,7 @@ class SmileIDTest {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             runTest {
                 val jobId = "validJobId"
-                every { listJobIds(any(), any(), any()) } returns listOf("validJobId")
+                every { doGetUnsubmittedJobs() } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
                         jobId,
@@ -161,7 +162,7 @@ class SmileIDTest {
                         any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
-                SmileID.submitJob(jobId, this).join()
+                SmileID.submitJob(jobId, true, this).join()
             }
         }
         assertEquals("Invalid file name or not found", exception.message)
@@ -172,7 +173,7 @@ class SmileIDTest {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             runTest {
                 val jobId = "validJobId"
-                every { listJobIds(any(), any(), any()) } returns listOf("validJobId")
+                every { doGetUnsubmittedJobs() } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
                         jobId,
@@ -181,7 +182,7 @@ class SmileIDTest {
                         any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
-                SmileID.submitJob(jobId, this).join()
+                SmileID.submitJob(jobId, true, this).join()
             }
         }
         assertEquals("Invalid file name or not found", exception.message)
@@ -203,7 +204,7 @@ class SmileIDTest {
         every { SmileID.moshi } returns moshi // Corrected parameters
 
         val jobId = "jobId"
-        every { listJobIds(any(), any(), any()) } returns listOf(jobId)
+        every { doGetUnsubmittedJobs() } returns listOf(jobId)
 
         // Mock API responses
         val authResponse = mockk<AuthenticationResponse> {
@@ -234,7 +235,7 @@ class SmileIDTest {
         coEvery { api.upload(any(), any()) } just Runs
 
         // Execute
-        val job = SmileID.submitJob(jobId, this)
+        val job = SmileID.submitJob(jobId, true, this)
 
         // Assert
         job.join() // Waits for the coroutine to complete

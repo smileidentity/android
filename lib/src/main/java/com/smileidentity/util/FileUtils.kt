@@ -157,6 +157,14 @@ private fun listSubdirectories(rootDir: File): List<File> {
     return rootDir.listFiles { file -> file.isDirectory }.orEmpty().toList()
 }
 
+internal fun doGetUnsubmittedJobs(): List<String> {
+    return listJobIds(includeSubmitted = false, includeUnsubmitted = true)
+}
+
+internal fun doGetSubmittedJobs(): List<String> {
+    return listJobIds(includeSubmitted = true, includeUnsubmitted = false)
+}
+
 /**
  * Lists the job IDs based on their completion status. This function can retrieve job IDs from both
  * completed and pending categories, depending on the parameters provided. It allows for flexible retrieval,
@@ -172,7 +180,7 @@ private fun listSubdirectories(rootDir: File): List<File> {
  * or pending categories, or both, based on the flags provided. The order of IDs in the list is determined
  * by the file system's enumeration order and is not guaranteed to follow any specific sorting.
  */
-internal fun listJobIds(
+private fun listJobIds(
     includeSubmitted: Boolean = true,
     includeUnsubmitted: Boolean = false,
     savePath: String = SmileID.fileSavePath,

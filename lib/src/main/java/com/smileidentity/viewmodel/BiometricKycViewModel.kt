@@ -69,18 +69,29 @@ class BiometricKycViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = fun(e: Throwable) {
             Timber.e(e)
-            val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
-                R.string.si_offline_message
-            } else {
-                R.string.si_processing_error_subtitle
-            }
             handleOfflineJobFailure(jobId, e)
-            result = SmileIDResult.Error(e)
-            _uiState.update {
-                it.copy(
-                    processingState = ProcessingState.Error,
-                    errorMessage = errorMessage,
+            if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
+                result = SmileIDResult.Success(
+                    BiometricKycResult(
+                        selfieFile,
+                        livenessFiles,
+                        true,
+                    ),
                 )
+                _uiState.update {
+                    it.copy(
+                        processingState = ProcessingState.Success,
+                        errorMessage = R.string.si_offline_message,
+                    )
+                }
+            } else {
+                result = SmileIDResult.Error(e)
+                _uiState.update {
+                    it.copy(
+                        processingState = ProcessingState.Error,
+                        errorMessage = R.string.si_processing_error_subtitle,
+                    )
+                }
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
@@ -170,7 +181,7 @@ class BiometricKycViewModel(
                 BiometricKycResult(
                     selfieFileResult,
                     livenessFilesResult,
-                    jobStatusResponse,
+                    true,
                 ),
             )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }

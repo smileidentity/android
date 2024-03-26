@@ -260,25 +260,36 @@ class SelfieViewModel(
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         if (skipApiSubmission) {
-            result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
+            result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, false))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
             return
         }
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
 
         val proxy = fun(e: Throwable) {
-            val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
-                R.string.si_offline_message
-            } else {
-                R.string.si_processing_error_subtitle
-            }
             handleOfflineJobFailure(jobId, e)
-            result = SmileIDResult.Error(e)
-            _uiState.update {
-                it.copy(
-                    processingState = ProcessingState.Error,
-                    errorMessage = errorMessage,
+            if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
+                result = SmileIDResult.Success(
+                    SmartSelfieResult(
+                        selfieFile,
+                        livenessFiles,
+                        false,
+                    ),
                 )
+                _uiState.update {
+                    it.copy(
+                        processingState = ProcessingState.Success,
+                        errorMessage = R.string.si_offline_message,
+                    )
+                }
+            } else {
+                result = SmileIDResult.Error(e)
+                _uiState.update {
+                    it.copy(
+                        processingState = ProcessingState.Error,
+                        errorMessage = R.string.si_processing_error_subtitle,
+                    )
+                }
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
@@ -332,7 +343,6 @@ class SelfieViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getSmartSelfieJobStatus(jobStatusRequest)
             var selfieFileResult = selfieFile
             var livenessFilesResult = livenessFiles
             // if we've gotten this far we move files
@@ -358,7 +368,7 @@ class SelfieViewModel(
                 SmartSelfieResult(
                     selfieFileResult,
                     livenessFilesResult,
-                    jobStatusResponse,
+                    true,
                 ),
             )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }

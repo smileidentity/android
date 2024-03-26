@@ -11,7 +11,6 @@ import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
-import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
@@ -31,6 +30,7 @@ import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.createUploadRequestFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
+import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
@@ -117,11 +117,12 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         submitJob()
     }
 
-    abstract fun getJobStatus(
-        jobStatusRequest: JobStatusRequest,
+    abstract fun saveResult(
         selfieImage: File,
         documentFrontFile: File,
         documentBackFile: File?,
+        livenessFiles: List<File>?,
+        didSubmitJob: Boolean,
     )
 
     private fun submitJob() {
@@ -189,25 +190,54 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
-            val jobStatusRequest = JobStatusRequest(
-                jobId = authResponse.partnerParams.jobId,
-                userId = authResponse.partnerParams.userId,
-                includeImageLinks = false,
-                includeHistory = false,
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
+        }
+    }
 
-            getJobStatus(
-                jobStatusRequest = jobStatusRequest,
-                selfieImage = selfieImageInfo.image,
-                documentFrontFile = documentFrontFile,
-                documentBackFile = documentBackFile,
-            )
-
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
+    fun sendResult(
+        documentFrontFile: File,
+        documentBackFile: File? = null,
+        livenessFiles: List<File>? = null,
+    ) {
+        var selfieFileResult: File = selfieFile ?: run {
+            Timber.w("Selfie file not found for job ID: $jobId")
+            throw Exception("Selfie file not found for job ID: $jobId")
+        }
+        var livenessFilesResult = livenessFiles
+        var documentFrontFileResult = documentFrontFile
+        var documentBackFileResult = documentBackFile
+        val copySuccess = moveJobToSubmitted(jobId)
+        if (copySuccess) {
+            selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+                Timber.w("Selfie file not found for job ID: $jobId")
+                throw Exception("Selfie file not found for job ID: $jobId")
             }
+            livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+            documentFrontFileResult = getFileByType(jobId, FileType.DOCUMENT_FRONT) ?: run {
+                Timber.w("Document front file not found for job ID: $jobId")
+                throw Exception("Document front found for job ID: $jobId")
+            }
+            documentBackFileResult = getFileByType(jobId, FileType.DOCUMENT_BACK)
+        } else {
+            Timber.w("Failed to move job $jobId to complete")
+            SmileIDCrashReporting.hub.addBreadcrumb(
+                Breadcrumb().apply {
+                    category = "Offline Mode"
+                    message = "Failed to move job $jobId to complete"
+                    level = SentryLevel.INFO
+                },
+            )
+        }
+
+        saveResult(
+            selfieImage = selfieFileResult,
+            documentFrontFile = documentFrontFileResult,
+            documentBackFile = documentBackFileResult,
+            livenessFilesResult,
+            didSubmitJob = true,
+        )
+
+        _uiState.update {
+            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
         }
     }
 
@@ -215,21 +245,36 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
-        val errorMessage = if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
-            R.string.si_offline_message
-        } else {
-            R.string.si_processing_error_subtitle
-        }
         handleOfflineJobFailure(jobId, throwable)
         stepToRetry = uiState.value.currentStep
         _uiState.update {
             it.copy(
                 currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                errorMessage = errorMessage,
+                errorMessage = R.string.si_processing_error_subtitle,
             )
         }
-        Timber.w(throwable, "Error in $stepToRetry")
-        result = SmileIDResult.Error(throwable)
+        if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
+            saveResult(
+                selfieImage = selfieFile ?: throw IllegalStateException("Selfie file is null"),
+                documentFrontFile = documentFrontFile ?: throw IllegalStateException(
+                    "Document front file is null",
+                ),
+                documentBackFile = documentBackFile,
+                livenessFiles,
+                didSubmitJob = false,
+            )
+            _uiState.update {
+                it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
+            }
+        } else {
+            result = SmileIDResult.Error(throwable)
+            _uiState.update {
+                it.copy(
+                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
+                    errorMessage = R.string.si_processing_error_subtitle,
+                )
+            }
+        }
     }
 
     /**
@@ -275,50 +320,21 @@ internal class DocumentVerificationViewModel(
     extraPartnerParams = extraPartnerParams,
 ) {
 
-    override fun getJobStatus(
-        jobStatusRequest: JobStatusRequest,
+    override fun saveResult(
         selfieImage: File,
         documentFrontFile: File,
         documentBackFile: File?,
+        livenessFiles: List<File>?,
+        didSubmitJob: Boolean,
     ) {
-        viewModelScope.launch {
-            val jobStatusResponse =
-                SmileID.api.getDocumentVerificationJobStatus(jobStatusRequest)
-            var selfieFileResult = selfieImage
-            var documentFrontFileResult = documentFrontFile
-            var documentBackFileResult = documentBackFile
-            // if we've gotten this far we move files
-            // to complete from pending
-            val copySuccess = moveJobToSubmitted(jobId)
-            if (copySuccess) {
-                selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
-                    Timber.w("Selfie file not found for job ID: $jobId")
-                    throw Exception("Selfie file not found for job ID: $jobId")
-                }
-                documentFrontFileResult = getFileByType(jobId, FileType.DOCUMENT_FRONT) ?: run {
-                    Timber.w("Document front file not found for job ID: $jobId")
-                    throw Exception("Document front found for job ID: $jobId")
-                }
-                documentBackFileResult = getFileByType(jobId, FileType.DOCUMENT_BACK)
-            } else {
-                Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.hub.addBreadcrumb(
-                    Breadcrumb().apply {
-                        category = "Offline Mode"
-                        message = "Failed to move job $jobId to complete"
-                        level = SentryLevel.INFO
-                    },
-                )
-            }
-            result = SmileIDResult.Success(
-                DocumentVerificationResult(
-                    selfieFile = selfieFileResult,
-                    documentFrontFile = documentFrontFileResult,
-                    documentBackFile = documentBackFileResult,
-                    jobStatusResponse = jobStatusResponse,
-                ),
-            )
-        }
+        result = SmileIDResult.Success(
+            DocumentVerificationResult(
+                selfieFile = selfieImage,
+                documentFrontFile = documentFrontFile,
+                documentBackFile = documentBackFile,
+                didSubmitDocumentVerificationJob = didSubmitJob,
+            ),
+        )
     }
 }
 
@@ -344,50 +360,21 @@ internal class EnhancedDocumentVerificationViewModel(
     extraPartnerParams = extraPartnerParams,
 ) {
 
-    override fun getJobStatus(
-        jobStatusRequest: JobStatusRequest,
+    override fun saveResult(
         selfieImage: File,
         documentFrontFile: File,
         documentBackFile: File?,
+        livenessFiles: List<File>?,
+        didSubmitJob: Boolean,
     ) {
-        viewModelScope.launch {
-            val jobStatusResponse = SmileID.api.getEnhancedDocumentVerificationJobStatus(
-                jobStatusRequest,
-            )
-            var selfieFileResult = selfieImage
-            var documentFrontFileResult = documentFrontFile
-            var documentBackFileResult = documentBackFile
-            // if we've gotten this far we move files
-            // to complete from pending
-            val copySuccess = moveJobToSubmitted(jobId)
-            if (copySuccess) {
-                selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
-                    Timber.w("Selfie file not found for job ID: $jobId")
-                    throw Exception("Selfie found for job ID: $jobId")
-                }
-                documentFrontFileResult = getFileByType(jobId, FileType.DOCUMENT_FRONT) ?: run {
-                    Timber.w("Document front file not found for job ID: $jobId")
-                    throw Exception("Document front found for job ID: $jobId")
-                }
-                documentBackFileResult = getFileByType(jobId, FileType.DOCUMENT_BACK)
-            } else {
-                Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.hub.addBreadcrumb(
-                    Breadcrumb().apply {
-                        category = "Offline Mode"
-                        message = "Failed to move job $jobId to complete"
-                        level = SentryLevel.INFO
-                    },
-                )
-            }
-            result = SmileIDResult.Success(
-                EnhancedDocumentVerificationResult(
-                    selfieFile = selfieFileResult,
-                    documentFrontFile = documentFrontFileResult,
-                    documentBackFile = documentBackFileResult,
-                    jobStatusResponse = jobStatusResponse,
-                ),
-            )
-        }
+        result = SmileIDResult.Success(
+            EnhancedDocumentVerificationResult(
+                selfieImage,
+                documentFrontFile,
+                livenessFiles,
+                documentBackFile,
+                didSubmitEnhancedDocVJob = didSubmitJob,
+            ),
+        )
     }
 }
