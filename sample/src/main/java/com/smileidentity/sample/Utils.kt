@@ -94,19 +94,18 @@ fun jobResultMessageBuilder(
 ): String {
     val message = StringBuilder("$jobName ")
     if (didSubmitJob == true) {
-        message.append("was submitted ")
-    } else {
-        message.append("saved offline ")
-    }
-    if (jobComplete == true) {
-        if (jobSuccess == true) {
-            message.append("completed successfully")
+        if (jobComplete == true) {
+            if (jobSuccess == true) {
+                message.append("completed successfully")
+            } else {
+                message.append("completed unsuccessfully")
+            }
+            message.append(" (resultText=$resultText, code=$code, resultCode=$resultCode)")
         } else {
-            message.append("completed unsuccessfully")
+            message.append("still pending")
         }
-        message.append(" (resultText=$resultText, code=$code, resultCode=$resultCode)")
     } else {
-        message.append("still pending")
+        message.append("was saved offline and will need to be submitted later ")
     }
     suffix?.let { message.append(" $it") }
     return message.toString()

@@ -66,7 +66,7 @@ public class JavaActivity extends FragmentActivity {
                     List<File> livenessFiles = successResult.getData().getLivenessFiles();
                     boolean jobSubmitted = successResult.getData().getDidSubmitSmartSelfieJob();
                     // When offline mode is enabled, the job is saved offline and can be submitted later.
-                    if (jobSubmitted ) {
+                    if (jobSubmitted) {
                         Timber.v("SmartSelfieEnrollment Job Submitted");
                     } else {
                         Timber.v("SmartSelfieEnrollment Job saved offline.");

@@ -26,6 +26,8 @@ import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.jobResultMessageBuilder
+import com.smileidentity.sample.model.Job
+import com.smileidentity.sample.model.getCurrentTimeAsHumanReadableTimestamp
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -92,6 +94,7 @@ class MainScreenViewModel : ViewModel() {
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
                     EnhancedDocumentVerification ->
                         SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
+
                     else -> {
                         Timber.e("Unexpected pending job: $job")
                         throw IllegalStateException("Unexpected pending job: $job")
@@ -229,14 +232,22 @@ class MainScreenViewModel : ViewModel() {
                     snackbarMessage = message,
                 )
             }
-            // TODO: Discuss how to handle these cases
-            // viewModelScope.launch {
-            //     DataStoreRepository.addPendingJob(
-            //         partnerId = SmileID.config.partnerId,
-            //         isProduction = uiState.value.isProduction,
-            //         job = response.toJob(userId, jobId, true),
-            //     )
-            // }
+            if (result.data.didSubmitSmartSelfieJob) {
+                viewModelScope.launch {
+                    DataStoreRepository.addPendingJob(
+                        partnerId = SmileID.config.partnerId,
+                        isProduction = uiState.value.isProduction,
+                        job = Job(
+                            jobType = SmartSelfieEnrollment,
+                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                            userId = userId,
+                            jobId = jobId,
+                        ),
+                    )
+                }
+            } else {
+                Timber.w(" $jobId not saved to pending job, offline enabled")
+            }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
             val message = "SmartSelfie Enrollment error: ${th.message}"
@@ -266,14 +277,22 @@ class MainScreenViewModel : ViewModel() {
             )
             Timber.d("$message: $jobId $userId $result")
             _uiState.update { it.copy(snackbarMessage = message) }
-            // TODO: Discuss how to handle these
-            // viewModelScope.launch {
-            //     DataStoreRepository.addPendingJob(
-            //         partnerId = SmileID.config.partnerId,
-            //         isProduction = uiState.value.isProduction,
-            //         job = response.toJob(userId, jobId, true),
-            //     )
-            // }
+            if (result.data.didSubmitSmartSelfieJob) {
+                viewModelScope.launch {
+                    DataStoreRepository.addPendingJob(
+                        partnerId = SmileID.config.partnerId,
+                        isProduction = uiState.value.isProduction,
+                        job = Job(
+                            jobType = SmartSelfieAuthentication,
+                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                            userId = userId,
+                            jobId = jobId,
+                        ),
+                    )
+                }
+            } else {
+                Timber.w(" $jobId not saved to pending job, offline enabled")
+            }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
             val message = "SmartSelfie Authentication error: ${th.message}"
@@ -343,18 +362,26 @@ class MainScreenViewModel : ViewModel() {
             Timber.d("Biometric KYC Result: $result")
             val message = jobResultMessageBuilder(
                 jobName = "Biometric KYC",
-                didSubmitJob = result.data.didSubmitBiometricJob,
+                didSubmitJob = result.data.didSubmitBiometricKycJob,
             )
             Timber.d("$message: $jobId $userId $result")
             _uiState.update { it.copy(snackbarMessage = message) }
-            // TODO:Disscuss how to handle these cases
-            // viewModelScope.launch {
-            //     DataStoreRepository.addPendingJob(
-            //         partnerId = SmileID.config.partnerId,
-            //         isProduction = uiState.value.isProduction,
-            //         job = response.toJob(userId, jobId),
-            //     )
-            // }
+            if (result.data.didSubmitBiometricKycJob) {
+                viewModelScope.launch {
+                    DataStoreRepository.addPendingJob(
+                        partnerId = SmileID.config.partnerId,
+                        isProduction = uiState.value.isProduction,
+                        job = Job(
+                            jobType = BiometricKyc,
+                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                            userId = userId,
+                            jobId = jobId,
+                        ),
+                    )
+                }
+            } else {
+                Timber.w(" $jobId not saved to pending job, offline enabled")
+            }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
             val message = "Biometric KYC error: ${th.message}"
@@ -384,14 +411,22 @@ class MainScreenViewModel : ViewModel() {
             )
             Timber.d("$message: $jobId $userId $result")
             _uiState.update { it.copy(snackbarMessage = message) }
-            // TODO: Discuss how to handle these cases
-            // viewModelScope.launch {
-            //     DataStoreRepository.addPendingJob(
-            //         partnerId = SmileID.config.partnerId,
-            //         isProduction = uiState.value.isProduction,
-            //         job = response.toJob(userId, jobId),
-            //     )
-            // }
+            if (result.data.didSubmitDocumentVerificationJob) {
+                viewModelScope.launch {
+                    DataStoreRepository.addPendingJob(
+                        partnerId = SmileID.config.partnerId,
+                        isProduction = uiState.value.isProduction,
+                        job = Job(
+                            jobType = DocumentVerification,
+                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                            userId = userId,
+                            jobId = jobId,
+                        ),
+                    )
+                }
+            } else {
+                Timber.w(" $jobId not saved to pending job, offline enabled")
+            }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
             val message = "Document Verification error: ${th.message}"
@@ -442,14 +477,22 @@ class MainScreenViewModel : ViewModel() {
             )
             Timber.d("$message: $jobId $userId $result")
             _uiState.update { it.copy(snackbarMessage = message) }
-            // TODO: Discuss how to handle these cases
-            // viewModelScope.launch {
-            //     DataStoreRepository.addPendingJob(
-            //         partnerId = SmileID.config.partnerId,
-            //         isProduction = uiState.value.isProduction,
-            //         job = response.toJob(userId, jobId),
-            //     )
-            // }
+            if (result.data.didSubmitEnhancedDocVJob) {
+                viewModelScope.launch {
+                    DataStoreRepository.addPendingJob(
+                        partnerId = SmileID.config.partnerId,
+                        isProduction = uiState.value.isProduction,
+                        job = Job(
+                            jobType = EnhancedDocumentVerification,
+                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                            userId = userId,
+                            jobId = jobId,
+                        ),
+                    )
+                }
+            } else {
+                Timber.w(" $jobId not saved to pending job, offline enabled")
+            }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
             val message = "Enhanced Document Verification error: ${th.message}"

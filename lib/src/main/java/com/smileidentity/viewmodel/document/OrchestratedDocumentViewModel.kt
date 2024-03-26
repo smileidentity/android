@@ -117,7 +117,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         submitJob()
     }
 
-    abstract fun onOfflineSuccess(
+    abstract fun saveResult(
         selfieImage: File,
         documentFrontFile: File,
         documentBackFile: File?,
@@ -228,7 +228,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
         }
 
-        onOfflineSuccess(
+        saveResult(
             selfieImage = selfieFileResult,
             documentFrontFile = documentFrontFileResult,
             documentBackFile = documentBackFileResult,
@@ -254,7 +254,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
         }
         if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
-            onOfflineSuccess(
+            saveResult(
                 selfieImage = selfieFile ?: throw IllegalStateException("Selfie file is null"),
                 documentFrontFile = documentFrontFile ?: throw IllegalStateException(
                     "Document front file is null",
@@ -320,7 +320,7 @@ internal class DocumentVerificationViewModel(
     extraPartnerParams = extraPartnerParams,
 ) {
 
-    override fun onOfflineSuccess(
+    override fun saveResult(
         selfieImage: File,
         documentFrontFile: File,
         documentBackFile: File?,
@@ -360,7 +360,7 @@ internal class EnhancedDocumentVerificationViewModel(
     extraPartnerParams = extraPartnerParams,
 ) {
 
-    override fun onOfflineSuccess(
+    override fun saveResult(
         selfieImage: File,
         documentFrontFile: File,
         documentBackFile: File?,

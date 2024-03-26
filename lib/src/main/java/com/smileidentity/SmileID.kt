@@ -370,19 +370,20 @@ object SmileID {
             idInfo = idInfo,
         )
         api.upload(prepUploadResponse.uploadUrl, uploadRequest)
-        val copySuccess = moveJobToSubmitted(jobId)
-        if (!copySuccess) {
-            Timber.w("Failed to move job $jobId to complete")
-            SmileIDCrashReporting.hub.addBreadcrumb(
-                Breadcrumb().apply {
-                    category = "Offline Mode"
-                    message = "Failed to move job $jobId to complete"
-                    level = SentryLevel.INFO
-                },
-            )
-        }
         if (deleteFilesOnSuccess) {
             cleanup(jobId)
+        } else {
+            val copySuccess = moveJobToSubmitted(jobId)
+            if (!copySuccess) {
+                Timber.w("Failed to move job $jobId to complete")
+                SmileIDCrashReporting.hub.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
+            }
         }
         Timber.d("Upload finished")
     }
