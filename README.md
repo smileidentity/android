@@ -20,6 +20,9 @@ Please see [CHANGELOG.md](CHANGELOG.md) or
 [Releases](https://github.com/smileidentity/android/releases) for the most recent version and
 release notes
 
+<a href='https://play.google.com/store/apps/details?id=com.smileidentity.sample&utm_source=github&utm_campaign=android&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="175" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+
+
 ## Getting Started
 
 Full documentation is available at https://docs.usesmileid.com/integration-options/mobile
