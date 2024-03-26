@@ -351,7 +351,7 @@ class SelfieViewModel(
             if (copySuccess) {
                 selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
                     Timber.w("Selfie file not found for job ID: $jobId")
-                    throw Exception("Selfie file not found for job ID: $jobId")
+                    throw IllegalStateException("Selfie file not found for job ID: $jobId")
                 }
                 livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
             } else {

@@ -209,12 +209,12 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         if (copySuccess) {
             selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
                 Timber.w("Selfie file not found for job ID: $jobId")
-                throw Exception("Selfie file not found for job ID: $jobId")
+                throw IllegalStateException("Selfie file not found for job ID: $jobId")
             }
             livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
             documentFrontFileResult = getFileByType(jobId, FileType.DOCUMENT_FRONT) ?: run {
                 Timber.w("Document front file not found for job ID: $jobId")
-                throw Exception("Document front found for job ID: $jobId")
+                throw IllegalStateException("Document front found for job ID: $jobId")
             }
             documentBackFileResult = getFileByType(jobId, FileType.DOCUMENT_BACK)
         } else {
