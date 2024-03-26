@@ -281,7 +281,7 @@ object SmileID {
             handleOfflineJobFailure(jobId, throwable, exceptionHandler)
         },
     ) {
-        val jobIds = doGetSubmittedJobs()
+        val jobIds = doGetUnsubmittedJobs()
         if (jobId !in jobIds) {
             Timber.v("Invalid jobId or not found")
             throw IllegalArgumentException("Invalid jobId or not found")
