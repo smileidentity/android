@@ -121,7 +121,7 @@ object FileAdapter {
     fun toJson(file: File): String = file.name
 
     @FromJson
-    fun fromJson(fileName: String): File = throw NotImplementedError()
+    fun fromJson(fileName: String): File = File(fileName)
 }
 
 @Suppress("unused")

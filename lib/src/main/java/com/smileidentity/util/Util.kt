@@ -38,6 +38,7 @@ import java.io.Serializable
 import java.nio.ByteBuffer
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
+import okio.IOException
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -238,19 +239,6 @@ internal fun postProcessImage(
 }
 
 /**
- * Save to temporary file, which does not require any storage permissions. It will be saved to the
- * app's cache directory, which is cleared when the app is uninstalled. Images will be saved in the
- * format `si_${imageType}_<timestamp>.jpg`
- */
-internal fun createSmileTempFile(imageType: String, savePath: String = SmileID.fileSavePath): File {
-    return File(savePath, "si_${imageType}_${System.currentTimeMillis()}.jpg")
-}
-
-internal fun createLivenessFile() = createSmileTempFile("liveness")
-internal fun createSelfieFile() = createSmileTempFile("selfie")
-internal fun createDocumentFile() = createSmileTempFile("document")
-
-/**
  * Creates a [CoroutineExceptionHandler] that logs the exception, and attempts to convert it to
  * [SmileIDException] if it is an [HttpException] (this may not always be possible, i.e. if we get
  * an error during S3 upload, or if we get an unconventional 500 error from the API). Otherwise, the
@@ -284,6 +272,30 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
         throwable
     }
     proxy(converted)
+}
+
+fun handleOfflineJobFailure(
+    jobId: String,
+    throwable: Throwable,
+    exceptionHandler: (
+        (Throwable) -> Unit
+    )? = null,
+) {
+    Timber.e(throwable, "Error in submitJob for jobId: $jobId")
+    if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
+        val complete = moveJobToSubmitted(jobId)
+        if (!complete) {
+            Timber.w("Failed to move job $jobId to complete")
+            SmileIDCrashReporting.hub.addBreadcrumb(
+                Breadcrumb().apply {
+                    category = "Offline Mode"
+                    message = "Failed to move job $jobId to complete"
+                    level = SentryLevel.INFO
+                },
+            )
+        }
+    }
+    exceptionHandler?.let { it(throwable) }
 }
 
 fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
@@ -351,6 +363,22 @@ private fun getDataColumn(context: Context, uri: Uri?): String? {
     }
     return null
 }
+
+/**
+ * Checks if the given exception is a result of a network failure.
+ *
+ * This method considers an exception to be a network failure if it is either
+ * an [IOException] or an [InterruptedException]. [IOException] typically indicates
+ * an issue with network connectivity, such as a timeout or unreachable server.
+ * [InterruptedException] is included as a network failure condition here because
+ * network operations can be interrupted, especially in a multithreaded context or
+ * when a coroutine is cancelled.
+ *
+ * @param e The exception to check for being indicative of a network failure.
+ * @return [Boolean] `true` if the exception is related to a network failure,
+ *         `false` otherwise.
+ */
+internal fun isNetworkFailure(e: Throwable): Boolean = e is IOException || e is InterruptedException
 
 /**
  * @param uri The Uri to check.

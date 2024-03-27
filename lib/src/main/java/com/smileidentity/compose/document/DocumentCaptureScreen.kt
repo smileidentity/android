@@ -76,6 +76,7 @@ enum class DocumentCaptureSide {
  */
 @Composable
 fun DocumentCaptureScreen(
+    jobId: String,
     side: DocumentCaptureSide,
     showInstructions: Boolean,
     showAttribution: Boolean,
@@ -91,7 +92,7 @@ fun DocumentCaptureScreen(
     modifier: Modifier = Modifier,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
-        factory = viewModelFactory { DocumentCaptureViewModel(knownIdAspectRatio) },
+        factory = viewModelFactory { DocumentCaptureViewModel(jobId, side, knownIdAspectRatio) },
         key = side.name,
     ),
 ) {

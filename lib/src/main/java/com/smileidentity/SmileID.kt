@@ -7,7 +7,12 @@ import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
+import com.smileidentity.models.IdInfo
+import com.smileidentity.models.JobType
+import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -20,9 +25,32 @@ import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
+import com.smileidentity.networking.asDocumentBackImage
+import com.smileidentity.networking.asDocumentFrontImage
+import com.smileidentity.networking.asLivenessImage
+import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.util.AUTH_REQUEST_FILE
+import com.smileidentity.util.FileType
+import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
+import com.smileidentity.util.UPLOAD_REQUEST_FILE
+import com.smileidentity.util.cleanupJobs
+import com.smileidentity.util.doGetSubmittedJobs
+import com.smileidentity.util.doGetUnsubmittedJobs
+import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.getFileByType
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.getSmileTempFile
+import com.smileidentity.util.handleOfflineJobFailure
+import com.smileidentity.util.moveJobToSubmitted
 import com.squareup.moshi.Moshi
+import io.sentry.Breadcrumb
+import io.sentry.SentryLevel
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -44,6 +72,8 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
+    internal var allowOfflineMode: Boolean = false
+        private set
     var callbackUrl: String = ""
         private set
 
@@ -157,6 +187,205 @@ object SmileID {
     @JvmStatic
     fun setCallbackUrl(callbackUrl: URL?) {
         SmileID.callbackUrl = callbackUrl?.toString() ?: ""
+    }
+
+    /**
+     * Sets the state of offline mode for the SDK.
+     *
+     * This function enables or disables the SDK's ability to operate in offline mode,
+     * where it can continue functioning without an active internet connection. When offline mode
+     * is enabled (allowOfflineMode = true), the SDK will attempt to use capture and cache
+     * images in local file storage and will not attempt to submit the job. Conversely, when offline
+     * mode is disabled (allowOfflineMode = false), the application will require an active internet
+     * connection for all operations that involve data fetching or submission.
+     *
+     * @param allowOfflineMode A Boolean value indicating whether offline mode should be enabled (true)
+     *                         or disabled (false).
+     */
+    @JvmStatic
+    fun setAllowOfflineMode(allowOfflineMode: Boolean) {
+        SmileID.allowOfflineMode = allowOfflineMode
+    }
+
+    /**
+     * Retrieves a list of submitted job IDs.
+     * This method filters the job IDs to include only those that have been completed (submitted),
+     * excluding any pending jobs.
+     *j
+     * @return A list of strings representing the IDs of submitted jobs.
+     */
+    @JvmStatic
+    fun getSubmittedJobs(): List<String> = doGetSubmittedJobs()
+
+    /**
+     * Retrieves a list of unsubmitted job IDs.
+     * This method filters the job IDs to include only those that are still pending,
+     * excluding any completed (submitted) jobs.
+     *
+     * @return A list of strings representing the IDs of unsubmitted jobs.
+     */
+    @JvmStatic
+    fun getUnsubmittedJobs(): List<String> = doGetUnsubmittedJobs()
+
+    /**
+     * Initiates the cleanup process for a single job by its ID.
+     * This is a convenience method that wraps the cleanup process, allowing for a single job ID
+     * to be specified for cleanup.
+     *
+     * @param jobId The ID of the job to clean up.Helpful methods for obtaining job
+     *  *              IDs include: [doGetSubmittedJobs] [doGetUnsubmittedJobs]
+     */
+    @JvmStatic
+    fun cleanup(jobId: String) = cleanupJobs(jobIds = listOf(jobId))
+
+    /**
+     * Initiates the cleanup process for multiple jobs by their IDs.
+     * If no IDs are provided, a default cleanup process is initiated that may target
+     * specific jobs based on the implementation in com.smileidentity.util.cleanup.
+     *
+     * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
+     * a predefined cleanup process.  Helpful methods for obtaining
+     * job IDs include:[doGetSubmittedJobs], [doGetUnsubmittedJobs]
+     */
+    @JvmStatic
+    fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
+
+    /**
+     * Submits a previously captured job to SmileID for processing.
+     *
+     * @param jobId The unique identifier for the job to be submitted. This ID should be obtained
+     *              through the appropriate SmileID service mechanism and is used to track and
+     *              manage the job within SmileID's processing system. Helpful methods for
+     *              obtaining job  IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
+     *
+     * Usage:
+     * To use this function, ensure you are calling it from a coroutine scope or
+     * another suspend function. For example, in a coroutine scope:
+     *
+     * ```kotlin
+     * coroutineScope {
+     *     SmileID.submitJob("your_job_id")
+     * }
+     * ```
+     * Note: Ensure that the jobId provided is valid and that your environment is properly set up
+     * to handle potential network responses, including success, failure, or error cases.
+     */
+    @JvmStatic
+    suspend fun submitJob(
+        jobId: String,
+        deleteFilesOnSuccess: Boolean,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
+        exceptionHandler: ((Throwable) -> Unit)? = null,
+    ): Job = scope.launch(
+        getExceptionHandler { throwable ->
+            handleOfflineJobFailure(jobId, throwable, exceptionHandler)
+        },
+    ) {
+        val jobIds = doGetUnsubmittedJobs()
+        if (jobId !in jobIds) {
+            Timber.v("Invalid jobId or not found")
+            throw IllegalArgumentException("Invalid jobId or not found")
+        }
+        val authRequestJsonString = getSmileTempFile(
+            jobId,
+            AUTH_REQUEST_FILE,
+            true,
+        ).useLines { it.joinToString("\n") }
+        val authRequest = moshi.adapter(AuthenticationRequest::class.java)
+            .fromJson(authRequestJsonString)?.apply {
+                authToken = config.authToken
+            }
+            ?: run {
+                Timber.v(
+                    "Error decoding AuthenticationRequest JSON to class: " +
+                        authRequestJsonString,
+                )
+                throw IllegalArgumentException("Invalid jobId information")
+            }
+
+        val authResponse = api.authenticate(authRequest)
+
+        val prepUploadRequestJsonString = getSmileTempFile(
+            jobId,
+            PREP_UPLOAD_REQUEST_FILE,
+            true,
+        ).useLines { it.joinToString("\n") }
+        val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
+            .fromJson(prepUploadRequestJsonString)
+            ?: run {
+                Timber.v(
+                    "Error decoding PrepUploadRequest JSON to class: " +
+                        prepUploadRequestJsonString,
+                )
+                throw IllegalArgumentException("Invalid jobId information")
+            }
+
+        val prepUploadRequest = savedPrepUploadRequest.copy(
+            timestamp = authResponse.timestamp,
+            signature = authResponse.signature,
+        )
+
+        val prepUploadResponse = api.prepUpload(prepUploadRequest)
+
+        val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
+        val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
+        val documentFrontFileResult =
+            getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
+        val documentBackFileResult =
+            getFileByType(jobId, FileType.DOCUMENT_BACK, submitted = false)
+
+        val selfieImageInfo = selfieFileResult?.asSelfieImage()
+        val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
+        val frontImageInfo = documentFrontFileResult?.asDocumentFrontImage()
+        val backImageInfo = documentBackFileResult?.asDocumentBackImage()
+
+        var idInfo: IdInfo? = null
+        if (authRequest.jobType == JobType.BiometricKyc ||
+            authRequest.jobType == JobType.DocumentVerification ||
+            authRequest.jobType == JobType.EnhancedDocumentVerification
+        ) {
+            val uploadRequestJson = getSmileTempFile(
+                jobId,
+                UPLOAD_REQUEST_FILE,
+                true,
+            ).useLines { it.joinToString("\n") }
+            val savedUploadRequestJson = moshi.adapter(UploadRequest::class.java)
+                .fromJson(uploadRequestJson)
+                ?: run {
+                    Timber.v(
+                        "Error decoding UploadRequest JSON to class: " +
+                            uploadRequestJson,
+                    )
+                    throw IllegalArgumentException("Invalid jobId information")
+                }
+            idInfo = savedUploadRequestJson.idInfo
+        }
+
+        val uploadRequest = UploadRequest(
+            images = listOfNotNull(
+                frontImageInfo,
+                backImageInfo,
+                selfieImageInfo,
+            ) + livenessImageInfo,
+            idInfo = idInfo,
+        )
+        api.upload(prepUploadResponse.uploadUrl, uploadRequest)
+        if (deleteFilesOnSuccess) {
+            cleanup(jobId)
+        } else {
+            val copySuccess = moveJobToSubmitted(jobId)
+            if (!copySuccess) {
+                Timber.w("Failed to move job $jobId to complete")
+                SmileIDCrashReporting.hub.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
+            }
+        }
+        Timber.d("Upload finished")
     }
 
     /**

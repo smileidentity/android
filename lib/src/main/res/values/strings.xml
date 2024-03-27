@@ -153,4 +153,7 @@
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
+
+    <!--  Offline Mode  -->
+    <string name="si_offline_message">No internet connection. Your verification will be completed once you are back online</string>
 </resources>
