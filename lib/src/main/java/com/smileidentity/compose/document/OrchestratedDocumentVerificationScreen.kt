@@ -111,7 +111,9 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
                 inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
                 successTitle = stringResource(R.string.si_doc_v_processing_success_title),
-                successSubtitle = stringResource(R.string.si_doc_v_processing_success_subtitle),
+                successSubtitle = stringResource(
+                    uiState.errorMessage ?: R.string.si_doc_v_processing_success_subtitle,
+                ),
                 successIcon = painterResource(R.drawable.si_processing_success),
                 errorTitle = stringResource(id = R.string.si_doc_v_processing_error_title),
                 errorSubtitle = stringResource(
