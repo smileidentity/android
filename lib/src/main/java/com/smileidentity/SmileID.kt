@@ -11,7 +11,8 @@ import com.smileidentity.models.Config
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
-import com.smileidentity.networking.FileAdapter
+import com.smileidentity.networking.FileContentsRequestConverterFactory
+import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
@@ -96,6 +97,7 @@ object SmileID {
             .baseUrl(url)
             .client(okHttpClient)
             .addConverterFactory(UploadRequestConverterFactory)
+            .addConverterFactory(FileContentsRequestConverterFactory)
             // Needed for String form data. Otherwise the Moshi adapter adds extraneous quotations
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -226,7 +228,7 @@ object SmileID {
             .add(JobTypeAdapter)
             .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
-            .add(FileAdapter)
+            .add(FileNameAdapter)
             .add(SmartSelfieJobResultAdapter)
             .add(DocumentVerificationJobResultAdapter)
             .add(BiometricKycJobResultAdapter)

@@ -17,9 +17,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.JobType
-import com.smileidentity.models.SmartSelfieJobResult
+import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.asFormDataPart
 import com.smileidentity.networking.asFormDataParts
 import com.smileidentity.results.SmileIDCallback
@@ -80,7 +78,6 @@ data class BiometricAuthenticationUiState(
 @kotlin.OptIn(FlowPreview::class)
 class BiometricAuthenticationViewModel(
     private val userId: String,
-    private val jobId: String,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val selfieQualityModel: SelfieQualityModel,
     private val faceDetector: FaceDetector = FaceDetection.getClient(
@@ -91,7 +88,7 @@ class BiometricAuthenticationViewModel(
             setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
         }.build(),
     ),
-    private val onResult: SmileIDCallback<SmartSelfieJobResult.Entry>,
+    private val onResult: SmileIDCallback<SmartSelfieResponse>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricAuthenticationUiState())
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
@@ -316,23 +313,12 @@ class BiometricAuthenticationViewModel(
     private suspend fun submitJob(
         selfieFile: File,
         livenessFiles: List<File>,
-    ): SmartSelfieJobResult.Entry {
-        val authResponse = SmileID.api.authenticate(
-            AuthenticationRequest(
-                jobType = JobType.SmartSelfieAuthentication,
-                enrollment = false,
-                userId = userId,
-                jobId = jobId,
-            ),
-        )
-        return SmileID.api.doBiometricAuthentication(
-            timestamp = authResponse.timestamp,
-            signature = authResponse.signature,
-            partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-            selfieImage = selfieFile.asFormDataPart("image", "image/jpeg"),
-            livenessImages = livenessFiles.asFormDataParts("liveness_sequence", "image/jpeg"),
-        )
-    }
+    ): SmartSelfieResponse = SmileID.api.doSmartSelfieAuthentication(
+        userId = userId,
+        selfieImage = selfieFile.asFormDataPart("selfie_image", "image/jpeg"),
+        livenessImages = livenessFiles.asFormDataParts("liveness_images", "image/jpeg"),
+        partnerParams = extraPartnerParams,
+    )
 
     private fun resetFaceQuality() {
         _uiState.update {

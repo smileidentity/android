@@ -115,8 +115,31 @@ fun List<File>.asFormDataParts(
     mediaType: String? = null,
 ): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
 
+/**
+ * NB! This is separate from the FileNameAdapter. The converter factory converts request bodies for
+ * Retrofit, while the Adapter is for Moshi to convert between JSON and Kotlin objects.
+ */
+object FileContentsRequestConverterFactory : Converter.Factory() {
+    override fun requestBodyConverter(
+        type: Type,
+        parameterAnnotations: Array<out Annotation>,
+        methodAnnotations: Array<out Annotation>,
+        retrofit: Retrofit,
+    ): Converter<*, RequestBody>? {
+        if (type != File::class.java) {
+            return null
+        }
+        return Converter<File, RequestBody> { it.asRequestBody("image/jpeg".toMediaType()) }
+    }
+}
+
+/**
+ * NB! This is separate from the FileContentsRequestConverterFactory. The converter factory converts
+ * request bodies for Retrofit, while the Adapter is for Moshi to convert between JSON and Kotlin
+ * objects.
+ */
 @Suppress("unused", "UNUSED_PARAMETER")
-object FileAdapter {
+object FileNameAdapter {
     @ToJson
     fun toJson(file: File): String = file.name
 

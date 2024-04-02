@@ -24,7 +24,7 @@ import com.smileidentity.compose.theme.typography
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
-import com.smileidentity.models.SmartSelfieJobResult
+import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -438,22 +438,33 @@ fun SmileID.ConsentScreen(
     }
 }
 
+/**
+ * Perform a Biometric Authentication
+ *
+ * @param userId The user ID to authenticate with the Biometric Authentication. This should be
+ * an ID that was previously registered via a SmartSelfie™ Enrollment
+ * @param modifier The modifier to apply to the layout
+ * @param extraPartnerParams Custom values specific to partners
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Biometric Authentication is complete.
+ */
 @Composable
 fun SmileID.BiometricAuthentication(
     userId: String,
     modifier: Modifier = Modifier,
-    jobId: String = rememberSaveable { randomJobId() },
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
-    onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
+    onResult: SmileIDCallback<SmartSelfieResponse>,
 ) {
     val context = LocalContext.current
     val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedBiometricAuthenticationScreen(
             userId = userId,
-            jobId = jobId,
             selfieQualityModel = selfieQualityModel,
             extraPartnerParams = extraPartnerParams,
             modifier = modifier,

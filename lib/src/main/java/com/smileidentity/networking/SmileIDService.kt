@@ -2,9 +2,7 @@
 
 package com.smileidentity.networking
 
-import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
-import com.smileidentity.SmileIDOptIn
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
@@ -19,18 +17,17 @@ import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobStatusResponse
-import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.ProductsConfigResponse
 import com.smileidentity.models.ServicesResponse
-import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.SmartSelfieJobStatusResponse
 import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
+import com.smileidentity.models.v2.SmartSelfieResponse
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -38,7 +35,6 @@ import kotlinx.coroutines.flow.channelFlow
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -64,7 +60,7 @@ interface SmileIDService {
     /**
      * Uploads files to S3. The URL should be the one returned by [prepUpload]. The files will be
      * uploaded in the order they are provided in [UploadRequest.images], and will be zipped
-     * together by [UploadRequestConverterFactory] and [FileAdapter]
+     * together by [UploadRequestConverterFactory] and [FileNameAdapter]
      */
     @PUT
     suspend fun upload(@Url url: String, @Body request: UploadRequest)
@@ -73,19 +69,25 @@ interface SmileIDService {
     //  livenessImages to be List<File> and use a File to RequestBody converter instead. This will
     //  allow us to specify the Part name on the API/service definition rather than when creating
     //  the request body.
+    /**
+     * Perform a synchronous SmartSelfie Authentication. The response will include the final result
+     * of the authentication.
+     */
+    @SmileHeaderAuth
+    @SmileHeaderMetadata
     @Multipart
-    @POST("/v1/biometric_authentication")
-    @SmileIDOptIn
-    suspend fun doBiometricAuthentication(
-        @Header("SmileID-Timestamp") timestamp: String,
-        @Header("SmileID-Request-Signature") signature: String,
-        @Header("SmileID-Partner-ID") partnerId: String = SmileID.config.partnerId,
+    @POST("/v2/smart-selfie-authentication")
+    suspend fun doSmartSelfieAuthentication(
+        @Part("user_id") userId: String,
+        // @Part("selfie_image") selfieImage: File,
+        // @Part("liveness_images", encoding = "") livenessImages: List<@JvmSuppressWildcards File>,
         @Part selfieImage: MultipartBody.Part,
         @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
-        @Part("partner_params") partnerParams: PartnerParams,
-        @Part("source_sdk") sourceSdk: String = "android",
-        @Part("source_sdk_version") sourceSdkVersion: String = BuildConfig.VERSION_NAME,
-    ): SmartSelfieJobResult.Entry
+        @Part("partner_params")
+        partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
+        @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl,
+        @Part("sandbox_result") sandboxResult: Int? = null,
+    ): SmartSelfieResponse
 
     /**
      * Query the Identity Information of an individual using their ID number from a supported ID

@@ -16,6 +16,7 @@ import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobResult
+import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.pollBiometricKycJobStatus
 import com.smileidentity.networking.pollDocumentVerificationJobStatus
 import com.smileidentity.networking.pollEnhancedDocumentVerificationJobStatus
@@ -33,7 +34,6 @@ import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
-import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -461,7 +461,7 @@ class MainScreenViewModel : ViewModel() {
         _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricAuthentication.label) }
     }
 
-    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieJobResult.Entry>) {
+    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieResponse>) {
         onHomeSelected()
         if (result is SmileIDResult.Success) {
             val response = result.data
@@ -469,9 +469,9 @@ class MainScreenViewModel : ViewModel() {
                 jobName = "Biometric Authentication",
                 jobComplete = true,
                 jobSuccess = true,
-                code = null,
-                resultCode = response.resultCode,
-                resultText = response.resultText,
+                code = response.code,
+                resultCode = null,
+                resultText = response.message,
             )
             Timber.d("$message: $result")
             _uiState.update { it.copy(snackbarMessage = message) }
@@ -480,16 +480,16 @@ class MainScreenViewModel : ViewModel() {
                     partnerId = SmileID.config.partnerId,
                     isProduction = uiState.value.isProduction,
                     job = Job(
-                        jobType = response.partnerParams.jobType!!,
-                        timestamp = Date().toString(),
-                        userId = response.partnerParams.userId,
-                        jobId = response.partnerParams.jobId,
+                        jobType = SmartSelfieAuthentication,
+                        timestamp = response.createdAt,
+                        userId = response.userId,
+                        jobId = response.jobId,
                         jobComplete = true,
                         jobSuccess = true,
-                        code = null,
-                        resultCode = response.resultCode,
-                        smileJobId = response.smileJobId,
-                        resultText = response.resultText,
+                        code = response.code,
+                        resultCode = null,
+                        smileJobId = null,
+                        resultText = response.message,
                         selfieImageUrl = null,
                     ),
                 )

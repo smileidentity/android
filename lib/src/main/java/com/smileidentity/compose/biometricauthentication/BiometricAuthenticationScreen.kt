@@ -63,7 +63,7 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.roundedRectCornerDashPathEffect
 import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.SmartSelfieJobResult
+import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
@@ -84,16 +84,14 @@ const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 @Composable
 fun OrchestratedBiometricAuthenticationScreen(
     userId: String,
-    jobId: String,
     selfieQualityModel: SelfieQualityModel,
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    onResult: SmileIDCallback<SmartSelfieJobResult.Entry> = {},
+    onResult: SmileIDCallback<SmartSelfieResponse> = {},
     @Suppress("UNUSED_PARAMETER") viewModel: BiometricAuthenticationViewModel = viewModel(
         initializer = {
             BiometricAuthenticationViewModel(
                 userId = userId,
-                jobId = jobId,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
                 onResult = onResult,
