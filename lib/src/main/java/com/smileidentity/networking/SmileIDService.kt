@@ -68,6 +68,29 @@ interface SmileIDService {
     suspend fun upload(@Url url: String, @Body request: UploadRequest)
 
     /**
+     * Perform a synchronous SmartSelfie Enrollment. The response will include the final result of
+     * the enrollment.
+     *
+     * This method should not be used directly. Use the extension function instead, which takes
+     * the [File] objects and assigns the correct part name to them.
+     */
+    @SmileHeaderAuth
+    @SmileHeaderMetadata
+    @SmileIDOptIn
+    @Multipart
+    @POST("/v2/smart-selfie-enrollment")
+    suspend fun doSmartSelfieEnrollment(
+        @Part selfieImage: MultipartBody.Part,
+        @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
+        @Part("user_id") userId: String? = null,
+        @Part("partner_params")
+        partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
+        @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
+        @Part("sandbox_result") sandboxResult: Int? = null,
+        @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
+    ): SmartSelfieResponse
+
+    /**
      * Perform a synchronous SmartSelfie Authentication. The response will include the final result
      * of the authentication.
      *
@@ -186,6 +209,47 @@ interface SmileIDService {
     suspend fun submitBvnOtp(@Body request: SubmitBvnTotpRequest): SubmitBvnTotpResponse
 }
 
+/**
+ * Perform a synchronous SmartSelfie Enrollment. The response will include the final result of the
+ * enrollment.
+ *
+ * @param selfieImage The selfie image to use for enrollment
+ * @param livenessImages The liveness images to use for enrollment
+ * @param userId The ID of the user to enroll
+ * @param partnerParams Additional parameters to send to the server
+ * @param callbackUrl The URL to send the result to
+ * @param sandboxResult The result to return if in sandbox mode to test your integration
+ * @param allowNewEnroll Whether to allow new enrollments for the user
+ */
+suspend fun SmileIDService.doSmartSelfieEnrollment(
+    selfieImage: File,
+    livenessImages: List<File>,
+    userId: String? = null,
+    partnerParams: Map<String, String>? = null,
+    callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
+    sandboxResult: Int? = null,
+    allowNewEnroll: Boolean? = null,
+) = doSmartSelfieEnrollment(
+    selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
+    livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    userId = userId,
+    partnerParams = partnerParams,
+    callbackUrl = callbackUrl,
+    sandboxResult = sandboxResult,
+    allowNewEnroll = allowNewEnroll,
+)
+
+/**
+ * Perform a synchronous SmartSelfie Authentication. The response will include the final result
+ * of the authentication.
+ *
+ * @param userId The ID of the user to authenticate
+ * @param selfieImage The selfie image to use for authentication
+ * @param livenessImages The liveness images to use for authentication
+ * @param partnerParams Additional parameters to send to the server
+ * @param callbackUrl The URL to send the result to
+ * @param sandboxResult The result to return if in sandbox mode to test your integration
+ */
 suspend fun SmileIDService.doSmartSelfieAuthentication(
     userId: String,
     selfieImage: File,
@@ -194,12 +258,12 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
 ) = doSmartSelfieAuthentication(
-    userId,
-    selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
-    livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
-    partnerParams,
-    callbackUrl,
-    sandboxResult,
+    userId = userId,
+    selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
+    livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    partnerParams = partnerParams,
+    callbackUrl = callbackUrl,
+    sandboxResult = sandboxResult,
 )
 
 /**
