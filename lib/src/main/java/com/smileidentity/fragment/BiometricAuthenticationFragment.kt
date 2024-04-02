@@ -39,7 +39,6 @@ import kotlinx.collections.immutable.toImmutableMap
  *
  * To theme the UI, override the si_color_* resources
  *
- * TODO: Test
  */
 class BiometricAuthenticationFragment : DialogFragment() {
     companion object {
