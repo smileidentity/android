@@ -11,7 +11,6 @@ import com.smileidentity.models.Config
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
-import com.smileidentity.networking.FileContentsRequestConverterFactory
 import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
@@ -48,7 +47,7 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
-    var callbackUrl: String? = null
+    var callbackUrl: String = ""
         private set
 
     internal var apiKey: String? = null
@@ -97,7 +96,6 @@ object SmileID {
             .baseUrl(url)
             .client(okHttpClient)
             .addConverterFactory(UploadRequestConverterFactory)
-            .addConverterFactory(FileContentsRequestConverterFactory)
             // Needed for String form data. Otherwise the Moshi adapter adds extraneous quotations
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -163,7 +161,7 @@ object SmileID {
      */
     @JvmStatic
     fun setCallbackUrl(callbackUrl: URL?) {
-        SmileID.callbackUrl = callbackUrl?.toString()
+        SmileID.callbackUrl = callbackUrl?.toString() ?: ""
     }
 
     /**

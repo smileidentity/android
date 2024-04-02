@@ -3,6 +3,7 @@
 package com.smileidentity.networking
 
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
@@ -28,6 +29,7 @@ import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.SmartSelfieResponse
+import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -65,27 +67,25 @@ interface SmileIDService {
     @PUT
     suspend fun upload(@Url url: String, @Body request: UploadRequest)
 
-    // TODO: Once the API no longer requires the filename to be sent, change selfieImage and
-    //  livenessImages to be List<File> and use a File to RequestBody converter instead. This will
-    //  allow us to specify the Part name on the API/service definition rather than when creating
-    //  the request body.
     /**
      * Perform a synchronous SmartSelfie Authentication. The response will include the final result
      * of the authentication.
+     *
+     * This method should not be used directly. Use the extension function instead, which takes
+     * the [File] objects and assigns the correct part name to them.
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")
     suspend fun doSmartSelfieAuthentication(
         @Part("user_id") userId: String,
-        // @Part("selfie_image") selfieImage: File,
-        // @Part("liveness_images", encoding = "") livenessImages: List<@JvmSuppressWildcards File>,
         @Part selfieImage: MultipartBody.Part,
         @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
         @Part("partner_params")
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
-        @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl,
+        @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
     ): SmartSelfieResponse
 
@@ -185,6 +185,22 @@ interface SmileIDService {
     @POST("/v1/totp_consent/otp")
     suspend fun submitBvnOtp(@Body request: SubmitBvnTotpRequest): SubmitBvnTotpResponse
 }
+
+suspend fun SmileIDService.doSmartSelfieAuthentication(
+    userId: String,
+    selfieImage: File,
+    livenessImages: List<File>,
+    partnerParams: Map<String, String>? = null,
+    callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
+    sandboxResult: Int? = null,
+) = doSmartSelfieAuthentication(
+    userId,
+    selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
+    livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    partnerParams,
+    callbackUrl,
+    sandboxResult,
+)
 
 /**
  * Polls the server for the status of a Job until it is complete. This should be called after the

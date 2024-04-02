@@ -18,8 +18,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.SmartSelfieResponse
-import com.smileidentity.networking.asFormDataPart
-import com.smileidentity.networking.asFormDataParts
+import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.area
@@ -315,8 +314,8 @@ class BiometricAuthenticationViewModel(
         livenessFiles: List<File>,
     ): SmartSelfieResponse = SmileID.api.doSmartSelfieAuthentication(
         userId = userId,
-        selfieImage = selfieFile.asFormDataPart("selfie_image", "image/jpeg"),
-        livenessImages = livenessFiles.asFormDataParts("liveness_images", "image/jpeg"),
+        selfieImage = selfieFile,
+        livenessImages = livenessFiles,
         partnerParams = extraPartnerParams,
     )
 

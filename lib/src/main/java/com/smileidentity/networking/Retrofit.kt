@@ -87,10 +87,6 @@ object UploadRequestConverterFactory : Converter.Factory() {
  * @param partName The form data key name
  * @param mediaType The media type of the file (e.g. "image/jpeg")
  */
-// TODO: Get rid of this once API does not require the filename to be sent
-//  at that point, we can just use a default converter from File to RequestBody, and that would
-//  allow us to specify the Part name on the API/service definition rather than when creating the
-//  request body
 fun File.asFormDataPart(partName: String, mediaType: String? = null): MultipartBody.Part =
     MultipartBody.Part.createFormData(
         partName,
@@ -106,38 +102,11 @@ fun File.asFormDataPart(partName: String, mediaType: String? = null): MultipartB
  * @param partName The form data key name
  * @param mediaType The media type of the file (e.g. "image/jpeg")
  */
-// TODO: Get rid of this once API does not require the filename to be sent
-//  at that point, we can just use a default converter from File to RequestBody, and that would
-//  allow us to specify the Part name on the API/service definition rather than when creating the
-//  request body
 fun List<File>.asFormDataParts(
     partName: String,
     mediaType: String? = null,
 ): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
 
-/**
- * NB! This is separate from the FileNameAdapter. The converter factory converts request bodies for
- * Retrofit, while the Adapter is for Moshi to convert between JSON and Kotlin objects.
- */
-object FileContentsRequestConverterFactory : Converter.Factory() {
-    override fun requestBodyConverter(
-        type: Type,
-        parameterAnnotations: Array<out Annotation>,
-        methodAnnotations: Array<out Annotation>,
-        retrofit: Retrofit,
-    ): Converter<*, RequestBody>? {
-        if (type != File::class.java) {
-            return null
-        }
-        return Converter<File, RequestBody> { it.asRequestBody("image/jpeg".toMediaType()) }
-    }
-}
-
-/**
- * NB! This is separate from the FileContentsRequestConverterFactory. The converter factory converts
- * request bodies for Retrofit, while the Adapter is for Moshi to convert between JSON and Kotlin
- * objects.
- */
 @Suppress("unused", "UNUSED_PARAMETER")
 object FileNameAdapter {
     @ToJson
