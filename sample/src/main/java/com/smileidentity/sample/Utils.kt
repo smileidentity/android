@@ -86,7 +86,14 @@ fun jobResultMessageBuilder(
         } else {
             message.append("completed unsuccessfully")
         }
-        message.append(" (resultText=$resultText, code=$code, resultCode=$resultCode)")
+        val parenthesesText = listOf(
+            "resultText=$resultText",
+            "code=$code",
+            "resultCode=$resultCode",
+        ).filterNot { it.contains("null") }.joinToString(", ")
+        if (parenthesesText.isNotEmpty()) {
+            message.append(" ($parenthesesText)")
+        }
     } else {
         message.append("still pending")
     }

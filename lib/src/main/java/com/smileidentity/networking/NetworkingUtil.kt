@@ -11,7 +11,12 @@ import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipOutputStream
+import okhttp3.Request
 import okio.ByteString.Companion.encode
+import retrofit2.Invocation
+
+fun <T : Annotation> Request.getCustomAnnotation(annotationClass: Class<T>): T? =
+    this.tag(Invocation::class.java)?.method()?.getAnnotation(annotationClass)
 
 fun calculateSignature(timestamp: String): String {
     val apiKey = SmileID.apiKey ?: throw IllegalStateException(
