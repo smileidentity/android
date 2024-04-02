@@ -12,7 +12,6 @@ import com.smileidentity.models.JobType.DocumentVerification
 import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
-import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.pollBiometricKycJobStatus
 import com.smileidentity.networking.pollDocumentVerificationJobStatus

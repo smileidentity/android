@@ -334,7 +334,7 @@ internal fun getSmileTempFile(
 
 /**
  * Creates a new image file within a specified folder. The file is intended
- * for storing an image of a specified type, such as "jpg" or "png".
+ * for storing an image of a specified type, such as selfie or liveness
  *
  * The function constructs a uniquely named file to avoid naming conflicts
  * and places it within a folder named according to the `folderName` parameter.

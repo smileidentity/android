@@ -238,7 +238,7 @@ class BiometricAuthenticationViewModel(
             }
             lastAutoCaptureTimeMs = System.currentTimeMillis()
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                val livenessFile = createLivenessFile()
+                val livenessFile = createLivenessFile(userId)
                 Timber.v("Capturing liveness image to $livenessFile")
                 postProcessImageBitmap(
                     bitmap = fullSelfieBmp,
@@ -253,7 +253,7 @@ class BiometricAuthenticationViewModel(
             shouldAnalyzeImages = false
 
             // local variable is for null type safety purposes
-            val selfieFile = createSelfieFile()
+            val selfieFile = createSelfieFile(userId)
             this.selfieFile = selfieFile
             Timber.v("Capturing selfie image to $selfieFile")
             postProcessImageBitmap(

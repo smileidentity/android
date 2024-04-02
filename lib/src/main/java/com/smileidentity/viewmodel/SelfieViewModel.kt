@@ -17,7 +17,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
@@ -334,15 +333,6 @@ class SelfieViewModel(
             val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
-            val jobStatusRequest = JobStatusRequest(
-                jobId = authResponse.partnerParams.jobId,
-                userId = authResponse.partnerParams.userId,
-                includeImageLinks = false,
-                includeHistory = false,
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
-
             var selfieFileResult = selfieFile
             var livenessFilesResult = livenessFiles
             // if we've gotten this far we move files

@@ -15,8 +15,8 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
-import com.smileidentity.util.calculateLuminance
 import com.smileidentity.compose.document.DocumentCaptureSide
+import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState

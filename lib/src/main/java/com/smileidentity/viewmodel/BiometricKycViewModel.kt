@@ -155,7 +155,6 @@ class BiometricKycViewModel(
                 timestamp = authResponse.timestamp,
             )
 
-            val jobStatusResponse = SmileID.api.getBiometricKycJobStatus(jobStatusRequest)
             var selfieFileResult = selfieFile
             var livenessFilesResult = livenessFiles
             // if we've gotten this far we move files
