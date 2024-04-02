@@ -47,7 +47,7 @@ object SmileID {
     var useSandbox: Boolean = true
         private set
 
-    var callbackUrl: String = ""
+    var callbackUrl: String? = null
         private set
 
     internal var apiKey: String? = null
@@ -161,7 +161,7 @@ object SmileID {
      */
     @JvmStatic
     fun setCallbackUrl(callbackUrl: URL?) {
-        SmileID.callbackUrl = callbackUrl?.toString() ?: ""
+        SmileID.callbackUrl = callbackUrl?.toString()
     }
 
     /**
