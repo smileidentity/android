@@ -83,7 +83,7 @@ fun OrchestratedSelfieCaptureScreen(
                 inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
                 successTitle = stringResource(R.string.si_smart_selfie_processing_success_title),
                 successSubtitle = stringResource(
-                    R.string.si_smart_selfie_processing_success_subtitle,
+                    uiState.errorMessage ?: R.string.si_smart_selfie_processing_success_subtitle,
                 ),
                 successIcon = painterResource(R.drawable.si_processing_success),
                 errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),

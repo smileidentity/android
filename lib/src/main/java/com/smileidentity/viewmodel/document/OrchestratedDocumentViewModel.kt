@@ -254,6 +254,12 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
         }
         if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
+            _uiState.update {
+                it.copy(
+                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
+                    errorMessage = R.string.si_offline_message,
+                )
+            }
             saveResult(
                 selfieImage = selfieFile ?: throw IllegalStateException("Selfie file is null"),
                 documentFrontFile = documentFrontFile ?: throw IllegalStateException(
@@ -263,9 +269,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 livenessFiles,
                 didSubmitJob = false,
             )
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
-            }
         } else {
             result = SmileIDResult.Error(throwable)
             _uiState.update {
