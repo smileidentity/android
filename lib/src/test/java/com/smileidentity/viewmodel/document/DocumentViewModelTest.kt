@@ -159,7 +159,7 @@ class DocumentViewModelTest {
         val selfieResult = SmartSelfieResult(
             selfieFile = selfieFile,
             livenessFiles = listOf(File.createTempFile("liveness", ".jpg")),
-            jobStatusResponse = null,
+            true,
         )
         coEvery { SmileID.api.authenticate(any()) } returns AuthenticationResponse(
             success = true,

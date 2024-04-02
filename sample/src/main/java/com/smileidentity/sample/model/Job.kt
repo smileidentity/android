@@ -34,13 +34,13 @@ data class Job(
     val timestamp: String,
     val userId: String,
     val jobId: String,
-    val jobComplete: Boolean,
-    val jobSuccess: Boolean,
-    val code: String?,
-    val resultCode: String?,
-    val smileJobId: String?,
-    val resultText: String?,
-    val selfieImageUrl: String?,
+    val jobComplete: Boolean = false,
+    val jobSuccess: Boolean = false,
+    val code: String? = null,
+    val resultCode: String? = null,
+    val smileJobId: String? = null,
+    val resultText: String? = null,
+    val selfieImageUrl: String? = null,
 )
 
 private val outputFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
@@ -61,6 +61,9 @@ private fun toHumanReadableTimestamp(timestamp: String): String {
         timestamp
     }
 }
+
+public fun getCurrentTimeAsHumanReadableTimestamp() =
+    toHumanReadableTimestamp(inputFormat.format(Date()))
 
 fun EnhancedKycResponse.toJob() = Job(
     jobType = EnhancedKyc,
@@ -104,6 +107,7 @@ fun EnhancedDocumentVerificationJobStatusResponse.toJob(userId: String, jobId: S
     jobType = EnhancedDocumentVerification,
 )
 
+// TODO: Make this support offline mode
 fun JobStatusResponse.toJob(userId: String, jobId: String, jobType: JobType) = Job(
     jobType = jobType,
     timestamp = toHumanReadableTimestamp(timestamp),

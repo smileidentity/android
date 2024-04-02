@@ -1,13 +1,17 @@
 package com.smileidentity.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smileidentity.R
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
+import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
@@ -15,7 +19,18 @@ import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.FileType
+import com.smileidentity.util.createAuthenticationRequestFile
+import com.smileidentity.util.createPrepUploadFile
+import com.smileidentity.util.createUploadRequestFile
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.getFileByType
+import com.smileidentity.util.getFilesByType
+import com.smileidentity.util.handleOfflineJobFailure
+import com.smileidentity.util.isNetworkFailure
+import com.smileidentity.util.moveJobToSubmitted
+import io.sentry.Breadcrumb
+import io.sentry.SentryLevel
 import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
@@ -27,6 +42,7 @@ import timber.log.Timber
 
 data class BiometricKycUiState(
     val processingState: ProcessingState? = null,
+    @StringRes val errorMessage: Int? = null,
 )
 
 class BiometricKycViewModel(
@@ -51,10 +67,32 @@ class BiometricKycViewModel(
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
-        val proxy = { e: Throwable ->
+        val proxy = fun(e: Throwable) {
             Timber.e(e)
-            result = SmileIDResult.Error(e)
-            _uiState.update { it.copy(processingState = ProcessingState.Error) }
+            handleOfflineJobFailure(jobId, e)
+            if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
+                result = SmileIDResult.Success(
+                    BiometricKycResult(
+                        selfieFile,
+                        livenessFiles,
+                        true,
+                    ),
+                )
+                _uiState.update {
+                    it.copy(
+                        processingState = ProcessingState.Success,
+                        errorMessage = R.string.si_offline_message,
+                    )
+                }
+            } else {
+                result = SmileIDResult.Error(e)
+                _uiState.update {
+                    it.copy(
+                        processingState = ProcessingState.Error,
+                        errorMessage = R.string.si_processing_error_subtitle,
+                    )
+                }
+            }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val authRequest = AuthenticationRequest(
@@ -62,6 +100,32 @@ class BiometricKycViewModel(
                 userId = userId,
                 jobId = jobId,
             )
+
+            if (SmileID.allowOfflineMode) {
+                createAuthenticationRequestFile(jobId, authRequest)
+                createPrepUploadFile(
+                    jobId,
+                    PrepUploadRequest(
+                        partnerParams = PartnerParams(
+                            jobType = JobType.BiometricKyc,
+                            jobId = jobId,
+                            userId = userId,
+                            extras = extraPartnerParams,
+                        ),
+                        allowNewEnroll = allowNewEnroll.toString(),
+                        timestamp = "",
+                        signature = "",
+                    ),
+                )
+                createUploadRequestFile(
+                    jobId,
+                    UploadRequest(
+                        images = livenessFiles.map { it.asLivenessImage() } +
+                            selfieFile.asSelfieImage(),
+                        idInfo = idInfo.copy(entered = true),
+                    ),
+                )
+            }
 
             val authResponse = SmileID.api.authenticate(authRequest)
 
@@ -72,6 +136,7 @@ class BiometricKycViewModel(
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
+
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
             val selfieImageInfo = selfieFile.asSelfieImage()
@@ -91,11 +156,32 @@ class BiometricKycViewModel(
             )
 
             val jobStatusResponse = SmileID.api.getBiometricKycJobStatus(jobStatusRequest)
+            var selfieFileResult = selfieFile
+            var livenessFilesResult = livenessFiles
+            // if we've gotten this far we move files
+            // to complete from pending
+            val copySuccess = moveJobToSubmitted(jobId)
+            if (copySuccess) {
+                selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+                    Timber.w("Selfie file not found for job ID: $jobId")
+                    throw IllegalStateException("Selfie file not found for job ID: $jobId")
+                }
+                livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+            } else {
+                Timber.w("Failed to move job $jobId to complete")
+                SmileIDCrashReporting.hub.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
+            }
             result = SmileIDResult.Success(
                 BiometricKycResult(
-                    selfieFile,
-                    livenessFiles,
-                    jobStatusResponse,
+                    selfieFileResult,
+                    livenessFilesResult,
+                    true,
                 ),
             )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }

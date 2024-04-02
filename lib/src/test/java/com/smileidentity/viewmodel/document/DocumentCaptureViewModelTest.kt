@@ -3,6 +3,7 @@ package com.smileidentity.viewmodel.document
 import androidx.camera.view.CameraController
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.smileidentity.SmileID
+import com.smileidentity.compose.document.DocumentCaptureSide
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import io.mockk.Runs
@@ -30,7 +31,12 @@ class DocumentCaptureViewModelTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         SmileID.fileSavePath = "."
         val objectDetector: ObjectDetector = mockk()
-        subject = DocumentCaptureViewModel(knownAspectRatio = null, objectDetector)
+        subject = DocumentCaptureViewModel(
+            "jobId",
+            side = DocumentCaptureSide.Front,
+            knownAspectRatio = null,
+            objectDetector = objectDetector,
+        )
     }
 
     @Test
