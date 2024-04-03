@@ -2,8 +2,6 @@
 accompanist-permissions = "0.34.0"
 android-gradle-plugin = "8.2.2"
 androidx-activity = "1.8.2"
-# TODO: Check if https://android-review.googlesource.com/c/platform/frameworks/support/+/2576871 has
-#  been merged and if so, swap the buttons in ImageCaptureConfirmationDialog
 androidx-compose-bom = "2024.03.00"
 androidx-compose-compiler = "1.5.11"
 androidx-core = "1.12.0"

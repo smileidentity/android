@@ -1,10 +1,12 @@
 # Release Notes
 
-## Unreleased
+## 10.1.0
 
-* Bump Compose BOM to 2024.02.02
+* Added an Offline Mode, enabled by calling `SmileID.setAllowOfflineMode(true)`. If a job is attempted while the device is offline, and offline mode has been enabled, the UI will complete successfully and the job can be submitted at a later time by calling `SmileID.submitJob(jobId)`
+* Introduce a new SmartSelfie Authentication UI, available as the `SmileID.BiometricAuthentication` Composable
 * Made `KEY_RESULT` constants in `Fragment`s `internal` to remove a footgun where the constant was easily confused with `KEY_REQUEST`
 * Improved back button behavior on image confirmation and processing dialogs
+* Bump Compose BOM to 2024.03.00
 
 ## 10.0.4
 
