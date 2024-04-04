@@ -24,7 +24,6 @@ import com.smileidentity.compose.theme.typography
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
-import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -458,7 +457,7 @@ fun SmileID.BiometricAuthentication(
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
-    onResult: SmileIDCallback<SmartSelfieResponse>,
+    onResult: SmileIDCallback<SmartSelfieResult>,
 ) {
     val context = LocalContext.current
     val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }

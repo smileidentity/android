@@ -17,7 +17,7 @@ import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KE
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.resultFromBundle
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
-import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.getSerializableCompat
@@ -105,6 +105,6 @@ private var Bundle.extraPartnerParams: HashMap<String, String>?
     get() = getSerializableCompat(KEY_EXTRA_PARTNER_PARAMS)
     set(value) = putSerializable(KEY_EXTRA_PARTNER_PARAMS, value)
 
-private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResponse>
+private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
     get() = getParcelableCompat(KEY_RESULT)!!
     set(value) = putParcelable(KEY_RESULT, value)
