@@ -417,6 +417,9 @@ object SmileID {
                         if (response.code < 500) {
                             return@Interceptor response
                         }
+                        // Must close the response before retrying
+                        // see: https://github.com/square/retrofit/issues/3478
+                        response.close()
                     } catch (e: Exception) {
                         Timber.w(e, "Smile ID SDK network attempt #$attempt failed")
                         // Network failures end up here. These will be retried
