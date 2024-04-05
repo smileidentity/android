@@ -159,7 +159,7 @@ class EnhancedDocumentVerificationViewModelTest {
         val selfieResult = SmartSelfieResult(
             selfieFile = selfieFile,
             livenessFiles = listOf(File.createTempFile("liveness", ".jpg")),
-            true,
+            null,
         )
         coEvery { SmileID.api.authenticate(any()) } returns AuthenticationResponse(
             success = true,

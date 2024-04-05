@@ -31,6 +31,6 @@ class BiometricAuthenticationViewModelTest {
         assertEquals(SelfieHint.SearchingForFace, uiState.selfieHint)
         assertEquals(false, uiState.showLoading)
         assertEquals(false, uiState.showCompletion)
-        assertEquals(null, uiState.showBorderHighlight)
+        assertEquals(false, uiState.showBorderHighlight)
     }
 }
