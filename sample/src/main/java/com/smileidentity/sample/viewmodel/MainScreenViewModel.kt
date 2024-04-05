@@ -12,6 +12,7 @@ import com.smileidentity.models.JobType.DocumentVerification
 import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
+import com.smileidentity.models.v2.SmartSelfieStatus
 import com.smileidentity.networking.pollBiometricKycJobStatus
 import com.smileidentity.networking.pollDocumentVerificationJobStatus
 import com.smileidentity.networking.pollEnhancedDocumentVerificationJobStatus
@@ -242,7 +243,7 @@ class MainScreenViewModel : ViewModel() {
                         userId = userId,
                         jobId = jobId,
                         jobComplete = true,
-                        jobSuccess = true,
+                        jobSuccess = response.status == SmartSelfieStatus.Approved,
                         code = response.code,
                         resultText = response.message,
                     ),
@@ -290,8 +291,8 @@ class MainScreenViewModel : ViewModel() {
                         timestamp = response.createdAt,
                         userId = userId,
                         jobId = jobId,
-                        jobComplete = true,
-                        jobSuccess = true,
+                        jobComplete = response.status != SmartSelfieStatus.Pending,
+                        jobSuccess = response.status == SmartSelfieStatus.Approved,
                         code = response.code,
                         resultText = response.message,
                     ),
