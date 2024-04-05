@@ -239,6 +239,8 @@ fun SmileID.DocumentVerification(
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
  * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
  * standard size of ~1.6
+ * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
+ * and instead the provided file will be used as the selfie image
  * @param userId The user ID to associate with the Enhanced Document Verification. Most often, this will
  * correspond to a unique User ID within your own system. If not provided, a random user ID will be
  * generated
@@ -266,6 +268,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     documentType: String? = null,
     captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
+    bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowNewEnroll: Boolean = false,
@@ -299,6 +302,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
+                        selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
                     )
                 },
