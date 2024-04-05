@@ -7,6 +7,7 @@ import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.SmileIDCrashReporting.Metrics
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
@@ -115,6 +116,7 @@ object SmileID {
             SmileIDCrashReporting.enable(isInDebugMode)
         }
         requestFaceDetectionModuleInstallation(context)
+        SmileIDCrashReporting.hub.metrics().increment(Metrics.KEY_SDK_INITIALIZATION)
 
         SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl

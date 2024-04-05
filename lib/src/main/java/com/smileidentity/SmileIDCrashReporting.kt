@@ -34,12 +34,17 @@ object SmileIDCrashReporting {
     private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
     internal var hub: IHub = NoOpHub.getInstance()
 
+    object Metrics {
+        const val KEY_SDK_INITIALIZATION = "sdk_initialization"
+    }
+
     @JvmStatic
     fun enable(isInDebugMode: Boolean = false) {
         val options = SentryOptions().apply {
             dsn = BuildConfig.SENTRY_DSN
             release = BuildConfig.VERSION_NAME
             isEnableUncaughtExceptionHandler = true
+            isEnableMetrics = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
                 try {
                     if (isEventFromIDE(event)) {
