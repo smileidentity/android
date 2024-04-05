@@ -32,8 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
@@ -129,6 +132,7 @@ fun DocumentCaptureScreen(
                 showSkipButton = showSkipButton,
                 onInstructionsAcknowledgedSelectFromGallery = {
                     Timber.v("onInstructionsAcknowledgedSelectFromGallery")
+                    SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
                     photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
                 },
                 onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
@@ -138,9 +142,15 @@ fun DocumentCaptureScreen(
 
         documentImageToConfirm != null -> {
             val painter = remember {
-                BitmapPainter(
-                    BitmapFactory.decodeFile(documentImageToConfirm.absolutePath).asImageBitmap(),
-                )
+                val path = documentImageToConfirm.absolutePath
+                try {
+                    BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
+                } catch (e: Exception) {
+                    SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
+                    SmileIDCrashReporting.hub.captureException(e)
+                    onError(e)
+                    ColorPainter(Color.Black)
+                }
             }
             ImageCaptureConfirmationDialog(
                 titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
