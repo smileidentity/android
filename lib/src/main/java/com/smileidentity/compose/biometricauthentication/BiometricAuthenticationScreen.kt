@@ -281,6 +281,7 @@ private fun BiometricAuthenticationScreen(
             visible = overlayImage != null,
             enter = fadeIn() + expandIn(expandFrom = Center),
         ) {
+            // TODO: Add Lottie animations here
             overlayImage?.let {
                 Image(
                     // The extra key() is needed otherwise there are weird artifacts
