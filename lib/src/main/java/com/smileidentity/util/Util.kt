@@ -21,6 +21,7 @@ import android.util.Size
 import android.widget.Toast
 import androidx.annotation.IntRange
 import androidx.annotation.StringRes
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
 import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
@@ -35,7 +36,6 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
-import java.nio.ByteBuffer
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okio.IOException
@@ -95,6 +95,16 @@ internal fun isImageAtLeast(
     val imageHeight = options.outHeight
     val imageWidth = options.outWidth
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
+}
+
+fun calculateLuminance(imageProxy: ImageProxy): Double {
+    // planes[0] is the Y plane aka "luma"
+    val data = imageProxy.planes[0].buffer.apply { rewind() }
+    var sum = 0.0
+    while (data.hasRemaining()) {
+        sum += data.get().toInt() and 0xFF
+    }
+    return sum / data.limit()
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
@@ -420,11 +430,4 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
-}
-
-internal fun ByteBuffer.toByteArray(): ByteArray {
-    rewind()
-    val data = ByteArray(remaining())
-    get(data)
-    return data
 }

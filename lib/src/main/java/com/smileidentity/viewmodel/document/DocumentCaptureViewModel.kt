@@ -16,9 +16,9 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
+import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
-import com.smileidentity.util.toByteArray
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
@@ -259,13 +259,6 @@ class DocumentCaptureViewModel(
         _uiState.update {
             it.copy(areEdgesDetected = false, idAspectRatio = defaultAspectRatio)
         }
-    }
-
-    private fun calculateLuminance(imageProxy: ImageProxy): Double {
-        // planes[0] is the Y plane aka "luma"
-        val data = imageProxy.planes[0].buffer.toByteArray()
-        val pixels = data.map { it.toInt() and 0xFF }
-        return pixels.average()
     }
 
     private fun isBoundingBoxCentered(

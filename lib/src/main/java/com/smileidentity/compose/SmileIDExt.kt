@@ -6,18 +6,22 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.biometricauthentication.OrchestratedBiometricAuthenticationScreen
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
@@ -429,6 +433,41 @@ fun SmileID.ConsentScreen(
             onConsentDenied = onConsentDenied,
             modifier = modifier,
             showAttribution = showAttribution,
+        )
+    }
+}
+
+/**
+ * Perform a Biometric Authentication
+ *
+ * @param userId The user ID to authenticate with the Biometric Authentication. This should be
+ * an ID that was previously registered via a SmartSelfie™ Enrollment
+ * @param modifier The modifier to apply to the layout
+ * @param extraPartnerParams Custom values specific to partners
+ * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
+ * ID branded UI by default, but allow the user to override it if they want.
+ * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
+ * branded UI by default, but allow the user to override it if they want.
+ * @param onResult Callback to be invoked when the Biometric Authentication is complete.
+ */
+@Composable
+fun SmileID.BiometricAuthentication(
+    userId: String,
+    modifier: Modifier = Modifier,
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<SmartSelfieResult>,
+) {
+    val context = LocalContext.current
+    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+        OrchestratedBiometricAuthenticationScreen(
+            userId = userId,
+            selfieQualityModel = selfieQualityModel,
+            extraPartnerParams = extraPartnerParams,
+            modifier = modifier,
+            onResult = onResult,
         )
     }
 }

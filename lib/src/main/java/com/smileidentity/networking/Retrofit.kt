@@ -87,10 +87,6 @@ object UploadRequestConverterFactory : Converter.Factory() {
  * @param partName The form data key name
  * @param mediaType The media type of the file (e.g. "image/jpeg")
  */
-// TODO: Get rid of this once API does not require the filename to be sent
-//  at that point, we can just use a default converter from File to RequestBody, and that would
-//  allow us to specify the Part name on the API/service definition rather than when creating the
-//  request body
 fun File.asFormDataPart(partName: String, mediaType: String? = null): MultipartBody.Part =
     MultipartBody.Part.createFormData(
         partName,
@@ -106,17 +102,13 @@ fun File.asFormDataPart(partName: String, mediaType: String? = null): MultipartB
  * @param partName The form data key name
  * @param mediaType The media type of the file (e.g. "image/jpeg")
  */
-// TODO: Get rid of this once API does not require the filename to be sent
-//  at that point, we can just use a default converter from File to RequestBody, and that would
-//  allow us to specify the Part name on the API/service definition rather than when creating the
-//  request body
 fun List<File>.asFormDataParts(
     partName: String,
     mediaType: String? = null,
 ): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
 
 @Suppress("unused", "UNUSED_PARAMETER")
-object FileAdapter {
+object FileNameAdapter {
     @ToJson
     fun toJson(file: File): String = file.name
 

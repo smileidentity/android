@@ -62,8 +62,7 @@ private fun toHumanReadableTimestamp(timestamp: String): String {
     }
 }
 
-public fun getCurrentTimeAsHumanReadableTimestamp() =
-    toHumanReadableTimestamp(inputFormat.format(Date()))
+fun getCurrentTimeAsHumanReadableTimestamp() = toHumanReadableTimestamp(inputFormat.format(Date()))
 
 fun EnhancedKycResponse.toJob() = Job(
     jobType = EnhancedKyc,

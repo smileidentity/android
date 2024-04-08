@@ -16,12 +16,14 @@ import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
-import com.smileidentity.networking.FileAdapter
+import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
+import com.smileidentity.networking.SmileHeaderAuthInterceptor
+import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -56,6 +58,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 
 @Suppress("unused")
@@ -123,6 +126,8 @@ object SmileID {
             .baseUrl(url)
             .client(okHttpClient)
             .addConverterFactory(UploadRequestConverterFactory)
+            // Needed for String form data. Otherwise the Moshi adapter adds extraneous quotations
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
 
@@ -273,7 +278,7 @@ object SmileID {
     @JvmStatic
     suspend fun submitJob(
         jobId: String,
-        deleteFilesOnSuccess: Boolean,
+        deleteFilesOnSuccess: Boolean = true,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         exceptionHandler: ((Throwable) -> Unit)? = null,
     ): Job = scope.launch(
@@ -399,6 +404,8 @@ object SmileID {
         connectTimeout(30, TimeUnit.SECONDS)
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)
+        addInterceptor(SmileHeaderAuthInterceptor)
+        addInterceptor(SmileHeaderMetadataInterceptor)
         addInterceptor(
             Interceptor { chain: Interceptor.Chain ->
                 // Retry on exception (network error) and 5xx
@@ -451,7 +458,7 @@ object SmileID {
             .add(JobTypeAdapter)
             .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
-            .add(FileAdapter)
+            .add(FileNameAdapter)
             .add(SmartSelfieJobResultAdapter)
             .add(DocumentVerificationJobResultAdapter)
             .add(BiometricKycJobResultAdapter)
