@@ -17,8 +17,8 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.doSmartSelfieAuthentication
+import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.area
@@ -87,7 +87,7 @@ class BiometricAuthenticationViewModel(
             setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
         }.build(),
     ),
-    private val onResult: SmileIDCallback<SmartSelfieResponse>,
+    private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricAuthenticationUiState())
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
@@ -271,7 +271,12 @@ class BiometricAuthenticationViewModel(
                 // to make it feel like the API call is a bit faster
                 awaitAll(
                     async {
-                        val result = submitJob(selfieFile, livenessFiles)
+                        val apiResponse = SmileID.api.doSmartSelfieAuthentication(
+                            userId = userId,
+                            selfieImage = selfieFile,
+                            livenessImages = livenessFiles,
+                            partnerParams = extraPartnerParams,
+                        )
                         done = true
                         _uiState.update {
                             it.copy(
@@ -283,6 +288,7 @@ class BiometricAuthenticationViewModel(
                         }
                         // Delay to ensure the completion icon is shown for a little bit
                         delay(2500)
+                        val result = SmartSelfieResult(selfieFile, livenessFiles, apiResponse)
                         onResult(SmileIDResult.Success(result))
                     },
                     async {
@@ -308,16 +314,6 @@ class BiometricAuthenticationViewModel(
             imageProxy.close()
         }
     }
-
-    private suspend fun submitJob(
-        selfieFile: File,
-        livenessFiles: List<File>,
-    ): SmartSelfieResponse = SmileID.api.doSmartSelfieAuthentication(
-        userId = userId,
-        selfieImage = selfieFile,
-        livenessImages = livenessFiles,
-        partnerParams = extraPartnerParams,
-    )
 
     private fun resetFaceQuality() {
         _uiState.update {

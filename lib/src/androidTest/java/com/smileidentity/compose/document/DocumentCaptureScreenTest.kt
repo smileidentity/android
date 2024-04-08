@@ -38,6 +38,7 @@ class DocumentCaptureScreenTest {
         composeTestRule.setContent {
             permissionState = rememberPermissionState(Manifest.permission.CAMERA)
             DocumentCaptureScreen(
+                jobId = "jobId",
                 side = DocumentCaptureSide.Front,
                 showInstructions = true,
                 showAttribution = true,
@@ -70,6 +71,7 @@ class DocumentCaptureScreenTest {
         // when
         composeTestRule.setContent {
             DocumentCaptureScreen(
+                jobId = "jobId",
                 side = DocumentCaptureSide.Front,
                 showInstructions = true,
                 showAttribution = true,

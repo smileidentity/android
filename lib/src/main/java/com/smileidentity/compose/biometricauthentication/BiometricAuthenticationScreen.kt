@@ -63,7 +63,7 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.roundedRectCornerDashPathEffect
 import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
@@ -87,7 +87,7 @@ fun OrchestratedBiometricAuthenticationScreen(
     selfieQualityModel: SelfieQualityModel,
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    onResult: SmileIDCallback<SmartSelfieResponse> = {},
+    onResult: SmileIDCallback<SmartSelfieResult> = {},
     @Suppress("UNUSED_PARAMETER") viewModel: BiometricAuthenticationViewModel = viewModel(
         initializer = {
             BiometricAuthenticationViewModel(

@@ -380,8 +380,8 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
 }
 
 /**
- * Moves a folder from 'unsubmitted' to 'submitted' within the app's specific directory, handling all
- * edge cases.
+ * Moves a folder from 'unsubmitted' to 'submitted' within the app's specific directory, handling
+ * all edge cases.
  * @param folderName The name of the job or operation, corresponding to the folder to be moved.
  * @param savePath The base path where the 'pending' and 'complete' folders are
  * located, defaulting to SmileID.fileSavePath.
@@ -406,7 +406,8 @@ internal fun moveJobToSubmitted(
             }
         }
         if (unSubmittedPath.copyRecursively(submittedPath, overwrite = true)) {
-            // After successfully deleting JSON files, delete the original directory if empty or any remaining files
+            // After successfully deleting JSON files, delete the original directory if empty or any
+            // remaining files
             if (!unSubmittedPath.deleteRecursively()) {
                 throw IOException(
                     "Failed to delete the source directory or " +
@@ -417,7 +418,7 @@ internal fun moveJobToSubmitted(
             throw IOException("Failed to copy files to the target directory ${submittedPath.path}")
         }
     } catch (e: IOException) {
-        e.printStackTrace()
+        Timber.w(e, "Failed to move job to submitted")
         return false
     }
 
@@ -482,7 +483,8 @@ internal fun createUploadRequestFile(jobId: String, uploadRequest: UploadRequest
  *              request file with its corresponding job, ensuring that the authentication
  *              process is tied to the correct job context.
  * @param authRequest A populated instance of AuthenticationRequest containing the necessary
- *              details for the job. This includes the job type, user ID, and other relevant information
+ *                    details for the job. This includes the job type, user ID, and other relevant
+ *                    information
  * @return A File object that points to the newly created authentication request file. This file
  *         is structured to include all necessary details for processing the authentication
  *         request and is ready for submission or further action as required by the job's
@@ -494,9 +496,8 @@ internal fun createAuthenticationRequestFile(
 ): File {
     val file = createSmileJsonFile(AUTH_REQUEST_FILE, jobId)
     file.sink().buffer().use { sink ->
-        SmileID.moshi.adapter(
-            AuthenticationRequest::class.java,
-        ).toJson(sink, authRequest.copy(authToken = ""))
+        SmileID.moshi.adapter(AuthenticationRequest::class.java)
+            .toJson(sink, authRequest.copy(authToken = ""))
     }
     return file
 }

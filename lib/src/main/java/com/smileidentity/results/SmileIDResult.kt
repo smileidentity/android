@@ -1,8 +1,10 @@
 package com.smileidentity.results
 
 import android.os.Parcelable
+import com.smileidentity.SmileID
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.EnhancedKycResponse
+import com.smileidentity.models.v2.SmartSelfieResponse
 import com.squareup.moshi.JsonClass
 import java.io.File
 import kotlinx.parcelize.Parcelize
@@ -41,19 +43,19 @@ sealed interface SmileIDResult<out T : Parcelable> : Parcelable {
 }
 
 /**
- * The result of a smartselfie verification which consist of
+ * The result of a SmartSelfie verification
  *  @param selfieFile the captured selfie file
- *  @param livenessFiles optional selfie liveness files
- *  @param didSubmitSmartSelfieJob true if the job has been
- *  submitted to the SmileID apis and false if offline is enabled and the
- *  network request failed
+ *  @param livenessFiles the captured liveness files
+ *  @param apiResponse The response from the REST API. This will be null if offline mode is enabled
+ *  and the network request failed. In that case, you must use [SmileID.submitJob] to submit the
+ *  job to the SmileID API when internet connectivity is restored.
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class SmartSelfieResult(
     val selfieFile: File,
     val livenessFiles: List<File>,
-    val didSubmitSmartSelfieJob: Boolean,
+    val apiResponse: SmartSelfieResponse?,
 ) : Parcelable
 
 /**

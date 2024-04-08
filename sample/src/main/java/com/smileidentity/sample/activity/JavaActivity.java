@@ -15,7 +15,6 @@ import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
-import com.smileidentity.models.SmartSelfieJobStatusResponse;
 import com.smileidentity.results.DocumentVerificationResult;
 import com.smileidentity.results.SmartSelfieResult;
 import com.smileidentity.results.SmileIDResult;
@@ -64,7 +63,7 @@ public class JavaActivity extends FragmentActivity {
                 if (smartSelfieResult instanceof SmileIDResult.Success<SmartSelfieResult> successResult) {
                     File selfieFile = successResult.getData().getSelfieFile();
                     List<File> livenessFiles = successResult.getData().getLivenessFiles();
-                    boolean jobSubmitted = successResult.getData().getDidSubmitSmartSelfieJob();
+                    boolean jobSubmitted = successResult.getData().getApiResponse() != null;
                     // When offline mode is enabled, the job is saved offline and can be submitted later.
                     if (jobSubmitted) {
                         Timber.v("SmartSelfieEnrollment Job Submitted");

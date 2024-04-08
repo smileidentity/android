@@ -12,7 +12,7 @@ import com.smileidentity.models.JobType.DocumentVerification
 import com.smileidentity.models.JobType.EnhancedDocumentVerification
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
-import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.models.v2.SmartSelfieStatus
 import com.smileidentity.networking.pollBiometricKycJobStatus
 import com.smileidentity.networking.pollDocumentVerificationJobStatus
 import com.smileidentity.networking.pollEnhancedDocumentVerificationJobStatus
@@ -216,32 +216,38 @@ class MainScreenViewModel : ViewModel() {
         result: SmileIDResult<SmartSelfieResult>,
     ) {
         if (result is SmileIDResult.Success) {
+            val response = result.data.apiResponse ?: run {
+                val errorMessage = "SmartSelfie Enrollment completed in offline mode"
+                Timber.w(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val message = jobResultMessageBuilder(
                 jobName = "SmartSelfie Enrollment",
-                didSubmitJob = result.data.didSubmitSmartSelfieJob,
+                jobComplete = true,
+                jobSuccess = true,
+                code = response.code,
+                resultCode = null,
+                resultText = response.message,
             )
-            Timber.d("$message: $jobId $result")
             _uiState.update {
-                it.copy(
-                    clipboardText = AnnotatedString(userId),
-                    snackbarMessage = message,
-                )
+                it.copy(clipboardText = AnnotatedString(userId), snackbarMessage = message)
             }
-            if (result.data.didSubmitSmartSelfieJob) {
-                viewModelScope.launch {
-                    DataStoreRepository.addPendingJob(
-                        partnerId = SmileID.config.partnerId,
-                        isProduction = uiState.value.isProduction,
-                        job = Job(
-                            jobType = SmartSelfieEnrollment,
-                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
-                            userId = userId,
-                            jobId = jobId,
-                        ),
-                    )
-                }
-            } else {
-                Timber.w(" $jobId not saved to pending job, offline enabled")
+            viewModelScope.launch {
+                DataStoreRepository.addCompletedJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = SmartSelfieEnrollment,
+                        timestamp = response.createdAt,
+                        userId = userId,
+                        jobId = jobId,
+                        jobComplete = true,
+                        jobSuccess = response.status == SmartSelfieStatus.Approved,
+                        code = response.code,
+                        resultText = response.message,
+                    ),
+                )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -261,27 +267,36 @@ class MainScreenViewModel : ViewModel() {
         result: SmileIDResult<SmartSelfieResult>,
     ) {
         if (result is SmileIDResult.Success) {
+            val response = result.data.apiResponse ?: run {
+                val errorMessage = "SmartSelfie Authentication completed in offline mode"
+                Timber.w(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val message = jobResultMessageBuilder(
                 jobName = "SmartSelfie Authentication",
-                didSubmitJob = result.data.didSubmitSmartSelfieJob,
+                jobComplete = true,
+                jobSuccess = true,
+                code = response.code,
+                resultCode = null,
+                resultText = response.message,
             )
-            Timber.d("$message: $jobId $userId $result")
             _uiState.update { it.copy(snackbarMessage = message) }
-            if (result.data.didSubmitSmartSelfieJob) {
-                viewModelScope.launch {
-                    DataStoreRepository.addPendingJob(
-                        partnerId = SmileID.config.partnerId,
-                        isProduction = uiState.value.isProduction,
-                        job = Job(
-                            jobType = SmartSelfieAuthentication,
-                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
-                            userId = userId,
-                            jobId = jobId,
-                        ),
-                    )
-                }
-            } else {
-                Timber.w(" $jobId not saved to pending job, offline enabled")
+            viewModelScope.launch {
+                DataStoreRepository.addCompletedJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = SmartSelfieAuthentication,
+                        timestamp = response.createdAt,
+                        userId = userId,
+                        jobId = jobId,
+                        jobComplete = response.status != SmartSelfieStatus.Pending,
+                        jobSuccess = response.status == SmartSelfieStatus.Approved,
+                        code = response.code,
+                        resultText = response.message,
+                    ),
+                )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -466,19 +481,24 @@ class MainScreenViewModel : ViewModel() {
         _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricAuthentication.label) }
     }
 
-    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieResponse>) {
+    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieResult>) {
         onHomeSelected()
         if (result is SmileIDResult.Success) {
-            val response = result.data
+            val response = result.data.apiResponse ?: run {
+                val errorMessage = "Biometric Authentication completed in offline mode"
+                Timber.w(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
             val message = jobResultMessageBuilder(
                 jobName = "Biometric Authentication",
+                didSubmitJob = true,
                 jobComplete = true,
                 jobSuccess = true,
                 code = response.code,
                 resultCode = null,
                 resultText = response.message,
             )
-            Timber.d("$message: $result")
             _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
                 DataStoreRepository.addCompletedJob(
@@ -492,10 +512,7 @@ class MainScreenViewModel : ViewModel() {
                         jobComplete = true,
                         jobSuccess = true,
                         code = response.code,
-                        resultCode = null,
-                        smileJobId = null,
                         resultText = response.message,
-                        selfieImageUrl = null,
                     ),
                 )
             }
