@@ -202,6 +202,8 @@ dependencies {
     implementation(libs.accompanist.permissions)
     // CameraX Compose component
     implementation(libs.camposer)
+    // Lottie Compose component
+    implementation(libs.lottie)
 
     // Unbundled model -- will be dynamically downloaded via Google Play Services
     implementation(libs.play.services.mlkit.face.detection)

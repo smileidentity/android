@@ -9,7 +9,6 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.IdInfo
-import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
@@ -146,19 +145,10 @@ class BiometricKycViewModel(
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
-            val jobStatusRequest = JobStatusRequest(
-                jobId = authResponse.partnerParams.jobId,
-                userId = authResponse.partnerParams.userId,
-                includeImageLinks = false,
-                includeHistory = false,
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
 
             var selfieFileResult = selfieFile
             var livenessFilesResult = livenessFiles
-            // if we've gotten this far we move files
-            // to complete from pending
+            // if we've gotten this far, we move files to complete from pending
             val copySuccess = moveJobToSubmitted(jobId)
             if (copySuccess) {
                 selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
