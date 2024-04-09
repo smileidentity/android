@@ -35,10 +35,10 @@ enum class ProductScreen(
         com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
         R.drawable.smart_selfie_authentication,
     ),
-    EnhancedKyc(
-        "enhanced_kyc",
-        R.string.enhanced_kyc_product_name,
-        R.drawable.enhanced_kyc,
+    BiometricAuthentication(
+        "biometric_authentication",
+        com.smileidentity.R.string.si_biometric_authentication_product_name,
+        R.drawable.biometric_authentication,
     ),
     BiometricKyc(
         "biometric_kyc",
@@ -50,15 +50,20 @@ enum class ProductScreen(
         com.smileidentity.R.string.si_doc_v_product_name,
         R.drawable.doc_v,
     ),
-    BvnConsent(
-        "bvn_consent",
-        com.smileidentity.R.string.si_bvn_product_name,
-        R.drawable.bvn_consent,
-    ),
     EnhancedDocumentVerification(
         "enhanced_docv",
         com.smileidentity.R.string.si_enhanced_docv_product_name,
         R.drawable.enhanced_doc_v,
+    ),
+    EnhancedKyc(
+        "enhanced_kyc",
+        R.string.enhanced_kyc_product_name,
+        R.drawable.enhanced_kyc,
+    ),
+    BvnConsent(
+        "bvn_consent",
+        com.smileidentity.R.string.si_bvn_product_name,
+        R.drawable.bvn_consent,
     ),
 }
 

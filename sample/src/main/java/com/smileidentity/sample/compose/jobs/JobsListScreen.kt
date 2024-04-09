@@ -1,6 +1,7 @@
 package com.smileidentity.sample.compose.jobs
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -19,10 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
@@ -71,12 +72,14 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
             @DrawableRes
             val iconRes = when (it.jobType) {
                 SmartSelfieEnrollment -> R.drawable.si_smart_selfie_instructions_hero
-                SmartSelfieAuthentication -> R.drawable.si_smart_selfie_instructions_hero
+                SmartSelfieAuthentication ->
+                    com.smileidentity.sample.R.drawable.smart_selfie_authentication
+
                 DocumentVerification -> com.smileidentity.sample.R.drawable.doc_v
+                EnhancedDocumentVerification -> R.drawable.si_smart_selfie_instructions_hero
                 BiometricKyc -> com.smileidentity.sample.R.drawable.biometric_kyc
                 EnhancedKyc -> com.smileidentity.sample.R.drawable.enhanced_kyc
                 BVN -> com.smileidentity.sample.R.drawable.biometric_kyc
-                EnhancedDocumentVerification -> R.drawable.si_smart_selfie_instructions_hero
                 JobType.Unknown -> {
                     Timber.e("Unknown job type")
                     R.drawable.si_smart_selfie_instructions_hero
@@ -85,7 +88,7 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
             JobListItem(
                 sourceIcon = {
                     Image(
-                        painter = painterResource(id = iconRes),
+                        painter = painterResource(iconRes),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                     )
@@ -107,7 +110,6 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun JobListItem(
     sourceIcon: @Composable () -> Unit,
@@ -122,7 +124,6 @@ private fun JobListItem(
     Card(
         onClick = { expanded = !expanded },
         modifier = modifier
-            .animateContentSize()
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
@@ -131,15 +132,21 @@ private fun JobListItem(
             overlineContent = { Text(timestamp) },
             headlineContent = { Text(jobType) },
             supportingContent = {
-                if (resultText != null) {
-                    Text(resultText, style = MaterialTheme.typography.labelLarge)
-                }
-                if (expanded) {
-                    expandedContent()
-                }
-                if (isProcessing) {
-                    Spacer(modifier = Modifier.size(4.dp))
-                    LinearProgressIndicator(strokeCap = StrokeCap.Round)
+                Column {
+                    if (resultText != null) {
+                        SelectionContainer {
+                            Text(resultText, style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                    AnimatedVisibility(visible = expanded) {
+                        Column(modifier = Modifier.animateContentSize()) {
+                            expandedContent()
+                        }
+                    }
+                    if (isProcessing) {
+                        Spacer(modifier = Modifier.size(4.dp))
+                        LinearProgressIndicator(strokeCap = StrokeCap.Round)
+                    }
                 }
             },
             trailingContent = {
@@ -183,7 +190,6 @@ private fun ColumnScope.JobListItemAdditionalDetails(
     resultCode: String?,
     code: String?,
 ) {
-    // TODO: Add Actions support
     JobMetadataItem(
         label = stringResource(com.smileidentity.sample.R.string.jobs_detail_user_id_label),
         value = userId,
@@ -213,7 +219,9 @@ private fun JobMetadataItem(label: String, value: String?) {
             Spacer(modifier = Modifier.size(8.dp))
             Text(text = label, style = MaterialTheme.typography.labelMedium)
             Spacer(modifier = Modifier.size(2.dp))
-            Text(value, style = MaterialTheme.typography.bodySmall)
+            SelectionContainer {
+                Text(value, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

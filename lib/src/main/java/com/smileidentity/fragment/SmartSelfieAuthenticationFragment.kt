@@ -77,10 +77,13 @@ class SmartSelfieAuthenticationFragment : Fragment() {
          * @param jobId The job ID to associate with the SmartSelfie™ Authentication. Most often, this
          * will correspond to a unique Job ID within your own system. If not provided, a random job ID
          * will be generated.
+         * @param allowNewEnroll Whether to allow new enrollments
          * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
          * displayed allowing toggling between the back camera and front camera. If not allowed,
          * only the front camera will be used.
          * @param showAttribution Whether to show the Smile ID attribution or not.
+         * @param showInstructions Whether to show the instructions or not.
+         * @param extraPartnerParams Custom values specific to partners
          */
         @JvmStatic
         @JvmOverloads

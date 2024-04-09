@@ -6,9 +6,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class FileAdapterTest {
+class FileNameAdapterTest {
     private val adapter = Moshi.Builder()
-        .add(FileAdapter)
+        .add(FileNameAdapter)
         .build()
         .adapter(File::class.java)!!
 

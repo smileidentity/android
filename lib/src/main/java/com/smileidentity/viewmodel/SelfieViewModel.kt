@@ -17,14 +17,12 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.JobStatusRequest
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
-import com.smileidentity.models.UploadRequest
-import com.smileidentity.networking.asLivenessImage
-import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.networking.doSmartSelfieAuthentication
+import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -210,8 +208,8 @@ class SelfieViewModel(
             val bitmap = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
             lastAutoCaptureTimeMs = System.currentTimeMillis()
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                Timber.v("Capturing liveness image")
                 val livenessFile = createLivenessFile(jobId)
+                Timber.v("Capturing liveness image to $livenessFile")
                 postProcessImageBitmap(
                     bitmap = bitmap,
                     file = livenessFile,
@@ -260,7 +258,7 @@ class SelfieViewModel(
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         if (skipApiSubmission) {
-            result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, false))
+            result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
             return
         }
@@ -273,7 +271,7 @@ class SelfieViewModel(
                     SmartSelfieResult(
                         selfieFile,
                         livenessFiles,
-                        false,
+                        null,
                     ),
                 )
                 _uiState.update {
@@ -293,14 +291,15 @@ class SelfieViewModel(
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
-            val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
-            val authRequest = AuthenticationRequest(
-                jobType = jobType,
-                enrollment = isEnroll,
-                userId = userId,
-                jobId = jobId,
-            )
             if (SmileID.allowOfflineMode) {
+                // For the moment, we continue to use the async API endpoints for offline mode
+                val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
+                val authRequest = AuthenticationRequest(
+                    jobType = jobType,
+                    enrollment = isEnroll,
+                    userId = userId,
+                    jobId = jobId,
+                )
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
                     jobId,
@@ -318,42 +317,31 @@ class SelfieViewModel(
                 )
             }
 
-            val authResponse = SmileID.api.authenticate(authRequest)
-
-            val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-                // TODO : Michael will change this to boolean
-                allowNewEnroll = allowNewEnroll.toString(),
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
-
-            val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
-            val livenessImagesInfo = livenessFiles.map { it.asLivenessImage() }
-            val selfieImageInfo = selfieFile.asSelfieImage()
-            val uploadRequest = UploadRequest(livenessImagesInfo + selfieImageInfo)
-            SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
-            Timber.d("Upload finished")
-            val jobStatusRequest = JobStatusRequest(
-                jobId = authResponse.partnerParams.jobId,
-                userId = authResponse.partnerParams.userId,
-                includeImageLinks = false,
-                includeHistory = false,
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
-
-            var selfieFileResult = selfieFile
-            var livenessFilesResult = livenessFiles
-            // if we've gotten this far we move files
-            // to complete from pending
+            val apiResponse = if (isEnroll) {
+                SmileID.api.doSmartSelfieEnrollment(
+                    selfieImage = selfieFile,
+                    livenessImages = livenessFiles,
+                    userId = userId,
+                    partnerParams = extraPartnerParams,
+                    allowNewEnroll = allowNewEnroll,
+                )
+            } else {
+                SmileID.api.doSmartSelfieAuthentication(
+                    selfieImage = selfieFile,
+                    livenessImages = livenessFiles,
+                    userId = userId,
+                    partnerParams = extraPartnerParams,
+                )
+            }
+            // Move files from unsubmitted to submitted directories
             val copySuccess = moveJobToSubmitted(jobId)
-            if (copySuccess) {
-                selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+            val (selfieFileResult, livenessFilesResult) = if (copySuccess) {
+                val selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
                     Timber.w("Selfie file not found for job ID: $jobId")
                     throw IllegalStateException("Selfie file not found for job ID: $jobId")
                 }
-                livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+                val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+                selfieFileResult to livenessFilesResult
             } else {
                 Timber.w("Failed to move job $jobId to complete")
                 SmileIDCrashReporting.hub.addBreadcrumb(
@@ -363,13 +351,10 @@ class SelfieViewModel(
                         level = SentryLevel.INFO
                     },
                 )
+                selfieFile to livenessFiles
             }
             result = SmileIDResult.Success(
-                SmartSelfieResult(
-                    selfieFileResult,
-                    livenessFilesResult,
-                    true,
-                ),
+                SmartSelfieResult(selfieFileResult, livenessFilesResult, apiResponse),
             )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
@@ -394,7 +379,7 @@ class SelfieViewModel(
 
     fun onRetry() {
         // If selfie file is present, all captures were completed, so we're retrying a network issue
-        if (selfieFile != null) {
+        if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
             submitJob(selfieFile!!, livenessFiles)
         } else {
             shouldAnalyzeImages = true
