@@ -65,7 +65,7 @@ enum class SelfieHint(@DrawableRes val animation: Int) {
     NeedLight(R.drawable.si_tf_light_flash),
 }
 
-data class BiometricAuthenticationUiState(
+data class SmartSelfieV2UiState(
     val backgroundOpacity: Float = 0.8f,
     val cutoutOpacity: Float = 0.8f,
     val showBorderHighlight: Boolean = false,
@@ -75,7 +75,7 @@ data class BiometricAuthenticationUiState(
 )
 
 @kotlin.OptIn(FlowPreview::class)
-class BiometricAuthenticationViewModel(
+class SmartSelfieV2ViewModel(
     private val userId: String,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val selfieQualityModel: SelfieQualityModel,
@@ -89,11 +89,11 @@ class BiometricAuthenticationViewModel(
     ),
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(BiometricAuthenticationUiState())
+    private val _uiState = MutableStateFlow(SmartSelfieV2UiState())
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        BiometricAuthenticationUiState(),
+        SmartSelfieV2UiState(),
     )
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null

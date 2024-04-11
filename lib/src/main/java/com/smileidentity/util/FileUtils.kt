@@ -108,8 +108,8 @@ internal fun cleanupJobs(
  * pending jobs, or both, depending on the scope provided. If job IDs are specified, the cleanup is restricted to those
  * specific jobs; otherwise, it applies to all jobs within the specified scope.
  *
- * @param scope The scope of the cleanup operation, determined by the DeleteScope enum. The default is DeleteScope.CompletedJobs,
- * indicating that, by default, only completed jobs are targeted for cleanup. This parameter can be adjusted to target
+ * @param scope The scope of the cleanup operation, determined by the DeleteScope enum. The default is DeleteScope.All,
+ * indicating that, by default, all jobs are targeted for cleanup. This parameter can be adjusted to target
  * pending jobs or both pending and completed jobs, offering flexibility in how cleanup operations are conducted.
  * @param jobIds An optional list of job IDs to specifically target for cleanup. If provided, only the files associated
  * with these job IDs will be cleaned up, within the bounds of the specified scope. If null or not provided, the cleanup

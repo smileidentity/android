@@ -306,6 +306,53 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onSmartSelfieAuthenticationV2Selected() {
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthenticationV2.label) }
+    }
+
+    fun onSmartSelfieAuthenticationV2Result(result: SmileIDResult<SmartSelfieResult>) {
+        onHomeSelected()
+        if (result is SmileIDResult.Success) {
+            val response = result.data.apiResponse ?: run {
+                val errorMessage = "SmartSelfie Authentication completed in offline mode"
+                Timber.w(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
+            val message = jobResultMessageBuilder(
+                jobName = "SmartSelfie Authentication",
+                didSubmitJob = true,
+                jobComplete = true,
+                jobSuccess = true,
+                code = response.code,
+                resultCode = null,
+                resultText = response.message,
+            )
+            _uiState.update { it.copy(snackbarMessage = message) }
+            viewModelScope.launch {
+                DataStoreRepository.addCompletedJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = SmartSelfieAuthentication,
+                        timestamp = response.createdAt,
+                        userId = response.userId,
+                        jobId = response.jobId,
+                        jobComplete = true,
+                        jobSuccess = true,
+                        code = response.code,
+                        resultText = response.message,
+                    ),
+                )
+            }
+        } else if (result is SmileIDResult.Error) {
+            val th = result.throwable
+            val message = "SmartSelfie Authentication error: ${th.message}"
+            Timber.e(th, message)
+            _uiState.update { it.copy(snackbarMessage = message) }
+        }
+    }
+
     fun onEnhancedKycSelected() {
         _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedKyc.label) }
     }
@@ -472,53 +519,6 @@ class MainScreenViewModel : ViewModel() {
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
             val message = "Enhanced Document Verification error: ${th.message}"
-            Timber.e(th, message)
-            _uiState.update { it.copy(snackbarMessage = message) }
-        }
-    }
-
-    fun onBiometricAuthenticationSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricAuthentication.label) }
-    }
-
-    fun onBiometricAuthenticationResult(result: SmileIDResult<SmartSelfieResult>) {
-        onHomeSelected()
-        if (result is SmileIDResult.Success) {
-            val response = result.data.apiResponse ?: run {
-                val errorMessage = "Biometric Authentication completed in offline mode"
-                Timber.w(errorMessage)
-                _uiState.update { it.copy(snackbarMessage = errorMessage) }
-                return
-            }
-            val message = jobResultMessageBuilder(
-                jobName = "Biometric Authentication",
-                didSubmitJob = true,
-                jobComplete = true,
-                jobSuccess = true,
-                code = response.code,
-                resultCode = null,
-                resultText = response.message,
-            )
-            _uiState.update { it.copy(snackbarMessage = message) }
-            viewModelScope.launch {
-                DataStoreRepository.addCompletedJob(
-                    partnerId = SmileID.config.partnerId,
-                    isProduction = uiState.value.isProduction,
-                    job = Job(
-                        jobType = SmartSelfieAuthentication,
-                        timestamp = response.createdAt,
-                        userId = response.userId,
-                        jobId = response.jobId,
-                        jobComplete = true,
-                        jobSuccess = true,
-                        code = response.code,
-                        resultText = response.message,
-                    ),
-                )
-            }
-        } else if (result is SmileIDResult.Error) {
-            val th = result.throwable
-            val message = "Biometric Authentication error: ${th.message}"
             Timber.e(th, message)
             _uiState.update { it.copy(snackbarMessage = message) }
         }

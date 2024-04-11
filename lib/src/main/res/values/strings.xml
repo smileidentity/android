@@ -48,6 +48,9 @@
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
+    <!--  SmartSelfie Authentication V2  -->
+    <string name="si_smart_selfie_authentication_v2_product_name">SmartSelfie Authentication (New UI)</string>
+
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
     <string name="si_doc_v_instruction_skip_back_id">Skip Back of ID</string>
@@ -150,9 +153,6 @@
 
     <!--  Enhanced DocV Screen  -->
     <string name="si_enhanced_docv_product_name">Enhanced Document Verification</string>
-
-    <!--  Biometric Authentication  -->
-    <string name="si_biometric_authentication_product_name">Biometric Authentication</string>
 
     <!--  Generic Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
