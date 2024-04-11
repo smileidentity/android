@@ -1,4 +1,4 @@
-package com.smileidentity.compose.biometricauthentication
+package com.smileidentity.compose.selfie.v2
 
 import android.Manifest
 import android.os.OperationCanceledException
@@ -67,7 +67,7 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
-import com.smileidentity.viewmodel.BiometricAuthenticationViewModel
+import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ImplementationMode
@@ -82,15 +82,15 @@ const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun OrchestratedBiometricAuthenticationScreen(
+fun OrchestratedSelfieCaptureScreenV2(
     userId: String,
     selfieQualityModel: SelfieQualityModel,
     modifier: Modifier = Modifier,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
-    @Suppress("UNUSED_PARAMETER") viewModel: BiometricAuthenticationViewModel = viewModel(
+    @Suppress("UNUSED_PARAMETER") viewModel: SmartSelfieV2ViewModel = viewModel(
         initializer = {
-            BiometricAuthenticationViewModel(
+            SmartSelfieV2ViewModel(
                 userId = userId,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
@@ -123,7 +123,7 @@ fun OrchestratedBiometricAuthenticationScreen(
             dismissOnClickOutside = false,
         ),
     ) {
-        BiometricAuthenticationScreen(
+        SmartSelfieV2Screen(
             modifier = modifier
                 .height(512.dp)
                 .clip(MaterialTheme.shapes.large),
@@ -138,9 +138,9 @@ fun OrchestratedBiometricAuthenticationScreen(
  */
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
-private fun BiometricAuthenticationScreen(
+private fun SmartSelfieV2Screen(
     modifier: Modifier = Modifier,
-    viewModel: BiometricAuthenticationViewModel = viewModel(),
+    viewModel: SmartSelfieV2ViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()

@@ -84,6 +84,8 @@ class SmartSelfieAuthenticationFragment : Fragment() {
          * @param showAttribution Whether to show the Smile ID attribution or not.
          * @param showInstructions Whether to show the instructions or not.
          * @param extraPartnerParams Custom values specific to partners
+         * @param useExperimentalUi Whether to use the new experimental UI. Note that not all
+         * parameters are supported in the experimental UI.
          */
         @JvmStatic
         @JvmOverloads
@@ -95,6 +97,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
             extraPartnerParams: HashMap<String, String>? = null,
+            useExperimentalUi: Boolean = false,
         ) = SmartSelfieAuthenticationFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
@@ -104,6 +107,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
                 this.extraPartnerParams = extraPartnerParams
+                this.useExperimentalUi = useExperimentalUi
             }
         }
 
@@ -129,6 +133,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
                 showAttribution = args.showAttribution,
                 showInstructions = args.showInstructions,
                 extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+                useExperimentalUi = args.useExperimentalUi,
                 onResult = {
                     setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
                 },
@@ -171,6 +176,11 @@ private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private var Bundle.extraPartnerParams: HashMap<String, String>?
     get() = getSerializableCompat(KEY_EXTRA_PARTNER_PARAMS)
     set(value) = putSerializable(KEY_EXTRA_PARTNER_PARAMS, value)
+
+private const val KEY_USE_EXPERIMENTAL_UI = "useExperimentalUi"
+private var Bundle.useExperimentalUi: Boolean
+    get() = getBoolean(KEY_USE_EXPERIMENTAL_UI)
+    set(value) = putBoolean(KEY_USE_EXPERIMENTAL_UI, value)
 
 private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
     get() = getParcelableCompat(KEY_RESULT)!!

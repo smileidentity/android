@@ -54,7 +54,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.SmileID
-import com.smileidentity.compose.BiometricAuthentication
 import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
@@ -96,7 +95,7 @@ fun MainScreen(
     val dialogDestinations = remember {
         listOf(
             "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
-            "^${ProductScreen.BiometricAuthentication.route}.*$".toRegex(),
+            "^${ProductScreen.SmartSelfieAuthenticationV2.route}.*$".toRegex(),
         )
     }
     val clipboardManager = LocalClipboardManager.current
@@ -211,6 +210,28 @@ fun MainScreen(
                         allowAgentMode = true,
                     ) { result ->
                         viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
+                        navController.popBackStack()
+                    }
+                }
+                dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
+                    SmartSelfieAuthenticationUserIdInputDialog(
+                        onDismiss = {
+                            viewModel.onHomeSelected()
+                            navController.popBackStack()
+                        },
+                        onConfirm = { userId ->
+                            navController.navigate(
+                                "${ProductScreen.SmartSelfieAuthenticationV2.route}/$userId",
+                            ) { popUpTo(BottomNavigationScreen.Home.route) }
+                        },
+                    )
+                }
+                dialog(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
+                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                    SmileID.SmartSelfieAuthentication(userId = userId, useExperimentalUi = true) {
+                        viewModel.onSmartSelfieAuthenticationV2Result(it)
                         navController.popBackStack()
                     }
                 }
@@ -348,28 +369,6 @@ fun MainScreen(
                             )
                         },
                     )
-                }
-                dialog(ProductScreen.BiometricAuthentication.route) {
-                    LaunchedEffect(Unit) { viewModel.onBiometricAuthenticationSelected() }
-                    SmartSelfieAuthenticationUserIdInputDialog(
-                        onDismiss = {
-                            viewModel.onHomeSelected()
-                            navController.popBackStack()
-                        },
-                        onConfirm = { userId ->
-                            navController.navigate(
-                                "${ProductScreen.BiometricAuthentication.route}/$userId",
-                            ) { popUpTo(BottomNavigationScreen.Home.route) }
-                        },
-                    )
-                }
-                dialog(ProductScreen.BiometricAuthentication.route + "/{userId}") {
-                    LaunchedEffect(Unit) { viewModel.onBiometricAuthenticationSelected() }
-                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.BiometricAuthentication(userId = userId) { result ->
-                        viewModel.onBiometricAuthenticationResult(result)
-                        navController.popBackStack()
-                    }
                 }
             }
         },
