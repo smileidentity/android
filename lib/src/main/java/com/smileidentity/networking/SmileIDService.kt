@@ -78,7 +78,7 @@ interface SmileIDService {
     @SmileHeaderMetadata
     @SmileIDOptIn
     @Multipart
-    @POST("/v2/smart-selfie-enrollment")
+    @POST("/v2/smart-selfie-enroll")
     suspend fun doSmartSelfieEnrollment(
         @Part selfieImage: MultipartBody.Part,
         @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
