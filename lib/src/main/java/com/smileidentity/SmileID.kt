@@ -278,7 +278,7 @@ object SmileID {
     @JvmStatic
     suspend fun submitJob(
         jobId: String,
-        deleteFilesOnSuccess: Boolean = false,
+        deleteFilesOnSuccess: Boolean = true,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         exceptionHandler: ((Throwable) -> Unit)? = null,
     ): Job = scope.launch(
