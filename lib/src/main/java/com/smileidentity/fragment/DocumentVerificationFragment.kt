@@ -133,6 +133,7 @@ class DocumentVerificationFragment : Fragment() {
                 allowGalleryUpload = args.allowGalleryUpload,
                 showInstructions = args.showInstructions,
                 idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
+                captureBothSides = args.captureBothSides,
                 bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
                 extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
                 onResult = {

@@ -43,6 +43,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -60,6 +61,8 @@ import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
+import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -230,10 +233,16 @@ fun MainScreen(
                 dialog(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.SmartSelfieAuthentication(userId = userId, useExperimentalUi = true) {
-                        viewModel.onSmartSelfieAuthenticationV2Result(it)
-                        navController.popBackStack()
-                    }
+                    val context = LocalContext.current
+                    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+                    OrchestratedSelfieCaptureScreenV2(
+                        userId = userId,
+                        selfieQualityModel = selfieQualityModel,
+                        onResult = {
+                            viewModel.onSmartSelfieAuthenticationV2Result(it)
+                            navController.popBackStack()
+                        },
+                    )
                 }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }

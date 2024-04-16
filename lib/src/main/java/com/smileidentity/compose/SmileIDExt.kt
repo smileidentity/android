@@ -99,7 +99,7 @@ fun SmileID.SmartSelfieEnrollment(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-authentication)
  *
  * @param userId The user ID to authenticate with the SmartSelfie™ Authentication. This should be
- * an ID that was previously registered via a SmartSelfie™ Enrollment
+ * an ID previously registered via a SmartSelfie™ Enrollment
  * (see: [SmileID.SmartSelfieEnrollment])
  * @param jobId The job ID to associate with the SmartSelfie™ Authentication. Most often, this
  * will correspond to a unique Job ID within your own system. If not provided, a random job ID
@@ -110,8 +110,6 @@ fun SmileID.SmartSelfieEnrollment(
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
  * @param extraPartnerParams Custom values specific to partners
- * @param useExperimentalUi Whether to use the new experimental UI. Note that not all parameters are
- * supported in the experimental UI.
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -128,11 +126,12 @@ fun SmileID.SmartSelfieAuthentication(
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    useExperimentalUi: Boolean = false,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    // TODO: Move this to a function parameter once we decided to expose it
+    val useExperimentalUi = false
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         if (useExperimentalUi) {
             val context = LocalContext.current
@@ -258,6 +257,8 @@ fun SmileID.DocumentVerification(
  * @param idAspectRatio The aspect ratio of the ID to be captured. If not specified, the aspect
  * ratio will attempt to be inferred from the device's camera. If that fails, it will default to a
  * standard size of ~1.6
+ * @param bypassSelfieCaptureWithFile If provided, the user will not be prompted to take a selfie
+ * and instead the provided file will be used as the selfie image
  * @param userId The user ID to associate with the Enhanced Document Verification. Most often, this will
  * correspond to a unique User ID within your own system. If not provided, a random user ID will be
  * generated
@@ -285,6 +286,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     documentType: String? = null,
     captureBothSides: Boolean = true,
     idAspectRatio: Float? = null,
+    bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowNewEnroll: Boolean = false,
@@ -318,6 +320,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
+                        selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
                     )
                 },

@@ -60,6 +60,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
+import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.roundedRectCornerDashPathEffect
 import com.smileidentity.ml.SelfieQualityModel
@@ -81,6 +82,7 @@ import kotlinx.collections.immutable.persistentMapOf
 const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 
 @OptIn(ExperimentalPermissionsApi::class)
+@SmileIDOptIn
 @Composable
 fun OrchestratedSelfieCaptureScreenV2(
     userId: String,
