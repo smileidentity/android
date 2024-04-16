@@ -21,6 +21,7 @@ import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import java.io.File
 import kotlinx.collections.immutable.toImmutableMap
 
 /**
@@ -84,6 +85,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
+            bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = EnhancedDocumentVerificationFragment().apply {
             arguments = Bundle().apply {
@@ -98,6 +100,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
         }
@@ -127,6 +130,8 @@ class EnhancedDocumentVerificationFragment : Fragment() {
                 allowAgentMode = args.allowAgentMode,
                 allowGalleryUpload = args.allowGalleryUpload,
                 showInstructions = args.showInstructions,
+                captureBothSides = args.captureBothSides,
+                bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
                 idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
                 extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
                 onResult = {
@@ -190,7 +195,13 @@ private var Bundle.idAspectRatio: Float
     get() = getFloat(KEY_ID_ASPECT_RATIO)
     set(value) = putFloat(KEY_ID_ASPECT_RATIO, value)
 
+private const val KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE = "bypassSelfieCaptureWithFile"
+private var Bundle.bypassSelfieCaptureWithFile: File?
+    get() = getSerializableCompat(KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE) as File?
+    set(value) = putSerializable(KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE, value)
+
 private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
+
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
