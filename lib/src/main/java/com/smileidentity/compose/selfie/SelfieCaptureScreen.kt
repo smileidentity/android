@@ -1,5 +1,6 @@
 package com.smileidentity.compose.selfie
 
+import androidx.camera.core.ImageAnalysis
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -20,7 +21,6 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,17 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.randomJobId
-import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
-import com.smileidentity.viewmodel.SelfieViewModel
-import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
@@ -57,31 +51,17 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
  */
 @Composable
 fun SelfieCaptureScreen(
+    imageAnalyzer: ImageAnalysis.Analyzer,
+    captureProgress: Float,
+    directive: String,
     modifier: Modifier = Modifier,
-    userId: String = rememberSaveable { randomUserId() },
-    jobId: String = rememberSaveable { randomJobId() },
-    allowNewEnroll: Boolean = false,
-    isEnroll: Boolean = true,
-    allowAgentMode: Boolean = true,
-    skipApiSubmission: Boolean = false,
-    viewModel: SelfieViewModel = viewModel(
-        factory = viewModelFactory {
-            SelfieViewModel(
-                isEnroll = isEnroll,
-                userId = userId,
-                jobId = jobId,
-                allowNewEnroll = allowNewEnroll,
-                skipApiSubmission = skipApiSubmission,
-            )
-        },
-    ),
+    allowAgentMode: Boolean = false,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
     val viewfinderZoom = 1.1f
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
-    // Force maximum brightness in order to light up the user's face
+    // Force maximum brightness to light up the user's face
     ForceBrightness()
     Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
@@ -89,7 +69,7 @@ fun SelfieCaptureScreen(
             camSelector = camSelector,
             implementationMode = ImplementationMode.Performance,
             imageAnalyzer = cameraState.rememberImageAnalyzer(
-                analyze = viewModel::analyzeImage,
+                analyze = imageAnalyzer,
                 // Guarantees only one image will be delivered for analysis at a time
                 imageAnalysisBackpressureStrategy = KeepOnlyLatest,
             ),
@@ -105,7 +85,7 @@ fun SelfieCaptureScreen(
                 .scale(viewfinderZoom),
         )
         val animatedProgress by animateFloatAsState(
-            targetValue = uiState.progress,
+            targetValue = captureProgress,
             animationSpec = tween(easing = LinearEasing),
             label = "selfie_progress",
         )
@@ -124,7 +104,7 @@ fun SelfieCaptureScreen(
                 .fillMaxSize(),
         ) {
             Text(
-                text = stringResource(uiState.directive.displayText),
+                text = directive,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,
@@ -177,6 +157,11 @@ private fun AgentModeSwitch(isAgentModeEnabled: Boolean, onCamSelectorChange: (B
 @Composable
 private fun SelfieCaptureScreenPreview() {
     Preview {
-        SelfieCaptureScreen(allowAgentMode = true)
+        SelfieCaptureScreen(
+            imageAnalyzer = { },
+            captureProgress = 0.5f,
+            directive = "Example Directive",
+            allowAgentMode = true,
+        )
     }
 }

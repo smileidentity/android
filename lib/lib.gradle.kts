@@ -205,6 +205,9 @@ dependencies {
     // Lottie Compose component
     implementation(libs.lottie)
 
+    // Navigation with Compose integration
+    implementation(libs.androidx.navigation.compose)
+
     // Unbundled model -- will be dynamically downloaded via Google Play Services
     implementation(libs.play.services.mlkit.face.detection)
 

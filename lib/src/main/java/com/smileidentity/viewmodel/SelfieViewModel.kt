@@ -360,7 +360,7 @@ class SelfieViewModel(
         }
     }
 
-    fun onSelfieRejected() {
+    fun clearPreviousCapture() {
         _uiState.update {
             it.copy(
                 processingState = null,
