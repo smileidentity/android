@@ -106,15 +106,13 @@ class SelfieViewModel(
     )
     var result: SmileIDResult<SmartSelfieResult>? = null
 
+    @VisibleForTesting
+    internal var selfieFile: File? = null
     private val livenessFiles = mutableListOf<File>()
-    private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
     private var previousHeadRotationX = Float.POSITIVE_INFINITY
     private var previousHeadRotationY = Float.POSITIVE_INFINITY
     private var previousHeadRotationZ = Float.POSITIVE_INFINITY
-
-    @VisibleForTesting
-    internal var shouldAnalyzeImages = true
 
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -127,7 +125,7 @@ class SelfieViewModel(
     internal fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
-        if (!shouldAnalyzeImages || elapsedTimeMs < INTRA_IMAGE_MIN_DELAY_MS || image == null) {
+        if (selfieFile != null || elapsedTimeMs < INTRA_IMAGE_MIN_DELAY_MS || image == null) {
             imageProxy.close()
             return
         }
@@ -229,7 +227,6 @@ class SelfieViewModel(
                     compressionQuality = 80,
                     maxOutputSize = SELFIE_IMAGE_SIZE,
                 )
-                shouldAnalyzeImages = false
                 _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
             }
         }.addOnFailureListener { exception ->
@@ -361,6 +358,12 @@ class SelfieViewModel(
     }
 
     fun clearPreviousCapture() {
+        livenessFiles.forEach { it.delete() }
+        livenessFiles.clear()
+        selfieFile?.delete()?.also { deleted ->
+            if (!deleted) Timber.w("Failed to delete $selfieFile")
+        }
+        selfieFile = null
         _uiState.update {
             it.copy(
                 processingState = null,
@@ -368,32 +371,27 @@ class SelfieViewModel(
                 progress = 0f,
             )
         }
-        selfieFile?.delete()?.also { deleted ->
-            if (!deleted) Timber.w("Failed to delete $selfieFile")
-        }
-        livenessFiles.removeAll { it.delete() }
-        selfieFile = null
         result = null
-        shouldAnalyzeImages = true
     }
 
-    fun onRetry() {
+    /**
+     * Retry the job submission if it failed due to a network issue.
+     * Retry capture if selfie or liveness capture failed
+     *
+     * @return true if the retry was a network error, false when capture
+     */
+    fun onRetry(): Boolean {
         // If selfie file is present, all captures were completed, so we're retrying a network issue
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
-            submitJob(selfieFile!!, livenessFiles)
+            submitJob()
+            return true
         } else {
-            shouldAnalyzeImages = true
-            _uiState.update {
-                it.copy(processingState = null)
-            }
+            clearPreviousCapture()
+            return false
         }
     }
 
-    fun submitJob() {
-        submitJob(selfieFile!!, livenessFiles)
-    }
+    fun submitJob() = submitJob(selfieFile!!, livenessFiles)
 
-    fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
-        callback(result!!)
-    }
+    fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) = callback(result!!)
 }

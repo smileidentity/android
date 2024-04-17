@@ -7,6 +7,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -53,7 +54,7 @@ class SelfieViewModelTest {
         val proxy = mockk<ImageProxy>()
         every { proxy.image } returns mockk(relaxed = true)
         every { proxy.close() } returns Unit
-        subject.shouldAnalyzeImages = false
+        subject.selfieFile = File("/tmp")
 
         // when
         subject.analyzeImage(proxy)

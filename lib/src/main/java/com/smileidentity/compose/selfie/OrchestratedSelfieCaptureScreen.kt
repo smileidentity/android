@@ -2,6 +2,7 @@ package com.smileidentity.compose.selfie
 
 import android.graphics.BitmapFactory
 import android.os.OperationCanceledException
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -110,6 +111,11 @@ fun OrchestratedSelfieCaptureScreen(
                     }
                 }
                 composable("capture") {
+                    BackHandler {
+                        // TODO: check this behavior when showInstructions is false
+                        viewModel.clearPreviousCapture()
+                        navController.popBackStack()
+                    }
                     SelfieCaptureScreen(
                         modifier = modifier,
                         imageAnalyzer = viewModel::analyzeImage,
@@ -188,7 +194,12 @@ fun OrchestratedSelfieCaptureScreen(
                         retryButtonText = stringResource(
                             R.string.si_smart_selfie_processing_retry_button,
                         ),
-                        onRetry = viewModel::onRetry,
+                        onRetry = {
+                            val isNetworkRetry = viewModel.onRetry()
+                            if (!isNetworkRetry) {
+                                navController.popBackStack("capture", inclusive = false)
+                            }
+                        },
                         closeButtonText = stringResource(
                             R.string.si_smart_selfie_processing_close_button,
                         ),
