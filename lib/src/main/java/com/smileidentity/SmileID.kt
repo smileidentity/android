@@ -238,19 +238,17 @@ object SmileID {
      * to be specified for cleanup.
      *
      * @param jobId The ID of the job to clean up.Helpful methods for obtaining job
-     *  *              IDs include: [doGetSubmittedJobs] [doGetUnsubmittedJobs]
+     * IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobId: String) = cleanupJobs(jobIds = listOf(jobId))
 
     /**
      * Initiates the cleanup process for multiple jobs by their IDs.
-     * If no IDs are provided, a default cleanup process is initiated that may target
-     * specific jobs based on the implementation in com.smileidentity.util.cleanup.
      *
      * @param jobIds An optional list of job IDs to clean up. If null, the method defaults to
-     * a predefined cleanup process.  Helpful methods for obtaining
-     * job IDs include:[doGetSubmittedJobs], [doGetUnsubmittedJobs]
+     * cleaning all jobs. Helpful methods for obtaining job IDs include: [getSubmittedJobs],
+     * [getUnsubmittedJobs]
      */
     @JvmStatic
     fun cleanup(jobIds: List<String>? = null) = cleanupJobs(jobIds = jobIds)
@@ -258,14 +256,8 @@ object SmileID {
     /**
      * Submits a previously captured job to SmileID for processing.
      *
-     * @param jobId The unique identifier for the job to be submitted. This ID should be obtained
-     *              through the appropriate SmileID service mechanism and is used to track and
-     *              manage the job within SmileID's processing system. Helpful methods for
-     *              obtaining job  IDs include: [getSubmittedJobs] [getUnsubmittedJobs]
-     *
-     * Usage:
-     * To use this function, ensure you are calling it from a coroutine scope or
-     * another suspend function. For example, in a coroutine scope:
+     * Ensure you are calling this from a coroutine scope or another suspend function.
+     * For example, in a coroutine scope:
      *
      * ```kotlin
      * coroutineScope {
@@ -274,6 +266,11 @@ object SmileID {
      * ```
      * Note: Ensure that the jobId provided is valid and that your environment is properly set up
      * to handle potential network responses, including success, failure, or error cases.
+     *
+     * @param jobId The unique identifier for the job to be submitted. This ID should be obtained
+     * through the appropriate SmileID service mechanism and is used to track and manage the job
+     * within SmileID's processing system. Helpful methods for obtaining job IDs include:
+     * [getSubmittedJobs] [getUnsubmittedJobs]
      */
     @JvmStatic
     suspend fun submitJob(

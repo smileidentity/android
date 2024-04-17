@@ -14,6 +14,7 @@
     <string name="si_cd_logo">Smile ID logo</string>
     <string name="si_cd_agent_mode_enabled">Agent Mode enabled</string>
     <string name="si_cd_selfie_capture_instructions">Selfie Capture instructions</string>
+    <string name="si_cd_close">Close</string>
 
     <!--  Generic Instructions  -->
     <string name="si_photo_capture_instruction_good_light_title">Good Light</string>
