@@ -122,7 +122,7 @@ class DocumentCaptureViewModel(
      * taps the manual capture button.
      */
     fun captureDocument(cameraState: CameraState) {
-        if (isCapturing) {
+        if (isCapturing || uiState.value.documentImageToConfirm != null) {
             Timber.v("Already capturing. Skipping duplicate capture request")
             return
         }
@@ -132,7 +132,6 @@ class DocumentCaptureViewModel(
         }
         val documentFile = createDocumentFile(jobId, (side == DocumentCaptureSide.Front))
         cameraState.takePicture(documentFile) { result ->
-            isCapturing = false
             when (result) {
                 is ImageCaptureResult.Success -> {
                     _uiState.update {
@@ -153,6 +152,8 @@ class DocumentCaptureViewModel(
                     }
                 }
             }
+            // NB: This should be set to false last after processing is done for the captured image
+            isCapturing = false
         }
     }
 
@@ -243,7 +244,9 @@ class DocumentCaptureViewModel(
                     )
                 }
 
-                if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing && !isFocusing) {
+                if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing && !isFocusing &&
+                    uiState.value.documentImageToConfirm == null
+                ) {
                     captureNextAnalysisFrame = false
                     captureDocument(cameraState)
                 }
