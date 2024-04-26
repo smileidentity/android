@@ -6,11 +6,7 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
-import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
@@ -130,7 +126,7 @@ fun Bitmap.rotated(rotationDegrees: Int, flipX: Boolean = false, flipY: Boolean 
 
 /**
  * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
- * [maxOutputSize], but maintains the aspect ratio. The image can also converted to grayscale.
+ * [maxOutputSize], but maintains the aspect ratio.
  *
  * Only one of [maxOutputSize] or [desiredAspectRatio] can be set. Setting both is not supported,
  * and will throw an [IllegalArgumentException].
@@ -139,7 +135,6 @@ fun Bitmap.rotated(rotationDegrees: Int, flipX: Boolean = false, flipY: Boolean 
 internal fun postProcessImageBitmap(
     bitmap: Bitmap,
     file: File,
-    saveAsGrayscale: Boolean = false,
     processRotation: Boolean = false,
     @IntRange(from = 0, to = 100) compressionQuality: Int = 100,
     maxOutputSize: Size? = null,
@@ -150,12 +145,6 @@ internal fun postProcessImageBitmap(
         throw IllegalArgumentException("Only one of maxOutputSize or desiredAspectRatio can be set")
     }
     var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-    if (saveAsGrayscale) {
-        val canvas = Canvas(mutableBitmap)
-        val colorMatrix = ColorMatrix().apply { setSaturation(0f) }
-        val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(colorMatrix) }
-        canvas.drawBitmap(mutableBitmap, 0f, 0f, paint)
-    }
 
     if (processRotation) {
         val exif = Exif.createFromFile(file)
@@ -232,7 +221,6 @@ internal fun postProcessImageBitmap(
  */
 internal fun postProcessImage(
     file: File,
-    saveAsGrayscale: Boolean = false,
     processRotation: Boolean = true,
     compressionQuality: Int = 100,
     desiredAspectRatio: Float? = null,
@@ -241,7 +229,6 @@ internal fun postProcessImage(
     return postProcessImageBitmap(
         bitmap = bitmap,
         file = file,
-        saveAsGrayscale = saveAsGrayscale,
         processRotation = processRotation,
         compressionQuality = compressionQuality,
         desiredAspectRatio = desiredAspectRatio,

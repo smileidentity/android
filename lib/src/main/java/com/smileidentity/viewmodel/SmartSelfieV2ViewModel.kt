@@ -243,7 +243,6 @@ class SmartSelfieV2ViewModel(
                 postProcessImageBitmap(
                     bitmap = fullSelfieBmp,
                     file = livenessFile,
-                    saveAsGrayscale = false,
                     compressionQuality = 80,
                     maxOutputSize = LIVENESS_IMAGE_SIZE,
                 )
@@ -259,7 +258,6 @@ class SmartSelfieV2ViewModel(
             postProcessImageBitmap(
                 bitmap = fullSelfieBmp,
                 file = selfieFile,
-                saveAsGrayscale = false,
                 compressionQuality = 80,
                 maxOutputSize = SELFIE_IMAGE_SIZE,
             )
