@@ -223,6 +223,7 @@ fun SmileID.DocumentVerification(
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
+            captureBothSides = captureBothSides,
             idAspectRatio = idAspectRatio,
             onResult = onResult,
             viewModel = viewModel(
@@ -308,6 +309,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
+            captureBothSides = captureBothSides,
             idAspectRatio = idAspectRatio,
             onResult = onResult,
             viewModel = viewModel(

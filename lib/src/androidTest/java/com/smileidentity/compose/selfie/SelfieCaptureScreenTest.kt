@@ -43,7 +43,11 @@ class SelfieCaptureScreenTest {
         // when
         composeTestRule.setContent {
             permissionState = rememberPermissionState(Manifest.permission.CAMERA)
-            SelfieCaptureScreen()
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+            )
         }
 
         // then
@@ -58,7 +62,13 @@ class SelfieCaptureScreenTest {
         val attributionTag = "smile_id_attribution"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen() }
+        composeTestRule.setContent {
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+            )
+        }
 
         // then
         composeTestRule.onNodeWithTag(attributionTag).assertIsDisplayed()
@@ -71,7 +81,14 @@ class SelfieCaptureScreenTest {
         val switchTag = "agent_mode_switch"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen(allowAgentMode = true) }
+        composeTestRule.setContent {
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+                allowAgentMode = true,
+            )
+        }
 
         // then
         composeTestRule.onNodeWithText(labelText).assertIsDisplayed()
@@ -85,7 +102,14 @@ class SelfieCaptureScreenTest {
         val switchTag = "agent_mode_switch"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen(allowAgentMode = false) }
+        composeTestRule.setContent {
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+                allowAgentMode = false,
+            )
+        }
 
         // then
         composeTestRule.onNodeWithText(labelText).assertDoesNotExist()
@@ -98,7 +122,13 @@ class SelfieCaptureScreenTest {
         val cameraPreviewTag = "selfie_camera_preview"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen() }
+        composeTestRule.setContent {
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+            )
+        }
 
         // then
         composeTestRule.onNodeWithTag(cameraPreviewTag).assertIsDisplayed()
@@ -110,7 +140,13 @@ class SelfieCaptureScreenTest {
         val instructionsSubstring = "Put your face inside the oval"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen() }
+        composeTestRule.setContent {
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+            )
+        }
 
         // then
         composeTestRule.onNodeWithText(instructionsSubstring, substring = true).assertIsDisplayed()
@@ -122,7 +158,13 @@ class SelfieCaptureScreenTest {
         val directiveSubstring = "Put your face inside the oval frame and wait until it turns green"
 
         // when
-        composeTestRule.setContent { SelfieCaptureScreen() }
+        composeTestRule.setContent {
+            SelfieCaptureScreen(
+                imageAnalyzer = { },
+                captureProgress = 0f,
+                directive = "Directive",
+            )
+        }
 
         // then
         composeTestRule.onNodeWithText(directiveSubstring, substring = true).assertIsDisplayed()
@@ -138,7 +180,13 @@ class SelfieCaptureScreenTest {
 
         // when
         composeTestRule.apply {
-            setContent { SelfieCaptureScreen(viewModel = viewModel) }
+            setContent {
+                SelfieCaptureScreen(
+                    imageAnalyzer = viewModel::analyzeImage,
+                    captureProgress = 0f,
+                    directive = "Directive",
+                )
+            }
             waitUntilAtLeastOneExists(hasTestTag(takePictureTag))
         }
 

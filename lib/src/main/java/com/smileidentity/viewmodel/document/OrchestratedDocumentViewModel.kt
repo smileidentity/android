@@ -9,7 +9,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
@@ -46,7 +45,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
-    val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
+    val processingState: ProcessingState? = null,
     @StringRes val errorMessage: Int? = null,
 )
 
@@ -73,14 +72,14 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     protected var documentFrontFile: File? = null
     protected var documentBackFile: File? = null
     protected var livenessFiles: List<File>? = null
-    private var stepToRetry: DocumentCaptureFlow? = null
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
+        _uiState.update {
+            it.copy(errorMessage = null)
+        }
         if (captureBothSides) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture, errorMessage = null)
-            }
+
         } else if (selfieFile == null) {
             _uiState.update {
                 it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)

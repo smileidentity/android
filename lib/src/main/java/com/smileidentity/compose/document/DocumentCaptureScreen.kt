@@ -8,6 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +28,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -46,6 +50,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
@@ -99,6 +106,7 @@ fun DocumentCaptureScreen(
         key = side.name,
     ),
 ) {
+    val navController = rememberNavController()
     val context = LocalContext.current
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -112,17 +120,29 @@ fun DocumentCaptureScreen(
             if (isValidDocumentImage(context, uri)) {
                 val selectedPhotoFile = generateFileFromUri(uri = uri, context = context)
                 viewModel.onPhotoSelectedFromGallery(selectedPhotoFile)
+                navController.navigate("confirmation")
             } else {
                 context.toast(R.string.si_doc_v_validation_image_too_small)
             }
         },
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val documentImageToConfirm = uiState.documentImageToConfirm
     val captureError = uiState.captureError
-    when {
-        captureError != null -> onError(captureError)
-        showInstructions && !uiState.acknowledgedInstructions -> {
+    val startingDestination = if (showInstructions) "instructions" else "capture"
+    LaunchedEffect(captureError) {
+        if (captureError != null) {
+            onError(captureError)
+        }
+    }
+    NavHost(
+        navController = navController,
+        startDestination = startingDestination,
+        enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+        exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+        popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+        popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
+    ) {
+        composable("instructions") {
             DocumentCaptureInstructionsScreen(
                 heroImage = instructionsHeroImage,
                 title = instructionsTitleText,
@@ -131,16 +151,38 @@ fun DocumentCaptureScreen(
                 allowPhotoFromGallery = allowGallerySelection,
                 showSkipButton = showSkipButton,
                 onInstructionsAcknowledgedSelectFromGallery = {
-                    Timber.v("onInstructionsAcknowledgedSelectFromGallery")
                     SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
                     photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
                 },
-                onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
+                onInstructionsAcknowledgedTakePhoto = { navController.navigate("capture") },
                 onSkip = onSkip,
             )
         }
-
-        documentImageToConfirm != null -> {
+        composable("capture") {
+            val aspectRatio by animateFloatAsState(
+                targetValue = uiState.idAspectRatio,
+                label = "ID Aspect Ratio",
+            )
+            CaptureScreenContent(
+                titleText = captureTitleText,
+                subtitleText = stringResource(id = uiState.directive.displayText),
+                idAspectRatio = aspectRatio,
+                areEdgesDetected = uiState.areEdgesDetected,
+                showCaptureInProgress = uiState.showCaptureInProgress,
+                showManualCaptureButton = uiState.showManualCaptureButton,
+                onCaptureClicked = viewModel::captureDocument,
+                imageAnalyzer = viewModel::analyze,
+                onFocusEvent = viewModel::onFocusEvent,
+                modifier = modifier,
+            )
+            LaunchedEffect(uiState.documentImageToConfirm) {
+                if (uiState.documentImageToConfirm != null) {
+                    navController.navigate("confirmation")
+                }
+            }
+        }
+        composable("confirmation") {
+            val documentImageToConfirm = uiState.documentImageToConfirm ?: return@composable
             val painter = remember {
                 val path = documentImageToConfirm.absolutePath
                 try {
@@ -164,33 +206,17 @@ fun DocumentCaptureScreen(
                 retakeButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_retake_button,
                 ),
-                onRetake = viewModel::onRetry,
-            )
-        }
-
-        else -> {
-            val aspectRatio by animateFloatAsState(
-                targetValue = uiState.idAspectRatio,
-                label = "ID Aspect Ratio",
-            )
-            CaptureScreenContent(
-                titleText = captureTitleText,
-                subtitleText = stringResource(id = uiState.directive.displayText),
-                idAspectRatio = aspectRatio,
-                areEdgesDetected = uiState.areEdgesDetected,
-                showCaptureInProgress = uiState.showCaptureInProgress,
-                showManualCaptureButton = uiState.showManualCaptureButton,
-                onCaptureClicked = viewModel::captureDocument,
-                imageAnalyzer = viewModel::analyze,
-                onFocusEvent = viewModel::onFocusEvent,
-                modifier = modifier,
+                onRetake = {
+                    viewModel.onRetry()
+                    navController.popBackStack()
+                },
             )
         }
     }
 }
 
 @Composable
-private fun CaptureScreenContent(
+fun CaptureScreenContent(
     titleText: String,
     subtitleText: String,
     idAspectRatio: Float,
@@ -202,7 +228,10 @@ private fun CaptureScreenContent(
     onFocusEvent: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cameraState = rememberCameraState()
+    // val cameraState = rememberCameraState()
+    val context = LocalContext.current
+    val cameraState by rememberUpdatedState(newValue = CameraState(context))
+    val cameraState = remember(context) {CameraState(context)}
     val camSelector by rememberCamSelector(CamSelector.Back)
     val lifecycleOwner = LocalLifecycleOwner.current
     cameraState.controller.tapToFocusState.observe(lifecycleOwner, onFocusEvent)
@@ -283,7 +312,7 @@ private fun CaptureScreenContent(
 }
 
 @Composable
-private fun CaptureDocumentButton(modifier: Modifier = Modifier, onCaptureClicked: () -> Unit) {
+fun CaptureDocumentButton(modifier: Modifier = Modifier, onCaptureClicked: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.si_camera_capture),
         contentDescription = "smile_camera_capture",

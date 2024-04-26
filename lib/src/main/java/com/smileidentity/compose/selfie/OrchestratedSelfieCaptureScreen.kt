@@ -89,7 +89,7 @@ fun OrchestratedSelfieCaptureScreen(
             navController.navigate("confirmation")
         }
     }
-    Box {
+    Box(modifier = modifier) {
         Scaffold {
             NavHost(
                 navController = navController,
@@ -103,10 +103,7 @@ fun OrchestratedSelfieCaptureScreen(
                 popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
             ) {
                 composable("instructions") {
-                    SmartSelfieInstructionsScreen(
-                        modifier = modifier,
-                        showAttribution = showAttribution,
-                    ) {
+                    SmartSelfieInstructionsScreen(showAttribution = showAttribution) {
                         navController.navigate("capture")
                     }
                 }
@@ -117,7 +114,6 @@ fun OrchestratedSelfieCaptureScreen(
                         navController.popBackStack()
                     }
                     SelfieCaptureScreen(
-                        modifier = modifier,
                         imageAnalyzer = viewModel::analyzeImage,
                         captureProgress = uiState.progress,
                         directive = stringResource(uiState.directive.displayText),

@@ -31,6 +31,7 @@ fun calculateSignature(timestamp: String): String {
 
 fun UploadRequest.zip(): File {
     val uploadRequest = deDupedUploadRequest(this)
+    // sometimes this fails creating file?
     val zipFile = File.createTempFile("upload", ".zip")
     val zipOutputStream = ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFile)))
 

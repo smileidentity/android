@@ -38,7 +38,6 @@ private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
 private const val DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS = 1_000L
 
 data class DocumentCaptureUiState(
-    val acknowledgedInstructions: Boolean = false,
     val directive: DocumentDirective = DocumentDirective.DefaultInstructions,
     val areEdgesDetected: Boolean = false,
     val idAspectRatio: Float = 1f,
@@ -65,6 +64,7 @@ class DocumentCaptureViewModel(
             .build(),
     ),
 ) : ViewModel() {
+    // TODO: Bug where docv is stuck in processing indefinitely
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
     private var lastAnalysisTimeMs = 0L
@@ -101,10 +101,6 @@ class DocumentCaptureViewModel(
         }
     }
 
-    fun onInstructionsAcknowledged() {
-        _uiState.update { it.copy(acknowledgedInstructions = true) }
-    }
-
     fun onPhotoSelectedFromGallery(selectedPhoto: File?) {
         if (selectedPhoto == null) {
             val throwable = IllegalStateException("selectedPhoto is null")
@@ -112,7 +108,7 @@ class DocumentCaptureViewModel(
             _uiState.update { it.copy(captureError = throwable) }
         } else {
             _uiState.update {
-                it.copy(acknowledgedInstructions = true, documentImageToConfirm = selectedPhoto)
+                it.copy(documentImageToConfirm = selectedPhoto)
             }
         }
     }
@@ -141,7 +137,6 @@ class DocumentCaptureViewModel(
                                 documentFile,
                                 desiredAspectRatio = uiState.value.idAspectRatio,
                             ),
-                            showCaptureInProgress = false,
                         )
                     }
                 }
@@ -165,9 +160,9 @@ class DocumentCaptureViewModel(
             it.copy(
                 captureError = null,
                 documentImageToConfirm = null,
-                acknowledgedInstructions = false,
                 directive = DocumentDirective.DefaultInstructions,
                 areEdgesDetected = false,
+                showCaptureInProgress = false,
             )
         }
     }

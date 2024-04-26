@@ -19,8 +19,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
@@ -34,6 +34,7 @@ import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
 @Composable
 internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     viewModel: OrchestratedDocumentViewModel<T>,
+    captureBothSides: Boolean,
     modifier: Modifier = Modifier,
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
@@ -46,11 +47,11 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
 ) {
     val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Box {
+    Box(modifier = modifier) {
         Scaffold {
             NavHost(
                 navController = navController,
-                startDestination = "font_document_capture",
+                startDestination = "front_document_capture",
                 modifier = Modifier
                     .padding(it)
                     .consumeWindowInsets(it),
@@ -76,7 +77,14 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                             id = R.string.si_doc_v_capture_instructions_front_title,
                         ),
                         knownIdAspectRatio = idAspectRatio,
-                        onConfirm = viewModel::onDocumentFrontCaptureSuccess,
+                        onConfirm = {
+                            viewModel.onDocumentFrontCaptureSuccess(it)
+                            if (captureBothSides) {
+                                navController.navigate("back_document_capture")
+                            } else {
+                                navController.navigate("selfie_capture")
+                            }
+                        },
                         onError = viewModel::onError,
                     )
                 }
@@ -99,7 +107,10 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                             id = R.string.si_doc_v_capture_instructions_back_title,
                         ),
                         knownIdAspectRatio = idAspectRatio,
-                        onConfirm = viewModel::onDocumentBackCaptureSuccess,
+                        onConfirm = {
+                            viewModel.onDocumentBackCaptureSuccess(it)
+                            navController.navigate("selfie_capture")
+                        },
                         onError = viewModel::onError,
                         onSkip = viewModel::onDocumentBackSkip,
                     )
@@ -121,10 +132,9 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                     }
                 }
                 composable("processing") {
-                    val currentStep = uiState.currentStep as? DocumentCaptureFlow.ProcessingScreen
-                        ?: return@composable
+                    val processingState = uiState.processingState ?: ProcessingState.InProgress
                     ProcessingScreen(
-                        processingState = currentStep.processingState,
+                        processingState = processingState,
                         inProgressTitle = stringResource(R.string.si_doc_v_processing_title),
                         inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
                         inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
