@@ -85,7 +85,7 @@ internal fun isImageAtLeast(
     height: Int? = 1080,
 ): Boolean {
     if (uri == null) return false
-    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    val options = Options().apply { inJustDecodeBounds = true }
     context.contentResolver.openInputStream(uri).use {
         BitmapFactory.decodeStream(it, null, options)
     }
@@ -205,7 +205,7 @@ internal fun postProcessImageBitmap(
 }
 
 /**
- * Post-processes the image stored in `file`, in-place
+ * Post-processes the image stored in [file] in-place
  */
 internal fun postProcessImage(
     file: File,
