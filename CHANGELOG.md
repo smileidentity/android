@@ -1,5 +1,10 @@
 # Release Notes
 
+## Unreleased
+
+* Optimize Bitmap processing for less memory usage
+* Improved Selfie image quality
+
 ## 10.1.0
 
 * Added an Offline Mode, enabled by calling `SmileID.setAllowOfflineMode(true)`. If a job is attempted while the device is offline, and offline mode has been enabled, the UI will complete successfully and the job can be submitted at a later time by calling `SmileID.submitJob(jobId)`

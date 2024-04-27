@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
+import android.graphics.BitmapFactory.Options
 import android.graphics.Matrix
 import android.graphics.Rect
 import android.net.Uri
@@ -19,7 +20,6 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
-import androidx.core.graphics.scale
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.R
 import com.smileidentity.SmileID
@@ -32,6 +32,7 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
+import kotlin.math.max
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okio.IOException
@@ -107,15 +108,15 @@ internal fun isValidDocumentImage(context: Context, uri: Uri?) =
     isImageAtLeast(context, uri, width = 1920, height = 1080)
 
 fun Bitmap.rotated(rotationDegrees: Int, flipX: Boolean = false, flipY: Boolean = false): Bitmap {
-    val matrix = Matrix()
+    val matrix = Matrix().apply {
+        // Rotate the image back to straight.
+        postRotate(rotationDegrees.toFloat())
 
-    // Rotate the image back to straight.
-    matrix.postRotate(rotationDegrees.toFloat())
+        // Mirror the image along the X or Y axis.
+        postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
+    }
 
-    // Mirror the image along the X or Y axis.
-    matrix.postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
-    val rotatedBitmap =
-        Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+    val rotatedBitmap = Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
 
     // Recycle the old bitmap if it has changed.
     if (rotatedBitmap !== this) {
@@ -125,11 +126,11 @@ fun Bitmap.rotated(rotationDegrees: Int, flipX: Boolean = false, flipY: Boolean 
 }
 
 /**
- * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled to
- * [maxOutputSize], but maintains the aspect ratio.
+ * Post-processes the image stored in [bitmap] and saves to [file]. The image is scaled such that
+ * the longer dimension equals [resizeLongerDimensionTo] while maintaining the aspect ratio.
  *
- * Only one of [maxOutputSize] or [desiredAspectRatio] can be set. Setting both is not supported,
- * and will throw an [IllegalArgumentException].
+ * Only one of [resizeLongerDimensionTo] or [desiredAspectRatio] can be set. Setting both is not
+ * supported, and will throw an [IllegalArgumentException].
  */
 @SuppressLint("RestrictedApi")
 internal fun postProcessImageBitmap(
@@ -137,47 +138,31 @@ internal fun postProcessImageBitmap(
     file: File,
     processRotation: Boolean = false,
     @IntRange(from = 0, to = 100) compressionQuality: Int = 100,
-    maxOutputSize: Size? = null,
+    resizeLongerDimensionTo: Int? = null,
     desiredAspectRatio: Float? = null,
 ): File {
     check(compressionQuality in 0..100) { "Compression quality must be between 0 and 100" }
-    if (maxOutputSize != null && desiredAspectRatio != null) {
+    if (resizeLongerDimensionTo != null && desiredAspectRatio != null) {
         throw IllegalArgumentException("Only one of maxOutputSize or desiredAspectRatio can be set")
     }
-    var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
+    val matrix = Matrix()
+    val didSwapDimensions: Boolean
     if (processRotation) {
         val exif = Exif.createFromFile(file)
-        val degrees = exif.rotation.toFloat()
+        val degrees = exif.rotation
+        didSwapDimensions = degrees == 90 || degrees == 270
         val scale = if (exif.isFlippedHorizontally) -1F else 1F
-        val matrix = Matrix().apply {
-            postScale(scale, 1F)
-            postRotate(degrees)
-        }
-        mutableBitmap = Bitmap.createBitmap(
-            mutableBitmap,
-            0,
-            0,
-            mutableBitmap.width,
-            mutableBitmap.height,
-            matrix,
-            true,
-        )
+        matrix.postScale(scale, 1F)
+        matrix.postRotate(degrees.toFloat())
+    } else {
+        didSwapDimensions = false
     }
 
-    // If size is the original Bitmap size, then no scaling will be performed by the underlying call
-    // Aspect ratio will be maintained by retaining the larger dimension
-    val outputSize = maxOutputSize?.let { size ->
-        val aspectRatioInput = mutableBitmap.width.toFloat() / mutableBitmap.height
-        val aspectRatioMax = size.width.toFloat() / size.height
-        var outputWidth = size.width
-        var outputHeight = size.height
-        if (aspectRatioInput > aspectRatioMax) {
-            outputHeight = (outputWidth / aspectRatioInput).toInt()
-        } else {
-            outputWidth = (outputHeight * aspectRatioInput).toInt()
-        }
-        Size(outputWidth, outputHeight)
+    resizeLongerDimensionTo?.let {
+        val maxDimensionSize = max(bitmap.width, bitmap.height)
+        val scaleFactor = it.toFloat() / maxDimensionSize
+        matrix.postScale(scaleFactor, scaleFactor)
     }
 
     // Crop height to match desired aspect ratio. This specific behavior is because we force
@@ -185,33 +170,36 @@ internal fun postProcessImageBitmap(
     // wide. If the image is wider than it is tall, then we return as-is
     // For reference, the default aspect ratio of an ID card is around ~1.6
     // NB! This assumes that the portrait mode pic will be taller than it is wide
-    val croppedHeight = desiredAspectRatio?.let {
-        return@let if (mutableBitmap.width > mutableBitmap.height) {
-            Timber.w("Image is wider than it is tall, so not cropping the height")
-            mutableBitmap.height
+    val (x, y, newSize) = desiredAspectRatio?.let {
+        val width = if (didSwapDimensions) bitmap.height else bitmap.width
+        val height = if (didSwapDimensions) bitmap.width else bitmap.height
+        if (width > height) {
+            return@let Triple(0, 0, Size(bitmap.width, bitmap.height))
+        }
+        val newHeight = (width / it).toInt().coerceIn(0..height)
+        val y = (height - newHeight) / 2
+        return@let if (didSwapDimensions) {
+            Triple(y, 0, Size(newHeight, width))
         } else {
-            (mutableBitmap.width / it).toInt().coerceIn(0..mutableBitmap.height)
+            Triple(0, y, Size(width, newHeight))
         }
-    } ?: mutableBitmap.height
+    } ?: Triple(0, 0, Size(bitmap.width, bitmap.height))
 
+    // Center crop the bitmap to the specified croppedHeight and apply the matrix
     file.outputStream().use {
-        outputSize?.let { outputSize ->
-            // Filter is set to false for improved performance at the expense of image quality
-            mutableBitmap = mutableBitmap.scale(outputSize.width, outputSize.height, filter = false)
+        val compressSuccess = Bitmap.createBitmap(
+            bitmap,
+            x,
+            y,
+            newSize.width,
+            newSize.height,
+            matrix,
+            true,
+        ).compress(JPEG, compressionQuality, it)
+        if (!compressSuccess) {
+            SmileIDCrashReporting.hub.addBreadcrumb("Failed to compress bitmap")
+            throw IOException("Failed to compress bitmap")
         }
-
-        desiredAspectRatio?.let {
-            // Center crop the bitmap to the specified croppedHeight
-            mutableBitmap = Bitmap.createBitmap(
-                mutableBitmap,
-                0,
-                (mutableBitmap.height - croppedHeight) / 2,
-                mutableBitmap.width,
-                croppedHeight,
-            )
-        }
-
-        mutableBitmap.compress(JPEG, compressionQuality, it)
     }
     return file
 }
@@ -225,7 +213,8 @@ internal fun postProcessImage(
     compressionQuality: Int = 100,
     desiredAspectRatio: Float? = null,
 ): File {
-    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+    val options = Options().apply { inMutable = true }
+    val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
     return postProcessImageBitmap(
         bitmap = bitmap,
         file = file,
