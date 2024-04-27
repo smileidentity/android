@@ -2,8 +2,7 @@
 
 ## Unreleased
 
-* Optimize Bitmap processing for less memory usage
-* Improved Selfie image quality
+* Optimize Bitmap processing for less memory usage and improved quality
 
 ## 10.1.0
 
