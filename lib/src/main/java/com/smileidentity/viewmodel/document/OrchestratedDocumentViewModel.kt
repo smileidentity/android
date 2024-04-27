@@ -194,7 +194,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
-    fun sendResult(
+    private fun sendResult(
         documentFrontFile: File,
         documentBackFile: File? = null,
         livenessFiles: List<File>? = null,
