@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fixed a bug where Document Capture would occasionally fail
 * Fixed a bug where Document Verification would get stuck on the processing screen
 
 ## 10.1.0
