@@ -1,6 +1,5 @@
 package com.smileidentity.viewmodel
 
-import android.util.Size
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -61,8 +60,8 @@ private val UI_DEBOUNCE_DURATION = 250.milliseconds
 private const val INTRA_IMAGE_MIN_DELAY_MS = 350
 private const val NUM_LIVENESS_IMAGES = 7
 private const val TOTAL_STEPS = NUM_LIVENESS_IMAGES + 1 // 7 B&W Liveness + 1 Color Selfie
-private val LIVENESS_IMAGE_SIZE = Size(320, 320)
-private val SELFIE_IMAGE_SIZE = Size(640, 640)
+private const val LIVENESS_IMAGE_SIZE = 320
+private const val SELFIE_IMAGE_SIZE = 640
 private const val NO_FACE_RESET_DELAY_MS = 3000
 private const val FACE_ROTATION_THRESHOLD = 0.75f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
@@ -213,9 +212,8 @@ class SelfieViewModel(
                 postProcessImageBitmap(
                     bitmap = bitmap,
                     file = livenessFile,
-                    saveAsGrayscale = false,
                     compressionQuality = 80,
-                    maxOutputSize = LIVENESS_IMAGE_SIZE,
+                    resizeLongerDimensionTo = LIVENESS_IMAGE_SIZE,
                 )
                 livenessFiles.add(livenessFile)
                 _uiState.update { it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat()) }
@@ -225,9 +223,8 @@ class SelfieViewModel(
                 postProcessImageBitmap(
                     bitmap = bitmap,
                     file = selfieFile!!,
-                    saveAsGrayscale = false,
                     compressionQuality = 80,
-                    maxOutputSize = SELFIE_IMAGE_SIZE,
+                    resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
                 )
                 shouldAnalyzeImages = false
                 _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }

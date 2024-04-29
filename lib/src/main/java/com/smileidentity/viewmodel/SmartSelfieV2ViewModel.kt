@@ -50,8 +50,8 @@ import timber.log.Timber
 private const val HISTORY_LENGTH = 7
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 private const val NUM_LIVENESS_IMAGES = 4
-private val LIVENESS_IMAGE_SIZE = android.util.Size(320, 320)
-private val SELFIE_IMAGE_SIZE = android.util.Size(640, 640)
+private const val LIVENESS_IMAGE_SIZE = 320
+private const val SELFIE_IMAGE_SIZE = 640
 private const val FACE_QUALITY_THRESHOLD = 0.5f
 private const val MIN_FACE_FILL_THRESHOLD = 0.15f
 private const val MAX_FACE_FILL_THRESHOLD = 0.25f
@@ -243,9 +243,8 @@ class SmartSelfieV2ViewModel(
                 postProcessImageBitmap(
                     bitmap = fullSelfieBmp,
                     file = livenessFile,
-                    saveAsGrayscale = false,
                     compressionQuality = 80,
-                    maxOutputSize = LIVENESS_IMAGE_SIZE,
+                    resizeLongerDimensionTo = LIVENESS_IMAGE_SIZE,
                 )
                 livenessFiles.add(livenessFile)
                 return@addOnSuccessListener
@@ -259,9 +258,8 @@ class SmartSelfieV2ViewModel(
             postProcessImageBitmap(
                 bitmap = fullSelfieBmp,
                 file = selfieFile,
-                saveAsGrayscale = false,
                 compressionQuality = 80,
-                maxOutputSize = SELFIE_IMAGE_SIZE,
+                resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
             )
 
             val proxy = { e: Throwable -> onResult(SmileIDResult.Error(e)) }
