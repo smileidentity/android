@@ -70,9 +70,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     var result: SmileIDResult<T> = SmileIDResult.Error(
         IllegalStateException("Document Capture incomplete"),
     )
-    protected var documentFrontFile: File? = null
-    protected var documentBackFile: File? = null
-    protected var livenessFiles: List<File>? = null
+    private var documentFrontFile: File? = null
+    private var documentBackFile: File? = null
+    private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
@@ -145,7 +145,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 "Selfie file is null",
             )
             // Liveness files will be null when the partner bypasses our Selfie capture with a file
-            val livenessImageInfo = livenessFiles?.map { it.asLivenessImage() } ?: emptyList()
+            val livenessImageInfo = livenessFiles.orEmpty().map { it.asLivenessImage() }
             val uploadRequest = UploadRequest(
                 images = listOfNotNull(
                     frontImageInfo,
@@ -190,10 +190,11 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
+            sendResult(documentFrontFile, documentBackFile, livenessFiles)
         }
     }
 
-    fun sendResult(
+    private fun sendResult(
         documentFrontFile: File,
         documentBackFile: File? = null,
         livenessFiles: List<File>? = null,
@@ -281,7 +282,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     }
 
     /**
-     * If stepToRetry is ProcessingScreen, we're retrying a network issue, so we need to kick off
+     * If [stepToRetry] is ProcessingScreen, we're retrying a network issue, so we need to kick off
      * the resubmission manually. Otherwise, we're retrying a capture error, so we just need to
      * reset the UI state
      */
