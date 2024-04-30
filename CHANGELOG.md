@@ -5,6 +5,7 @@
 * Fixed a bug where Document Capture would occasionally fail
 * Optimize Bitmap processing for less memory usage and improved quality
 * Fixed a bug where Document Verification would get stuck on the processing screen
+* Fixed a bug where the Document Verification ViewModel was erroneously re-used across multiple invocations 
 
 ## 10.1.0
 

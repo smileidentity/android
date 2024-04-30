@@ -29,6 +29,7 @@ import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.util.randomId
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
@@ -214,6 +215,7 @@ fun SmileID.DocumentVerification(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
+    val viewModelKey = rememberSaveable { randomId("vm") }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
@@ -226,6 +228,7 @@ fun SmileID.DocumentVerification(
             idAspectRatio = idAspectRatio,
             onResult = onResult,
             viewModel = viewModel(
+                key = viewModelKey,
                 factory = viewModelFactory {
                     DocumentVerificationViewModel(
                         jobType = JobType.DocumentVerification,
@@ -299,6 +302,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
+    val viewModelKey = rememberSaveable { randomId("vm") }
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
@@ -311,6 +315,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             idAspectRatio = idAspectRatio,
             onResult = onResult,
             viewModel = viewModel(
+                key = viewModelKey,
                 factory = viewModelFactory {
                     EnhancedDocumentVerificationViewModel(
                         jobType = JobType.EnhancedDocumentVerification,
