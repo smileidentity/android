@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 10.1.1
 
 * Fixed a bug where Document Capture would occasionally fail
 * Optimize Bitmap processing for less memory usage and improved quality
