@@ -7,13 +7,16 @@ import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
 import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipOutputStream
 import okhttp3.Request
 import okio.ByteString.Companion.encode
 import retrofit2.Invocation
+import timber.log.Timber
 
 fun <T : Annotation> Request.getCustomAnnotation(annotationClass: Class<T>): T? =
     this.tag(Invocation::class.java)?.method()?.getAnnotation(annotationClass)
@@ -32,7 +35,20 @@ fun calculateSignature(timestamp: String): String {
 fun UploadRequest.zip(): File {
     val uploadRequest = deDupedUploadRequest(this)
     val zipFile = File.createTempFile("upload", ".zip")
-    val zipOutputStream = ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFile)))
+    val zipOutputStream = try {
+        ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFile)))
+    } catch (e: FileNotFoundException) {
+        Timber.w(e, "Error creating zip file")
+        // We save our Image captures inside a temp file. If the device is low on storage, then
+        // the OS may silently delete the temp file. This will cause a FileNotFoundException
+        // when we try to read the file. We throw a more user-friendly error message in this
+        // case so that it can be handled by the app.
+        // NB! It is also possible (albeit unlikely) that the user deleted the file
+        throw IOException(
+            "Your device is running low on storage. Please free up space and try again",
+            e,
+        )
+    }
 
     // Write info.json
     zipOutputStream.putNextEntry(ZipEntry("info.json"))
@@ -43,7 +59,20 @@ fun UploadRequest.zip(): File {
     // Write images
     uploadRequest.images.forEach { imageInfo ->
         zipOutputStream.putNextEntry(ZipEntry(imageInfo.image.name))
-        imageInfo.image.inputStream().use { it.copyTo(zipOutputStream) }
+        try {
+            imageInfo.image.inputStream().use { it.copyTo(zipOutputStream) }
+        } catch (e: FileNotFoundException) {
+            Timber.w(e, "Error reading image file ${imageInfo.image.name}")
+            // We save our Image captures inside a temp file. If the device is low on storage, then
+            // the OS may silently delete the temp file. This will cause a FileNotFoundException
+            // when we try to read the file. We throw a more user-friendly error message in this
+            // case so that it can be handled by the app.
+            // NB! It is also possible (albeit unlikely) that the user deleted the file
+            throw IOException(
+                "Your device is running low on storage. Please free up space and try again",
+                e,
+            )
+        }
         zipOutputStream.closeEntry()
     }
 
