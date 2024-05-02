@@ -2,7 +2,6 @@ package com.smileidentity.util
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
@@ -289,65 +288,22 @@ fun randomUserId() = randomId("user")
 fun randomJobId() = randomId("job")
 
 /**
- * This code gets the real path/ sd card path from intent data, and handles every possible scenario
- * and edge cases, on multiple devices.
+ * Save the contents of the URI to the provided File.
  *
- * This replaces uri.toFile() in normal scenarios
- *
- * Gist - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
- *
- *  @param uri a URI
+ *  @param file the file to save the URI contents to
+ *  @param uri a URI returned by the Photo Picker
  *  @param context Android Context
  */
-internal fun generateFileFromUri(uri: Uri, context: Context): File? =
-    uri.getFilePath(context = context)?.let { File(it) }
-
-/**
- * Get path from a URI
- *
- * @param context Android context
- */
-private fun Uri.getFilePath(context: Context): String? = getImagePath(context, this)
-
-/**
- * Borrowed here - https://gist.github.com/MeNiks/947b471b762f3b26178ef165a7f5558a
- */
-private fun getImagePath(context: Context, uri: Uri): String? =
-    if ("content".equals(uri.scheme!!, ignoreCase = true)) {
-        if (isGooglePhotosUri(uri)) {
-            uri.lastPathSegment
-        } else {
-            getDataColumn(context, uri)
-        }
-    } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
-        uri.path
-    } else {
-        null
+internal fun writeUriToFile(file: File, uri: Uri, context: Context) {
+    // Read URI contents into a new temporary file. We expect this to be moved/renamed
+    // by downstream business logic
+    val uriInputStream = context.contentResolver.openInputStream(uri) ?: run {
+        Timber.w("Unable to read URI $uri")
+        SmileIDCrashReporting.hub.addBreadcrumb("Unable to read URI $uri")
+        return
     }
-
-/**
- * Get the value of the data column for this Uri. This is useful for
- * MediaStore Uris, and other file-based ContentProviders.
- *
- * @param context       The context.
- * @param uri           The Uri to query.
- * @return The value of the _data column, which is typically a file path.
- */
-private fun getDataColumn(context: Context, uri: Uri?): String? {
-    var cursor: Cursor? = null
-    val column = "_data"
-    val projection = arrayOf(column)
-
-    try {
-        cursor = context.contentResolver.query(uri!!, projection, null, null, null)
-        if (cursor != null && cursor.moveToFirst()) {
-            val index = cursor.getColumnIndexOrThrow(column)
-            return cursor.getString(index)
-        }
-    } finally {
-        cursor?.close()
-    }
-    return null
+    val fileOutputStream = file.outputStream().buffered()
+    uriInputStream.use { fileOutputStream.use { uriInputStream.copyTo(it) } }
 }
 
 /**

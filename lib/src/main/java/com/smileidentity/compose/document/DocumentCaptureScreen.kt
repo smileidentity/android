@@ -51,9 +51,10 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.generateFileFromUri
+import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
+import com.smileidentity.util.writeUriToFile
 import com.smileidentity.viewmodel.document.DocumentCaptureViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import com.ujizin.camposer.CameraPreview
@@ -110,9 +111,11 @@ fun DocumentCaptureScreen(
                 return@rememberLauncherForActivityResult
             }
             if (isValidDocumentImage(context, uri)) {
-                val selectedPhotoFile = generateFileFromUri(uri = uri, context = context)
-                viewModel.onPhotoSelectedFromGallery(selectedPhotoFile)
+                val documentFile = createDocumentFile(jobId, (side == DocumentCaptureSide.Front))
+                writeUriToFile(documentFile, uri, context)
+                viewModel.onPhotoSelectedFromGallery(documentFile)
             } else {
+                SmileIDCrashReporting.hub.addBreadcrumb("Gallery upload document image too small")
                 context.toast(R.string.si_doc_v_validation_image_too_small)
             }
         },
