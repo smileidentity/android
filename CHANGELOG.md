@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Better error message when the device is low on storage
+
 ## 10.1.1
 
 * Fixed a bug where Document Capture would occasionally fail
