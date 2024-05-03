@@ -1,8 +1,9 @@
 # Release Notes
 
-## Unreleased
+## 10.1.2
 
 * Better error message when the device is low on storage
+* Fixed a bug where Gallery selection of document images did not work in some cases
 
 ## 10.1.1
 

@@ -158,8 +158,8 @@ class DocumentCaptureViewModel(
     }
 
     fun onRetry() {
-        // It is safe to delete the file here, EVEN THOUGH it may have been selected from gallery
-        // because the URI we get back from the PhotoPicker does not grant us write access
+        // It is safe to delete the file here, even though it may have been selected from the
+        // gallery because we copied the URI contents to a new File first
         uiState.value.documentImageToConfirm?.delete()
         isCapturing = false
         _uiState.update {
