@@ -50,7 +50,7 @@ import timber.log.Timber
 
 private const val HISTORY_LENGTH = 7
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
-private const val NUM_LIVENESS_IMAGES = 4
+private const val NUM_LIVENESS_IMAGES = 6
 private const val LIVENESS_IMAGE_SIZE = 320
 private const val SELFIE_IMAGE_SIZE = 640
 private const val FACE_QUALITY_THRESHOLD = 0.5f
@@ -70,7 +70,7 @@ enum class FaceDirection {
     Left,
     Right,
     Up,
-    Down,
+    // Down,
 }
 
 data class SmartSelfieV2UiState(
@@ -286,7 +286,7 @@ class SmartSelfieV2ViewModel(
 
             if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
                 _uiState.update {
-                    val index = livenessFiles.size % orderedFaceDirections.size
+                    val index = (livenessFiles.size / 2) % orderedFaceDirections.size
                     it.copy(faceDirectionHint = orderedFaceDirections[index])
                 }
                 return@addOnSuccessListener
@@ -351,6 +351,7 @@ class SmartSelfieV2ViewModel(
                 showBorderHighlight = false,
                 cutoutOpacity = 0.8f,
                 selfieHint = SelfieHint.SearchingForFace,
+                faceDirectionHint = null,
             )
         }
         selfieQualityHistory.clear()
@@ -360,13 +361,26 @@ class SmartSelfieV2ViewModel(
     }
 
     private fun shouldCaptureLiveness(face: Face): Boolean {
-        val index = livenessFiles.size % orderedFaceDirections.size
+        // For each direction the user is supposed to look, we capture 2 liveness images:
+        // 1. At the midpoint of the direction
+        // 2. At the end of the direction
+        val index = (livenessFiles.size / 2) % orderedFaceDirections.size
         val currentActiveLivenessDirection = orderedFaceDirections[index]
-        val isLookingCorrectDirection = when (currentActiveLivenessDirection) {
-            FaceDirection.Left -> isFaceLookingLeft(face)
-            FaceDirection.Right -> isFaceLookingRight(face)
-            FaceDirection.Up -> isFaceLookingUp(face)
-            FaceDirection.Down -> isFaceLookingDown(face)
+        val shouldCaptureMidpoint = livenessFiles.size % 2 == 0
+        val isLookingCorrectDirection = if (shouldCaptureMidpoint) {
+            when (currentActiveLivenessDirection) {
+                FaceDirection.Left -> isFaceLookingLeft(face, 10f)
+                FaceDirection.Right -> isFaceLookingRight(face, 10f)
+                FaceDirection.Up -> isFaceLookingUp(face, 7.5f)
+                // FaceDirection.Down -> isFaceLookingDown(face, 5f)
+            }
+        } else {
+            when (currentActiveLivenessDirection) {
+                FaceDirection.Left -> isFaceLookingLeft(face)
+                FaceDirection.Right -> isFaceLookingRight(face)
+                FaceDirection.Up -> isFaceLookingUp(face)
+                // FaceDirection.Down -> isFaceLookingDown(face)
+            }
         }
         return isLookingCorrectDirection && livenessFiles.size < NUM_LIVENESS_IMAGES
     }

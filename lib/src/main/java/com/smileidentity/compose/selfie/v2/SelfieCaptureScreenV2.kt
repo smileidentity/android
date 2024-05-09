@@ -69,7 +69,6 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
-import com.smileidentity.viewmodel.FaceDirection
 import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
@@ -300,12 +299,6 @@ private fun SmartSelfieV2Screen(
             CircularProgressIndicator()
         }
 
-        when (uiState.faceDirectionHint) {
-            FaceDirection.Left -> Text("Look Left", color = Color.White)
-            FaceDirection.Right -> Text("Look Right", color = Color.White)
-            FaceDirection.Up -> Text("Look Up", color = Color.White)
-            FaceDirection.Down -> Text("Look Down", color = Color.White)
-            else -> {}
-        }
+        uiState.faceDirectionHint?.let { Text("Look $it", color = Color.White) }
     }
 }
