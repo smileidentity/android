@@ -365,6 +365,20 @@ class SmartSelfieV2ViewModel(
         selfieFile = null
     }
 
+    /**
+     * Determines if conditions are met to capture a liveness image.
+     *
+     * If strict mode is enabled, then this runs active liveness checks. Otherwise, it returns true.
+     *
+     * For strict mode/active liveness, a randomized set of directions for the user to look in was
+     * chosen on class initialization. We capture two types of liveness images: midpoint and end.
+     *
+     * For midpoint images, we capture eagerly. For end images, we only capture if the user has been
+     * looking in the correct direction for a certain amount of time. This is to prevent blurriness.
+     * We don't do the same for midpoint images because we don't want to interrupt the user mid-turn
+     *
+     * @param face The face detected in the image
+     */
     private fun shouldCaptureLiveness(face: Face): Boolean {
         // For each direction the user is supposed to look, we capture 2 liveness images:
         // 1. At the midpoint of the direction
@@ -374,15 +388,15 @@ class SmartSelfieV2ViewModel(
         val shouldCaptureMidpoint = livenessFiles.size % 2 == 0
         val isLookingCorrectDirection = if (shouldCaptureMidpoint) {
             when (currentActiveLivenessDirection) {
-                FaceDirection.Left -> isFaceLookingLeft(face, 10f)
-                FaceDirection.Right -> isFaceLookingRight(face, 10f)
-                FaceDirection.Up -> isFaceLookingUp(face, 7.5f)
+                FaceDirection.Left -> face.isLookingLeft(10f)
+                FaceDirection.Right -> face.isLookingRight(10f)
+                FaceDirection.Up -> face.isLookingUp(7.5f)
             }
         } else {
             when (currentActiveLivenessDirection) {
-                FaceDirection.Left -> isFaceLookingLeft(face)
-                FaceDirection.Right -> isFaceLookingRight(face)
-                FaceDirection.Up -> isFaceLookingUp(face)
+                FaceDirection.Left -> face.isLookingLeft()
+                FaceDirection.Right -> face.isLookingRight()
+                FaceDirection.Up -> face.isLookingUp()
             }
         }
         if (!isLookingCorrectDirection) {
@@ -406,21 +420,15 @@ class SmartSelfieV2ViewModel(
         return result
     }
 
-    private fun isFaceLookingLeft(face: Face, qualifyingAngle: Float = 20f): Boolean {
-        val result = face.headEulerAngleY > qualifyingAngle
-        Timber.v("isFaceLookingLeft: $result")
-        return result
+    private fun Face.isLookingLeft(qualifyingAngle: Float = 20f): Boolean {
+        return headEulerAngleY > qualifyingAngle
     }
 
-    private fun isFaceLookingRight(face: Face, qualifyingAngle: Float = 20f): Boolean {
-        val result = face.headEulerAngleY < -qualifyingAngle
-        Timber.v("isFaceLookingRight: $result")
-        return result
+    private fun Face.isLookingRight(qualifyingAngle: Float = 20f): Boolean {
+        return headEulerAngleY < -qualifyingAngle
     }
 
-    private fun isFaceLookingUp(face: Face, qualifyingAngle: Float = 15f): Boolean {
-        val result = face.headEulerAngleX > qualifyingAngle
-        Timber.v("isFaceLookingUp: $result")
-        return result
+    private fun Face.isLookingUp(qualifyingAngle: Float = 15f): Boolean {
+        return headEulerAngleX > qualifyingAngle
     }
 }
