@@ -60,6 +60,7 @@ private const val LUMINANCE_THRESHOLD = 50
 private const val MAX_FACE_PITCH_THRESHOLD = 30
 private const val MAX_FACE_YAW_THRESHOLD = 15
 private const val MAX_FACE_ROLL_THRESHOLD = 30
+private const val LIVENESS_STABILITY_TIME_MS = 300
 
 enum class SelfieHint(@DrawableRes val animation: Int) {
     SearchingForFace(R.drawable.si_tf_face_search),
@@ -70,7 +71,6 @@ enum class FaceDirection {
     Left,
     Right,
     Up,
-    // Down,
 }
 
 data class SmartSelfieV2UiState(
@@ -111,6 +111,7 @@ class SmartSelfieV2ViewModel(
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
     private val orderedFaceDirections = FaceDirection.entries.shuffled()
+    private var initialLivenessSatisfiedTimeMs = Long.MAX_VALUE
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
@@ -345,6 +346,10 @@ class SmartSelfieV2ViewModel(
         }
     }
 
+    private fun resetLivenessStabilityTime() {
+        initialLivenessSatisfiedTimeMs = Long.MAX_VALUE
+    }
+
     private fun resetCaptureProgress() {
         _uiState.update {
             it.copy(
@@ -372,17 +377,33 @@ class SmartSelfieV2ViewModel(
                 FaceDirection.Left -> isFaceLookingLeft(face, 10f)
                 FaceDirection.Right -> isFaceLookingRight(face, 10f)
                 FaceDirection.Up -> isFaceLookingUp(face, 7.5f)
-                // FaceDirection.Down -> isFaceLookingDown(face, 5f)
             }
         } else {
             when (currentActiveLivenessDirection) {
                 FaceDirection.Left -> isFaceLookingLeft(face)
                 FaceDirection.Right -> isFaceLookingRight(face)
                 FaceDirection.Up -> isFaceLookingUp(face)
-                // FaceDirection.Down -> isFaceLookingDown(face)
             }
         }
-        return isLookingCorrectDirection && livenessFiles.size < NUM_LIVENESS_IMAGES
+        if (!isLookingCorrectDirection) {
+            resetLivenessStabilityTime()
+        }
+        // Check that user has been looking in the correct direction for half a second for non-midpoint capture
+        var hasBeenLookingLongEnough = true
+        if (!shouldCaptureMidpoint) {
+            if (initialLivenessSatisfiedTimeMs == Long.MAX_VALUE) {
+                initialLivenessSatisfiedTimeMs = System.currentTimeMillis()
+            }
+            val elapsedTimeMs = System.currentTimeMillis() - initialLivenessSatisfiedTimeMs
+            hasBeenLookingLongEnough = elapsedTimeMs > LIVENESS_STABILITY_TIME_MS
+        }
+        val result = isLookingCorrectDirection &&
+            hasBeenLookingLongEnough &&
+            livenessFiles.size < NUM_LIVENESS_IMAGES
+        if (result) {
+            resetLivenessStabilityTime()
+        }
+        return result
     }
 
     private fun isFaceLookingLeft(face: Face, qualifyingAngle: Float = 20f): Boolean {
@@ -400,12 +421,6 @@ class SmartSelfieV2ViewModel(
     private fun isFaceLookingUp(face: Face, qualifyingAngle: Float = 15f): Boolean {
         val result = face.headEulerAngleX > qualifyingAngle
         Timber.v("isFaceLookingUp: $result")
-        return result
-    }
-
-    private fun isFaceLookingDown(face: Face, qualifyingAngle: Float = 10f): Boolean {
-        val result = face.headEulerAngleX < -qualifyingAngle
-        Timber.v("isFaceLookingDown: $result")
         return result
     }
 }
