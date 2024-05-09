@@ -10,6 +10,7 @@ import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -65,6 +66,13 @@ enum class SelfieHint(@DrawableRes val animation: Int) {
     NeedLight(R.drawable.si_tf_light_flash),
 }
 
+enum class FaceDirection {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
 data class SmartSelfieV2UiState(
     val backgroundOpacity: Float = 0.8f,
     val cutoutOpacity: Float = 0.8f,
@@ -72,6 +80,7 @@ data class SmartSelfieV2UiState(
     val selfieHint: SelfieHint? = SelfieHint.SearchingForFace,
     val showLoading: Boolean = false,
     val showCompletion: Boolean = false,
+    val faceDirectionHint: FaceDirection? = null,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -101,6 +110,7 @@ class SmartSelfieV2ViewModel(
     private var shouldAnalyzeImages = true
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
+    private val orderedFaceDirections = FaceDirection.entries.shuffled()
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
@@ -138,13 +148,13 @@ class SmartSelfieV2ViewModel(
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
             val face = faces.firstOrNull() ?: run {
                 Timber.d("No face detected")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
 
             if (faces.size > 1) {
                 Timber.d("More than one face detected")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
 
@@ -155,7 +165,7 @@ class SmartSelfieV2ViewModel(
                 bBox.top >= 0 && bBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
                 Timber.d("Face bounding box not within image")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
 
@@ -163,105 +173,126 @@ class SmartSelfieV2ViewModel(
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
             if (faceFillRatio < MIN_FACE_FILL_THRESHOLD) {
                 Timber.d("Face not close enough to camera")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
             if (faceFillRatio > MAX_FACE_FILL_THRESHOLD) {
                 Timber.d("Face too close to camera")
-                resetFaceQuality()
-                return@addOnSuccessListener
-            }
-
-            // Reject extreme head poses
-            val extremePitch = face.headEulerAngleX.absoluteValue > MAX_FACE_PITCH_THRESHOLD
-            val extremeYaw = face.headEulerAngleY.absoluteValue > MAX_FACE_YAW_THRESHOLD
-            val extremeRoll = face.headEulerAngleZ.absoluteValue > MAX_FACE_ROLL_THRESHOLD
-            if (extremePitch || extremeYaw || extremeRoll) {
-                Timber.d("Extreme head pose detected")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
 
             val fullSelfieBmp = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
             if (bBox.left + bBox.width() > fullSelfieBmp.width) {
                 Timber.d("Face bounding box width is greater than image width")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
             if (bBox.top + bBox.height() > fullSelfieBmp.height) {
                 Timber.d("Face bounding box height is greater than image height")
-                resetFaceQuality()
+                resetCaptureProgress()
                 return@addOnSuccessListener
             }
 
-            // Image Quality Model Inference
-            // Model input: nx120x120x3 - n images, each cropped to face bounding box
-            // Model output: nx2 - n images, each with 2 probabilities
-            // 1st column is the actual quality. 2nd column is 1-(1st_column)
+            val selfieFile = this.selfieFile // for smart casting purposes
+            if (selfieFile == null) {
+                // Reject extreme head poses
+                val extremePitch = face.headEulerAngleX.absoluteValue > MAX_FACE_PITCH_THRESHOLD
+                val extremeYaw = face.headEulerAngleY.absoluteValue > MAX_FACE_YAW_THRESHOLD
+                val extremeRoll = face.headEulerAngleZ.absoluteValue > MAX_FACE_ROLL_THRESHOLD
+                if (extremePitch || extremeYaw || extremeRoll) {
+                    Timber.d("Extreme head pose detected")
+                    resetCaptureProgress()
+                    return@addOnSuccessListener
+                }
+                // We only run the image quality model on the selfie capture because the liveness
+                // task requires a turned head, which receives a lower score from the model
 
-            // NB! Model is trained on *face mesh* crop (potentially different from face detection)
-            val input = TensorImage(DataType.FLOAT32).apply {
-                val modelInputBmp = Bitmap.createBitmap(
-                    fullSelfieBmp,
-                    bBox.left,
-                    bBox.top,
-                    bBox.width(),
-                    bBox.height(),
-                    // NB! bBox is not guaranteed to be square, so scale might squish the image
-                ).scale(modelInputSize[1], modelInputSize[2], false)
-                load(modelInputBmp)
-            }
-            val outputs = selfieQualityModel.process(input.tensorBuffer)
-            val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
-                Timber.w("No image quality output")
-                resetFaceQuality()
-                return@addOnSuccessListener
-            }
-            selfieQualityHistory.add(output)
-            if (selfieQualityHistory.size > HISTORY_LENGTH) {
-                // We should only ever exceed history length by 1
-                selfieQualityHistory.removeAt(0)
-            }
+                // Image Quality Model Inference
+                // Model input: nx120x120x3 - n images, each cropped to face bounding box
+                // Model output: nx2 - n images, each with 2 probabilities
+                // 1st column is the actual quality. 2nd column is 1-(1st_column)
 
-            val averageFaceQuality = selfieQualityHistory.average()
+                // NB! Model is trained on *face mesh* crop (potentially different from face
+                // detection)
+                val input = TensorImage(DataType.FLOAT32).apply {
+                    val modelInputBmp = Bitmap.createBitmap(
+                        fullSelfieBmp,
+                        bBox.left,
+                        bBox.top,
+                        bBox.width(),
+                        bBox.height(),
+                        // NB! bBox is not guaranteed to be square, so scale might squish the image
+                    ).scale(modelInputSize[1], modelInputSize[2], false)
+                    load(modelInputBmp)
+                }
+                val outputs = selfieQualityModel.process(input.tensorBuffer)
+                val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
+                    Timber.w("No image quality output")
+                    resetCaptureProgress()
+                    return@addOnSuccessListener
+                }
+                selfieQualityHistory.add(output)
+                if (selfieQualityHistory.size > HISTORY_LENGTH) {
+                    // We should only ever exceed history length by 1
+                    selfieQualityHistory.removeAt(0)
+                }
 
-            if (averageFaceQuality < FACE_QUALITY_THRESHOLD) {
-                // We don't want to reset the history here, since the model output is noisy
-                Timber.d("Face quality not met ($averageFaceQuality)")
-                _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
-                return@addOnSuccessListener
-            }
-            _uiState.update {
-                it.copy(showBorderHighlight = true, cutoutOpacity = 0f, selfieHint = null)
-            }
-            lastAutoCaptureTimeMs = System.currentTimeMillis()
-            if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                val livenessFile = createLivenessFile(userId)
-                Timber.v("Capturing liveness image to $livenessFile")
+                val averageFaceQuality = selfieQualityHistory.average()
+
+                if (averageFaceQuality < FACE_QUALITY_THRESHOLD) {
+                    // We don't want to reset the history here, since the model output is noisy
+                    Timber.d("Face quality not met ($averageFaceQuality)")
+                    _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
+                    return@addOnSuccessListener
+                }
+                _uiState.update {
+                    it.copy(
+                        showBorderHighlight = true,
+                        cutoutOpacity = 0f,
+                        selfieHint = null,
+                        faceDirectionHint = orderedFaceDirections.first(),
+                    )
+                }
+                lastAutoCaptureTimeMs = System.currentTimeMillis()
+                // local variable is for null type safety purposes
+                val selfieFile = createSelfieFile(userId)
+                this.selfieFile = selfieFile
+                Timber.v("Capturing selfie image to $selfieFile")
                 postProcessImageBitmap(
                     bitmap = fullSelfieBmp,
-                    file = livenessFile,
+                    file = selfieFile,
                     compressionQuality = 80,
-                    resizeLongerDimensionTo = LIVENESS_IMAGE_SIZE,
+                    resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
                 )
-                livenessFiles.add(livenessFile)
                 return@addOnSuccessListener
             }
-            shouldAnalyzeImages = false
 
-            // local variable is for null type safety purposes
-            val selfieFile = createSelfieFile(userId)
-            this.selfieFile = selfieFile
-            Timber.v("Capturing selfie image to $selfieFile")
+            if (!shouldCaptureLiveness(face)) {
+                return@addOnSuccessListener
+            }
+
+            val livenessFile = createLivenessFile(userId)
+            Timber.v("Capturing liveness image to $livenessFile")
             postProcessImageBitmap(
                 bitmap = fullSelfieBmp,
-                file = selfieFile,
+                file = livenessFile,
                 compressionQuality = 80,
-                resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
+                resizeLongerDimensionTo = LIVENESS_IMAGE_SIZE,
             )
+            livenessFiles.add(livenessFile)
 
+            if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
+                _uiState.update {
+                    val index = livenessFiles.size % orderedFaceDirections.size
+                    it.copy(faceDirectionHint = orderedFaceDirections[index])
+                }
+                return@addOnSuccessListener
+            }
+
+            shouldAnalyzeImages = false
             val proxy = { e: Throwable -> onResult(SmileIDResult.Error(e)) }
             viewModelScope.launch(getExceptionHandler(proxy)) {
                 var done = false
@@ -297,6 +328,7 @@ class SmartSelfieV2ViewModel(
                                     showLoading = true,
                                     backgroundOpacity = 0.99f,
                                     showBorderHighlight = false,
+                                    faceDirectionHint = null,
                                 )
                             }
                         }
@@ -313,7 +345,7 @@ class SmartSelfieV2ViewModel(
         }
     }
 
-    private fun resetFaceQuality() {
+    private fun resetCaptureProgress() {
         _uiState.update {
             it.copy(
                 showBorderHighlight = false,
@@ -325,5 +357,41 @@ class SmartSelfieV2ViewModel(
         livenessFiles.removeAll { it.delete() }
         selfieFile?.delete()
         selfieFile = null
+    }
+
+    private fun shouldCaptureLiveness(face: Face): Boolean {
+        val index = livenessFiles.size % orderedFaceDirections.size
+        val currentActiveLivenessDirection = orderedFaceDirections[index]
+        val isLookingCorrectDirection = when (currentActiveLivenessDirection) {
+            FaceDirection.Left -> isFaceLookingLeft(face)
+            FaceDirection.Right -> isFaceLookingRight(face)
+            FaceDirection.Up -> isFaceLookingUp(face)
+            FaceDirection.Down -> isFaceLookingDown(face)
+        }
+        return isLookingCorrectDirection && livenessFiles.size < NUM_LIVENESS_IMAGES
+    }
+
+    private fun isFaceLookingLeft(face: Face, qualifyingAngle: Float = 20f): Boolean {
+        val result = face.headEulerAngleY > qualifyingAngle
+        Timber.v("isFaceLookingLeft: $result")
+        return result
+    }
+
+    private fun isFaceLookingRight(face: Face, qualifyingAngle: Float = 20f): Boolean {
+        val result = face.headEulerAngleY < -qualifyingAngle
+        Timber.v("isFaceLookingRight: $result")
+        return result
+    }
+
+    private fun isFaceLookingUp(face: Face, qualifyingAngle: Float = 15f): Boolean {
+        val result = face.headEulerAngleX > qualifyingAngle
+        Timber.v("isFaceLookingUp: $result")
+        return result
+    }
+
+    private fun isFaceLookingDown(face: Face, qualifyingAngle: Float = 10f): Boolean {
+        val result = face.headEulerAngleX < -qualifyingAngle
+        Timber.v("isFaceLookingDown: $result")
+        return result
     }
 }

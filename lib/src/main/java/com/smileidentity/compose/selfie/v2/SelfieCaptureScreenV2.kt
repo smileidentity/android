@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,6 +69,7 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
+import com.smileidentity.viewmodel.FaceDirection
 import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
@@ -296,6 +298,14 @@ private fun SmartSelfieV2Screen(
 
         if (uiState.showLoading) {
             CircularProgressIndicator()
+        }
+
+        when (uiState.faceDirectionHint) {
+            FaceDirection.Left -> Text("Look Left", color = Color.White)
+            FaceDirection.Right -> Text("Look Right", color = Color.White)
+            FaceDirection.Up -> Text("Look Up", color = Color.White)
+            FaceDirection.Down -> Text("Look Down", color = Color.White)
+            else -> {}
         }
     }
 }
