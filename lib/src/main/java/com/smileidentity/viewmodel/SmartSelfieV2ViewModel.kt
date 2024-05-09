@@ -27,6 +27,9 @@ import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
+import com.smileidentity.util.isLookingLeft
+import com.smileidentity.util.isLookingRight
+import com.smileidentity.util.isLookingUp
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
 import java.io.File
@@ -60,6 +63,8 @@ private const val LUMINANCE_THRESHOLD = 50
 private const val MAX_FACE_PITCH_THRESHOLD = 30
 private const val MAX_FACE_YAW_THRESHOLD = 15
 private const val MAX_FACE_ROLL_THRESHOLD = 30
+private const val ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD = 20f
+private const val ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD = 15f
 private const val LIVENESS_STABILITY_TIME_MS = 300
 
 enum class SelfieHint(@DrawableRes val animation: Int) {
@@ -388,15 +393,15 @@ class SmartSelfieV2ViewModel(
         val shouldCaptureMidpoint = livenessFiles.size % 2 == 0
         val isLookingCorrectDirection = if (shouldCaptureMidpoint) {
             when (currentActiveLivenessDirection) {
-                FaceDirection.Left -> face.isLookingLeft(10f)
-                FaceDirection.Right -> face.isLookingRight(10f)
-                FaceDirection.Up -> face.isLookingUp(7.5f)
+                FaceDirection.Left -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
+                FaceDirection.Right -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
+                FaceDirection.Up -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD / 2)
             }
         } else {
             when (currentActiveLivenessDirection) {
-                FaceDirection.Left -> face.isLookingLeft()
-                FaceDirection.Right -> face.isLookingRight()
-                FaceDirection.Up -> face.isLookingUp()
+                FaceDirection.Left -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
+                FaceDirection.Right -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
+                FaceDirection.Up -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD)
             }
         }
         if (!isLookingCorrectDirection) {
@@ -418,17 +423,5 @@ class SmartSelfieV2ViewModel(
             resetLivenessStabilityTime()
         }
         return result
-    }
-
-    private fun Face.isLookingLeft(qualifyingAngle: Float = 20f): Boolean {
-        return headEulerAngleY > qualifyingAngle
-    }
-
-    private fun Face.isLookingRight(qualifyingAngle: Float = 20f): Boolean {
-        return headEulerAngleY < -qualifyingAngle
-    }
-
-    private fun Face.isLookingUp(qualifyingAngle: Float = 15f): Boolean {
-        return headEulerAngleX > qualifyingAngle
     }
 }

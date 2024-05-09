@@ -20,6 +20,7 @@ import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
@@ -323,13 +324,6 @@ internal fun writeUriToFile(file: File, uri: Uri, context: Context) {
 internal fun isNetworkFailure(e: Throwable): Boolean = e is IOException || e is InterruptedException
 
 /**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is Google Photos.
- */
-private fun isGooglePhotosUri(uri: Uri): Boolean =
-    "com.google.android.apps.photos.content" == uri.authority
-
-/**
  * The old getParcelable method is deprecated in API 33 -- use the new one if supported, otherwise
  * fall back to the old one.
  *
@@ -362,4 +356,16 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
+}
+
+internal fun Face.isLookingLeft(angleThreshold: Float): Boolean {
+    return headEulerAngleY > angleThreshold
+}
+
+internal fun Face.isLookingRight(angleThreshold: Float): Boolean {
+    return headEulerAngleY < -angleThreshold
+}
+
+internal fun Face.isLookingUp(angleThreshold: Float): Boolean {
+    return headEulerAngleX > angleThreshold
 }
