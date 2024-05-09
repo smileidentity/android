@@ -1,15 +1,21 @@
 package com.smileidentity.viewmodel
 
 import androidx.camera.core.ImageProxy
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -62,5 +68,26 @@ class SelfieViewModelTest {
         verify(exactly = 1) { proxy.close() }
         verify(exactly = 1) { proxy.image }
         confirmVerified(proxy)
+    }
+
+    @Test
+    fun `submitJob should skip API submission when skipApiSubmission is true`() {
+        runTest {
+            // Arrange
+            val selfieFile = mockk<File>()
+            subject.shouldSkipApiSubmission = true
+            subject.mockSelfieFile = selfieFile
+
+            // Act
+            subject.submitJob()
+
+            // Assert
+            val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                subject.uiState.collect()
+                assertEquals(ProcessingState.Success, subject.uiState.value.processingState)
+            }
+
+            job.cancel()
+        }
     }
 }

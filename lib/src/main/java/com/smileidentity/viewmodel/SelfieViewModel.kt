@@ -115,6 +115,12 @@ class SelfieViewModel(
     @VisibleForTesting
     internal var shouldAnalyzeImages = true
 
+    @VisibleForTesting
+    internal var shouldSkipApiSubmission: Boolean? = null
+
+    @VisibleForTesting
+    internal var mockSelfieFile: File? = null
+
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
@@ -254,7 +260,7 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
-        if (skipApiSubmission) {
+        if (shouldSkipApiSubmission ?: skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
             return
@@ -387,7 +393,7 @@ class SelfieViewModel(
     }
 
     fun submitJob() {
-        submitJob(selfieFile!!, livenessFiles)
+        submitJob(mockSelfieFile ?: selfieFile!!, livenessFiles)
     }
 
     fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {

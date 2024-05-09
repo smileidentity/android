@@ -75,6 +75,7 @@ fun SmileID.SmartSelfieEnrollment(
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
+    skipApiSubmission: Boolean = false,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
@@ -88,6 +89,7 @@ fun SmileID.SmartSelfieEnrollment(
             showAttribution = showAttribution,
             showInstructions = showInstructions,
             extraPartnerParams = extraPartnerParams,
+            skipApiSubmission = skipApiSubmission,
             onResult = onResult,
         )
     }
