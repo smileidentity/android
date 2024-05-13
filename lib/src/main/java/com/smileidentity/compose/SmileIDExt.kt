@@ -61,6 +61,7 @@ import kotlinx.collections.immutable.persistentMapOf
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
  * branded UI by default, but allow the user to override it if they want.
+ * @param skipApiSubmission Whether to skip submitting the captured selfie data to the server.
  * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
