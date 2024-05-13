@@ -98,7 +98,6 @@ fun MainScreen(
     val dialogDestinations = remember {
         listOf(
             "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
-            "^${ProductScreen.SmartSelfieAuthenticationV2.route}.*$".toRegex(),
         )
     }
     val clipboardManager = LocalClipboardManager.current
@@ -230,7 +229,7 @@ fun MainScreen(
                         },
                     )
                 }
-                dialog(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
+                composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
                     val context = LocalContext.current
@@ -238,6 +237,7 @@ fun MainScreen(
                     OrchestratedSelfieCaptureScreenV2(
                         userId = userId,
                         selfieQualityModel = selfieQualityModel,
+                        useStrictMode = true,
                         onResult = {
                             viewModel.onSmartSelfieAuthenticationV2Result(it)
                             navController.popBackStack()

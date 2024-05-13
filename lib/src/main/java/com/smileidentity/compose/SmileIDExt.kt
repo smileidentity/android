@@ -132,7 +132,7 @@ fun SmileID.SmartSelfieAuthentication(
 ) {
     // TODO: Move this to a function parameter once we decided to expose it
     val useExperimentalUi = false
-    val useStrictMode = false
+    val useStrictMode = true
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         if (useExperimentalUi) {
             val context = LocalContext.current
