@@ -91,6 +91,7 @@ data class SmartSelfieV2UiState(
 @kotlin.OptIn(FlowPreview::class)
 class SmartSelfieV2ViewModel(
     private val userId: String,
+    private val useStrictMode: Boolean,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val selfieQualityModel: SelfieQualityModel,
     private val faceDetector: FaceDetector = FaceDetection.getClient(
@@ -385,6 +386,9 @@ class SmartSelfieV2ViewModel(
      * @param face The face detected in the image
      */
     private fun shouldCaptureLiveness(face: Face): Boolean {
+        if (!useStrictMode) {
+            return true
+        }
         // For each direction the user is supposed to look, we capture 2 liveness images:
         // 1. At the midpoint of the direction
         // 2. At the end of the direction
