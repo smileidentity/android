@@ -132,12 +132,14 @@ fun SmileID.SmartSelfieAuthentication(
 ) {
     // TODO: Move this to a function parameter once we decided to expose it
     val useExperimentalUi = false
+    val useStrictMode = false
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
         if (useExperimentalUi) {
             val context = LocalContext.current
             val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenV2(
                 userId = userId,
+                useStrictMode = useStrictMode,
                 selfieQualityModel = selfieQualityModel,
                 extraPartnerParams = extraPartnerParams,
                 modifier = modifier,

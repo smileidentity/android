@@ -82,6 +82,18 @@ import kotlinx.collections.immutable.persistentMapOf
 
 const val DEFAULT_CUTOUT_PROPORTION = 0.8f
 
+/**
+ * Orchestrates the Selfie Capture Flow. Navigates between instructions, requesting permissions,
+ * showing camera view, and displaying processing screen
+ *
+ * @param userId The user ID to associate with the selfie capture
+ * @param selfieQualityModel The model to use for selfie quality analysis
+ * @param modifier The modifier to apply to this composable
+ * @param useStrictMode Whether to use strict mode for the selfie capture. Strict mode entails the
+ * user performing an active liveness task
+ * @param extraPartnerParams Extra partner_params to send to the API
+ * @param onResult The callback to invoke when the selfie capture is complete
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @SmileIDOptIn
 @Composable
@@ -89,12 +101,14 @@ fun OrchestratedSelfieCaptureScreenV2(
     userId: String,
     selfieQualityModel: SelfieQualityModel,
     modifier: Modifier = Modifier,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
     @Suppress("UNUSED_PARAMETER") viewModel: SmartSelfieV2ViewModel = viewModel(
         initializer = {
             SmartSelfieV2ViewModel(
                 userId = userId,
+                useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
                 onResult = onResult,
