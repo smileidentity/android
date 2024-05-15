@@ -1,5 +1,10 @@
 # Release Notes
 
+## Unreleased
+
+* Kotlin 1.9.24
+* AndroidX Lifecycle 2.8.0
+
 ## 10.1.2
 
 * Better error message when the device is low on storage
