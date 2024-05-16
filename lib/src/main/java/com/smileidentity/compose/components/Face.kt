@@ -1,5 +1,6 @@
 package com.smileidentity.compose.components
 
+import androidx.annotation.FloatRange
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -7,6 +8,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,11 +25,23 @@ import com.smileidentity.compose.preview.Preview
 import kotlin.math.min
 import kotlin.math.sin
 
+/**
+ * Draws a basic face. It can be animated by adjusting the `featureOffsetX` and `featureOffsetY`
+ * parameters. NB! Usually you will want to animate between 0.25 and 0.75. Going all the way to
+ * 0 or 1 will make the eyes and mouth draw outside the face circle.
+ * The eyes and mouth shrink slightly when the head turns, providing a 3D effect.
+ *
+ * @param modifier The modifier to apply to this layout node.
+ * @param featureOffsetX The horizontal offset of the face features. A value of 0.5 means the face
+ * is centered, 0 means the face is turned to the left, and 1 means the face is turned to the right.
+ * @param featureOffsetY The vertical offset of the face features. A value of 0.5 means the face is
+ * centered, 0 means the face is looking up, and 1 means the face is looking down.
+ */
 @Composable
 fun Face(
     modifier: Modifier = Modifier,
-    featureOffsetX: Float = 0.5f,
-    featureOffsetY: Float = 0.5f,
+    @FloatRange(from = 0.25, to = 0.75) featureOffsetX: Float = 0.5f,
+    @FloatRange(from = 0.25, to = 0.75) featureOffsetY: Float = 0.5f,
 ) {
     val color = MaterialTheme.colorScheme.primary
     Canvas(modifier) {
@@ -42,9 +56,7 @@ fun Face(
         val left = size.width * (featureOffsetX - 0.5f)
         val top = size.height * (featureOffsetY - 0.5f)
         translate(left, top) {
-            // Left Eye. Shrinks slightly when featureOffsetX is < 0.5
-            // When featureOffsetX is 0, the eye is at its smallest, at 1/4 the original height
-            // If featureOffsetX is > 0.5, then no change
+            // Left Eye. Shrinks when featureOffsetX is < 0.5, or featureOffsetY is ≠ 0.5
             val leftEyeStart = Offset(size.width / 3, size.height / 3)
             val leftEyeEnd = Offset(size.width / 3, size.height / 2)
             val leftEyeHeight = leftEyeEnd - leftEyeStart
@@ -63,7 +75,7 @@ fun Face(
                 cap = StrokeCap.Round,
             )
 
-            // Right Eye
+            // Right Eye. Shrinks when featureOffsetX is > 0.5, or featureOffsetY is ≠ 0.5
             val rightEyeStart = Offset(size.width * 2 / 3, size.height / 3)
             val rightEyeEnd = Offset(size.width * 2 / 3, size.height / 2)
             val rightEyeHeight = rightEyeEnd - rightEyeStart
@@ -82,11 +94,10 @@ fun Face(
                 cap = StrokeCap.Round,
             )
 
-            // Mouth
+            // Mouth. Shrinks when featureOffsetX is ≠ 0.5, or featureOffsetY is ≠ 0.5
             val mouthStart = Offset(size.width * 0.4f, size.height * 2 / 3)
             val mouthEnd = Offset(size.width * 0.6f, size.height * 2 / 3)
             val mouthWidth = mouthEnd - mouthStart
-            // val widthScaleFactor = 0.5f * sin(featureOffsetX / 0.5f * Math.PI.toFloat()) + 0.5f
             val normalizedMouthWidth = mouthWidth * min(
                 sin(featureOffsetX * Math.PI.toFloat()),
                 sin(featureOffsetY * Math.PI.toFloat()),
@@ -105,6 +116,10 @@ fun Face(
     }
 }
 
+/**
+ * Conveniently animated version of the [Face] composable that makes the face look to the left.
+ * The animation plays in reverse rather than resetting, and then it repeats indefinitely.
+ */
 @Composable
 fun FaceAnimatingLeft(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "FaceAnimatingLeft")
@@ -120,6 +135,10 @@ fun FaceAnimatingLeft(modifier: Modifier = Modifier) {
     Face(modifier = modifier, featureOffsetX = featureOffsetX)
 }
 
+/**
+ * Conveniently animated version of the [Face] composable that makes the face look to the right.
+ * The animation plays in reverse rather than resetting, and then it repeats indefinitely.
+ */
 @Composable
 fun FaceAnimatingRight(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "FaceAnimatingRight")
@@ -135,6 +154,10 @@ fun FaceAnimatingRight(modifier: Modifier = Modifier) {
     Face(modifier = modifier, featureOffsetX = featureOffsetX)
 }
 
+/**
+ * Conveniently animated version of the [Face] composable that makes the face look up.
+ * The animation plays in reverse rather than resetting, and then it repeats indefinitely.
+ */
 @Composable
 fun FaceAnimatingUp(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "FaceAnimatingUp")
@@ -155,7 +178,7 @@ fun FaceAnimatingUp(modifier: Modifier = Modifier) {
 private fun FacePreview() {
     val infiniteTransition = rememberInfiniteTransition(label = "infiniteTransition")
     val featureOffsetX by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
+        initialValue = 0.25f,
         targetValue = 0.75f,
         label = "featureOffsetX",
         animationSpec = infiniteRepeatable(
@@ -163,21 +186,12 @@ private fun FacePreview() {
             repeatMode = RepeatMode.Reverse,
         ),
     )
-    val featureOffsetY by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 0.25f,
-        label = "featureOffsetY",
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500, easing = EaseInOut),
-            repeatMode = RepeatMode.Restart,
-        ),
-    )
     Preview {
         Surface {
             Face(
                 featureOffsetX = featureOffsetX,
-                featureOffsetY = featureOffsetY,
-                modifier = Modifier.size(128.dp),
+                featureOffsetY = 0.5f,
+                modifier = Modifier.padding(2.dp).size(64.dp),
             )
         }
     }
