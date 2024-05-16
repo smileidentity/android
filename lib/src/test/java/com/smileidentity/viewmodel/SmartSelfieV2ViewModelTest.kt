@@ -31,7 +31,6 @@ class SmartSelfieV2ViewModelTest {
         val uiState = subject.uiState.value
         assertEquals(SelfieHint.SearchingForFace, uiState.selfieHint)
         assertEquals(false, uiState.showLoading)
-        assertEquals(false, uiState.showCompletion)
         assertEquals(false, uiState.showBorderHighlight)
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
+import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.core.graphics.scale
@@ -51,41 +52,46 @@ import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
 import timber.log.Timber
 
-private const val HISTORY_LENGTH = 7
+private const val SELFIE_QUALITY_HISTORY_LENGTH = 7
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
-private const val NUM_LIVENESS_IMAGES = 6
+
+/*
+This is used only when NOT in strict mode. In strict mode, the number of images is determined
+by the liveness task
+ */
+private const val NUM_LIVENESS_IMAGES = 4
 private const val LIVENESS_IMAGE_SIZE = 320
 private const val SELFIE_IMAGE_SIZE = 640
+private const val NO_FACE_RESET_DELAY_MS = 3000
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val MIN_FACE_FILL_THRESHOLD = 0.15f
-private const val MAX_FACE_FILL_THRESHOLD = 0.25f
+private const val MIN_FACE_FILL_THRESHOLD = 0.1f
+private const val MAX_FACE_FILL_THRESHOLD = 0.3f
 private const val LUMINANCE_THRESHOLD = 50
 private const val MAX_FACE_PITCH_THRESHOLD = 30
 private const val MAX_FACE_YAW_THRESHOLD = 15
 private const val MAX_FACE_ROLL_THRESHOLD = 30
 private const val ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD = 20f
 private const val ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD = 15f
-private const val LIVENESS_STABILITY_TIME_MS = 300
+private const val LIVENESS_STABILITY_TIME_MS = 300L
 
-enum class SelfieHint(@DrawableRes val animation: Int) {
-    SearchingForFace(R.drawable.si_tf_face_search),
-    NeedLight(R.drawable.si_tf_light_flash),
-}
-
-enum class FaceDirection {
-    Left,
-    Right,
-    Up,
+enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int) {
+    SearchingForFace(
+        R.drawable.si_tf_face_search,
+        R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
+    ),
+    NeedLight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_need_more_light),
+    MoveBack(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_move_back),
+    MoveCloser(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_move_closer),
+    LookLeft(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_look_left),
+    LookRight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_look_right),
+    LookUp(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_look_up),
+    KeepLooking(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_keep_looking),
 }
 
 data class SmartSelfieV2UiState(
-    val backgroundOpacity: Float = 0.8f,
-    val cutoutOpacity: Float = 0.8f,
     val showBorderHighlight: Boolean = false,
-    val selfieHint: SelfieHint? = SelfieHint.SearchingForFace,
+    val selfieHint: SelfieHint = SelfieHint.SearchingForFace,
     val showLoading: Boolean = false,
-    val showCompletion: Boolean = false,
-    val faceDirectionHint: FaceDirection? = null,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -113,16 +119,16 @@ class SmartSelfieV2ViewModel(
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
+    private var lastFaceDetectedTime = 0L
     private var shouldAnalyzeImages = true
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
-    private val orderedFaceDirections = FaceDirection.entries.shuffled()
-    private var initialLivenessSatisfiedTimeMs = Long.MAX_VALUE
+    private val activeLiveness = ActiveLiveness(LIVENESS_STABILITY_TIME_MS)
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
-        val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
-        val enoughTimeHasPassed = elapsedTimeMs > INTRA_IMAGE_MIN_DELAY_MS
+        val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
+        val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
             imageProxy.close()
             return
@@ -134,18 +140,15 @@ class SmartSelfieV2ViewModel(
             imageProxy.close()
             return
         }
+        val elapsedTimeSinceFaceDetectedMs = System.currentTimeMillis() - lastFaceDetectedTime
 
         // YUV_420_888 is the format produced by CameraX and needed for Luminance calculation
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val luminance = calculateLuminance(imageProxy)
         if (luminance < LUMINANCE_THRESHOLD) {
             Timber.d("Low luminance detected")
-            _uiState.update {
-                it.copy(
-                    showBorderHighlight = false,
-                    cutoutOpacity = 1f,
-                    selfieHint = SelfieHint.NeedLight,
-                )
+            if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                resetCaptureProgress(reason = SelfieHint.NeedLight)
             }
             imageProxy.close()
             return
@@ -155,13 +158,18 @@ class SmartSelfieV2ViewModel(
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
             val face = faces.firstOrNull() ?: run {
                 Timber.d("No face detected")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
+            lastFaceDetectedTime = System.currentTimeMillis()
 
             if (faces.size > 1) {
                 Timber.d("More than one face detected")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
 
@@ -172,7 +180,9 @@ class SmartSelfieV2ViewModel(
                 bBox.top >= 0 && bBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
                 Timber.d("Face bounding box not within image")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
 
@@ -180,26 +190,34 @@ class SmartSelfieV2ViewModel(
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
             if (faceFillRatio < MIN_FACE_FILL_THRESHOLD) {
                 Timber.d("Face not close enough to camera")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
             if (faceFillRatio > MAX_FACE_FILL_THRESHOLD) {
                 Timber.d("Face too close to camera")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
 
             val fullSelfieBmp = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
             if (bBox.left + bBox.width() > fullSelfieBmp.width) {
                 Timber.d("Face bounding box width is greater than image width")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
             if (bBox.top + bBox.height() > fullSelfieBmp.height) {
                 Timber.d("Face bounding box height is greater than image height")
-                resetCaptureProgress()
+                if (elapsedTimeSinceFaceDetectedMs > NO_FACE_RESET_DELAY_MS) {
+                    resetCaptureProgress()
+                }
                 return@addOnSuccessListener
             }
 
@@ -211,7 +229,8 @@ class SmartSelfieV2ViewModel(
                 val extremeRoll = face.headEulerAngleZ.absoluteValue > MAX_FACE_ROLL_THRESHOLD
                 if (extremePitch || extremeYaw || extremeRoll) {
                     Timber.d("Extreme head pose detected")
-                    resetCaptureProgress()
+                    // Don't reset progress here, because the user might be trying some active
+                    // liveness tasks
                     return@addOnSuccessListener
                 }
                 // We only run the image quality model on the selfie capture because the liveness
@@ -238,11 +257,10 @@ class SmartSelfieV2ViewModel(
                 val outputs = selfieQualityModel.process(input.tensorBuffer)
                 val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
                     Timber.w("No image quality output")
-                    resetCaptureProgress()
                     return@addOnSuccessListener
                 }
                 selfieQualityHistory.add(output)
-                if (selfieQualityHistory.size > HISTORY_LENGTH) {
+                if (selfieQualityHistory.size > SELFIE_QUALITY_HISTORY_LENGTH) {
                     // We should only ever exceed history length by 1
                     selfieQualityHistory.removeAt(0)
                 }
@@ -252,15 +270,13 @@ class SmartSelfieV2ViewModel(
                 if (averageFaceQuality < FACE_QUALITY_THRESHOLD) {
                     // We don't want to reset the history here, since the model output is noisy
                     Timber.d("Face quality not met ($averageFaceQuality)")
-                    _uiState.update { it.copy(showBorderHighlight = false, cutoutOpacity = 0.8f) }
+                    _uiState.update { it.copy(showBorderHighlight = false) }
                     return@addOnSuccessListener
                 }
                 _uiState.update {
                     it.copy(
                         showBorderHighlight = true,
-                        cutoutOpacity = 0f,
-                        selfieHint = null,
-                        faceDirectionHint = orderedFaceDirections.first(),
+                        selfieHint = activeLiveness.selfieHint,
                     )
                 }
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
@@ -277,8 +293,11 @@ class SmartSelfieV2ViewModel(
                 return@addOnSuccessListener
             }
 
-            if (!shouldCaptureLiveness(face)) {
-                return@addOnSuccessListener
+            if (useStrictMode) {
+                if (!activeLiveness.doesFaceMeetCurrentActiveLivenessTask(face)) {
+                    return@addOnSuccessListener
+                }
+                activeLiveness.markCurrentDirectionSatisfied()
             }
 
             val livenessFile = createLivenessFile(userId)
@@ -291,12 +310,18 @@ class SmartSelfieV2ViewModel(
             )
             livenessFiles.add(livenessFile)
 
-            if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                _uiState.update {
-                    val index = (livenessFiles.size / 2) % orderedFaceDirections.size
-                    it.copy(faceDirectionHint = orderedFaceDirections[index])
+            if (useStrictMode) {
+                if (!activeLiveness.isFinished) {
+                    _uiState.update { it.copy(selfieHint = activeLiveness.selfieHint) }
+                    return@addOnSuccessListener
                 }
-                return@addOnSuccessListener
+            } else {
+                if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
+                    _uiState.update {
+                        it.copy(selfieHint = SelfieHint.KeepLooking)
+                    }
+                    return@addOnSuccessListener
+                }
             }
 
             shouldAnalyzeImages = false
@@ -317,8 +342,6 @@ class SmartSelfieV2ViewModel(
                         _uiState.update {
                             it.copy(
                                 showLoading = false,
-                                showCompletion = true,
-                                backgroundOpacity = 0.99f,
                                 showBorderHighlight = false,
                             )
                         }
@@ -333,9 +356,7 @@ class SmartSelfieV2ViewModel(
                             _uiState.update {
                                 it.copy(
                                     showLoading = true,
-                                    backgroundOpacity = 0.99f,
                                     showBorderHighlight = false,
-                                    faceDirectionHint = null,
                                 )
                             }
                         }
@@ -352,23 +373,18 @@ class SmartSelfieV2ViewModel(
         }
     }
 
-    private fun resetLivenessStabilityTime() {
-        initialLivenessSatisfiedTimeMs = Long.MAX_VALUE
-    }
-
-    private fun resetCaptureProgress() {
+    private fun resetCaptureProgress(reason: SelfieHint = SelfieHint.SearchingForFace) {
         _uiState.update {
             it.copy(
                 showBorderHighlight = false,
-                cutoutOpacity = 0.8f,
-                selfieHint = SelfieHint.SearchingForFace,
-                faceDirectionHint = null,
+                selfieHint = reason,
             )
         }
         selfieQualityHistory.clear()
         livenessFiles.removeAll { it.delete() }
         selfieFile?.delete()
         selfieFile = null
+        activeLiveness.restart()
     }
 
     /**
@@ -389,43 +405,118 @@ class SmartSelfieV2ViewModel(
         if (!useStrictMode) {
             return true
         }
-        // For each direction the user is supposed to look, we capture 2 liveness images:
-        // 1. At the midpoint of the direction
-        // 2. At the end of the direction
-        val index = (livenessFiles.size / 2) % orderedFaceDirections.size
-        val currentActiveLivenessDirection = orderedFaceDirections[index]
-        val shouldCaptureMidpoint = livenessFiles.size % 2 == 0
-        val isLookingCorrectDirection = if (shouldCaptureMidpoint) {
-            when (currentActiveLivenessDirection) {
-                FaceDirection.Left -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
-                FaceDirection.Right -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
-                FaceDirection.Up -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD / 2)
-            }
-        } else {
-            when (currentActiveLivenessDirection) {
-                FaceDirection.Left -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
-                FaceDirection.Right -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
-                FaceDirection.Up -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD)
+        return activeLiveness.doesFaceMeetCurrentActiveLivenessTask(face)
+    }
+}
+
+/**
+ * Determines a randomized set of directions for the user to look in
+ * We capture two types of tasks: midpoint and end.
+ */
+private class ActiveLiveness(
+    private val endpointStabilityTimeMs: Long,
+    shouldCaptureMidTrack: Boolean = true,
+) {
+    private sealed interface FaceDirection
+    private sealed interface Left : FaceDirection
+    private sealed interface Right : FaceDirection
+    private sealed interface Up : FaceDirection
+    private sealed interface Midpoint : FaceDirection
+    private sealed class Endpoint(val midpoint: Midpoint) : FaceDirection
+    private data object LeftEnd : Left, Endpoint(LeftMid)
+    private data object LeftMid : Left, Midpoint
+    private data object RightEnd : Right, Endpoint(RightMid)
+    private data object RightMid : Right, Midpoint
+    private data object UpEnd : Up, Endpoint(UpMid)
+    private data object UpMid : Up, Midpoint
+
+    // private val orderedFaceDirections = FaceDirection.entries.shuffled()
+    private val orderedFaceDirections = listOf(LeftEnd, RightEnd, UpEnd)
+        .shuffled()
+        .flatMap {
+            if (shouldCaptureMidTrack) {
+                listOf(it, it.midpoint)
+            } else {
+                listOf(it)
             }
         }
-        if (!isLookingCorrectDirection) {
+    private var currentDirectionIdx = 0
+    private var currentDirectionInitiallySatisfiedAt = Long.MAX_VALUE
+
+    /**
+     * Determines if conditions are met for the current active liveness task
+     *
+     * For midpoint images, we capture eagerly. For end images, we only capture if the user has been
+     * looking in the correct direction for a certain amount of time. This is to prevent blurriness.
+     * We don't do the same for midpoint images because we don't want to interrupt the user mid-turn
+     *
+     * @param face The face detected in the image
+     */
+    fun doesFaceMeetCurrentActiveLivenessTask(face: Face): Boolean {
+        val isLookingRightDirection = when (orderedFaceDirections[currentDirectionIdx]) {
+            is LeftMid -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
+            is LeftEnd -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
+            is RightMid -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
+            is RightEnd -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
+            is UpMid -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD / 2)
+            is UpEnd -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD)
+        }
+        if (!isLookingRightDirection) {
+            resetLivenessStabilityTime()
+            return false
+        }
+        if (orderedFaceDirections[currentDirectionIdx] is Midpoint) {
+            return true
+        }
+        if (currentDirectionInitiallySatisfiedAt > System.currentTimeMillis()) {
+            currentDirectionInitiallySatisfiedAt = System.currentTimeMillis()
+        }
+        val elapsedTimeMs = System.currentTimeMillis() - currentDirectionInitiallySatisfiedAt
+        val hasBeenLongEnough = elapsedTimeMs > endpointStabilityTimeMs
+        if (hasBeenLongEnough) {
             resetLivenessStabilityTime()
         }
-        // Check that user has been looking in the correct direction for half a second for non-midpoint capture
-        var hasBeenLookingLongEnough = true
-        if (!shouldCaptureMidpoint) {
-            if (initialLivenessSatisfiedTimeMs == Long.MAX_VALUE) {
-                initialLivenessSatisfiedTimeMs = System.currentTimeMillis()
-            }
-            val elapsedTimeMs = System.currentTimeMillis() - initialLivenessSatisfiedTimeMs
-            hasBeenLookingLongEnough = elapsedTimeMs > LIVENESS_STABILITY_TIME_MS
+        return hasBeenLongEnough
+    }
+
+    /**
+     * Marks the current direction as satisfied and moves to the next direction.
+     *
+     * @return true if there are more directions to satisfy, false otherwise
+     */
+    fun markCurrentDirectionSatisfied(): Boolean {
+        currentDirectionIdx += 1
+        return currentDirectionIdx < orderedFaceDirections.size
+    }
+
+    val isFinished
+        get() = currentDirectionIdx >= orderedFaceDirections.size
+
+    /**
+     * Resets the current direction and the time it was initially satisfied.
+     */
+    fun restart() {
+        currentDirectionIdx = 0
+        resetLivenessStabilityTime()
+    }
+
+    /**
+     * Converts the current direction to a selfie hint.
+     */
+    val selfieHint
+        get() = when (orderedFaceDirections[currentDirectionIdx]) {
+            is LeftMid -> SelfieHint.LookLeft
+            is LeftEnd -> SelfieHint.LookLeft
+            is RightMid -> SelfieHint.LookRight
+            is RightEnd -> SelfieHint.LookRight
+            is UpMid -> SelfieHint.LookUp
+            is UpEnd -> SelfieHint.LookUp
         }
-        val result = isLookingCorrectDirection &&
-            hasBeenLookingLongEnough &&
-            livenessFiles.size < NUM_LIVENESS_IMAGES
-        if (result) {
-            resetLivenessStabilityTime()
-        }
-        return result
+
+    /**
+     * Resets the time the current direction was initially satisfied.
+     */
+    private fun resetLivenessStabilityTime() {
+        currentDirectionInitiallySatisfiedAt = Long.MAX_VALUE
     }
 }
