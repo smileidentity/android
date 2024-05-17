@@ -73,8 +73,6 @@ import com.ujizin.camposer.state.rememberImageAnalyzer
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
-const val DEFAULT_CUTOUT_PROPORTION = 0.8f
-
 /**
  * Orchestrates the Selfie Capture Flow. Navigates between instructions, requesting permissions,
  * showing camera view, and displaying processing screen
