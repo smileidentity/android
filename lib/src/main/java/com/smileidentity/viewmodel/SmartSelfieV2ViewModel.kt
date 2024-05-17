@@ -85,6 +85,7 @@ private const val MAX_FACE_ROLL_THRESHOLD = 30
 private const val ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD = 20f
 private const val ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD = 15f
 private const val LIVENESS_STABILITY_TIME_MS = 300L
+private const val FORCED_FAILURE_TIMEOUT_MS = 5_000L
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -147,6 +148,23 @@ class SmartSelfieV2ViewModel(
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
     private val activeLiveness = ActiveLiveness(LIVENESS_STABILITY_TIME_MS)
+    private var forcedFailureTimerExpired = false
+
+    init {
+        if (useStrictMode) {
+            viewModelScope.launch {
+                delay(FORCED_FAILURE_TIMEOUT_MS)
+                val selfieState = uiState.value.selfieState
+                // These 2 conditions should theoretically both be true at the same time
+                if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
+                    SmileIDCrashReporting.hub.addBreadcrumb("Strict Mode force fail timer expired")
+                    Timber.d("Strict Mode forced failure timer expired")
+                    forcedFailureTimerExpired = true
+                    resetCaptureProgress(LookStraight)
+                }
+            }
+        }
+    }
 
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
@@ -300,7 +318,7 @@ class SmartSelfieV2ViewModel(
                 return@addOnSuccessListener
             }
 
-            if (useStrictMode) {
+            if (useStrictMode && !forcedFailureTimerExpired) {
                 if (!activeLiveness.doesFaceMeetCurrentActiveLivenessTask(face)) {
                     return@addOnSuccessListener
                 }
@@ -317,7 +335,7 @@ class SmartSelfieV2ViewModel(
             )
             livenessFiles.add(livenessFile)
 
-            if (useStrictMode) {
+            if (useStrictMode && !forcedFailureTimerExpired) {
                 if (!activeLiveness.isFinished) {
                     _uiState.update {
                         it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
@@ -339,6 +357,7 @@ class SmartSelfieV2ViewModel(
                 // to make it feel like the API call is a bit faster
                 awaitAll(
                     async {
+                        // activeLivenessDetails = ActiveLivenessDetails(orderedFaceDirections = activeLiveness.orderedFaceDirections, forceFailure = forcedFailureTimerExpired),
                         val apiResponse = SmileID.api.doSmartSelfieAuthentication(
                             userId = userId,
                             selfieImage = selfieFile,
@@ -393,27 +412,6 @@ class SmartSelfieV2ViewModel(
         selfieFile?.delete()
         selfieFile = null
         activeLiveness.restart()
-    }
-
-    /**
-     * Determines if conditions are met to capture a liveness image.
-     *
-     * If strict mode is enabled, then this runs active liveness checks. Otherwise, it returns true.
-     *
-     * For strict mode/active liveness, a randomized set of directions for the user to look in was
-     * chosen on class initialization. We capture two types of liveness images: midpoint and end.
-     *
-     * For midpoint images, we capture eagerly. For end images, we only capture if the user has been
-     * looking in the correct direction for a certain amount of time. This is to prevent blurriness.
-     * We don't do the same for midpoint images because we don't want to interrupt the user mid-turn
-     *
-     * @param face The face detected in the image
-     */
-    private fun shouldCaptureLiveness(face: Face): Boolean {
-        if (!useStrictMode) {
-            return true
-        }
-        return activeLiveness.doesFaceMeetCurrentActiveLivenessTask(face)
     }
 }
 
