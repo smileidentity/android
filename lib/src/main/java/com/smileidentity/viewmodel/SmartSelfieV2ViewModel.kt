@@ -85,7 +85,7 @@ private const val MAX_FACE_ROLL_THRESHOLD = 30
 private const val ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD = 20f
 private const val ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD = 15f
 private const val LIVENESS_STABILITY_TIME_MS = 300L
-private const val FORCED_FAILURE_TIMEOUT_MS = 5_000L
+private const val FORCED_FAILURE_TIMEOUT_MS = 30_000L
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
