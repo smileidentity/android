@@ -29,9 +29,6 @@ class SmartSelfieV2ViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(SelfieHint.SearchingForFace, uiState.selfieHint)
-        assertEquals(false, uiState.showLoading)
-        assertEquals(false, uiState.showCompletion)
-        assertEquals(false, uiState.showBorderHighlight)
+        assertEquals(SelfieState.Analyzing(SelfieHint.SearchingForFace), uiState.selfieState)
     }
 }
