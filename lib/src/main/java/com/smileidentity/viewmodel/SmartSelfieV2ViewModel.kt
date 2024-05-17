@@ -71,7 +71,7 @@ private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 This is used only when NOT in strict mode. In strict mode, the number of images is determined
 by the liveness task
  */
-private const val NUM_LIVENESS_IMAGES = 4
+private const val NUM_LIVENESS_IMAGES = 8
 private const val LIVENESS_IMAGE_SIZE = 320
 private const val SELFIE_IMAGE_SIZE = 640
 private const val NO_FACE_RESET_DELAY_MS = 500
@@ -149,6 +149,7 @@ class SmartSelfieV2ViewModel(
     private val selfieQualityHistory = mutableListOf<Float>()
     private val activeLiveness = ActiveLiveness(LIVENESS_STABILITY_TIME_MS)
     private var forcedFailureTimerExpired = false
+    private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
 
     init {
         if (useStrictMode) {
@@ -166,6 +167,21 @@ class SmartSelfieV2ViewModel(
         }
     }
 
+    /**
+     * This checks all conditions of the camera frame. It returns eagerly. The checks performed are:
+     * 1. Whether enough time has elapsed since the last capture
+     * 2. Luminance
+     * 3. Face detection
+     * 4. More than one face detected
+     * 5. Face bounding box within image ("entire face visible")
+     * 6. Face too far from camera
+     * 7. Face too close to camera
+     * 8. For selfie images only:
+     *   a. Face looking straight ahead
+     *   b. Face quality model
+     * 9. For liveness images only in strict mode AND strict mode timer is not expired:
+     *   a. Face looking in the correct direction
+     */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
@@ -318,7 +334,7 @@ class SmartSelfieV2ViewModel(
                 return@addOnSuccessListener
             }
 
-            if (useStrictMode && !forcedFailureTimerExpired) {
+            if (shouldUseActiveLiveness) {
                 if (!activeLiveness.doesFaceMeetCurrentActiveLivenessTask(face)) {
                     return@addOnSuccessListener
                 }
@@ -335,7 +351,7 @@ class SmartSelfieV2ViewModel(
             )
             livenessFiles.add(livenessFile)
 
-            if (useStrictMode && !forcedFailureTimerExpired) {
+            if (shouldUseActiveLiveness) {
                 if (!activeLiveness.isFinished) {
                     _uiState.update {
                         it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
