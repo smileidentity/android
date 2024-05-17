@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,12 +37,16 @@ import kotlin.math.sin
  * is centered, 0 means the face is turned to the left, and 1 means the face is turned to the right.
  * @param featureOffsetY The vertical offset of the face features. A value of 0.5 means the face is
  * centered, 0 means the face is looking up, and 1 means the face is looking down.
+ * @param featureScale The scale of the face features. A value of 1 means the face features are
+ * normal size, 0.5 means the face features are half the size, and 1.5 means the face features are
+ * 50% larger.
  */
 @Composable
 fun Face(
     modifier: Modifier = Modifier,
     @FloatRange(from = 0.25, to = 0.75) featureOffsetX: Float = 0.5f,
     @FloatRange(from = 0.25, to = 0.75) featureOffsetY: Float = 0.5f,
+    @FloatRange(from = 0.5, to = 1.5) featureScale: Float = 1f,
 ) {
     val color = MaterialTheme.colorScheme.primary
     Canvas(modifier) {
@@ -53,65 +58,67 @@ fun Face(
             style = Stroke(width = strokeWidth),
         )
 
-        val left = size.width * (featureOffsetX - 0.5f)
-        val top = size.height * (featureOffsetY - 0.5f)
-        translate(left, top) {
-            // Left Eye. Shrinks when featureOffsetX is < 0.5, or featureOffsetY is ≠ 0.5
-            val leftEyeStart = Offset(size.width / 3, size.height / 3)
-            val leftEyeEnd = Offset(size.width / 3, size.height / 2)
-            val leftEyeHeight = leftEyeEnd - leftEyeStart
-            val normalizedLeftEyeHeight = leftEyeHeight * min(
-                sin(featureOffsetX.coerceAtMost(0.5f) * Math.PI.toFloat()),
-                sin(featureOffsetY * Math.PI.toFloat()),
-            )
-            val normalizedLeftEyeOffset = (leftEyeHeight - normalizedLeftEyeHeight) / 2f
-            val normalizedLeftEyeStart = leftEyeStart + normalizedLeftEyeOffset
-            val normalizedLeftEyeEnd = leftEyeEnd - normalizedLeftEyeOffset
-            drawLine(
-                color = color,
-                start = normalizedLeftEyeStart,
-                end = normalizedLeftEyeEnd,
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round,
-            )
+        scale(featureScale) {
+            val left = size.width * (featureOffsetX - 0.5f)
+            val top = size.height * (featureOffsetY - 0.5f)
+            translate(left, top) {
+                // Left Eye. Shrinks when featureOffsetX is < 0.5, or featureOffsetY is ≠ 0.5
+                val leftEyeStart = Offset(size.width / 3, size.height / 3)
+                val leftEyeEnd = Offset(size.width / 3, size.height / 2)
+                val leftEyeHeight = leftEyeEnd - leftEyeStart
+                val normalizedLeftEyeHeight = leftEyeHeight * min(
+                    sin(featureOffsetX.coerceAtMost(0.5f) * Math.PI.toFloat()),
+                    sin(featureOffsetY * Math.PI.toFloat()),
+                )
+                val normalizedLeftEyeOffset = (leftEyeHeight - normalizedLeftEyeHeight) / 2f
+                val normalizedLeftEyeStart = leftEyeStart + normalizedLeftEyeOffset
+                val normalizedLeftEyeEnd = leftEyeEnd - normalizedLeftEyeOffset
+                drawLine(
+                    color = color,
+                    start = normalizedLeftEyeStart,
+                    end = normalizedLeftEyeEnd,
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
 
-            // Right Eye. Shrinks when featureOffsetX is > 0.5, or featureOffsetY is ≠ 0.5
-            val rightEyeStart = Offset(size.width * 2 / 3, size.height / 3)
-            val rightEyeEnd = Offset(size.width * 2 / 3, size.height / 2)
-            val rightEyeHeight = rightEyeEnd - rightEyeStart
-            val normalizedRightEyeHeight = rightEyeHeight * min(
-                sin(featureOffsetX.coerceAtLeast(0.5f) * Math.PI.toFloat()),
-                sin(featureOffsetY * Math.PI.toFloat()),
-            )
-            val normalizedRightEyeOffset = (rightEyeHeight - normalizedRightEyeHeight) / 2f
-            val normalizedRightEyeStart = rightEyeStart + normalizedRightEyeOffset
-            val normalizedRightEyeEnd = rightEyeEnd - normalizedRightEyeOffset
-            drawLine(
-                color = color,
-                start = normalizedRightEyeStart,
-                end = normalizedRightEyeEnd,
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round,
-            )
+                // Right Eye. Shrinks when featureOffsetX is > 0.5, or featureOffsetY is ≠ 0.5
+                val rightEyeStart = Offset(size.width * 2 / 3, size.height / 3)
+                val rightEyeEnd = Offset(size.width * 2 / 3, size.height / 2)
+                val rightEyeHeight = rightEyeEnd - rightEyeStart
+                val normalizedRightEyeHeight = rightEyeHeight * min(
+                    sin(featureOffsetX.coerceAtLeast(0.5f) * Math.PI.toFloat()),
+                    sin(featureOffsetY * Math.PI.toFloat()),
+                )
+                val normalizedRightEyeOffset = (rightEyeHeight - normalizedRightEyeHeight) / 2f
+                val normalizedRightEyeStart = rightEyeStart + normalizedRightEyeOffset
+                val normalizedRightEyeEnd = rightEyeEnd - normalizedRightEyeOffset
+                drawLine(
+                    color = color,
+                    start = normalizedRightEyeStart,
+                    end = normalizedRightEyeEnd,
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
 
-            // Mouth. Shrinks when featureOffsetX is ≠ 0.5, or featureOffsetY is ≠ 0.5
-            val mouthStart = Offset(size.width * 0.4f, size.height * 2 / 3)
-            val mouthEnd = Offset(size.width * 0.6f, size.height * 2 / 3)
-            val mouthWidth = mouthEnd - mouthStart
-            val normalizedMouthWidth = mouthWidth * min(
-                sin(featureOffsetX * Math.PI.toFloat()),
-                sin(featureOffsetY * Math.PI.toFloat()),
-            )
-            val normalizedMouthOffset = (mouthWidth - normalizedMouthWidth) / 2f
-            val normalizedMouthStart = mouthStart + normalizedMouthOffset
-            val normalizedMouthEnd = mouthEnd - normalizedMouthOffset
-            drawLine(
-                color = color,
-                start = normalizedMouthStart,
-                end = normalizedMouthEnd,
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round,
-            )
+                // Mouth. Shrinks when featureOffsetX is ≠ 0.5, or featureOffsetY is ≠ 0.5
+                val mouthStart = Offset(size.width * 0.4f, size.height * 2 / 3)
+                val mouthEnd = Offset(size.width * 0.6f, size.height * 2 / 3)
+                val mouthWidth = mouthEnd - mouthStart
+                val normalizedMouthWidth = mouthWidth * min(
+                    sin(featureOffsetX * Math.PI.toFloat()),
+                    sin(featureOffsetY * Math.PI.toFloat()),
+                )
+                val normalizedMouthOffset = (mouthWidth - normalizedMouthWidth) / 2f
+                val normalizedMouthStart = mouthStart + normalizedMouthOffset
+                val normalizedMouthEnd = mouthEnd - normalizedMouthOffset
+                drawLine(
+                    color = color,
+                    start = normalizedMouthStart,
+                    end = normalizedMouthEnd,
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
+            }
         }
     }
 }
@@ -171,6 +178,44 @@ fun FaceAnimatingUp(modifier: Modifier = Modifier) {
         ),
     )
     Face(modifier = modifier, featureOffsetY = featureOffsetY)
+}
+
+/**
+ * Conveniently animated version of the [Face] composable that makes the face move back.
+ * The animation resets rather than playing in reverse, and then it repeats indefinitely.
+ */
+@Composable
+fun FaceMovingBack(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "FaceMovingBack")
+    val featureScale by infiniteTransition.animateFloat(
+        initialValue = 1.5f,
+        targetValue = 1f,
+        label = "FaceMovingBack.featureScale",
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500, easing = EaseInOut),
+            repeatMode = RepeatMode.Restart,
+        ),
+    )
+    Face(modifier = modifier, featureScale = featureScale)
+}
+
+/**
+ * Conveniently animated version of the [Face] composable that makes the face move closer.
+ * The animation resets rather than playing in reverse, and then it repeats indefinitely.
+ */
+@Composable
+fun FaceMovingCloser(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "FaceMovingForward")
+    val featureScale by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1f,
+        label = "FaceMovingForward.featureScale",
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500, easing = EaseInOut),
+            repeatMode = RepeatMode.Restart,
+        ),
+    )
+    Face(modifier = modifier, featureScale = featureScale)
 }
 
 @Preview
