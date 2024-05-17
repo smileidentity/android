@@ -28,6 +28,7 @@ import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
+import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
 import java.io.File
 import kotlin.time.Duration
@@ -88,6 +89,7 @@ interface SmileIDService {
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
+        @Part("metadata") metadata: List<Metadata>? = null,
     ): SmartSelfieResponse
 
     /**
@@ -110,6 +112,7 @@ interface SmileIDService {
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
+        @Part("metadata") metadata: List<Metadata>? = null,
     ): SmartSelfieResponse
 
     /**
@@ -220,6 +223,7 @@ interface SmileIDService {
  * @param callbackUrl The URL to send the result to
  * @param sandboxResult The result to return if in sandbox mode to test your integration
  * @param allowNewEnroll Whether to allow new enrollments for the user
+ * @param metadata Additional metadata to send to the server
  */
 suspend fun SmileIDService.doSmartSelfieEnrollment(
     selfieImage: File,
@@ -229,6 +233,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     allowNewEnroll: Boolean? = null,
+    metadata: List<Metadata>? = null,
 ) = doSmartSelfieEnrollment(
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
     livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
@@ -237,6 +242,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
     allowNewEnroll = allowNewEnroll,
+    metadata = metadata,
 )
 
 /**
@@ -249,6 +255,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
  * @param partnerParams Additional parameters to send to the server
  * @param callbackUrl The URL to send the result to
  * @param sandboxResult The result to return if in sandbox mode to test your integration
+ * @param metadata Additional metadata to send to the server
  */
 suspend fun SmileIDService.doSmartSelfieAuthentication(
     userId: String,
@@ -257,6 +264,7 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     partnerParams: Map<String, String>? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
+    metadata: List<Metadata>? = null,
 ) = doSmartSelfieAuthentication(
     userId = userId,
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
@@ -264,6 +272,7 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     partnerParams = partnerParams,
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
+    metadata = metadata,
 )
 
 /**
