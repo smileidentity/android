@@ -54,7 +54,7 @@ fun Face(
         drawCircle(
             color = color,
             radius = size.minDimension / 2,
-            center = Offset(size.width / 2, size.height / 2),
+            center = center,
             style = Stroke(width = strokeWidth),
         )
 
