@@ -37,7 +37,7 @@ enum class ProductScreen(
     ),
     SmartSelfieAuthenticationV2(
         "smart_selfie_authentication_v2",
-        com.smileidentity.R.string.si_smart_selfie_authentication_v2_product_name,
+        com.smileidentity.R.string.si_smart_selfie_v2_auth_product_name,
         R.drawable.smart_selfie_authentication_v2,
     ),
     BiometricKyc(
