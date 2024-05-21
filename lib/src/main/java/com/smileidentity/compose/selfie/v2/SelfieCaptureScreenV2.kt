@@ -293,6 +293,7 @@ private fun DirectiveVisual(selfieState: SelfieState) {
                 SelfieHint.MoveBack -> FaceMovingBack(modifier = size)
                 SelfieHint.MoveCloser -> FaceMovingCloser(modifier = size)
                 SelfieHint.LookStraight -> Face(modifier = size)
+                SelfieHint.Smile -> Face(modifier = size)
             }
 
             SelfieState.Processing -> CircularProgressIndicator(modifier = size)

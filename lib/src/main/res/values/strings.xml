@@ -61,6 +61,7 @@
     <string name="si_smart_selfie_v2_directive_look_right">Look right</string>
     <string name="si_smart_selfie_v2_directive_look_up">Look up</string>
     <string name="si_smart_selfie_v2_directive_keep_looking">Look at the camera</string>
+    <string name="si_smart_selfie_v2_directive_smile">Smile!</string>
     <string name="si_smart_selfie_v2_submitting">Submitting…</string>
     <string name="si_smart_selfie_v2_submission_successful">Submission Successful</string>
     <string name="si_smart_selfie_v2_submission_failed">Submission Failed</string>

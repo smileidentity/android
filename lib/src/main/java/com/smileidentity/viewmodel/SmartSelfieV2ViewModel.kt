@@ -38,6 +38,7 @@ import com.smileidentity.viewmodel.SelfieHint.NeedLight
 import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
 import com.smileidentity.viewmodel.SelfieHint.PoorImageQuality
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
+import com.smileidentity.viewmodel.SelfieHint.Smile
 import java.io.File
 import java.io.IOException
 import kotlin.math.absoluteValue
@@ -105,6 +106,7 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
     LookRight(-1, R.string.si_smart_selfie_v2_directive_look_right),
     LookUp(-1, R.string.si_smart_selfie_v2_directive_look_up),
     LookStraight(-1, R.string.si_smart_selfie_v2_directive_keep_looking),
+    Smile(-1, R.string.si_smart_selfie_v2_directive_smile),
 }
 
 data class SmartSelfieV2UiState(
@@ -362,7 +364,7 @@ class SmartSelfieV2ViewModel(
                 }
             } else {
                 if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                    _uiState.update { it.copy(selfieState = SelfieState.Analyzing(LookStraight)) }
+                    _uiState.update { it.copy(selfieState = SelfieState.Analyzing(Smile)) }
                     return@addOnSuccessListener
                 }
             }
