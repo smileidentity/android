@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -53,14 +54,14 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
 import com.smileidentity.SmileIDOptIn
-import com.smileidentity.compose.components.CameraFrameCornerBorder
 import com.smileidentity.compose.components.Face
-import com.smileidentity.compose.components.FaceAnimatingLeft
-import com.smileidentity.compose.components.FaceAnimatingRight
-import com.smileidentity.compose.components.FaceAnimatingUp
 import com.smileidentity.compose.components.FaceMovingBack
 import com.smileidentity.compose.components.FaceMovingCloser
 import com.smileidentity.compose.components.ForceBrightness
+import com.smileidentity.compose.components.LottieFace
+import com.smileidentity.compose.components.LottieFaceLookingLeft
+import com.smileidentity.compose.components.LottieFaceLookingRight
+import com.smileidentity.compose.components.LottieFaceLookingUp
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
@@ -178,7 +179,10 @@ fun SmartSelfieV2Screen(
             .padding(16.dp),
     ) {
         // Could be loading indicator, composable animation, animated image, or static image
-        DirectiveVisual(selfieState = selfieState)
+        DirectiveVisual(
+            selfieState = selfieState,
+            modifier = Modifier.size(64.dp),
+        )
         Text(
             text = when (selfieState) {
                 is SelfieState.Analyzing -> stringResource(selfieState.hint.text)
@@ -261,54 +265,43 @@ fun SmartSelfieV2Screen(
 }
 
 @Composable
-private fun DirectiveVisual(selfieState: SelfieState) {
-    Box(modifier = Modifier.size(64.dp)) {
-        if (selfieState is SelfieState.Analyzing) {
-            CameraFrameCornerBorder(
-                cornerRadius = 4.dp,
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.errorContainer,
-                modifier = Modifier.matchParentSize(),
+private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modifier = Modifier) {
+    when (selfieState) {
+        is SelfieState.Analyzing -> when (val hint = selfieState.hint) {
+            SelfieHint.NeedLight -> AnimatedImageFromSelfieHint(hint, modifier = modifier)
+            SelfieHint.SearchingForFace -> AnimatedImageFromSelfieHint(
+                hint,
+                modifier = modifier,
             )
+
+            SelfieHint.OnlyOneFace -> Face(modifier = modifier)
+            SelfieHint.EnsureEntireFaceVisible -> Face(modifier = modifier)
+            SelfieHint.PoorImageQuality -> AnimatedImageFromSelfieHint(
+                hint,
+                modifier = modifier,
+            )
+
+            SelfieHint.LookLeft -> LottieFaceLookingLeft(modifier = modifier)
+            SelfieHint.LookRight -> LottieFaceLookingRight(modifier = modifier)
+            SelfieHint.LookUp -> LottieFaceLookingUp(modifier = modifier)
+            SelfieHint.MoveBack -> FaceMovingBack(modifier = modifier)
+            SelfieHint.MoveCloser -> FaceMovingCloser(modifier = modifier)
+            SelfieHint.LookStraight -> LottieFace(startFrame = 0, endFrame = 0, modifier = modifier)
+            SelfieHint.Smile -> LottieFace(startFrame = 0, endFrame = 0, modifier = modifier)
         }
-        val size = Modifier.size(52.dp).align(Alignment.Center)
-        when (selfieState) {
-            is SelfieState.Analyzing -> when (val hint = selfieState.hint) {
-                SelfieHint.NeedLight -> AnimatedImageFromSelfieHint(hint, modifier = size)
-                SelfieHint.SearchingForFace -> AnimatedImageFromSelfieHint(
-                    hint,
-                    modifier = size,
-                )
 
-                SelfieHint.OnlyOneFace -> Face(modifier = size)
-                SelfieHint.EnsureEntireFaceVisible -> Face(modifier = size)
-                SelfieHint.PoorImageQuality -> AnimatedImageFromSelfieHint(
-                    hint,
-                    modifier = size,
-                )
+        SelfieState.Processing -> CircularProgressIndicator(modifier = modifier)
+        is SelfieState.Error -> Image(
+            painter = painterResource(R.drawable.si_error_enclosed_x),
+            contentDescription = null,
+            modifier = modifier,
+        )
 
-                SelfieHint.LookLeft -> FaceAnimatingLeft(modifier = size)
-                SelfieHint.LookRight -> FaceAnimatingRight(modifier = size)
-                SelfieHint.LookUp -> FaceAnimatingUp(modifier = size)
-                SelfieHint.MoveBack -> FaceMovingBack(modifier = size)
-                SelfieHint.MoveCloser -> FaceMovingCloser(modifier = size)
-                SelfieHint.LookStraight -> Face(modifier = size)
-                SelfieHint.Smile -> Face(modifier = size)
-            }
-
-            SelfieState.Processing -> CircularProgressIndicator(modifier = size)
-            is SelfieState.Error -> Image(
-                painter = painterResource(R.drawable.si_error_enclosed_x),
-                contentDescription = null,
-                modifier = size,
-            )
-
-            is SelfieState.Success -> Image(
-                painter = painterResource(R.drawable.si_processing_success),
-                contentDescription = null,
-                modifier = size,
-            )
-        }
+        is SelfieState.Success -> Image(
+            painter = painterResource(R.drawable.si_processing_success),
+            contentDescription = null,
+            modifier = modifier,
+        )
     }
 }
 
