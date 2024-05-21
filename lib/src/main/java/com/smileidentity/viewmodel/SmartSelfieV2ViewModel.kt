@@ -95,7 +95,7 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
     ),
     OnlyOneFace(-1, R.string.si_smart_selfie_v2_directive_ensure_one_face),
     EnsureEntireFaceVisible(-1, R.string.si_smart_selfie_v2_directive_ensure_entire_face_visible),
-    NeedLight(-1, R.string.si_smart_selfie_v2_directive_need_more_light),
+    NeedLight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_need_more_light),
     MoveBack(-1, R.string.si_smart_selfie_v2_directive_move_back),
     MoveCloser(-1, R.string.si_smart_selfie_v2_directive_move_closer),
     PoorImageQuality(
