@@ -280,6 +280,16 @@ class SmartSelfieV2ViewModel(
                     // liveness tasks
                     return@addOnSuccessListener
                 }
+
+                // Reject closed eyes. But if it's null, assume eyes are open
+                val isLeftEyeClosed = (face.leftEyeOpenProbability ?: 1f) < 0.3
+                val isRightEyeClosed = (face.rightEyeOpenProbability ?: 1f) < 0.3
+                if (isLeftEyeClosed || isRightEyeClosed) {
+                    Timber.d("Closed eyes detected")
+                    conditionFailedWithReasonAndTimeout(LookStraight)
+                    return@addOnSuccessListener
+                }
+
                 // We only run the image quality model on the selfie capture because the liveness
                 // task requires a turned head, which receives a lower score from the model
 

@@ -125,7 +125,8 @@ fun OrchestratedSelfieCaptureScreenV2(
         if (!granted) {
             // We don't jump to the settings screen here (unlike in CameraPermissionButton)
             // because it would cause an infinite loop of permission requests due to the
-            // LaunchedEffect requesting the permission again.
+            // LaunchedEffect requesting the permission again. We should leave this decision to the
+            // caller.
             onResult(SmileIDResult.Error(OperationCanceledException("Camera permission denied")))
         }
     }

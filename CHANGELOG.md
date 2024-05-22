@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* SmartSelfie Enrollment and Authentication receive new, streamlined UIs
+  * Set `useStrictMode=true` parameter for better pass rates
+  * Removed `showInstructions`
 * Kotlin 1.9.24
 * AndroidX Lifecycle 2.8.0
 
