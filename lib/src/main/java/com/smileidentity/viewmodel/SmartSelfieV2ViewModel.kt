@@ -284,7 +284,8 @@ class SmartSelfieV2ViewModel(
                 // Reject closed eyes. But if it's null, assume eyes are open
                 val isLeftEyeClosed = (face.leftEyeOpenProbability ?: 1f) < 0.3
                 val isRightEyeClosed = (face.rightEyeOpenProbability ?: 1f) < 0.3
-                if (isLeftEyeClosed || isRightEyeClosed) {
+                // && instead of || for cases where the user has e.g. an eyepatch
+                if (isLeftEyeClosed && isRightEyeClosed) {
                     Timber.d("Closed eyes detected")
                     conditionFailedWithReasonAndTimeout(LookStraight)
                     return@addOnSuccessListener
