@@ -224,6 +224,8 @@ fun MainScreen(
                         isEnroll = true,
                         selfieQualityModel = selfieQualityModel,
                         useStrictMode = true,
+                        allowAgentMode = false,
+                        showAttribution = true,
                         onResult = {
                             viewModel.onSmartSelfieEnrollmentV2Result(it)
                             navController.popBackStack()
@@ -254,6 +256,8 @@ fun MainScreen(
                         isEnroll = false,
                         selfieQualityModel = selfieQualityModel,
                         useStrictMode = true,
+                        showAttribution = true,
+                        allowAgentMode = false,
                         onResult = {
                             viewModel.onSmartSelfieAuthenticationV2Result(it)
                             navController.popBackStack()

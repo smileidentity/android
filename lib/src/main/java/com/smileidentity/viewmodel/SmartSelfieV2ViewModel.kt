@@ -120,6 +120,7 @@ class SmartSelfieV2ViewModel(
     private val isEnroll: Boolean,
     private val useStrictMode: Boolean,
     private val selfieQualityModel: SelfieQualityModel,
+    private val allowNewEnroll: Boolean? = null,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val faceDetector: FaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder().apply {
@@ -439,6 +440,7 @@ class SmartSelfieV2ViewModel(
                 userId = userId,
                 selfieImage = selfieFile,
                 livenessImages = livenessFiles,
+                allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
             )
         } else {

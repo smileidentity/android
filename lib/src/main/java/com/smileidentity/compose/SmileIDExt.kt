@@ -85,12 +85,15 @@ fun SmileID.SmartSelfieEnrollment(
             val context = LocalContext.current
             val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenV2(
+                modifier = modifier,
                 userId = userId,
+                allowNewEnroll = allowNewEnroll,
                 isEnroll = true,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
                 useStrictMode = useStrictMode,
                 selfieQualityModel = selfieQualityModel,
                 extraPartnerParams = extraPartnerParams,
-                modifier = modifier,
                 onResult = onResult,
             )
         } else {
@@ -155,12 +158,14 @@ fun SmileID.SmartSelfieAuthentication(
             val context = LocalContext.current
             val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenV2(
+                modifier = modifier,
                 userId = userId,
                 isEnroll = false,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
                 useStrictMode = useStrictMode,
                 selfieQualityModel = selfieQualityModel,
                 extraPartnerParams = extraPartnerParams,
-                modifier = modifier,
                 onResult = onResult,
             )
         } else {
