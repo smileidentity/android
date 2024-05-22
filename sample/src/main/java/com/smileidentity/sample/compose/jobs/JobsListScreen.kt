@@ -71,9 +71,10 @@ fun JobsListScreen(jobs: ImmutableList<Job>, modifier: Modifier = Modifier) {
         items(jobs) {
             @DrawableRes
             val iconRes = when (it.jobType) {
-                SmartSelfieEnrollment -> R.drawable.si_smart_selfie_instructions_hero
+                SmartSelfieEnrollment ->
+                    com.smileidentity.sample.R.drawable.smart_selfie_enrollment_v2
                 SmartSelfieAuthentication ->
-                    com.smileidentity.sample.R.drawable.smart_selfie_authentication
+                    com.smileidentity.sample.R.drawable.smart_selfie_authentication_v2
 
                 DocumentVerification -> com.smileidentity.sample.R.drawable.doc_v
                 EnhancedDocumentVerification -> R.drawable.si_smart_selfie_instructions_hero

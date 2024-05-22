@@ -215,6 +215,21 @@ fun MainScreen(
                         navController.popBackStack()
                     }
                 }
+                composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
+                    val context = LocalContext.current
+                    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+                    OrchestratedSelfieCaptureScreenV2(
+                        userId = rememberSaveable { randomUserId() },
+                        isEnroll = true,
+                        selfieQualityModel = selfieQualityModel,
+                        useStrictMode = true,
+                        onResult = {
+                            viewModel.onSmartSelfieEnrollmentV2Result(it)
+                            navController.popBackStack()
+                        },
+                    )
+                }
                 dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     SmartSelfieAuthenticationUserIdInputDialog(
@@ -236,6 +251,7 @@ fun MainScreen(
                     val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
                     OrchestratedSelfieCaptureScreenV2(
                         userId = userId,
+                        isEnroll = false,
                         selfieQualityModel = selfieQualityModel,
                         useStrictMode = true,
                         onResult = {

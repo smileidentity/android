@@ -20,6 +20,7 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.doSmartSelfieAuthentication
+import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -116,9 +117,10 @@ data class SmartSelfieV2UiState(
 @kotlin.OptIn(FlowPreview::class)
 class SmartSelfieV2ViewModel(
     private val userId: String,
+    private val isEnroll: Boolean,
     private val useStrictMode: Boolean,
-    private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val selfieQualityModel: SelfieQualityModel,
+    private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val faceDetector: FaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder().apply {
             setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -393,13 +395,7 @@ class SmartSelfieV2ViewModel(
                 // to make it feel like the API call is a bit faster
                 awaitAll(
                     async {
-                        // activeLivenessDetails = ActiveLivenessDetails(orderedFaceDirections = activeLiveness.orderedFaceDirections, forceFailure = forcedFailureTimerExpired),
-                        val apiResponse = SmileID.api.doSmartSelfieAuthentication(
-                            userId = userId,
-                            selfieImage = selfieFile,
-                            livenessImages = livenessFiles,
-                            partnerParams = extraPartnerParams,
-                        )
+                        val apiResponse = submitJob(selfieFile)
                         done = true
                         _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
                         // Delay to ensure the completion icon is shown for a little bit
@@ -422,6 +418,25 @@ class SmartSelfieV2ViewModel(
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
+        }
+    }
+
+    // activeLivenessDetails = ActiveLivenessDetails(orderedFaceDirections = activeLiveness.orderedFaceDirections, forceFailure = forcedFailureTimerExpired),
+    private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
+        return if (isEnroll) {
+            SmileID.api.doSmartSelfieEnrollment(
+                userId = userId,
+                selfieImage = selfieFile,
+                livenessImages = livenessFiles,
+                partnerParams = extraPartnerParams,
+            )
+        } else {
+            SmileID.api.doSmartSelfieAuthentication(
+                userId = userId,
+                selfieImage = selfieFile,
+                livenessImages = livenessFiles,
+                partnerParams = extraPartnerParams,
+            )
         }
     }
 

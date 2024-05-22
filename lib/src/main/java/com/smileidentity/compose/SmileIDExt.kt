@@ -77,19 +77,36 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    // TODO: Move this to a function parameter once we decided to expose it
+    val useExperimentalUi = false
+    val useStrictMode = false
     MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedSelfieCaptureScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            allowNewEnroll = allowNewEnroll,
-            isEnroll = true,
-            allowAgentMode = allowAgentMode,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+        if (useExperimentalUi) {
+            val context = LocalContext.current
+            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+            OrchestratedSelfieCaptureScreenV2(
+                userId = userId,
+                isEnroll = true,
+                useStrictMode = useStrictMode,
+                selfieQualityModel = selfieQualityModel,
+                extraPartnerParams = extraPartnerParams,
+                modifier = modifier,
+                onResult = onResult,
+            )
+        } else {
+            OrchestratedSelfieCaptureScreen(
+                modifier = modifier,
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                isEnroll = true,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                extraPartnerParams = extraPartnerParams,
+                onResult = onResult,
+            )
+        }
     }
 }
 
@@ -139,6 +156,7 @@ fun SmileID.SmartSelfieAuthentication(
             val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenV2(
                 userId = userId,
+                isEnroll = false,
                 useStrictMode = useStrictMode,
                 selfieQualityModel = selfieQualityModel,
                 extraPartnerParams = extraPartnerParams,

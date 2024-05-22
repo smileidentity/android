@@ -101,6 +101,7 @@ import kotlinx.collections.immutable.persistentMapOf
 @Composable
 fun OrchestratedSelfieCaptureScreenV2(
     userId: String,
+    isEnroll: Boolean,
     selfieQualityModel: SelfieQualityModel,
     onResult: SmileIDCallback<SmartSelfieResult>,
     modifier: Modifier = Modifier,
@@ -110,6 +111,7 @@ fun OrchestratedSelfieCaptureScreenV2(
         initializer = {
             SmartSelfieV2ViewModel(
                 userId = userId,
+                isEnroll = isEnroll,
                 useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
