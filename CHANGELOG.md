@@ -1,5 +1,15 @@
 # Release Notes
 
+## Unreleased
+
+* Update to K2 (aka Kotlin `2.0.0`)
+* Update Compose BOM to 2024.05.00
+* Update AndroidX to 1.13.1
+* Update Activity to 
+* Update Fragment to 1.7.1
+* Update Datastore to 1.1.1
+* Update Sentry to 7.9.0
+
 ## 10.1.2
 
 * Better error message when the device is low on storage
