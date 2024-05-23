@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Fixed a bug where invalid file paths were returned and retries did not work
+
 ## 10.1.2
 
 * Better error message when the device is low on storage
