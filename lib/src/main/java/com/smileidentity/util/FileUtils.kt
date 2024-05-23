@@ -401,7 +401,11 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
 
 /**
  * Moves a folder from 'unsubmitted' to 'submitted' within the app's specific directory, handling
- * all edge cases.
+ * all edge cases. We copy files recursively as opposed to moving the entire folder so that we can
+ * merge contents (i.e. in the case something got moved to submitted but was later retried - this
+ * can happen in the case when Offline Mode is disabled, but there was an error and the user
+ * retries).
+ *
  * @param folderName The name of the job or operation, corresponding to the folder to be moved.
  * @param savePath The base path where the 'pending' and 'complete' folders are
  * located, defaulting to SmileID.fileSavePath.
@@ -415,7 +419,7 @@ internal fun moveJobToSubmitted(
     val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
     if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
-        println("Source directory does not exist or is not a directory")
+        Timber.v("Unsubmitted directory does not exist or is not a directory")
         return false
     }
 

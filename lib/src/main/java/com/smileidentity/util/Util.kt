@@ -259,17 +259,25 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
     proxy(converted)
 }
 
+/**
+ * Handles file moving in a failure scenario. If offline mode *is not* enabled, the job is moved to
+ * the submitted directory. If offline mode *is* enabled, the job is moved to submitted only if the
+ * error is not a network error. Otherwise, (if Offline Mode is enabled, and it is a network error),
+ * the job is left in the unsubmitted directory (either to be retried or submitted later).
+ *
+ * @return if the job was moved to the submitted directory
+ */
 fun handleOfflineJobFailure(
     jobId: String,
     throwable: Throwable,
     exceptionHandler: (
         (Throwable) -> Unit
     )? = null,
-) {
-    Timber.e(throwable, "Error in submitJob for jobId: $jobId")
+): Boolean {
+    var didMove = false
     if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
-        val complete = moveJobToSubmitted(jobId)
-        if (!complete) {
+        didMove = moveJobToSubmitted(jobId)
+        if (!didMove) {
             Timber.w("Failed to move job $jobId to complete")
             SmileIDCrashReporting.hub.addBreadcrumb(
                 Breadcrumb().apply {
@@ -281,6 +289,7 @@ fun handleOfflineJobFailure(
         }
     }
     exceptionHandler?.let { it(throwable) }
+    return didMove
 }
 
 fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
