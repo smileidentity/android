@@ -475,13 +475,13 @@ object SmileID {
         val moduleInstallRequest = ModuleInstallRequest.newBuilder()
             .addApi(FaceDetection.getClient())
             .setListener {
-                Timber.d(
-                    "Face Detection install status: " +
-                        "errorCode=${it.errorCode}, " +
-                        "installState=${it.installState}, " +
-                        "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
-                        "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}",
-                )
+                val message = "Face Detection install status: " +
+                    "errorCode=${it.errorCode}, " +
+                    "installState=${it.installState}, " +
+                    "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
+                    "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}"
+                Timber.d(message)
+                SmileIDCrashReporting.hub.addBreadcrumb(message)
             }.build()
 
         ModuleInstall.getClient(context)
@@ -491,6 +491,7 @@ object SmileID {
             }
             .addOnFailureListener {
                 Timber.w(it, "Face Detection install failed")
+                SmileIDCrashReporting.hub.addBreadcrumb("Face Detection install failed")
             }
     }
 }
