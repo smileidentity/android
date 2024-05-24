@@ -48,8 +48,9 @@
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
-    <!--  SmartSelfie Authentication V2  -->
+    <!--  SmartSelfie V2  -->
     <string name="si_smart_selfie_v2_auth_product_name">SmartSelfie™ Authentication v2</string>
+    <string name="si_smart_selfie_v2_enroll_product_name">SmartSelfie™ Enrollment v2</string>
     <string name="si_smart_selfie_v2_directive_place_entire_head_in_frame">Place entire head in frame</string>
     <string name="si_smart_selfie_v2_directive_ensure_one_face">Ensure only 1 face is visible</string>
     <string name="si_smart_selfie_v2_directive_ensure_entire_face_visible">Ensure your entire face is visible</string>
