@@ -81,6 +81,8 @@ private const val MAX_FACE_YAW_THRESHOLD = 15
 private const val MAX_FACE_ROLL_THRESHOLD = 30
 private const val LIVENESS_STABILITY_TIME_MS = 300L
 private const val FORCED_FAILURE_TIMEOUT_MS = 30_000L
+private const val LOADING_INDICATOR_DELAY_MS = 200L
+private const val COMPLETED_DELAY_MS = 2000L
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -411,12 +413,12 @@ class SmartSelfieV2ViewModel(
                         done = true
                         _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
                         // Delay to ensure the completion icon is shown for a little bit
-                        delay(2000)
+                        delay(COMPLETED_DELAY_MS)
                         val result = SmartSelfieResult(selfieFile, livenessFiles, apiResponse)
                         onResult(SmileIDResult.Success(result))
                     },
                     async {
-                        delay(200)
+                        delay(LOADING_INDICATOR_DELAY_MS)
                         if (!done) {
                             _uiState.update { it.copy(selfieState = SelfieState.Processing) }
                         }
