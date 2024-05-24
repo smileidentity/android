@@ -1,6 +1,7 @@
 package com.smileidentity.util
 
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
@@ -419,7 +420,9 @@ internal fun moveJobToSubmitted(
     val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
     if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
-        Timber.v("Unsubmitted directory does not exist or is not a directory")
+        val message = "Unsubmitted directory does not exist or is not a directory"
+        Timber.v(message)
+        SmileIDCrashReporting.hub.addBreadcrumb(message)
         return false
     }
 
