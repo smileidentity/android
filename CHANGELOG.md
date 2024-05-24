@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Increase network call timeout to 120 seconds
+* Fixed a bug where invalid file paths were returned and retries did not work
 * Update to K2 (aka Kotlin `2.0.0`)
 * Update Compose BOM to 2024.05.00
 * Update AndroidX to 1.13.1

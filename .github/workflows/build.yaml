@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: musichin/ktlint-check@v3
         with:
-          ktlint-version: "1.1.1"
+          ktlint-version: "1.2.1"
 
   dependency-submission:
     runs-on: ubuntu-latest

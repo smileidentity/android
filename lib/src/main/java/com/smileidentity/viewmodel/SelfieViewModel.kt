@@ -262,7 +262,14 @@ class SelfieViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
 
         val proxy = fun(e: Throwable) {
-            handleOfflineJobFailure(jobId, e)
+            val didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
+            if (didMoveToSubmitted) {
+                this.selfieFile = getFileByType(jobId, FileType.SELFIE)
+                this.livenessFiles.apply {
+                    clear()
+                    addAll(getFilesByType(jobId, FileType.LIVENESS))
+                }
+            }
             if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 result = SmileIDResult.Success(
                     SmartSelfieResult(
