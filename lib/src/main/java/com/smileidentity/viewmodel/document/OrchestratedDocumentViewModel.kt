@@ -246,7 +246,11 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
-        handleOfflineJobFailure(jobId, throwable)
+        val didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable)
+        if (didMoveToSubmitted) {
+            this.selfieFile = getFileByType(jobId, FileType.SELFIE)
+            this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
+        }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
             it.copy(

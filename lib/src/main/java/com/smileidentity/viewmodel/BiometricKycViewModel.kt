@@ -67,8 +67,11 @@ class BiometricKycViewModel(
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = fun(e: Throwable) {
-            Timber.e(e)
-            handleOfflineJobFailure(jobId, e)
+            val didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
+            if (didMoveToSubmitted) {
+                this.selfieFile = getFileByType(jobId, FileType.SELFIE)
+                this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
+            }
             if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 result = SmileIDResult.Success(
                     BiometricKycResult(
