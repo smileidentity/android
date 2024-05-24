@@ -62,9 +62,11 @@ import com.smileidentity.compose.components.LottieFace
 import com.smileidentity.compose.components.LottieFaceLookingLeft
 import com.smileidentity.compose.components.LottieFaceLookingRight
 import com.smileidentity.compose.components.LottieFaceLookingUp
+import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.compose.selfie.AgentModeSwitch
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -106,12 +108,16 @@ fun OrchestratedSelfieCaptureScreenV2(
     onResult: SmileIDCallback<SmartSelfieResult>,
     modifier: Modifier = Modifier,
     useStrictMode: Boolean = false,
+    showAttribution: Boolean = true,
+    allowAgentMode: Boolean = false,
+    allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: SmartSelfieV2ViewModel = viewModel(
         initializer = {
             SmartSelfieV2ViewModel(
                 userId = userId,
                 isEnroll = isEnroll,
+                allowNewEnroll = allowNewEnroll,
                 useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
@@ -125,7 +131,8 @@ fun OrchestratedSelfieCaptureScreenV2(
         if (!granted) {
             // We don't jump to the settings screen here (unlike in CameraPermissionButton)
             // because it would cause an infinite loop of permission requests due to the
-            // LaunchedEffect requesting the permission again.
+            // LaunchedEffect requesting the permission again. We should leave this decision to the
+            // caller.
             onResult(SmileIDResult.Error(OperationCanceledException("Camera permission denied")))
         }
     }
@@ -139,9 +146,13 @@ fun OrchestratedSelfieCaptureScreenV2(
     BackHandler { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()
-    val camSelector by rememberCamSelector(CamSelector.Front)
+    var camSelector by rememberCamSelector(CamSelector.Front)
     SmartSelfieV2Screen(
         selfieState = uiState.selfieState,
+        showAttribution = showAttribution,
+        allowAgentMode = allowAgentMode,
+        isAgentModeEnabled = camSelector == CamSelector.Back,
+        onCamSelectorChange = { camSelector = camSelector.inverse },
         modifier = modifier,
         onRetry = viewModel::onRetry,
         onResult = onResult,
@@ -164,13 +175,23 @@ fun OrchestratedSelfieCaptureScreenV2(
 }
 
 // todo: make public the layer above this which can take in an image analyzer and also handles camera preview for you
+/**
+ * The Smart Selfie Capture Screen. This screen is responsible for displaying the selfie capture
+ * contents, including directive visual, directive text, camera preview, retry/close buttons,
+ * attribution, and agent mode switch.
+ * This composable relies on the caller to make camera changes and perform image analysis.
+ */
 @Composable
 fun SmartSelfieV2Screen(
     selfieState: SelfieState,
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
-    cameraPreview: @Composable BoxScope.() -> Unit,
+    cameraPreview: @Composable (BoxScope.() -> Unit),
+    isAgentModeEnabled: Boolean,
+    onCamSelectorChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    showAttribution: Boolean = true,
+    allowAgentMode: Boolean = false,
 ) {
     Column(
         verticalArrangement = Arrangement.Top,
@@ -192,6 +213,7 @@ fun SmartSelfieV2Screen(
                 is SelfieState.Error -> stringResource(
                     R.string.si_smart_selfie_v2_submission_failed,
                 )
+
                 is SelfieState.Success -> stringResource(
                     R.string.si_smart_selfie_v2_submission_successful,
                 )
@@ -262,6 +284,15 @@ fun SmartSelfieV2Screen(
                     Text(text = stringResource(R.string.si_smart_selfie_processing_close_button))
                 },
             )
+        }
+        if (allowAgentMode) {
+            AgentModeSwitch(
+                isAgentModeEnabled = isAgentModeEnabled,
+                onCamSelectorChange = onCamSelectorChange,
+            )
+        }
+        if (showAttribution) {
+            SmileIDAttribution(modifier = Modifier.padding(top = 4.dp))
         }
     }
 }
@@ -334,10 +365,14 @@ private fun SmartSelfieV2ScreenPreview() {
     Preview {
         SmartSelfieV2Screen(
             // selfieState = SelfieState.Processing,
-            // selfieState = SelfieState.Error(RuntimeException()),
-            selfieState = SelfieState.Analyzing(SelfieHint.LookUp),
+            selfieState = SelfieState.Error(RuntimeException()),
+            // selfieState = SelfieState.Analyzing(SelfieHint.LookUp),
             onResult = {},
             onRetry = {},
+            showAttribution = true,
+            allowAgentMode = true,
+            isAgentModeEnabled = false,
+            onCamSelectorChange = {},
             modifier = Modifier.fillMaxSize(),
             cameraPreview = {
                 Box(

@@ -8,8 +8,11 @@ import com.smileidentity.viewmodel.SelfieHint.LookLeft
 import com.smileidentity.viewmodel.SelfieHint.LookRight
 import com.smileidentity.viewmodel.SelfieHint.LookUp
 
-private const val ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD = 20f
-private const val ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD = 15f
+private const val ORTHOGONAL_ANGLE_BUFFER = 15f
+private const val MIDWAY_ANGLE_MIN = 10f
+private const val MIDWAY_ANGLE_MAX = 30f
+private const val END_ANGLE_MIN = 30f
+private const val END_ANGLE_MAX = 50f
 
 /**
  * Determines a randomized set of directions for the user to look in
@@ -56,12 +59,41 @@ internal class ActiveLivenessTask(
      */
     fun doesFaceMeetCurrentActiveLivenessTask(face: Face): Boolean {
         val isLookingRightDirection = when (orderedFaceDirections[currentDirectionIdx]) {
-            is LeftMid -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
-            is LeftEnd -> face.isLookingLeft(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
-            is RightMid -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD / 2)
-            is RightEnd -> face.isLookingRight(ACTIVE_LIVENESS_LR_ANGLE_THRESHOLD)
-            is UpMid -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD / 2)
-            is UpEnd -> face.isLookingUp(ACTIVE_LIVENESS_UP_ANGLE_THRESHOLD)
+            is LeftMid -> face.isLookingLeft(
+                minAngle = MIDWAY_ANGLE_MIN,
+                maxAngle = MIDWAY_ANGLE_MAX,
+                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+            )
+
+            is LeftEnd -> face.isLookingLeft(
+                minAngle = END_ANGLE_MIN,
+                maxAngle = END_ANGLE_MAX,
+                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+            )
+
+            is RightMid -> face.isLookingRight(
+                minAngle = MIDWAY_ANGLE_MIN,
+                maxAngle = MIDWAY_ANGLE_MAX,
+                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+            )
+
+            is RightEnd -> face.isLookingRight(
+                minAngle = END_ANGLE_MIN,
+                maxAngle = END_ANGLE_MAX,
+                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+            )
+
+            is UpMid -> face.isLookingUp(
+                minAngle = MIDWAY_ANGLE_MIN,
+                maxAngle = MIDWAY_ANGLE_MAX,
+                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+            )
+
+            is UpEnd -> face.isLookingUp(
+                minAngle = END_ANGLE_MIN,
+                maxAngle = END_ANGLE_MAX,
+                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+            )
         }
         if (!isLookingRightDirection) {
             resetLivenessStabilityTime()

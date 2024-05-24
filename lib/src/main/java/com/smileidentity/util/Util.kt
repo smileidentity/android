@@ -32,6 +32,7 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
+import kotlin.math.abs
 import kotlin.math.max
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -358,14 +359,47 @@ inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String):
     else -> getSerializable(key) as? T
 }
 
-internal fun Face.isLookingLeft(angleThreshold: Float): Boolean {
-    return headEulerAngleY > angleThreshold
+/**
+ * Determines whether the face is looking left, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking left
+ * @param maxAngle The maximum angle the face should be looking left
+ * @param verticalAngleBuffer The buffer for the vertical angle
+ */
+internal fun Face.isLookingLeft(
+    minAngle: Float,
+    maxAngle: Float,
+    verticalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleY in minAngle..maxAngle && abs(headEulerAngleX) < verticalAngleBuffer
 }
 
-internal fun Face.isLookingRight(angleThreshold: Float): Boolean {
-    return headEulerAngleY < -angleThreshold
+/**
+ * Determines whether the face is looking right, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking right
+ * @param maxAngle The maximum angle the face should be looking right
+ * @param verticalAngleBuffer The buffer for the vertical angle
+ */
+internal fun Face.isLookingRight(
+    minAngle: Float,
+    maxAngle: Float,
+    verticalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleY in -maxAngle..-minAngle && abs(headEulerAngleX) < verticalAngleBuffer
 }
 
-internal fun Face.isLookingUp(angleThreshold: Float): Boolean {
-    return headEulerAngleX > angleThreshold
+/**
+ * Determines whether the face is looking up, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking up
+ * @param maxAngle The maximum angle the face should be looking up
+ * @param horizontalAngleBuffer The buffer for the horizontal angle
+ */
+internal fun Face.isLookingUp(
+    minAngle: Float,
+    maxAngle: Float,
+    horizontalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
 }
