@@ -18,6 +18,7 @@ class SmartSelfieV2ViewModelTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         subject = SmartSelfieV2ViewModel(
             userId = "userId",
+            isEnroll = false,
             useStrictMode = false,
             extraPartnerParams = persistentMapOf(),
             selfieQualityModel = mockk(),
