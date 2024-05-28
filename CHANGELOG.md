@@ -6,7 +6,7 @@
     * Set `useStrictMode=true` parameter for better pass rates
     * Removed `showInstructions` and `jobId` input parameters
 
-## 10.1.3
+## 10.1.4
 
 * Increase network call timeout to 120 seconds
 * Fixed a bug where invalid file paths were returned and retries did not work
