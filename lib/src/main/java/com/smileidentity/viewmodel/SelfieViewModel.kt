@@ -77,11 +77,7 @@ data class SelfieUiState(
     val processingState: ProcessingState? = null,
     @StringRes val errorMessageRes: Int? = null,
     val errorMessage: String? = null,
-) {
-    fun getErrorMessage(): Pair<Int?, String?> {
-        return Pair(errorMessageRes, errorMessage)
-    }
-}
+)
 
 enum class SelfieDirective(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),

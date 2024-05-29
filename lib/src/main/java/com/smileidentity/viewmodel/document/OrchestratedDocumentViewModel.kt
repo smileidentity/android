@@ -51,11 +51,7 @@ internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
     @StringRes val errorMessageRes: Int? = null,
     val errorMessage: String? = null,
-) {
-    fun getErrorMessage(): Pair<Int?, String?> {
-        return Pair(errorMessageRes, errorMessage)
-    }
-}
+)
 
 /**
  * @param selfieFile The selfie image file to use for authentication. If null, selfie capture will

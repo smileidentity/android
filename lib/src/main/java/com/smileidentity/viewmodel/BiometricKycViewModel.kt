@@ -45,11 +45,7 @@ data class BiometricKycUiState(
     val processingState: ProcessingState? = null,
     @StringRes val errorMessageRes: Int? = null,
     val errorMessage: String? = null,
-) {
-    fun getErrorMessage(): Pair<Int?, String?> {
-        return Pair(errorMessageRes, errorMessage)
-    }
-}
+)
 
 class BiometricKycViewModel(
     private val idInfo: IdInfo,
