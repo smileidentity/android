@@ -76,7 +76,6 @@ interface SmileIDService {
      * the [File] objects and assigns the correct part name to them.
      */
     @SmileHeaderAuth
-    @SmileHeaderMetadata
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-enroll")
@@ -89,7 +88,7 @@ interface SmileIDService {
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
-        @Part("metadata") metadata: List<Metadata>? = null,
+        @Part("metadata") metadata: Metadata? = Metadata.default(),
     ): SmartSelfieResponse
 
     /**
@@ -100,7 +99,6 @@ interface SmileIDService {
      * the [File] objects and assigns the correct part name to them.
      */
     @SmileHeaderAuth
-    @SmileHeaderMetadata
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")
@@ -112,7 +110,7 @@ interface SmileIDService {
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
-        @Part("metadata") metadata: List<Metadata>? = null,
+        @Part("metadata") metadata: Metadata? = Metadata.default(),
     ): SmartSelfieResponse
 
     /**
@@ -233,10 +231,10 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     allowNewEnroll: Boolean? = null,
-    metadata: List<Metadata>? = null,
+    metadata: Metadata? = Metadata.default(),
 ) = doSmartSelfieEnrollment(
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
-    livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
     userId = userId,
     partnerParams = partnerParams,
     callbackUrl = callbackUrl,
@@ -264,11 +262,11 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     partnerParams: Map<String, String>? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
-    metadata: List<Metadata>? = null,
+    metadata: Metadata? = Metadata.default(),
 ) = doSmartSelfieAuthentication(
     userId = userId,
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
-    livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
     partnerParams = partnerParams,
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
