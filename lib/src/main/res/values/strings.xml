@@ -154,8 +154,27 @@
     <!--  Enhanced DocV Screen  -->
     <string name="si_enhanced_docv_product_name">Enhanced Document Verification</string>
 
-    <!--  Generic Errors  -->
+    <!--  SDK Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
+    <string name="si_no_internet">Please check your internet connectivity</string>
+    <string name="si_2201_2301_2401"></string>
+    <string name="si_2203"></string>
+    <string name="si_2204"></string>
+    <string name="si_2205_2405"></string>
+    <string name="si_2207"></string>
+    <string name="si_2208"></string>
+    <string name="si_2209"></string>
+    <string name="si_2210"></string>
+    <string name="si_2211"></string>
+    <string name="si_2212"></string>
+    <string name="si_2213_2413"></string>
+    <string name="si_2215"></string>
+    <string name="si_2216"></string>
+    <string name="si_2220"></string>
+    <string name="si_2221"></string>
+    <string name="si_2314"></string>
+    <string name="si_2413"></string>
+    <string name="si_2414"></string>
 
     <!--  Offline Mode  -->
     <string name="si_offline_message">No internet connection. Your verification will be completed once you are back online</string>

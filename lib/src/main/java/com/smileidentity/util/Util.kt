@@ -259,6 +259,33 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
     proxy(converted)
 }
 
+fun SmileIDException.toErrorMessage(): Pair<Int, String?> {
+    val systemError = setOf("2201", "2301", "2401")
+    val notAuthorized = setOf("2205", "2405")
+    val missingParameters = setOf("2213", "2413")
+
+    return when (details.code) {
+        in systemError -> Pair(R.string.si_2201_2301_2401, message)
+        in notAuthorized -> Pair(R.string.si_2205_2405, message)
+        in missingParameters -> Pair(R.string.si_2213_2413, message)
+        "2203" -> Pair(R.string.si_2203, message)
+        "2204" -> Pair(R.string.si_2204, message)
+        "2207" -> Pair(R.string.si_2207, message)
+        "2208" -> Pair(R.string.si_2208, message)
+        "2209" -> Pair(R.string.si_2209, message)
+        "2210" -> Pair(R.string.si_2210, message)
+        "2211" -> Pair(R.string.si_2211, message)
+        "2212" -> Pair(R.string.si_2212, message)
+        "2215" -> Pair(R.string.si_2215, message)
+        "2216" -> Pair(R.string.si_2216, message)
+        "2220" -> Pair(R.string.si_2220, message)
+        "2221" -> Pair(R.string.si_2221, message)
+        "2314" -> Pair(R.string.si_2314, message)
+        "2414" -> Pair(R.string.si_2414, message)
+        else -> Pair(R.string.si_offline_message, null)
+    }
+}
+
 /**
  * Handles file moving in a failure scenario. If offline mode *is not* enabled, the job is moved to
  * the submitted directory. If offline mode *is* enabled, the job is moved to submitted only if the

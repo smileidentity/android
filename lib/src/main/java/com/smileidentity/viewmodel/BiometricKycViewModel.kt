@@ -12,6 +12,7 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
@@ -28,6 +29,7 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
+import com.smileidentity.util.toErrorMessage
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -41,8 +43,13 @@ import timber.log.Timber
 
 data class BiometricKycUiState(
     val processingState: ProcessingState? = null,
-    @StringRes val errorMessage: Int? = null,
-)
+    @StringRes val errorMessageRes: Int? = null,
+    val errorMessage: String? = null,
+) {
+    fun getErrorMessage(): Pair<Int?, String?> {
+        return Pair(errorMessageRes, errorMessage)
+    }
+}
 
 class BiometricKycViewModel(
     private val idInfo: IdInfo,
@@ -83,15 +90,24 @@ class BiometricKycViewModel(
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Success,
-                        errorMessage = R.string.si_offline_message,
+                        errorMessageRes = R.string.si_offline_message,
                     )
                 }
             } else {
+                val (errorMessageRes, errorMessage) = when {
+                    isNetworkFailure(e) -> Pair(R.string.si_no_internet, null)
+                    e is SmileIDException -> Pair(
+                        e.toErrorMessage().first,
+                        e.toErrorMessage().second,
+                    )
+                    else -> Pair(R.string.si_processing_error_subtitle, null)
+                }
                 result = SmileIDResult.Error(e)
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Error,
-                        errorMessage = R.string.si_processing_error_subtitle,
+                        errorMessageRes = errorMessageRes,
+                        errorMessage = errorMessage,
                     )
                 }
             }

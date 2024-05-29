@@ -69,6 +69,12 @@ fun OrchestratedSelfieCaptureScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
+        val errorSubtitle = uiState.errorMessageRes?.let { resId ->
+            stringResource(resId).takeIf { it.isNotEmpty() }
+        } ?: uiState.errorMessage.takeIf {
+            !it.isNullOrEmpty()
+        } ?: stringResource(R.string.si_processing_error_subtitle)
+
         when {
             showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
                 showAttribution = showAttribution,
@@ -83,13 +89,11 @@ fun OrchestratedSelfieCaptureScreen(
                 inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
                 successTitle = stringResource(R.string.si_smart_selfie_processing_success_title),
                 successSubtitle = stringResource(
-                    uiState.errorMessage ?: R.string.si_smart_selfie_processing_success_subtitle,
+                    uiState.errorMessageRes ?: R.string.si_smart_selfie_processing_success_subtitle,
                 ),
                 successIcon = painterResource(R.drawable.si_processing_success),
                 errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),
-                errorSubtitle = stringResource(
-                    uiState.errorMessage ?: R.string.si_processing_error_subtitle,
-                ),
+                errorSubtitle = errorSubtitle,
                 errorIcon = painterResource(R.drawable.si_processing_error),
                 continueButtonText = stringResource(R.string.si_continue),
                 onContinue = { viewModel.onFinished(onResult) },

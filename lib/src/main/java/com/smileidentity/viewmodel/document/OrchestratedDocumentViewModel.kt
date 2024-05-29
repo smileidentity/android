@@ -14,6 +14,7 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
@@ -34,6 +35,7 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
+import com.smileidentity.util.toErrorMessage
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -47,8 +49,13 @@ import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
-    @StringRes val errorMessage: Int? = null,
-)
+    @StringRes val errorMessageRes: Int? = null,
+    val errorMessage: String? = null,
+) {
+    fun getErrorMessage(): Pair<Int?, String?> {
+        return Pair(errorMessageRes, errorMessage)
+    }
+}
 
 /**
  * @param selfieFile The selfie image file to use for authentication. If null, selfie capture will
@@ -255,14 +262,14 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         _uiState.update {
             it.copy(
                 currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                errorMessage = R.string.si_processing_error_subtitle,
+                errorMessageRes = R.string.si_processing_error_subtitle,
             )
         }
         if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
             _uiState.update {
                 it.copy(
                     currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
-                    errorMessage = R.string.si_offline_message,
+                    errorMessageRes = R.string.si_offline_message,
                 )
             }
             saveResult(
@@ -275,11 +282,20 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 didSubmitJob = false,
             )
         } else {
+            val (errorMessageRes, errorMessage) = when {
+                isNetworkFailure(throwable) -> Pair(R.string.si_no_internet, null)
+                throwable is SmileIDException -> Pair(
+                    throwable.toErrorMessage().first,
+                    throwable.toErrorMessage().second,
+                )
+                else -> Pair(R.string.si_processing_error_subtitle, null)
+            }
             result = SmileIDResult.Error(throwable)
             _uiState.update {
                 it.copy(
                     currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                    errorMessage = R.string.si_processing_error_subtitle,
+                    errorMessageRes = errorMessageRes,
+                    errorMessage = errorMessage,
                 )
             }
         }
