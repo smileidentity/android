@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.1.4
+
+* Update generic errors with actual platform errors
+
 ## 10.1.3
 
 * Increase network call timeout to 120 seconds
