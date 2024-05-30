@@ -49,6 +49,9 @@ import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
+    // we use `errorMessageRes` to map to the actual code to the stringRes to allow localization,
+    // and use `errorMessage` to show the actual platform error message that we show if
+    // `errorMessageRes` is not set by the partner
     @StringRes val errorMessageRes: Int? = null,
     val errorMessage: String? = null,
 )
