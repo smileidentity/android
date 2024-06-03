@@ -61,9 +61,6 @@ import org.tensorflow.lite.support.image.TensorImage
 import retrofit2.HttpException
 import timber.log.Timber
 
-private const val SELFIE_QUALITY_HISTORY_LENGTH = 7
-private const val INTRA_IMAGE_MIN_DELAY_MS = 250
-
 /*
 This is used only when NOT in strict mode. In strict mode, the number of images is determined
 by the liveness task
@@ -71,18 +68,6 @@ by the liveness task
 private const val NUM_LIVENESS_IMAGES = 8
 private const val LIVENESS_IMAGE_SIZE = 320
 private const val SELFIE_IMAGE_SIZE = 640
-private const val NO_FACE_RESET_DELAY_MS = 500
-private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val MIN_FACE_FILL_THRESHOLD = 0.1f
-private const val MAX_FACE_FILL_THRESHOLD = 0.3f
-private const val LUMINANCE_THRESHOLD = 50
-private const val MAX_FACE_PITCH_THRESHOLD = 30
-private const val MAX_FACE_YAW_THRESHOLD = 15
-private const val MAX_FACE_ROLL_THRESHOLD = 30
-private const val LIVENESS_STABILITY_TIME_MS = 300L
-private const val FORCED_FAILURE_TIMEOUT_MS = 30_000L
-private const val LOADING_INDICATOR_DELAY_MS = 200L
-private const val COMPLETED_DELAY_MS = 2000L
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -114,6 +99,20 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
 
 data class SmartSelfieV2UiState(
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
+    val SELFIE_QUALITY_HISTORY_LENGTH: Float,
+    val INTRA_IMAGE_MIN_DELAY_MS: Float,
+    val NO_FACE_RESET_DELAY_MS: Float,
+    val FACE_QUALITY_THRESHOLD: Float,
+    val MIN_FACE_FILL_THRESHOLD: Float,
+    val MAX_FACE_FILL_THRESHOLD: Float,
+    val LUMINANCE_THRESHOLD: Float,
+    val MAX_FACE_PITCH_THRESHOLD: Float,
+    val MAX_FACE_YAW_THRESHOLD: Float,
+    val MAX_FACE_ROLL_THRESHOLD: Float,
+    val LIVENESS_STABILITY_TIME_MS: Float,
+    val FORCED_FAILURE_TIMEOUT_MS: Float,
+    val LOADING_INDICATOR_DELAY_MS: Float,
+    val COMPLETED_DELAY_MS: Float,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -134,11 +133,44 @@ class SmartSelfieV2ViewModel(
     ),
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SmartSelfieV2UiState())
+    ////// PARAMETER DEBUGGING
+    private var SELFIE_QUALITY_HISTORY_LENGTH = 7
+    private var INTRA_IMAGE_MIN_DELAY_MS = 250
+    private var NO_FACE_RESET_DELAY_MS = 500
+    private var FACE_QUALITY_THRESHOLD = 0.2f
+    private var MIN_FACE_FILL_THRESHOLD = 0.1f
+    private var MAX_FACE_FILL_THRESHOLD = 0.3f
+    private var LUMINANCE_THRESHOLD = 50
+    private var MAX_FACE_PITCH_THRESHOLD = 30
+    private var MAX_FACE_YAW_THRESHOLD = 15
+    private var MAX_FACE_ROLL_THRESHOLD = 30
+    private var LIVENESS_STABILITY_TIME_MS = 300L
+    private var FORCED_FAILURE_TIMEOUT_MS = 30_000L
+    private var LOADING_INDICATOR_DELAY_MS = 200L
+    private var COMPLETED_DELAY_MS = 2000L
+
+    private val _uiState = MutableStateFlow(
+        SmartSelfieV2UiState(
+            SELFIE_QUALITY_HISTORY_LENGTH = SELFIE_QUALITY_HISTORY_LENGTH.toFloat(),
+            INTRA_IMAGE_MIN_DELAY_MS = INTRA_IMAGE_MIN_DELAY_MS.toFloat(),
+            NO_FACE_RESET_DELAY_MS = NO_FACE_RESET_DELAY_MS.toFloat(),
+            FACE_QUALITY_THRESHOLD = FACE_QUALITY_THRESHOLD,
+            MIN_FACE_FILL_THRESHOLD = MIN_FACE_FILL_THRESHOLD,
+            MAX_FACE_FILL_THRESHOLD = MAX_FACE_FILL_THRESHOLD,
+            LUMINANCE_THRESHOLD = LUMINANCE_THRESHOLD.toFloat(),
+            MAX_FACE_PITCH_THRESHOLD = MAX_FACE_PITCH_THRESHOLD.toFloat(),
+            MAX_FACE_YAW_THRESHOLD = MAX_FACE_YAW_THRESHOLD.toFloat(),
+            MAX_FACE_ROLL_THRESHOLD = MAX_FACE_ROLL_THRESHOLD.toFloat(),
+            LIVENESS_STABILITY_TIME_MS = LIVENESS_STABILITY_TIME_MS.toFloat(),
+            FORCED_FAILURE_TIMEOUT_MS = FORCED_FAILURE_TIMEOUT_MS.toFloat(),
+            LOADING_INDICATOR_DELAY_MS = LOADING_INDICATOR_DELAY_MS.toFloat(),
+            COMPLETED_DELAY_MS = COMPLETED_DELAY_MS.toFloat(),
+        ),
+    )
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        SmartSelfieV2UiState(),
+        _uiState.value,
     )
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
@@ -444,6 +476,7 @@ class SmartSelfieV2ViewModel(
                 livenessImages = livenessFiles,
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
+                metadata = null,
             )
         } else {
             SmileID.api.doSmartSelfieAuthentication(
@@ -451,6 +484,7 @@ class SmartSelfieV2ViewModel(
                 selfieImage = selfieFile,
                 livenessImages = livenessFiles,
                 partnerParams = extraPartnerParams,
+                metadata = null,
             )
         }
     }
@@ -490,5 +524,76 @@ class SmartSelfieV2ViewModel(
         selfieFile?.delete()
         selfieFile = null
         activeLiveness.restart()
+    }
+
+    // Parameter Debugging
+    fun onSelfieQualityHistoryLengthUpdated(value: Float) {
+        SELFIE_QUALITY_HISTORY_LENGTH = value.toInt()
+        _uiState.update { it.copy(SELFIE_QUALITY_HISTORY_LENGTH = value) }
+    }
+
+    fun onIntraImageMinDelayMsUpdated(value: Float) {
+        INTRA_IMAGE_MIN_DELAY_MS = value.toInt()
+        _uiState.update { it.copy(INTRA_IMAGE_MIN_DELAY_MS = value) }
+    }
+
+    fun onNoFaceResetDelayMsUpdated(value: Float) {
+        NO_FACE_RESET_DELAY_MS = value.toInt()
+        _uiState.update { it.copy(NO_FACE_RESET_DELAY_MS = value) }
+    }
+
+    fun onFaceQualityThresholdUpdated(value: Float) {
+        FACE_QUALITY_THRESHOLD = value
+        _uiState.update { it.copy(FACE_QUALITY_THRESHOLD = value) }
+    }
+
+    fun onMinFaceFillThresholdUpdated(value: Float) {
+        MIN_FACE_FILL_THRESHOLD = value
+        _uiState.update { it.copy(MIN_FACE_FILL_THRESHOLD = value) }
+    }
+
+    fun onMaxFaceFillThresholdUpdated(value: Float) {
+        MAX_FACE_FILL_THRESHOLD = value
+        _uiState.update { it.copy(MAX_FACE_FILL_THRESHOLD = value) }
+    }
+
+    fun onLuminanceThresholdUpdated(value: Float) {
+        LUMINANCE_THRESHOLD = value.toInt()
+        _uiState.update { it.copy(LUMINANCE_THRESHOLD = value) }
+    }
+
+    fun onMaxFacePitchThresholdUpdated(value: Float) {
+        MAX_FACE_PITCH_THRESHOLD = value.toInt()
+        _uiState.update { it.copy(MAX_FACE_PITCH_THRESHOLD = value) }
+    }
+
+    fun onMaxFaceYawThresholdUpdated(value: Float) {
+        MAX_FACE_YAW_THRESHOLD = value.toInt()
+        _uiState.update { it.copy(MAX_FACE_YAW_THRESHOLD = value) }
+    }
+
+    fun onMaxFaceRollThresholdUpdated(value: Float) {
+        MAX_FACE_ROLL_THRESHOLD = value.toInt()
+        _uiState.update { it.copy(MAX_FACE_ROLL_THRESHOLD = value) }
+    }
+
+    fun onLivenessStabilityTimeMsUpdated(value: Float) {
+        LIVENESS_STABILITY_TIME_MS = value.toLong()
+        _uiState.update { it.copy(LIVENESS_STABILITY_TIME_MS = value) }
+    }
+
+    fun onForcedFailureTimeoutMsUpdated(value: Float) {
+        FORCED_FAILURE_TIMEOUT_MS = value.toLong()
+        _uiState.update { it.copy(FORCED_FAILURE_TIMEOUT_MS = value) }
+    }
+
+    fun onLoadingIndicatorDelayMsUpdated(value: Float) {
+        LOADING_INDICATOR_DELAY_MS = value.toLong()
+        _uiState.update { it.copy(LOADING_INDICATOR_DELAY_MS = value) }
+    }
+
+    fun onCompletedDelayMsUpdated(value: Float) {
+        COMPLETED_DELAY_MS = value.toLong()
+        _uiState.update { it.copy(COMPLETED_DELAY_MS = value) }
     }
 }

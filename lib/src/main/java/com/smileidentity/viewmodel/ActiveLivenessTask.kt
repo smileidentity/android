@@ -8,11 +8,11 @@ import com.smileidentity.viewmodel.SelfieHint.LookLeft
 import com.smileidentity.viewmodel.SelfieHint.LookRight
 import com.smileidentity.viewmodel.SelfieHint.LookUp
 
-private const val ORTHOGONAL_ANGLE_BUFFER = 15f
+private const val ORTHOGONAL_ANGLE_BUFFER = Float.MAX_VALUE
 private const val MIDWAY_ANGLE_MIN = 10f
-private const val MIDWAY_ANGLE_MAX = 30f
+private const val MIDWAY_ANGLE_MAX = Float.MAX_VALUE
 private const val END_ANGLE_MIN = 30f
-private const val END_ANGLE_MAX = 50f
+private const val END_ANGLE_MAX = Float.MAX_VALUE
 
 /**
  * Determines a randomized set of directions for the user to look in
