@@ -109,10 +109,19 @@ data class SmartSelfieV2UiState(
     val MAX_FACE_PITCH_THRESHOLD: Float,
     val MAX_FACE_YAW_THRESHOLD: Float,
     val MAX_FACE_ROLL_THRESHOLD: Float,
-    val LIVENESS_STABILITY_TIME_MS: Float,
     val FORCED_FAILURE_TIMEOUT_MS: Float,
     val LOADING_INDICATOR_DELAY_MS: Float,
     val COMPLETED_DELAY_MS: Float,
+    val LIVENESS_STABILITY_TIME_MS: Float,
+    val ORTHOGONAL_ANGLE_BUFFER: Float,
+    val MIDWAY_LR_ANGLE_MIN: Float,
+    val MIDWAY_LR_ANGLE_MAX: Float,
+    val END_LR_ANGLE_MIN: Float,
+    val END_LR_ANGLE_MAX: Float,
+    val MIDWAY_UP_ANGLE_MIN: Float,
+    val MIDWAY_UP_ANGLE_MAX: Float,
+    val END_UP_ANGLE_MIN: Float,
+    val END_UP_ANGLE_MAX: Float,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -127,27 +136,28 @@ class SmartSelfieV2ViewModel(
         FaceDetectorOptions.Builder().apply {
             setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
             setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
-            setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+            setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
             setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
         }.build(),
     ),
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
-    ////// PARAMETER DEBUGGING
+    // PARAMETER DEBUGGING
     private var SELFIE_QUALITY_HISTORY_LENGTH = 7
     private var INTRA_IMAGE_MIN_DELAY_MS = 250
     private var NO_FACE_RESET_DELAY_MS = 500
-    private var FACE_QUALITY_THRESHOLD = 0.2f
+    private var FACE_QUALITY_THRESHOLD = 0.5f
     private var MIN_FACE_FILL_THRESHOLD = 0.1f
     private var MAX_FACE_FILL_THRESHOLD = 0.3f
     private var LUMINANCE_THRESHOLD = 50
     private var MAX_FACE_PITCH_THRESHOLD = 30
     private var MAX_FACE_YAW_THRESHOLD = 15
     private var MAX_FACE_ROLL_THRESHOLD = 30
-    private var LIVENESS_STABILITY_TIME_MS = 300L
     private var FORCED_FAILURE_TIMEOUT_MS = 30_000L
     private var LOADING_INDICATOR_DELAY_MS = 200L
     private var COMPLETED_DELAY_MS = 2000L
+
+    private val activeLiveness = ActiveLivenessTask()
 
     private val _uiState = MutableStateFlow(
         SmartSelfieV2UiState(
@@ -161,10 +171,19 @@ class SmartSelfieV2ViewModel(
             MAX_FACE_PITCH_THRESHOLD = MAX_FACE_PITCH_THRESHOLD.toFloat(),
             MAX_FACE_YAW_THRESHOLD = MAX_FACE_YAW_THRESHOLD.toFloat(),
             MAX_FACE_ROLL_THRESHOLD = MAX_FACE_ROLL_THRESHOLD.toFloat(),
-            LIVENESS_STABILITY_TIME_MS = LIVENESS_STABILITY_TIME_MS.toFloat(),
             FORCED_FAILURE_TIMEOUT_MS = FORCED_FAILURE_TIMEOUT_MS.toFloat(),
             LOADING_INDICATOR_DELAY_MS = LOADING_INDICATOR_DELAY_MS.toFloat(),
             COMPLETED_DELAY_MS = COMPLETED_DELAY_MS.toFloat(),
+            LIVENESS_STABILITY_TIME_MS = activeLiveness.LIVENESS_STABILITY_TIME_MS.toFloat(),
+            ORTHOGONAL_ANGLE_BUFFER = activeLiveness.ORTHOGONAL_ANGLE_BUFFER,
+            MIDWAY_LR_ANGLE_MIN = activeLiveness.MIDWAY_LR_ANGLE_MIN,
+            MIDWAY_LR_ANGLE_MAX = activeLiveness.MIDWAY_LR_ANGLE_MAX,
+            END_LR_ANGLE_MIN = activeLiveness.END_LR_ANGLE_MIN,
+            END_LR_ANGLE_MAX = activeLiveness.END_LR_ANGLE_MAX,
+            MIDWAY_UP_ANGLE_MIN = activeLiveness.MIDWAY_UP_ANGLE_MIN,
+            MIDWAY_UP_ANGLE_MAX = activeLiveness.MIDWAY_UP_ANGLE_MAX,
+            END_UP_ANGLE_MIN = activeLiveness.END_UP_ANGLE_MIN,
+            END_UP_ANGLE_MAX = activeLiveness.END_UP_ANGLE_MAX,
         ),
     )
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
@@ -179,12 +198,11 @@ class SmartSelfieV2ViewModel(
     private var shouldAnalyzeImages = true
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
-    private val activeLiveness = ActiveLivenessTask(LIVENESS_STABILITY_TIME_MS)
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
 
     init {
-        startStrictModeTimerIfNecessary()
+        // startStrictModeTimerIfNecessary()
     }
 
     /**
@@ -336,14 +354,21 @@ class SmartSelfieV2ViewModel(
 
                 // NB! Model is trained on *face mesh* crop (potentially different from face
                 // detection)
+
                 val input = TensorImage(DataType.FLOAT32).apply {
+                    // Get the min and max x and y coordinates of the face mesh contour points
+                    val allPoints = face.allContours.flatMap { it.points }
+                    val left = allPoints.minOf { it.x }.toInt()
+                    val top = allPoints.minOf { it.y }.toInt()
+                    val width = allPoints.maxOf { it.x }.toInt() - left
+                    val height = allPoints.maxOf { it.y }.toInt() - top
                     val modelInputBmp = Bitmap.createBitmap(
                         fullSelfieBmp,
-                        bBox.left,
-                        bBox.top,
-                        bBox.width(),
-                        bBox.height(),
-                        // NB! bBox is not guaranteed to be square, so scale might squish the image
+                        left,
+                        top,
+                        width,
+                        height,
+                        // NB! input is not guaranteed to be square, so scale might squish the image
                     ).scale(modelInputSize[1], modelInputSize[2], false)
                     load(modelInputBmp)
                 }
@@ -489,6 +514,17 @@ class SmartSelfieV2ViewModel(
         }
     }
 
+    fun stop() {
+        shouldAnalyzeImages = false
+        resetCaptureProgress(SearchingForFace)
+        forcedFailureTimerExpired = false
+    }
+
+    fun start() {
+        shouldAnalyzeImages = true
+        startStrictModeTimerIfNecessary()
+    }
+
     /**
      * The retry button is displayed only when the error is due to IO issues (network or file) or
      * unexpected 5xx. In these cases, we restart the process entirely, mainly to cater for the
@@ -577,11 +613,6 @@ class SmartSelfieV2ViewModel(
         _uiState.update { it.copy(MAX_FACE_ROLL_THRESHOLD = value) }
     }
 
-    fun onLivenessStabilityTimeMsUpdated(value: Float) {
-        LIVENESS_STABILITY_TIME_MS = value.toLong()
-        _uiState.update { it.copy(LIVENESS_STABILITY_TIME_MS = value) }
-    }
-
     fun onForcedFailureTimeoutMsUpdated(value: Float) {
         FORCED_FAILURE_TIMEOUT_MS = value.toLong()
         _uiState.update { it.copy(FORCED_FAILURE_TIMEOUT_MS = value) }
@@ -595,5 +626,55 @@ class SmartSelfieV2ViewModel(
     fun onCompletedDelayMsUpdated(value: Float) {
         COMPLETED_DELAY_MS = value.toLong()
         _uiState.update { it.copy(COMPLETED_DELAY_MS = value) }
+    }
+
+    fun onLivenessStabilityTimeMsUpdated(value: Float) {
+        activeLiveness.LIVENESS_STABILITY_TIME_MS = value.toLong()
+        _uiState.update { it.copy(LIVENESS_STABILITY_TIME_MS = value) }
+    }
+
+    fun onOrthogonalAngleBufferUpdated(value: Float) {
+        activeLiveness.ORTHOGONAL_ANGLE_BUFFER = value
+        _uiState.update { it.copy(ORTHOGONAL_ANGLE_BUFFER = value) }
+    }
+
+    fun onMidwayLrAngleMinUpdated(value: Float) {
+        activeLiveness.MIDWAY_LR_ANGLE_MIN = value
+        _uiState.update { it.copy(MIDWAY_LR_ANGLE_MIN = value) }
+    }
+
+    fun onMidwayLrAngleMaxUpdated(value: Float) {
+        activeLiveness.MIDWAY_LR_ANGLE_MAX = value
+        _uiState.update { it.copy(MIDWAY_LR_ANGLE_MAX = value) }
+    }
+
+    fun onEndLrAngleMinUpdated(value: Float) {
+        activeLiveness.END_LR_ANGLE_MIN = value
+        _uiState.update { it.copy(END_LR_ANGLE_MIN = value) }
+    }
+
+    fun onEndLrAngleMaxUpdated(value: Float) {
+        activeLiveness.END_LR_ANGLE_MAX = value
+        _uiState.update { it.copy(END_LR_ANGLE_MAX = value) }
+    }
+
+    fun onMidwayUpAngleMinUpdated(value: Float) {
+        activeLiveness.MIDWAY_UP_ANGLE_MIN = value
+        _uiState.update { it.copy(MIDWAY_UP_ANGLE_MIN = value) }
+    }
+
+    fun onMidwayUpAngleMaxUpdated(value: Float) {
+        activeLiveness.MIDWAY_UP_ANGLE_MAX = value
+        _uiState.update { it.copy(MIDWAY_UP_ANGLE_MAX = value) }
+    }
+
+    fun onEndUpAngleMinUpdated(value: Float) {
+        activeLiveness.END_UP_ANGLE_MIN = value
+        _uiState.update { it.copy(END_UP_ANGLE_MIN = value) }
+    }
+
+    fun onEndUpAngleMaxUpdated(value: Float) {
+        activeLiveness.END_UP_ANGLE_MAX = value
+        _uiState.update { it.copy(END_UP_ANGLE_MAX = value) }
     }
 }

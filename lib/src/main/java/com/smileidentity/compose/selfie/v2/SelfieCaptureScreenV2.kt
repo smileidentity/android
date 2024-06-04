@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,7 +27,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -52,7 +50,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -133,6 +130,25 @@ fun OrchestratedSelfieCaptureScreenV2(
         },
     ),
 ) {
+    var hasConfirmedParameters by remember { mutableStateOf(false) }
+    BackHandler {
+        if (hasConfirmedParameters) {
+            hasConfirmedParameters = false
+            viewModel.stop()
+        } else {
+            onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
+        }
+    }
+    if (!hasConfirmedParameters) {
+        ParameterTuningScreen(
+            viewModel = viewModel,
+            onNextClicked = { hasConfirmedParameters = true },
+        )
+        return
+    }
+    LaunchedEffect(Unit) {
+        viewModel.start()
+    }
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
         if (!granted) {
@@ -150,7 +166,6 @@ fun OrchestratedSelfieCaptureScreenV2(
         }
     }
     ForceBrightness()
-    BackHandler { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Column(
         verticalArrangement = Arrangement.Top,
@@ -161,7 +176,6 @@ fun OrchestratedSelfieCaptureScreenV2(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-
         val cameraState = rememberCameraState()
         var camSelector by rememberCamSelector(CamSelector.Front)
         SmartSelfieV2Screen(
@@ -189,36 +203,6 @@ fun OrchestratedSelfieCaptureScreenV2(
                 )
             },
         )
-        ParameterTuning(
-            selfieQualityHistoryLength = uiState.SELFIE_QUALITY_HISTORY_LENGTH,
-            onSelfieQualityHistoryLengthChange = { viewModel.onSelfieQualityHistoryLengthUpdated(it.toFloat()) },
-            intraImageMinDelay = uiState.INTRA_IMAGE_MIN_DELAY_MS.toFloat(),
-            onIntraImageMinDelayChange = { viewModel.onIntraImageMinDelayMsUpdated(it) },
-            noFaceResetDelay = uiState.NO_FACE_RESET_DELAY_MS.toFloat(),
-            onNoFaceResetDelayChange = { viewModel.onNoFaceResetDelayMsUpdated(it) },
-            faceQualityThreshold = uiState.FACE_QUALITY_THRESHOLD,
-            onFaceQualityThresholdChange = { viewModel.onFaceQualityThresholdUpdated(it) },
-            minFaceFillThreshold = uiState.MIN_FACE_FILL_THRESHOLD,
-            onMinFaceFillThresholdChange = { viewModel.onMinFaceFillThresholdUpdated(it) },
-            maxFaceFillThreshold = uiState.MAX_FACE_FILL_THRESHOLD,
-            onMaxFaceFillThresholdChange = { viewModel.onMaxFaceFillThresholdUpdated(it) },
-            luminanceThreshold = uiState.LUMINANCE_THRESHOLD,
-            onLuminanceThresholdChange = { viewModel.onLuminanceThresholdUpdated(it.toFloat()) },
-            maxFacePitchThreshold = uiState.MAX_FACE_PITCH_THRESHOLD,
-            onMaxFacePitchThresholdChange = { viewModel.onMaxFacePitchThresholdUpdated(it.toFloat()) },
-            maxFaceYawThreshold = uiState.MAX_FACE_YAW_THRESHOLD,
-            onMaxFaceYawThresholdChange = { viewModel.onMaxFaceYawThresholdUpdated(it.toFloat()) },
-            maxFaceRollThreshold = uiState.MAX_FACE_ROLL_THRESHOLD,
-            onMaxFaceRollThresholdChange = { viewModel.onMaxFaceRollThresholdUpdated(it.toFloat()) },
-            livenessStabilityTime = uiState.LIVENESS_STABILITY_TIME_MS,
-            onLivenessStabilityTimeChange = { viewModel.onLivenessStabilityTimeMsUpdated(it.toFloat()) },
-            forcedFailureTimeout = uiState.FORCED_FAILURE_TIMEOUT_MS,
-            onForcedFailureTimeoutChange = { viewModel.onForcedFailureTimeoutMsUpdated(it.toFloat()) },
-            loadingIndicatorDelay = uiState.LOADING_INDICATOR_DELAY_MS,
-            onLoadingIndicatorDelayChange = { viewModel.onLoadingIndicatorDelayMsUpdated(it.toFloat()) },
-            completedDelay = uiState.COMPLETED_DELAY_MS,
-            onCompletedDelayChange = { viewModel.onCompletedDelayMsUpdated(it.toFloat()) },
-        )
     }
 }
 
@@ -241,8 +225,6 @@ fun ColumnScope.SmartSelfieV2Screen(
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
 ) {
-    val context = LocalContext.current
-    context.resources.getIdentifier()
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -408,257 +390,6 @@ private fun AnimatedImageFromSelfieHint(selfieHint: SelfieHint, modifier: Modifi
         contentDescription = null,
         modifier = modifier,
     )
-}
-
-@Composable
-private fun ColumnScope.ParameterTuning(
-    selfieQualityHistoryLength: Float,
-    onSelfieQualityHistoryLengthChange: (Int) -> Unit,
-    intraImageMinDelay: Float,
-    onIntraImageMinDelayChange: (Float) -> Unit,
-    noFaceResetDelay: Float,
-    onNoFaceResetDelayChange: (Float) -> Unit,
-    faceQualityThreshold: Float,
-    onFaceQualityThresholdChange: (Float) -> Unit,
-    minFaceFillThreshold: Float,
-    onMinFaceFillThresholdChange: (Float) -> Unit,
-    maxFaceFillThreshold: Float,
-    onMaxFaceFillThresholdChange: (Float) -> Unit,
-    luminanceThreshold: Float,
-    onLuminanceThresholdChange: (Float) -> Unit,
-    maxFacePitchThreshold: Float,
-    onMaxFacePitchThresholdChange: (Float) -> Unit,
-    maxFaceYawThreshold: Float,
-    onMaxFaceYawThresholdChange: (Float) -> Unit,
-    maxFaceRollThreshold: Float,
-    onMaxFaceRollThresholdChange: (Float) -> Unit,
-    livenessStabilityTime: Float,
-    onLivenessStabilityTimeChange: (Float) -> Unit,
-    forcedFailureTimeout: Float,
-    onForcedFailureTimeoutChange: (Float) -> Unit,
-    loadingIndicatorDelay: Float,
-    onLoadingIndicatorDelayChange: (Float) -> Unit,
-    completedDelay: Float,
-    onCompletedDelayChange: (Float) -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.height(IntrinsicSize.Min).fillMaxWidth(),
-    ) {
-        Text("Parameter Tuning", style = MaterialTheme.typography.titleLarge)
-
-        Text(
-            "Intra Image min delay: ${intraImageMinDelay}ms",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Min time to wait between each image capture",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = intraImageMinDelay,
-            onValueChange = onIntraImageMinDelayChange,
-            valueRange = 0f..1000f,
-        )
-
-        Text(
-            "No Face Reset Delay: ${noFaceResetDelay}ms",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Time to wait after no face is detected before resetting",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = noFaceResetDelay,
-            onValueChange = onNoFaceResetDelayChange,
-            valueRange = 0f..2000f,
-        )
-
-        Text(
-            "Selfie Quality History: $selfieQualityHistoryLength",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Number of images to average selfie image quality model score over",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = selfieQualityHistoryLength,
-            onValueChange = { onSelfieQualityHistoryLengthChange(it.toInt()) },
-            valueRange = 2f..20f,
-            steps = 18,
-        )
-
-        Text(
-            "Selfie Quality Threshold: $faceQualityThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Min average score from selfie image quality model for a face to be considered valid",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = faceQualityThreshold,
-            onValueChange = onFaceQualityThresholdChange,
-            valueRange = 0f..1f,
-        )
-
-        Text(
-            "Min Face Fill Threshold (%): $minFaceFillThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Min % of the frame that the face should fill (NB! the camera preview is zoomed in, but the percentage is wrt the full image)",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = minFaceFillThreshold,
-            onValueChange = onMinFaceFillThresholdChange,
-            valueRange = 0f..1f,
-        )
-
-        Text(
-            "Max Face Fill Threshold (%): $maxFaceFillThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Max % of the frame that the face should fill (NB! the camera preview is zoomed in, but the percentage is wrt the full image)",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = maxFaceFillThreshold,
-            onValueChange = onMaxFaceFillThresholdChange,
-            valueRange = 0f..1f,
-        )
-
-        Text(
-            "Min Luminance Threshold: $luminanceThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Avg of the \"Y\" plane in YUV format (aka luma plane)",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = luminanceThreshold,
-            onValueChange = onLuminanceThresholdChange,
-            valueRange = 0f..255f,
-        )
-
-        Text(
-            "Max Face Pitch Threshold: $maxFacePitchThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Max pitch (x-axis) for *selfie capture only* for extreme head pose rejection",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = maxFacePitchThreshold,
-            onValueChange = onMaxFacePitchThresholdChange,
-            valueRange = 0f..90f,
-        )
-
-        Text(
-            "Max Face Yaw Threshold: $maxFaceYawThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Max yaw (y-axis) for *selfie capture only* for extreme head pose rejection",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = maxFaceYawThreshold,
-            onValueChange = onMaxFaceYawThresholdChange,
-            valueRange = 0f..90f,
-        )
-
-        Text(
-            "Max Face Roll Threshold: $maxFaceRollThreshold",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Max roll (z-axis) for *selfie capture only* for extreme head pose rejection",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = maxFaceRollThreshold,
-            onValueChange = onMaxFaceRollThresholdChange,
-            valueRange = 0f..90f,
-        )
-
-        Text(
-            "Active Liveness Stability Time: ${livenessStabilityTime}ms",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Time that the face must be pointing in the requested direction before being considered satisfied",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = livenessStabilityTime,
-            onValueChange = onLivenessStabilityTimeChange,
-            valueRange = 0f..3000f,
-        )
-
-        Text(
-            "Active Liveness Forced Failure Timeout: ${forcedFailureTimeout}ms",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Time to wait before bypassing active liveness and force failing the job",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = forcedFailureTimeout,
-            onValueChange = onForcedFailureTimeoutChange,
-            valueRange = 0f..60_000f,
-        )
-
-        Text(
-            "Loading Indicator Delay: ${loadingIndicatorDelay}ms",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Time to wait before showing the loading indicator (UI trick to make the network request feel faster)",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = loadingIndicatorDelay,
-            onValueChange = onLoadingIndicatorDelayChange,
-            valueRange = 0f..3000f,
-        )
-
-        Text(
-            "Completed Delay: ${completedDelay}ms",
-            modifier = Modifier.padding(top = 8.dp),
-            style = MaterialTheme.typography.labelLarge,
-        )
-        Text(
-            "Time after successful network submission to keep checkmark on screen before exiting",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Slider(
-            value = completedDelay,
-            onValueChange = onCompletedDelayChange,
-            valueRange = 0f..5000f,
-        )
-    }
 }
 
 @SmilePreviews
