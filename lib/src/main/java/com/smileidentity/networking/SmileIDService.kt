@@ -76,6 +76,7 @@ interface SmileIDService {
      * the [File] objects and assigns the correct part name to them.
      */
     @SmileHeaderAuth
+    @SmileHeaderMetadata
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-enroll")
@@ -99,6 +100,7 @@ interface SmileIDService {
      * the [File] objects and assigns the correct part name to them.
      */
     @SmileHeaderAuth
+    @SmileHeaderMetadata
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")

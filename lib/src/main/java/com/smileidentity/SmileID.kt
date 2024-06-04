@@ -24,6 +24,7 @@ import com.smileidentity.networking.MetadataAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
+import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -405,6 +406,7 @@ object SmileID {
         readTimeout(30, TimeUnit.SECONDS)
         writeTimeout(30, TimeUnit.SECONDS)
         addInterceptor(SmileHeaderAuthInterceptor)
+        addInterceptor(SmileHeaderMetadataInterceptor)
         addInterceptor(
             Interceptor { chain: Interceptor.Chain ->
                 // Retry on exception (network error) and 5xx
