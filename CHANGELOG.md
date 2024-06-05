@@ -1,6 +1,10 @@
 # Release Notes
 
-## 10.1.3
+## Unreleased
+
+* Fixed a bug where MLKit initialization would sometimes fail due to Application Context
+
+## 10.1.4
 
 * Increase network call timeout to 120 seconds
 * Fixed a bug where invalid file paths were returned and retries did not work
