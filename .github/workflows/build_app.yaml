@@ -41,10 +41,10 @@ jobs:
           fileName: 'upload.jks'
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
-      - name: Assemble
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: bundleRelease
+      - name: Bundle
+        run: ./gradlew bundleRelease
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}

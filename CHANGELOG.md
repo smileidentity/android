@@ -5,6 +5,7 @@
 * SmartSelfie Enrollment and Authentication receive new, streamlined UIs
     * Set `useStrictMode=true` parameter for better pass rates
     * Removed `showInstructions` and `jobId` input parameters
+* Fixed a bug where MLKit initialization would sometimes fail due to Application Context
 
 ## 10.1.4
 
