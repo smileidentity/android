@@ -76,7 +76,7 @@ class DocumentViewModelTest {
         assertEquals(DocumentCaptureFlow.FrontDocumentCapture, uiState.currentStep)
         assertEquals(
             StringResource.ResId(R.string.si_processing_error_subtitle),
-            uiState.errorMessage
+            uiState.errorMessage,
         )
     }
 

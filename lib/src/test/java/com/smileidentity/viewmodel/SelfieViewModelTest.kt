@@ -48,7 +48,7 @@ class SelfieViewModelTest {
         assertEquals(null, uiState.processingState)
         assertEquals(
             StringResource.ResId(R.string.si_processing_error_subtitle),
-            uiState.errorMessage
+            uiState.errorMessage,
         )
     }
 
