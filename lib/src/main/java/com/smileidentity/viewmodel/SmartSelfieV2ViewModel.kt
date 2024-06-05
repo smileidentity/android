@@ -194,7 +194,7 @@ class SmartSelfieV2ViewModel(
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
-    private var lastFaceDetectedTime = 0L
+    private var lastValidFaceDetectTime = 0L
     private var shouldAnalyzeImages = true
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
@@ -274,7 +274,6 @@ class SmartSelfieV2ViewModel(
                 conditionFailedWithReasonAndTimeout(SearchingForFace)
                 return@addOnSuccessListener
             }
-            lastFaceDetectedTime = System.currentTimeMillis()
 
             if (faces.size > 1) {
                 Timber.d("More than one face detected")
@@ -341,6 +340,11 @@ class SmartSelfieV2ViewModel(
                 conditionFailedWithReasonAndTimeout(MoveBack)
                 return@addOnSuccessListener
             }
+
+            // Active liveness tasks may cause temporary loss of detected face. We want to provide a
+            // time buffer for such occurrences before we reset. However, after said time buffer,
+            // we should reset.
+            lastValidFaceDetectTime = System.currentTimeMillis()
 
             val selfieFile = this.selfieFile // for smart casting purposes
             if (selfieFile == null) {
@@ -564,9 +568,12 @@ class SmartSelfieV2ViewModel(
     private fun conditionFailedWithReasonAndTimeout(reason: SelfieHint) {
         if (selfieFile == null) {
             _uiState.update { it.copy(selfieState = SelfieState.Analyzing(reason)) }
-        } else if (System.currentTimeMillis() - lastFaceDetectedTime > NO_FACE_RESET_DELAY_MS) {
+        } else if (System.currentTimeMillis() - lastValidFaceDetectTime > NO_FACE_RESET_DELAY_MS) {
             resetCaptureProgress(reason)
         }
+        // Otherwise we swallow the failure reason.
+        // Subsequently, in future invocations, either the face *does* satisfy all the conditions,
+        // OR, NO_FACE_RESET_DELAY_MS time elapses, and we reset progress at that point
     }
 
     private fun resetCaptureProgress(reason: SelfieHint) {
