@@ -46,8 +46,8 @@ jobs:
           echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Assemble
-        run: ./gradlew assemble
+      - name: Bundle
+        run: ./gradlew bundleRelease
         env:
           ORG_GRADLE_PROJECT_VERSION_CODE: ${{ steps.version_code.outputs.version_code }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
