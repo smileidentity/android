@@ -19,6 +19,10 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.R
 import com.smileidentity.SmileID
@@ -259,30 +263,60 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
     proxy(converted)
 }
 
-fun SmileIDException.toErrorMessage(): Pair<Int, String?> {
-    val systemError = setOf("2201", "2301", "2401")
-    val notAuthorized = setOf("2205", "2405")
-    val missingParameters = setOf("2213", "2413")
+@Stable
+sealed interface StringResource {
+    fun resolve(context: Context): String
 
-    return when (details.code) {
-        in systemError -> Pair(R.string.si_2201_2301_2401, message)
-        in notAuthorized -> Pair(R.string.si_2205_2405, message)
-        in missingParameters -> Pair(R.string.si_2213_2413, message)
-        "2203" -> Pair(R.string.si_2203, message)
-        "2204" -> Pair(R.string.si_2204, message)
-        "2207" -> Pair(R.string.si_2207, message)
-        "2208" -> Pair(R.string.si_2208, message)
-        "2209" -> Pair(R.string.si_2209, message)
-        "2210" -> Pair(R.string.si_2210, message)
-        "2211" -> Pair(R.string.si_2211, message)
-        "2212" -> Pair(R.string.si_2212, message)
-        "2215" -> Pair(R.string.si_2215, message)
-        "2216" -> Pair(R.string.si_2216, message)
-        "2220" -> Pair(R.string.si_2220, message)
-        "2221" -> Pair(R.string.si_2221, message)
-        "2314" -> Pair(R.string.si_2314, message)
-        "2414" -> Pair(R.string.si_2414, message)
-        else -> Pair(R.string.si_offline_message, null)
+    data class Text(val text: String) : StringResource {
+        override fun resolve(context: Context): String {
+            return text
+        }
+    }
+
+    data class ResId(@StringRes val stringId: Int) : StringResource {
+        override fun resolve(context: Context): String {
+            return context.getString(stringId)
+        }
+    }
+
+    data class ResIdFromSmileIDException(val exception: SmileIDException) : StringResource {
+        @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
+        override fun resolve(context: Context): String {
+            val resourceName = "si_error_message_${exception.details.code}"
+            val resourceId = context.resources.getIdentifier(
+                /* name = */
+                resourceName,
+                /* defType = */
+                "string",
+                /* defPackage = */
+                context.packageName,
+            )
+            return context.getString(resourceId)
+        }
+    }
+
+    @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
+    @Composable
+    fun resolve(): String {
+        return when (this) {
+            is ResId -> stringResource(id = stringId)
+            is ResIdFromSmileIDException -> {
+                val context = LocalContext.current
+                val resourceName = "si_error_message_${exception.details.code}"
+                val resourceId = context.resources.getIdentifier(
+                    /* name = */
+                    resourceName,
+                    /* defType = */
+                    "string",
+                    /* defPackage = */
+                    context.packageName,
+                )
+
+                return stringResource(id = resourceId).takeIf { it.isNotEmpty() }
+                    ?: exception.details.message
+            }
+            is Text -> text
+        }
     }
 }
 

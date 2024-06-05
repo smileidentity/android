@@ -1,6 +1,5 @@
 package com.smileidentity.viewmodel
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
@@ -20,6 +19,7 @@ import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.createUploadRequestFile
@@ -29,7 +29,6 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
-import com.smileidentity.util.toErrorMessage
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -43,11 +42,7 @@ import timber.log.Timber
 
 data class BiometricKycUiState(
     val processingState: ProcessingState? = null,
-    // we use `errorMessageRes` to map to the actual code to the stringRes to allow localization,
-    // and use `errorMessage` to show the actual platform error message that we show if
-    // `errorMessageRes` is not set by the partner
-    @StringRes val errorMessageRes: Int? = null,
-    val errorMessage: String? = null,
+    val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
 
 class BiometricKycViewModel(
@@ -89,23 +84,19 @@ class BiometricKycViewModel(
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Success,
-                        errorMessageRes = R.string.si_offline_message,
+                        errorMessage = StringResource.ResId(R.string.si_offline_message),
                     )
                 }
             } else {
-                val (errorMessageRes, errorMessage) = when {
-                    isNetworkFailure(e) -> Pair(R.string.si_no_internet, null)
-                    e is SmileIDException -> Pair(
-                        e.toErrorMessage().first,
-                        e.toErrorMessage().second,
-                    )
-                    else -> Pair(R.string.si_processing_error_subtitle, null)
+                val errorMessage: StringResource = when {
+                    isNetworkFailure(e) -> StringResource.ResId(R.string.si_no_internet)
+                    e is SmileIDException -> StringResource.ResIdFromSmileIDException(e)
+                    else -> StringResource.ResId(R.string.si_processing_error_subtitle)
                 }
                 result = SmileIDResult.Error(e)
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Error,
-                        errorMessageRes = errorMessageRes,
                         errorMessage = errorMessage,
                     )
                 }

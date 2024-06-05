@@ -27,6 +27,7 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.area
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
@@ -40,7 +41,6 @@ import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
-import com.smileidentity.util.toErrorMessage
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -75,11 +75,7 @@ data class SelfieUiState(
     val progress: Float = 0f,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
-    // we use `errorMessageRes` to map to the actual code to the stringRes to allow localization,
-    // and use `errorMessage` to show the actual platform error message that we show if
-    // `errorMessageRes` is not set by the partner
-    @StringRes val errorMessageRes: Int? = null,
-    val errorMessage: String? = null,
+    val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
 
 enum class SelfieDirective(@StringRes val displayText: Int) {
@@ -148,7 +144,6 @@ class SelfieViewModel(
                             progress = 0f,
                             selfieToConfirm = null,
                             processingState = null,
-                            errorMessage = null,
                         )
                     }
                     livenessFiles.removeAll { it.delete() }
@@ -241,7 +236,7 @@ class SelfieViewModel(
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessageRes = R.string.si_processing_error_subtitle,
+                    errorMessage = StringResource.ResId(R.string.si_processing_error_subtitle),
                 )
             }
         }.addOnCompleteListener {
@@ -287,23 +282,19 @@ class SelfieViewModel(
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Success,
-                        errorMessageRes = R.string.si_offline_message,
+                        errorMessage = StringResource.ResId(R.string.si_offline_message),
                     )
                 }
             } else {
-                val (errorMessageRes, errorMessage) = when {
-                    isNetworkFailure(e) -> Pair(R.string.si_no_internet, null)
-                    e is SmileIDException -> Pair(
-                        e.toErrorMessage().first,
-                        e.toErrorMessage().second,
-                    )
-                    else -> Pair(R.string.si_processing_error_subtitle, null)
+                val errorMessage: StringResource = when {
+                    isNetworkFailure(e) -> StringResource.ResId(R.string.si_no_internet)
+                    e is SmileIDException -> StringResource.ResIdFromSmileIDException(e)
+                    else -> StringResource.ResId(R.string.si_processing_error_subtitle)
                 }
                 result = SmileIDResult.Error(e)
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Error,
-                        errorMessageRes = errorMessageRes,
                         errorMessage = errorMessage,
                     )
                 }

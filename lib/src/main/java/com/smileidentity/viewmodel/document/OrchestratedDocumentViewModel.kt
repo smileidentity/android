@@ -1,7 +1,6 @@
 package com.smileidentity.viewmodel.document
 
 import android.os.Parcelable
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
@@ -26,6 +25,7 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.createUploadRequestFile
@@ -35,7 +35,6 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
-import com.smileidentity.util.toErrorMessage
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -49,11 +48,7 @@ import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
-    // we use `errorMessageRes` to map to the actual code to the stringRes to allow localization,
-    // and use `errorMessage` to show the actual platform error message that we show if
-    // `errorMessageRes` is not set by the partner
-    @StringRes val errorMessageRes: Int? = null,
-    val errorMessage: String? = null,
+    val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
 
 /**
@@ -85,11 +80,11 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         documentFrontFile = documentImageFile
         if (captureBothSides) {
             _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture, errorMessage = null)
+                it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture)
             }
         } else if (selfieFile == null) {
             _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
+                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
             }
         } else {
             submitJob()
@@ -99,7 +94,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onDocumentBackSkip() {
         if (selfieFile == null) {
             _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
+                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
             }
         } else {
             submitJob()
@@ -110,7 +105,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         documentBackFile = documentImageFile
         if (selfieFile == null) {
             _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
+                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
             }
         } else {
             submitJob()
@@ -261,14 +256,14 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         _uiState.update {
             it.copy(
                 currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                errorMessageRes = R.string.si_processing_error_subtitle,
+                errorMessage = StringResource.ResId(R.string.si_processing_error_subtitle),
             )
         }
         if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
             _uiState.update {
                 it.copy(
                     currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
-                    errorMessageRes = R.string.si_offline_message,
+                    errorMessage = StringResource.ResId(R.string.si_offline_message),
                 )
             }
             saveResult(
@@ -281,19 +276,15 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 didSubmitJob = false,
             )
         } else {
-            val (errorMessageRes, errorMessage) = when {
-                isNetworkFailure(throwable) -> Pair(R.string.si_no_internet, null)
-                throwable is SmileIDException -> Pair(
-                    throwable.toErrorMessage().first,
-                    throwable.toErrorMessage().second,
-                )
-                else -> Pair(R.string.si_processing_error_subtitle, null)
+            val errorMessage: StringResource = when {
+                isNetworkFailure(throwable) -> StringResource.ResId(R.string.si_no_internet)
+                throwable is SmileIDException -> StringResource.ResIdFromSmileIDException(throwable)
+                else -> StringResource.ResId(R.string.si_processing_error_subtitle)
             }
             result = SmileIDResult.Error(throwable)
             _uiState.update {
                 it.copy(
                     currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                    errorMessageRes = errorMessageRes,
                     errorMessage = errorMessage,
                 )
             }
@@ -311,7 +302,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         val step = stepToRetry
         stepToRetry = null
         step?.let { stepToRetry ->
-            _uiState.update { it.copy(currentStep = stepToRetry, errorMessage = null) }
+            _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
                 submitJob()
             }
