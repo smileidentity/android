@@ -1,6 +1,8 @@
 package com.smileidentity.viewmodel
 
 import androidx.camera.core.ImageProxy
+import com.smileidentity.R
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import io.mockk.confirmVerified
@@ -44,7 +46,10 @@ class SelfieViewModelTest {
         assertEquals(0f, uiState.progress)
         assertEquals(null, uiState.selfieToConfirm)
         assertEquals(null, uiState.processingState)
-        assertEquals(null, uiState.errorMessage)
+        assertEquals(
+            StringResource.ResId(R.string.si_processing_error_subtitle),
+            uiState.errorMessage
+        )
     }
 
     @Test
