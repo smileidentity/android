@@ -293,6 +293,28 @@ class SmartSelfieV2ViewModel(
                 return@addOnSuccessListener
             }
 
+            // The face contour is used for the Selfie Quality Model later. Sometimes, the contours
+            // extend beyond the face bounding box, so we have to check the bounds explicitly
+            val contoursBoxLeft: Int
+            val contoursBoxTop: Int
+            val contoursBoxWidth: Int
+            val contoursBoxHeight: Int
+            with(face.allContours.flatMap { it.points }) {
+                // Get the min and max x and y coordinates of the face mesh contour points
+                contoursBoxLeft = minOf { it.x }.toInt()
+                contoursBoxTop = minOf { it.y }.toInt()
+                contoursBoxWidth = maxOf { it.x }.toInt() - contoursBoxLeft
+                contoursBoxHeight = maxOf { it.y }.toInt() - contoursBoxTop
+            }
+            if (contoursBoxLeft < 0 || contoursBoxTop < 0 ||
+                contoursBoxLeft + contoursBoxWidth > inputImage.width ||
+                contoursBoxTop + contoursBoxHeight > inputImage.height
+            ) {
+                Timber.d("Face contour not within image")
+                conditionFailedWithReasonAndTimeout(EnsureEntireFaceVisible)
+                return@addOnSuccessListener
+            }
+
             // Check that the face is close enough to the camera
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
             if (faceFillRatio < MIN_FACE_FILL_THRESHOLD) {
@@ -356,18 +378,12 @@ class SmartSelfieV2ViewModel(
                 // detection)
 
                 val input = TensorImage(DataType.FLOAT32).apply {
-                    // Get the min and max x and y coordinates of the face mesh contour points
-                    val allPoints = face.allContours.flatMap { it.points }
-                    val left = allPoints.minOf { it.x }.toInt()
-                    val top = allPoints.minOf { it.y }.toInt()
-                    val width = allPoints.maxOf { it.x }.toInt() - left
-                    val height = allPoints.maxOf { it.y }.toInt() - top
                     val modelInputBmp = Bitmap.createBitmap(
                         fullSelfieBmp,
-                        left,
-                        top,
-                        width,
-                        height,
+                        contoursBoxLeft,
+                        contoursBoxTop,
+                        contoursBoxWidth,
+                        contoursBoxHeight,
                         // NB! input is not guaranteed to be square, so scale might squish the image
                     ).scale(modelInputSize[1], modelInputSize[2], false)
                     load(modelInputBmp)
