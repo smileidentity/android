@@ -34,11 +34,11 @@ jobs:
             echo "Version $VERSION does not contain -SNAPSHOT"
             echo "version=$VERSION-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
-      - name: Build, Test, Lint, Assemble, Publish Snapshot
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          # NB! The "lint" gradle action here is different than ktLint
-          arguments: lint build assembleDebug publish
+      - name: Build, Test, Lint, Assemble, Publish Snapshot
+        # NB! The "lint" gradle action here is different than ktLint
+        run: ./gradlew lint build assembleDebug publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

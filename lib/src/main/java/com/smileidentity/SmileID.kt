@@ -5,6 +5,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.models.AuthenticationRequest
@@ -472,6 +473,8 @@ object SmileID {
      * Request Google Play Services to install the Face Detection Module, if not already installed.
      */
     private fun requestFaceDetectionModuleInstallation(context: Context) {
+        // see: https://github.com/googlesamples/mlkit/issues/264
+        MlKitContext.initializeIfNeeded(context)
         val moduleInstallRequest = ModuleInstallRequest.newBuilder()
             .addApi(FaceDetection.getClient())
             .setListener {
