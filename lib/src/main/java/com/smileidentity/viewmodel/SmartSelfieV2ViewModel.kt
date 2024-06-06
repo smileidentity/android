@@ -68,6 +68,7 @@ by the liveness task
 private const val NUM_LIVENESS_IMAGES = 8
 private const val LIVENESS_IMAGE_SIZE = 320
 private const val SELFIE_IMAGE_SIZE = 640
+const val VIEWFINDER_SCALE = 1.3f
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -122,6 +123,11 @@ data class SmartSelfieV2UiState(
     val MIDWAY_UP_ANGLE_MAX: Float,
     val END_UP_ANGLE_MIN: Float,
     val END_UP_ANGLE_MAX: Float,
+    val IGNORE_FACES_SMALLER_THAN: Float,
+    val headRoll: Float,
+    val headYaw: Float,
+    val headPitch: Float,
+    val selfieQuality: Float,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -153,9 +159,10 @@ class SmartSelfieV2ViewModel(
     private var MAX_FACE_PITCH_THRESHOLD = 30
     private var MAX_FACE_YAW_THRESHOLD = 15
     private var MAX_FACE_ROLL_THRESHOLD = 30
-    private var FORCED_FAILURE_TIMEOUT_MS = 30_000L
+    private var FORCED_FAILURE_TIMEOUT_MS = 60_000L
     private var LOADING_INDICATOR_DELAY_MS = 200L
     private var COMPLETED_DELAY_MS = 2000L
+    private var IGNORE_FACES_SMALLER_THAN = 0.03f
 
     private val activeLiveness = ActiveLivenessTask()
 
@@ -184,6 +191,11 @@ class SmartSelfieV2ViewModel(
             MIDWAY_UP_ANGLE_MAX = activeLiveness.MIDWAY_UP_ANGLE_MAX,
             END_UP_ANGLE_MIN = activeLiveness.END_UP_ANGLE_MIN,
             END_UP_ANGLE_MAX = activeLiveness.END_UP_ANGLE_MAX,
+            IGNORE_FACES_SMALLER_THAN = IGNORE_FACES_SMALLER_THAN,
+            headRoll = 0f,
+            headYaw = 0f,
+            headPitch = 0f,
+            selfieQuality = 0f,
         ),
     )
     val uiState = _uiState.asStateFlow().sample(250).stateIn(
@@ -267,18 +279,39 @@ class SmartSelfieV2ViewModel(
             return
         }
 
+        val viewfinderRect = image.cropRect.apply {
+            val factor = VIEWFINDER_SCALE
+            val newWidth = (width() / factor).toInt()
+            val newHeight = (height() / factor).toInt()
+            inset((width() - newWidth) / 2, (height() - newHeight) / 2)
+        }
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
-            val face = faces.firstOrNull() ?: run {
+            // Provide feedback only on what the user sees
+            // (https://smileidentity.slack.com/archives/C049K02DQU9/p1717552675191829?thread_ts=1717551669.342599&cid=C049K02DQU9)
+            val facesToConsider = faces.filter {
+                // Only consider faces within the preview visible to the user and with some min size
+                viewfinderRect.contains(it.boundingBox.centerX(), it.boundingBox.centerY()) &&
+                    it.boundingBox.area / inputImage.area.toFloat() > IGNORE_FACES_SMALLER_THAN
+            }
+
+            if (facesToConsider.size > 1) {
+                Timber.d("More than one face detected")
+                conditionFailedWithReasonAndTimeout(OnlyOneFace)
+                return@addOnSuccessListener
+            }
+
+            val face = facesToConsider.firstOrNull() ?: run {
                 Timber.d("No face detected")
                 conditionFailedWithReasonAndTimeout(SearchingForFace)
                 return@addOnSuccessListener
             }
-
-            if (faces.size > 1) {
-                Timber.d("More than one face detected")
-                conditionFailedWithReasonAndTimeout(OnlyOneFace)
-                return@addOnSuccessListener
+            _uiState.update {
+                it.copy(
+                    headRoll = face.headEulerAngleZ,
+                    headYaw = face.headEulerAngleY,
+                    headPitch = face.headEulerAngleX,
+                )
             }
 
             val bBox = face.boundingBox
@@ -294,17 +327,17 @@ class SmartSelfieV2ViewModel(
 
             // The face contour is used for the Selfie Quality Model later. Sometimes, the contours
             // extend beyond the face bounding box, so we have to check the bounds explicitly
-            val contoursBoxLeft: Int
-            val contoursBoxTop: Int
-            val contoursBoxWidth: Int
-            val contoursBoxHeight: Int
-            with(face.allContours.flatMap { it.points }) {
-                // Get the min and max x and y coordinates of the face mesh contour points
-                contoursBoxLeft = minOf { it.x }.toInt()
-                contoursBoxTop = minOf { it.y }.toInt()
-                contoursBoxWidth = maxOf { it.x }.toInt() - contoursBoxLeft
-                contoursBoxHeight = maxOf { it.y }.toInt() - contoursBoxTop
+            // Get the min and max x and y coordinates of the face mesh contour points
+            val allContourPoints = face.allContours.flatMap { it.points }
+            if (allContourPoints.isEmpty()) {
+                Timber.d("No face contour points detected")
+                // No directive update here because there is nothing the user can do
+                return@addOnSuccessListener
             }
+            val contoursBoxLeft = allContourPoints.minOf { it.x }.toInt()
+            val contoursBoxTop = allContourPoints.minOf { it.y }.toInt()
+            val contoursBoxWidth = allContourPoints.maxOf { it.x }.toInt() - contoursBoxLeft
+            val contoursBoxHeight = allContourPoints.maxOf { it.y }.toInt() - contoursBoxTop
             if (contoursBoxLeft < 0 || contoursBoxTop < 0 ||
                 contoursBoxLeft + contoursBoxWidth > inputImage.width ||
                 contoursBoxTop + contoursBoxHeight > inputImage.height
@@ -397,6 +430,7 @@ class SmartSelfieV2ViewModel(
                     Timber.w("No image quality output")
                     return@addOnSuccessListener
                 }
+                _uiState.update { it.copy(selfieQuality = output) }
                 selfieQualityHistory.add(output)
                 if (selfieQualityHistory.size > SELFIE_QUALITY_HISTORY_LENGTH) {
                     // We should only ever exceed history length by 1
@@ -699,5 +733,9 @@ class SmartSelfieV2ViewModel(
     fun onEndUpAngleMaxUpdated(value: Float) {
         activeLiveness.END_UP_ANGLE_MAX = value
         _uiState.update { it.copy(END_UP_ANGLE_MAX = value) }
+    }
+
+    fun onIgnoreFacesSmallerThanUpdated(value: Float) {
+        _uiState.update { it.copy(IGNORE_FACES_SMALLER_THAN = value) }
     }
 }

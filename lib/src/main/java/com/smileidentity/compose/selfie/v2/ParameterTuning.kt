@@ -43,7 +43,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Active Liveness Stability Time (ms): ${uiState.LIVENESS_STABILITY_TIME_MS}",
+                "Active Liveness Stability Time (ms): ${uiState.LIVENESS_STABILITY_TIME_MS.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -58,7 +58,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "LR Halfway Qualifying Angles (°): ${uiState.MIDWAY_LR_ANGLE_MIN}-${uiState.MIDWAY_LR_ANGLE_MAX}",
+                "LR Halfway Qualifying Angles (°): ${uiState.MIDWAY_LR_ANGLE_MIN.toInt()}-${uiState.MIDWAY_LR_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -76,7 +76,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "LR Qualifying Angle (°): ${uiState.END_LR_ANGLE_MIN}-${uiState.END_LR_ANGLE_MAX}",
+                "LR Qualifying Angle (°): ${uiState.END_LR_ANGLE_MIN.toInt()}-${uiState.END_LR_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -94,7 +94,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Up Halfway Qualifying Angles Min (°): ${uiState.MIDWAY_UP_ANGLE_MIN}-${uiState.MIDWAY_UP_ANGLE_MAX}",
+                "Up Halfway Qualifying Angles Min (°): ${uiState.MIDWAY_UP_ANGLE_MIN.toInt()}-${uiState.MIDWAY_UP_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -112,7 +112,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Up Qualifying Angle (°): ${uiState.END_UP_ANGLE_MIN}-${uiState.END_UP_ANGLE_MAX}",
+                "Up Qualifying Angle (°): ${uiState.END_UP_ANGLE_MIN.toInt()}-${uiState.END_UP_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -130,7 +130,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Orthogonal Angle Buffer (°): ${uiState.ORTHOGONAL_ANGLE_BUFFER}",
+                "Orthogonal Angle Buffer (°): ${uiState.ORTHOGONAL_ANGLE_BUFFER.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -176,7 +176,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Active Liveness Forced Failure Timeout (ms): ${uiState.FORCED_FAILURE_TIMEOUT_MS}",
+                "Active Liveness Forced Failure Timeout (s): ${(uiState.FORCED_FAILURE_TIMEOUT_MS / 1000).toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -187,11 +187,11 @@ fun ParameterTuningScreen(
             Slider(
                 value = uiState.FORCED_FAILURE_TIMEOUT_MS,
                 onValueChange = viewModel::onForcedFailureTimeoutMsUpdated,
-                valueRange = 0f..90_000f,
+                valueRange = 0f..120_000f,
             )
 
             Text(
-                "Intra Image min delay (ms): ${uiState.INTRA_IMAGE_MIN_DELAY_MS}",
+                "Intra Image min delay (ms): ${uiState.INTRA_IMAGE_MIN_DELAY_MS.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -221,7 +221,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Min Face Fill Threshold (%): ${uiState.MIN_FACE_FILL_THRESHOLD}",
+                "Min Face Fill Threshold (%): ${(uiState.MIN_FACE_FILL_THRESHOLD * 100).toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -236,7 +236,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Max Face Fill Threshold (%): ${uiState.MAX_FACE_FILL_THRESHOLD}",
+                "Max Face Fill Threshold (%): ${(uiState.MAX_FACE_FILL_THRESHOLD * 100).toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -248,6 +248,21 @@ fun ParameterTuningScreen(
                 value = uiState.MAX_FACE_FILL_THRESHOLD,
                 onValueChange = viewModel::onMaxFaceFillThresholdUpdated,
                 valueRange = 0f..1f,
+            )
+
+            Text(
+                "Ignore faces smaller than (%): ${(uiState.IGNORE_FACES_SMALLER_THAN * 100).toInt()}",
+                modifier = Modifier.padding(top = 8.dp),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Text(
+                "Face bounding boxes taking up less than this percentage of the frame will be ignored",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Slider(
+                value = uiState.IGNORE_FACES_SMALLER_THAN,
+                onValueChange = viewModel::onIgnoreFacesSmallerThanUpdated,
+                valueRange = 0f..0.1f,
             )
 
             Text(
@@ -266,7 +281,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Max Face Pitch Threshold: ${uiState.MAX_FACE_PITCH_THRESHOLD}",
+                "Max Face Pitch Threshold (°): ${uiState.MAX_FACE_PITCH_THRESHOLD.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -281,7 +296,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Max Face Yaw Threshold: ${uiState.MAX_FACE_YAW_THRESHOLD}",
+                "Max Face Yaw Threshold (°): ${uiState.MAX_FACE_YAW_THRESHOLD.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -296,7 +311,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Max Face Roll Threshold: ${uiState.MAX_FACE_ROLL_THRESHOLD}",
+                "Max Face Roll Threshold (°): ${uiState.MAX_FACE_ROLL_THRESHOLD.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -311,7 +326,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Loading Indicator Delay (ms): ${uiState.LOADING_INDICATOR_DELAY_MS}",
+                "Loading Indicator Delay (ms): ${uiState.LOADING_INDICATOR_DELAY_MS.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -326,7 +341,7 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Completed Delay (ms): ${uiState.COMPLETED_DELAY_MS}",
+                "Completed Delay (ms): ${uiState.COMPLETED_DELAY_MS.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )

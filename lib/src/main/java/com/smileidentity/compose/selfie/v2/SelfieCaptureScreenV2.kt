@@ -79,6 +79,7 @@ import com.smileidentity.util.toast
 import com.smileidentity.viewmodel.SelfieHint
 import com.smileidentity.viewmodel.SelfieState
 import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
+import com.smileidentity.viewmodel.VIEWFINDER_SCALE
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.ImplementationMode
@@ -199,9 +200,25 @@ fun OrchestratedSelfieCaptureScreenV2(
                     isImageAnalysisEnabled = true,
                     modifier = Modifier
                         .padding(32.dp)
-                        .scale(1.3f),
+                        .scale(VIEWFINDER_SCALE),
                 )
             },
+        )
+        Text(
+            text = "Head Roll: ${uiState.headRoll}",
+            style = MaterialTheme.typography.bodySmall,
+        )
+        Text(
+            text = "Head Yaw: ${uiState.headYaw}",
+            style = MaterialTheme.typography.bodySmall,
+        )
+        Text(
+            text = "Head Pitch: ${uiState.headPitch}",
+            style = MaterialTheme.typography.bodySmall,
+        )
+        Text(
+            text = "Selfie Quality: ${uiState.selfieQuality}",
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }
