@@ -1,10 +1,13 @@
 # Release Notes
 
-## 10.1.5
+## Unreleased
 
 * SmartSelfie Enrollment and Authentication receive new, streamlined UIs
-    * Set `useStrictMode=true` parameter for better pass rates
-    * Removed `showInstructions` and `jobId` input parameters
+  * Set `useStrictMode=true` parameter for better pass rates
+  * Removed `showInstructions` and `jobId` input parameters
+
+## 10.1.5
+
 * Fixed a bug where MLKit initialization would sometimes fail due to Application Context
 * Verify SDK for Google Play SDK Console
 
