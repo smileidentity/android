@@ -1,8 +1,9 @@
 # Release Notes
 
-## Unreleased
+## 10.1.5
 
 * Fixed a bug where MLKit initialization would sometimes fail due to Application Context
+* Verify SDK for Google Play SDK Console
 
 ## 10.1.4
 
