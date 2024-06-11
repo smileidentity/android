@@ -2,6 +2,7 @@
 
 ## 10.1.5
 
+* Update generic errors with actual platform errors
 * Fixed a bug where MLKit initialization would sometimes fail due to Application Context
 * Verify SDK for Google Play SDK Console
 

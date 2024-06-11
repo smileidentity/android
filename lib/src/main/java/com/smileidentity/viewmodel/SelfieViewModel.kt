@@ -20,12 +20,14 @@ import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.area
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
@@ -73,7 +75,7 @@ data class SelfieUiState(
     val progress: Float = 0f,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
-    @StringRes val errorMessage: Int? = null,
+    val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
 
 enum class SelfieDirective(@StringRes val displayText: Int) {
@@ -142,7 +144,6 @@ class SelfieViewModel(
                             progress = 0f,
                             selfieToConfirm = null,
                             processingState = null,
-                            errorMessage = null,
                         )
                     }
                     livenessFiles.removeAll { it.delete() }
@@ -235,7 +236,7 @@ class SelfieViewModel(
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_processing_error_subtitle,
+                    errorMessage = StringResource.ResId(R.string.si_processing_error_subtitle),
                 )
             }
         }.addOnCompleteListener {
@@ -281,19 +282,25 @@ class SelfieViewModel(
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Success,
-                        errorMessage = R.string.si_offline_message,
+                        errorMessage = StringResource.ResId(R.string.si_offline_message),
                     )
                 }
             } else {
+                val errorMessage: StringResource = when {
+                    isNetworkFailure(e) -> StringResource.ResId(R.string.si_no_internet)
+                    e is SmileIDException -> StringResource.ResIdFromSmileIDException(e)
+                    else -> StringResource.ResId(R.string.si_processing_error_subtitle)
+                }
                 result = SmileIDResult.Error(e)
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Error,
-                        errorMessage = R.string.si_processing_error_subtitle,
+                        errorMessage = errorMessage,
                     )
                 }
             }
         }
+
         viewModelScope.launch(getExceptionHandler(proxy)) {
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode

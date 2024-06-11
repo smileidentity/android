@@ -19,6 +19,10 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.mlkit.vision.common.InputImage
 import com.smileidentity.R
 import com.smileidentity.SmileID
@@ -257,6 +261,63 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
         throwable
     }
     proxy(converted)
+}
+
+@Stable
+sealed interface StringResource {
+    fun resolve(context: Context): String
+
+    data class Text(val text: String) : StringResource {
+        override fun resolve(context: Context): String {
+            return text
+        }
+    }
+
+    data class ResId(@StringRes val stringId: Int) : StringResource {
+        override fun resolve(context: Context): String {
+            return context.getString(stringId)
+        }
+    }
+
+    data class ResIdFromSmileIDException(val exception: SmileIDException) : StringResource {
+        @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
+        override fun resolve(context: Context): String {
+            val resourceName = "si_error_message_${exception.details.code}"
+            val resourceId = context.resources.getIdentifier(
+                /* name = */
+                resourceName,
+                /* defType = */
+                "string",
+                /* defPackage = */
+                context.packageName,
+            )
+            return context.getString(resourceId)
+        }
+    }
+
+    @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
+    @Composable
+    fun resolve(): String {
+        return when (this) {
+            is ResId -> stringResource(id = stringId)
+            is ResIdFromSmileIDException -> {
+                val context = LocalContext.current
+                val resourceName = "si_error_message_${exception.details.code}"
+                val resourceId = context.resources.getIdentifier(
+                    /* name = */
+                    resourceName,
+                    /* defType = */
+                    "string",
+                    /* defPackage = */
+                    context.packageName,
+                )
+
+                return stringResource(id = resourceId).takeIf { it.isNotEmpty() }
+                    ?: exception.details.message
+            }
+            is Text -> text
+        }
+    }
 }
 
 /**
