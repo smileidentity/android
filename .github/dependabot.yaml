@@ -16,9 +16,17 @@ updates:
           - "com.google.devtools.ksp"
           - "org.jetbrains.kotlin.*"
           - "dev.zacsweers.moshix"
+      agp:
+        # We often want to hold off on AGP updates, so bump this separately
+        patterns:
+          - "com.android.*"
+      androidx:
+        # AndroidX updates often include behavioral changes that need to be tested
+        patterns:
+          - "androidx.*"
       all:
-        # Group all patch and minor updates together. Kotlin/KSP updates belong to the first group
-        # so they will not be updated as part of this group
+        # Group all patch and minor updates together. Kotlin/KSP/AGP updates belong to earlier
+        # groups so they will not be updated as part of this group
         update-types:
           - "patch"
           - "minor"
