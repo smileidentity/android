@@ -6,6 +6,10 @@
   * Set `useStrictMode=true` parameter for better pass rates
   * Removed `showInstructions` and `jobId` input parameters
 
+## 10.1.6
+
+* Update generic errors with actual platform errors
+
 ## 10.1.5
 
 * Fixed a bug where MLKit initialization would sometimes fail due to Application Context
