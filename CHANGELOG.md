@@ -1,10 +1,16 @@
 # Release Notes
 
+<<<<<<< active-liveness
 ## Unreleased
 
 * SmartSelfie Enrollment and Authentication receive new, streamlined UIs
   * Set `useStrictMode=true` parameter for better pass rates
   * Removed `showInstructions` and `jobId` input parameters
+=======
+## 10.1.6
+
+* Update generic errors with actual platform errors
+>>>>>>> main
 
 ## 10.1.5
 
