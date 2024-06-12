@@ -67,7 +67,7 @@ fun FaceShapedProgressIndicator(
             drawPath(FaceShape.path, color = incompleteProgressStrokeColor, style = stroke)
 
             // To prevent a bug where the progress initially shows up as a full circle
-            if (progress == 0f) return@Canvas
+            if (progress == 0f || strokeWidth == 0.dp) return@Canvas
 
             // Note: Height grows downwards
             val faceShapeSize = faceShapeBounds.size
