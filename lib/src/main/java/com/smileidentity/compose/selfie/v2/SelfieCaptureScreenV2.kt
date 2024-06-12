@@ -276,6 +276,7 @@ fun ColumnScope.SmartSelfieV2Screen(
         val mainBorderColor = Color.Black
         val accentBorderColor = MaterialTheme.colorScheme.errorContainer
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(horizontal = 32.dp, vertical = 16.dp)
                 .aspectRatio(0.75f) // 480 x 640 -> 3/4 -> 0.75

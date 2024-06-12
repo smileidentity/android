@@ -2,6 +2,7 @@ package com.smileidentity.viewmodel
 
 import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
+import android.graphics.Rect
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
@@ -244,7 +245,7 @@ class SmartSelfieV2ViewModel(
      * 2. Luminance
      * 3. Face detection
      * 4. More than one face detected
-     * 5. Face bounding box within image ("entire face visible")
+     * 5. Face landmark contours bounding box within image ("entire face visible")
      * 6. Face too far from camera
      * 7. Face too close to camera
      * 8. For selfie images only:
@@ -279,18 +280,21 @@ class SmartSelfieV2ViewModel(
             return
         }
 
-        val viewfinderRect = image.cropRect.apply {
-            val factor = VIEWFINDER_SCALE
-            val newWidth = (width() / factor).toInt()
-            val newHeight = (height() / factor).toInt()
-            inset((width() - newWidth) / 2, (height() - newHeight) / 2)
-        }
         val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
         faceDetector.process(inputImage).addOnSuccessListener { faces ->
-            // Provide feedback only on what the user sees
-            // (https://smileidentity.slack.com/archives/C049K02DQU9/p1717552675191829?thread_ts=1717551669.342599&cid=C049K02DQU9)
+            val bmp = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
+            val viewfinderWidth = (bmp.width / VIEWFINDER_SCALE).toInt()
+            val viewfinderHeight = (bmp.height / VIEWFINDER_SCALE).toInt()
+            val viewfinderRect = Rect(
+                (bmp.width - viewfinderWidth) / 2,
+                (bmp.height - viewfinderHeight) / 2,
+                bmp.width - ((bmp.width - viewfinderWidth) / 2),
+                bmp.height - ((bmp.height - viewfinderHeight) / 2),
+            )
+            // Ignore faces outside the zoomed in viewfinder (i.e. Provide feedback only on what the
+            // user sees) and ignore very small faces (i.e. if user is in a crowded location)
+            // https://smileidentity.slack.com/archives/C049K02DQU9/p1717552675191829?thread_ts=1717551669.342599&cid=C049K02DQU9
             val facesToConsider = faces.filter {
-                // Only consider faces within the preview visible to the user and with some min size
                 viewfinderRect.contains(it.boundingBox.centerX(), it.boundingBox.centerY()) &&
                     it.boundingBox.area / inputImage.area.toFloat() > IGNORE_FACES_SMALLER_THAN
             }
@@ -314,17 +318,6 @@ class SmartSelfieV2ViewModel(
                 )
             }
 
-            val bBox = face.boundingBox
-
-            // Check that the corners of the face bounding box are within the inputImage
-            val faceCornersInImage = bBox.left >= 0 && bBox.right <= inputImage.width &&
-                bBox.top >= 0 && bBox.bottom <= inputImage.height
-            if (!faceCornersInImage) {
-                Timber.d("Face bounding box not within image")
-                conditionFailedWithReasonAndTimeout(EnsureEntireFaceVisible)
-                return@addOnSuccessListener
-            }
-
             // The face contour is used for the Selfie Quality Model later. Sometimes, the contours
             // extend beyond the face bounding box, so we have to check the bounds explicitly
             // Get the min and max x and y coordinates of the face mesh contour points
@@ -334,14 +327,14 @@ class SmartSelfieV2ViewModel(
                 // No directive update here because there is nothing the user can do
                 return@addOnSuccessListener
             }
-            val contoursBoxLeft = allContourPoints.minOf { it.x }.toInt()
-            val contoursBoxTop = allContourPoints.minOf { it.y }.toInt()
-            val contoursBoxWidth = allContourPoints.maxOf { it.x }.toInt() - contoursBoxLeft
-            val contoursBoxHeight = allContourPoints.maxOf { it.y }.toInt() - contoursBoxTop
-            if (contoursBoxLeft < 0 || contoursBoxTop < 0 ||
-                contoursBoxLeft + contoursBoxWidth > inputImage.width ||
-                contoursBoxTop + contoursBoxHeight > inputImage.height
-            ) {
+            val contourRect = Rect(
+                allContourPoints.minOf { it.x }.toInt(),
+                allContourPoints.minOf { it.y }.toInt(),
+                allContourPoints.maxOf { it.x }.toInt(),
+                allContourPoints.maxOf { it.y }.toInt(),
+            )
+
+            if (!viewfinderRect.contains(contourRect)) {
                 Timber.d("Face contour not within image")
                 conditionFailedWithReasonAndTimeout(EnsureEntireFaceVisible)
                 return@addOnSuccessListener
@@ -358,18 +351,6 @@ class SmartSelfieV2ViewModel(
             // Check that the face is not too close to the camera
             if (faceFillRatio > MAX_FACE_FILL_THRESHOLD) {
                 Timber.d("Face too close to camera")
-                conditionFailedWithReasonAndTimeout(MoveBack)
-                return@addOnSuccessListener
-            }
-
-            val fullSelfieBmp = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
-            if (bBox.left + bBox.width() > fullSelfieBmp.width) {
-                Timber.d("Face bounding box width is greater than image width")
-                conditionFailedWithReasonAndTimeout(MoveBack)
-                return@addOnSuccessListener
-            }
-            if (bBox.top + bBox.height() > fullSelfieBmp.height) {
-                Timber.d("Face bounding box height is greater than image height")
                 conditionFailedWithReasonAndTimeout(MoveBack)
                 return@addOnSuccessListener
             }
@@ -411,16 +392,15 @@ class SmartSelfieV2ViewModel(
                 // Model output: nx2 - n images, each with 2 probabilities
                 // 1st column is the actual quality. 2nd column is 1-(1st_column)
 
-                // NB! Model is trained on *face mesh* crop (potentially different from face
-                // detection)
+                // NB! Model is trained on *face mesh* crop, not face bounding box crop
 
                 val input = TensorImage(DataType.FLOAT32).apply {
                     val modelInputBmp = Bitmap.createBitmap(
-                        fullSelfieBmp,
-                        contoursBoxLeft,
-                        contoursBoxTop,
-                        contoursBoxWidth,
-                        contoursBoxHeight,
+                        bmp,
+                        contourRect.left,
+                        contourRect.top,
+                        contourRect.width(),
+                        contourRect.height(),
                         // NB! input is not guaranteed to be square, so scale might squish the image
                     ).scale(modelInputSize[1], modelInputSize[2], false)
                     load(modelInputBmp)
@@ -457,7 +437,7 @@ class SmartSelfieV2ViewModel(
                 this.selfieFile = selfieFile
                 Timber.v("Capturing selfie image to $selfieFile")
                 postProcessImageBitmap(
-                    bitmap = fullSelfieBmp,
+                    bitmap = bmp,
                     file = selfieFile,
                     compressionQuality = 80,
                     resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
@@ -475,7 +455,7 @@ class SmartSelfieV2ViewModel(
             val livenessFile = createLivenessFile(userId)
             Timber.v("Capturing liveness image to $livenessFile")
             postProcessImageBitmap(
-                bitmap = fullSelfieBmp,
+                bitmap = bmp,
                 file = livenessFile,
                 compressionQuality = 80,
                 resizeLongerDimensionTo = LIVENESS_IMAGE_SIZE,
