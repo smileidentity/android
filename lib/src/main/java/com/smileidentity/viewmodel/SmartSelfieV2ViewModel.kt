@@ -32,6 +32,7 @@ import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
+import com.smileidentity.viewmodel.SelfieHint.EnsureDeviceUpright
 import com.smileidentity.viewmodel.SelfieHint.EnsureEntireFaceVisible
 import com.smileidentity.viewmodel.SelfieHint.LookStraight
 import com.smileidentity.viewmodel.SelfieHint.MoveBack
@@ -83,6 +84,7 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
         R.drawable.si_tf_face_search,
         R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
     ),
+    EnsureDeviceUpright(R.drawable.si_tf_face_search, R.string.si_smart_selfie_v2_directive_ensure_device_upright),
     OnlyOneFace(-1, R.string.si_smart_selfie_v2_directive_ensure_one_face),
     EnsureEntireFaceVisible(-1, R.string.si_smart_selfie_v2_directive_ensure_entire_face_visible),
     NeedLight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_need_more_light),
@@ -209,6 +211,7 @@ class SmartSelfieV2ViewModel(
     private var lastAutoCaptureTimeMs = 0L
     private var lastValidFaceDetectTime = 0L
     private var shouldAnalyzeImages = true
+    private var selfieCameraOrientation: Int? = null
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
@@ -267,6 +270,18 @@ class SmartSelfieV2ViewModel(
             Timber.w("ImageProxy has no image")
             SmileIDCrashReporting.hub.addBreadcrumb("ImageProxy has no image")
             imageProxy.close()
+            return
+        }
+
+        // We want to hold the orientation constant for the duration of the capture
+        val desiredOrientation = selfieCameraOrientation ?: imageProxy.imageInfo.rotationDegrees
+        if (imageProxy.imageInfo.rotationDegrees != desiredOrientation) {
+            val message = "Camera orientation changed. Resetting progress"
+            Timber.d(message)
+            SmileIDCrashReporting.hub.addBreadcrumb(message)
+            resetCaptureProgress(EnsureDeviceUpright)
+            imageProxy.close()
+            selfieCameraOrientation = null
             return
         }
 
@@ -431,6 +446,7 @@ class SmartSelfieV2ViewModel(
                 _uiState.update {
                     it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
                 }
+                selfieCameraOrientation = imageProxy.imageInfo.rotationDegrees
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
                 // local variable is for null type safety purposes
                 val selfieFile = createSelfieFile(userId)

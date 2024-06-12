@@ -357,6 +357,10 @@ private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modi
                 hint,
                 modifier = modifier,
             )
+            SelfieHint.EnsureDeviceUpright -> AnimatedImageFromSelfieHint(
+                hint,
+                modifier = modifier,
+            )
 
             SelfieHint.OnlyOneFace -> Face(modifier = modifier)
             SelfieHint.EnsureEntireFaceVisible -> Face(modifier = modifier)
