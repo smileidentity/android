@@ -42,16 +42,16 @@ internal class ActiveLivenessTask(
     private var currentDirectionInitiallySatisfiedAt = Long.MAX_VALUE
 
     // Parameter tuning
-    var LIVENESS_STABILITY_TIME_MS = 300L
-    var ORTHOGONAL_ANGLE_BUFFER = 90f
-    var MIDWAY_LR_ANGLE_MIN = 10f
-    var MIDWAY_LR_ANGLE_MAX = 90f
-    var END_LR_ANGLE_MIN = 30f
-    var END_LR_ANGLE_MAX = 90f
-    var MIDWAY_UP_ANGLE_MIN = 10f
-    var MIDWAY_UP_ANGLE_MAX = 90f
-    var END_UP_ANGLE_MIN = 20f
-    var END_UP_ANGLE_MAX = 90f
+    var livenessStabilityTimeMs = 300L
+    var orthogonalAngleBuffer = 90f
+    var midwayLrAngleMin = 10f
+    var midwayLrAngleMax = 90f
+    var endLrAngleMin = 30f
+    var endLrAngleMax = 90f
+    var midwayUpAngleMin = 10f
+    var midwayUpAngleMax = 90f
+    var endUpAngleMin = 20f
+    var endUpAngleMax = 90f
 
     /**
      * Determines if conditions are met for the current active liveness task
@@ -65,39 +65,39 @@ internal class ActiveLivenessTask(
     fun doesFaceMeetCurrentActiveLivenessTask(face: Face): Boolean {
         val isLookingRightDirection = when (orderedFaceDirections[currentDirectionIdx]) {
             is LeftMid -> face.isLookingLeft(
-                minAngle = MIDWAY_LR_ANGLE_MIN,
-                maxAngle = MIDWAY_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                minAngle = midwayLrAngleMin,
+                maxAngle = midwayLrAngleMax,
+                verticalAngleBuffer = orthogonalAngleBuffer,
             )
 
             is LeftEnd -> face.isLookingLeft(
-                minAngle = END_LR_ANGLE_MIN,
-                maxAngle = END_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                minAngle = endLrAngleMin,
+                maxAngle = endLrAngleMax,
+                verticalAngleBuffer = orthogonalAngleBuffer,
             )
 
             is RightMid -> face.isLookingRight(
-                minAngle = MIDWAY_LR_ANGLE_MIN,
-                maxAngle = MIDWAY_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                minAngle = midwayLrAngleMin,
+                maxAngle = midwayLrAngleMax,
+                verticalAngleBuffer = orthogonalAngleBuffer,
             )
 
             is RightEnd -> face.isLookingRight(
-                minAngle = END_LR_ANGLE_MIN,
-                maxAngle = END_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                minAngle = endLrAngleMin,
+                maxAngle = endLrAngleMax,
+                verticalAngleBuffer = orthogonalAngleBuffer,
             )
 
             is UpMid -> face.isLookingUp(
-                minAngle = MIDWAY_UP_ANGLE_MIN,
-                maxAngle = MIDWAY_UP_ANGLE_MAX,
-                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                minAngle = midwayUpAngleMin,
+                maxAngle = midwayUpAngleMax,
+                horizontalAngleBuffer = orthogonalAngleBuffer,
             )
 
             is UpEnd -> face.isLookingUp(
-                minAngle = END_UP_ANGLE_MIN,
-                maxAngle = END_UP_ANGLE_MAX,
-                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                minAngle = endUpAngleMin,
+                maxAngle = endUpAngleMax,
+                horizontalAngleBuffer = orthogonalAngleBuffer,
             )
         }
         if (!isLookingRightDirection) {
@@ -111,7 +111,7 @@ internal class ActiveLivenessTask(
             currentDirectionInitiallySatisfiedAt = System.currentTimeMillis()
         }
         val elapsedTimeMs = System.currentTimeMillis() - currentDirectionInitiallySatisfiedAt
-        val hasBeenLongEnough = elapsedTimeMs > LIVENESS_STABILITY_TIME_MS
+        val hasBeenLongEnough = elapsedTimeMs > livenessStabilityTimeMs
         if (hasBeenLongEnough) {
             resetLivenessStabilityTime()
         }
