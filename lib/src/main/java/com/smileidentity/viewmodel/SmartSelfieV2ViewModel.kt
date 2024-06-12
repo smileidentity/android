@@ -84,7 +84,10 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
         R.drawable.si_tf_face_search,
         R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
     ),
-    EnsureDeviceUpright(R.drawable.si_tf_face_search, R.string.si_smart_selfie_v2_directive_ensure_device_upright),
+    EnsureDeviceUpright(
+        R.drawable.si_tf_face_search,
+        R.string.si_smart_selfie_v2_directive_ensure_device_upright,
+    ),
     OnlyOneFace(-1, R.string.si_smart_selfie_v2_directive_ensure_one_face),
     EnsureEntireFaceVisible(-1, R.string.si_smart_selfie_v2_directive_ensure_entire_face_visible),
     NeedLight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_need_more_light),
