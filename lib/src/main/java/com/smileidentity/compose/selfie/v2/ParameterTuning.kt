@@ -43,12 +43,14 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Active Liveness Stability Time (ms): ${uiState.LIVENESS_STABILITY_TIME_MS.toInt()}",
+                "Active Liveness Stability Time (ms): " +
+                    "${uiState.LIVENESS_STABILITY_TIME_MS.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Time that the face must be pointing in the requested direction before being considered satisfied",
+                "Time that the face must be pointing in the requested direction before being" +
+                    " considered satisfied",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -58,12 +60,14 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "LR Halfway Qualifying Angles (°): ${uiState.MIDWAY_LR_ANGLE_MIN.toInt()}-${uiState.MIDWAY_LR_ANGLE_MAX.toInt()}",
+                "LR Halfway Qualifying Angles (°): " +
+                    "${uiState.MIDWAY_LR_ANGLE_MIN.toInt()}-${uiState.MIDWAY_LR_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Head angle range that determines when we perform the left/right midpoint capture",
+                "Head angle range that determines when we perform the left/right" +
+                    " midpoint capture",
                 style = MaterialTheme.typography.bodySmall,
             )
             RangeSlider(
@@ -76,7 +80,8 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "LR Qualifying Angle (°): ${uiState.END_LR_ANGLE_MIN.toInt()}-${uiState.END_LR_ANGLE_MAX.toInt()}",
+                "LR Qualifying Angle (°):" +
+                    " ${uiState.END_LR_ANGLE_MIN.toInt()}-${uiState.END_LR_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -94,12 +99,14 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Up Halfway Qualifying Angles Min (°): ${uiState.MIDWAY_UP_ANGLE_MIN.toInt()}-${uiState.MIDWAY_UP_ANGLE_MAX.toInt()}",
+                "Up Halfway Qualifying Angles Min (°): " +
+                    "${uiState.MIDWAY_UP_ANGLE_MIN.toInt()}-${uiState.MIDWAY_UP_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Head angle range that determines when we perform the midpoint capture when looking up",
+                "Head angle range that determines when we perform the midpoint capture" +
+                    " when looking up",
                 style = MaterialTheme.typography.bodySmall,
             )
             RangeSlider(
@@ -112,7 +119,8 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Up Qualifying Angle (°): ${uiState.END_UP_ANGLE_MIN.toInt()}-${uiState.END_UP_ANGLE_MAX.toInt()}",
+                "Up Qualifying Angle (°):" +
+                    " ${uiState.END_UP_ANGLE_MIN.toInt()}-${uiState.END_UP_ANGLE_MAX.toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -135,7 +143,8 @@ fun ParameterTuningScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "The angle buffer around the orthogonal angle (i.e. how much you can look up/down when asked to look left/right and vice versa)",
+                "The angle buffer around the orthogonal angle (i.e. how much you can" +
+                    " look up/down when asked to look left/right and vice versa)",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -166,7 +175,8 @@ fun ParameterTuningScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Min average score from selfie image quality model for a face to be considered valid",
+                "Min average score from selfie image quality model for a face to be" +
+                    " considered valid",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -176,7 +186,8 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Active Liveness Forced Failure Timeout (s): ${(uiState.FORCED_FAILURE_TIMEOUT_MS / 1000).toInt()}",
+                "Active Liveness Forced Failure Timeout (s):" +
+                    " ${(uiState.FORCED_FAILURE_TIMEOUT_MS / 1000).toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
@@ -226,7 +237,8 @@ fun ParameterTuningScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Min % of the frame that the face should fill (NB! the camera preview is zoomed in, but the percentage is wrt the full image)",
+                "Min % of the frame that the face should fill (NB! the camera preview is" +
+                    " zoomed in, but the percentage is wrt the full image)",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -241,7 +253,8 @@ fun ParameterTuningScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Max % of the frame that the face should fill (NB! the camera preview is zoomed in, but the percentage is wrt the full image)",
+                "Max % of the frame that the face should fill (NB! the camera preview is" +
+                    " zoomed in, but the percentage is wrt the full image)",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -251,12 +264,14 @@ fun ParameterTuningScreen(
             )
 
             Text(
-                "Ignore faces smaller than (%): ${(uiState.IGNORE_FACES_SMALLER_THAN * 100).toInt()}",
+                "Ignore faces smaller than (%):" +
+                    " ${(uiState.IGNORE_FACES_SMALLER_THAN * 100).toInt()}",
                 modifier = Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Face bounding boxes taking up less than this percentage of the frame will be ignored",
+                "Face bounding boxes taking up less than this percentage of the frame" +
+                    " will be ignored",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -331,7 +346,8 @@ fun ParameterTuningScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Time to wait before showing the loading indicator (UI trick to make the network request feel faster)",
+                "Time to wait before showing the loading indicator (UI trick to make" +
+                    " the network request feel faster)",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
@@ -346,7 +362,8 @@ fun ParameterTuningScreen(
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                "Time after successful network submission to keep checkmark on screen before exiting",
+                "Time after successful network submission to keep checkmark on" +
+                    " screen before exiting",
                 style = MaterialTheme.typography.bodySmall,
             )
             Slider(
