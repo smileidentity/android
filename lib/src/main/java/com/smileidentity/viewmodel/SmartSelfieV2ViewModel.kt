@@ -155,7 +155,7 @@ class SmartSelfieV2ViewModel(
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
     // PARAMETER DEBUGGING
-    private var selfieQualityHistoryLength = 7
+    private var selfieQualityHistoryLength = 5
     private var intraImageMinDelayMs = 250
     private var noFaceResetDelayMs = 500
     private var faceQualityThreshold = 0.5f
@@ -166,8 +166,8 @@ class SmartSelfieV2ViewModel(
     private var maxFaceYawThreshold = 15
     private var maxFaceRollThreshold = 30
     private var forcedFailureTimeoutMs = 60_000L
-    private var loadingIndicatorDelayMs = 200L
-    private var completedDelayMs = 2000L
+    private var loadingIndicatorDelayMs = 100L
+    private var completedDelayMs = 1500L
     private var ignoreFacesSmallerThan = 0.03f
 
     private val activeLiveness = ActiveLivenessTask()
@@ -204,7 +204,7 @@ class SmartSelfieV2ViewModel(
             selfieQuality = 0f,
         ),
     )
-    val uiState = _uiState.asStateFlow().sample(250).stateIn(
+    val uiState = _uiState.asStateFlow().sample(500).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
         _uiState.value,
@@ -221,6 +221,7 @@ class SmartSelfieV2ViewModel(
     private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
 
     init {
+        // TODO: re-enable
         // startStrictModeTimerIfNecessary()
     }
 

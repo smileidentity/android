@@ -328,7 +328,9 @@ class MainScreenViewModel : ViewModel() {
                 resultCode = null,
                 resultText = response.message,
             )
-            _uiState.update { it.copy(snackbarMessage = message) }
+            _uiState.update {
+                it.copy(clipboardText = AnnotatedString(response.userId), snackbarMessage = message)
+            }
             viewModelScope.launch {
                 DataStoreRepository.addCompletedJob(
                     partnerId = SmileID.config.partnerId,

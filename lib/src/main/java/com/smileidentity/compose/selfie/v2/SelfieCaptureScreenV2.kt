@@ -52,6 +52,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -260,7 +262,7 @@ fun ColumnScope.SmartSelfieV2Screen(
         // Could be loading indicator, composable animation, animated image, or static image
         DirectiveVisual(
             selfieState = selfieState,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(80.dp),
         )
         Text(
             text = when (selfieState) {
@@ -274,7 +276,9 @@ fun ColumnScope.SmartSelfieV2Screen(
                     R.string.si_smart_selfie_v2_submission_successful,
                 )
             },
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp),
         )
         val roundedCornerShape = RoundedCornerShape(32.dp)
