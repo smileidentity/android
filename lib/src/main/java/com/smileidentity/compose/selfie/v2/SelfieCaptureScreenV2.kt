@@ -47,7 +47,9 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -71,6 +73,7 @@ import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.selfie.AgentModeSwitch
+import com.smileidentity.compose.selfie.FaceShapedProgressIndicator
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -89,6 +92,7 @@ import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.coroutines.delay
 
 /**
  * Orchestrates the Selfie Capture Flow. Requests permissions, sets brightness, handles back press,
@@ -251,6 +255,8 @@ fun ColumnScope.SmartSelfieV2Screen(
             .background(MaterialTheme.colorScheme.tertiaryContainer)
             .padding(16.dp),
     ) {
+        DirectiveHaptics(selfieState)
+
         // Could be loading indicator, composable animation, animated image, or static image
         DirectiveVisual(
             selfieState = selfieState,
@@ -272,9 +278,8 @@ fun ColumnScope.SmartSelfieV2Screen(
             modifier = Modifier.padding(top = 16.dp),
         )
         val roundedCornerShape = RoundedCornerShape(32.dp)
-        // val mainBorderColor = MaterialTheme.colorScheme.onTertiaryContainer
-        val mainBorderColor = Color.Black
-        val accentBorderColor = MaterialTheme.colorScheme.errorContainer
+        val mainBorderColor = MaterialTheme.colorScheme.inverseSurface
+        val accentBorderColor = MaterialTheme.colorScheme.tertiary
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -314,6 +319,14 @@ fun ColumnScope.SmartSelfieV2Screen(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black.copy(alpha = 0.8f)),
+                )
+            } else {
+                FaceShapedProgressIndicator(
+                    progress = 0f,
+                    faceFillPercent = 0.4f,
+                    strokeWidth = 0.dp,
+                    incompleteProgressStrokeColor = Color.Transparent,
+                    backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f),
                 )
             }
         }
@@ -357,6 +370,7 @@ private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modi
                 hint,
                 modifier = modifier,
             )
+
             SelfieHint.EnsureDeviceUpright -> AnimatedImageFromSelfieHint(
                 hint,
                 modifier = modifier,
@@ -412,6 +426,25 @@ private fun AnimatedImageFromSelfieHint(selfieHint: SelfieHint, modifier: Modifi
         contentDescription = null,
         modifier = modifier,
     )
+}
+
+@Composable
+private fun DirectiveHaptics(selfieState: SelfieState) {
+    val haptic = LocalHapticFeedback.current
+    if (selfieState is SelfieState.Analyzing) {
+        if (selfieState.hint == SelfieHint.LookUp ||
+            selfieState.hint == SelfieHint.LookRight ||
+            selfieState.hint == SelfieHint.LookLeft
+        ) {
+            LaunchedEffect(selfieState.hint) {
+                // Custom vibration pattern
+                for (i in 0..2) {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    delay(100)
+                }
+            }
+        }
+    }
 }
 
 @SmilePreviews
