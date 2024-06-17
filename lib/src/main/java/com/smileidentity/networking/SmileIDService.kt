@@ -28,6 +28,7 @@ import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
+import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
 import java.io.File
@@ -86,6 +87,7 @@ interface SmileIDService {
         @Part("user_id") userId: String? = null,
         @Part("partner_params")
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
+        @Part("failure_reason") failureReason: FailureReason? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
@@ -110,6 +112,7 @@ interface SmileIDService {
         @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
         @Part("partner_params")
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
+        @Part("failure_reason") failureReason: FailureReason? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("metadata") metadata: Metadata? = Metadata.default(),
@@ -230,6 +233,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     livenessImages: List<File>,
     userId: String? = null,
     partnerParams: Map<String, String>? = null,
+    failureReason: FailureReason? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     allowNewEnroll: Boolean? = null,
@@ -239,6 +243,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
     userId = userId,
     partnerParams = partnerParams,
+    failureReason = failureReason,
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
     allowNewEnroll = allowNewEnroll,
@@ -262,6 +267,7 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     selfieImage: File,
     livenessImages: List<File>,
     partnerParams: Map<String, String>? = null,
+    failureReason: FailureReason? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     metadata: Metadata? = Metadata.default(),
@@ -270,6 +276,7 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
     livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
     partnerParams = partnerParams,
+    failureReason = failureReason,
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
     metadata = metadata,

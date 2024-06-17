@@ -19,6 +19,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
@@ -555,6 +556,7 @@ class SmartSelfieV2ViewModel(
                 livenessImages = livenessFiles,
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
+                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
                 metadata = null,
             )
         } else {
