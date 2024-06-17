@@ -72,3 +72,11 @@
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
 -keep,allowobfuscation,allowshrinking class com.squareup.moshi.JsonAdapter
+
+# https://issuetracker.google.com/issues/346808608 (TODO: Remove below 2 rules once resolved)
+-if public class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
+    public static *** getLocalLifecycleOwner();
+}
+-keep public class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
+    public static *** getLocalLifecycleOwner();
+}
