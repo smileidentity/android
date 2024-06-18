@@ -42,15 +42,15 @@ internal class ActiveLivenessTask(
     private var currentDirectionInitiallySatisfiedAt = Long.MAX_VALUE
 
     // Parameter tuning
-    var livenessStabilityTimeMs = 300L
+    var livenessStabilityTimeMs = 150L
     var orthogonalAngleBuffer = 90f
-    var midwayLrAngleMin = 10f
+    var midwayLrAngleMin = 9f
     var midwayLrAngleMax = 90f
-    var endLrAngleMin = 30f
+    var endLrAngleMin = 27f
     var endLrAngleMax = 90f
-    var midwayUpAngleMin = 10f
+    var midwayUpAngleMin = 7f
     var midwayUpAngleMax = 90f
-    var endUpAngleMin = 20f
+    var endUpAngleMin = 17f
     var endUpAngleMax = 90f
 
     /**

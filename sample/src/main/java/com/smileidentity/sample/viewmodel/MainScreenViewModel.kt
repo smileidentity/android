@@ -328,13 +328,15 @@ class MainScreenViewModel : ViewModel() {
                 resultCode = null,
                 resultText = response.message,
             )
-            _uiState.update { it.copy(snackbarMessage = message) }
+            _uiState.update {
+                it.copy(clipboardText = AnnotatedString(response.userId), snackbarMessage = message)
+            }
             viewModelScope.launch {
                 DataStoreRepository.addCompletedJob(
                     partnerId = SmileID.config.partnerId,
                     isProduction = uiState.value.isProduction,
                     job = Job(
-                        jobType = SmartSelfieAuthentication,
+                        jobType = SmartSelfieEnrollment,
                         timestamp = response.createdAt,
                         userId = response.userId,
                         jobId = response.jobId,
@@ -347,7 +349,7 @@ class MainScreenViewModel : ViewModel() {
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
-            val message = "SmartSelfie Authentication error: ${th.message}"
+            val message = "SmartSelfie Enrollment error: ${th.message}"
             Timber.e(th, message)
             _uiState.update { it.copy(snackbarMessage = message) }
         }

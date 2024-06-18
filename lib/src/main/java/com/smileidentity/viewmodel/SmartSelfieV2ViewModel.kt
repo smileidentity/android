@@ -19,6 +19,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
@@ -32,6 +33,7 @@ import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
+import com.smileidentity.viewmodel.SelfieHint.EnsureDeviceUpright
 import com.smileidentity.viewmodel.SelfieHint.EnsureEntireFaceVisible
 import com.smileidentity.viewmodel.SelfieHint.LookStraight
 import com.smileidentity.viewmodel.SelfieHint.MoveBack
@@ -82,6 +84,10 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
     SearchingForFace(
         R.drawable.si_tf_face_search,
         R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
+    ),
+    EnsureDeviceUpright(
+        R.drawable.si_tf_face_search,
+        R.string.si_smart_selfie_v2_directive_ensure_device_upright,
     ),
     OnlyOneFace(-1, R.string.si_smart_selfie_v2_directive_ensure_one_face),
     EnsureEntireFaceVisible(-1, R.string.si_smart_selfie_v2_directive_ensure_entire_face_visible),
@@ -150,7 +156,7 @@ class SmartSelfieV2ViewModel(
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
     // PARAMETER DEBUGGING
-    private var selfieQualityHistoryLength = 7
+    private var selfieQualityHistoryLength = 5
     private var intraImageMinDelayMs = 250
     private var noFaceResetDelayMs = 500
     private var faceQualityThreshold = 0.5f
@@ -161,8 +167,8 @@ class SmartSelfieV2ViewModel(
     private var maxFaceYawThreshold = 15
     private var maxFaceRollThreshold = 30
     private var forcedFailureTimeoutMs = 60_000L
-    private var loadingIndicatorDelayMs = 200L
-    private var completedDelayMs = 2000L
+    private var loadingIndicatorDelayMs = 100L
+    private var completedDelayMs = 1500L
     private var ignoreFacesSmallerThan = 0.03f
 
     private val activeLiveness = ActiveLivenessTask()
@@ -199,7 +205,7 @@ class SmartSelfieV2ViewModel(
             selfieQuality = 0f,
         ),
     )
-    val uiState = _uiState.asStateFlow().sample(250).stateIn(
+    val uiState = _uiState.asStateFlow().sample(500).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
         _uiState.value,
@@ -209,12 +215,14 @@ class SmartSelfieV2ViewModel(
     private var lastAutoCaptureTimeMs = 0L
     private var lastValidFaceDetectTime = 0L
     private var shouldAnalyzeImages = true
+    private var selfieCameraOrientation: Int? = null
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
 
     init {
+        // TODO: re-enable
         // startStrictModeTimerIfNecessary()
     }
 
@@ -267,6 +275,18 @@ class SmartSelfieV2ViewModel(
             Timber.w("ImageProxy has no image")
             SmileIDCrashReporting.hub.addBreadcrumb("ImageProxy has no image")
             imageProxy.close()
+            return
+        }
+
+        // We want to hold the orientation constant for the duration of the capture
+        val desiredOrientation = selfieCameraOrientation ?: imageProxy.imageInfo.rotationDegrees
+        if (imageProxy.imageInfo.rotationDegrees != desiredOrientation) {
+            val message = "Camera orientation changed. Resetting progress"
+            Timber.d(message)
+            SmileIDCrashReporting.hub.addBreadcrumb(message)
+            resetCaptureProgress(EnsureDeviceUpright)
+            imageProxy.close()
+            selfieCameraOrientation = null
             return
         }
 
@@ -431,6 +451,7 @@ class SmartSelfieV2ViewModel(
                 _uiState.update {
                     it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
                 }
+                selfieCameraOrientation = imageProxy.imageInfo.rotationDegrees
                 lastAutoCaptureTimeMs = System.currentTimeMillis()
                 // local variable is for null type safety purposes
                 val selfieFile = createSelfieFile(userId)
@@ -535,6 +556,7 @@ class SmartSelfieV2ViewModel(
                 livenessImages = livenessFiles,
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
+                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
                 metadata = null,
             )
         } else {
