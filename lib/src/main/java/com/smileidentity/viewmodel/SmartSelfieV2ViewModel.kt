@@ -72,6 +72,7 @@ private const val NUM_LIVENESS_IMAGES = 8
 private const val LIVENESS_IMAGE_SIZE = 320
 private const val SELFIE_IMAGE_SIZE = 640
 const val VIEWFINDER_SCALE = 1.3f
+private const val SMILE_THRESHOLD = 0.8f
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -473,6 +474,13 @@ class SmartSelfieV2ViewModel(
                     return@addOnSuccessListener
                 }
                 activeLiveness.markCurrentDirectionSatisfied()
+            } else if (!useStrictMode) {
+                // Check for smiling only in non-strict mode, non forced failure reason scenario
+                val isSmiling = (face.smilingProbability ?: 0f) > SMILE_THRESHOLD
+                if (livenessFiles.size > NUM_LIVENESS_IMAGES / 2 && !isSmiling) {
+                    Timber.d("User not smiling")
+                    return@addOnSuccessListener
+                }
             }
 
             val livenessFile = createLivenessFile(userId)
