@@ -166,7 +166,7 @@ class SmartSelfieV2ViewModel(
     private var maxFacePitchThreshold = 30
     private var maxFaceYawThreshold = 15
     private var maxFaceRollThreshold = 30
-    private var forcedFailureTimeoutMs = 60_000L
+    private var forcedFailureTimeoutMs = 20_000L
     private var loadingIndicatorDelayMs = 100L
     private var completedDelayMs = 1500L
     private var ignoreFacesSmallerThan = 0.03f
@@ -448,8 +448,10 @@ class SmartSelfieV2ViewModel(
                     }
                     return@addOnSuccessListener
                 }
-                _uiState.update {
-                    it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
+                if (shouldUseActiveLiveness) {
+                    _uiState.update {
+                        it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
+                    }
                 }
                 selfieCameraOrientation = imageProxy.imageInfo.rotationDegrees
                 lastAutoCaptureTimeMs = System.currentTimeMillis()

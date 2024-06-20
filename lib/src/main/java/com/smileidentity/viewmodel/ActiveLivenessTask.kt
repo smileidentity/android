@@ -50,7 +50,7 @@ internal class ActiveLivenessTask(
     var endLrAngleMax = 90f
     var midwayUpAngleMin = 7f
     var midwayUpAngleMax = 90f
-    var endUpAngleMin = 17f
+    var endUpAngleMin = 20f
     var endUpAngleMax = 90f
 
     /**
