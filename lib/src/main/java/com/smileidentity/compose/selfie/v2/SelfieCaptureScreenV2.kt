@@ -70,12 +70,12 @@ import com.smileidentity.compose.components.LottieFace
 import com.smileidentity.compose.components.LottieFaceLookingLeft
 import com.smileidentity.compose.components.LottieFaceLookingRight
 import com.smileidentity.compose.components.LottieFaceLookingUp
+import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.selfie.AgentModeSwitch
-import com.smileidentity.compose.selfie.FaceShapedProgressIndicator
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -325,11 +325,8 @@ fun ColumnScope.SmartSelfieV2Screen(
                         .background(Color.Black.copy(alpha = 0.8f)),
                 )
             } else {
-                FaceShapedProgressIndicator(
-                    progress = 0f,
-                    faceFillPercent = 0.4f,
-                    strokeWidth = 0.dp,
-                    incompleteProgressStrokeColor = Color.Transparent,
+                OvalCutout(
+                    faceFillPercent = 0.6f,
                     backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f),
                 )
             }
