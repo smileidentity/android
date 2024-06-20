@@ -137,25 +137,7 @@ fun OrchestratedSelfieCaptureScreenV2(
         },
     ),
 ) {
-    var hasConfirmedParameters by remember { mutableStateOf(false) }
-    BackHandler {
-        if (hasConfirmedParameters) {
-            hasConfirmedParameters = false
-            viewModel.stop()
-        } else {
-            onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
-        }
-    }
-    if (!hasConfirmedParameters) {
-        ParameterTuningScreen(
-            viewModel = viewModel,
-            onNextClicked = { hasConfirmedParameters = true },
-        )
-        return
-    }
-    LaunchedEffect(Unit) {
-        viewModel.start()
-    }
+    BackHandler { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) }
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
         if (!granted) {
@@ -209,22 +191,6 @@ fun OrchestratedSelfieCaptureScreenV2(
                         .scale(VIEWFINDER_SCALE),
                 )
             },
-        )
-        Text(
-            text = "Head Roll: ${uiState.headRoll}",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Text(
-            text = "Head Yaw: ${uiState.headYaw}",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Text(
-            text = "Head Pitch: ${uiState.headPitch}",
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Text(
-            text = "Selfie Quality: ${uiState.selfieQuality}",
-            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

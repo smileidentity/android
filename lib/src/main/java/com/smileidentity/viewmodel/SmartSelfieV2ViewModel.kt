@@ -68,10 +68,24 @@ import timber.log.Timber
 This is used only when NOT in strict mode. In strict mode, the number of images is determined
 by the liveness task
  */
-private const val NUM_LIVENESS_IMAGES = 8
-private const val LIVENESS_IMAGE_SIZE = 320
-private const val SELFIE_IMAGE_SIZE = 640
 const val VIEWFINDER_SCALE = 1.3f
+private const val COMPLETED_DELAY_MS = 1500L
+private const val FACE_QUALITY_THRESHOLD = 0.5f
+private const val FORCED_FAILURE_TIMEOUT_MS = 20_000L
+private const val IGNORE_FACES_SMALLER_THAN = 0.03f
+private const val INTRA_IMAGE_MIN_DELAY_MS = 250
+private const val LIVENESS_IMAGE_SIZE = 320
+private const val LOADING_INDICATOR_DELAY_MS = 100L
+private const val LUMINANCE_THRESHOLD = 50
+private const val MAX_FACE_FILL_THRESHOLD = 0.3f
+private const val MAX_FACE_PITCH_THRESHOLD = 30
+private const val MAX_FACE_ROLL_THRESHOLD = 30
+private const val MAX_FACE_YAW_THRESHOLD = 15
+private const val MIN_FACE_FILL_THRESHOLD = 0.1f
+private const val NO_FACE_RESET_DELAY_MS = 500
+private const val NUM_LIVENESS_IMAGES = 8
+private const val SELFIE_IMAGE_SIZE = 640
+private const val SELFIE_QUALITY_HISTORY_LENGTH = 5
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -107,34 +121,6 @@ enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int)
 
 data class SmartSelfieV2UiState(
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
-    val SELFIE_QUALITY_HISTORY_LENGTH: Float,
-    val INTRA_IMAGE_MIN_DELAY_MS: Float,
-    val NO_FACE_RESET_DELAY_MS: Float,
-    val FACE_QUALITY_THRESHOLD: Float,
-    val MIN_FACE_FILL_THRESHOLD: Float,
-    val MAX_FACE_FILL_THRESHOLD: Float,
-    val LUMINANCE_THRESHOLD: Float,
-    val MAX_FACE_PITCH_THRESHOLD: Float,
-    val MAX_FACE_YAW_THRESHOLD: Float,
-    val MAX_FACE_ROLL_THRESHOLD: Float,
-    val FORCED_FAILURE_TIMEOUT_MS: Float,
-    val LOADING_INDICATOR_DELAY_MS: Float,
-    val COMPLETED_DELAY_MS: Float,
-    val LIVENESS_STABILITY_TIME_MS: Float,
-    val ORTHOGONAL_ANGLE_BUFFER: Float,
-    val MIDWAY_LR_ANGLE_MIN: Float,
-    val MIDWAY_LR_ANGLE_MAX: Float,
-    val END_LR_ANGLE_MIN: Float,
-    val END_LR_ANGLE_MAX: Float,
-    val MIDWAY_UP_ANGLE_MIN: Float,
-    val MIDWAY_UP_ANGLE_MAX: Float,
-    val END_UP_ANGLE_MIN: Float,
-    val END_UP_ANGLE_MAX: Float,
-    val IGNORE_FACES_SMALLER_THAN: Float,
-    val headRoll: Float,
-    val headYaw: Float,
-    val headPitch: Float,
-    val selfieQuality: Float,
 )
 
 @kotlin.OptIn(FlowPreview::class)
@@ -155,56 +141,9 @@ class SmartSelfieV2ViewModel(
     ),
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
-    // PARAMETER DEBUGGING
-    private var selfieQualityHistoryLength = 5
-    private var intraImageMinDelayMs = 250
-    private var noFaceResetDelayMs = 500
-    private var faceQualityThreshold = 0.5f
-    private var minFaceFillThreshold = 0.1f
-    private var maxFaceFillThreshold = 0.3f
-    private var luminanceThreshold = 50
-    private var maxFacePitchThreshold = 30
-    private var maxFaceYawThreshold = 15
-    private var maxFaceRollThreshold = 30
-    private var forcedFailureTimeoutMs = 20_000L
-    private var loadingIndicatorDelayMs = 100L
-    private var completedDelayMs = 1500L
-    private var ignoreFacesSmallerThan = 0.03f
-
     private val activeLiveness = ActiveLivenessTask()
 
-    private val _uiState = MutableStateFlow(
-        SmartSelfieV2UiState(
-            SELFIE_QUALITY_HISTORY_LENGTH = selfieQualityHistoryLength.toFloat(),
-            INTRA_IMAGE_MIN_DELAY_MS = intraImageMinDelayMs.toFloat(),
-            NO_FACE_RESET_DELAY_MS = noFaceResetDelayMs.toFloat(),
-            FACE_QUALITY_THRESHOLD = faceQualityThreshold,
-            MIN_FACE_FILL_THRESHOLD = minFaceFillThreshold,
-            MAX_FACE_FILL_THRESHOLD = maxFaceFillThreshold,
-            LUMINANCE_THRESHOLD = luminanceThreshold.toFloat(),
-            MAX_FACE_PITCH_THRESHOLD = maxFacePitchThreshold.toFloat(),
-            MAX_FACE_YAW_THRESHOLD = maxFaceYawThreshold.toFloat(),
-            MAX_FACE_ROLL_THRESHOLD = maxFaceRollThreshold.toFloat(),
-            FORCED_FAILURE_TIMEOUT_MS = forcedFailureTimeoutMs.toFloat(),
-            LOADING_INDICATOR_DELAY_MS = loadingIndicatorDelayMs.toFloat(),
-            COMPLETED_DELAY_MS = completedDelayMs.toFloat(),
-            LIVENESS_STABILITY_TIME_MS = activeLiveness.livenessStabilityTimeMs.toFloat(),
-            ORTHOGONAL_ANGLE_BUFFER = activeLiveness.orthogonalAngleBuffer,
-            MIDWAY_LR_ANGLE_MIN = activeLiveness.midwayLrAngleMin,
-            MIDWAY_LR_ANGLE_MAX = activeLiveness.midwayLrAngleMax,
-            END_LR_ANGLE_MIN = activeLiveness.endLrAngleMin,
-            END_LR_ANGLE_MAX = activeLiveness.endLrAngleMax,
-            MIDWAY_UP_ANGLE_MIN = activeLiveness.midwayUpAngleMin,
-            MIDWAY_UP_ANGLE_MAX = activeLiveness.midwayUpAngleMax,
-            END_UP_ANGLE_MIN = activeLiveness.endUpAngleMin,
-            END_UP_ANGLE_MAX = activeLiveness.endUpAngleMax,
-            IGNORE_FACES_SMALLER_THAN = ignoreFacesSmallerThan,
-            headRoll = 0f,
-            headYaw = 0f,
-            headPitch = 0f,
-            selfieQuality = 0f,
-        ),
-    )
+    private val _uiState = MutableStateFlow(SmartSelfieV2UiState())
     val uiState = _uiState.asStateFlow().sample(500).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
@@ -222,8 +161,7 @@ class SmartSelfieV2ViewModel(
     private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
 
     init {
-        // TODO: re-enable
-        // startStrictModeTimerIfNecessary()
+        startStrictModeTimerIfNecessary()
     }
 
     /**
@@ -234,7 +172,7 @@ class SmartSelfieV2ViewModel(
     private fun startStrictModeTimerIfNecessary() {
         if (useStrictMode) {
             viewModelScope.launch {
-                delay(forcedFailureTimeoutMs)
+                delay(FORCED_FAILURE_TIMEOUT_MS)
                 val selfieState = uiState.value.selfieState
                 // These 2 conditions should theoretically both be true at the same time
                 if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
@@ -265,7 +203,7 @@ class SmartSelfieV2ViewModel(
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy) {
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
-        val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > intraImageMinDelayMs
+        val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
             imageProxy.close()
             return
@@ -293,7 +231,7 @@ class SmartSelfieV2ViewModel(
         // YUV_420_888 is the format produced by CameraX and needed for Luminance calculation
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val luminance = calculateLuminance(imageProxy)
-        if (luminance < luminanceThreshold) {
+        if (luminance < LUMINANCE_THRESHOLD) {
             Timber.d("Low luminance detected")
             conditionFailedWithReasonAndTimeout(NeedLight)
             imageProxy.close()
@@ -316,7 +254,7 @@ class SmartSelfieV2ViewModel(
             // https://smileidentity.slack.com/archives/C049K02DQU9/p1717552675191829?thread_ts=1717551669.342599&cid=C049K02DQU9
             val facesToConsider = faces.filter {
                 viewfinderRect.contains(it.boundingBox.centerX(), it.boundingBox.centerY()) &&
-                    it.boundingBox.area / inputImage.area.toFloat() > ignoreFacesSmallerThan
+                    it.boundingBox.area / inputImage.area.toFloat() > IGNORE_FACES_SMALLER_THAN
             }
 
             if (facesToConsider.size > 1) {
@@ -329,13 +267,6 @@ class SmartSelfieV2ViewModel(
                 Timber.d("No face detected")
                 conditionFailedWithReasonAndTimeout(SearchingForFace)
                 return@addOnSuccessListener
-            }
-            _uiState.update {
-                it.copy(
-                    headRoll = face.headEulerAngleZ,
-                    headYaw = face.headEulerAngleY,
-                    headPitch = face.headEulerAngleX,
-                )
             }
 
             // The face contour is used for the Selfie Quality Model later. Sometimes, the contours
@@ -362,14 +293,14 @@ class SmartSelfieV2ViewModel(
 
             // Check that the face is close enough to the camera
             val faceFillRatio = (face.boundingBox.area / inputImage.area.toFloat())
-            if (faceFillRatio < minFaceFillThreshold) {
+            if (faceFillRatio < MIN_FACE_FILL_THRESHOLD) {
                 Timber.d("Face not close enough to camera")
                 conditionFailedWithReasonAndTimeout(MoveCloser)
                 return@addOnSuccessListener
             }
 
             // Check that the face is not too close to the camera
-            if (faceFillRatio > maxFaceFillThreshold) {
+            if (faceFillRatio > MAX_FACE_FILL_THRESHOLD) {
                 Timber.d("Face too close to camera")
                 conditionFailedWithReasonAndTimeout(MoveBack)
                 return@addOnSuccessListener
@@ -383,9 +314,9 @@ class SmartSelfieV2ViewModel(
             val selfieFile = this.selfieFile // for smart casting purposes
             if (selfieFile == null) {
                 // Reject extreme head poses
-                val extremePitch = face.headEulerAngleX.absoluteValue > maxFacePitchThreshold
-                val extremeYaw = face.headEulerAngleY.absoluteValue > maxFaceYawThreshold
-                val extremeRoll = face.headEulerAngleZ.absoluteValue > maxFaceRollThreshold
+                val extremePitch = face.headEulerAngleX.absoluteValue > MAX_FACE_PITCH_THRESHOLD
+                val extremeYaw = face.headEulerAngleY.absoluteValue > MAX_FACE_YAW_THRESHOLD
+                val extremeRoll = face.headEulerAngleZ.absoluteValue > MAX_FACE_ROLL_THRESHOLD
                 if (extremePitch || extremeYaw || extremeRoll) {
                     Timber.d("Extreme head pose detected")
                     conditionFailedWithReasonAndTimeout(LookStraight)
@@ -430,16 +361,15 @@ class SmartSelfieV2ViewModel(
                     Timber.w("No image quality output")
                     return@addOnSuccessListener
                 }
-                _uiState.update { it.copy(selfieQuality = output) }
                 selfieQualityHistory.add(output)
-                if (selfieQualityHistory.size > selfieQualityHistoryLength) {
+                if (selfieQualityHistory.size > SELFIE_QUALITY_HISTORY_LENGTH) {
                     // We should only ever exceed history length by 1
                     selfieQualityHistory.removeAt(0)
                 }
 
                 val averageFaceQuality = selfieQualityHistory.average()
 
-                if (averageFaceQuality < faceQualityThreshold) {
+                if (averageFaceQuality < FACE_QUALITY_THRESHOLD) {
                     // We don't want to reset the history here, since the model output is noisy, so
                     // don't use the helper function
                     Timber.d("Face quality not met ($averageFaceQuality)")
@@ -527,12 +457,12 @@ class SmartSelfieV2ViewModel(
                         done = true
                         _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
                         // Delay to ensure the completion icon is shown for a little bit
-                        delay(completedDelayMs)
+                        delay(COMPLETED_DELAY_MS)
                         val result = SmartSelfieResult(selfieFile, livenessFiles, apiResponse)
                         onResult(SmileIDResult.Success(result))
                     },
                     async {
-                        delay(loadingIndicatorDelayMs)
+                        delay(LOADING_INDICATOR_DELAY_MS)
                         if (!done) {
                             _uiState.update { it.copy(selfieState = SelfieState.Processing) }
                         }
@@ -572,17 +502,6 @@ class SmartSelfieV2ViewModel(
         }
     }
 
-    fun stop() {
-        shouldAnalyzeImages = false
-        resetCaptureProgress(SearchingForFace)
-        forcedFailureTimerExpired = false
-    }
-
-    fun start() {
-        shouldAnalyzeImages = true
-        startStrictModeTimerIfNecessary()
-    }
-
     /**
      * The retry button is displayed only when the error is due to IO issues (network or file) or
      * unexpected 5xx. In these cases, we restart the process entirely, mainly to cater for the
@@ -601,12 +520,12 @@ class SmartSelfieV2ViewModel(
      * face is visible*! e.g. we will show "Look left" even if the face is too far/needs to show
      * some other feedback. This is to prevent the user from being overwhelmed with feedback, but
      * comes with the downside that they may no longer get accurate feedback.
-     * If the face is not detected for [noFaceResetDelayMs], then progress is reset.
+     * If the face is not detected for [NO_FACE_RESET_DELAY_MS], then progress is reset.
      */
     private fun conditionFailedWithReasonAndTimeout(reason: SelfieHint) {
         if (selfieFile == null) {
             _uiState.update { it.copy(selfieState = SelfieState.Analyzing(reason)) }
-        } else if (System.currentTimeMillis() - lastValidFaceDetectTime > noFaceResetDelayMs) {
+        } else if (System.currentTimeMillis() - lastValidFaceDetectTime > NO_FACE_RESET_DELAY_MS) {
             resetCaptureProgress(reason)
         }
         // Otherwise we swallow the failure reason.
@@ -621,125 +540,5 @@ class SmartSelfieV2ViewModel(
         selfieFile?.delete()
         selfieFile = null
         activeLiveness.restart()
-    }
-
-    // Parameter Debugging
-    fun onSelfieQualityHistoryLengthUpdated(value: Float) {
-        selfieQualityHistoryLength = value.toInt()
-        _uiState.update { it.copy(SELFIE_QUALITY_HISTORY_LENGTH = value) }
-    }
-
-    fun onIntraImageMinDelayMsUpdated(value: Float) {
-        intraImageMinDelayMs = value.toInt()
-        _uiState.update { it.copy(INTRA_IMAGE_MIN_DELAY_MS = value) }
-    }
-
-    fun onNoFaceResetDelayMsUpdated(value: Float) {
-        noFaceResetDelayMs = value.toInt()
-        _uiState.update { it.copy(NO_FACE_RESET_DELAY_MS = value) }
-    }
-
-    fun onFaceQualityThresholdUpdated(value: Float) {
-        faceQualityThreshold = value
-        _uiState.update { it.copy(FACE_QUALITY_THRESHOLD = value) }
-    }
-
-    fun onMinFaceFillThresholdUpdated(value: Float) {
-        minFaceFillThreshold = value
-        _uiState.update { it.copy(MIN_FACE_FILL_THRESHOLD = value) }
-    }
-
-    fun onMaxFaceFillThresholdUpdated(value: Float) {
-        maxFaceFillThreshold = value
-        _uiState.update { it.copy(MAX_FACE_FILL_THRESHOLD = value) }
-    }
-
-    fun onLuminanceThresholdUpdated(value: Float) {
-        luminanceThreshold = value.toInt()
-        _uiState.update { it.copy(LUMINANCE_THRESHOLD = value) }
-    }
-
-    fun onMaxFacePitchThresholdUpdated(value: Float) {
-        maxFacePitchThreshold = value.toInt()
-        _uiState.update { it.copy(MAX_FACE_PITCH_THRESHOLD = value) }
-    }
-
-    fun onMaxFaceYawThresholdUpdated(value: Float) {
-        maxFaceYawThreshold = value.toInt()
-        _uiState.update { it.copy(MAX_FACE_YAW_THRESHOLD = value) }
-    }
-
-    fun onMaxFaceRollThresholdUpdated(value: Float) {
-        maxFaceRollThreshold = value.toInt()
-        _uiState.update { it.copy(MAX_FACE_ROLL_THRESHOLD = value) }
-    }
-
-    fun onForcedFailureTimeoutMsUpdated(value: Float) {
-        forcedFailureTimeoutMs = value.toLong()
-        _uiState.update { it.copy(FORCED_FAILURE_TIMEOUT_MS = value) }
-    }
-
-    fun onLoadingIndicatorDelayMsUpdated(value: Float) {
-        loadingIndicatorDelayMs = value.toLong()
-        _uiState.update { it.copy(LOADING_INDICATOR_DELAY_MS = value) }
-    }
-
-    fun onCompletedDelayMsUpdated(value: Float) {
-        completedDelayMs = value.toLong()
-        _uiState.update { it.copy(COMPLETED_DELAY_MS = value) }
-    }
-
-    fun onLivenessStabilityTimeMsUpdated(value: Float) {
-        activeLiveness.livenessStabilityTimeMs = value.toLong()
-        _uiState.update { it.copy(LIVENESS_STABILITY_TIME_MS = value) }
-    }
-
-    fun onOrthogonalAngleBufferUpdated(value: Float) {
-        activeLiveness.orthogonalAngleBuffer = value
-        _uiState.update { it.copy(ORTHOGONAL_ANGLE_BUFFER = value) }
-    }
-
-    fun onMidwayLrAngleMinUpdated(value: Float) {
-        activeLiveness.midwayLrAngleMin = value
-        _uiState.update { it.copy(MIDWAY_LR_ANGLE_MIN = value) }
-    }
-
-    fun onMidwayLrAngleMaxUpdated(value: Float) {
-        activeLiveness.midwayLrAngleMax = value
-        _uiState.update { it.copy(MIDWAY_LR_ANGLE_MAX = value) }
-    }
-
-    fun onEndLrAngleMinUpdated(value: Float) {
-        activeLiveness.endLrAngleMin = value
-        _uiState.update { it.copy(END_LR_ANGLE_MIN = value) }
-    }
-
-    fun onEndLrAngleMaxUpdated(value: Float) {
-        activeLiveness.endLrAngleMax = value
-        _uiState.update { it.copy(END_LR_ANGLE_MAX = value) }
-    }
-
-    fun onMidwayUpAngleMinUpdated(value: Float) {
-        activeLiveness.midwayUpAngleMin = value
-        _uiState.update { it.copy(MIDWAY_UP_ANGLE_MIN = value) }
-    }
-
-    fun onMidwayUpAngleMaxUpdated(value: Float) {
-        activeLiveness.midwayUpAngleMax = value
-        _uiState.update { it.copy(MIDWAY_UP_ANGLE_MAX = value) }
-    }
-
-    fun onEndUpAngleMinUpdated(value: Float) {
-        activeLiveness.endUpAngleMin = value
-        _uiState.update { it.copy(END_UP_ANGLE_MIN = value) }
-    }
-
-    fun onEndUpAngleMaxUpdated(value: Float) {
-        activeLiveness.endUpAngleMax = value
-        _uiState.update { it.copy(END_UP_ANGLE_MAX = value) }
-    }
-
-    fun onIgnoreFacesSmallerThanUpdated(value: Float) {
-        _uiState.update { it.copy(IGNORE_FACES_SMALLER_THAN = value) }
     }
 }
