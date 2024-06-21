@@ -5,6 +5,9 @@ on:
       smile_config:
         description: 'The contents of the smile_config.json file (default: Partner 2423)'
         required: false
+      changelog:
+        description: 'Description of changes or test instructions'
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -65,7 +68,8 @@ jobs:
               "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}",
               "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}",
               "branch": "${{ github.ref }}",
-              "commit_sha": "${{ github.sha }}"
+              "commit_sha": "${{ github.sha }}",
+              "changelog": "${{ github.event.inputs.changelog }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_SAMPLE_APP_DOWNLOAD }}
