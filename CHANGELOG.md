@@ -1,5 +1,10 @@
 # Release Notes
 
+## Unreleased
+
+* Fixed a bug where some failed authentication requests were incorrectly handled
+* Fixed a bug where errors with no code were not being handled correctly
+
 ## 10.1.6
 
 * Update generic errors with actual platform errors
