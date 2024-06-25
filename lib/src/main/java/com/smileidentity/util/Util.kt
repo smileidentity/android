@@ -235,8 +235,10 @@ internal fun postProcessImage(
  *
  * @param proxy Callback to be invoked with the exception
  */
-fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler { _, throwable ->
-    Timber.e(throwable, "Error during coroutine execution")
+fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler { _, parentThrow ->
+    Timber.e(parentThrow, "Error during coroutine execution")
+    // Check suppressed to handle cases where auth fails within the Interceptor
+    val throwable = parentThrow.suppressed.firstOrNull() ?: parentThrow
     val converted = if (throwable is HttpException) {
         val adapter = moshi.adapter(SmileIDException.Details::class.java)
         try {
@@ -265,35 +267,11 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
 
 @Stable
 sealed interface StringResource {
-    fun resolve(context: Context): String
+    data class Text(val text: String) : StringResource
 
-    data class Text(val text: String) : StringResource {
-        override fun resolve(context: Context): String {
-            return text
-        }
-    }
+    data class ResId(@StringRes val stringId: Int) : StringResource
 
-    data class ResId(@StringRes val stringId: Int) : StringResource {
-        override fun resolve(context: Context): String {
-            return context.getString(stringId)
-        }
-    }
-
-    data class ResIdFromSmileIDException(val exception: SmileIDException) : StringResource {
-        @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
-        override fun resolve(context: Context): String {
-            val resourceName = "si_error_message_${exception.details.code}"
-            val resourceId = context.resources.getIdentifier(
-                /* name = */
-                resourceName,
-                /* defType = */
-                "string",
-                /* defPackage = */
-                context.packageName,
-            )
-            return context.getString(resourceId)
-        }
-    }
+    data class ResIdFromSmileIDException(val exception: SmileIDException) : StringResource
 
     @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
     @Composable
@@ -302,6 +280,9 @@ sealed interface StringResource {
             is ResId -> stringResource(id = stringId)
             is ResIdFromSmileIDException -> {
                 val context = LocalContext.current
+                if (exception.details.code == null) {
+                    return exception.details.message
+                }
                 val resourceName = "si_error_message_${exception.details.code}"
                 val resourceId = context.resources.getIdentifier(
                     /* name = */
