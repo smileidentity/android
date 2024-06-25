@@ -31,6 +31,7 @@ import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.getCurrentTimeAsHumanReadableTimestamp
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
+import com.smileidentity.util.getExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -69,7 +70,14 @@ class MainScreenViewModel : ViewModel() {
     private var pendingJobCountJob = createPendingJobCountPoller()
     private var backgroundJobsPollingJob = createBackgroundJobsPoller()
 
-    private fun createBackgroundJobsPoller() = viewModelScope.launch {
+    private fun createBackgroundJobsPoller() = viewModelScope.launch(
+        getExceptionHandler { throwable ->
+            Timber.e(throwable, "Background job polling failed")
+            _uiState.update {
+                it.copy(snackbarMessage = "Background job polling failed: ${throwable.message}")
+            }
+        },
+    ) {
         val authRequest = AuthenticationRequest(SmartSelfieEnrollment)
         val authResponse = SmileID.api.authenticate(authRequest)
         DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
@@ -95,6 +103,7 @@ class MainScreenViewModel : ViewModel() {
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
                     EnhancedDocumentVerification ->
                         SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
+
                     else -> {
                         Timber.e("Unexpected pending job: $job")
                         throw IllegalStateException("Unexpected pending job: $job")
@@ -145,7 +154,14 @@ class MainScreenViewModel : ViewModel() {
             }
     }
 
-    private fun createPendingJobCountPoller() = viewModelScope.launch {
+    private fun createPendingJobCountPoller() = viewModelScope.launch(
+        getExceptionHandler { throwable ->
+            Timber.e(throwable, "Pending job count poller failed")
+            _uiState.update {
+                it.copy(snackbarMessage = "Pending job count poller failed: ${throwable.message}")
+            }
+        },
+    ) {
         DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
             .distinctUntilChanged()
             .map { it.size }
