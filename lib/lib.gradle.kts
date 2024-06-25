@@ -157,6 +157,7 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.annotation.experimental)
 
     implementation(libs.coil)
 
