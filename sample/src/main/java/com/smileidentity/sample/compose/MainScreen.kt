@@ -43,7 +43,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,8 +60,6 @@ import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.BottomNavigationScreen
@@ -217,20 +214,10 @@ fun MainScreen(
                 }
                 composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                    val context = LocalContext.current
-                    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-                    OrchestratedSelfieCaptureScreenV2(
-                        userId = rememberSaveable { randomUserId() },
-                        isEnroll = true,
-                        selfieQualityModel = selfieQualityModel,
-                        useStrictMode = true,
-                        allowAgentMode = false,
-                        showAttribution = true,
-                        onResult = {
-                            viewModel.onSmartSelfieEnrollmentV2Result(it)
-                            navController.popBackStack()
-                        },
-                    )
+                    SmileID.SmartSelfieEnrollment(useStrictMode = true) {
+                        viewModel.onSmartSelfieEnrollmentV2Result(it)
+                        navController.popBackStack()
+                    }
                 }
                 dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
@@ -249,20 +236,10 @@ fun MainScreen(
                 composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    val context = LocalContext.current
-                    val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-                    OrchestratedSelfieCaptureScreenV2(
-                        userId = userId,
-                        isEnroll = false,
-                        selfieQualityModel = selfieQualityModel,
-                        useStrictMode = true,
-                        showAttribution = true,
-                        allowAgentMode = false,
-                        onResult = {
-                            viewModel.onSmartSelfieAuthenticationV2Result(it)
-                            navController.popBackStack()
-                        },
-                    )
+                    SmileID.SmartSelfieAuthentication(userId = userId, useStrictMode = true) {
+                        viewModel.onSmartSelfieAuthenticationV2Result(it)
+                        navController.popBackStack()
+                    }
                 }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }

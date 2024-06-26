@@ -2,9 +2,7 @@
 
 ## Unreleased
 
-* SmartSelfie Enrollment and Authentication receive new, streamlined UIs
-  * Set `useStrictMode=true` parameter for better pass rates
-  * Removed `showInstructions` and `jobId` input parameters
+* Added an optional "Strict Mode" to SmartSelfie Enrollment and Authentication to achieve better pass rates. Set `useStrictMode=true` to enable this new, streamlined UI and associated active liveness tasks
 * Fixed a bug where some failed authentication requests were incorrectly handled
 * Fixed a bug where errors with no code were not being handled correctly
 

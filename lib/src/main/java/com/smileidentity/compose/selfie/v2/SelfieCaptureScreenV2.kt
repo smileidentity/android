@@ -61,7 +61,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
-import com.smileidentity.SmileIDOptIn
 import com.smileidentity.compose.components.Face
 import com.smileidentity.compose.components.FaceMovingBack
 import com.smileidentity.compose.components.FaceMovingCloser
@@ -101,16 +100,19 @@ import kotlinx.coroutines.delay
  * shows the view, and handling the viewmodel.
  *
  * @param userId The user ID to associate with the selfie capture
+ * @param isEnroll Whether this selfie capture is for enrollment
  * @param selfieQualityModel The model to use for selfie quality analysis
  * @param onResult The callback to invoke when the selfie capture is complete
  * @param modifier The modifier to apply to this composable
  * @param useStrictMode Whether to use strict mode for the selfie capture. Strict mode is stricter
  * about what constitutes a good selfie capture and results in better pass rates.
+ * @param showAttribution Whether to show the Smile ID attribution
+ * @param allowAgentMode Whether to allow the user to switch to agent mode (back camera)
+ * @param allowNewEnroll Whether to allow new enrollments
  * @param extraPartnerParams Extra partner_params to send to the API
  * @param viewModel The viewmodel to use for the selfie capture (should not be explicitly passed in)
  */
 @OptIn(ExperimentalPermissionsApi::class)
-@SmileIDOptIn // TODO: Remove on go-live
 @Composable
 fun OrchestratedSelfieCaptureScreenV2(
     userId: String,
@@ -195,12 +197,21 @@ fun OrchestratedSelfieCaptureScreenV2(
     }
 }
 
-// todo: make public the layer above this which can take in an image analyzer and also handles camera preview for you
 /**
  * The Smart Selfie Capture Screen. This screen is responsible for displaying the selfie capture
  * contents, including directive visual, directive text, camera preview, retry/close buttons,
  * attribution, and agent mode switch.
  * This composable relies on the caller to make camera changes and perform image analysis.
+ *
+ * @param selfieState The state of the selfie capture
+ * @param onRetry The callback to invoke when the user wants to retry on error
+ * @param onResult The callback to invoke when the selfie capture is complete
+ * @param cameraPreview The composable slot to display the camera preview
+ * @param isAgentModeEnabled Whether agent mode is enabled
+ * @param onCamSelectorChange The callback to invoke when the user wants to switch cameras
+ * @param modifier The modifier to apply to this composable
+ * @param showAttribution Whether to show the Smile ID attribution
+ * @param allowAgentMode Whether to allow the user to switch to agent mode (back camera)
  */
 @Composable
 fun ColumnScope.SmartSelfieV2Screen(
@@ -374,6 +385,9 @@ private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modi
     }
 }
 
+/**
+ * Displays the animated image for the given selfie hint.
+ */
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 private fun AnimatedImageFromSelfieHint(selfieHint: SelfieHint, modifier: Modifier = Modifier) {
@@ -395,6 +409,9 @@ private fun AnimatedImageFromSelfieHint(selfieHint: SelfieHint, modifier: Modifi
     )
 }
 
+/**
+ * Provide custom haptic feedback based on the selfie hint.
+ */
 @Composable
 private fun DirectiveHaptics(selfieState: SelfieState) {
     val haptic = LocalHapticFeedback.current
