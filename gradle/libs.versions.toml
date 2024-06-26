@@ -1,18 +1,19 @@
 [versions]
 accompanist-permissions = "0.34.0"
-android-gradle-plugin = "8.2.2"
+android-gradle-plugin = "8.5.0"
 androidx-activity = "1.9.0"
-androidx-compose-bom = "2024.05.00"
+androidx-annotation-experimental = "1.4.1"
+androidx-compose-bom = "2024.06.00"
 androidx-core = "1.13.1"
 androidx-core-splashscreen = "1.0.1"
-androidx-fragment = "1.7.1"
+androidx-fragment = "1.8.0"
 androidx-lifecycle = "2.8.2"
 androidx-navigation = "2.7.7"
-androidx-test-core = "1.5.0"
-androidx-test-espresso = "3.5.1"
-androidx-test-fragment = "1.7.1"
-androidx-test-junit = "1.1.5"
-androidx-test-rules = "1.5.0"
+androidx-test-core = "1.6.0"
+androidx-test-espresso = "3.6.0"
+androidx-test-fragment = "1.8.0"
+androidx-test-junit = "1.2.0"
+androidx-test-rules = "1.6.0"
 camposer = "0.4.0"
 chucker = "4.0.0"
 coil = "2.6.0"
@@ -26,7 +27,7 @@ ksp = "2.0.0-1.0.21"
 ktlint-plugin = "12.1.1"
 leakcanary = "2.14"
 lottie = "6.4.1"
-maven-publish = "0.28.0"
+maven-publish = "0.29.0"
 mlkit-code-scanner = "16.1.0"
 mlkit-obj-detection = "17.0.1"
 mockk = "1.13.11"
@@ -59,6 +60,7 @@ parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotli
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-annotation-experimental = { module = "androidx.annotation:annotation-experimental", version.ref = "androidx-annotation-experimental" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation-graphics" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
