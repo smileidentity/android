@@ -234,12 +234,15 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             selfieImage = selfieFileResult,
             documentFrontFile = documentFrontFileResult,
             documentBackFile = documentBackFileResult,
-            livenessFilesResult,
+            livenessFiles = livenessFilesResult,
             didSubmitJob = true,
         )
 
         _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
+            it.copy(
+                currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
+                errorMessage = StringResource.ResId(R.string.si_doc_v_processing_success_subtitle),
+            )
         }
     }
 
@@ -272,7 +275,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     "Document front file is null",
                 ),
                 documentBackFile = documentBackFile,
-                livenessFiles,
+                livenessFiles = livenessFiles,
                 didSubmitJob = false,
             )
         } else {
