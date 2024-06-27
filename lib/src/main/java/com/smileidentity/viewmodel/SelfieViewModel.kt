@@ -375,15 +375,12 @@ class SelfieViewModel(
             result = SmileIDResult.Success(
                 SmartSelfieResult(selfieFileResult, livenessFilesResult, apiResponse),
             )
-            val message = if (SmileID.allowOfflineMode) {
-                R.string.si_offline_message
-            } else {
-                R.string.si_smart_selfie_processing_success_subtitle
-            }
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Success,
-                    errorMessage = StringResource.ResId(message),
+                    errorMessage = StringResource.ResId(
+                        R.string.si_smart_selfie_processing_success_subtitle,
+                    ),
                 )
             }
         }
