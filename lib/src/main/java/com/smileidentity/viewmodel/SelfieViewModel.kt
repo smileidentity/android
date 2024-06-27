@@ -228,7 +228,15 @@ class SelfieViewModel(
                     resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
                 )
                 shouldAnalyzeImages = false
-                _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
+                _uiState.update {
+                    it.copy(
+                        progress = 1f,
+                        selfieToConfirm = selfieFile,
+                        errorMessage = StringResource.ResId(
+                            R.string.si_smart_selfie_processing_success_subtitle,
+                        ),
+                    )
+                }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
@@ -367,7 +375,17 @@ class SelfieViewModel(
             result = SmileIDResult.Success(
                 SmartSelfieResult(selfieFileResult, livenessFilesResult, apiResponse),
             )
-            _uiState.update { it.copy(processingState = ProcessingState.Success) }
+            val message = if (SmileID.allowOfflineMode) {
+                R.string.si_offline_message
+            } else {
+                R.string.si_smart_selfie_processing_success_subtitle
+            }
+            _uiState.update {
+                it.copy(
+                    processingState = ProcessingState.Success,
+                    errorMessage = StringResource.ResId(message),
+                )
+            }
         }
     }
 

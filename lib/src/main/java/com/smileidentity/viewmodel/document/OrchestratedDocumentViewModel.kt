@@ -238,8 +238,16 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             didSubmitJob = true,
         )
 
+        val message = if (SmileID.allowOfflineMode) {
+            R.string.si_offline_message
+        } else {
+            R.string.si_doc_v_processing_success_subtitle
+        }
         _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
+            it.copy(
+                currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
+                errorMessage = StringResource.ResId(message),
+            )
         }
     }
 
