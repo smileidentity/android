@@ -4,6 +4,7 @@
 
 * Fixed a bug where some failed authentication requests were incorrectly handled
 * Fixed a bug where errors with no code were not being handled correctly
+* Fixed a bug on Selfie and Document capture success screen where the message was wrong
 
 ## 10.1.6
 
