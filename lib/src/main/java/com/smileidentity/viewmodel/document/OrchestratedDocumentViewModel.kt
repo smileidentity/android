@@ -234,7 +234,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             selfieImage = selfieFileResult,
             documentFrontFile = documentFrontFileResult,
             documentBackFile = documentBackFileResult,
-            livenessFilesResult,
+            livenessFiles = livenessFilesResult,
             didSubmitJob = true,
         )
 
@@ -275,7 +275,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     "Document front file is null",
                 ),
                 documentBackFile = documentBackFile,
-                livenessFiles,
+                livenessFiles = livenessFiles,
                 didSubmitJob = false,
             )
         } else {

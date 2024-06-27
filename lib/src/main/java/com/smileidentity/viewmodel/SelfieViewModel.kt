@@ -282,9 +282,9 @@ class SelfieViewModel(
             if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 result = SmileIDResult.Success(
                     SmartSelfieResult(
-                        selfieFile,
-                        livenessFiles,
-                        null,
+                        selfieFile = selfieFile,
+                        livenessFiles = livenessFiles,
+                        apiResponse = null,
                     ),
                 )
                 _uiState.update {
