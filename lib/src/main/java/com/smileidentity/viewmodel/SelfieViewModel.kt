@@ -373,7 +373,11 @@ class SelfieViewModel(
                 selfieFile to livenessFiles
             }
             result = SmileIDResult.Success(
-                SmartSelfieResult(selfieFileResult, livenessFilesResult, apiResponse),
+                SmartSelfieResult(
+                    selfieFile = selfieFileResult,
+                    livenessFiles = livenessFilesResult,
+                    apiResponse = apiResponse
+                ),
             )
             _uiState.update {
                 it.copy(
