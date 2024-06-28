@@ -376,7 +376,7 @@ class SelfieViewModel(
                 SmartSelfieResult(
                     selfieFile = selfieFileResult,
                     livenessFiles = livenessFilesResult,
-                    apiResponse = apiResponse
+                    apiResponse = apiResponse,
                 ),
             )
             _uiState.update {
