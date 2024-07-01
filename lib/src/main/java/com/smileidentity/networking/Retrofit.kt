@@ -8,6 +8,8 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.Metadata
+import com.smileidentity.models.v2.Metadatum
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
@@ -247,4 +249,14 @@ object StringifiedBooleanAdapter {
     @FromJson
     @StringifiedBoolean
     fun fromJson(value: String): Boolean = value.toBoolean()
+}
+
+@Suppress("unused")
+object MetadataAdapter {
+    @ToJson
+    fun toJson(writer: JsonWriter, metadata: Metadata, delegate: JsonAdapter<List<Metadatum>>) =
+        delegate.toJson(writer, metadata.items)
+
+    @FromJson
+    fun fromJson(value: String): Metadata = throw NotImplementedError("MetadataAdapter.fromJson")
 }

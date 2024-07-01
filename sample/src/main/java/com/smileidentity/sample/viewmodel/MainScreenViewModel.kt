@@ -322,8 +322,57 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onSmartSelfieEnrollmentV2Selected() {
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
+    }
+
+    fun onSmartSelfieEnrollmentV2Result(result: SmileIDResult<SmartSelfieResult>) {
+        onHomeSelected()
+        if (result is SmileIDResult.Success) {
+            val response = result.data.apiResponse ?: run {
+                val errorMessage = "SmartSelfie Enrollment completed in offline mode"
+                Timber.w(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
+            val message = jobResultMessageBuilder(
+                jobName = "SmartSelfie Enrollment",
+                didSubmitJob = true,
+                jobComplete = true,
+                jobSuccess = true,
+                code = response.code,
+                resultCode = null,
+                resultText = response.message,
+            )
+            _uiState.update {
+                it.copy(clipboardText = AnnotatedString(response.userId), snackbarMessage = message)
+            }
+            viewModelScope.launch {
+                DataStoreRepository.addCompletedJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = SmartSelfieEnrollment,
+                        timestamp = response.createdAt,
+                        userId = response.userId,
+                        jobId = response.jobId,
+                        jobComplete = true,
+                        jobSuccess = true,
+                        code = response.code,
+                        resultText = response.message,
+                    ),
+                )
+            }
+        } else if (result is SmileIDResult.Error) {
+            val th = result.throwable
+            val message = "SmartSelfie Enrollment error: ${th.message}"
+            Timber.e(th, message)
+            _uiState.update { it.copy(snackbarMessage = message) }
+        }
+    }
+
     fun onSmartSelfieAuthenticationV2Selected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthenticationV2.label) }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
     }
 
     fun onSmartSelfieAuthenticationV2Result(result: SmileIDResult<SmartSelfieResult>) {

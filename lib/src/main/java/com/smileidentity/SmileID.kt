@@ -21,6 +21,7 @@ import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
+import com.smileidentity.networking.MetadataAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
@@ -459,6 +460,7 @@ object SmileID {
             .add(JobTypeAdapter)
             .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
+            .add(MetadataAdapter)
             .add(FileNameAdapter)
             .add(SmartSelfieJobResultAdapter)
             .add(DocumentVerificationJobResultAdapter)
@@ -478,13 +480,13 @@ object SmileID {
         val moduleInstallRequest = ModuleInstallRequest.newBuilder()
             .addApi(FaceDetection.getClient())
             .setListener {
-                Timber.d(
-                    "Face Detection install status: " +
-                        "errorCode=${it.errorCode}, " +
-                        "installState=${it.installState}, " +
-                        "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
-                        "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}",
-                )
+                val message = "Face Detection install status: " +
+                    "errorCode=${it.errorCode}, " +
+                    "installState=${it.installState}, " +
+                    "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
+                    "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}"
+                Timber.d(message)
+                SmileIDCrashReporting.hub.addBreadcrumb(message)
             }.build()
 
         ModuleInstall.getClient(context)
@@ -494,6 +496,7 @@ object SmileID {
             }
             .addOnFailureListener {
                 Timber.w(it, "Face Detection install failed")
+                SmileIDCrashReporting.hub.addBreadcrumb("Face Detection install failed")
             }
     }
 }

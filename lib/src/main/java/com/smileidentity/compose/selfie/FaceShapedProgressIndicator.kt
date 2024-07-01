@@ -63,6 +63,9 @@ fun FaceShapedProgressIndicator(
                 drawRect(color = backgroundColor)
             }
 
+            // No need to draw the progress if the stroke width is 0
+            if (strokeWidth == 0.dp) return@Canvas
+
             // 4. Draw the Progress Indicator Track
             drawPath(FaceShape.path, color = incompleteProgressStrokeColor, style = stroke)
 
