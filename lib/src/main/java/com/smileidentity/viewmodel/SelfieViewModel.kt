@@ -228,7 +228,15 @@ class SelfieViewModel(
                     resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
                 )
                 shouldAnalyzeImages = false
-                _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
+                _uiState.update {
+                    it.copy(
+                        progress = 1f,
+                        selfieToConfirm = selfieFile,
+                        errorMessage = StringResource.ResId(
+                            R.string.si_smart_selfie_processing_success_subtitle,
+                        ),
+                    )
+                }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
@@ -274,9 +282,9 @@ class SelfieViewModel(
             if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 result = SmileIDResult.Success(
                     SmartSelfieResult(
-                        selfieFile,
-                        livenessFiles,
-                        null,
+                        selfieFile = selfieFile,
+                        livenessFiles = livenessFiles,
+                        apiResponse = null,
                     ),
                 )
                 _uiState.update {
@@ -365,9 +373,20 @@ class SelfieViewModel(
                 selfieFile to livenessFiles
             }
             result = SmileIDResult.Success(
-                SmartSelfieResult(selfieFileResult, livenessFilesResult, apiResponse),
+                SmartSelfieResult(
+                    selfieFile = selfieFileResult,
+                    livenessFiles = livenessFilesResult,
+                    apiResponse = apiResponse,
+                ),
             )
-            _uiState.update { it.copy(processingState = ProcessingState.Success) }
+            _uiState.update {
+                it.copy(
+                    processingState = ProcessingState.Success,
+                    errorMessage = StringResource.ResId(
+                        R.string.si_smart_selfie_processing_success_subtitle,
+                    ),
+                )
+            }
         }
     }
 

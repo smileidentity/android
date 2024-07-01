@@ -177,9 +177,9 @@ class BiometricKycViewModel(
             }
             result = SmileIDResult.Success(
                 BiometricKycResult(
-                    selfieFileResult,
-                    livenessFilesResult,
-                    true,
+                    selfieFile = selfieFileResult,
+                    livenessFiles = livenessFilesResult,
+                    didSubmitBiometricKycJob = true,
                 ),
             )
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
