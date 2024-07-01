@@ -323,7 +323,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieEnrollmentV2Selected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollmentV2.label) }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
     }
 
     fun onSmartSelfieEnrollmentV2Result(result: SmileIDResult<SmartSelfieResult>) {
@@ -372,7 +372,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieAuthenticationV2Selected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthenticationV2.label) }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
     }
 
     fun onSmartSelfieAuthenticationV2Result(result: SmileIDResult<SmartSelfieResult>) {
