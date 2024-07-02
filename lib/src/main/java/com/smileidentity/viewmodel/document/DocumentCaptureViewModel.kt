@@ -16,6 +16,7 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
+import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -65,6 +66,8 @@ class DocumentCaptureViewModel(
             .build(),
     ),
 ) : ViewModel() {
+    var documentImageOrigin: DocumentImageOriginValue? = null
+        private set
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
     private var lastAnalysisTimeMs = 0L
@@ -111,10 +114,16 @@ class DocumentCaptureViewModel(
             Timber.w(throwable)
             _uiState.update { it.copy(captureError = throwable) }
         } else {
+            documentImageOrigin = DocumentImageOriginValue.Gallery
             _uiState.update {
                 it.copy(acknowledgedInstructions = true, documentImageToConfirm = selectedPhoto)
             }
         }
+    }
+
+    fun captureDocumentManually(cameraState: CameraState) {
+        documentImageOrigin = DocumentImageOriginValue.CameraManualCapture
+        captureDocument(cameraState)
     }
 
     /**
@@ -162,6 +171,7 @@ class DocumentCaptureViewModel(
         // gallery because we copied the URI contents to a new File first
         uiState.value.documentImageToConfirm?.delete()
         isCapturing = false
+        documentImageOrigin = null
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -248,6 +258,7 @@ class DocumentCaptureViewModel(
                     uiState.value.documentImageToConfirm == null
                 ) {
                     captureNextAnalysisFrame = false
+                    documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
                     captureDocument(cameraState)
                 }
             }

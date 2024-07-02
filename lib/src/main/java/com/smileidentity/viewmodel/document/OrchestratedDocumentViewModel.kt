@@ -15,6 +15,8 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.DocumentImageOriginValue
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -75,17 +77,19 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
+    private val metadata: MutableList<Metadatum> =
+        com.smileidentity.models.v2.Metadata.default().items.toMutableList()
 
-    fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
+    fun onDocumentFrontCaptureSuccess(
+        documentImageFile: File,
+        imageOrigin: DocumentImageOriginValue?,
+    ) {
         documentFrontFile = documentImageFile
+        imageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
         if (captureBothSides) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
         } else if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -93,20 +97,20 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
     fun onDocumentBackSkip() {
         if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
     }
 
-    fun onDocumentBackCaptureSuccess(documentImageFile: File) {
+    fun onDocumentBackCaptureSuccess(
+        documentImageFile: File,
+        imageOrigin: DocumentImageOriginValue?,
+    ) {
         documentBackFile = documentImageFile
+        imageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
         if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -168,6 +172,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll.toString(),
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -184,6 +189,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 // TODO : Michael will change this to boolean
                 allowNewEnroll = allowNewEnroll.toString(),
+                metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
