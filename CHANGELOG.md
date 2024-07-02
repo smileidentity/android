@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 10.1.7
 
 * Fixed a bug where some failed authentication requests were incorrectly handled
 * Fixed a bug where errors with no code were not being handled correctly
