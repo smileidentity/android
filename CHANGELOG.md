@@ -3,6 +3,9 @@
 ## 10.2.0
 
 * Added an optional "Strict Mode" to SmartSelfie Enrollment and Authentication to achieve better pass rates. Set `useStrictMode=true` to enable this new, streamlined UI and associated active liveness tasks
+
+## 10.1.7
+
 * Fixed a bug where some failed authentication requests were incorrectly handled
 * Fixed a bug where errors with no code were not being handled correctly
 * Fixed a bug on Selfie and Document capture success screen where the message was wrong
