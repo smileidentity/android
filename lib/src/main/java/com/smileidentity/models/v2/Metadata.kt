@@ -2,6 +2,7 @@ package com.smileidentity.models.v2
 
 import android.os.Parcelable
 import com.smileidentity.BuildConfig
+import com.smileidentity.SmileID
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -14,7 +15,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Metadata(val items: List<Metadatum>) : Parcelable {
     companion object {
-        fun default(): Metadata = Metadata(listOf(Metadatum.Sdk, Metadatum.SdkVersion))
+        fun default(): Metadata = Metadata(
+            listOf(Metadatum.Sdk, Metadatum.SdkVersion, Metadatum.Fingerprint),
+        )
     }
 }
 
@@ -33,6 +36,10 @@ sealed class Metadatum(
     @Parcelize
     @TypeLabel(label = "sdk_version")
     data object SdkVersion : Metadatum(BuildConfig.VERSION_NAME)
+
+    @Parcelize
+    @TypeLabel(label = "fingerprint")
+    data object Fingerprint : Metadatum(SmileID.fingerprint)
 
     @Parcelize
     @TypeLabel(label = "document_front_image_origin")

@@ -20,6 +20,7 @@ coil = "2.6.0"
 compose-lint-checks = "1.3.1"
 coroutines = "1.8.1"
 datastore = "1.1.1"
+fingerprint-js = "2.1.0"
 junit = "4.13.2"
 kotlin = "2.0.0"
 kotlin-immutable-collections = "0.3.7"
@@ -90,6 +91,7 @@ compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", v
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+fingerprint-js = { module = "com.github.fingerprintjs:fingerprint-android", version.ref = "fingerprint-js" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-immutable-collections" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
