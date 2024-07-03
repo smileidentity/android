@@ -23,7 +23,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DocumentCaptureRouteViewModelTest {
+class DocumentCaptureViewModelTest {
     private lateinit var subject: DocumentCaptureViewModel
 
     @Before

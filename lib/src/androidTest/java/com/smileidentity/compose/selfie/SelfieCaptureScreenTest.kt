@@ -24,7 +24,7 @@ import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
 
-class SelfieRouteCaptureScreenTest {
+class SelfieCaptureScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 

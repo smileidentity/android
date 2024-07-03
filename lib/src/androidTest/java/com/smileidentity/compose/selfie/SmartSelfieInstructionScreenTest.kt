@@ -14,7 +14,7 @@ import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
 import org.junit.Rule
 import org.junit.Test
 
-class SmartSelfieRouteInstructionScreenTest {
+class SmartSelfieInstructionScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 

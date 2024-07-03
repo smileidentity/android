@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 
-class OrchestratedSelfieRouteCaptureScreenTest {
+class OrchestratedSelfieCaptureScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
