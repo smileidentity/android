@@ -19,5 +19,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // TODO: Remove once https://github.com/fingerprintjs/fingerprintjs-android/issues/76 is
+        //  resolved
+        maven("https://jitpack.io")
     }
 }

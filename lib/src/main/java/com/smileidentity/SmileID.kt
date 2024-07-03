@@ -3,6 +3,8 @@ package com.smileidentity
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
+import com.fingerprintjs.android.fingerprint.Fingerprinter
+import com.fingerprintjs.android.fingerprint.FingerprinterFactory
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.common.sdkinternal.MlKitContext
@@ -85,6 +87,7 @@ object SmileID {
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
+    internal var fingerprint = ""
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
@@ -137,6 +140,10 @@ object SmileID {
 
         // Usually looks like: /data/user/0/<package name>/app_SmileID
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
+        FingerprinterFactory.create(context).getFingerprint(version = Fingerprinter.Version.V_5) {
+            // Returns empty string if there was an error
+            fingerprint = it
+        }
     }
 
     /**
