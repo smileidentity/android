@@ -51,6 +51,7 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -91,7 +92,7 @@ fun DocumentCaptureScreen(
     instructionsSubtitleText: String,
     captureTitleText: String,
     knownIdAspectRatio: Float?,
-    onConfirm: (File) -> Unit,
+    onConfirm: (File, DocumentImageOriginValue?) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
     onSkip: () -> Unit = { },
@@ -163,7 +164,7 @@ fun DocumentCaptureScreen(
                 confirmButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_confirm_button,
                 ),
-                onConfirm = { onConfirm(documentImageToConfirm) },
+                onConfirm = { onConfirm(documentImageToConfirm, viewModel.documentImageOrigin) },
                 retakeButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_retake_button,
                 ),
@@ -183,7 +184,7 @@ fun DocumentCaptureScreen(
                 areEdgesDetected = uiState.areEdgesDetected,
                 showCaptureInProgress = uiState.showCaptureInProgress,
                 showManualCaptureButton = uiState.showManualCaptureButton,
-                onCaptureClicked = viewModel::captureDocument,
+                onCaptureClicked = viewModel::captureDocumentManually,
                 imageAnalyzer = viewModel::analyze,
                 onFocusEvent = viewModel::onFocusEvent,
                 modifier = modifier,
