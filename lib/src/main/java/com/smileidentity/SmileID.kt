@@ -87,7 +87,7 @@ object SmileID {
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
-    internal lateinit var fingerprint: String
+    internal var fingerprint = ""
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
