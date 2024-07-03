@@ -11,6 +11,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadResponse
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
@@ -90,7 +91,7 @@ class EnhancedDocumentVerificationViewModelTest {
         }
 
         // when
-        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile, DocumentImageOriginValue.Gallery)
 
         // then
         // the submitJob coroutine won't have finished executing yet, so should still be processing
@@ -109,7 +110,7 @@ class EnhancedDocumentVerificationViewModelTest {
         coEvery { SmileID.api.authenticate(any()) } throws RuntimeException()
 
         // when
-        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile, DocumentImageOriginValue.Gallery)
 
         // then
         val currentStep = subject.uiState.value.currentStep
@@ -150,7 +151,7 @@ class EnhancedDocumentVerificationViewModelTest {
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
 
         // when
-        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile, DocumentImageOriginValue.Gallery)
 
         // then
         assertNotNull(uploadBodySlot.captured.idInfo)
@@ -195,7 +196,7 @@ class EnhancedDocumentVerificationViewModelTest {
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
 
         // when
-        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile, DocumentImageOriginValue.Gallery)
         subject.onSelfieCaptureSuccess(SmileIDResult.Success(selfieResult))
 
         // then
