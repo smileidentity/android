@@ -348,6 +348,7 @@ internal class DocumentVerificationViewModel(
             DocumentVerificationResult(
                 selfieFile = selfieImage,
                 documentFrontFile = documentFrontFile,
+                livenessFiles = livenessFiles,
                 documentBackFile = documentBackFile,
                 didSubmitDocumentVerificationJob = didSubmitJob,
             ),
@@ -386,10 +387,10 @@ internal class EnhancedDocumentVerificationViewModel(
     ) {
         result = SmileIDResult.Success(
             EnhancedDocumentVerificationResult(
-                selfieImage,
-                documentFrontFile,
-                livenessFiles,
-                documentBackFile,
+                selfieFile = selfieImage,
+                documentFrontFile = documentFrontFile,
+                livenessFiles = livenessFiles,
+                documentBackFile = documentBackFile,
                 didSubmitEnhancedDocVJob = didSubmitJob,
             ),
         )
