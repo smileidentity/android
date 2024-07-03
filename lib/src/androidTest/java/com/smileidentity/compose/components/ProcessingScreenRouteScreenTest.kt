@@ -10,7 +10,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-class ProcessingScreenTest {
+class ProcessingScreenRouteScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 

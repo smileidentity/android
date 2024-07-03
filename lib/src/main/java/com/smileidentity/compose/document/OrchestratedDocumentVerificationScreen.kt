@@ -14,10 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
+import com.smileidentity.compose.nav.DocumentCaptureScreenCaptureRoute
+import com.smileidentity.compose.nav.OrchestratedProcessingRoute
+import com.smileidentity.compose.nav.OrchestratedSelfieCaptureScreenRoute
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
@@ -42,89 +48,92 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     onResult: SmileIDCallback<T> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val navController = rememberNavController()
+    val frontCapture = DocumentCaptureScreenCaptureRoute(
+        aspectRatio = idAspectRatio ?: 1f,
+        side = DocumentCaptureSide.Front,
+        instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+        instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
+        instructionsSubtitleText = stringResource(R.string.si_verify_identity_instruction_subtitle),
+        captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_front_title),
+    )
+    val backCapture = DocumentCaptureScreenCaptureRoute(
+        aspectRatio = idAspectRatio ?: 1f,
+        side = DocumentCaptureSide.Front,
+        instructionsHeroImage = R.drawable.si_doc_v_back_hero,
+        instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
+        instructionsSubtitleText = stringResource(R.string.si_doc_v_instruction_back_subtitle),
+        captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_back_title),
+    )
+
     Box(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        when (val currentStep = uiState.currentStep) {
-            DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
-                jobId = jobId,
-                side = DocumentCaptureSide.Front,
-                showInstructions = showInstructions,
-                showAttribution = showAttribution,
-                allowGallerySelection = allowGalleryUpload,
-                showSkipButton = false,
-                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
-                instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
-                instructionsSubtitleText = stringResource(
-                    id = R.string.si_verify_identity_instruction_subtitle,
-                ),
-                captureTitleText = stringResource(
-                    id = R.string.si_doc_v_capture_instructions_front_title,
-                ),
-                knownIdAspectRatio = idAspectRatio,
-                onConfirm = viewModel::onDocumentFrontCaptureSuccess,
-                onError = viewModel::onError,
-            )
-
-            DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
-                jobId = jobId,
-                side = DocumentCaptureSide.Back,
-                showInstructions = showInstructions,
-                showAttribution = showAttribution,
-                allowGallerySelection = allowGalleryUpload,
-                showSkipButton = false,
-                instructionsHeroImage = R.drawable.si_doc_v_back_hero,
-                instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
-                instructionsSubtitleText = stringResource(
-                    id = R.string.si_doc_v_instruction_back_subtitle,
-                ),
-                captureTitleText = stringResource(
-                    id = R.string.si_doc_v_capture_instructions_back_title,
-                ),
-                knownIdAspectRatio = idAspectRatio,
-                onConfirm = viewModel::onDocumentBackCaptureSuccess,
-                onError = viewModel::onError,
-                onSkip = viewModel::onDocumentBackSkip,
-            )
-
-            DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                skipApiSubmission = true,
-            ) {
-                when (it) {
-                    is SmileIDResult.Error -> viewModel.onError(it.throwable)
-                    is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
+        NavHost(navController, startDestination = frontCapture) {
+            composable<DocumentCaptureScreenCaptureRoute> { backStackEntry ->
+                val documentImageRoute: DocumentCaptureScreenCaptureRoute = backStackEntry.toRoute()
+                DocumentCaptureScreen(
+                    jobId = jobId,
+                    side = documentImageRoute.side,
+                    showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowGallerySelection = allowGalleryUpload,
+                    showSkipButton = false,
+                    instructionsHeroImage = documentImageRoute.instructionsHeroImage,
+                    instructionsTitleText = documentImageRoute.instructionsTitleText,
+                    instructionsSubtitleText = documentImageRoute.instructionsSubtitleText,
+                    captureTitleText = documentImageRoute.captureTitleText,
+                    knownIdAspectRatio = documentImageRoute.aspectRatio,
+                    onConfirm = viewModel::onDocumentFrontCaptureSuccess,
+                    onError = viewModel::onError,
+                )
+            }
+            composable<OrchestratedSelfieCaptureScreenRoute> {
+                OrchestratedSelfieCaptureScreen(
+                    userId = userId,
+                    jobId = jobId,
+                    isEnroll = false,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    showInstructions = showInstructions,
+                    skipApiSubmission = true,
+                ) {
+                    when (it) {
+                        is SmileIDResult.Error -> viewModel.onError(it.throwable)
+                        is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
+                    }
                 }
             }
-
-            is DocumentCaptureFlow.ProcessingScreen -> ProcessingScreen(
-                processingState = currentStep.processingState,
-                inProgressTitle = stringResource(R.string.si_doc_v_processing_title),
-                inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
-                inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
-                successTitle = stringResource(R.string.si_doc_v_processing_success_title),
-                successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-                    ?: stringResource(R.string.si_doc_v_processing_success_subtitle),
-                successIcon = painterResource(R.drawable.si_processing_success),
-                errorTitle = stringResource(id = R.string.si_doc_v_processing_error_title),
-                errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-                    ?: stringResource(id = R.string.si_processing_error_subtitle),
-                errorIcon = painterResource(R.drawable.si_processing_error),
-                continueButtonText = stringResource(R.string.si_continue),
-                onContinue = { viewModel.onFinished(onResult) },
-                retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-                onRetry = viewModel::onRetry,
-                closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
-                onClose = { viewModel.onFinished(onResult) },
-            )
+            composable<OrchestratedProcessingRoute> { backStackEntry ->
+                val processingRoute: OrchestratedProcessingRoute = backStackEntry.toRoute()
+                ProcessingScreen(
+                    processingState = processingRoute.processingState,
+                    inProgressTitle = stringResource(R.string.si_doc_v_processing_title),
+                    inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
+                    inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
+                    successTitle = stringResource(R.string.si_doc_v_processing_success_title),
+                    successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                        ?: stringResource(R.string.si_doc_v_processing_success_subtitle),
+                    successIcon = painterResource(R.drawable.si_processing_success),
+                    errorTitle = stringResource(id = R.string.si_doc_v_processing_error_title),
+                    errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                        ?: stringResource(id = R.string.si_processing_error_subtitle),
+                    errorIcon = painterResource(R.drawable.si_processing_error),
+                    continueButtonText = stringResource(R.string.si_continue),
+                    onContinue = { viewModel.onFinished(onResult) },
+                    retryButtonText = stringResource(
+                        R.string.si_smart_selfie_processing_retry_button,
+                    ),
+                    onRetry = viewModel::onRetry,
+                    closeButtonText = stringResource(
+                        R.string.si_smart_selfie_processing_close_button,
+                    ),
+                    onClose = { viewModel.onFinished(onResult) },
+                )
+            }
         }
     }
 }

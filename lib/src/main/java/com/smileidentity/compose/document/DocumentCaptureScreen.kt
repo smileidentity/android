@@ -1,6 +1,7 @@
 package com.smileidentity.compose.document
 
 import android.graphics.BitmapFactory
+import android.os.Parcelable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,9 +47,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.nav.DocumentCaptureScreenCaptureRoute
+import com.smileidentity.compose.nav.DocumentCaptureScreenConfirmDocumentImageRoute
+import com.smileidentity.compose.nav.DocumentCaptureScreenInstructionRoute
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.createDocumentFile
@@ -66,11 +74,13 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 import java.io.File
+import kotlinx.android.parcel.Parcelize
 import timber.log.Timber
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
-enum class DocumentCaptureSide {
+@Parcelize
+enum class DocumentCaptureSide : Parcelable {
     Front,
     Back,
 }
@@ -120,12 +130,44 @@ fun DocumentCaptureScreen(
             }
         },
     )
+    val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val documentImageToConfirm = uiState.documentImageToConfirm
     val captureError = uiState.captureError
+    val startDestination =
+        if (showInstructions && !uiState.acknowledgedInstructions) {
+            DocumentCaptureScreenInstructionRoute
+        } else {
+            DocumentCaptureScreenCaptureRoute
+        }
     when {
-        captureError != null -> onError(captureError)
-        showInstructions && !uiState.acknowledgedInstructions -> {
+        captureError != null -> {
+            onError(captureError)
+        }
+
+        documentImageToConfirm != null -> {
+            navController.navigate(
+                DocumentCaptureScreenConfirmDocumentImageRoute(
+                    documentImageToConfirm.absolutePath,
+                ),
+            )
+        }
+
+        else -> {
+            navController.navigate(
+                DocumentCaptureScreenCaptureRoute(
+                    uiState.idAspectRatio,
+                    side,
+                    instructionsHeroImage,
+                    instructionsTitleText,
+                    instructionsSubtitleText,
+                    captureTitleText,
+                ),
+            )
+        }
+    }
+    NavHost(navController, startDestination = startDestination) {
+        composable<DocumentCaptureScreenInstructionRoute> {
             DocumentCaptureInstructionsScreen(
                 heroImage = instructionsHeroImage,
                 title = instructionsTitleText,
@@ -142,10 +184,11 @@ fun DocumentCaptureScreen(
                 onSkip = onSkip,
             )
         }
-
-        documentImageToConfirm != null -> {
+        composable<DocumentCaptureScreenConfirmDocumentImageRoute> { backStackEntry ->
+            val documentImageRoute: DocumentCaptureScreenConfirmDocumentImageRoute =
+                backStackEntry.toRoute()
             val painter = remember {
-                val path = documentImageToConfirm.absolutePath
+                val path = documentImageRoute.documentImageToConfirm
                 try {
                     BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
                 } catch (e: Exception) {
@@ -155,25 +198,32 @@ fun DocumentCaptureScreen(
                     ColorPainter(Color.Black)
                 }
             }
-            ImageCaptureConfirmationDialog(
-                titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
-                subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-                painter = painter,
-                scaleFactor = PREVIEW_SCALE_FACTOR,
-                confirmButtonText = stringResource(
-                    id = R.string.si_doc_v_confirmation_dialog_confirm_button,
-                ),
-                onConfirm = { onConfirm(documentImageToConfirm) },
-                retakeButtonText = stringResource(
-                    id = R.string.si_doc_v_confirmation_dialog_retake_button,
-                ),
-                onRetake = viewModel::onRetry,
-            )
+            documentImageToConfirm?.let {
+                ImageCaptureConfirmationDialog(
+                    titleText =
+                    stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
+                    subtitleText =
+                    stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
+                    painter = painter,
+                    scaleFactor = PREVIEW_SCALE_FACTOR,
+                    confirmButtonText = stringResource(
+                        id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+                    ),
+                    onConfirm = { onConfirm(it) },
+                    retakeButtonText = stringResource(
+                        id = R.string.si_doc_v_confirmation_dialog_retake_button,
+                    ),
+                    onRetake = viewModel::onRetry,
+                )
+            } ?: run {
+                onError(IllegalStateException("Document image to confirm is null"))
+            }
         }
-
-        else -> {
+        composable<DocumentCaptureScreenCaptureRoute> { backStackEntry ->
+            val documentCaptureScreenCaptureRoute: DocumentCaptureScreenCaptureRoute =
+                backStackEntry.toRoute()
             val aspectRatio by animateFloatAsState(
-                targetValue = uiState.idAspectRatio,
+                targetValue = documentCaptureScreenCaptureRoute.aspectRatio,
                 label = "ID Aspect Ratio",
             )
             CaptureScreenContent(

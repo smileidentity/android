@@ -1,5 +1,6 @@
 package com.smileidentity.compose.components
 
+import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,9 +33,13 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.Serializable
 
 @SmileIDOptIn
-enum class ProcessingState {
+@Serializable
+@Parcelize
+enum class ProcessingState : Parcelable {
     InProgress,
     Success,
     Error,

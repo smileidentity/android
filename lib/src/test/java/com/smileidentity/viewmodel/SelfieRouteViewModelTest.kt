@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SelfieViewModelTest {
+class SelfieRouteViewModelTest {
     private lateinit var subject: SelfieViewModel
 
     @Before

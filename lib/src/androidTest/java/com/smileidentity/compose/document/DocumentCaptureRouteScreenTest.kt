@@ -17,7 +17,7 @@ import com.smileidentity.R
 import org.junit.Rule
 import org.junit.Test
 
-class DocumentCaptureScreenTest {
+class DocumentCaptureRouteScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
