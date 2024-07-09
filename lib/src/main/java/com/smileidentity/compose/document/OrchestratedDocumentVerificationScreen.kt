@@ -20,15 +20,20 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
+import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.compose.nav.DocumentCaptureScreenCaptureRoute
+import com.smileidentity.compose.nav.DocumentCaptureSideNavType
 import com.smileidentity.compose.nav.OrchestratedProcessingRoute
 import com.smileidentity.compose.nav.OrchestratedSelfieCaptureScreenRoute
+import com.smileidentity.compose.nav.ProcessingStateNavType
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
+import kotlin.reflect.typeOf
 
 /**
  * Orchestrates the document capture flow - navigates between instructions, requesting permissions,
@@ -59,7 +64,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     )
     val backCapture = DocumentCaptureScreenCaptureRoute(
         aspectRatio = idAspectRatio ?: 1f,
-        side = DocumentCaptureSide.Front,
+        side = DocumentCaptureSide.Back,
         instructionsHeroImage = R.drawable.si_doc_v_back_hero,
         instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
         instructionsSubtitleText = stringResource(R.string.si_doc_v_instruction_back_subtitle),
@@ -73,8 +78,12 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             .fillMaxSize(),
     ) {
         NavHost(navController, startDestination = frontCapture) {
-            composable<DocumentCaptureScreenCaptureRoute> { backStackEntry ->
-                val documentImageRoute: DocumentCaptureScreenCaptureRoute = backStackEntry.toRoute()
+            composable<DocumentCaptureScreenCaptureRoute>(
+                typeMap = mapOf(
+                    typeOf<DocumentCaptureSide>() to DocumentCaptureSideNavType,
+                ),
+            ) { backStackEntry ->
+                val documentImageRoute = backStackEntry.toRoute<DocumentCaptureScreenCaptureRoute>()
                 DocumentCaptureScreen(
                     jobId = jobId,
                     side = documentImageRoute.side,
@@ -91,7 +100,11 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                     onError = viewModel::onError,
                 )
             }
-            composable<OrchestratedSelfieCaptureScreenRoute> {
+            composable<OrchestratedSelfieCaptureScreenRoute>(
+                typeMap = mapOf(
+                    typeOf<ProcessingState>() to ProcessingStateNavType,
+                ),
+            ) {
                 OrchestratedSelfieCaptureScreen(
                     userId = userId,
                     jobId = jobId,
@@ -107,7 +120,11 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                     }
                 }
             }
-            composable<OrchestratedProcessingRoute> { backStackEntry ->
+            composable<OrchestratedProcessingRoute>(
+                typeMap = mapOf(
+                    typeOf<ProcessingState>() to ProcessingStateNavType,
+                ),
+            ) { backStackEntry ->
                 val processingRoute: OrchestratedProcessingRoute = backStackEntry.toRoute()
                 ProcessingScreen(
                     processingState = processingRoute.processingState,
@@ -134,6 +151,23 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                     onClose = { viewModel.onFinished(onResult) },
                 )
             }
+        }
+    }
+    when (val currentStep = uiState.currentStep) {
+        is DocumentCaptureFlow.FrontDocumentCapture -> {
+            navController.navigate(frontCapture)
+        }
+
+        is DocumentCaptureFlow.BackDocumentCapture -> {
+            navController.navigate(backCapture)
+        }
+
+        is DocumentCaptureFlow.SelfieCapture -> {
+            navController.navigate(OrchestratedSelfieCaptureScreenRoute)
+        }
+
+        is DocumentCaptureFlow.ProcessingScreen -> {
+            navController.navigate(OrchestratedProcessingRoute(currentStep.processingState))
         }
     }
 }
