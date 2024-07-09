@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -49,9 +50,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.models.v2.DocumentImageOriginValue
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -92,12 +94,20 @@ fun DocumentCaptureScreen(
     instructionsSubtitleText: String,
     captureTitleText: String,
     knownIdAspectRatio: Float?,
-    onConfirm: (File, DocumentImageOriginValue?) -> Unit,
+    onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
+    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
-        factory = viewModelFactory { DocumentCaptureViewModel(jobId, side, knownIdAspectRatio) },
+        factory = viewModelFactory {
+            DocumentCaptureViewModel(
+                jobId,
+                side,
+                knownIdAspectRatio,
+                metadata,
+            )
+        },
         key = side.name,
     ),
 ) {
@@ -164,7 +174,7 @@ fun DocumentCaptureScreen(
                 confirmButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_confirm_button,
                 ),
-                onConfirm = { onConfirm(documentImageToConfirm, viewModel.documentImageOrigin) },
+                onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
                 retakeButtonText = stringResource(
                     id = R.string.si_doc_v_confirmation_dialog_retake_button,
                 ),

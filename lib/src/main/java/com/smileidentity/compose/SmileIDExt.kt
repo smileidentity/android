@@ -6,14 +6,17 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
@@ -24,6 +27,7 @@ import com.smileidentity.compose.theme.typography
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.v2.Metadata
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -80,36 +84,40 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
-        if (useStrictMode) {
-            val context = LocalContext.current
-            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-            OrchestratedSelfieCaptureScreenV2(
-                modifier = modifier,
-                userId = userId,
-                allowNewEnroll = allowNewEnroll,
-                isEnroll = true,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                useStrictMode = useStrictMode,
-                selfieQualityModel = selfieQualityModel,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        } else {
-            OrchestratedSelfieCaptureScreen(
-                modifier = modifier,
-                userId = userId,
-                jobId = jobId,
-                allowNewEnroll = allowNewEnroll,
-                isEnroll = true,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+            if (useStrictMode) {
+                val context = LocalContext.current
+                val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+                OrchestratedSelfieCaptureScreenV2(
+                    modifier = modifier,
+                    userId = userId,
+                    allowNewEnroll = allowNewEnroll,
+                    isEnroll = true,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    useStrictMode = useStrictMode,
+                    selfieQualityModel = selfieQualityModel,
+                    extraPartnerParams = extraPartnerParams,
+                    onResult = onResult,
+                )
+            } else {
+                OrchestratedSelfieCaptureScreen(
+                    modifier = modifier,
+                    userId = userId,
+                    jobId = jobId,
+                    allowNewEnroll = allowNewEnroll,
+                    isEnroll = true,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    showInstructions = showInstructions,
+                    extraPartnerParams = extraPartnerParams,
+                    onResult = onResult,
+                )
+            }
         }
     }
 }
@@ -154,35 +162,39 @@ fun SmileID.SmartSelfieAuthentication(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
-        if (useStrictMode) {
-            val context = LocalContext.current
-            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-            OrchestratedSelfieCaptureScreenV2(
-                modifier = modifier,
-                userId = userId,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                useStrictMode = useStrictMode,
-                selfieQualityModel = selfieQualityModel,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        } else {
-            OrchestratedSelfieCaptureScreen(
-                modifier = modifier,
-                userId = userId,
-                jobId = jobId,
-                allowNewEnroll = allowNewEnroll,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+            if (useStrictMode) {
+                val context = LocalContext.current
+                val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+                OrchestratedSelfieCaptureScreenV2(
+                    modifier = modifier,
+                    userId = userId,
+                    isEnroll = false,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    useStrictMode = useStrictMode,
+                    selfieQualityModel = selfieQualityModel,
+                    extraPartnerParams = extraPartnerParams,
+                    onResult = onResult,
+                )
+            } else {
+                OrchestratedSelfieCaptureScreen(
+                    modifier = modifier,
+                    userId = userId,
+                    jobId = jobId,
+                    allowNewEnroll = allowNewEnroll,
+                    isEnroll = false,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    showInstructions = showInstructions,
+                    extraPartnerParams = extraPartnerParams,
+                    onResult = onResult,
+                )
+            }
         }
     }
 }
@@ -241,33 +253,37 @@ fun SmileID.DocumentVerification(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedDocumentVerificationScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            showAttribution = showAttribution,
-            allowAgentMode = allowAgentMode,
-            allowGalleryUpload = allowGalleryUpload,
-            showInstructions = showInstructions,
-            idAspectRatio = idAspectRatio,
-            onResult = onResult,
-            viewModel = viewModel(
-                factory = viewModelFactory {
-                    DocumentVerificationViewModel(
-                        jobType = JobType.DocumentVerification,
-                        userId = userId,
-                        jobId = jobId,
-                        allowNewEnroll = allowNewEnroll,
-                        countryCode = countryCode,
-                        documentType = documentType,
-                        captureBothSides = captureBothSides,
-                        selfieFile = bypassSelfieCaptureWithFile,
-                        extraPartnerParams = extraPartnerParams,
-                    )
-                },
-            ),
-        )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            OrchestratedDocumentVerificationScreen(
+                modifier = modifier,
+                userId = userId,
+                jobId = jobId,
+                showAttribution = showAttribution,
+                allowAgentMode = allowAgentMode,
+                allowGalleryUpload = allowGalleryUpload,
+                showInstructions = showInstructions,
+                idAspectRatio = idAspectRatio,
+                onResult = onResult,
+                viewModel = viewModel(
+                    factory = viewModelFactory {
+                        DocumentVerificationViewModel(
+                            jobType = JobType.DocumentVerification,
+                            userId = userId,
+                            jobId = jobId,
+                            allowNewEnroll = allowNewEnroll,
+                            countryCode = countryCode,
+                            documentType = documentType,
+                            captureBothSides = captureBothSides,
+                            selfieFile = bypassSelfieCaptureWithFile,
+                            extraPartnerParams = extraPartnerParams,
+                        )
+                    },
+                ),
+            )
+        }
     }
 }
 
@@ -326,33 +342,37 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedDocumentVerificationScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            showAttribution = showAttribution,
-            allowAgentMode = allowAgentMode,
-            allowGalleryUpload = allowGalleryUpload,
-            showInstructions = showInstructions,
-            idAspectRatio = idAspectRatio,
-            onResult = onResult,
-            viewModel = viewModel(
-                factory = viewModelFactory {
-                    EnhancedDocumentVerificationViewModel(
-                        jobType = JobType.EnhancedDocumentVerification,
-                        userId = userId,
-                        jobId = jobId,
-                        allowNewEnroll = allowNewEnroll,
-                        countryCode = countryCode,
-                        documentType = documentType,
-                        captureBothSides = captureBothSides,
-                        selfieFile = bypassSelfieCaptureWithFile,
-                        extraPartnerParams = extraPartnerParams,
-                    )
-                },
-            ),
-        )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            OrchestratedDocumentVerificationScreen(
+                modifier = modifier,
+                userId = userId,
+                jobId = jobId,
+                showAttribution = showAttribution,
+                allowAgentMode = allowAgentMode,
+                allowGalleryUpload = allowGalleryUpload,
+                showInstructions = showInstructions,
+                idAspectRatio = idAspectRatio,
+                onResult = onResult,
+                viewModel = viewModel(
+                    factory = viewModelFactory {
+                        EnhancedDocumentVerificationViewModel(
+                            jobType = JobType.EnhancedDocumentVerification,
+                            userId = userId,
+                            jobId = jobId,
+                            allowNewEnroll = allowNewEnroll,
+                            countryCode = countryCode,
+                            documentType = documentType,
+                            captureBothSides = captureBothSides,
+                            selfieFile = bypassSelfieCaptureWithFile,
+                            extraPartnerParams = extraPartnerParams,
+                        )
+                    },
+                ),
+            )
+        }
     }
 }
 
@@ -395,19 +415,23 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedBiometricKYCScreen(
-            modifier = modifier,
-            idInfo = idInfo,
-            userId = userId,
-            jobId = jobId,
-            allowNewEnroll = allowNewEnroll,
-            allowAgentMode = allowAgentMode,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            OrchestratedBiometricKYCScreen(
+                modifier = modifier,
+                idInfo = idInfo,
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                extraPartnerParams = extraPartnerParams,
+                onResult = onResult,
+            )
+        }
     }
 }
 
@@ -443,17 +467,21 @@ fun SmileID.BvnConsentScreen(
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedBvnConsentScreen(
-            modifier = modifier,
-            userId = userId,
-            partnerIcon = partnerIcon,
-            partnerName = partnerName,
-            partnerPrivacyPolicy = partnerPrivacyPolicy,
-            onConsentGranted = onConsentGranted,
-            onConsentDenied = onConsentDenied,
-            showAttribution = showAttribution,
-        )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            OrchestratedBvnConsentScreen(
+                modifier = modifier,
+                userId = userId,
+                partnerIcon = partnerIcon,
+                partnerName = partnerName,
+                partnerPrivacyPolicy = partnerPrivacyPolicy,
+                onConsentGranted = onConsentGranted,
+                onConsentDenied = onConsentDenied,
+                showAttribution = showAttribution,
+            )
+        }
     }
 }
 
@@ -468,16 +496,20 @@ fun SmileID.ConsentScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedConsentScreen(
-            partnerIcon = partnerIcon,
-            partnerName = partnerName,
-            productName = productName,
-            partnerPrivacyPolicy = partnerPrivacyPolicy,
-            onConsentGranted = onConsentGranted,
-            onConsentDenied = onConsentDenied,
-            modifier = modifier,
-            showAttribution = showAttribution,
-        )
+    CompositionLocalProvider(
+        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
+    ) {
+        MaterialTheme(colorScheme = colorScheme, typography = typography) {
+            OrchestratedConsentScreen(
+                partnerIcon = partnerIcon,
+                partnerName = partnerName,
+                productName = productName,
+                partnerPrivacyPolicy = partnerPrivacyPolicy,
+                onConsentGranted = onConsentGranted,
+                onConsentDenied = onConsentDenied,
+                modifier = modifier,
+                showAttribution = showAttribution,
+            )
+        }
     }
 }

@@ -15,7 +15,6 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
@@ -80,12 +79,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val metadata: MutableList<Metadatum> =
         com.smileidentity.models.v2.Metadata.default().items.toMutableList()
 
-    fun onDocumentFrontCaptureSuccess(
-        documentImageFile: File,
-        imageOrigin: DocumentImageOriginValue?,
-    ) {
+    fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
-        imageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
         if (captureBothSides) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
         } else if (selfieFile == null) {
@@ -103,12 +98,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
-    fun onDocumentBackCaptureSuccess(
-        documentImageFile: File,
-        imageOrigin: DocumentImageOriginValue?,
-    ) {
+    fun onDocumentBackCaptureSuccess(documentImageFile: File) {
         documentBackFile = documentImageFile
-        imageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
         if (selfieFile == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
