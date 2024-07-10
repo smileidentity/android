@@ -56,6 +56,10 @@ open class Metadatum(
     @Parcelize
     data class CameraFacing(val facing: CameraFacingValue) : Metadatum("camera_facing", facing.name)
 
+    /**
+     * This represents the time it took for the user to complete *their* portion of the task. It
+     * does *NOT* include network time.
+     */
     @Parcelize
     data class SelfieCaptureDuration(val duration: Duration) :
         Metadatum("selfie_capture_duration", duration.toIsoString())
@@ -76,10 +80,18 @@ open class Metadatum(
     data class BackDocumentCaptureRetries(val retries: Int) :
         Metadatum("back_document_capture_retries", retries.toString())
 
+    /**
+     * This represents the time it took for the user to complete *their* portion of the task. It
+     * does *NOT* include network time.
+     */
     @Parcelize
     data class FrontDocumentCaptureDuration(val duration: Duration) :
         Metadatum("front_document_capture_duration", duration.toIsoString())
 
+    /**
+     * This represents the time it took for the user to complete *their* portion of the task. It
+     * does *NOT* include network time.
+     */
     @Parcelize
     data class BackDocumentCaptureDuration(val duration: Duration) :
         Metadatum("back_document_capture_duration", duration.toIsoString())
@@ -133,6 +145,10 @@ private val isEmulator: Boolean
         }
     }
 
+/**
+ * Returns the model of the device. If the device is an emulator, it returns "emulator". Any errors
+ * result in "unknown"
+ */
 private val model: String
     get() {
         try {
@@ -146,9 +162,15 @@ private val model: String
                 "$manufacturer $model"
             }
         } catch (e: Exception) {
+            Timber.w(e, "Error getting device model")
+            SmileIDCrashReporting.hub.addBreadcrumb("Error getting device model: $e")
             return "unknown"
         }
     }
 
+/**
+ * On Android, we return the API level, as this provides much more signal than the consumer facing
+ * version number
+ */
 private val os: String
     get() = "Android API ${Build.VERSION.SDK_INT}"
