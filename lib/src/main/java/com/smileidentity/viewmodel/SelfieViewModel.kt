@@ -21,8 +21,9 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
-import com.smileidentity.models.v2.CameraFacingValue
 import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -262,10 +263,10 @@ class SelfieViewModel(
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
-        metadata.removeAll { it is Metadatum.CameraFacing }
+        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
         when (camSelector) {
-            CamSelector.Front -> metadata.add(Metadatum.CameraFacing(CameraFacingValue.Front))
-            CamSelector.Back -> metadata.add(Metadatum.CameraFacing(CameraFacingValue.Back))
+            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
+            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
         }
     }
 
@@ -430,7 +431,7 @@ class SelfieViewModel(
             submitJob(selfieFile!!, livenessFiles)
         } else {
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
-            metadata.removeAll { it is Metadatum.CameraFacing }
+            metadata.removeAll { it is Metadatum.SelfieImageOrigin }
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)

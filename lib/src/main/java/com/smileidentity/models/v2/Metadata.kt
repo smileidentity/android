@@ -2,13 +2,15 @@ package com.smileidentity.models.v2
 
 import android.os.Build
 import android.os.Parcelable
-import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 
 /**
  * Wrap Metadatum in a list. This allows for easy conversion with Moshi and the format the
@@ -54,7 +56,8 @@ open class Metadatum(
     data object Fingerprint : Metadatum("fingerprint", SmileID.fingerprint)
 
     @Parcelize
-    data class CameraFacing(val facing: CameraFacingValue) : Metadatum("camera_facing", facing.name)
+    data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :
+        Metadatum("selfie_image_origin", origin.name)
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -62,7 +65,10 @@ open class Metadatum(
      */
     @Parcelize
     data class SelfieCaptureDuration(val duration: Duration) :
-        Metadatum("selfie_capture_duration", duration.toIsoString())
+        Metadatum(
+            "selfie_capture_duration_ms",
+            duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
+        )
 
     @Parcelize
     data class DocumentFrontImageOrigin(val origin: DocumentImageOriginValue) :
@@ -86,7 +92,10 @@ open class Metadatum(
      */
     @Parcelize
     data class FrontDocumentCaptureDuration(val duration: Duration) :
-        Metadatum("front_document_capture_duration", duration.toIsoString())
+        Metadatum(
+            "front_document_capture_duration_ms",
+            duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
+        )
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -94,10 +103,12 @@ open class Metadatum(
      */
     @Parcelize
     data class BackDocumentCaptureDuration(val duration: Duration) :
-        Metadatum("back_document_capture_duration", duration.toIsoString())
+        Metadatum(
+            "back_document_capture_duration_ms",
+            duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
+        )
 }
 
-@FallbackEnum(name = "Gallery")
 enum class DocumentImageOriginValue {
     @Json(name = "gallery")
     Gallery,
@@ -109,13 +120,12 @@ enum class DocumentImageOriginValue {
     CameraManualCapture,
 }
 
-@FallbackEnum(name = "Front")
-enum class CameraFacingValue {
-    @Json(name = "front")
-    Front,
+enum class SelfieImageOriginValue {
+    @Json(name = "front_camera")
+    FrontCamera,
 
-    @Json(name = "back")
-    Back,
+    @Json(name = "back_camera")
+    BackCamera,
 }
 
 private val isEmulator: Boolean
