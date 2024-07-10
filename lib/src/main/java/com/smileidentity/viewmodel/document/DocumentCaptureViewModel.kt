@@ -175,6 +175,19 @@ class DocumentCaptureViewModel(
         // It is safe to delete the file here, even though it may have been selected from the
         // gallery because we copied the URI contents to a new File first
         uiState.value.documentImageToConfirm?.delete()
+        when (side) {
+            DocumentCaptureSide.Front -> {
+                metadata.removeAll { it is Metadatum.FrontDocumentCaptureRetries }
+                metadata.removeAll { it is Metadatum.FrontDocumentCaptureDuration }
+                metadata.removeAll { it is Metadatum.DocumentFrontImageOrigin }
+            }
+
+            DocumentCaptureSide.Back -> {
+                metadata.removeAll { it is Metadatum.BackDocumentCaptureRetries }
+                metadata.removeAll { it is Metadatum.BackDocumentCaptureDuration }
+                metadata.removeAll { it is Metadatum.DocumentBackImageOrigin }
+            }
+        }
         isCapturing = false
         documentImageOrigin = null
         retryCount++
