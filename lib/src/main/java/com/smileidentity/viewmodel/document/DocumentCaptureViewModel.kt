@@ -177,14 +177,14 @@ class DocumentCaptureViewModel(
         uiState.value.documentImageToConfirm?.delete()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.removeAll { it is Metadatum.FrontDocumentCaptureRetries }
-                metadata.removeAll { it is Metadatum.FrontDocumentCaptureDuration }
+                metadata.removeAll { it is Metadatum.DocumentFrontCaptureRetries }
+                metadata.removeAll { it is Metadatum.DocumentFrontCaptureDuration }
                 metadata.removeAll { it is Metadatum.DocumentFrontImageOrigin }
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.removeAll { it is Metadatum.BackDocumentCaptureRetries }
-                metadata.removeAll { it is Metadatum.BackDocumentCaptureDuration }
+                metadata.removeAll { it is Metadatum.DocumentBackCaptureRetries }
+                metadata.removeAll { it is Metadatum.DocumentBackCaptureDuration }
                 metadata.removeAll { it is Metadatum.DocumentBackImageOrigin }
             }
         }
@@ -206,14 +206,14 @@ class DocumentCaptureViewModel(
         val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.add(Metadatum.FrontDocumentCaptureRetries(retryCount))
-                metadata.add(Metadatum.FrontDocumentCaptureDuration(elapsed))
+                metadata.add(Metadatum.DocumentFrontCaptureRetries(retryCount))
+                metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.add(Metadatum.BackDocumentCaptureRetries(retryCount))
-                metadata.add(Metadatum.BackDocumentCaptureDuration(elapsed))
+                metadata.add(Metadatum.DocumentBackCaptureRetries(retryCount))
+                metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
             }
         }

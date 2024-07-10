@@ -79,21 +79,21 @@ open class Metadatum(
         Metadatum("document_back_image_origin", origin.name)
 
     @Parcelize
-    data class FrontDocumentCaptureRetries(val retries: Int) :
-        Metadatum("front_document_capture_retries", retries.toString())
+    data class DocumentFrontCaptureRetries(val retries: Int) :
+        Metadatum("document_front_capture_retries", retries.toString())
 
     @Parcelize
-    data class BackDocumentCaptureRetries(val retries: Int) :
-        Metadatum("back_document_capture_retries", retries.toString())
+    data class DocumentBackCaptureRetries(val retries: Int) :
+        Metadatum("document_back_capture_retries", retries.toString())
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
      * does *NOT* include network time.
      */
     @Parcelize
-    data class FrontDocumentCaptureDuration(val duration: Duration) :
+    data class DocumentFrontCaptureDuration(val duration: Duration) :
         Metadatum(
-            "front_document_capture_duration_ms",
+            "document_front_capture_duration_ms",
             duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
         )
 
@@ -102,9 +102,9 @@ open class Metadatum(
      * does *NOT* include network time.
      */
     @Parcelize
-    data class BackDocumentCaptureDuration(val duration: Duration) :
+    data class DocumentBackCaptureDuration(val duration: Duration) :
         Metadatum(
-            "back_document_capture_duration_ms",
+            "document_back_capture_duration_ms",
             duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
         )
 }
