@@ -58,7 +58,7 @@ open class Metadatum(
 
     @Parcelize
     data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :
-        Metadatum("selfie_image_origin", origin.name)
+        Metadatum("selfie_image_origin", origin.value)
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -70,11 +70,11 @@ open class Metadatum(
 
     @Parcelize
     data class DocumentFrontImageOrigin(val origin: DocumentImageOriginValue) :
-        Metadatum("document_front_image_origin", origin.name)
+        Metadatum("document_front_image_origin", origin.value)
 
     @Parcelize
     data class DocumentBackImageOrigin(val origin: DocumentImageOriginValue) :
-        Metadatum("document_back_image_origin", origin.name)
+        Metadatum("document_back_image_origin", origin.value)
 
     @Parcelize
     data class DocumentFrontCaptureRetries(val retries: Int) :
@@ -101,23 +101,18 @@ open class Metadatum(
         Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
 }
 
-enum class DocumentImageOriginValue {
-    @Json(name = "gallery")
-    Gallery,
+enum class DocumentImageOriginValue(val value: String) {
+    Gallery("gallery"),
 
-    @Json(name = "camera_auto_capture")
-    CameraAutoCapture,
+    CameraAutoCapture("camera_auto_capture"),
 
-    @Json(name = "camera_manual_capture")
-    CameraManualCapture,
+    CameraManualCapture("camera_manual_capture"),
 }
 
-enum class SelfieImageOriginValue {
-    @Json(name = "front_camera")
-    FrontCamera,
+enum class SelfieImageOriginValue(val value: String) {
+    FrontCamera("front_camera"),
 
-    @Json(name = "back_camera")
-    BackCamera,
+    BackCamera("back_camera"),
 }
 
 private val isEmulator: Boolean
