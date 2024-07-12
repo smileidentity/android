@@ -21,13 +21,10 @@ import androidx.navigation.toRoute
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.compose.nav.DocumentCaptureScreenCaptureRoute
 import com.smileidentity.compose.nav.DocumentCaptureSideNavType
-import com.smileidentity.compose.nav.OrchestratedProcessingRoute
-import com.smileidentity.compose.nav.OrchestratedSelfieCaptureScreenRoute
 import com.smileidentity.compose.nav.ProcessingStateNavType
+import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
@@ -54,22 +51,22 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
-    val frontCapture = DocumentCaptureScreenCaptureRoute(
-        aspectRatio = idAspectRatio ?: 1f,
-        side = DocumentCaptureSide.Front,
-        instructionsHeroImage = R.drawable.si_doc_v_front_hero,
-        instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
-        instructionsSubtitleText = stringResource(R.string.si_verify_identity_instruction_subtitle),
-        captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_front_title),
-    )
-    val backCapture = DocumentCaptureScreenCaptureRoute(
-        aspectRatio = idAspectRatio ?: 1f,
-        side = DocumentCaptureSide.Back,
-        instructionsHeroImage = R.drawable.si_doc_v_back_hero,
-        instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
-        instructionsSubtitleText = stringResource(R.string.si_doc_v_instruction_back_subtitle),
-        captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_back_title),
-    )
+    // val frontCapture = Routes.DocumentFrontCaptureRoute(
+    //     aspectRatio = idAspectRatio ?: 1f,
+    //     side = DocumentCaptureSide.Front,
+    //     instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+    //     instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
+    //     instructionsSubtitleText = stringResource(R.string.si_verify_identity_instruction_subtitle),
+    //     captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_front_title),
+    // )
+    // val backCapture = Routes.DocumentFrontCaptureRoute(
+    //     aspectRatio = idAspectRatio ?: 1f,
+    //     side = DocumentCaptureSide.Back,
+    //     instructionsHeroImage = R.drawable.si_doc_v_back_hero,
+    //     instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
+    //     instructionsSubtitleText = stringResource(R.string.si_doc_v_instruction_back_subtitle),
+    //     captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_back_title),
+    // )
 
     Box(
         modifier = modifier
@@ -77,30 +74,49 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        NavHost(navController, startDestination = frontCapture) {
-            composable<DocumentCaptureScreenCaptureRoute>(
-                typeMap = mapOf(
-                    typeOf<DocumentCaptureSide>() to DocumentCaptureSideNavType,
-                ),
+        NavHost(navController, startDestination = Routes.DocumentFrontCaptureRoute) {
+            composable<Routes.DocumentFrontCaptureRoute>(
             ) { backStackEntry ->
-                val documentImageRoute = backStackEntry.toRoute<DocumentCaptureScreenCaptureRoute>()
+                val documentImageRoute = backStackEntry.toRoute<Routes.DocumentFrontCaptureRoute>()
                 DocumentCaptureScreen(
                     jobId = jobId,
-                    side = documentImageRoute.side,
                     showInstructions = showInstructions,
                     showAttribution = showAttribution,
                     allowGallerySelection = allowGalleryUpload,
                     showSkipButton = false,
-                    instructionsHeroImage = documentImageRoute.instructionsHeroImage,
-                    instructionsTitleText = documentImageRoute.instructionsTitleText,
-                    instructionsSubtitleText = documentImageRoute.instructionsSubtitleText,
-                    captureTitleText = documentImageRoute.captureTitleText,
-                    knownIdAspectRatio = documentImageRoute.aspectRatio,
+                    side = DocumentCaptureSide.Front,
+                    instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+                    instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
+                    knownIdAspectRatio = idAspectRatio ?: 1f,
+                    instructionsSubtitleText = stringResource(R.string.si_verify_identity_instruction_subtitle),
+                    captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_front_title),
                     onConfirm = viewModel::onDocumentFrontCaptureSuccess,
                     onError = viewModel::onError,
                 )
             }
-            composable<OrchestratedSelfieCaptureScreenRoute>(
+            composable<Routes.DocumentBackCaptureRoute>(
+                typeMap = mapOf(
+                    typeOf<DocumentCaptureSide>() to DocumentCaptureSideNavType,
+                ),
+            ) { backStackEntry ->
+                val documentImageRoute = backStackEntry.toRoute<Routes.DocumentFrontCaptureRoute>()
+                DocumentCaptureScreen(
+                    jobId = jobId,
+                    showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowGallerySelection = allowGalleryUpload,
+                    showSkipButton = false,
+                    side = DocumentCaptureSide.Back,
+                    instructionsHeroImage = R.drawable.si_doc_v_back_hero,
+                    instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
+                    knownIdAspectRatio = idAspectRatio ?: 1f,
+                    instructionsSubtitleText = stringResource(R.string.si_doc_v_instruction_back_subtitle),
+                    captureTitleText = stringResource(R.string.si_doc_v_capture_instructions_back_title),
+                    onConfirm = viewModel::onDocumentBackCaptureSuccess,
+                    onError = viewModel::onError,
+                )
+            }
+            composable<Routes.OrchestratedSelfieCaptureScreenRoute>(
                 typeMap = mapOf(
                     typeOf<ProcessingState>() to ProcessingStateNavType,
                 ),
@@ -120,12 +136,12 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                     }
                 }
             }
-            composable<OrchestratedProcessingRoute>(
+            composable<Routes.OrchestratedProcessingRoute>(
                 typeMap = mapOf(
                     typeOf<ProcessingState>() to ProcessingStateNavType,
                 ),
             ) { backStackEntry ->
-                val processingRoute: OrchestratedProcessingRoute = backStackEntry.toRoute()
+                val processingRoute: Routes.OrchestratedProcessingRoute = backStackEntry.toRoute()
                 ProcessingScreen(
                     processingState = processingRoute.processingState,
                     inProgressTitle = stringResource(R.string.si_doc_v_processing_title),
@@ -153,21 +169,21 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             }
         }
     }
-    when (val currentStep = uiState.currentStep) {
-        is DocumentCaptureFlow.FrontDocumentCapture -> {
-            navController.navigate(frontCapture)
-        }
-
-        is DocumentCaptureFlow.BackDocumentCapture -> {
-            navController.navigate(backCapture)
-        }
-
-        is DocumentCaptureFlow.SelfieCapture -> {
-            navController.navigate(OrchestratedSelfieCaptureScreenRoute)
-        }
-
-        is DocumentCaptureFlow.ProcessingScreen -> {
-            navController.navigate(OrchestratedProcessingRoute(currentStep.processingState))
-        }
-    }
+    // when (val currentStep = uiState.currentStep) {
+    //     is DocumentCaptureFlow.FrontDocumentCapture -> {
+    //         navController.navigate(frontCapture)
+    //     }
+    //
+    //     is DocumentCaptureFlow.BackDocumentCapture -> {
+    //         navController.navigate(backCapture)
+    //     }
+    //
+    //     is DocumentCaptureFlow.SelfieCapture -> {
+    //         navController.navigate(OrchestratedSelfieCaptureScreenRoute)
+    //     }
+    //
+    //     is DocumentCaptureFlow.ProcessingScreen -> {
+    //         navController.navigate(OrchestratedProcessingRoute(currentStep.processingState))
+    //     }
+    // }
 }

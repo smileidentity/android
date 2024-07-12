@@ -34,9 +34,11 @@ import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.Serializable
 
 @SmileIDOptIn
 @Parcelize
+@Serializable
 enum class ProcessingState : Parcelable {
     InProgress,
     Success,

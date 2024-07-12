@@ -18,8 +18,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.nav.OrchestratedProcessingRoute
-import com.smileidentity.compose.nav.OrchestratedSelfieCaptureScreenRoute
+import com.smileidentity.compose.components.ProcessingState
+import com.smileidentity.compose.nav.ProcessingStateNavType
+import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
@@ -29,6 +30,7 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlin.reflect.typeOf
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -64,8 +66,8 @@ fun OrchestratedBiometricKYCScreen(
             .fillMaxSize(),
     ) {
         val navController = rememberNavController()
-        NavHost(navController, startDestination = OrchestratedSelfieCaptureScreenRoute) {
-            composable<OrchestratedSelfieCaptureScreenRoute> {
+        NavHost(navController, startDestination = Routes.OrchestratedSelfieCaptureScreenRoute) {
+            composable<Routes.OrchestratedSelfieCaptureScreenRoute> {
                 OrchestratedSelfieCaptureScreen(
                     userId = userId,
                     jobId = jobId,
@@ -81,12 +83,14 @@ fun OrchestratedBiometricKYCScreen(
                                 selfieFile = it.data.selfieFile,
                                 livenessFiles = it.data.livenessFiles,
                             )
-                            navController.navigate(OrchestratedProcessingRoute)
+                            navController.navigate(Routes.OrchestratedProcessingRoute)
                         }
                     }
                 }
             }
-            composable<OrchestratedProcessingRoute> {
+            composable<Routes.OrchestratedProcessingRoute>( typeMap = mapOf(
+                typeOf<ProcessingState>() to ProcessingStateNavType,
+            )) {
                 uiState.processingState?.let {
                     ProcessingScreen(
                         processingState = it,

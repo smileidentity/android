@@ -5,34 +5,29 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.navigation.NavType
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.compose.document.DocumentCaptureSide
-import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Serializable
-object DocumentCaptureScreenInstructionRoute
+sealed class Routes {
+    @Serializable
+    data object DocumentCaptureScreenInstructionRoute : Routes()
 
-@Serializable
-data class DocumentCaptureScreenConfirmDocumentImageRoute(val documentImageToConfirm: String)
+    @Serializable
+    data class DocumentCaptureScreenConfirmDocumentImageRoute(val documentImageToConfirm: String) : Routes()
 
-@Serializable
-@Parcelize
-data class DocumentCaptureScreenCaptureRoute(
-    val aspectRatio: Float = 1f,
-    val side: DocumentCaptureSide,
-    val instructionsHeroImage: Int,
-    val instructionsTitleText: String,
-    val instructionsSubtitleText: String,
-    val captureTitleText: String,
-) : Parcelable
+    @Serializable
+    data object DocumentFrontCaptureRoute : Routes()
 
-@Serializable
-object OrchestratedSelfieCaptureScreenRoute
+    @Serializable
+    data object DocumentBackCaptureRoute : Routes()
 
-@Serializable
-data class OrchestratedProcessingRoute(val processingState: ProcessingState)
+    @Serializable
+    data object OrchestratedSelfieCaptureScreenRoute : Routes()
+
+    @Serializable
+    data class OrchestratedProcessingRoute(val processingState: ProcessingState) : Routes()
+}
 
 inline fun <reified T : Parcelable> parcelableType(
     isNullableAllowed: Boolean = false,
