@@ -66,6 +66,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private val metadata: MutableList<Metadatum>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -76,8 +77,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
-    private val metadata: MutableList<Metadatum> =
-        com.smileidentity.models.v2.Metadata.default().items.toMutableList()
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
@@ -322,6 +321,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -332,6 +332,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -363,6 +364,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -373,6 +375,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(

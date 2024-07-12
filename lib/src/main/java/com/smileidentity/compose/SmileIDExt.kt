@@ -256,6 +256,7 @@ fun SmileID.DocumentVerification(
     CompositionLocalProvider(
         LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
     ) {
+        val metadata = LocalMetadata.current
         MaterialTheme(colorScheme = colorScheme, typography = typography) {
             OrchestratedDocumentVerificationScreen(
                 modifier = modifier,
@@ -279,6 +280,7 @@ fun SmileID.DocumentVerification(
                             captureBothSides = captureBothSides,
                             selfieFile = bypassSelfieCaptureWithFile,
                             extraPartnerParams = extraPartnerParams,
+                            metadata = metadata,
                         )
                     },
                 ),
@@ -345,6 +347,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     CompositionLocalProvider(
         LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
     ) {
+        val metadata = LocalMetadata.current
         MaterialTheme(colorScheme = colorScheme, typography = typography) {
             OrchestratedDocumentVerificationScreen(
                 modifier = modifier,
@@ -368,6 +371,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                             captureBothSides = captureBothSides,
                             selfieFile = bypassSelfieCaptureWithFile,
                             extraPartnerParams = extraPartnerParams,
+                            metadata = metadata,
                         )
                     },
                 ),

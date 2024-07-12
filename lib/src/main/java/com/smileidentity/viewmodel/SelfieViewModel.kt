@@ -24,6 +24,7 @@ import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -348,6 +349,7 @@ class SelfieViewModel(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll.toString(),
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -361,6 +363,7 @@ class SelfieViewModel(
                     userId = userId,
                     partnerParams = extraPartnerParams,
                     allowNewEnroll = allowNewEnroll,
+                    metadata = metadata.asNetworkRequest(),
                 )
             } else {
                 SmileID.api.doSmartSelfieAuthentication(
@@ -368,6 +371,7 @@ class SelfieViewModel(
                     livenessImages = livenessFiles,
                     userId = userId,
                     partnerParams = extraPartnerParams,
+                    metadata = metadata.asNetworkRequest(),
                 )
             }
             // Move files from unsubmitted to submitted directories

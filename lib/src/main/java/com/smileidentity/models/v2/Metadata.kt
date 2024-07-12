@@ -8,7 +8,6 @@ import com.smileidentity.SmileIDCrashReporting
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
@@ -30,6 +29,8 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
         )
     }
 }
+
+fun List<Metadatum>.asNetworkRequest(): Metadata = Metadata(this)
 
 /**
  * key-value pair that can be used to store additional information about a job
@@ -65,10 +66,7 @@ open class Metadatum(
      */
     @Parcelize
     data class SelfieCaptureDuration(val duration: Duration) :
-        Metadatum(
-            "selfie_capture_duration_ms",
-            duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
-        )
+        Metadatum("selfie_capture_duration_ms", duration.inWholeMilliseconds.toString())
 
     @Parcelize
     data class DocumentFrontImageOrigin(val origin: DocumentImageOriginValue) :
@@ -92,10 +90,7 @@ open class Metadatum(
      */
     @Parcelize
     data class DocumentFrontCaptureDuration(val duration: Duration) :
-        Metadatum(
-            "document_front_capture_duration_ms",
-            duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
-        )
+        Metadatum("document_front_capture_duration_ms", duration.inWholeMilliseconds.toString())
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -103,10 +98,7 @@ open class Metadatum(
      */
     @Parcelize
     data class DocumentBackCaptureDuration(val duration: Duration) :
-        Metadatum(
-            "document_back_capture_duration_ms",
-            duration.toString(unit = DurationUnit.MILLISECONDS, decimals = 0),
-        )
+        Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
 }
 
 enum class DocumentImageOriginValue {
