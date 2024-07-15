@@ -212,35 +212,35 @@ fun MainScreen(
                         navController.popBackStack()
                     }
                 }
-                composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
-                    LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                    SmileID.SmartSelfieEnrollment(useStrictMode = true) {
-                        viewModel.onSmartSelfieEnrollmentV2Result(it)
-                        navController.popBackStack()
-                    }
-                }
-                dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
-                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
-                    SmartSelfieAuthenticationUserIdInputDialog(
-                        onDismiss = {
-                            viewModel.onHomeSelected()
-                            navController.popBackStack()
-                        },
-                        onConfirm = { userId ->
-                            navController.navigate(
-                                "${ProductScreen.SmartSelfieAuthenticationV2.route}/$userId",
-                            ) { popUpTo(BottomNavigationScreen.Home.route) }
-                        },
-                    )
-                }
-                composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
-                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
-                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.SmartSelfieAuthentication(userId = userId, useStrictMode = true) {
-                        viewModel.onSmartSelfieAuthenticationV2Result(it)
-                        navController.popBackStack()
-                    }
-                }
+                // composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
+                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
+                //     SmileID.SmartSelfieEnrollment(useStrictMode = true) {
+                //         viewModel.onSmartSelfieEnrollmentV2Result(it)
+                //         navController.popBackStack()
+                //     }
+                // }
+                // dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
+                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
+                //     SmartSelfieAuthenticationUserIdInputDialog(
+                //         onDismiss = {
+                //             viewModel.onHomeSelected()
+                //             navController.popBackStack()
+                //         },
+                //         onConfirm = { userId ->
+                //             navController.navigate(
+                //                 "${ProductScreen.SmartSelfieAuthenticationV2.route}/$userId",
+                //             ) { popUpTo(BottomNavigationScreen.Home.route) }
+                //         },
+                //     )
+                // }
+                // composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
+                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
+                //     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                //     SmileID.SmartSelfieAuthentication(userId = userId, useStrictMode = true) {
+                //         viewModel.onSmartSelfieAuthenticationV2Result(it)
+                //         navController.popBackStack()
+                //     }
+                // }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
                     val userId = rememberSaveable { randomUserId() }
