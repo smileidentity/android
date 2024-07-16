@@ -39,7 +39,6 @@ internal class ActiveLivenessTask(
     private data object UpEnd : Up, Endpoint(UpMid)
     private data object UpMid : Up, Midpoint
 
-    // private val orderedFaceDirections = FaceDirection.entries.shuffled()
     private val orderedFaceDirections = listOf(LeftEnd, RightEnd, UpEnd)
         .shuffled()
         .flatMap {

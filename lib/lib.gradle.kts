@@ -82,6 +82,11 @@ composeCompiler {
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 
+moshi {
+    // Opt-in to enable moshi-sealed, disabled by default.
+    enableSealed.set(true)
+}
+
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
     signAllPublications()

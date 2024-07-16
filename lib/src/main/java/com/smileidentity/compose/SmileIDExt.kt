@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
@@ -242,6 +243,7 @@ fun SmileID.DocumentVerification(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -264,6 +266,7 @@ fun SmileID.DocumentVerification(
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
+                        metadata = metadata,
                     )
                 },
             ),
@@ -327,6 +330,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -349,6 +353,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
+                        metadata = metadata,
                     )
                 },
             ),

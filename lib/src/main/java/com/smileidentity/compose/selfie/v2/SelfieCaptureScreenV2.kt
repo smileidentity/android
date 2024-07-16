@@ -36,6 +36,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +66,7 @@ import com.smileidentity.compose.components.Face
 import com.smileidentity.compose.components.FaceMovingBack
 import com.smileidentity.compose.components.FaceMovingCloser
 import com.smileidentity.compose.components.ForceBrightness
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.LottieFace
 import com.smileidentity.compose.components.LottieFaceLookingLeft
 import com.smileidentity.compose.components.LottieFaceLookingRight
@@ -76,6 +78,7 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.selfie.AgentModeSwitch
 import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -125,6 +128,7 @@ fun OrchestratedSelfieCaptureScreenV2(
     allowAgentMode: Boolean = false,
     allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     viewModel: SmartSelfieV2ViewModel = viewModel(
         initializer = {
             SmartSelfieV2ViewModel(
@@ -134,6 +138,7 @@ fun OrchestratedSelfieCaptureScreenV2(
                 useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
+                metadata = metadata,
                 onResult = onResult,
             )
         },
@@ -185,7 +190,7 @@ fun OrchestratedSelfieCaptureScreenV2(
                     implementationMode = ImplementationMode.Compatible,
                     scaleType = ScaleType.FillCenter,
                     imageAnalyzer = cameraState.rememberImageAnalyzer(
-                        analyze = viewModel::analyzeImage,
+                        analyze = { viewModel.analyzeImage(it, camSelector) },
                     ),
                     isImageAnalysisEnabled = true,
                     modifier = Modifier

@@ -10,4 +10,5 @@
     <color name="si_color_background_main">#FFDBDBC4</color>
     <color name="si_color_background_light">#FFE2DCD5</color>
     <color name="si_color_background_lightest">#FFF9F0E7</color>
+    <color name="si_color_material_surface">@color/si_color_background_dark</color>
 </resources>

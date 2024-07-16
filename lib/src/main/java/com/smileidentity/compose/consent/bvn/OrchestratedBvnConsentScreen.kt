@@ -1,11 +1,13 @@
 package com.smileidentity.compose.consent.bvn
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -35,6 +37,7 @@ internal fun OrchestratedBvnConsentScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),

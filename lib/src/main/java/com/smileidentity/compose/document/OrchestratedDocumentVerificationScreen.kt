@@ -1,12 +1,14 @@
 package com.smileidentity.compose.document
 
 import android.os.Parcelable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +46,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
