@@ -66,7 +66,6 @@ android {
     }
 
     buildFeatures {
-        compose = true
         buildConfig = true
         mlModelBinding = true
     }

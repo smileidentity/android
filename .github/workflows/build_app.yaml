@@ -16,6 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Play Store Internal App Sharing
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
