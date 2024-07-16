@@ -3,7 +3,6 @@
 package com.smileidentity.compose
 
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
@@ -80,7 +80,7 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
         if (useStrictMode) {
             val context = LocalContext.current
@@ -154,7 +154,7 @@ fun SmileID.SmartSelfieAuthentication(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
         if (useStrictMode) {
             val context = LocalContext.current
@@ -241,7 +241,7 @@ fun SmileID.DocumentVerification(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -326,7 +326,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -395,7 +395,7 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedBiometricKYCScreen(
             modifier = modifier,
             idInfo = idInfo,
@@ -443,7 +443,7 @@ fun SmileID.BvnConsentScreen(
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
             modifier = modifier,
             userId = userId,
@@ -468,7 +468,7 @@ fun SmileID.ConsentScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedConsentScreen(
             partnerIcon = partnerIcon,
             partnerName = partnerName,
