@@ -23,6 +23,7 @@ class SmartSelfieV2ViewModelTest {
             extraPartnerParams = persistentMapOf(),
             selfieQualityModel = mockk(),
             faceDetector = mockk(),
+            metadata = mutableListOf(),
             onResult = {},
         )
     }

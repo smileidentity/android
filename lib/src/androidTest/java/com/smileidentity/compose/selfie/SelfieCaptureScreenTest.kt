@@ -134,7 +134,7 @@ class SelfieCaptureScreenTest {
         // given
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
-        every { viewModel.analyzeImage(any()) } just Runs
+        every { viewModel.analyzeImage(any(), camSelector) } just Runs
 
         // when
         composeTestRule.apply {
@@ -143,6 +143,6 @@ class SelfieCaptureScreenTest {
         }
 
         // then
-        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any()) }
+        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any(), camSelector) }
     }
 }

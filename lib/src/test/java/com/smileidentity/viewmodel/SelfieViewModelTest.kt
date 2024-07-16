@@ -5,6 +5,7 @@ import com.smileidentity.R
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import com.ujizin.camposer.state.CamSelector
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -31,6 +32,7 @@ class SelfieViewModelTest {
             jobId = randomJobId(),
             allowNewEnroll = false,
             skipApiSubmission = false,
+            metadata = mutableListOf(),
         )
     }
 
@@ -61,7 +63,7 @@ class SelfieViewModelTest {
         subject.shouldAnalyzeImages = false
 
         // when
-        subject.analyzeImage(proxy)
+        subject.analyzeImage(proxy, CamSelector.Back)
 
         // then
         verify(exactly = 1) { proxy.close() }

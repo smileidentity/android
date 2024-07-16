@@ -20,7 +20,11 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
+import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -43,9 +47,11 @@ import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
 import com.smileidentity.viewmodel.SelfieHint.PoorImageQuality
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
 import com.smileidentity.viewmodel.SelfieHint.Smile
+import com.ujizin.camposer.state.CamSelector
 import java.io.File
 import java.io.IOException
 import kotlin.math.absoluteValue
+import kotlin.time.TimeSource
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
@@ -129,6 +135,7 @@ class SmartSelfieV2ViewModel(
     private val isEnroll: Boolean,
     private val useStrictMode: Boolean,
     private val selfieQualityModel: SelfieQualityModel,
+    private val metadata: MutableList<Metadatum>,
     private val allowNewEnroll: Boolean? = null,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val faceDetector: FaceDetector = FaceDetection.getClient(
@@ -159,6 +166,7 @@ class SmartSelfieV2ViewModel(
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
+    private val metadataTimerStart = TimeSource.Monotonic.markNow()
 
     init {
         startStrictModeTimerIfNecessary()
@@ -201,7 +209,7 @@ class SmartSelfieV2ViewModel(
      *   a. Face looking in the correct direction
      */
     @OptIn(ExperimentalGetImage::class)
-    fun analyzeImage(imageProxy: ImageProxy) {
+    fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
@@ -430,6 +438,7 @@ class SmartSelfieV2ViewModel(
             }
 
             shouldAnalyzeImages = false
+            setCameraFacingMetadata(camSelector)
             val proxy = { e: Throwable ->
                 when {
                     e is IOException -> {
@@ -479,8 +488,8 @@ class SmartSelfieV2ViewModel(
         }
     }
 
-    // activeLivenessDetails = ActiveLivenessDetails(orderedFaceDirections = activeLiveness.orderedFaceDirections, forceFailure = forcedFailureTimerExpired),
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
+        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(
                 userId = userId,
@@ -489,7 +498,7 @@ class SmartSelfieV2ViewModel(
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = null,
+                metadata = metadata.asNetworkRequest(),
             )
         } else {
             SmileID.api.doSmartSelfieAuthentication(
@@ -497,7 +506,8 @@ class SmartSelfieV2ViewModel(
                 selfieImage = selfieFile,
                 livenessImages = livenessFiles,
                 partnerParams = extraPartnerParams,
-                metadata = null,
+                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
+                metadata = metadata.asNetworkRequest(),
             )
         }
     }
@@ -508,10 +518,20 @@ class SmartSelfieV2ViewModel(
      * file IO scenario.
      */
     fun onRetry() {
+        metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
+        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
         shouldAnalyzeImages = true
+    }
+
+    private fun setCameraFacingMetadata(camSelector: CamSelector) {
+        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        when (camSelector) {
+            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
+            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+        }
     }
 
     /**

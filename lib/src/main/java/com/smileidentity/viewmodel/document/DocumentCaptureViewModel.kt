@@ -17,6 +17,7 @@ import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.models.v2.DocumentImageOriginValue
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -25,6 +26,7 @@ import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,6 +62,7 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
+    private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
@@ -76,6 +79,8 @@ class DocumentCaptureViewModel(
     private var documentFirstDetectedTimeMs: Long? = null
     private var captureNextAnalysisFrame = false
     private val defaultAspectRatio = knownAspectRatio ?: 1f
+    private var retryCount = 0
+    private val timerStart = TimeSource.Monotonic.markNow()
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
@@ -170,8 +175,22 @@ class DocumentCaptureViewModel(
         // It is safe to delete the file here, even though it may have been selected from the
         // gallery because we copied the URI contents to a new File first
         uiState.value.documentImageToConfirm?.delete()
+        when (side) {
+            DocumentCaptureSide.Front -> {
+                metadata.removeAll { it is Metadatum.DocumentFrontCaptureRetries }
+                metadata.removeAll { it is Metadatum.DocumentFrontCaptureDuration }
+                metadata.removeAll { it is Metadatum.DocumentFrontImageOrigin }
+            }
+
+            DocumentCaptureSide.Back -> {
+                metadata.removeAll { it is Metadatum.DocumentBackCaptureRetries }
+                metadata.removeAll { it is Metadatum.DocumentBackCaptureDuration }
+                metadata.removeAll { it is Metadatum.DocumentBackImageOrigin }
+            }
+        }
         isCapturing = false
         documentImageOrigin = null
+        retryCount++
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -181,6 +200,24 @@ class DocumentCaptureViewModel(
                 areEdgesDetected = false,
             )
         }
+    }
+
+    fun onConfirm(documentImageToConfirm: File, onConfirm: (File) -> Unit) {
+        val elapsed = timerStart.elapsedNow()
+        when (side) {
+            DocumentCaptureSide.Front -> {
+                metadata.add(Metadatum.DocumentFrontCaptureRetries(retryCount))
+                metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
+                documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
+            }
+
+            DocumentCaptureSide.Back -> {
+                metadata.add(Metadatum.DocumentBackCaptureRetries(retryCount))
+                metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
+                documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
+            }
+        }
+        onConfirm(documentImageToConfirm)
     }
 
     fun onFocusEvent(focusEvent: Int) {

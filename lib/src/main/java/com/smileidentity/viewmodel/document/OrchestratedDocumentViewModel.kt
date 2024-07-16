@@ -15,7 +15,6 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
@@ -67,6 +66,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private val metadata: MutableList<Metadatum>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -77,15 +77,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
-    private val metadata: MutableList<Metadatum> =
-        com.smileidentity.models.v2.Metadata.default().items.toMutableList()
 
-    fun onDocumentFrontCaptureSuccess(
-        documentImageFile: File,
-        imageOrigin: DocumentImageOriginValue?,
-    ) {
+    fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
-        imageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
         if (captureBothSides) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
         } else if (selfieFile == null) {
@@ -103,12 +97,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
-    fun onDocumentBackCaptureSuccess(
-        documentImageFile: File,
-        imageOrigin: DocumentImageOriginValue?,
-    ) {
+    fun onDocumentBackCaptureSuccess(documentImageFile: File) {
         documentBackFile = documentImageFile
-        imageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
         if (selfieFile == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
@@ -331,6 +321,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -341,6 +332,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -372,6 +364,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -382,6 +375,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(
