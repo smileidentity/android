@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 10.2.1
 
 * Wrap Composables in a `Surface` for additional background color customization
 * Add metadata support
