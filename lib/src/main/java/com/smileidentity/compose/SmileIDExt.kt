@@ -5,10 +5,8 @@ package com.smileidentity.compose
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -27,7 +25,6 @@ import com.smileidentity.compose.theme.typography
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
-import com.smileidentity.models.v2.Metadata
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
