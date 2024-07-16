@@ -220,8 +220,6 @@ dependencies {
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
 
-    implementation(libs.fingerprint.js)
-
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.junit)

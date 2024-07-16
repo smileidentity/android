@@ -1,10 +1,10 @@
 package com.smileidentity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
-import com.fingerprintjs.android.fingerprint.Fingerprinter
-import com.fingerprintjs.android.fingerprint.FingerprinterFactory
+import android.provider.Settings.Secure
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.common.sdkinternal.MlKitContext
@@ -101,6 +101,8 @@ object SmileID {
      * source docs for [SmileIDCrashReporting]
      * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
      */
+    // "Using device identifiers is not recommended other than for high value fraud prevention"
+    @SuppressLint("HardwareIds")
     @JvmStatic
     @JvmOverloads
     fun initialize(
@@ -140,10 +142,8 @@ object SmileID {
 
         // Usually looks like: /data/user/0/<package name>/app_SmileID
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
-        FingerprinterFactory.create(context).getFingerprint(version = Fingerprinter.Version.V_5) {
-            // Returns empty string if there was an error
-            fingerprint = it
-        }
+        // ANDROID_ID may be null. Since Android 8, each app has a different value
+        Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
     }
 
     /**
