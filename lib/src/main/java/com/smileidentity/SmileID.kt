@@ -343,6 +343,8 @@ object SmileID {
         val prepUploadResponse = try {
             api.prepUpload(prepUploadRequest)
         } catch (e: SmileIDException) {
+            // It may be the case that Prep Upload was called during the job but the link expired.
+            // We need to pass retry=true in order to obtain a new link
             if (e.details.code == "2215") {
                 api.prepUpload(prepUploadRequest.copy(retry = true))
             } else {
