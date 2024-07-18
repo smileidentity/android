@@ -15,6 +15,7 @@ import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
@@ -339,7 +340,17 @@ object SmileID {
             signature = authResponse.signature,
         )
 
-        val prepUploadResponse = api.prepUpload(prepUploadRequest)
+        val prepUploadResponse = try {
+            api.prepUpload(prepUploadRequest)
+        } catch (e: SmileIDException) {
+            // It may be the case that Prep Upload was called during the job but the link expired.
+            // We need to pass retry=true in order to obtain a new link
+            if (e.details.code == "2215") {
+                api.prepUpload(prepUploadRequest.copy(retry = true))
+            } else {
+                throw e
+            }
+        }
 
         val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
         val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)

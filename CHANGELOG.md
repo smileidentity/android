@@ -3,6 +3,7 @@
 ## 10.2.2
 
 * Fixed a bug where the `BiometricKycViewModel` would succeed but use the default error message as it was not being updated when changing state
+* Fixed a bug where `SmileID.submitJob` would not work for previously attempted API requests
 
 ## 10.2.1
 
