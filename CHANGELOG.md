@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Fixed a bug where `SmileID.submitJob` would not work for previously attempted API requests
+
 ## 10.2.1
 
 * Wrap Composables in a `Surface` for additional background color customization
