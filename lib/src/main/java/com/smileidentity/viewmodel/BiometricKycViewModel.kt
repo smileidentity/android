@@ -176,7 +176,12 @@ class BiometricKycViewModel(
                     true,
                 ),
             )
-            _uiState.update { it.copy(processingState = ProcessingState.Success) }
+            _uiState.update {
+                it.copy(
+                    processingState = ProcessingState.Success,
+                    errorMessage = R.string.si_biometric_kyc_processing_success_subtitle,
+                )
+            }
         }
     }
 
