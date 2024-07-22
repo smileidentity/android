@@ -1,8 +1,9 @@
 # Release Notes
 
-## 10.2.3 (Unreleased)
+## 10.2.3
 
 * Handle invalid resource IDs
+* Fix fileSavePath not initialized error (missing smile_config.json file)
 
 ## 10.2.2
 
