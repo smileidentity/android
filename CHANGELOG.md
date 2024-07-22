@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.2.3 (Unreleased)
+
+* Handle invalid resource IDs
+
 ## 10.2.2
 
 * Fixed a bug where the `BiometricKycViewModel` would succeed but use the default error message as it was not being updated when changing state
