@@ -2,6 +2,7 @@ package com.smileidentity.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
@@ -295,8 +296,13 @@ sealed interface StringResource {
                     context.packageName,
                 )
 
-                return stringResource(id = resourceId).takeIf { it.isNotEmpty() }
-                    ?: exception.details.message
+                return try {
+                    context.resources.getString(resourceId).takeIf { it.isNotEmpty() }
+                        ?: exception.details.message
+                } catch (e: Resources.NotFoundException) {
+                    Timber.w("Got error code whose message can't be overridden")
+                    exception.details.message
+                }
             }
             is Text -> text
         }
