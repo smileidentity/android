@@ -16,12 +16,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.sample.BuildConfig
@@ -44,11 +46,26 @@ fun SettingsScreen(
             viewModel::showSmileConfigInput,
         ),
     )
+    val client = remember {
+        SmileID.getOkHttpClientBuilder()
+            .addInterceptor(ChuckerInterceptor.Builder(context).build())
+            .build()
+    }
 
     if (uiState.showSmileConfigBottomSheet) {
         SmileConfigModalBottomSheet(
             onSaveSmileConfig = {
-                viewModel.updateSmileConfig(it)
+                val config = viewModel.updateSmileConfig(it)
+                // reinitialize SmileID if config is updated
+                if (config != null) {
+                    SmileID.initialize(
+                        context = context,
+                        config = config,
+                        useSandbox = false,
+                        enableCrashReporting = !BuildConfig.DEBUG,
+                        okHttpClient = client,
+                    )
+                }
                 Toast.makeText(context, R.string.applying_config, Toast.LENGTH_SHORT).show()
             },
             onDismiss = viewModel::hideSmileConfigInput,
