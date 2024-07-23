@@ -4,6 +4,7 @@
 
 * Handle invalid resource IDs
 * Fix fileSavePath not initialized error (missing smile_config.json file)
+* Add missing ActionResult responses
 
 ## 10.2.2
 

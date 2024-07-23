@@ -316,6 +316,12 @@ enum class ActionResult {
     @Json(name = "Issuer Unavailable")
     IssuerUnavailable,
 
+    @Json(name = "ID Authority Photo Not Available")
+    IdAuthorityPhotoNotAvailable,
+
+    @Json(name = "Sent to Human Review")
+    SentToHumanReview,
+
     /**
      * Special value used to indicate that the value returned from the server is not yet supported
      * by the SDK. Please update the SDK to the latest version to support the latest values.
