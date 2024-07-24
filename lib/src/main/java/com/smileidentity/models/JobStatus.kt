@@ -9,6 +9,7 @@ import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -159,7 +160,7 @@ sealed interface BiometricKycJobResult : JobResult {
         @Json(name = "Address") val address: String?,
         @Json(name = "Country") val country: String?,
         @Json(name = "Document") val documentImageBase64: String?,
-        @Json(name = "FullData") val fullData: Map<String, String>?,
+        @Json(name = "FullData") val fullData: @RawValue Map<String, Any>?,
         @Json(name = "FullName") val fullName: String?,
         @Json(name = "IDNumber") val idNumber: String?,
         @Json(name = "PhoneNumber") val phoneNumber: String?,
@@ -189,7 +190,7 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
         @Json(name = "Address") val address: String?,
         @Json(name = "Country") val country: String?,
         @Json(name = "Document") val documentImageBase64: String?,
-        @Json(name = "FullData") val fullData: Map<String, String>?,
+        @Json(name = "FullData") val fullData: @RawValue Map<String, Any>?,
         @Json(name = "FullName") val fullName: String?,
         @Json(name = "IDNumber") val idNumber: String?,
         @Json(name = "PhoneNumber") val phoneNumber: String?,
