@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.moshix)
@@ -16,7 +17,7 @@ android {
         targetSdk = 34
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
-        versionName = "1.5_" + project(":lib").version.toString()
+        versionName = "1.6_" + project(":lib").version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -64,25 +65,11 @@ android {
             // without having to add the opt-in annotation to every usage. The annotation's purpose
             // is primarily for consumers of the SDK to use, not for us.
             freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
-            if (project.hasProperty("enableComposeCompilerReports")) {
-                val outputDir = layout.buildDirectory.dir("compose-reports").get().asFile.path
-                freeCompilerArgs += listOf(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$outputDir",
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$outputDir",
-                )
-            }
         }
     }
 
     buildFeatures {
-        compose = true
         buildConfig = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
 
     packaging {
@@ -95,6 +82,12 @@ android {
         enable += "ComposeM2Api"
         error += "ComposeM2Api"
     }
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 
 val checkSmileConfigFileTaskName = "checkSmileConfigFile"
