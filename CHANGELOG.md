@@ -1,5 +1,10 @@
 # Release Notes
 
+## 10.2.4
+
+#### Fixed
+* Job status history full data parsing causing a crash during polling
+
 ## 10.2.3
 
 * Handle invalid resource IDs
