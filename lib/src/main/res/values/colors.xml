@@ -27,7 +27,7 @@
     <color name="si_color_material_on_tertiary_container">@color/si_color_on_light</color>
     <color name="si_color_material_background">@color/si_color_background_main</color>
     <color name="si_color_material_on_background">@color/si_color_on_light</color>
-    <color name="si_color_material_surface">@color/si_color_background_dark</color>
+    <color name="si_color_material_surface">@color/si_color_background_main</color>
     <color name="si_color_material_on_surface">@color/si_color_on_light</color>
     <color name="si_color_material_surface_variant">@color/si_color_background_light</color>
     <color name="si_color_material_on_surface_variant">@color/si_color_on_light</color>

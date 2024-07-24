@@ -1,12 +1,14 @@
 package com.smileidentity.compose.document
 
 import android.os.Parcelable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +46,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
@@ -111,14 +114,12 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
                 inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
                 successTitle = stringResource(R.string.si_doc_v_processing_success_title),
-                successSubtitle = stringResource(
-                    uiState.errorMessage ?: R.string.si_doc_v_processing_success_subtitle,
-                ),
+                successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                    ?: stringResource(R.string.si_doc_v_processing_success_subtitle),
                 successIcon = painterResource(R.drawable.si_processing_success),
                 errorTitle = stringResource(id = R.string.si_doc_v_processing_error_title),
-                errorSubtitle = stringResource(
-                    uiState.errorMessage ?: R.string.si_processing_error_subtitle,
-                ),
+                errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                    ?: stringResource(id = R.string.si_processing_error_subtitle),
                 errorIcon = painterResource(R.drawable.si_processing_error),
                 continueButtonText = stringResource(R.string.si_continue),
                 onContinue = { viewModel.onFinished(onResult) },

@@ -1,6 +1,7 @@
 package com.smileidentity.util
 
 import com.smileidentity.SmileID
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
@@ -44,9 +45,7 @@ enum class FileType(val fileType: String) {
     DOCUMENT_BACK("si_document_back_"),
     ;
 
-    override fun toString(): String {
-        return fileType
-    }
+    override fun toString() = fileType
 }
 
 /**
@@ -59,9 +58,10 @@ enum class FileType(val fileType: String) {
  * jobs for deletion. This enables clearing out space or managing files that are no longer needed
  * after job completion. Defaults to false to prevent accidental deletion of completed jobs.
  *
- * @param deleteUnsubmittedJobs When set to true, the function targets files associated with unsubmitted
- * jobs for deletion. Useful for resetting or clearing jobs that have not been completed or are
- * no longer needed. Defaults to false to protect ongoing or queued jobs from unintended deletion.
+ * @param deleteUnsubmittedJobs When set to true, the function targets files associated with
+ * unsubmitted jobs for deletion. Useful for resetting or clearing jobs that have not been completed
+ * or are no longer needed. Defaults to false to protect ongoing or queued jobs from unintended
+ * deletion.
  *
  * @param jobIds An optional list of specific job IDs to delete. If provided, the cleanup process
  * is limited to these IDs, within the context of the completion status flags set. If null, the
@@ -69,8 +69,9 @@ enum class FileType(val fileType: String) {
  * bulk cleanup operations.
  *
  * This function directly manipulates the file system by removing files and directories associated
- * with the targeted jobs. It's designed to facilitate efficient storage management and job lifecycle
- * maintenance within the system, ensuring that resources are allocated and used effectively.
+ * with the targeted jobs. It's designed to facilitate efficient storage management and job
+ * lifecycle maintenance within the system, ensuring that resources are allocated and used
+ * effectively.
  */
 internal fun cleanupJobs(
     deleteSubmittedJobs: Boolean = false,
@@ -103,20 +104,24 @@ internal fun cleanupJobs(
 }
 
 /**
- * Initiates the cleanup process for jobs based on their scope and specified job IDs. This function allows for
- * targeted cleanup operations, making it possible to selectively delete job-related files either from completed jobs,
- * pending jobs, or both, depending on the scope provided. If job IDs are specified, the cleanup is restricted to those
- * specific jobs; otherwise, it applies to all jobs within the specified scope.
+ * Initiates the cleanup process for jobs based on their scope and specified job IDs. This function
+ * allows for targeted cleanup operations, making it possible to selectively delete job-related
+ * files either from completed jobs, pending jobs, or both, depending on the scope provided. If job
+ * IDs are specified, the cleanup is restricted to those specific jobs; otherwise, it applies to all
+ * jobs within the specified scope.
  *
- * @param scope The scope of the cleanup operation, determined by the DeleteScope enum. The default is DeleteScope.All,
- * indicating that, by default, all jobs are targeted for cleanup. This parameter can be adjusted to target
- * pending jobs or both pending and completed jobs, offering flexibility in how cleanup operations are conducted.
- * @param jobIds An optional list of job IDs to specifically target for cleanup. If provided, only the files associated
- * with these job IDs will be cleaned up, within the bounds of the specified scope. If null or not provided, the cleanup
- * operation targets all jobs within the specified scope, allowing for bulk cleanup operations.
+ * @param scope The scope of the cleanup operation, determined by the DeleteScope enum. The default
+ * is DeleteScope.All, indicating that, by default, all jobs are targeted for cleanup. This
+ * parameter can be adjusted to target pending jobs or both pending and completed jobs, offering
+ * flexibility in how cleanup operations are conducted.
+ * @param jobIds An optional list of job IDs to specifically target for cleanup. If provided, only
+ * the files associated with these job IDs will be cleaned up, within the bounds of the specified
+ * scope. If null or not provided, the cleanup operation targets all jobs within the specified
+ * scope, allowing for bulk cleanup operations.
  *
- * This function does not return any value, but it directly affects the file system by deleting files associated with
- * the specified jobs. It's designed for internal use within the system to maintain cleanliness and manage storage efficiently.
+ * This function does not return any value, but it directly affects the file system by deleting
+ * files associated with the specified jobs. It's designed for internal use within the system to
+ * maintain cleanliness and manage storage efficiently.
  */
 
 internal fun cleanupJobs(scope: DeleteScope = DeleteScope.All, jobIds: List<String>? = null) {
@@ -167,18 +172,21 @@ internal fun doGetSubmittedJobs(): List<String> {
 
 /**
  * Lists the job IDs based on their completion status. This function can retrieve job IDs from both
- * completed and pending categories, depending on the parameters provided. It allows for flexible retrieval,
- * making it suitable for scenarios where either one or both types of job statuses are of interest.
+ * completed and pending categories, depending on the parameters provided. It allows for flexible
+ * retrieval, making it suitable for scenarios where either one or both types of job statuses are of
+ * interest.
  *
  * @param includeSubmitted A boolean flag that, when set to true, includes the IDs of completed jobs
- * in the returned list. Defaults to true to ensure completed jobs are included unless explicitly excluded.
+ * in the returned list. Defaults to true to ensure completed jobs are included unless explicitly
+ * excluded.
  * @param includeUnsubmitted A boolean flag that, when set to true, includes the IDs of pending jobs
- * in the returned list. Defaults to false, focusing the function on completed jobs unless pending jobs
- * are explicitly requested.
+ * in the returned list. Defaults to false, focusing the function on completed jobs unless pending
+ * jobs are explicitly requested.
  *
- * @return A list of strings representing the job IDs. The list may include IDs from either the completed
- * or pending categories, or both, based on the flags provided. The order of IDs in the list is determined
- * by the file system's enumeration order and is not guaranteed to follow any specific sorting.
+ * @return A list of strings representing the job IDs. The list may include IDs from either the
+ * completed or pending categories, or both, based on the flags provided. The order of IDs in the
+ * list is determined by the file system's enumeration order and is not guaranteed to follow any
+ * specific sorting.
  */
 private fun listJobIds(
     includeSubmitted: Boolean = true,
@@ -203,21 +211,26 @@ private fun listJobIds(
 }
 
 /**
- * Retrieves a file of a specified type from a given folder, either from the submitted or unsubmitted directory.
- * This function filters files based on their prefix which indicates the file type (e.g., "si_selfie_" for selfies),
- * allowing for selective retrieval based on the file's purpose or content.
+ * Retrieves a file of a specified type from a given folder, either from the submitted or
+ * unsubmitted directory. This function filters files based on their prefix which indicates the file
+ * type (e.g., "si_selfie_" for selfies), allowing for selective retrieval based on the file's
+ * purpose or content.
  *
- * @param folderName The name of the subfolder within the base save path from which to retrieve files. This allows for
- * organization of files by job or category within the broader submitted or unsubmitted directories.
- * @param fileType The type of file to retrieve, specified by the FileType enum. This parameter determines the prefix
- * used to filter files in the directory (SELFIE, LIVENESS, DOCUMENT).
- * @param savePath The base path where files are stored. Defaults to SmileID.fileSavePath, but can be overridden to
- * target different storage locations. Useful for accessing files in environments with multiple storage directories.
- * @param submitted A boolean flag indicating whether to retrieve files from the submitted (true) or unsubmitted (false)
- * directory. This allows the function to adapt based on the processing stage of the files.
+ * @param folderName The name of the subfolder within the base save path from which to retrieve
+ * files. This allows for organization of files by job or category within the broader submitted or
+ * unsubmitted directories.
+ * @param fileType The type of file to retrieve, specified by the FileType enum. This parameter
+ * determines the prefix used to filter files in the directory (SELFIE, LIVENESS, DOCUMENT_FRONT,
+ * DOCUMENT_BACK).
+ * @param savePath The base path where files are stored. Defaults to SmileID.fileSavePath, but can
+ * be overridden to target different storage locations. Useful for accessing files in environments
+ * with multiple storage directories.
+ * @param submitted A boolean flag indicating whether to retrieve files from the submitted (true) or
+ * unsubmitted (false) directory. This allows the function to adapt based on the processing stage of
+ * the files.
  *
- * @return A File object that matches the specified type and submission status within the specified folder.
- * The file is filtered and sorted by name to ensure consistent ordering.
+ * @return A File object that matches the specified type and submission status within the specified
+ * folder. The file is filtered and sorted by name to ensure consistent ordering.
  */
 fun getFileByType(
     folderName: String,
@@ -234,21 +247,25 @@ fun getFileByType(
 }
 
 /**
- * Retrieves a list of files of a specified type from a given folder, either from submitted or unsubmitted directories.
- * This function filters files based on their prefix which indicates the file type (e.g., "si_selfie_" for selfies),
- * allowing for selective retrieval based on the file's purpose or content.
+ * Retrieves a list of files of a specified type from a given folder, either from submitted or
+ * unsubmitted directories. This function filters files based on their prefix which indicates the
+ * file type (e.g., "si_selfie_" for selfies), allowing for selective retrieval based on the file's
+ * purpose or content.
  *
- * @param folderName The name of the subfolder within the base save path from which to retrieve files. This allows for
- * organization of files by job or category within the broader submitted or unsubmitted directories.
- * @param fileType The type of files to retrieve, specified by the FileType enum. This parameter determines the prefix
- * used to filter files in the directory (SELFIE, LIVENESS, DOCUMENT).
- * @param savePath The base path where files are stored. Defaults to SmileID.fileSavePath, but can be overridden to
- * target different storage locations. Useful for accessing files in environments with multiple storage directories.
- * @param submitted A boolean flag indicating whether to retrieve files from the submitted (true) or unsubmitted (false)
- * directory. This allows the function to adapt based on the processing stage of the files.
+ * @param folderName The name of the subfolder within the base save path from which to retrieve
+ * files. This allows for organization of files by job or category within the broader submitted or
+ * unsubmitted directories.
+ * @param fileType The type of files to retrieve, specified by the FileType enum. This parameter
+ * determines the prefix used to filter files in the directory (Selfie, Liveness, DOCUMENT).
+ * @param savePath The base path where files are stored. Defaults to SmileID.fileSavePath, but can
+ * be overridden to target different storage locations. Useful for accessing files in environments
+ * with multiple storage directories.
+ * @param submitted A boolean flag indicating whether to retrieve files from the submitted (true) or
+ * unsubmitted (false) directory. This allows the function to adapt based on the processing stage of
+ * the files.
  *
- * @return A list of File objects that match the specified type and submission status within the specified folder.
- * The files are filtered and sorted by name to ensure consistent ordering.
+ * @return A list of File objects that match the specified type and submission status within the
+ * specified folder. The files are filtered and sorted by name to ensure consistent ordering.
  */
 fun getFilesByType(
     folderName: String,
@@ -294,13 +311,17 @@ internal fun createSmileTempFile(
 
 /**
  * Constructs a `File` object for a temporary file, ensuring the path and file name adhere to
- * expected formats and conditions. This method attempts to address potential edge cases
- * related to file path construction and directory accessibility.
+ * expected formats and conditions. This method attempts to address potential edge cases related to
+ * file path construction and directory accessibility.
  *
- * @param folderName The name of the folder where the file is saved. Must not be empty and should be a valid folder name.
- * @param fileName The base name of the file. Must not be empty and should be a valid file name without special characters.
- * @param state Indicates the state directory where the file is stored. True for UNSUBMITTED_PATH, false for SUBMITTED_PATH.
- * @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath. Must be accessible.
+ * @param folderName The name of the folder where the file is saved. Must not be empty and should be
+ * a valid folder name.
+ * @param fileName The base name of the file. Must not be empty and should be a valid file name
+ * without special characters.
+ * @param isUnsubmitted Indicates the isUnsubmitted directory where the file is stored. True for
+ * UNSUBMITTED_PATH, false for SUBMITTED_PATH.
+ * @param savePath The root directory where the file is saved. Defaults to SmileID.fileSavePath.
+ * Must be accessible.
  * @return The `File` object representing the exact file.
  * @throws IllegalArgumentException If any input parameters are invalid.
  * @throws IOException If the directory cannot be created or is not writable.
@@ -308,7 +329,7 @@ internal fun createSmileTempFile(
 internal fun getSmileTempFile(
     folderName: String,
     fileName: String,
-    state: Boolean = true,
+    isUnsubmitted: Boolean = true,
     savePath: String = SmileID.fileSavePath,
 ): File {
     if (folderName.isBlank() || fileName.isBlank()) {
@@ -317,7 +338,7 @@ internal fun getSmileTempFile(
         )
     }
 
-    val stateDirectory = if (state) UNSUBMITTED_PATH else SUBMITTED_PATH
+    val stateDirectory = if (isUnsubmitted) UNSUBMITTED_PATH else SUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
 
     if (!directory.exists() && !directory.mkdirs()) {
@@ -381,7 +402,11 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File {
 
 /**
  * Moves a folder from 'unsubmitted' to 'submitted' within the app's specific directory, handling
- * all edge cases.
+ * all edge cases. We copy files recursively as opposed to moving the entire folder so that we can
+ * merge contents (i.e. in the case something got moved to submitted but was later retried - this
+ * can happen in the case when Offline Mode is disabled, but there was an error and the user
+ * retries).
+ *
  * @param folderName The name of the job or operation, corresponding to the folder to be moved.
  * @param savePath The base path where the 'pending' and 'complete' folders are
  * located, defaulting to SmileID.fileSavePath.
@@ -395,7 +420,9 @@ internal fun moveJobToSubmitted(
     val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
 
     if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
-        println("Source directory does not exist or is not a directory")
+        val message = "Unsubmitted directory does not exist or is not a directory"
+        Timber.v(message)
+        SmileIDCrashReporting.hub.addBreadcrumb(message)
         return false
     }
 

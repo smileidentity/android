@@ -4,6 +4,7 @@ package com.smileidentity.models
 
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.calculateSignature
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -16,6 +17,8 @@ data class PrepUploadRequest(
     // TODO - Michael will change this to a boolean
     @Json(name = "allow_new_enroll") val allowNewEnroll: String,
     @Json(name = "smile_client_id") val partnerId: String = SmileID.config.partnerId,
+    @Json(name = "metadata") val metadata: List<Metadatum>? = null,
+    @Json(name = "retry") val retry: Boolean? = null,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
     @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),

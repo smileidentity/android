@@ -48,8 +48,25 @@
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
-    <!--  SmartSelfie Authentication V2  -->
-    <string name="si_smart_selfie_authentication_v2_product_name">SmartSelfie™ Authentication v2</string>
+    <!--  SmartSelfie V2  -->
+    <string name="si_smart_selfie_v2_auth_product_name">SmartSelfie™ Authentication\n(Strict Mode)</string>
+    <string name="si_smart_selfie_v2_enroll_product_name">SmartSelfie™ Enrollment\n(Strict Mode)</string>
+    <string name="si_smart_selfie_v2_directive_place_entire_head_in_frame">Place entire head in frame</string>
+    <string name="si_smart_selfie_v2_directive_ensure_device_upright">Ensure your device is upright</string>
+    <string name="si_smart_selfie_v2_directive_ensure_one_face">Ensure only 1 face is visible</string>
+    <string name="si_smart_selfie_v2_directive_ensure_entire_face_visible">Ensure your entire face is visible</string>
+    <string name="si_smart_selfie_v2_directive_need_more_light">Need more light</string>
+    <string name="si_smart_selfie_v2_directive_move_back">Move back</string>
+    <string name="si_smart_selfie_v2_directive_move_closer">Move closer</string>
+    <string name="si_smart_selfie_v2_directive_poor_image_quality">Poor image quality</string>
+    <string name="si_smart_selfie_v2_directive_look_left">Look left</string>
+    <string name="si_smart_selfie_v2_directive_look_right">Look right</string>
+    <string name="si_smart_selfie_v2_directive_look_up">Look up</string>
+    <string name="si_smart_selfie_v2_directive_keep_looking">Look at the camera</string>
+    <string name="si_smart_selfie_v2_directive_smile">Smile!</string>
+    <string name="si_smart_selfie_v2_submitting">Submitting…</string>
+    <string name="si_smart_selfie_v2_submission_successful">Submission Successful</string>
+    <string name="si_smart_selfie_v2_submission_failed">Submission Failed</string>
 
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
@@ -154,8 +171,31 @@
     <!--  Enhanced DocV Screen  -->
     <string name="si_enhanced_docv_product_name">Enhanced Document Verification</string>
 
-    <!--  Generic Errors  -->
+    <!--  SDK Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
+    <string name="si_no_internet">Please check your internet connectivity</string>
+    <string name="si_error_message_2201"></string>
+    <string name="si_error_message_2301"></string>
+    <string name="si_error_message_2401"></string>
+    <string name="si_error_message_2203"></string>
+    <string name="si_error_message_2204"></string>
+    <string name="si_error_message_2205"></string>
+    <string name="si_error_message_2405"></string>
+    <string name="si_error_message_2207"></string>
+    <string name="si_error_message_2208"></string>
+    <string name="si_error_message_2209"></string>
+    <string name="si_error_message_2210"></string>
+    <string name="si_error_message_2211"></string>
+    <string name="si_error_message_2212"></string>
+    <string name="si_error_message_2213"></string>
+    <string name="si_error_message_2214"></string>
+    <string name="si_error_message_2215"></string>
+    <string name="si_error_message_2216"></string>
+    <string name="si_error_message_2220"></string>
+    <string name="si_error_message_2221"></string>
+    <string name="si_error_message_2314"></string>
+    <string name="si_error_message_2413"></string>
+    <string name="si_error_message_2414"></string>
 
     <!--  Offline Mode  -->
     <string name="si_offline_message">No internet connection. Your verification will be completed once you are back online</string>

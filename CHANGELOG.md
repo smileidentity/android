@@ -1,5 +1,58 @@
 # Release Notes
 
+## 10.2.4
+
+#### Fixed
+* Job status history full data parsing causing a crash during polling
+
+## 10.2.3
+
+* Handle invalid resource IDs
+* Fix fileSavePath not initialized error (missing smile_config.json file)
+* Add missing ActionResult responses
+
+## 10.2.2
+
+* Fixed a bug where the `BiometricKycViewModel` would succeed but use the default error message as it was not being updated when changing state
+* Fixed a bug where `SmileID.submitJob` would not work for previously attempted API requests
+
+## 10.2.1
+
+* Wrap Composables in a `Surface` for additional background color customization
+* Add metadata support
+
+## 10.2.0
+
+* Added an optional "Strict Mode" to SmartSelfie Enrollment and Authentication to achieve better pass rates. Set `useStrictMode=true` to enable this new, streamlined UI and associated active liveness tasks
+
+## 10.1.7
+
+* Fixed a bug where some failed authentication requests were incorrectly handled
+* Fixed a bug where errors with no code were not being handled correctly
+* Fixed a bug on Selfie and Document capture success screen where the message was wrong
+* Fixed a bug where liveness files were missing on document verification jobs
+
+## 10.1.6
+
+* Update generic errors with actual platform errors
+
+## 10.1.5
+
+* Fixed a bug where MLKit initialization would sometimes fail due to Application Context
+* Verify SDK for Google Play SDK Console
+
+## 10.1.4
+
+* Increase network call timeout to 120 seconds
+* Fixed a bug where invalid file paths were returned and retries did not work
+* Update to K2 (aka Kotlin `2.0.0`)
+* Update Compose BOM to 2024.05.00
+* Update AndroidX to 1.13.1
+* Update Activity to 1.9.0 
+* Update Fragment to 1.7.1
+* Update Datastore to 1.1.1
+* Update Sentry to 7.9.0
+
 ## 10.1.2
 
 * Better error message when the device is low on storage

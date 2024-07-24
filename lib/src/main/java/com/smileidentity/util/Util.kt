@@ -2,6 +2,7 @@ package com.smileidentity.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
@@ -19,7 +20,12 @@ import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.utils.Exif
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
@@ -31,6 +37,7 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
+import kotlin.math.abs
 import kotlin.math.max
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -231,8 +238,10 @@ internal fun postProcessImage(
  *
  * @param proxy Callback to be invoked with the exception
  */
-fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler { _, throwable ->
-    Timber.e(throwable, "Error during coroutine execution")
+fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler { _, parentThrow ->
+    Timber.e(parentThrow, "Error during coroutine execution")
+    // Check suppressed to handle cases where auth fails within the Interceptor
+    val throwable = parentThrow.suppressed.firstOrNull() ?: parentThrow
     val converted = if (throwable is HttpException) {
         val adapter = moshi.adapter(SmileIDException.Details::class.java)
         try {
@@ -259,17 +268,66 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
     proxy(converted)
 }
 
+@Stable
+sealed interface StringResource {
+    data class Text(val text: String) : StringResource
+
+    data class ResId(@StringRes val stringId: Int) : StringResource
+
+    data class ResIdFromSmileIDException(val exception: SmileIDException) : StringResource
+
+    @SuppressLint("DiscouragedApi") // this way of obtaining identifiers is really slow
+    @Composable
+    fun resolve(): String {
+        return when (this) {
+            is ResId -> stringResource(id = stringId)
+            is ResIdFromSmileIDException -> {
+                val context = LocalContext.current
+                if (exception.details.code == null) {
+                    return exception.details.message
+                }
+                val resourceName = "si_error_message_${exception.details.code}"
+                val resourceId = context.resources.getIdentifier(
+                    /* name = */
+                    resourceName,
+                    /* defType = */
+                    "string",
+                    /* defPackage = */
+                    context.packageName,
+                )
+
+                return try {
+                    context.resources.getString(resourceId).takeIf { it.isNotEmpty() }
+                        ?: exception.details.message
+                } catch (e: Resources.NotFoundException) {
+                    Timber.w("Got error code whose message can't be overridden")
+                    exception.details.message
+                }
+            }
+            is Text -> text
+        }
+    }
+}
+
+/**
+ * Handles file moving in a failure scenario. If offline mode *is not* enabled, the job is moved to
+ * the submitted directory. If offline mode *is* enabled, the job is moved to submitted only if the
+ * error is not a network error. Otherwise, (if Offline Mode is enabled, and it is a network error),
+ * the job is left in the unsubmitted directory (either to be retried or submitted later).
+ *
+ * @return if the job was moved to the submitted directory
+ */
 fun handleOfflineJobFailure(
     jobId: String,
     throwable: Throwable,
     exceptionHandler: (
         (Throwable) -> Unit
     )? = null,
-) {
-    Timber.e(throwable, "Error in submitJob for jobId: $jobId")
+): Boolean {
+    var didMove = false
     if (!(SmileID.allowOfflineMode && isNetworkFailure(throwable))) {
-        val complete = moveJobToSubmitted(jobId)
-        if (!complete) {
+        didMove = moveJobToSubmitted(jobId)
+        if (!didMove) {
             Timber.w("Failed to move job $jobId to complete")
             SmileIDCrashReporting.hub.addBreadcrumb(
                 Breadcrumb().apply {
@@ -281,6 +339,7 @@ fun handleOfflineJobFailure(
         }
     }
     exceptionHandler?.let { it(throwable) }
+    return didMove
 }
 
 fun randomId(prefix: String) = prefix + "-" + java.util.UUID.randomUUID().toString()
@@ -323,13 +382,6 @@ internal fun writeUriToFile(file: File, uri: Uri, context: Context) {
 internal fun isNetworkFailure(e: Throwable): Boolean = e is IOException || e is InterruptedException
 
 /**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is Google Photos.
- */
-private fun isGooglePhotosUri(uri: Uri): Boolean =
-    "com.google.android.apps.photos.content" == uri.authority
-
-/**
  * The old getParcelable method is deprecated in API 33 -- use the new one if supported, otherwise
  * fall back to the old one.
  *
@@ -362,4 +414,49 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
+}
+
+/**
+ * Determines whether the face is looking left, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking left
+ * @param maxAngle The maximum angle the face should be looking left
+ * @param verticalAngleBuffer The buffer for the vertical angle
+ */
+internal fun Face.isLookingLeft(
+    minAngle: Float,
+    maxAngle: Float,
+    verticalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleY in minAngle..maxAngle && abs(headEulerAngleX) < verticalAngleBuffer
+}
+
+/**
+ * Determines whether the face is looking right, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking right
+ * @param maxAngle The maximum angle the face should be looking right
+ * @param verticalAngleBuffer The buffer for the vertical angle
+ */
+internal fun Face.isLookingRight(
+    minAngle: Float,
+    maxAngle: Float,
+    verticalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleY in -maxAngle..-minAngle && abs(headEulerAngleX) < verticalAngleBuffer
+}
+
+/**
+ * Determines whether the face is looking up, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking up
+ * @param maxAngle The maximum angle the face should be looking up
+ * @param horizontalAngleBuffer The buffer for the horizontal angle
+ */
+internal fun Face.isLookingUp(
+    minAngle: Float,
+    maxAngle: Float,
+    horizontalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
 }

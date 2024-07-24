@@ -18,9 +18,12 @@ class SmartSelfieV2ViewModelTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         subject = SmartSelfieV2ViewModel(
             userId = "userId",
+            isEnroll = false,
+            useStrictMode = false,
             extraPartnerParams = persistentMapOf(),
             selfieQualityModel = mockk(),
             faceDetector = mockk(),
+            metadata = mutableListOf(),
             onResult = {},
         )
     }
@@ -28,9 +31,6 @@ class SmartSelfieV2ViewModelTest {
     @Test
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
-        assertEquals(SelfieHint.SearchingForFace, uiState.selfieHint)
-        assertEquals(false, uiState.showLoading)
-        assertEquals(false, uiState.showCompletion)
-        assertEquals(false, uiState.showBorderHighlight)
+        assertEquals(SelfieState.Analyzing(SelfieHint.SearchingForFace), uiState.selfieState)
     }
 }

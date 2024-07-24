@@ -1,17 +1,20 @@
 package com.smileidentity.compose.selfie
 
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -21,7 +24,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.ProcessingScreen
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
@@ -47,6 +52,7 @@ fun OrchestratedSelfieCaptureScreen(
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory {
             SelfieViewModel(
@@ -55,6 +61,7 @@ fun OrchestratedSelfieCaptureScreen(
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
                 skipApiSubmission = skipApiSubmission,
+                metadata = metadata,
                 extraPartnerParams = extraPartnerParams,
             )
         },
@@ -65,6 +72,7 @@ fun OrchestratedSelfieCaptureScreen(
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
     Box(
         modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
@@ -82,14 +90,12 @@ fun OrchestratedSelfieCaptureScreen(
                 inProgressSubtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
                 inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
                 successTitle = stringResource(R.string.si_smart_selfie_processing_success_title),
-                successSubtitle = stringResource(
-                    uiState.errorMessage ?: R.string.si_smart_selfie_processing_success_subtitle,
-                ),
+                successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                    ?: stringResource(R.string.si_smart_selfie_processing_success_subtitle),
                 successIcon = painterResource(R.drawable.si_processing_success),
                 errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),
-                errorSubtitle = stringResource(
-                    uiState.errorMessage ?: R.string.si_processing_error_subtitle,
-                ),
+                errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                    ?: stringResource(id = R.string.si_processing_error_subtitle),
                 errorIcon = painterResource(R.drawable.si_processing_error),
                 continueButtonText = stringResource(R.string.si_continue),
                 onContinue = { viewModel.onFinished(onResult) },

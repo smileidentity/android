@@ -3,7 +3,6 @@
 package com.smileidentity.compose
 
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,6 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
+import com.smileidentity.compose.components.LocalMetadata
+import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
@@ -56,6 +57,8 @@ import kotlinx.collections.immutable.persistentMapOf
  * front camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
+ * @param useStrictMode Whether to use strict mode or not. Strict mode enables an advanced, more
+ * secure, and more accurate UX for higher pass rates. [showInstructions] will be ignored
  * @param extraPartnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
@@ -72,24 +75,43 @@ fun SmileID.SmartSelfieEnrollment(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        OrchestratedSelfieCaptureScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            allowNewEnroll = allowNewEnroll,
-            isEnroll = true,
-            allowAgentMode = allowAgentMode,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+        if (useStrictMode) {
+            val context = LocalContext.current
+            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+            OrchestratedSelfieCaptureScreenV2(
+                modifier = modifier,
+                userId = userId,
+                allowNewEnroll = allowNewEnroll,
+                isEnroll = true,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                useStrictMode = useStrictMode,
+                selfieQualityModel = selfieQualityModel,
+                extraPartnerParams = extraPartnerParams,
+                onResult = onResult,
+            )
+        } else {
+            OrchestratedSelfieCaptureScreen(
+                modifier = modifier,
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                isEnroll = true,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                extraPartnerParams = extraPartnerParams,
+                onResult = onResult,
+            )
+        }
     }
 }
 
@@ -109,6 +131,8 @@ fun SmileID.SmartSelfieEnrollment(
  * front camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
+ * @param useStrictMode Whether to use strict mode or not. Strict mode enables an advanced, more
+ * secure, and more accurate UX for higher pass rates. [showInstructions] will be ignored
  * @param extraPartnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
@@ -125,22 +149,26 @@ fun SmileID.SmartSelfieAuthentication(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    // TODO: Move this to a function parameter once we decided to expose it
-    val useExperimentalUi = false
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
-        if (useExperimentalUi) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+        if (useStrictMode) {
             val context = LocalContext.current
             val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenV2(
+                modifier = modifier,
                 userId = userId,
+                isEnroll = false,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                useStrictMode = useStrictMode,
                 selfieQualityModel = selfieQualityModel,
                 extraPartnerParams = extraPartnerParams,
-                modifier = modifier,
                 onResult = onResult,
             )
         } else {
@@ -214,7 +242,8 @@ fun SmileID.DocumentVerification(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -237,6 +266,7 @@ fun SmileID.DocumentVerification(
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
+                        metadata = metadata,
                     )
                 },
             ),
@@ -299,7 +329,8 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -322,6 +353,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
+                        metadata = metadata,
                     )
                 },
             ),
@@ -368,7 +400,7 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedBiometricKYCScreen(
             modifier = modifier,
             idInfo = idInfo,
@@ -416,7 +448,7 @@ fun SmileID.BvnConsentScreen(
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedBvnConsentScreen(
             modifier = modifier,
             userId = userId,
@@ -441,7 +473,7 @@ fun SmileID.ConsentScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
 ) {
-    MaterialTheme(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedConsentScreen(
             partnerIcon = partnerIcon,
             partnerName = partnerName,

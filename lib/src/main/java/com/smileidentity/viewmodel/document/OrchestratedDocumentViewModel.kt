@@ -1,7 +1,6 @@
 package com.smileidentity.viewmodel.document
 
 import android.os.Parcelable
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
@@ -14,7 +13,9 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -25,6 +26,7 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
 import com.smileidentity.util.createUploadRequestFile
@@ -47,7 +49,7 @@ import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
-    @StringRes val errorMessage: Int? = null,
+    val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
 
 /**
@@ -64,6 +66,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private val metadata: MutableList<Metadatum>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -78,13 +81,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
         if (captureBothSides) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture, errorMessage = null)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
         } else if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -92,9 +91,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
     fun onDocumentBackSkip() {
         if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -103,9 +100,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onDocumentBackCaptureSuccess(documentImageFile: File) {
         documentBackFile = documentImageFile
         if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture, errorMessage = null)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -167,6 +162,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll.toString(),
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -183,6 +179,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 // TODO : Michael will change this to boolean
                 allowNewEnroll = allowNewEnroll.toString(),
+                metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
@@ -233,12 +230,15 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             selfieImage = selfieFileResult,
             documentFrontFile = documentFrontFileResult,
             documentBackFile = documentBackFileResult,
-            livenessFilesResult,
+            livenessFiles = livenessFilesResult,
             didSubmitJob = true,
         )
 
         _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success))
+            it.copy(
+                currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
+                errorMessage = StringResource.ResId(R.string.si_doc_v_processing_success_subtitle),
+            )
         }
     }
 
@@ -246,19 +246,23 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
-        handleOfflineJobFailure(jobId, throwable)
+        val didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable)
+        if (didMoveToSubmitted) {
+            this.selfieFile = getFileByType(jobId, FileType.SELFIE)
+            this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
+        }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
             it.copy(
                 currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                errorMessage = R.string.si_processing_error_subtitle,
+                errorMessage = StringResource.ResId(R.string.si_processing_error_subtitle),
             )
         }
         if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
             _uiState.update {
                 it.copy(
                     currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
-                    errorMessage = R.string.si_offline_message,
+                    errorMessage = StringResource.ResId(R.string.si_offline_message),
                 )
             }
             saveResult(
@@ -267,15 +271,20 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     "Document front file is null",
                 ),
                 documentBackFile = documentBackFile,
-                livenessFiles,
+                livenessFiles = livenessFiles,
                 didSubmitJob = false,
             )
         } else {
+            val errorMessage: StringResource = when {
+                isNetworkFailure(throwable) -> StringResource.ResId(R.string.si_no_internet)
+                throwable is SmileIDException -> StringResource.ResIdFromSmileIDException(throwable)
+                else -> StringResource.ResId(R.string.si_processing_error_subtitle)
+            }
             result = SmileIDResult.Error(throwable)
             _uiState.update {
                 it.copy(
                     currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                    errorMessage = R.string.si_processing_error_subtitle,
+                    errorMessage = errorMessage,
                 )
             }
         }
@@ -292,7 +301,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         val step = stepToRetry
         stepToRetry = null
         step?.let { stepToRetry ->
-            _uiState.update { it.copy(currentStep = stepToRetry, errorMessage = null) }
+            _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
                 submitJob()
             }
@@ -312,6 +321,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -322,6 +332,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -335,6 +346,7 @@ internal class DocumentVerificationViewModel(
             DocumentVerificationResult(
                 selfieFile = selfieImage,
                 documentFrontFile = documentFrontFile,
+                livenessFiles = livenessFiles,
                 documentBackFile = documentBackFile,
                 didSubmitDocumentVerificationJob = didSubmitJob,
             ),
@@ -352,6 +364,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -362,6 +375,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -373,10 +387,10 @@ internal class EnhancedDocumentVerificationViewModel(
     ) {
         result = SmileIDResult.Success(
             EnhancedDocumentVerificationResult(
-                selfieImage,
-                documentFrontFile,
-                livenessFiles,
-                documentBackFile,
+                selfieFile = selfieImage,
+                documentFrontFile = documentFrontFile,
+                livenessFiles = livenessFiles,
+                documentBackFile = documentBackFile,
                 didSubmitEnhancedDocVJob = didSubmitJob,
             ),
         )

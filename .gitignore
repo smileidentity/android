@@ -3,6 +3,9 @@
 build/
 local.properties
 
+# Kotlin 2.0
+.kotlin/
+
 # Build artifacts
 *.apk
 *.aab

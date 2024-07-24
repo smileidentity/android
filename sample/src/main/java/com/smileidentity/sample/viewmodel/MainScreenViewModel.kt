@@ -31,6 +31,7 @@ import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.getCurrentTimeAsHumanReadableTimestamp
 import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
+import com.smileidentity.util.getExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -69,7 +70,14 @@ class MainScreenViewModel : ViewModel() {
     private var pendingJobCountJob = createPendingJobCountPoller()
     private var backgroundJobsPollingJob = createBackgroundJobsPoller()
 
-    private fun createBackgroundJobsPoller() = viewModelScope.launch {
+    private fun createBackgroundJobsPoller() = viewModelScope.launch(
+        getExceptionHandler { throwable ->
+            Timber.e(throwable, "Background job polling failed")
+            _uiState.update {
+                it.copy(snackbarMessage = "Background job polling failed: ${throwable.message}")
+            }
+        },
+    ) {
         val authRequest = AuthenticationRequest(SmartSelfieEnrollment)
         val authResponse = SmileID.api.authenticate(authRequest)
         DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
@@ -95,6 +103,7 @@ class MainScreenViewModel : ViewModel() {
                     BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
                     EnhancedDocumentVerification ->
                         SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
+
                     else -> {
                         Timber.e("Unexpected pending job: $job")
                         throw IllegalStateException("Unexpected pending job: $job")
@@ -145,7 +154,14 @@ class MainScreenViewModel : ViewModel() {
             }
     }
 
-    private fun createPendingJobCountPoller() = viewModelScope.launch {
+    private fun createPendingJobCountPoller() = viewModelScope.launch(
+        getExceptionHandler { throwable ->
+            Timber.e(throwable, "Pending job count poller failed")
+            _uiState.update {
+                it.copy(snackbarMessage = "Pending job count poller failed: ${throwable.message}")
+            }
+        },
+    ) {
         DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
             .distinctUntilChanged()
             .map { it.size }
@@ -306,8 +322,57 @@ class MainScreenViewModel : ViewModel() {
         }
     }
 
+    fun onSmartSelfieEnrollmentV2Selected() {
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
+    }
+
+    fun onSmartSelfieEnrollmentV2Result(result: SmileIDResult<SmartSelfieResult>) {
+        onHomeSelected()
+        if (result is SmileIDResult.Success) {
+            val response = result.data.apiResponse ?: run {
+                val errorMessage = "SmartSelfie Enrollment completed in offline mode"
+                Timber.w(errorMessage)
+                _uiState.update { it.copy(snackbarMessage = errorMessage) }
+                return
+            }
+            val message = jobResultMessageBuilder(
+                jobName = "SmartSelfie Enrollment",
+                didSubmitJob = true,
+                jobComplete = true,
+                jobSuccess = true,
+                code = response.code,
+                resultCode = null,
+                resultText = response.message,
+            )
+            _uiState.update {
+                it.copy(clipboardText = AnnotatedString(response.userId), snackbarMessage = message)
+            }
+            viewModelScope.launch {
+                DataStoreRepository.addCompletedJob(
+                    partnerId = SmileID.config.partnerId,
+                    isProduction = uiState.value.isProduction,
+                    job = Job(
+                        jobType = SmartSelfieEnrollment,
+                        timestamp = response.createdAt,
+                        userId = response.userId,
+                        jobId = response.jobId,
+                        jobComplete = true,
+                        jobSuccess = true,
+                        code = response.code,
+                        resultText = response.message,
+                    ),
+                )
+            }
+        } else if (result is SmileIDResult.Error) {
+            val th = result.throwable
+            val message = "SmartSelfie Enrollment error: ${th.message}"
+            Timber.e(th, message)
+            _uiState.update { it.copy(snackbarMessage = message) }
+        }
+    }
+
     fun onSmartSelfieAuthenticationV2Selected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthenticationV2.label) }
+        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
     }
 
     fun onSmartSelfieAuthenticationV2Result(result: SmileIDResult<SmartSelfieResult>) {

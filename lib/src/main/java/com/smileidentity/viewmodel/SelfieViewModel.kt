@@ -20,12 +20,18 @@ import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SmileIDException
+import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.area
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
@@ -39,11 +45,13 @@ import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
+import com.ujizin.camposer.state.CamSelector
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
@@ -73,7 +81,7 @@ data class SelfieUiState(
     val progress: Float = 0f,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
-    @StringRes val errorMessage: Int? = null,
+    val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
 
 enum class SelfieDirective(@StringRes val displayText: Int) {
@@ -92,6 +100,7 @@ class SelfieViewModel(
     private val jobId: String,
     private val allowNewEnroll: Boolean,
     private val skipApiSubmission: Boolean,
+    private val metadata: MutableList<Metadatum>,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -122,8 +131,10 @@ class SelfieViewModel(
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
+    private val metadataTimerStart = TimeSource.Monotonic.markNow()
+
     @OptIn(ExperimentalGetImage::class)
-    internal fun analyzeImage(imageProxy: ImageProxy) {
+    internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         if (!shouldAnalyzeImages || elapsedTimeMs < INTRA_IMAGE_MIN_DELAY_MS || image == null) {
@@ -142,7 +153,6 @@ class SelfieViewModel(
                             progress = 0f,
                             selfieToConfirm = null,
                             processingState = null,
-                            errorMessage = null,
                         )
                     }
                     livenessFiles.removeAll { it.delete() }
@@ -227,7 +237,16 @@ class SelfieViewModel(
                     resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
                 )
                 shouldAnalyzeImages = false
-                _uiState.update { it.copy(progress = 1f, selfieToConfirm = selfieFile) }
+                setCameraFacingMetadata(camSelector)
+                _uiState.update {
+                    it.copy(
+                        progress = 1f,
+                        selfieToConfirm = selfieFile,
+                        errorMessage = StringResource.ResId(
+                            R.string.si_smart_selfie_processing_success_subtitle,
+                        ),
+                    )
+                }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
@@ -235,12 +254,20 @@ class SelfieViewModel(
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Error,
-                    errorMessage = R.string.si_processing_error_subtitle,
+                    errorMessage = StringResource.ResId(R.string.si_processing_error_subtitle),
                 )
             }
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
+        }
+    }
+
+    private fun setCameraFacingMetadata(camSelector: CamSelector) {
+        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        when (camSelector) {
+            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
+            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
         }
     }
 
@@ -254,6 +281,7 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
+        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -262,31 +290,44 @@ class SelfieViewModel(
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
 
         val proxy = fun(e: Throwable) {
-            handleOfflineJobFailure(jobId, e)
+            val didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
+            if (didMoveToSubmitted) {
+                this.selfieFile = getFileByType(jobId, FileType.SELFIE)
+                this.livenessFiles.apply {
+                    clear()
+                    addAll(getFilesByType(jobId, FileType.LIVENESS))
+                }
+            }
             if (SmileID.allowOfflineMode && isNetworkFailure(e)) {
                 result = SmileIDResult.Success(
                     SmartSelfieResult(
-                        selfieFile,
-                        livenessFiles,
-                        null,
+                        selfieFile = selfieFile,
+                        livenessFiles = livenessFiles,
+                        apiResponse = null,
                     ),
                 )
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Success,
-                        errorMessage = R.string.si_offline_message,
+                        errorMessage = StringResource.ResId(R.string.si_offline_message),
                     )
                 }
             } else {
+                val errorMessage: StringResource = when {
+                    isNetworkFailure(e) -> StringResource.ResId(R.string.si_no_internet)
+                    e is SmileIDException -> StringResource.ResIdFromSmileIDException(e)
+                    else -> StringResource.ResId(R.string.si_processing_error_subtitle)
+                }
                 result = SmileIDResult.Error(e)
                 _uiState.update {
                     it.copy(
                         processingState = ProcessingState.Error,
-                        errorMessage = R.string.si_processing_error_subtitle,
+                        errorMessage = errorMessage,
                     )
                 }
             }
         }
+
         viewModelScope.launch(getExceptionHandler(proxy)) {
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode
@@ -308,6 +349,7 @@ class SelfieViewModel(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll.toString(),
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -321,6 +363,7 @@ class SelfieViewModel(
                     userId = userId,
                     partnerParams = extraPartnerParams,
                     allowNewEnroll = allowNewEnroll,
+                    metadata = metadata.asNetworkRequest(),
                 )
             } else {
                 SmileID.api.doSmartSelfieAuthentication(
@@ -328,6 +371,7 @@ class SelfieViewModel(
                     livenessImages = livenessFiles,
                     userId = userId,
                     partnerParams = extraPartnerParams,
+                    metadata = metadata.asNetworkRequest(),
                 )
             }
             // Move files from unsubmitted to submitted directories
@@ -351,9 +395,20 @@ class SelfieViewModel(
                 selfieFile to livenessFiles
             }
             result = SmileIDResult.Success(
-                SmartSelfieResult(selfieFileResult, livenessFilesResult, apiResponse),
+                SmartSelfieResult(
+                    selfieFile = selfieFileResult,
+                    livenessFiles = livenessFilesResult,
+                    apiResponse = apiResponse,
+                ),
             )
-            _uiState.update { it.copy(processingState = ProcessingState.Success) }
+            _uiState.update {
+                it.copy(
+                    processingState = ProcessingState.Success,
+                    errorMessage = StringResource.ResId(
+                        R.string.si_smart_selfie_processing_success_subtitle,
+                    ),
+                )
+            }
         }
     }
 
@@ -379,6 +434,8 @@ class SelfieViewModel(
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
             submitJob(selfieFile!!, livenessFiles)
         } else {
+            metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
+            metadata.removeAll { it is Metadatum.SelfieImageOrigin }
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)

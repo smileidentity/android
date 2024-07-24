@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel.document
 
+import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationResponse
@@ -13,6 +14,7 @@ import com.smileidentity.models.UploadRequest
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.StringResource
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import io.mockk.Runs
@@ -54,6 +56,7 @@ class EnhancedDocumentVerificationViewModelTest {
             documentType = "ID_CARD",
             selfieFile = selfieFile,
             captureBothSides = false,
+            metadata = mutableListOf(),
         )
         SmileID.config = Config(
             partnerId = "partnerId",
@@ -72,7 +75,10 @@ class EnhancedDocumentVerificationViewModelTest {
     fun `uiState should be initialized with the correct defaults`() {
         val uiState = subject.uiState.value
         assertEquals(DocumentCaptureFlow.FrontDocumentCapture, uiState.currentStep)
-        assertEquals(null, uiState.errorMessage)
+        assertEquals(
+            StringResource.ResId(R.string.si_processing_error_subtitle),
+            uiState.errorMessage,
+        )
     }
 
     @Test

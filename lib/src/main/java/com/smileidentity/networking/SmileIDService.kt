@@ -28,6 +28,8 @@ import com.smileidentity.models.SubmitBvnTotpRequest
 import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
+import com.smileidentity.models.v2.FailureReason
+import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
 import java.io.File
 import kotlin.time.Duration
@@ -85,9 +87,11 @@ interface SmileIDService {
         @Part("user_id") userId: String? = null,
         @Part("partner_params")
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
+        @Part("failure_reason") failureReason: FailureReason? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
+        @Part("metadata") metadata: Metadata? = Metadata.default(),
     ): SmartSelfieResponse
 
     /**
@@ -108,8 +112,10 @@ interface SmileIDService {
         @Part livenessImages: List<@JvmSuppressWildcards MultipartBody.Part>,
         @Part("partner_params")
         partnerParams: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards String>? = null,
+        @Part("failure_reason") failureReason: FailureReason? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
+        @Part("metadata") metadata: Metadata? = Metadata.default(),
     ): SmartSelfieResponse
 
     /**
@@ -220,23 +226,28 @@ interface SmileIDService {
  * @param callbackUrl The URL to send the result to
  * @param sandboxResult The result to return if in sandbox mode to test your integration
  * @param allowNewEnroll Whether to allow new enrollments for the user
+ * @param metadata Additional metadata to send to the server
  */
 suspend fun SmileIDService.doSmartSelfieEnrollment(
     selfieImage: File,
     livenessImages: List<File>,
     userId: String? = null,
     partnerParams: Map<String, String>? = null,
+    failureReason: FailureReason? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     allowNewEnroll: Boolean? = null,
+    metadata: Metadata? = Metadata.default(),
 ) = doSmartSelfieEnrollment(
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
-    livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
     userId = userId,
     partnerParams = partnerParams,
+    failureReason = failureReason,
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
     allowNewEnroll = allowNewEnroll,
+    metadata = metadata,
 )
 
 /**
@@ -249,21 +260,26 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
  * @param partnerParams Additional parameters to send to the server
  * @param callbackUrl The URL to send the result to
  * @param sandboxResult The result to return if in sandbox mode to test your integration
+ * @param metadata Additional metadata to send to the server
  */
 suspend fun SmileIDService.doSmartSelfieAuthentication(
     userId: String,
     selfieImage: File,
     livenessImages: List<File>,
     partnerParams: Map<String, String>? = null,
+    failureReason: FailureReason? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
+    metadata: Metadata? = Metadata.default(),
 ) = doSmartSelfieAuthentication(
     userId = userId,
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
-    livenessImages = livenessImages.map { it.asFormDataPart("liveness_images", "image/jpeg") },
+    livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
     partnerParams = partnerParams,
+    failureReason = failureReason,
     callbackUrl = callbackUrl,
     sandboxResult = sandboxResult,
+    metadata = metadata,
 )
 
 /**

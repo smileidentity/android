@@ -5,6 +5,9 @@ on:
       smile_config:
         description: 'The contents of the smile_config.json file (default: Partner 2423)'
         required: false
+      changelog:
+        description: 'Description of changes or test instructions'
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -13,6 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Play Store Internal App Sharing
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -41,10 +45,10 @@ jobs:
           fileName: 'upload.jks'
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
-      - name: Assemble
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: bundleRelease
+      - name: Bundle
+        run: ./gradlew bundleRelease
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
@@ -65,7 +69,8 @@ jobs:
               "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}",
               "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}",
               "branch": "${{ github.ref }}",
-              "commit_sha": "${{ github.sha }}"
+              "commit_sha": "${{ github.sha }}",
+              "changelog": "${{ github.event.inputs.changelog }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_SAMPLE_APP_DOWNLOAD }}

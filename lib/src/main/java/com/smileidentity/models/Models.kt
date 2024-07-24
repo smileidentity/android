@@ -10,7 +10,7 @@ import com.squareup.moshi.JsonClass
 import java.io.Serializable
 import kotlinx.parcelize.Parcelize
 
-@Suppress("CanBeParameter", "MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate")
 @Parcelize
 class SmileIDException(val details: Details) : Exception(details.message), Parcelable {
 

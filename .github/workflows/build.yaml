@@ -34,11 +34,11 @@ jobs:
             echo "Version $VERSION does not contain -SNAPSHOT"
             echo "version=$VERSION-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
-      - name: Build, Test, Lint, Assemble, Publish Snapshot
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          # NB! The "lint" gradle action here is different than ktLint
-          arguments: lint build assembleDebug publish
+      - name: Build, Test, Lint, Assemble, Publish Snapshot
+        # NB! The "lint" gradle action here is different than ktLint
+        run: ./gradlew lint build assembleDebug publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -64,23 +64,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: musichin/ktlint-check@v3
         with:
-          ktlint-version: "1.1.1"
-
-  dependency-submission:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v3
-        with:
-          build-scan-publish: true
-          build-scan-terms-of-service-url: "https://gradle.com/terms-of-service"
-          build-scan-terms-of-service-agree: "yes"
-        env:
-          ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          ktlint-version: "1.2.1"
