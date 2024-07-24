@@ -2,6 +2,7 @@
 
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.ksp)
@@ -61,32 +62,29 @@ android {
             // without having to add the opt-in annotation to every usage. The annotation's purpose
             // is primarily for consumers of the SDK to use, not for us.
             freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
-            if (project.hasProperty("enableComposeCompilerReports")) {
-                val outputDir = layout.buildDirectory.dir("compose-reports").get().asFile.path
-                freeCompilerArgs += listOf(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$outputDir",
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$outputDir",
-                )
-            }
         }
     }
 
     buildFeatures {
-        compose = true
         buildConfig = true
         mlModelBinding = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
 
     lint {
         enable += "ComposeM2Api"
         error += "ComposeM2Api"
     }
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
+moshi {
+    // Opt-in to enable moshi-sealed, disabled by default.
+    enableSealed.set(true)
 }
 
 mavenPublishing {
@@ -163,6 +161,7 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.annotation.experimental)
 
     implementation(libs.coil)
 
