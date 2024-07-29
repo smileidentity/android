@@ -56,6 +56,7 @@ class EnhancedDocumentVerificationViewModelTest {
             documentType = "ID_CARD",
             selfieFile = selfieFile,
             captureBothSides = false,
+            metadata = mutableListOf(),
         )
         SmileID.config = Config(
             partnerId = "partnerId",

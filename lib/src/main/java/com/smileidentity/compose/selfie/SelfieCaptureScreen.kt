@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
@@ -64,6 +67,7 @@ fun SelfieCaptureScreen(
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = true,
     skipApiSubmission: Boolean = false,
+    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory {
             SelfieViewModel(
@@ -72,6 +76,7 @@ fun SelfieCaptureScreen(
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
                 skipApiSubmission = skipApiSubmission,
+                metadata = metadata,
             )
         },
     ),
@@ -89,7 +94,7 @@ fun SelfieCaptureScreen(
             camSelector = camSelector,
             implementationMode = ImplementationMode.Performance,
             imageAnalyzer = cameraState.rememberImageAnalyzer(
-                analyze = viewModel::analyzeImage,
+                analyze = { viewModel.analyzeImage(it, camSelector) },
                 // Guarantees only one image will be delivered for analysis at a time
                 imageAnalysisBackpressureStrategy = KeepOnlyLatest,
             ),
@@ -141,7 +146,7 @@ fun SelfieCaptureScreen(
 }
 
 @Composable
-private fun AgentModeSwitch(isAgentModeEnabled: Boolean, onCamSelectorChange: (Boolean) -> Unit) {
+internal fun AgentModeSwitch(isAgentModeEnabled: Boolean, onCamSelectorChange: (Boolean) -> Unit) {
     val agentModeBackgroundColor = if (isAgentModeEnabled) {
         MaterialTheme.colorScheme.secondary
     } else {

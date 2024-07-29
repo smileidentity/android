@@ -31,7 +31,7 @@ class SettingsViewModel : ViewModel() {
         _uiState.update { it.copy(showSmileConfigBottomSheet = false) }
     }
 
-    fun updateSmileConfig(updatedConfig: String) {
+    fun updateSmileConfig(updatedConfig: String): Config? {
         try {
             val config = configAdapter.fromJson(updatedConfig)
             if (config != null) {
@@ -40,11 +40,14 @@ class SettingsViewModel : ViewModel() {
                     _uiState.update { it.copy(showSmileConfigBottomSheet = false) }
                 }
                 _uiState.update { it.copy(smileConfigError = null) }
+                return config
             } else {
                 _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }
+                return null
             }
         } catch (e: Exception) {
             _uiState.update { it.copy(smileConfigError = R.string.settings_smile_config_error) }
+            return null
         }
     }
 }

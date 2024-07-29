@@ -88,9 +88,11 @@ fun OrchestratedBiometricKYCScreen(
                     }
                 }
             }
-            composable<Routes.OrchestratedProcessingRoute>( typeMap = mapOf(
-                typeOf<ProcessingState>() to ProcessingStateNavType,
-            )) {
+            composable<Routes.OrchestratedProcessingRoute>(
+                typeMap = mapOf(
+                    typeOf<ProcessingState>() to ProcessingStateNavType,
+                ),
+            ) {
                 uiState.processingState?.let {
                     ProcessingScreen(
                         processingState = it,

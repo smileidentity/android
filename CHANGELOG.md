@@ -1,5 +1,30 @@
 # Release Notes
 
+## 10.2.4
+
+#### Fixed
+* Job status history full data parsing causing a crash during polling
+
+## 10.2.3
+
+* Handle invalid resource IDs
+* Fix fileSavePath not initialized error (missing smile_config.json file)
+* Add missing ActionResult responses
+
+## 10.2.2
+
+* Fixed a bug where the `BiometricKycViewModel` would succeed but use the default error message as it was not being updated when changing state
+* Fixed a bug where `SmileID.submitJob` would not work for previously attempted API requests
+
+## 10.2.1
+
+* Wrap Composables in a `Surface` for additional background color customization
+* Add metadata support
+
+## 10.2.0
+
+* Added an optional "Strict Mode" to SmartSelfie Enrollment and Authentication to achieve better pass rates. Set `useStrictMode=true` to enable this new, streamlined UI and associated active liveness tasks
+
 ## 10.1.7
 
 * Fixed a bug where some failed authentication requests were incorrectly handled

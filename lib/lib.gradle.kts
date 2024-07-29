@@ -67,7 +67,6 @@ android {
     }
 
     buildFeatures {
-        compose = true
         buildConfig = true
         mlModelBinding = true
     }
@@ -82,6 +81,11 @@ composeCompiler {
     enableStrongSkippingMode = true
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
+moshi {
+    // Opt-in to enable moshi-sealed, disabled by default.
+    enableSealed.set(true)
 }
 
 mavenPublishing {

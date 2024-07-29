@@ -1,10 +1,13 @@
 package com.smileidentity.compose.document
 
-import android.os.Parcelable
+import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,10 +27,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -38,12 +47,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.compose.nav.Routes
+import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -59,15 +69,11 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 import java.io.File
-import kotlinx.android.parcel.Parcelize
-import kotlinx.serialization.Serializable
 import timber.log.Timber
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
-@Parcelize
-@Serializable
-enum class DocumentCaptureSide : Parcelable {
+enum class DocumentCaptureSide {
     Front,
     Back,
 }
@@ -91,9 +97,17 @@ fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
+    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
-        factory = viewModelFactory { DocumentCaptureViewModel(jobId, side, knownIdAspectRatio) },
+        factory = viewModelFactory {
+            DocumentCaptureViewModel(
+                jobId,
+                side,
+                knownIdAspectRatio,
+                metadata,
+            )
+        },
         key = side.name,
     ),
 ) {
@@ -117,121 +131,76 @@ fun DocumentCaptureScreen(
             }
         },
     )
-    val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val documentImageToConfirm = uiState.documentImageToConfirm
     val captureError = uiState.captureError
-    val startDestination =
-        if (showInstructions && !uiState.acknowledgedInstructions) {
-            Routes.DocumentCaptureScreenInstructionRoute
-        } else {
-            Routes.DocumentFrontCaptureRoute
+    when {
+        captureError != null -> onError(captureError)
+        showInstructions && !uiState.acknowledgedInstructions -> {
+            DocumentCaptureInstructionsScreen(
+                heroImage = instructionsHeroImage,
+                title = instructionsTitleText,
+                subtitle = instructionsSubtitleText,
+                showAttribution = showAttribution,
+                allowPhotoFromGallery = allowGallerySelection,
+                showSkipButton = showSkipButton,
+                onInstructionsAcknowledgedSelectFromGallery = {
+                    Timber.v("onInstructionsAcknowledgedSelectFromGallery")
+                    SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
+                    photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
+                },
+                onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
+                onSkip = onSkip,
+            )
         }
-    // when {
-    //     captureError != null -> {
-    //         onError(captureError)
-    //     }
-    //
-    //     documentImageToConfirm != null -> {
-    //         navController.navigate(
-    //             Routes.DocumentCaptureScreenConfirmDocumentImageRoute(
-    //                 documentImageToConfirm.absolutePath,
-    //             ),
-    //         )
-    //     }
-    //
-    //     else -> {
-    //         navController.navigate(
-    //             Routes.DocumentFrontCaptureRoute
-    //         )
-    //     }
-    // }
-    CaptureScreenContent(
-        titleText = captureTitleText,
-        subtitleText = stringResource(id = uiState.directive.displayText),
-        idAspectRatio = 1f,
-        areEdgesDetected = uiState.areEdgesDetected,
-        showCaptureInProgress = uiState.showCaptureInProgress,
-        showManualCaptureButton = uiState.showManualCaptureButton,
-        onCaptureClicked = viewModel::captureDocument,
-        imageAnalyzer = viewModel::analyze,
-        onFocusEvent = viewModel::onFocusEvent,
-        modifier = modifier,
-    )
-    // NavHost(navController, startDestination = startDestination) {
-    //     composable<DocumentCaptureScreenInstructionRoute> {
-    //         DocumentCaptureInstructionsScreen(
-    //             heroImage = instructionsHeroImage,
-    //             title = instructionsTitleText,
-    //             subtitle = instructionsSubtitleText,
-    //             showAttribution = showAttribution,
-    //             allowPhotoFromGallery = allowGallerySelection,
-    //             showSkipButton = showSkipButton,
-    //             onInstructionsAcknowledgedSelectFromGallery = {
-    //                 Timber.v("onInstructionsAcknowledgedSelectFromGallery")
-    //                 SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
-    //                 photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
-    //             },
-    //             onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
-    //             onSkip = onSkip,
-    //         )
-    //     }
-    //     composable<DocumentCaptureScreenConfirmDocumentImageRoute> { backStackEntry ->
-    //         val documentImageRoute: DocumentCaptureScreenConfirmDocumentImageRoute =
-    //             backStackEntry.toRoute()
-    //         val painter = remember {
-    //             val path = documentImageRoute.documentImageToConfirm
-    //             try {
-    //                 BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
-    //             } catch (e: Exception) {
-    //                 SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
-    //                 SmileIDCrashReporting.hub.captureException(e)
-    //                 onError(e)
-    //                 ColorPainter(Color.Black)
-    //             }
-    //         }
-    //         documentImageToConfirm?.let {
-    //             ImageCaptureConfirmationDialog(
-    //                 titleText =
-    //                 stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
-    //                 subtitleText =
-    //                 stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-    //                 painter = painter,
-    //                 scaleFactor = PREVIEW_SCALE_FACTOR,
-    //                 confirmButtonText = stringResource(
-    //                     id = R.string.si_doc_v_confirmation_dialog_confirm_button,
-    //                 ),
-    //                 onConfirm = { onConfirm(it) },
-    //                 retakeButtonText = stringResource(
-    //                     id = R.string.si_doc_v_confirmation_dialog_retake_button,
-    //                 ),
-    //                 onRetake = viewModel::onRetry,
-    //             )
-    //         } ?: run {
-    //             onError(IllegalStateException("Document image to confirm is null"))
-    //         }
-    //     }
-    //     composable<DocumentCaptureScreenCaptureRoute> { backStackEntry ->
-    //         val documentCaptureScreenCaptureRoute: DocumentCaptureScreenCaptureRoute =
-    //             backStackEntry.toRoute()
-    //         val aspectRatio by animateFloatAsState(
-    //             targetValue = documentCaptureScreenCaptureRoute.aspectRatio,
-    //             label = "ID Aspect Ratio",
-    //         )
-    //         CaptureScreenContent(
-    //             titleText = captureTitleText,
-    //             subtitleText = stringResource(id = uiState.directive.displayText),
-    //             idAspectRatio = aspectRatio,
-    //             areEdgesDetected = uiState.areEdgesDetected,
-    //             showCaptureInProgress = uiState.showCaptureInProgress,
-    //             showManualCaptureButton = uiState.showManualCaptureButton,
-    //             onCaptureClicked = viewModel::captureDocument,
-    //             imageAnalyzer = viewModel::analyze,
-    //             onFocusEvent = viewModel::onFocusEvent,
-    //             modifier = modifier,
-    //         )
-    //     }
-    // }
+
+        documentImageToConfirm != null -> {
+            val painter = remember {
+                val path = documentImageToConfirm.absolutePath
+                try {
+                    BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
+                } catch (e: Exception) {
+                    SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
+                    SmileIDCrashReporting.hub.captureException(e)
+                    onError(e)
+                    ColorPainter(Color.Black)
+                }
+            }
+            ImageCaptureConfirmationDialog(
+                titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
+                subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
+                painter = painter,
+                scaleFactor = PREVIEW_SCALE_FACTOR,
+                confirmButtonText = stringResource(
+                    id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+                ),
+                onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
+                retakeButtonText = stringResource(
+                    id = R.string.si_doc_v_confirmation_dialog_retake_button,
+                ),
+                onRetake = viewModel::onRetry,
+            )
+        }
+
+        else -> {
+            val aspectRatio by animateFloatAsState(
+                targetValue = uiState.idAspectRatio,
+                label = "ID Aspect Ratio",
+            )
+            CaptureScreenContent(
+                titleText = captureTitleText,
+                subtitleText = stringResource(id = uiState.directive.displayText),
+                idAspectRatio = aspectRatio,
+                areEdgesDetected = uiState.areEdgesDetected,
+                showCaptureInProgress = uiState.showCaptureInProgress,
+                showManualCaptureButton = uiState.showManualCaptureButton,
+                onCaptureClicked = viewModel::captureDocumentManually,
+                imageAnalyzer = viewModel::analyze,
+                onFocusEvent = viewModel::onFocusEvent,
+                modifier = modifier,
+            )
+        }
+    }
 }
 
 @Composable

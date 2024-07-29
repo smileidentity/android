@@ -227,7 +227,18 @@ class SmileIDTest {
         every { prepUploadRequestAdapter.fromJson(any<String>()) } returns prepUploadRequest
 
         every {
-            prepUploadRequest.copy(any(), any(), any(), any(), any(), any(), any(), any())
+            prepUploadRequest.copy(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
         } returns prepUploadRequest
 
         coEvery { api.authenticate(any()) } returns authResponse

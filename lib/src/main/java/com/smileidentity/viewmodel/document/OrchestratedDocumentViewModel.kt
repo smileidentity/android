@@ -15,6 +15,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -65,6 +66,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    private val metadata: MutableList<Metadatum>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -79,13 +81,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
         if (captureBothSides) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
         } else if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -93,9 +91,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
     fun onDocumentBackSkip() {
         if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -104,9 +100,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onDocumentBackCaptureSuccess(documentImageFile: File) {
         documentBackFile = documentImageFile
         if (selfieFile == null) {
-            _uiState.update {
-                it.copy(currentStep = DocumentCaptureFlow.SelfieCapture)
-            }
+            _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
@@ -168,6 +162,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll.toString(),
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -184,6 +179,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 // TODO : Michael will change this to boolean
                 allowNewEnroll = allowNewEnroll.toString(),
+                metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
@@ -325,6 +321,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -335,6 +332,7 @@ internal class DocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -366,6 +364,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -376,6 +375,7 @@ internal class EnhancedDocumentVerificationViewModel(
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
+    metadata = metadata,
 ) {
 
     override fun saveResult(

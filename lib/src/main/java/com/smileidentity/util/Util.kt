@@ -2,6 +2,7 @@ package com.smileidentity.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.JPEG
 import android.graphics.BitmapFactory
@@ -24,6 +25,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
@@ -35,6 +37,7 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
+import kotlin.math.abs
 import kotlin.math.max
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -293,8 +296,13 @@ sealed interface StringResource {
                     context.packageName,
                 )
 
-                return stringResource(id = resourceId).takeIf { it.isNotEmpty() }
-                    ?: exception.details.message
+                return try {
+                    context.resources.getString(resourceId).takeIf { it.isNotEmpty() }
+                        ?: exception.details.message
+                } catch (e: Resources.NotFoundException) {
+                    Timber.w("Got error code whose message can't be overridden")
+                    exception.details.message
+                }
             }
             is Text -> text
         }
@@ -374,13 +382,6 @@ internal fun writeUriToFile(file: File, uri: Uri, context: Context) {
 internal fun isNetworkFailure(e: Throwable): Boolean = e is IOException || e is InterruptedException
 
 /**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is Google Photos.
- */
-private fun isGooglePhotosUri(uri: Uri): Boolean =
-    "com.google.android.apps.photos.content" == uri.authority
-
-/**
  * The old getParcelable method is deprecated in API 33 -- use the new one if supported, otherwise
  * fall back to the old one.
  *
@@ -413,4 +414,49 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String): T? = when {
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
+}
+
+/**
+ * Determines whether the face is looking left, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking left
+ * @param maxAngle The maximum angle the face should be looking left
+ * @param verticalAngleBuffer The buffer for the vertical angle
+ */
+internal fun Face.isLookingLeft(
+    minAngle: Float,
+    maxAngle: Float,
+    verticalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleY in minAngle..maxAngle && abs(headEulerAngleX) < verticalAngleBuffer
+}
+
+/**
+ * Determines whether the face is looking right, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking right
+ * @param maxAngle The maximum angle the face should be looking right
+ * @param verticalAngleBuffer The buffer for the vertical angle
+ */
+internal fun Face.isLookingRight(
+    minAngle: Float,
+    maxAngle: Float,
+    verticalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleY in -maxAngle..-minAngle && abs(headEulerAngleX) < verticalAngleBuffer
+}
+
+/**
+ * Determines whether the face is looking up, within some thresholds
+ *
+ * @param minAngle The minimum angle the face should be looking up
+ * @param maxAngle The maximum angle the face should be looking up
+ * @param horizontalAngleBuffer The buffer for the horizontal angle
+ */
+internal fun Face.isLookingUp(
+    minAngle: Float,
+    maxAngle: Float,
+    horizontalAngleBuffer: Float,
+): Boolean {
+    return headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
 }

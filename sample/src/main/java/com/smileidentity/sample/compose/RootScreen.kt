@@ -2,16 +2,19 @@ package com.smileidentity.sample.compose
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +28,7 @@ import com.smileidentity.sample.isInternetAvailable
 import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.RootViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.coroutines.delay
 
 /**
  * *****Note to Partners*****
@@ -39,7 +43,6 @@ fun RootScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val runtimeConfig by viewModel.runtimeConfig.collectAsStateWithLifecycle()
-    var initialized by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val client = remember {
         SmileID.getOkHttpClientBuilder()
@@ -47,57 +50,76 @@ fun RootScreen(
             .build()
     }
 
-    SmileIDTheme {
-        Surface(modifier = modifier) {
-            if (runtimeConfig != null) {
-                // If a config has been set at runtime, it takes first priority
-                LaunchedEffect(runtimeConfig) {
-                    initialized = false
-                    SmileID.initialize(
-                        context = context,
-                        config = runtimeConfig!!,
-                        useSandbox = false,
-                        enableCrashReporting = !BuildConfig.DEBUG,
-                        okHttpClient = client,
-                    )
-                    initialized = true
-                }
-            } else if (context.isConfigDefineInAssets()) {
-                // Otherwise, fallback to the config defined in assets
-                LaunchedEffect(Unit) {
-                    initialized = false
-                    SmileID.initialize(
-                        context = context,
-                        useSandbox = false,
-                        enableCrashReporting = !BuildConfig.DEBUG,
-                        okHttpClient = client,
-                    )
-                    initialized = true
-                }
-            } else {
-                WelcomeScreen(
-                    partnerId = uiState.partnerId,
-                    errorMessage = uiState.smileConfigError,
-                    hint = uiState.smileConfigHint,
-                    showConfirmation = uiState.showSmileConfigConfirmation,
-                    onSaveSmileConfig = {
-                        viewModel.updateSmileConfig(it)
-                        Toast.makeText(context, R.string.applying_config, Toast.LENGTH_SHORT).show()
-                    },
-                    onContinue = viewModel::onConfirmationContinue,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding(),
+    val initializationState by produceState<InitializationState>(
+        InitializationState.NotInitialized,
+    ) {
+        delay(1000)
+        when {
+            runtimeConfig != null -> {
+                SmileID.initialize(
+                    context = context,
+                    config = runtimeConfig!!,
+                    useSandbox = false,
+                    enableCrashReporting = !BuildConfig.DEBUG,
+                    okHttpClient = client,
                 )
             }
+            context.isConfigDefineInAssets() -> {
+                SmileID.initialize(
+                    context = context,
+                    useSandbox = false,
+                    enableCrashReporting = !BuildConfig.DEBUG,
+                    okHttpClient = client,
+                )
+            }
+            else -> {
+                value = InitializationState.NoConfig
+                return@produceState
+            }
+        }
+        value = InitializationState.Initialized
+    }
 
-            key(runtimeConfig) {
-                if (initialized) {
+    SmileIDTheme {
+        Surface(modifier = modifier) {
+            when (initializationState) {
+                InitializationState.Initialized -> {
                     MainScreen()
                     LaunchedEffect(Unit) {
                         if (!context.isInternetAvailable()) {
                             context.toast(R.string.warning_no_internet)
                         }
+                    }
+                }
+                InitializationState.NoConfig -> {
+                    WelcomeScreen(
+                        partnerId = uiState.partnerId,
+                        errorMessage = uiState.smileConfigError,
+                        hint = uiState.smileConfigHint,
+                        showConfirmation = uiState.showSmileConfigConfirmation,
+                        onSaveSmileConfig = {
+                            viewModel.updateSmileConfig(it)
+                            Toast.makeText(
+                                context,
+                                R.string.applying_config,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        },
+                        onContinue = viewModel::onConfirmationContinue,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding(),
+                    )
+                }
+                InitializationState.NotInitialized -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
             }
@@ -107,4 +129,10 @@ fun RootScreen(
 
 private fun Context.isConfigDefineInAssets(): Boolean {
     return assets.list("")?.contains("smile_config.json") ?: false
+}
+
+private sealed class InitializationState {
+    data object NotInitialized : InitializationState()
+    data object Initialized : InitializationState()
+    data object NoConfig : InitializationState()
 }
