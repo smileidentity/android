@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.components.LocalMetadata
@@ -21,8 +20,8 @@ import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.nav.DocumentCaptureScreenParams
 import com.smileidentity.compose.nav.Routes
+import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.mainGraph
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
@@ -87,58 +86,43 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+    val startDest = if (useStrictMode) {
+        Routes.SelfieCaptureScreenRoute(
+            SelfieCaptureParams(
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                isEnroll = true,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                useStrictMode = useStrictMode,
+            ),
+        )
+    } else {
+        Routes.SelfieCaptureScreenRouteV2(
+            SelfieCaptureParams(
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                isEnroll = true,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                useStrictMode = useStrictMode,
+            ),
+        )
+    }
+
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = Routes.DocumentCaptureFrontRoute(
-                DocumentCaptureScreenParams(
-                    userId = userId,
-                    jobId = jobId,
-                    showAttribution = showAttribution,
-                    showInstructions = showInstructions,
-                    allowGallerySelection = true,
-                    showSkipButton = true,
-                    instructionsHeroImage = R.drawable.si_doc_v_back_hero,
-                    instructionsTitleText = R.string.si_doc_v_instruction_back_title,
-                    instructionsSubtitleText = R.string.si_doc_v_instruction_back_subtitle,
-                    captureTitleText = R.string.si_doc_v_capture_instructions_back_title,
-                    knownIdAspectRatio = 1f,
-                ),
-            ),
+            startDestination = startDest,
         ) {
             mainGraph(navController, onResult)
         }
-        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
-        // if (useStrictMode) {
-        //     val context = LocalContext.current
-        //     val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        //     OrchestratedSelfieCaptureScreenV2(
-        //         modifier = modifier,
-        //         userId = userId,
-        //         allowNewEnroll = allowNewEnroll,
-        //         isEnroll = true,
-        //         allowAgentMode = allowAgentMode,
-        //         showAttribution = showAttribution,
-        //         useStrictMode = useStrictMode,
-        //         selfieQualityModel = selfieQualityModel,
-        //         extraPartnerParams = extraPartnerParams,
-        //         onResult = onResult,
-        //     )
-        // } else {
-        //     OrchestratedSelfieCaptureScreen(
-        //         modifier = modifier,
-        //         userId = userId,
-        //         jobId = jobId,
-        //         allowNewEnroll = allowNewEnroll,
-        //         isEnroll = true,
-        //         allowAgentMode = allowAgentMode,
-        //         showAttribution = showAttribution,
-        //         showInstructions = showInstructions,
-        //         extraPartnerParams = extraPartnerParams,
-        //         onResult = onResult,
-        //     )
-        // }
     }
 }
 

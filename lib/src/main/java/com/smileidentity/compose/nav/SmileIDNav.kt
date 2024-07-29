@@ -1,5 +1,7 @@
 package com.smileidentity.compose.nav
 
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -11,6 +13,8 @@ import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.document.DocumentCaptureScreen
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import kotlin.reflect.typeOf
@@ -26,16 +30,16 @@ sealed class Routes {
         Routes()
 
     @Serializable
-    data class DocumentCaptureFrontRoute(val params: DocumentCaptureScreenParams) : Routes()
+    data class DocumentCaptureFrontRoute(val params: DocumentCaptureParams) : Routes()
 
     @Serializable
-    data class DocumentCaptureBackRoute(val params: DocumentCaptureScreenParams) : Routes()
+    data class DocumentCaptureBackRoute(val params: DocumentCaptureParams) : Routes()
 
     @Serializable
-    data class OrchestratedSelfieCaptureScreenRoute(
-        val params: OrchestratedSelfieCaptureScreenParams,
-    ) :
-        Routes()
+    data class SelfieCaptureScreenRoute(val params: SelfieCaptureParams) : Routes()
+
+    @Serializable
+    data class SelfieCaptureScreenRouteV2(val params: SelfieCaptureParams) : Routes()
 
     @Serializable
     data class OrchestratedProcessingRoute(val params: ProcessingScreenParams) : Routes()
@@ -45,15 +49,15 @@ fun NavGraphBuilder.mainGraph(
     navController: NavController,
     onSmartSelfieResult: SmileIDCallback<SmartSelfieResult>?,
 ) {
-    composable<Routes.OrchestratedSelfieCaptureScreenRoute>(
+    composable<Routes.SelfieCaptureScreenRoute>(
         typeMap = mapOf(
-            typeOf<OrchestratedSelfieCaptureScreenParams>() to CustomNavType(
-                OrchestratedSelfieCaptureScreenParams::class.java,
-                OrchestratedSelfieCaptureScreenParams.serializer(),
+            typeOf<SelfieCaptureParams>() to CustomNavType(
+                SelfieCaptureParams::class.java,
+                SelfieCaptureParams.serializer(),
             ),
         ),
     ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.OrchestratedSelfieCaptureScreenRoute>()
+        val route = navBackStackEntry.toRoute<Routes.SelfieCaptureScreenRoute>()
         val params = route.params
         OrchestratedSelfieCaptureScreen(
             userId = params.userId,
@@ -62,6 +66,29 @@ fun NavGraphBuilder.mainGraph(
             showAttribution = params.showAttribution,
             showInstructions = params.showInstructions,
             skipApiSubmission = params.skipApiSubmission,
+            onResult = onSmartSelfieResult ?: {},
+        )
+    }
+    composable<Routes.SelfieCaptureScreenRouteV2>(
+        typeMap = mapOf(
+            typeOf<SelfieCaptureParams>() to CustomNavType(
+                SelfieCaptureParams::class.java,
+                SelfieCaptureParams.serializer(),
+            ),
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.SelfieCaptureScreenRoute>()
+        val params = route.params
+        val context = LocalContext.current
+        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+        OrchestratedSelfieCaptureScreenV2(
+            userId = params.userId,
+            allowNewEnroll = params.allowNewEnroll,
+            isEnroll = params.isEnroll,
+            allowAgentMode = params.allowAgentMode,
+            showAttribution = params.showAttribution,
+            useStrictMode = params.useStrictMode,
+            selfieQualityModel = selfieQualityModel,
             onResult = onSmartSelfieResult ?: {},
         )
     }
@@ -96,9 +123,9 @@ fun NavGraphBuilder.mainGraph(
     }
     composable<Routes.DocumentCaptureFrontRoute>(
         typeMap = mapOf(
-            typeOf<DocumentCaptureScreenParams>() to CustomNavType(
-                DocumentCaptureScreenParams::class.java,
-                DocumentCaptureScreenParams.serializer(),
+            typeOf<DocumentCaptureParams>() to CustomNavType(
+                DocumentCaptureParams::class.java,
+                DocumentCaptureParams.serializer(),
             ),
         ),
     ) { backStackEntry ->
@@ -122,9 +149,9 @@ fun NavGraphBuilder.mainGraph(
     }
     composable<Routes.DocumentCaptureBackRoute>(
         typeMap = mapOf(
-            typeOf<DocumentCaptureScreenParams>() to CustomNavType(
-                DocumentCaptureScreenParams::class.java,
-                DocumentCaptureScreenParams.serializer(),
+            typeOf<DocumentCaptureParams>() to CustomNavType(
+                DocumentCaptureParams::class.java,
+                DocumentCaptureParams.serializer(),
             ),
         ),
     ) { backStackEntry ->

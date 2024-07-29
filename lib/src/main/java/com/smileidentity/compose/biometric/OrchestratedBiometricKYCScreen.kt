@@ -66,8 +66,8 @@ fun OrchestratedBiometricKYCScreen(
             .fillMaxSize(),
     ) {
         val navController = rememberNavController()
-        NavHost(navController, startDestination = Routes.OrchestratedSelfieCaptureScreenRoute) {
-            composable<Routes.OrchestratedSelfieCaptureScreenRoute> {
+        NavHost(navController, startDestination = Routes.SelfieCaptureScreenRoute) {
+            composable<Routes.SelfieCaptureScreenRoute> {
                 OrchestratedSelfieCaptureScreen(
                     userId = userId,
                     jobId = jobId,

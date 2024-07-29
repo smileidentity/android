@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 @Parcelize
-data class OrchestratedSelfieCaptureScreenParams(
+data class SelfieCaptureParams(
     val userId: String,
     val jobId: String,
     val allowNewEnroll: Boolean = false,
@@ -21,6 +21,7 @@ data class OrchestratedSelfieCaptureScreenParams(
     val skipApiSubmission: Boolean = false,
     val showAttribution: Boolean = true,
     val showInstructions: Boolean = true,
+    val useStrictMode: Boolean = true,
 ) : Parcelable
 
 @Serializable
@@ -43,7 +44,7 @@ data class ProcessingScreenParams(
 
 @Serializable
 @Parcelize
-data class DocumentCaptureScreenParams(
+data class DocumentCaptureParams(
     val userId: String,
     val jobId: String,
     val showInstructions: Boolean,
