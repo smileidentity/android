@@ -5,6 +5,9 @@
 #### Fixed
 * Job status history full data parsing causing a crash during polling
 
+### Changed
+* Removed `SmileID.setEnvironment()` since the API Keys are no longer shared between environments
+
 ## 10.2.3
 
 * Handle invalid resource IDs
