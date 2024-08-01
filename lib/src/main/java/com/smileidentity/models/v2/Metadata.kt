@@ -7,6 +7,10 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.util.Collections
+import java.util.Locale
 import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
@@ -22,6 +26,7 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
             listOf(
                 Metadatum.Sdk,
                 Metadatum.SdkVersion,
+                Metadatum.ClientIP,
                 Metadatum.Fingerprint,
                 Metadatum.DeviceModel,
                 Metadatum.DeviceOS,
@@ -46,6 +51,9 @@ open class Metadatum(
 
     @Parcelize
     data object SdkVersion : Metadatum("sdk_version", BuildConfig.VERSION_NAME)
+
+    @Parcelize
+    data object ClientIP : Metadatum("client_ip", getIPAddress(useIPv4 = true))
 
     @Parcelize
     data object DeviceModel : Metadatum("device_model", model)
@@ -171,3 +179,38 @@ private val model: String
  */
 private val os: String
     get() = "Android API ${Build.VERSION.SDK_INT}"
+
+fun getIPAddress(useIPv4: Boolean): String {
+    return try {
+        val networkInterfaces: List<NetworkInterface> = Collections.list(
+            NetworkInterface.getNetworkInterfaces(),
+        )
+        for (networkInterface in networkInterfaces) {
+            val addresses: List<InetAddress> = Collections.list(networkInterface.inetAddresses)
+            for (item in addresses) {
+                if (!item.isLoopbackAddress) {
+                    val address = item.hostAddress
+                    val isIPv4 = address.indexOf(':') < 0
+
+                    if (useIPv4) {
+                        if (isIPv4) {
+                            return address
+                        }
+                    } else {
+                        if (!isIPv4) {
+                            val delim = address.indexOf('%') // drop ip6 zone suffix
+                            return if (delim < 0) {
+                                address.uppercase(Locale.getDefault())
+                            } else {
+                                address.substring(0, delim).uppercase(Locale.getDefault())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        "" // Return empty string if no IP address is found
+    } catch (ex: Exception) {
+        "" // Return empty string on exception
+    }
+}

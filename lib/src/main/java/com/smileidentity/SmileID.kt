@@ -82,6 +82,7 @@ object SmileID {
 
     internal var allowOfflineMode: Boolean = false
         private set
+
     var callbackUrl: String = ""
         private set
 
@@ -174,21 +175,6 @@ object SmileID {
     ) {
         SmileID.apiKey = apiKey
         initialize(context, config, useSandbox, enableCrashReporting, okHttpClient)
-    }
-
-    /**
-     * Switches the SDK between the sandbox and production API at runtime. Please note that if the
-     * environment is switched while you or the SDK is in the middle of a job (i.e. polling job
-     * status), this may cause API errors.
-     *
-     * @param useSandbox Whether to use the sandbox environment. If false, uses production
-     */
-    @JvmStatic
-    fun setEnvironment(useSandbox: Boolean) {
-        SmileID.useSandbox = useSandbox
-        val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
-        retrofit = retrofit.newBuilder().baseUrl(url).build()
-        api = retrofit.create(SmileIDService::class.java)
     }
 
     /**
