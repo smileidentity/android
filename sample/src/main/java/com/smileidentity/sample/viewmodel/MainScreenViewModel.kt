@@ -170,22 +170,6 @@ class MainScreenViewModel : ViewModel() {
             }
     }
 
-    /**
-     * Cancel any polling, switch the environment, and then restart polling (the auth request
-     * will automatically pick up the correct environment)
-     */
-    fun toggleEnvironment() {
-        pendingJobCountJob.cancel()
-        backgroundJobsPollingJob.cancel()
-
-        SmileID.setEnvironment(!SmileID.useSandbox)
-
-        pendingJobCountJob = createPendingJobCountPoller()
-        backgroundJobsPollingJob = createBackgroundJobsPoller()
-
-        _uiState.update { it.copy(isProduction = !SmileID.useSandbox) }
-    }
-
     fun onHomeSelected() {
         _uiState.update {
             it.copy(

@@ -405,7 +405,7 @@ private fun TopBar(
         actions = {
             FilterChip(
                 selected = uiState.isProduction,
-                onClick = viewModel::toggleEnvironment,
+                onClick = {},
                 label = { Text(stringResource(id = uiState.environmentName)) },
                 colors = filterChipColors(
                     selectedContainerColor = MaterialTheme.colorScheme.tertiary,
