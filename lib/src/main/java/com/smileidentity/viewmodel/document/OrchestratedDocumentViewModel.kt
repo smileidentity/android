@@ -184,7 +184,17 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 timestamp = authResponse.timestamp,
             )
 
-            val prepUploadResponse = SmileID.api.prepUpload(prepUploadRequest)
+            val prepUploadResponse = try {
+                SmileID.api.prepUpload(prepUploadRequest)
+            } catch (e: SmileIDException) {
+                // It may be the case that Prep Upload was called during the job but the link expired.
+                // We need to pass retry=true in order to obtain a new link
+                if (e.details.code == "2215") {
+                    SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                } else {
+                    throw e
+                }
+            }
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             sendResult(documentFrontFile, documentBackFile, livenessFiles)
