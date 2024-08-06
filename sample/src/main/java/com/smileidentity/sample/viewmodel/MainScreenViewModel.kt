@@ -207,7 +207,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieEnrollmentSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
     }
 
     fun onSmartSelfieEnrollmentResult(
@@ -258,7 +258,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieAuthenticationSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
     }
 
     fun onSmartSelfieAuthenticationResult(
@@ -307,7 +307,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieEnrollmentV2Selected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieEnrollment.label) }
     }
 
     fun onSmartSelfieEnrollmentV2Result(result: SmileIDResult<SmartSelfieResult>) {
@@ -356,7 +356,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onSmartSelfieAuthenticationV2Selected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.SmartSelfieAuthentication.label) }
     }
 
     fun onSmartSelfieAuthenticationV2Result(result: SmileIDResult<SmartSelfieResult>) {
@@ -403,7 +403,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onEnhancedKycSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedKyc.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedKyc.label) }
     }
 
     fun onEnhancedKycResult(result: SmileIDResult<EnhancedKycResult>) {
@@ -441,7 +441,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onBiometricKycSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricKyc.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.BiometricKyc.label) }
     }
 
     fun onBiometricKycResult(
@@ -482,7 +482,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onDocumentVerificationSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.DocumentVerification.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.DocumentVerification.label) }
     }
 
     fun onDocumentVerificationResult(
@@ -522,7 +522,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onBvnConsentSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.BvnConsent.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.BvnConsent.label) }
     }
 
     fun onConsentDenied() {
@@ -534,7 +534,7 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun onEnhancedDocumentVerificationSelected() {
-        _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedDocumentVerification.label) }
+        // _uiState.update { it.copy(appBarTitle = ProductScreen.EnhancedDocumentVerification.label) }
     }
 
     fun onEnhancedDocumentVerificationResult(

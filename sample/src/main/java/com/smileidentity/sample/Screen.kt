@@ -25,53 +25,53 @@ enum class ProductScreen(
     @StringRes override val label: Int,
     @DrawableRes val icon: Int,
 ) : Screen {
-    SmartSelfieEnrollment(
-        "smart_selfie_enrollment",
-        com.smileidentity.R.string.si_smart_selfie_enrollment_product_name,
-        com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
-    ),
-    SmartSelfieAuthentication(
-        "smart_selfie_authentication",
-        com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
-        R.drawable.smart_selfie_authentication,
-    ),
-
-    // SmartSelfieEnrollmentV2(
-    //     "smart_selfie_enrollment_v2",
-    //     com.smileidentity.R.string.si_smart_selfie_v2_enroll_product_name,
-    //     R.drawable.smart_selfie_enrollment_v2,
+    // SmartSelfieEnrollment(
+    //     "smart_selfie_enrollment",
+    //     com.smileidentity.R.string.si_smart_selfie_enrollment_product_name,
+    //     com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
     // ),
+    // SmartSelfieAuthentication(
+    //     "smart_selfie_authentication",
+    //     com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
+    //     R.drawable.smart_selfie_authentication,
+    // ),
+
+    SmartSelfieEnrollmentV2(
+        "smart_selfie_enrollment_v2",
+        com.smileidentity.R.string.si_smart_selfie_v2_enroll_product_name,
+        R.drawable.smart_selfie_enrollment_v2,
+    ),
     // SmartSelfieAuthenticationV2(
     //     "smart_selfie_authentication_v2",
     //     com.smileidentity.R.string.si_smart_selfie_v2_auth_product_name,
     //     R.drawable.smart_selfie_authentication_v2,
     // ),
 
-    BiometricKyc(
-        "biometric_kyc",
-        com.smileidentity.R.string.si_biometric_kyc_product_name,
-        R.drawable.biometric_kyc,
-    ),
-    DocumentVerification(
-        "document_verification",
-        com.smileidentity.R.string.si_doc_v_product_name,
-        R.drawable.doc_v,
-    ),
-    EnhancedDocumentVerification(
-        "enhanced_docv",
-        com.smileidentity.R.string.si_enhanced_docv_product_name,
-        R.drawable.enhanced_doc_v,
-    ),
-    EnhancedKyc(
-        "enhanced_kyc",
-        R.string.enhanced_kyc_product_name,
-        R.drawable.enhanced_kyc,
-    ),
-    BvnConsent(
-        "bvn_consent",
-        com.smileidentity.R.string.si_bvn_product_name,
-        R.drawable.bvn_consent,
-    ),
+    // BiometricKyc(
+    //     "biometric_kyc",
+    //     com.smileidentity.R.string.si_biometric_kyc_product_name,
+    //     R.drawable.biometric_kyc,
+    // ),
+    // DocumentVerification(
+    //     "document_verification",
+    //     com.smileidentity.R.string.si_doc_v_product_name,
+    //     R.drawable.doc_v,
+    // ),
+    // EnhancedDocumentVerification(
+    //     "enhanced_docv",
+    //     com.smileidentity.R.string.si_enhanced_docv_product_name,
+    //     R.drawable.enhanced_doc_v,
+    // ),
+    // EnhancedKyc(
+    //     "enhanced_kyc",
+    //     R.string.enhanced_kyc_product_name,
+    //     R.drawable.enhanced_kyc,
+    // ),
+    // BvnConsent(
+    //     "bvn_consent",
+    //     com.smileidentity.R.string.si_bvn_product_name,
+    //     R.drawable.bvn_consent,
+    // ),
 }
 
 enum class BottomNavigationScreen(

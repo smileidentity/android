@@ -92,11 +92,11 @@ fun MainScreen(
     val currentRoute by navController.currentBackStackEntryAsState()
     val bottomNavSelection = uiState.bottomNavSelection
     val bottomNavItems = remember { BottomNavigationScreen.entries.toImmutableList() }
-    val dialogDestinations = remember {
-        listOf(
-            "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
-        )
-    }
+    // val dialogDestinations = remember {
+    //     listOf(
+    //         "^${ProductScreen.SmartSelfieAuthentication.route}$".toRegex(),
+    //     )
+    // }
     val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(uiState.clipboardText) {
@@ -128,8 +128,8 @@ fun MainScreen(
                     val isDirectlyOnBottomNavDestination = bottomNavItems.any {
                         it.route.contains(routeString)
                     }
-                    val isOnDialogDestination = dialogDestinations.any { it matches routeString }
-                    return@derivedStateOf isDirectlyOnBottomNavDestination || isOnDialogDestination
+                    // val isOnDialogDestination = dialogDestinations.any { it matches routeString }
+                    return@derivedStateOf isDirectlyOnBottomNavDestination
                 }
             }
             if (showBottomBar) {
@@ -171,54 +171,54 @@ fun MainScreen(
                     LaunchedEffect(Unit) { viewModel.onSettingsSelected() }
                     SettingsScreen()
                 }
-                composable(ProductScreen.SmartSelfieEnrollment.route) {
-                    LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
-                    val userId = rememberSaveable { randomUserId() }
-                    val jobId = rememberSaveable { randomJobId() }
-                    SmileID.SmartSelfieEnrollment(
-                        userId = userId,
-                        jobId = jobId,
-                        allowAgentMode = true,
-                        showInstructions = true,
-                    ) { result ->
-                        viewModel.onSmartSelfieEnrollmentResult(userId, jobId, result)
-                        navController.popBackStack()
-                    }
-                }
-                dialog(ProductScreen.SmartSelfieAuthentication.route) {
-                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
-                    SmartSelfieAuthenticationUserIdInputDialog(
-                        onDismiss = {
-                            viewModel.onHomeSelected()
-                            navController.popBackStack()
-                        },
-                        onConfirm = { userId ->
-                            navController.navigate(
-                                "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
-                            ) { popUpTo(BottomNavigationScreen.Home.route) }
-                        },
-                    )
-                }
-                composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
-                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
-                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    val jobId = rememberSaveable { randomJobId() }
-                    SmileID.SmartSelfieAuthentication(
-                        userId = userId,
-                        jobId = jobId,
-                        allowAgentMode = true,
-                    ) { result ->
-                        viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
-                        navController.popBackStack()
-                    }
-                }
-                // composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
-                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                //     SmileID.SmartSelfieEnrollment(useStrictMode = true) {
-                //         viewModel.onSmartSelfieEnrollmentV2Result(it)
+                // composable(ProductScreen.SmartSelfieEnrollment.route) {
+                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentSelected() }
+                //     val userId = rememberSaveable { randomUserId() }
+                //     val jobId = rememberSaveable { randomJobId() }
+                //     SmileID.SmartSelfieEnrollment(
+                //         userId = userId,
+                //         jobId = jobId,
+                //         allowAgentMode = true,
+                //         showInstructions = true,
+                //     ) { result ->
+                //         viewModel.onSmartSelfieEnrollmentResult(userId, jobId, result)
                 //         navController.popBackStack()
                 //     }
                 // }
+                // dialog(ProductScreen.SmartSelfieAuthentication.route) {
+                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                //     SmartSelfieAuthenticationUserIdInputDialog(
+                //         onDismiss = {
+                //             viewModel.onHomeSelected()
+                //             navController.popBackStack()
+                //         },
+                //         onConfirm = { userId ->
+                //             navController.navigate(
+                //                 "${ProductScreen.SmartSelfieAuthentication.route}/$userId",
+                //             ) { popUpTo(BottomNavigationScreen.Home.route) }
+                //         },
+                //     )
+                // }
+                // composable(ProductScreen.SmartSelfieAuthentication.route + "/{userId}") {
+                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationSelected() }
+                //     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                //     val jobId = rememberSaveable { randomJobId() }
+                //     SmileID.SmartSelfieAuthentication(
+                //         userId = userId,
+                //         jobId = jobId,
+                //         allowAgentMode = true,
+                //     ) { result ->
+                //         viewModel.onSmartSelfieAuthenticationResult(userId, jobId, result)
+                //         navController.popBackStack()
+                //     }
+                // }
+                composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
+                    SmileID.SmartSelfieEnrollment(useStrictMode = true) {
+                        viewModel.onSmartSelfieEnrollmentV2Result(it)
+                        navController.popBackStack()
+                    }
+                }
                 // dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
                 //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                 //     SmartSelfieAuthenticationUserIdInputDialog(
@@ -241,141 +241,141 @@ fun MainScreen(
                 //         navController.popBackStack()
                 //     }
                 // }
-                composable(ProductScreen.EnhancedKyc.route) {
-                    LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
-                    val userId = rememberSaveable { randomUserId() }
-                    val jobId = rememberSaveable { randomJobId() }
-                    OrchestratedEnhancedKycScreen(
-                        userId = userId,
-                        jobId = jobId,
-                        onConsentDenied = {
-                            viewModel.onConsentDenied()
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        },
-                    ) { result ->
-                        viewModel.onEnhancedKycResult(result)
-                        navController.popBackStack()
-                    }
-                }
-                composable(ProductScreen.BiometricKyc.route) {
-                    LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
-                    val userId = rememberSaveable { randomUserId() }
-                    val jobId = rememberSaveable { randomJobId() }
-                    var idInfo: IdInfo? by remember { mutableStateOf(null) }
-                    if (idInfo == null) {
-                        IdTypeSelectorAndFieldInputScreen(
-                            userId = userId,
-                            jobId = jobId,
-                            jobType = JobType.BiometricKyc,
-                            onConsentDenied = {
-                                viewModel.onConsentDenied()
-                                navController.popBackStack(
-                                    route = BottomNavigationScreen.Home.route,
-                                    inclusive = false,
-                                )
-                            },
-                            onResult = { idInfo = it },
-                        )
-                    }
-                    idInfo?.let {
-                        SmileID.BiometricKYC(
-                            idInfo = it,
-                            userId = userId,
-                            jobId = jobId,
-                        ) { result ->
-                            viewModel.onBiometricKycResult(userId, jobId, result)
-                            navController.popBackStack()
-                        }
-                    }
-                }
-                composable(ProductScreen.DocumentVerification.route) {
-                    LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
-                        navController.navigate(
-                            route = ProductScreen.DocumentVerification.route +
-                                "/$country/$idType/$captureBothSides",
-                        ) { popUpTo(ProductScreen.DocumentVerification.route) }
-                    }
-                }
-                composable(
-                    ProductScreen.DocumentVerification.route +
-                        "/{countryCode}/{idType}/{captureBothSides}",
-                ) {
-                    LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    val userId = rememberSaveable { randomUserId() }
-                    val jobId = rememberSaveable { randomJobId() }
-                    SmileID.DocumentVerification(
-                        userId = userId,
-                        jobId = jobId,
-                        countryCode = it.arguments?.getString("countryCode")!!,
-                        documentType = it.arguments?.getString("documentType"),
-                        captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
-                        showInstructions = true,
-                        allowGalleryUpload = true,
-                    ) { result ->
-                        viewModel.onDocumentVerificationResult(userId, jobId, result)
-                        navController.popBackStack(
-                            route = BottomNavigationScreen.Home.route,
-                            inclusive = false,
-                        )
-                    }
-                }
-                composable(ProductScreen.EnhancedDocumentVerification.route) {
-                    LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }
-                    var idInfo: IdInfo? by remember { mutableStateOf(null) }
-                    if (idInfo == null) {
-                        IdTypeSelectorScreen(
-                            jobType = JobType.EnhancedDocumentVerification,
-                            onResult = { idInfo = it },
-                        )
-                    }
-                    idInfo?.let {
-                        val userId = rememberSaveable { randomUserId() }
-                        val jobId = rememberSaveable { randomJobId() }
-                        SmileID.EnhancedDocumentVerificationScreen(
-                            userId = userId,
-                            jobId = jobId,
-                            countryCode = it.country,
-                            documentType = it.idType,
-                            captureBothSides = true,
-                            showInstructions = true,
-                            allowGalleryUpload = true,
-                        ) { result ->
-                            viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        }
-                    }
-                }
-                composable(ProductScreen.BvnConsent.route) {
-                    LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
-                    SmileID.BvnConsentScreen(
-                        partnerIcon = painterResource(
-                            id = com.smileidentity.R.drawable.si_logo_with_text,
-                        ),
-                        partnerName = stringResource(com.smileidentity.R.string.si_company_name),
-                        partnerPrivacyPolicy = privacyPolicy,
-                        onConsentDenied = {
-                            viewModel.onConsentDenied()
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        },
-                        onConsentGranted = {
-                            viewModel.onSuccessfulBvnConsent()
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
-                        },
-                    )
-                }
+                // composable(ProductScreen.EnhancedKyc.route) {
+                //     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
+                //     val userId = rememberSaveable { randomUserId() }
+                //     val jobId = rememberSaveable { randomJobId() }
+                //     OrchestratedEnhancedKycScreen(
+                //         userId = userId,
+                //         jobId = jobId,
+                //         onConsentDenied = {
+                //             viewModel.onConsentDenied()
+                //             navController.popBackStack(
+                //                 route = BottomNavigationScreen.Home.route,
+                //                 inclusive = false,
+                //             )
+                //         },
+                //     ) { result ->
+                //         viewModel.onEnhancedKycResult(result)
+                //         navController.popBackStack()
+                //     }
+                // }
+                // composable(ProductScreen.BiometricKyc.route) {
+                //     LaunchedEffect(Unit) { viewModel.onBiometricKycSelected() }
+                //     val userId = rememberSaveable { randomUserId() }
+                //     val jobId = rememberSaveable { randomJobId() }
+                //     var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                //     if (idInfo == null) {
+                //         IdTypeSelectorAndFieldInputScreen(
+                //             userId = userId,
+                //             jobId = jobId,
+                //             jobType = JobType.BiometricKyc,
+                //             onConsentDenied = {
+                //                 viewModel.onConsentDenied()
+                //                 navController.popBackStack(
+                //                     route = BottomNavigationScreen.Home.route,
+                //                     inclusive = false,
+                //                 )
+                //             },
+                //             onResult = { idInfo = it },
+                //         )
+                //     }
+                //     idInfo?.let {
+                //         SmileID.BiometricKYC(
+                //             idInfo = it,
+                //             userId = userId,
+                //             jobId = jobId,
+                //         ) { result ->
+                //             viewModel.onBiometricKycResult(userId, jobId, result)
+                //             navController.popBackStack()
+                //         }
+                //     }
+                // }
+                // composable(ProductScreen.DocumentVerification.route) {
+                //     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
+                //     DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
+                //         navController.navigate(
+                //             route = ProductScreen.DocumentVerification.route +
+                //                 "/$country/$idType/$captureBothSides",
+                //         ) { popUpTo(ProductScreen.DocumentVerification.route) }
+                //     }
+                // }
+                // composable(
+                //     ProductScreen.DocumentVerification.route +
+                //         "/{countryCode}/{idType}/{captureBothSides}",
+                // ) {
+                //     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
+                //     val userId = rememberSaveable { randomUserId() }
+                //     val jobId = rememberSaveable { randomJobId() }
+                //     SmileID.DocumentVerification(
+                //         userId = userId,
+                //         jobId = jobId,
+                //         countryCode = it.arguments?.getString("countryCode")!!,
+                //         documentType = it.arguments?.getString("documentType"),
+                //         captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
+                //         showInstructions = true,
+                //         allowGalleryUpload = true,
+                //     ) { result ->
+                //         viewModel.onDocumentVerificationResult(userId, jobId, result)
+                //         navController.popBackStack(
+                //             route = BottomNavigationScreen.Home.route,
+                //             inclusive = false,
+                //         )
+                //     }
+                // }
+                // composable(ProductScreen.EnhancedDocumentVerification.route) {
+                //     LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }
+                //     var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                //     if (idInfo == null) {
+                //         IdTypeSelectorScreen(
+                //             jobType = JobType.EnhancedDocumentVerification,
+                //             onResult = { idInfo = it },
+                //         )
+                //     }
+                //     idInfo?.let {
+                //         val userId = rememberSaveable { randomUserId() }
+                //         val jobId = rememberSaveable { randomJobId() }
+                //         SmileID.EnhancedDocumentVerificationScreen(
+                //             userId = userId,
+                //             jobId = jobId,
+                //             countryCode = it.country,
+                //             documentType = it.idType,
+                //             captureBothSides = true,
+                //             showInstructions = true,
+                //             allowGalleryUpload = true,
+                //         ) { result ->
+                //             viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
+                //             navController.popBackStack(
+                //                 route = BottomNavigationScreen.Home.route,
+                //                 inclusive = false,
+                //             )
+                //         }
+                //     }
+                // }
+                // composable(ProductScreen.BvnConsent.route) {
+                //     LaunchedEffect(Unit) { viewModel.onBvnConsentSelected() }
+                //     SmileID.BvnConsentScreen(
+                //         partnerIcon = painterResource(
+                //             id = com.smileidentity.R.drawable.si_logo_with_text,
+                //         ),
+                //         partnerName = stringResource(com.smileidentity.R.string.si_company_name),
+                //         partnerPrivacyPolicy = privacyPolicy,
+                //         onConsentDenied = {
+                //             viewModel.onConsentDenied()
+                //             navController.popBackStack(
+                //                 route = BottomNavigationScreen.Home.route,
+                //                 inclusive = false,
+                //             )
+                //         },
+                //         onConsentGranted = {
+                //             viewModel.onSuccessfulBvnConsent()
+                //             navController.popBackStack(
+                //                 route = BottomNavigationScreen.Home.route,
+                //                 inclusive = false,
+                //             )
+                //         },
+                //     )
+                // }
             }
         },
     )
