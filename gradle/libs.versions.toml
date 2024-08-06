@@ -8,7 +8,7 @@ androidx-core = "1.13.1"
 androidx-core-splashscreen = "1.0.1"
 androidx-fragment = "1.8.2"
 androidx-lifecycle = "2.8.4"
-androidx-navigation = "2.7.7"
+androidx-navigation = "2.8.0-beta06"
 androidx-test-core = "1.6.1"
 androidx-test-espresso = "3.6.1"
 androidx-test-fragment = "1.8.2"
@@ -44,6 +44,7 @@ tflite-support = "0.4.4"
 timber = "5.0.1"
 truth = "1.4.4"
 uiautomator = "2.3.0"
+kotlinxSerializationJson = "1.6.3"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
@@ -56,6 +57,7 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
@@ -117,3 +119,4 @@ tflite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", v
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
