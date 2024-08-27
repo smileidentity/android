@@ -223,6 +223,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.rules)
