@@ -10,15 +10,17 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.smileidentity.R
-import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.nav.DocumentCaptureParams
+import com.smileidentity.compose.nav.ProcessingScreenParams
+import com.smileidentity.compose.nav.ResultCallbacks
+import com.smileidentity.compose.nav.Routes
+import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -32,6 +34,10 @@ import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
  */
 @Composable
 internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
+    mainNavController: NavController,
+    childNavController: NavController,
+    resultCallbacks: ResultCallbacks,
+    content: @Composable () -> Unit,
     viewModel: OrchestratedDocumentViewModel<T>,
     modifier: Modifier = Modifier,
     idAspectRatio: Float? = null,
@@ -43,7 +49,19 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     showInstructions: Boolean = true,
     onResult: SmileIDCallback<T> = {},
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    resultCallbacks.onDocumentFrontCaptureSuccess = viewModel::onDocumentFrontCaptureSuccess
+    resultCallbacks.onDocumentBackCaptureSuccess = viewModel::onDocumentBackCaptureSuccess
+    resultCallbacks.onDocumentCaptureError = viewModel::onError
+    resultCallbacks.onDocumentBackSkip = viewModel::onDocumentBackSkip
+    resultCallbacks.onProcessingContinue = { viewModel.onFinished(onResult) }
+    resultCallbacks.onProcessingClose = { viewModel.onFinished(onResult) }
+    resultCallbacks.onSmartSelfieResult = {
+        when (it) {
+            is SmileIDResult.Error -> viewModel.onError(it.throwable)
+            is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
+        }
+    }
     Box(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background)
@@ -51,83 +69,79 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        when (val currentStep = uiState.currentStep) {
-            DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
-                jobId = jobId,
-                side = DocumentCaptureSide.Front,
-                showInstructions = showInstructions,
-                showAttribution = showAttribution,
-                allowGallerySelection = allowGalleryUpload,
-                showSkipButton = false,
-                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
-                instructionsTitleText = stringResource(R.string.si_doc_v_instruction_title),
-                instructionsSubtitleText = stringResource(
-                    id = R.string.si_verify_identity_instruction_subtitle,
+        content()
+    }
+    when (val currentStep = uiState.currentStep) {
+        DocumentCaptureFlow.FrontDocumentCapture -> childNavController.navigate(
+            Routes.DocumentCaptureFrontRoute(
+                DocumentCaptureParams(
+                    jobId = jobId,
+                    userId = userId,
+                    showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowGallerySelection = allowGalleryUpload,
+                    showSkipButton = false,
+                    instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+                    instructionsTitleText = R.string.si_doc_v_instruction_title,
+                    instructionsSubtitleText = R.string.si_verify_identity_instruction_subtitle,
+                    captureTitleText = R.string.si_doc_v_capture_instructions_front_title,
+                    knownIdAspectRatio = idAspectRatio,
                 ),
-                captureTitleText = stringResource(
-                    id = R.string.si_doc_v_capture_instructions_front_title,
-                ),
-                knownIdAspectRatio = idAspectRatio,
-                onConfirm = viewModel::onDocumentFrontCaptureSuccess,
-                onError = viewModel::onError,
-            )
+            ),
+        )
 
-            DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
-                jobId = jobId,
-                side = DocumentCaptureSide.Back,
-                showInstructions = showInstructions,
-                showAttribution = showAttribution,
-                allowGallerySelection = allowGalleryUpload,
-                showSkipButton = false,
-                instructionsHeroImage = R.drawable.si_doc_v_back_hero,
-                instructionsTitleText = stringResource(R.string.si_doc_v_instruction_back_title),
-                instructionsSubtitleText = stringResource(
-                    id = R.string.si_doc_v_instruction_back_subtitle,
+        DocumentCaptureFlow.BackDocumentCapture -> childNavController.navigate(
+            Routes.DocumentCaptureFrontRoute(
+                DocumentCaptureParams(
+                    jobId = jobId,
+                    userId = userId,
+                    showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowGallerySelection = allowGalleryUpload,
+                    showSkipButton = false,
+                    instructionsHeroImage = R.drawable.si_doc_v_back_hero,
+                    instructionsTitleText = R.string.si_doc_v_instruction_back_title,
+                    instructionsSubtitleText = R.string.si_doc_v_instruction_back_subtitle,
+                    captureTitleText = R.string.si_doc_v_capture_instructions_back_title,
+                    knownIdAspectRatio = idAspectRatio,
                 ),
-                captureTitleText = stringResource(
-                    id = R.string.si_doc_v_capture_instructions_back_title,
+            ),
+        )
+
+        DocumentCaptureFlow.SelfieCapture -> mainNavController.navigate(
+            Routes.OrchestratedSelfieRoute(
+                SelfieCaptureParams(
+                    userId = userId,
+                    jobId = jobId,
+                    showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowAgentMode = allowAgentMode,
+                    skipApiSubmission = true,
                 ),
-                knownIdAspectRatio = idAspectRatio,
-                onConfirm = viewModel::onDocumentBackCaptureSuccess,
-                onError = viewModel::onError,
-                onSkip = viewModel::onDocumentBackSkip,
-            )
+            ),
+        )
 
-            DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                skipApiSubmission = true,
-            ) {
-                when (it) {
-                    is SmileIDResult.Error -> viewModel.onError(it.throwable)
-                    is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
-                }
-            }
-
-            is DocumentCaptureFlow.ProcessingScreen -> ProcessingScreen(
-                processingState = currentStep.processingState,
-                inProgressTitle = stringResource(R.string.si_doc_v_processing_title),
-                inProgressSubtitle = stringResource(R.string.si_doc_v_processing_subtitle),
-                inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
-                successTitle = stringResource(R.string.si_doc_v_processing_success_title),
-                successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-                    ?: stringResource(R.string.si_doc_v_processing_success_subtitle),
-                successIcon = painterResource(R.drawable.si_processing_success),
-                errorTitle = stringResource(id = R.string.si_doc_v_processing_error_title),
-                errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-                    ?: stringResource(id = R.string.si_processing_error_subtitle),
-                errorIcon = painterResource(R.drawable.si_processing_error),
-                continueButtonText = stringResource(R.string.si_continue),
-                onContinue = { viewModel.onFinished(onResult) },
-                retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-                onRetry = viewModel::onRetry,
-                closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
-                onClose = { viewModel.onFinished(onResult) },
-            )
-        }
+        is DocumentCaptureFlow.ProcessingScreen -> childNavController.navigate(
+            Routes.ProcessingScreenRoute(
+                ProcessingScreenParams(
+                    processingState = currentStep.processingState,
+                    inProgressTitle = R.string.si_doc_v_processing_title,
+                    inProgressSubtitle = R.string.si_doc_v_processing_subtitle,
+                    inProgressIcon = R.drawable.si_doc_v_processing_hero,
+                    successTitle = R.string.si_doc_v_processing_success_title,
+                    successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                        ?: stringResource(R.string.si_doc_v_processing_success_subtitle),
+                    successIcon = R.drawable.si_processing_success,
+                    errorTitle = R.string.si_doc_v_processing_error_title,
+                    errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                        ?: stringResource(id = R.string.si_processing_error_subtitle),
+                    errorIcon = R.drawable.si_processing_error,
+                    continueButtonText = R.string.si_continue,
+                    retryButtonText = R.string.si_smart_selfie_processing_retry_button,
+                    closeButtonText = R.string.si_smart_selfie_processing_close_button,
+                ),
+            ),
+        )
+        else -> println("test")
     }
 }

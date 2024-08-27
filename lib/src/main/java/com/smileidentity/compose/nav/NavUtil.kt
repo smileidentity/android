@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.navigation.NavType
 import java.io.File
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -63,25 +66,18 @@ internal fun getDocumentCaptureRoute(
     )
 }
 
-internal fun getSelfieCaptureRoute(
-    useStrictMode: Boolean,
-    params: SelfieCaptureParams,
-    isEnroll: Boolean,
-): Routes {
-    val captureParams = SelfieCaptureParams(
-        userId = params.userId,
-        jobId = params.jobId,
-        allowNewEnroll = params.allowNewEnroll,
-        isEnroll = isEnroll,
-        allowAgentMode = params.allowAgentMode,
-        showAttribution = params.showAttribution,
-        showInstructions = params.showInstructions,
-        useStrictMode = useStrictMode,
-        extraPartnerParams = params.extraPartnerParams,
-    )
+internal fun getSelfieCaptureRoute(useStrictMode: Boolean, params: SelfieCaptureParams): Routes {
     return if (useStrictMode) {
-        Routes.SelfieCaptureScreenRouteV2(captureParams)
+        Routes.SelfieCaptureScreenRouteV2(params)
     } else {
-        Routes.SelfieCaptureScreenRoute(captureParams)
+        Routes.SelfieCaptureScreenRoute(params)
     }
+}
+
+fun encodeUrl(url: String): String {
+    return URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
+}
+
+fun decodeUrl(encodedUrl: String): String {
+    return URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.toString())
 }

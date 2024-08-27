@@ -1,6 +1,5 @@
 package com.smileidentity.compose.document
 
-import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,16 +26,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -47,10 +41,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.LocalMetadata
+import com.smileidentity.compose.nav.DocumentInstructionParams
+import com.smileidentity.compose.nav.ImageConfirmParams
+import com.smileidentity.compose.nav.ResultCallbacks
+import com.smileidentity.compose.nav.Routes
+import com.smileidentity.compose.nav.encodeUrl
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.v2.Metadatum
@@ -82,7 +81,9 @@ enum class DocumentCaptureSide {
  * This handles Instructions + Capture + Confirmation for a single side of a document
  */
 @Composable
-fun DocumentCaptureScreen(
+internal fun DocumentCaptureScreen(
+    navController: NavController,
+    resultCallbacks: ResultCallbacks,
     jobId: String,
     side: DocumentCaptureSide,
     showInstructions: Boolean,
@@ -134,51 +135,47 @@ fun DocumentCaptureScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val documentImageToConfirm = uiState.documentImageToConfirm
     val captureError = uiState.captureError
+    resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery = {
+        Timber.v("onInstructionsAcknowledgedSelectFromGallery")
+        SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
+        photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
+    }
+    resultCallbacks.onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged
+    resultCallbacks.onDocumentInstructionSkip = onSkip
+    documentImageToConfirm?.let {
+        resultCallbacks.onConfirmCapturedImage =
+            { viewModel.onConfirm(documentImageToConfirm, onConfirm) }
+        resultCallbacks.onImageDialogRetake = viewModel::onRetry
+    }
     when {
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
-            DocumentCaptureInstructionsScreen(
-                heroImage = instructionsHeroImage,
-                title = instructionsTitleText,
-                subtitle = instructionsSubtitleText,
-                showAttribution = showAttribution,
-                allowPhotoFromGallery = allowGallerySelection,
-                showSkipButton = showSkipButton,
-                onInstructionsAcknowledgedSelectFromGallery = {
-                    Timber.v("onInstructionsAcknowledgedSelectFromGallery")
-                    SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
-                    photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
-                },
-                onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
-                onSkip = onSkip,
+            navController.navigate(
+                Routes.DocumentInstructionRoute(
+                    DocumentInstructionParams(
+                        heroImage = instructionsHeroImage,
+                        title = instructionsTitleText,
+                        subtitle = instructionsSubtitleText,
+                        showAttribution = showAttribution,
+                        allowPhotoFromGallery = allowGallerySelection,
+                        showSkipButton = showSkipButton,
+                    ),
+                ),
             )
         }
 
         documentImageToConfirm != null -> {
-            val painter = remember {
-                val path = documentImageToConfirm.absolutePath
-                try {
-                    BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
-                } catch (e: Exception) {
-                    SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
-                    SmileIDCrashReporting.hub.captureException(e)
-                    onError(e)
-                    ColorPainter(Color.Black)
-                }
-            }
-            ImageCaptureConfirmationDialog(
-                titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
-                subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-                painter = painter,
-                scaleFactor = PREVIEW_SCALE_FACTOR,
-                confirmButtonText = stringResource(
-                    id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+            navController.navigate(
+                Routes.ImageCaptureConfirmDialog(
+                    ImageConfirmParams(
+                        titleText = R.string.si_smart_selfie_confirmation_dialog_title,
+                        subtitleText = R.string.si_smart_selfie_confirmation_dialog_subtitle,
+                        imageFilePath = encodeUrl(documentImageToConfirm.absolutePath),
+                        confirmButtonText = R.string.si_doc_v_confirmation_dialog_confirm_button,
+                        retakeButtonText = R.string.si_doc_v_confirmation_dialog_retake_button,
+                        scaleFactor = 1.0f,
+                    ),
                 ),
-                onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
-                retakeButtonText = stringResource(
-                    id = R.string.si_doc_v_confirmation_dialog_retake_button,
-                ),
-                onRetake = viewModel::onRetry,
             )
         }
 
@@ -204,7 +201,7 @@ fun DocumentCaptureScreen(
 }
 
 @Composable
-private fun CaptureScreenContent(
+fun CaptureScreenContent(
     titleText: String,
     subtitleText: String,
     idAspectRatio: Float,

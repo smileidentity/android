@@ -19,7 +19,7 @@ import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.getDocumentCaptureRoute
 import com.smileidentity.compose.nav.getSelfieCaptureRoute
-import com.smileidentity.compose.nav.mainGraph
+import com.smileidentity.compose.nav.orchestratedNavGraph
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.IdInfo
@@ -85,10 +85,18 @@ fun SmileID.SmartSelfieEnrollment(
         showAttribution,
         showInstructions,
         extraPartnerParams,
+        true,
     )
-    val startDest = getSelfieCaptureRoute(useStrictMode, commonParams, isEnroll = true)
-    BaseSmileIDScreen(startDest, modifier, colorScheme, typography) {
-        mainGraph(onResult)
+    val orchestratedDestination = Routes.OrchestratedSelfieRoute(commonParams)
+    val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        modifier,
+        colorScheme,
+        typography,
+    ) { mainNavController, childNavController, resultCallBacks, content ->
+        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
     }
 }
 
@@ -141,10 +149,18 @@ fun SmileID.SmartSelfieAuthentication(
         showAttribution,
         showInstructions,
         extraPartnerParams,
+        isEnroll = false,
     )
-    val startDest = getSelfieCaptureRoute(useStrictMode, commonParams, isEnroll = false)
-    BaseSmileIDScreen(startDest, modifier, colorScheme, typography) {
-        mainGraph(onResult)
+    val orchestratedDestination = Routes.OrchestratedSelfieRoute(commonParams)
+    val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        modifier,
+        colorScheme,
+        typography,
+    ) { mainNavController, childNavController, resultCallBacks, content ->
+        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
     }
 }
 
@@ -203,7 +219,6 @@ fun SmileID.DocumentVerification(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     val commonParams = DocumentCaptureParams(
-        countryCode,
         userId,
         jobId,
         allowNewEnroll,
@@ -211,8 +226,9 @@ fun SmileID.DocumentVerification(
         showAttribution,
         showInstructions,
         extraPartnerParams,
+        countryCode = countryCode,
     )
-    val startDest = getDocumentCaptureRoute(
+    val screenDestination = getDocumentCaptureRoute(
         countryCode,
         commonParams,
         documentType,
@@ -221,8 +237,15 @@ fun SmileID.DocumentVerification(
         bypassSelfieCaptureWithFile,
         allowGalleryUpload,
     )
-    BaseSmileIDScreen(startDest, modifier, colorScheme, typography) {
-        mainGraph(onDocVResult = onResult)
+    val orchestratedDestination = Routes.OrchestratedDocVRoute(commonParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        modifier,
+        colorScheme,
+        typography,
+    ) { mainNavController, childNavController, resultCallBacks, content ->
+        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
     }
 }
 
@@ -282,7 +305,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     val commonParams = DocumentCaptureParams(
-        countryCode,
         userId,
         jobId,
         allowNewEnroll,
@@ -290,8 +312,9 @@ fun SmileID.EnhancedDocumentVerificationScreen(
         showAttribution,
         showInstructions,
         extraPartnerParams,
+        countryCode = countryCode,
     )
-    val startDest = getDocumentCaptureRoute(
+    val screenDestination = getDocumentCaptureRoute(
         countryCode,
         commonParams,
         documentType,
@@ -300,8 +323,15 @@ fun SmileID.EnhancedDocumentVerificationScreen(
         bypassSelfieCaptureWithFile,
         allowGalleryUpload,
     )
-    BaseSmileIDScreen(startDest, modifier, colorScheme, typography) {
-        mainGraph(onEnhancedDocVResult = onResult)
+    val orchestratedDestination = Routes.OrchestratedEnhancedDocVRoute(commonParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        modifier,
+        colorScheme,
+        typography,
+    ) { mainNavController, childNavController, resultCallBacks, content ->
+        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
     }
 }
 
@@ -344,7 +374,7 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    val startDest = Routes.OrchestratedBiometricKycRoute(
+    val orchestratedDestination = Routes.OrchestratedBiometricKycRoute(
         OrchestratedBiometricKYCParams(
             idInfo = idInfo,
             userId = userId,
@@ -356,8 +386,25 @@ fun SmileID.BiometricKYC(
             extraPartnerParams = extraPartnerParams,
         ),
     )
-    BaseSmileIDScreen(startDest, modifier, colorScheme, typography) {
-        mainGraph(onBiometricKYCResult = onResult)
+    val selfieCaptureParams = SelfieCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        true,
+    )
+    val screenDestination = getSelfieCaptureRoute(false, selfieCaptureParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        modifier,
+        colorScheme,
+        typography,
+    ) { mainNavController, childNavController, resultCallBacks, content ->
+        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
     }
 }
 

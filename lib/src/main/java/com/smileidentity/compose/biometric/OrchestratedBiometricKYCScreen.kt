@@ -1,21 +1,25 @@
 package com.smileidentity.compose.biometric
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
+import com.smileidentity.R
+import com.smileidentity.compose.nav.ProcessingScreenParams
+import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
-import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
@@ -28,7 +32,11 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
-fun OrchestratedBiometricKYCScreen(
+internal fun OrchestratedBiometricKYCScreen(
+    mainNavController: NavController,
+    childNavController: NavController,
+    resultCallbacks: ResultCallbacks,
+    content: @Composable () -> Unit,
     idInfo: IdInfo,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
@@ -51,80 +59,65 @@ fun OrchestratedBiometricKYCScreen(
     ),
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     Box(
         modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        val navController = rememberNavController()
-        NavHost(navController, startDestination = Routes.SelfieCaptureScreenRoute) {
-            composable<Routes.SelfieCaptureScreenRoute> {
-                OrchestratedSelfieCaptureScreen(
+        content()
+    }
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    resultCallbacks.onBiometricKYCResult = onResult
+    resultCallbacks.onSmartSelfieResult = {
+        when (it) {
+            is SmileIDResult.Error -> onResult(it)
+            is SmileIDResult.Success -> viewModel.onSelfieCaptured(
+                selfieFile = it.data.selfieFile,
+                livenessFiles = it.data.livenessFiles,
+            )
+        }
+    }
+    when {
+        uiState.processingState != null -> {
+            childNavController.navigate(
+                Routes.ProcessingScreenRoute(
+                    ProcessingScreenParams(
+                        processingState = uiState.processingState,
+                        inProgressTitle = R.string.si_biometric_kyc_processing_title,
+                        inProgressSubtitle = R.string.si_smart_selfie_processing_subtitle,
+                        inProgressIcon = R.drawable.si_smart_selfie_processing_hero,
+                        successTitle = R.string.si_biometric_kyc_processing_success_title,
+                        successSubtitle = uiState.errorMessage.resolve().takeIf {
+                            it.isNotEmpty()
+                        } ?: stringResource(R.string.si_biometric_kyc_processing_success_subtitle),
+                        successIcon = R.drawable.si_processing_success,
+                        errorTitle = R.string.si_biometric_kyc_processing_error_subtitle,
+                        errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+                            ?: stringResource(id = R.string.si_processing_error_subtitle),
+                        errorIcon = R.drawable.si_processing_error,
+                        continueButtonText = R.string.si_continue,
+                        retryButtonText = R.string.si_smart_selfie_processing_retry_button,
+                        closeButtonText = R.string.si_smart_selfie_processing_close_button,
+                    ),
+                ),
+            )
+        }
+
+        else -> mainNavController.navigate(
+            Routes.OrchestratedSelfieRoute(
+                SelfieCaptureParams(
                     userId = userId,
                     jobId = jobId,
-                    allowAgentMode = allowAgentMode,
-                    showAttribution = showAttribution,
                     showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowAgentMode = allowAgentMode,
+                    allowNewEnroll = allowNewEnroll,
+                    extraPartnerParams = extraPartnerParams,
                     skipApiSubmission = true,
-                ) {
-                    when (it) {
-                        is SmileIDResult.Error -> onResult(it)
-                        is SmileIDResult.Success -> {
-                            viewModel.onSelfieCaptured(
-                                selfieFile = it.data.selfieFile,
-                                livenessFiles = it.data.livenessFiles,
-                            )
-                            navController.navigate(Routes.OrchestratedProcessingRoute)
-                        }
-                    }
-                }
-            }
-            // composable<Routes.OrchestratedProcessingRoute>(
-            //     typeMap = mapOf(
-            //         typeOf<ProcessingState>() to ProcessingStateNavType,
-            //     ),
-            // ) {
-            //     uiState.processingState?.let {
-            //         ProcessingScreen(
-            //             processingState = it,
-            //             inProgressTitle = stringResource(
-            //                 R.string.si_biometric_kyc_processing_title,
-            //             ),
-            //             inProgressSubtitle = stringResource(
-            //                 R.string.si_smart_selfie_processing_subtitle,
-            //             ),
-            //             inProgressIcon = painterResource(
-            //                 R.drawable.si_smart_selfie_processing_hero,
-            //             ),
-            //             successTitle = stringResource(
-            //                 R.string.si_biometric_kyc_processing_success_title,
-            //             ),
-            //             successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-            //                 ?: stringResource(
-            //                     R.string.si_biometric_kyc_processing_success_subtitle,
-            //                 ),
-            //             successIcon = painterResource(R.drawable.si_processing_success),
-            //             errorTitle = stringResource(
-            //                 R.string.si_biometric_kyc_processing_error_subtitle,
-            //             ),
-            //             errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-            //                 ?: stringResource(id = R.string.si_processing_error_subtitle),
-            //             errorIcon = painterResource(R.drawable.si_processing_error),
-            //             continueButtonText = stringResource(R.string.si_continue),
-            //             onContinue = { viewModel.onFinished(onResult) },
-            //             retryButtonText = stringResource(
-            //                 R.string.si_smart_selfie_processing_retry_button,
-            //             ),
-            //             onRetry = { viewModel.onRetry() },
-            //             closeButtonText = stringResource(
-            //                 R.string.si_smart_selfie_processing_close_button,
-            //             ),
-            //             onClose = { viewModel.onFinished(onResult) },
-            //         )
-            //     }
-            // }
-        }
+                ),
+            ),
+        )
     }
 }
