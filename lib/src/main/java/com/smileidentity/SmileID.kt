@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import android.provider.Settings.Secure
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
@@ -54,10 +55,13 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -126,7 +130,6 @@ object SmileID {
         if (enableCrashReporting) {
             SmileIDCrashReporting.enable(isInDebugMode)
         }
-        requestFaceDetectionModuleInstallation(context)
 
         SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
@@ -146,6 +149,14 @@ object SmileID {
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
+
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            Timber.d("Face Detection Module Exception : ${throwable.message}")
+            throw throwable
+        }
+
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob() + exceptionHandler)
+        scope.launch { requestFaceDetectionModuleInstallation(context) }
     }
 
     /**
@@ -478,29 +489,53 @@ object SmileID {
     /**
      * Request Google Play Services to install the Face Detection Module, if not already installed.
      */
-    private fun requestFaceDetectionModuleInstallation(context: Context) {
-        // see: https://github.com/googlesamples/mlkit/issues/264
-        MlKitContext.initializeIfNeeded(context)
-        val moduleInstallRequest = ModuleInstallRequest.newBuilder()
-            .addApi(FaceDetection.getClient())
-            .setListener {
-                val message = "Face Detection install status: " +
-                    "errorCode=${it.errorCode}, " +
-                    "installState=${it.installState}, " +
-                    "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
-                    "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}"
-                Timber.d(message)
-                SmileIDCrashReporting.hub.addBreadcrumb(message)
-            }.build()
+    @Suppress("ktlint:standard:max-line-length")
+    private suspend fun requestFaceDetectionModuleInstallation(context: Context) {
+        withContext(Dispatchers.IO) {
+            try {
+                // see: https://github.com/googlesamples/mlkit/issues/264
+                MlKitContext.initializeIfNeeded(context)
 
-        ModuleInstall.getClient(context)
-            .installModules(moduleInstallRequest)
-            .addOnSuccessListener {
-                Timber.d("Face Detection install success: ${it.areModulesAlreadyInstalled()}")
+                val moduleInstallRequest = ModuleInstallRequest.newBuilder()
+                    .addApi(FaceDetection.getClient())
+                    .setListener {
+                        val message = "Face Detection install status: " +
+                            "errorCode=${it.errorCode}, " +
+                            "installState=${it.installState}, " +
+                            "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
+                            "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}"
+                        Timber.d(message)
+                        SmileIDCrashReporting.hub.addBreadcrumb(message)
+                    }.build()
+
+                val installTask =
+                    ModuleInstall.getClient(context).installModules(moduleInstallRequest)
+
+                Tasks.await(installTask)
+
+                if (installTask.isSuccessful) {
+                    Timber.d(
+                        "Face Detection install success: " +
+                            "${installTask.result.areModulesAlreadyInstalled()}",
+                    )
+                } else {
+                    val exception = installTask.exception
+                        ?: Exception(
+                            "An error occurred during Face Detection module installation." +
+                                "See the guide here to use the bundled version " +
+                                "https://developers.google.com/ml-kit/vision/face-detection/android",
+                        )
+                    Timber.w(exception, "Face Detection install failed")
+                    SmileIDCrashReporting.hub.addBreadcrumb("Face Detection install failed")
+                    throw exception
+                }
+            } catch (exception: Exception) {
+                Timber.e(exception, "Error during Face Detection module installation")
+                SmileIDCrashReporting.hub.addBreadcrumb(
+                    "Error during Face Detection module installation: ${exception.message}",
+                )
+                throw exception
             }
-            .addOnFailureListener {
-                Timber.w(it, "Face Detection install failed")
-                SmileIDCrashReporting.hub.addBreadcrumb("Face Detection install failed")
-            }
+        }
     }
 }
