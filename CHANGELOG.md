@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Changed MLKit download modules to throw an exception explicitly if download fails 
+
 ## 10.2.5
 
 * Fixed a bug where prep upload would not work for previously attempted API requests
