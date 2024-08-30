@@ -15,7 +15,6 @@ import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
-import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
@@ -49,6 +48,7 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.moveJobToSubmitted
+import com.smileidentity.util.toSmileIDException
 import com.squareup.moshi.Moshi
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -326,17 +327,24 @@ object SmileID {
             signature = authResponse.signature,
         )
 
-        val prepUploadResponse = try {
+        val prepUploadResponse = runCatching {
             api.prepUpload(prepUploadRequest)
-        } catch (e: SmileIDException) {
-            // It may be the case that Prep Upload was called during the job but the link expired.
-            // We need to pass retry=true in order to obtain a new link
-            if (e.details.code == "2215") {
-                api.prepUpload(prepUploadRequest.copy(retry = true))
-            } else {
-                throw e
+        }.recoverCatching { e ->
+            when {
+                e is HttpException -> {
+                    val smileIDException = e.toSmileIDException()
+                    if (smileIDException.details.code == "2215") {
+                        api.prepUpload(prepUploadRequest.copy(retry = true))
+                    } else {
+                        throw smileIDException
+                    }
+                }
+
+                else -> {
+                    throw e
+                }
             }
-        }
+        }.getOrThrow()
 
         val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
         val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)

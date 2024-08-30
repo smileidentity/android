@@ -36,6 +36,7 @@ import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
+import com.smileidentity.util.toSmileIDException
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
@@ -184,17 +186,25 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 timestamp = authResponse.timestamp,
             )
 
-            val prepUploadResponse = try {
+            val prepUploadResponse = runCatching {
                 SmileID.api.prepUpload(prepUploadRequest)
-            } catch (e: SmileIDException) {
-                // It may be the case that Prep Upload was called during the job but the link expired.
-                // We need to pass retry=true in order to obtain a new link
-                if (e.details.code == "2215") {
-                    SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
-                } else {
-                    throw e
+            }.recoverCatching { e ->
+                when {
+                    e is HttpException -> {
+                        val smileIDException = e.toSmileIDException()
+                        if (smileIDException.details.code == "2215") {
+                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                        } else {
+                            throw smileIDException
+                        }
+                    }
+
+                    else -> {
+                        throw e
+                    }
                 }
-            }
+            }.getOrThrow()
+
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
             sendResult(documentFrontFile, documentBackFile, livenessFiles)
