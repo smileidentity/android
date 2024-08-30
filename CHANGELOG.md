@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Fixed upload bug to retry in case a job already exists but zip was not uploaded
+
 ## 10.2.5
 
 * Fixed a bug where prep upload would not work for previously attempted API requests
