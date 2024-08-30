@@ -188,10 +188,10 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             val prepUploadResponse = runCatching {
                 SmileID.api.prepUpload(prepUploadRequest)
-            }.recoverCatching { e ->
+            }.recoverCatching { throwable ->
                 when {
-                    e is HttpException -> {
-                        val smileIDException = e.toSmileIDException()
+                    throwable is HttpException -> {
+                        val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
                             SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
                         } else {
@@ -200,7 +200,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     }
 
                     else -> {
-                        throw e
+                        throw throwable
                     }
                 }
             }.getOrThrow()
