@@ -1,5 +1,6 @@
 package com.smileidentity.sample.compose
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +50,7 @@ fun RootScreen(
             .build()
     }
 
+    @SuppressLint("ProduceStateDoesNotAssignValue")
     val initializationState by produceState<InitializationState>(
         InitializationState.NotInitialized,
     ) {
