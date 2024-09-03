@@ -46,7 +46,7 @@ jobs:
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Bundle
         run: ./gradlew bundleRelease
         env:
@@ -62,7 +62,7 @@ jobs:
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
           releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
       - name: Send Slack
-        uses: slackapi/slack-github-action@v1.26.0
+        uses: slackapi/slack-github-action@v1.27.0
         with:
           payload: |
             {

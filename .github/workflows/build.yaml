@@ -35,7 +35,7 @@ jobs:
             echo "version=$VERSION-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Build, Test, Lint, Assemble, Publish Snapshot
         # NB! The "lint" gradle action here is different than ktLint
         run: ./gradlew lint build assembleDebug publish
