@@ -18,7 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.smileidentity.R
 import com.smileidentity.SmileID
@@ -218,7 +217,7 @@ internal fun NavGraphBuilder.screensNavGraph(
     sharedDestinations(resultCallbacks)
     selfieDestinations(resultCallbacks)
     documentsDestinations(resultCallbacks, navController)
-    nestedDocumentsDestinations(resultCallbacks)
+    documentsDestinations(resultCallbacks)
 }
 
 internal fun NavGraphBuilder.documentsDestinations(
@@ -284,83 +283,57 @@ internal fun NavGraphBuilder.documentsDestinations(
     }
 }
 
-internal fun NavGraphBuilder.nestedDocumentsDestinations(
+internal fun NavGraphBuilder.documentsDestinations(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
 ) {
-    navigation<DocScreens>(
-        startDestination = Routes.Document.FrontInstructionScreen,
-    ) {
-        composable<Routes.Document.FrontInstructionScreen> { navBackStackEntry ->
-            // val route = navBackStackEntry.toRoute<Routes.Document.InstructionScreen>()
-            // val params = route.params
-            DocumentCaptureInstructionsScreen(
-                heroImage = R.drawable.si_doc_v_front_hero,
-                title = stringResource(R.string.si_doc_v_instruction_title),
-                subtitle = stringResource(
-                    id = R.string.si_verify_identity_instruction_subtitle,
-                ),
-                showAttribution = true,
-                allowPhotoFromGallery = false,
-                showSkipButton = false,
-                onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
-                onInstructionsAcknowledgedSelectFromGallery =
-                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
-                    ?: {},
-                onInstructionsAcknowledgedTakePhoto =
-                resultCallbacks.onInstructionsAcknowledgedTakePhoto
-                    ?: {},
-            )
-        }
-
-        composable<Routes.Document.InstructionScreen>(
-            typeMap = mapOf(
-                typeOf<DocumentInstructionParams>() to CustomNavType(
-                    DocumentInstructionParams::class.java,
-                    DocumentInstructionParams.serializer(),
-                ),
+    composable<Routes.Document.InstructionScreen>(
+        typeMap = mapOf(
+            typeOf<DocumentInstructionParams>() to CustomNavType(
+                DocumentInstructionParams::class.java,
+                DocumentInstructionParams.serializer(),
             ),
-        ) { navBackStackEntry ->
-            val route = navBackStackEntry.toRoute<Routes.Document.InstructionScreen>()
-            val params = route.params
-            DocumentCaptureInstructionsScreen(
-                heroImage = params.heroImage,
-                title = params.title,
-                subtitle = params.subtitle,
-                showAttribution = params.showAttribution,
-                allowPhotoFromGallery = params.allowPhotoFromGallery,
-                showSkipButton = params.showSkipButton,
-                onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
-                onInstructionsAcknowledgedSelectFromGallery =
-                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
-                    ?: {},
-                onInstructionsAcknowledgedTakePhoto =
-                resultCallbacks.onInstructionsAcknowledgedTakePhoto
-                    ?: {},
-            )
-        }
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.Document.InstructionScreen>()
+        val params = route.params
+        DocumentCaptureInstructionsScreen(
+            heroImage = params.heroImage,
+            title = params.title,
+            subtitle = params.subtitle,
+            showAttribution = params.showAttribution,
+            allowPhotoFromGallery = params.allowPhotoFromGallery,
+            showSkipButton = params.showSkipButton,
+            onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
+            onInstructionsAcknowledgedSelectFromGallery =
+            resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
+                ?: {},
+            onInstructionsAcknowledgedTakePhoto =
+            resultCallbacks.onInstructionsAcknowledgedTakePhoto
+                ?: {},
+        )
+    }
 
-        composable<Routes.Document.CaptureScreenContent>(
-            typeMap = mapOf(
-                typeOf<DocumentCaptureContentParams>() to CustomNavType(
-                    DocumentCaptureContentParams::class.java,
-                    DocumentCaptureContentParams.serializer(),
-                ),
+    composable<Routes.Document.CaptureScreenContent>(
+        typeMap = mapOf(
+            typeOf<DocumentCaptureContentParams>() to CustomNavType(
+                DocumentCaptureContentParams::class.java,
+                DocumentCaptureContentParams.serializer(),
             ),
-        ) { navBackStackEntry ->
-            val route = navBackStackEntry.toRoute<Routes.Document.CaptureScreenContent>()
-            val params = route.params
-            CaptureScreenContent(
-                titleText = stringResource(params.titleText),
-                subtitleText = stringResource(params.subtitleText),
-                idAspectRatio = params.idAspectRatio,
-                areEdgesDetected = params.areEdgesDetected,
-                showCaptureInProgress = params.showCaptureInProgress,
-                showManualCaptureButton = params.showManualCaptureButton,
-                onCaptureClicked = resultCallbacks.onCaptureClicked ?: {},
-                imageAnalyzer = resultCallbacks.imageAnalyzer ?: { _, _ -> },
-                onFocusEvent = resultCallbacks.onFocusEvent ?: {},
-            )
-        }
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.Document.CaptureScreenContent>()
+        val params = route.params
+        CaptureScreenContent(
+            titleText = stringResource(params.titleText),
+            subtitleText = stringResource(params.subtitleText),
+            idAspectRatio = params.idAspectRatio,
+            areEdgesDetected = params.areEdgesDetected,
+            showCaptureInProgress = params.showCaptureInProgress,
+            showManualCaptureButton = params.showManualCaptureButton,
+            onCaptureClicked = resultCallbacks.onCaptureClicked ?: {},
+            imageAnalyzer = resultCallbacks.imageAnalyzer ?: { _, _ -> },
+            onFocusEvent = resultCallbacks.onFocusEvent ?: {},
+        )
     }
 }
 

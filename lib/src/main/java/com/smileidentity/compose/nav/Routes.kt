@@ -4,12 +4,9 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
-@Serializable object DocScreens
-
-@Serializable object First
-
 @Serializable
 sealed class Routes : Parcelable {
+
     sealed class Selfie : Routes() {
         @Parcelize
         @Serializable

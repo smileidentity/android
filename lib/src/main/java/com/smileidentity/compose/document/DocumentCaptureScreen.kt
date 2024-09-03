@@ -5,18 +5,19 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.LocalMetadata
-import com.smileidentity.compose.nav.DocumentCaptureContentParams
 import com.smileidentity.compose.nav.DocumentInstructionParams
 import com.smileidentity.compose.nav.ImageConfirmParams
 import com.smileidentity.compose.nav.ResultCallbacks
@@ -103,45 +104,16 @@ internal fun DocumentCaptureScreen(
         photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
     }
     resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
-        navController.navigate(
-            Routes.Document.CaptureScreenContent(
-                DocumentCaptureContentParams(
-                    titleText = R.string.si_doc_v_instruction_title,
-                    subtitleText = uiState.directive.displayText,
-                    idAspectRatio = knownIdAspectRatio ?: 1.59f,
-                    areEdgesDetected = uiState.areEdgesDetected,
-                    showCaptureInProgress = uiState.showCaptureInProgress,
-                    showManualCaptureButton = uiState.areEdgesDetected,
-                ),
-            ),
-        )
+        viewModel.onInstructionsAcknowledged()
+        navController.popBackStack()
     }
-    resultCallbacks.onCaptureClicked = viewModel::captureDocumentManually
-    resultCallbacks.imageAnalyzer = viewModel::analyze
-    resultCallbacks.onFocusEvent = viewModel::onFocusEvent
     resultCallbacks.onDocumentInstructionSkip = onSkip
-    documentImageToConfirm?.let {
-        navController.navigate(
-            Routes.Shared.ImageConfirmDialog(
-                ImageConfirmParams(
-                    titleText = R.string.si_smart_selfie_confirmation_dialog_title,
-                    subtitleText = R.string.si_smart_selfie_confirmation_dialog_subtitle,
-                    imageFilePath = encodeUrl(documentImageToConfirm.absolutePath),
-                    confirmButtonText = R.string.si_doc_v_confirmation_dialog_confirm_button,
-                    retakeButtonText = R.string.si_doc_v_confirmation_dialog_retake_button,
-                    scaleFactor = 1.0f,
-                ),
-            ),
-        )
-        // resultCallbacks.onConfirmCapturedImage = { viewModel.onConfirm(documentImageToConfirm, onConfirm) }
-        // resultCallbacks.onImageDialogRetake = viewModel::onRetry
-    }
     when {
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
             navController.navigate(
                 Routes.Document.InstructionScreen(
-                    DocumentInstructionParams(
+                    params = DocumentInstructionParams(
                         heroImage = instructionsHeroImage,
                         title = instructionsTitleText,
                         subtitle = instructionsSubtitleText,
@@ -150,10 +122,21 @@ internal fun DocumentCaptureScreen(
                         showSkipButton = showSkipButton,
                     ),
                 ),
-            )
+            ) {
+                launchSingleTop = true
+                restoreState = true
+            }
         }
 
         documentImageToConfirm != null -> {
+            resultCallbacks.onConfirmCapturedImage = {
+                viewModel.onConfirm(documentImageToConfirm, onConfirm)
+                navController.popBackStack()
+            }
+            resultCallbacks.onImageDialogRetake = {
+                viewModel.onRetry()
+                navController.popBackStack()
+            }
             navController.navigate(
                 Routes.Shared.ImageConfirmDialog(
                     ImageConfirmParams(
@@ -165,26 +148,29 @@ internal fun DocumentCaptureScreen(
                         scaleFactor = 1.0f,
                     ),
                 ),
-            )
+            ) {
+                launchSingleTop = true
+                restoreState = true
+            }
         }
 
         else -> {
-            // val aspectRatio by animateFloatAsState(
-            //     targetValue = uiState.idAspectRatio,
-            //     label = "ID Aspect Ratio",
-            // )
-            // CaptureScreenContent(
-            //     titleText = captureTitleText,
-            //     subtitleText = stringResource(id = uiState.directive.displayText),
-            //     idAspectRatio = aspectRatio,
-            //     areEdgesDetected = uiState.areEdgesDetected,
-            //     showCaptureInProgress = uiState.showCaptureInProgress,
-            //     showManualCaptureButton = uiState.showManualCaptureButton,
-            //     onCaptureClicked = viewModel::captureDocumentManually,
-            //     imageAnalyzer = viewModel::analyze,
-            //     onFocusEvent = viewModel::onFocusEvent,
-            //     modifier = modifier,
-            // )
+            val aspectRatio by animateFloatAsState(
+                targetValue = uiState.idAspectRatio,
+                label = "ID Aspect Ratio",
+            )
+            CaptureScreenContent(
+                titleText = captureTitleText,
+                subtitleText = stringResource(id = uiState.directive.displayText),
+                idAspectRatio = aspectRatio,
+                areEdgesDetected = uiState.areEdgesDetected,
+                showCaptureInProgress = uiState.showCaptureInProgress,
+                showManualCaptureButton = uiState.showManualCaptureButton,
+                onCaptureClicked = viewModel::captureDocumentManually,
+                imageAnalyzer = viewModel::analyze,
+                onFocusEvent = viewModel::onFocusEvent,
+                modifier = modifier,
+            )
         }
     }
 }
