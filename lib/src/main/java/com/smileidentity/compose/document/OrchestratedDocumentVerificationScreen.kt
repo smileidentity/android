@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.smileidentity.R
 import com.smileidentity.compose.nav.DocumentCaptureParams
+import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
@@ -50,10 +51,31 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     onResult: SmileIDCallback<T> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery = {
+    }
+    resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
+    }
     resultCallbacks.onDocumentFrontCaptureSuccess = viewModel::onDocumentFrontCaptureSuccess
     resultCallbacks.onDocumentBackCaptureSuccess = viewModel::onDocumentBackCaptureSuccess
     resultCallbacks.onDocumentCaptureError = viewModel::onError
     resultCallbacks.onDocumentBackSkip = viewModel::onDocumentBackSkip
+    resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
+        Routes.Document.CaptureFrontScreen(
+            DocumentCaptureParams(
+                jobId = jobId,
+                userId = userId,
+                showInstructions = showInstructions,
+                showAttribution = showAttribution,
+                allowGallerySelection = allowGalleryUpload,
+                showSkipButton = false,
+                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+                instructionsTitleText = R.string.si_doc_v_instruction_title,
+                instructionsSubtitleText = R.string.si_verify_identity_instruction_subtitle,
+                captureTitleText = R.string.si_doc_v_capture_instructions_front_title,
+                knownIdAspectRatio = idAspectRatio,
+            ),
+        )
+    }
     resultCallbacks.onProcessingContinue = { viewModel.onFinished(onResult) }
     resultCallbacks.onProcessingClose = { viewModel.onFinished(onResult) }
     resultCallbacks.onSmartSelfieResult = {
@@ -73,7 +95,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     }
     when (val currentStep = uiState.currentStep) {
         DocumentCaptureFlow.FrontDocumentCapture -> childNavController.navigate(
-            Routes.DocumentCaptureFrontRoute(
+            Routes.Document.CaptureFrontScreen(
                 DocumentCaptureParams(
                     jobId = jobId,
                     userId = userId,
@@ -91,7 +113,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         )
 
         DocumentCaptureFlow.BackDocumentCapture -> childNavController.navigate(
-            Routes.DocumentCaptureFrontRoute(
+            Routes.Document.CaptureBackScreen(
                 DocumentCaptureParams(
                     jobId = jobId,
                     userId = userId,
@@ -109,20 +131,22 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         )
 
         DocumentCaptureFlow.SelfieCapture -> mainNavController.navigate(
-            Routes.OrchestratedSelfieRoute(
-                SelfieCaptureParams(
-                    userId = userId,
-                    jobId = jobId,
-                    showInstructions = showInstructions,
-                    showAttribution = showAttribution,
-                    allowAgentMode = allowAgentMode,
-                    skipApiSubmission = true,
+            Routes.Orchestrated.SelfieRoute(
+                OrchestratedSelfieCaptureParams(
+                    SelfieCaptureParams(
+                        userId = userId,
+                        jobId = jobId,
+                        showInstructions = showInstructions,
+                        showAttribution = showAttribution,
+                        allowAgentMode = allowAgentMode,
+                        skipApiSubmission = true,
+                    ),
                 ),
             ),
         )
 
         is DocumentCaptureFlow.ProcessingScreen -> childNavController.navigate(
-            Routes.ProcessingScreenRoute(
+            Routes.Shared.ProcessingScreen(
                 ProcessingScreenParams(
                     processingState = currentStep.processingState,
                     inProgressTitle = R.string.si_doc_v_processing_title,

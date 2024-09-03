@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -17,11 +18,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
+import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.document.CaptureScreenContent
@@ -34,6 +37,9 @@ import com.smileidentity.compose.selfie.SelfieCaptureScreen
 import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.models.JobType
+import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
+import com.smileidentity.viewmodel.viewModelFactory
 import kotlin.reflect.typeOf
 
 internal typealias MainGraphType = NavGraphBuilder.(
@@ -80,40 +86,40 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
     content: @Composable () -> Unit,
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
 ) {
-    composable<Routes.OrchestratedSelfieRoute>(
+    composable<Routes.Orchestrated.SelfieRoute>(
         typeMap = mapOf(
-            typeOf<SelfieCaptureParams>() to CustomNavType(
-                SelfieCaptureParams::class.java,
-                SelfieCaptureParams.serializer(),
+            typeOf<OrchestratedSelfieCaptureParams>() to CustomNavType(
+                OrchestratedSelfieCaptureParams::class.java,
+                OrchestratedSelfieCaptureParams.serializer(),
             ),
         ),
     ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.OrchestratedSelfieRoute>()
+        val route = navBackStackEntry.toRoute<Routes.Orchestrated.SelfieRoute>()
         val params = route.params
         OrchestratedSelfieCaptureScreen(
-            childNavController = mainNavController,
+            childNavController = childNavController,
             resultCallbacks = resultCallbacks,
             content = content,
-            userId = params.userId,
-            jobId = params.jobId,
-            allowNewEnroll = params.allowNewEnroll,
-            isEnroll = params.isEnroll,
-            allowAgentMode = params.allowAgentMode,
-            skipApiSubmission = params.skipApiSubmission,
-            showAttribution = params.showAttribution,
-            showInstructions = params.showInstructions,
-            extraPartnerParams = params.extraPartnerParams,
+            userId = params.captureParams.userId,
+            jobId = params.captureParams.jobId,
+            allowNewEnroll = params.captureParams.allowNewEnroll,
+            isEnroll = params.captureParams.isEnroll,
+            allowAgentMode = params.captureParams.allowAgentMode,
+            skipApiSubmission = params.captureParams.skipApiSubmission,
+            showAttribution = params.captureParams.showAttribution,
+            showInstructions = params.captureParams.showInstructions,
+            extraPartnerParams = params.captureParams.extraPartnerParams,
         )
     }
-    composable<Routes.OrchestratedBiometricKycRoute>(
+    composable<Routes.Orchestrated.BiometricKycRoute>(
         typeMap = mapOf(
-            typeOf<OrchestratedBiometricKYCParams>() to CustomNavType(
-                OrchestratedBiometricKYCParams::class.java,
-                OrchestratedBiometricKYCParams.serializer(),
+            typeOf<OrchestratedBiometricCaptureParams>() to CustomNavType(
+                OrchestratedBiometricCaptureParams::class.java,
+                OrchestratedBiometricCaptureParams.serializer(),
             ),
         ),
     ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.OrchestratedBiometricKycRoute>()
+        val route = backStackEntry.toRoute<Routes.Orchestrated.BiometricKycRoute>()
         val params = route.params
         resultCallbacks.biometricKycViewModel?.let {
             OrchestratedBiometricKYCScreen(
@@ -121,55 +127,69 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
                 childNavController = childNavController,
                 resultCallbacks = resultCallbacks,
                 content = content,
-                idInfo = params.idInfo,
-                userId = params.userId,
-                jobId = params.jobId,
-                allowNewEnroll = params.allowNewEnroll,
-                allowAgentMode = params.allowAgentMode,
-                showAttribution = params.showAttribution,
-                showInstructions = params.showInstructions,
-                extraPartnerParams = params.extraPartnerParams,
+                idInfo = params.captureParams.idInfo,
+                userId = params.captureParams.userId,
+                jobId = params.captureParams.jobId,
+                allowNewEnroll = params.captureParams.allowNewEnroll,
+                allowAgentMode = params.captureParams.allowAgentMode,
+                showAttribution = params.captureParams.showAttribution,
+                showInstructions = params.captureParams.showInstructions,
+                extraPartnerParams = params.captureParams.extraPartnerParams,
                 viewModel = it,
             )
         }
     }
-    composable<Routes.OrchestratedDocVRoute>(
+    composable<Routes.Orchestrated.DocVRoute>(
         typeMap = mapOf(
-            typeOf<DocumentCaptureParams>() to CustomNavType(
-                DocumentCaptureParams::class.java,
-                DocumentCaptureParams.serializer(),
+            typeOf<OrchestratedDocumentParams>() to CustomNavType(
+                OrchestratedDocumentParams::class.java,
+                OrchestratedDocumentParams.serializer(),
             ),
         ),
     ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.OrchestratedDocVRoute>()
+        val route = backStackEntry.toRoute<Routes.Orchestrated.DocVRoute>()
         val params = route.params
-        resultCallbacks.documentViewModel?.let {
-            OrchestratedDocumentVerificationScreen(
-                mainNavController = mainNavController,
-                childNavController = childNavController,
-                resultCallbacks = resultCallbacks,
-                content = content,
-                userId = params.userId,
-                jobId = params.jobId,
-                showAttribution = params.showAttribution,
-                allowAgentMode = params.allowAgentMode,
-                allowGalleryUpload = params.allowGallerySelection,
-                showInstructions = params.showInstructions,
-                idAspectRatio = params.knownIdAspectRatio,
-                onResult = resultCallbacks.onDocVResult ?: {},
-                viewModel = it,
-            )
-        }
+        val metadata = LocalMetadata.current
+        OrchestratedDocumentVerificationScreen(
+            mainNavController = mainNavController,
+            childNavController = childNavController,
+            resultCallbacks = resultCallbacks,
+            content = content,
+            userId = params.captureParams.userId,
+            jobId = params.captureParams.jobId,
+            showAttribution = params.captureParams.showAttribution,
+            allowAgentMode = params.captureParams.allowAgentMode,
+            allowGalleryUpload = params.captureParams.allowGallerySelection,
+            showInstructions = params.captureParams.showInstructions,
+            idAspectRatio = params.captureParams.knownIdAspectRatio,
+            onResult = resultCallbacks.onDocVResult ?: {},
+            viewModel = viewModel(
+                factory = viewModelFactory {
+                    DocumentVerificationViewModel(
+                        jobType = JobType.DocumentVerification,
+                        userId = params.captureParams.userId,
+                        jobId = params.captureParams.jobId,
+                        allowNewEnroll = params.captureParams.allowNewEnroll,
+                        countryCode = params.captureParams.countryCode!!,
+                        documentType = params.captureParams.documentType,
+                        captureBothSides = params.captureParams.captureBothSides,
+                        selfieFile = params.captureParams.selfieFile?.toFile(),
+                        extraPartnerParams = params.captureParams.extraPartnerParams,
+                        metadata = metadata,
+                    )
+                },
+            ),
+        )
     }
-    composable<Routes.OrchestratedEnhancedDocVRoute>(
+    composable<Routes.Orchestrated.EnhancedDocVRoute>(
         typeMap = mapOf(
-            typeOf<DocumentCaptureParams>() to CustomNavType(
-                DocumentCaptureParams::class.java,
-                DocumentCaptureParams.serializer(),
+            typeOf<OrchestratedDocumentParams>() to CustomNavType(
+                OrchestratedDocumentParams::class.java,
+                OrchestratedDocumentParams.serializer(),
             ),
         ),
     ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.OrchestratedEnhancedDocVRoute>()
+        val route = backStackEntry.toRoute<Routes.Orchestrated.EnhancedDocVRoute>()
         val params = route.params
         resultCallbacks.enhancedDocVViewModel?.let {
             OrchestratedDocumentVerificationScreen(
@@ -177,13 +197,13 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
                 childNavController = childNavController,
                 resultCallbacks = resultCallbacks,
                 content = content,
-                userId = params.userId,
-                jobId = params.jobId,
-                showAttribution = params.showAttribution,
-                allowAgentMode = params.allowAgentMode,
-                allowGalleryUpload = params.allowGallerySelection,
-                showInstructions = params.showInstructions,
-                idAspectRatio = params.knownIdAspectRatio,
+                userId = params.captureParams.userId,
+                jobId = params.captureParams.jobId,
+                showAttribution = params.captureParams.showAttribution,
+                allowAgentMode = params.captureParams.allowAgentMode,
+                allowGalleryUpload = params.captureParams.allowGallerySelection,
+                showInstructions = params.captureParams.showInstructions,
+                idAspectRatio = params.captureParams.knownIdAspectRatio,
                 onResult = resultCallbacks.onEnhancedDocVResult ?: {},
                 viewModel = it,
             )
@@ -195,151 +215,17 @@ internal fun NavGraphBuilder.screensNavGraph(
     navController: NavController,
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
 ) {
-    composable<Routes.SelfieCaptureScreenRoute>(
-        typeMap = mapOf(
-            typeOf<SelfieCaptureParams>() to CustomNavType(
-                SelfieCaptureParams::class.java,
-                SelfieCaptureParams.serializer(),
-            ),
-        ),
-    ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.SelfieCaptureScreenRoute>()
-        val params = route.params
-        resultCallbacks.selfieViewModel?.let {
-            SelfieCaptureScreen(
-                userId = params.userId,
-                jobId = params.jobId,
-                isEnroll = params.isEnroll,
-                allowAgentMode = params.allowAgentMode,
-                skipApiSubmission = params.skipApiSubmission,
-                viewModel = it,
-            )
-        }
-    }
+    sharedDestinations(resultCallbacks)
+    selfieDestinations(resultCallbacks)
+    documentsDestinations(resultCallbacks, navController)
+    nestedDocumentsDestinations(resultCallbacks)
+}
 
-    composable<Routes.SelfieInstructionsScreenRoute>(
-        typeMap = mapOf(
-            typeOf<InstructionScreenParams>() to CustomNavType(
-                InstructionScreenParams::class.java,
-                InstructionScreenParams.serializer(),
-            ),
-        ),
-    ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.SelfieInstructionsScreenRoute>()
-        val params = route.params
-        SmartSelfieInstructionsScreen(
-            showAttribution = params.showAttribution,
-            onInstructionsAcknowledged = resultCallbacks.onSelfieInstructionScreen ?: {},
-        )
-    }
-
-    composable<Routes.DocumentCaptureScreenContent>(
-        typeMap = mapOf(
-            typeOf<DocumentCaptureContentParams>() to CustomNavType(
-                DocumentCaptureContentParams::class.java,
-                DocumentCaptureContentParams.serializer(),
-            ),
-        ),
-    ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.DocumentCaptureScreenContent>()
-        val params = route.params
-        CaptureScreenContent(
-            titleText = stringResource(params.titleText),
-            subtitleText = stringResource(params.subtitleText),
-            idAspectRatio = params.idAspectRatio,
-            areEdgesDetected = params.areEdgesDetected,
-            showCaptureInProgress = params.showCaptureInProgress,
-            showManualCaptureButton = params.showManualCaptureButton,
-            onCaptureClicked = resultCallbacks.onCaptureClicked ?: {},
-            imageAnalyzer = resultCallbacks.imageAnalyzer ?: { _, _ -> },
-            onFocusEvent = resultCallbacks.onFocusEvent ?: {},
-        )
-    }
-
-    dialog<Routes.ImageCaptureConfirmDialog>(
-        typeMap = mapOf(
-            typeOf<ImageConfirmParams>() to CustomNavType(
-                ImageConfirmParams::class.java,
-                ImageConfirmParams.serializer(),
-            ),
-        ),
-    ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.ImageCaptureConfirmDialog>()
-        val params = route.params
-        val selfieUrl = decodeUrl(params.imageFilePath)
-        ImageCaptureConfirmationDialog(
-            titleText = stringResource(params.titleText),
-            subtitleText = stringResource(params.subtitleText),
-            painter = BitmapPainter(
-                BitmapFactory.decodeFile(selfieUrl).asImageBitmap(),
-            ),
-            confirmButtonText = stringResource(
-                params.confirmButtonText,
-            ),
-            onConfirm = resultCallbacks.onConfirmCapturedImage ?: {},
-            retakeButtonText = stringResource(
-                params.retakeButtonText,
-            ),
-            onRetake = resultCallbacks.onImageDialogRetake ?: {},
-            scaleFactor = 1.25f,
-        )
-    }
-    composable<Routes.ProcessingScreenRoute>(
-        typeMap = mapOf(
-            typeOf<ProcessingScreenParams>() to CustomNavType(
-                ProcessingScreenParams::class.java,
-                ProcessingScreenParams.serializer(),
-            ),
-        ),
-    ) { backStackEntry ->
-        val route: Routes.ProcessingScreenRoute = backStackEntry.toRoute()
-        val params = route.params
-        ProcessingScreen(
-            processingState = params.processingState,
-            inProgressTitle = stringResource(params.inProgressTitle),
-            inProgressSubtitle = stringResource(params.inProgressSubtitle),
-            inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
-            successTitle = stringResource(params.successTitle),
-            successSubtitle = params.successSubtitle,
-            successIcon = painterResource(R.drawable.si_processing_success),
-            errorTitle = stringResource(params.errorTitle),
-            errorSubtitle = params.errorSubtitle,
-            errorIcon = painterResource(R.drawable.si_processing_error),
-            continueButtonText = stringResource(params.continueButtonText),
-            onContinue = resultCallbacks.onProcessingContinue ?: {},
-            retryButtonText = stringResource(params.retryButtonText),
-            onRetry = resultCallbacks.onProcessingRetry ?: {},
-            closeButtonText = stringResource(params.closeButtonText),
-            onClose = resultCallbacks.onProcessingClose ?: {},
-        )
-    }
-    composable<Routes.DocumentInstructionRoute>(
-        typeMap = mapOf(
-            typeOf<DocumentInstructionParams>() to CustomNavType(
-                DocumentInstructionParams::class.java,
-                DocumentInstructionParams.serializer(),
-            ),
-        ),
-    ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.DocumentInstructionRoute>()
-        val params = route.params
-        DocumentCaptureInstructionsScreen(
-            heroImage = params.heroImage,
-            title = params.title,
-            subtitle = params.subtitle,
-            showAttribution = params.showAttribution,
-            allowPhotoFromGallery = params.allowPhotoFromGallery,
-            showSkipButton = params.showSkipButton,
-            onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
-            onInstructionsAcknowledgedSelectFromGallery =
-            resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
-                ?: {},
-            onInstructionsAcknowledgedTakePhoto =
-            resultCallbacks.onInstructionsAcknowledgedTakePhoto
-                ?: {},
-        )
-    }
-    composable<Routes.DocumentCaptureFrontRoute>(
+internal fun NavGraphBuilder.documentsDestinations(
+    resultCallbacks: ResultCallbacks = ResultCallbacks(),
+    navController: NavController,
+) {
+    composable<Routes.Document.CaptureFrontScreen>(
         typeMap = mapOf(
             typeOf<DocumentCaptureParams>() to CustomNavType(
                 DocumentCaptureParams::class.java,
@@ -347,7 +233,7 @@ internal fun NavGraphBuilder.screensNavGraph(
             ),
         ),
     ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.DocumentCaptureFrontRoute>()
+        val route = backStackEntry.toRoute<Routes.Document.CaptureFrontScreen>()
         val params = route.params
         DocumentCaptureScreen(
             navController = navController,
@@ -367,7 +253,8 @@ internal fun NavGraphBuilder.screensNavGraph(
             onError = resultCallbacks.onDocumentCaptureError ?: {},
         )
     }
-    composable<Routes.DocumentCaptureBackRoute>(
+
+    composable<Routes.Document.CaptureBackScreen>(
         typeMap = mapOf(
             typeOf<DocumentCaptureParams>() to CustomNavType(
                 DocumentCaptureParams::class.java,
@@ -375,7 +262,7 @@ internal fun NavGraphBuilder.screensNavGraph(
             ),
         ),
     ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.DocumentCaptureFrontRoute>()
+        val route = backStackEntry.toRoute<Routes.Document.CaptureBackScreen>()
         val params = route.params
         DocumentCaptureScreen(
             navController = navController,
@@ -393,6 +280,190 @@ internal fun NavGraphBuilder.screensNavGraph(
             captureTitleText = stringResource(params.captureTitleText),
             onConfirm = resultCallbacks.onDocumentBackCaptureSuccess ?: {},
             onError = resultCallbacks.onDocumentCaptureError ?: {},
+        )
+    }
+}
+
+internal fun NavGraphBuilder.nestedDocumentsDestinations(
+    resultCallbacks: ResultCallbacks = ResultCallbacks(),
+) {
+    navigation<DocScreens>(
+        startDestination = Routes.Document.FrontInstructionScreen,
+    ) {
+        composable<Routes.Document.FrontInstructionScreen> { navBackStackEntry ->
+            // val route = navBackStackEntry.toRoute<Routes.Document.InstructionScreen>()
+            // val params = route.params
+            DocumentCaptureInstructionsScreen(
+                heroImage = R.drawable.si_doc_v_front_hero,
+                title = stringResource(R.string.si_doc_v_instruction_title),
+                subtitle = stringResource(
+                    id = R.string.si_verify_identity_instruction_subtitle,
+                ),
+                showAttribution = true,
+                allowPhotoFromGallery = false,
+                showSkipButton = false,
+                onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
+                onInstructionsAcknowledgedSelectFromGallery =
+                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
+                    ?: {},
+                onInstructionsAcknowledgedTakePhoto =
+                resultCallbacks.onInstructionsAcknowledgedTakePhoto
+                    ?: {},
+            )
+        }
+
+        composable<Routes.Document.InstructionScreen>(
+            typeMap = mapOf(
+                typeOf<DocumentInstructionParams>() to CustomNavType(
+                    DocumentInstructionParams::class.java,
+                    DocumentInstructionParams.serializer(),
+                ),
+            ),
+        ) { navBackStackEntry ->
+            val route = navBackStackEntry.toRoute<Routes.Document.InstructionScreen>()
+            val params = route.params
+            DocumentCaptureInstructionsScreen(
+                heroImage = params.heroImage,
+                title = params.title,
+                subtitle = params.subtitle,
+                showAttribution = params.showAttribution,
+                allowPhotoFromGallery = params.allowPhotoFromGallery,
+                showSkipButton = params.showSkipButton,
+                onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
+                onInstructionsAcknowledgedSelectFromGallery =
+                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
+                    ?: {},
+                onInstructionsAcknowledgedTakePhoto =
+                resultCallbacks.onInstructionsAcknowledgedTakePhoto
+                    ?: {},
+            )
+        }
+
+        composable<Routes.Document.CaptureScreenContent>(
+            typeMap = mapOf(
+                typeOf<DocumentCaptureContentParams>() to CustomNavType(
+                    DocumentCaptureContentParams::class.java,
+                    DocumentCaptureContentParams.serializer(),
+                ),
+            ),
+        ) { navBackStackEntry ->
+            val route = navBackStackEntry.toRoute<Routes.Document.CaptureScreenContent>()
+            val params = route.params
+            CaptureScreenContent(
+                titleText = stringResource(params.titleText),
+                subtitleText = stringResource(params.subtitleText),
+                idAspectRatio = params.idAspectRatio,
+                areEdgesDetected = params.areEdgesDetected,
+                showCaptureInProgress = params.showCaptureInProgress,
+                showManualCaptureButton = params.showManualCaptureButton,
+                onCaptureClicked = resultCallbacks.onCaptureClicked ?: {},
+                imageAnalyzer = resultCallbacks.imageAnalyzer ?: { _, _ -> },
+                onFocusEvent = resultCallbacks.onFocusEvent ?: {},
+            )
+        }
+    }
+}
+
+internal fun NavGraphBuilder.selfieDestinations(
+    resultCallbacks: ResultCallbacks = ResultCallbacks(),
+) {
+    composable<Routes.Selfie.CaptureScreen>(
+        typeMap = mapOf(
+            typeOf<SelfieCaptureParams>() to CustomNavType(
+                SelfieCaptureParams::class.java,
+                SelfieCaptureParams.serializer(),
+            ),
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.Selfie.CaptureScreen>()
+        val params = route.params
+        resultCallbacks.selfieViewModel?.let {
+            SelfieCaptureScreen(
+                userId = params.userId,
+                jobId = params.jobId,
+                isEnroll = params.isEnroll,
+                allowAgentMode = params.allowAgentMode,
+                skipApiSubmission = params.skipApiSubmission,
+                viewModel = it,
+            )
+        }
+    }
+
+    composable<Routes.Selfie.InstructionsScreen>(
+        typeMap = mapOf(
+            typeOf<InstructionScreenParams>() to CustomNavType(
+                InstructionScreenParams::class.java,
+                InstructionScreenParams.serializer(),
+            ),
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.Selfie.InstructionsScreen>()
+        val params = route.params
+        SmartSelfieInstructionsScreen(
+            showAttribution = params.showAttribution,
+            onInstructionsAcknowledged = resultCallbacks.onSelfieInstructionScreen ?: {},
+        )
+    }
+}
+
+internal fun NavGraphBuilder.sharedDestinations(
+    resultCallbacks: ResultCallbacks = ResultCallbacks(),
+) {
+    dialog<Routes.Shared.ImageConfirmDialog>(
+        typeMap = mapOf(
+            typeOf<ImageConfirmParams>() to CustomNavType(
+                ImageConfirmParams::class.java,
+                ImageConfirmParams.serializer(),
+            ),
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.Shared.ImageConfirmDialog>()
+        val params = route.params
+        val selfieUrl = decodeUrl(params.imageFilePath)
+        ImageCaptureConfirmationDialog(
+            titleText = stringResource(params.titleText),
+            subtitleText = stringResource(params.subtitleText),
+            painter = BitmapPainter(
+                BitmapFactory.decodeFile(selfieUrl).asImageBitmap(),
+            ),
+            confirmButtonText = stringResource(
+                params.confirmButtonText,
+            ),
+            onConfirm = resultCallbacks.onConfirmCapturedImage ?: {},
+            retakeButtonText = stringResource(
+                params.retakeButtonText,
+            ),
+            onRetake = resultCallbacks.onImageDialogRetake ?: {},
+            scaleFactor = 1.25f,
+        )
+    }
+    composable<Routes.Shared.ProcessingScreen>(
+        typeMap = mapOf(
+            typeOf<ProcessingScreenParams>() to CustomNavType(
+                ProcessingScreenParams::class.java,
+                ProcessingScreenParams.serializer(),
+            ),
+        ),
+    ) { backStackEntry ->
+        val route: Routes.Shared.ProcessingScreen = backStackEntry.toRoute()
+        val params = route.params
+        ProcessingScreen(
+            processingState = params.processingState,
+            inProgressTitle = stringResource(params.inProgressTitle),
+            inProgressSubtitle = stringResource(params.inProgressSubtitle),
+            inProgressIcon = painterResource(R.drawable.si_doc_v_processing_hero),
+            successTitle = stringResource(params.successTitle),
+            successSubtitle = params.successSubtitle,
+            successIcon = painterResource(R.drawable.si_processing_success),
+            errorTitle = stringResource(params.errorTitle),
+            errorSubtitle = params.errorSubtitle,
+            errorIcon = painterResource(R.drawable.si_processing_error),
+            continueButtonText = stringResource(params.continueButtonText),
+            onContinue = resultCallbacks.onProcessingContinue ?: {},
+            retryButtonText = stringResource(params.retryButtonText),
+            onRetry = resultCallbacks.onProcessingRetry ?: {},
+            closeButtonText = stringResource(params.closeButtonText),
+            onClose = resultCallbacks.onProcessingClose ?: {},
         )
     }
 }

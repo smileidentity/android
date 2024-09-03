@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.smileidentity.R
+import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
@@ -82,7 +83,7 @@ internal fun OrchestratedBiometricKYCScreen(
     when {
         uiState.processingState != null -> {
             childNavController.navigate(
-                Routes.ProcessingScreenRoute(
+                Routes.Shared.ProcessingScreen(
                     ProcessingScreenParams(
                         processingState = uiState.processingState,
                         inProgressTitle = R.string.si_biometric_kyc_processing_title,
@@ -106,16 +107,18 @@ internal fun OrchestratedBiometricKYCScreen(
         }
 
         else -> mainNavController.navigate(
-            Routes.OrchestratedSelfieRoute(
-                SelfieCaptureParams(
-                    userId = userId,
-                    jobId = jobId,
-                    showInstructions = showInstructions,
-                    showAttribution = showAttribution,
-                    allowAgentMode = allowAgentMode,
-                    allowNewEnroll = allowNewEnroll,
-                    extraPartnerParams = extraPartnerParams,
-                    skipApiSubmission = true,
+            Routes.Orchestrated.SelfieRoute(
+                OrchestratedSelfieCaptureParams(
+                    captureParams = SelfieCaptureParams(
+                        userId = userId,
+                        jobId = jobId,
+                        showInstructions = showInstructions,
+                        showAttribution = showAttribution,
+                        allowAgentMode = allowAgentMode,
+                        allowNewEnroll = allowNewEnroll,
+                        extraPartnerParams = extraPartnerParams,
+                        skipApiSubmission = true,
+                    ),
                 ),
             ),
         )

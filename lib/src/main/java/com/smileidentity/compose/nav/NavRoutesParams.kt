@@ -2,6 +2,7 @@ package com.smileidentity.compose.nav
 
 import android.os.Parcelable
 import androidx.camera.core.ImageProxy
+import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
@@ -101,10 +102,11 @@ data class DocumentCaptureParams(
     val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     val allowGallerySelection: Boolean = false,
     val showSkipButton: Boolean = false,
-    val instructionsHeroImage: Int = 0,
-    val instructionsTitleText: Int = 0,
-    val instructionsSubtitleText: Int = 0,
-    val captureTitleText: Int = 0,
+    val skipApiSubmission: Boolean = false,
+    val instructionsHeroImage: Int = R.drawable.si_doc_v_front_hero,
+    val instructionsTitleText: Int = R.string.si_doc_v_instruction_title,
+    val instructionsSubtitleText: Int = R.string.si_verify_identity_instruction_subtitle,
+    val captureTitleText: Int = R.string.si_doc_v_capture_instructions_front_title,
     val knownIdAspectRatio: Float? = null,
     val documentType: String? = null,
     val captureBothSides: Boolean = true,
@@ -136,7 +138,7 @@ data class DocumentInstructionParams(
 
 @Serializable
 @Parcelize
-data class OrchestratedBiometricKYCParams(
+data class BiometricKYCParams(
     val idInfo: IdInfo,
     val userId: String,
     val jobId: String,
@@ -144,6 +146,7 @@ data class OrchestratedBiometricKYCParams(
     val allowAgentMode: Boolean = false,
     val showAttribution: Boolean = true,
     val showInstructions: Boolean = true,
+    val skipApiSubmission: Boolean = false,
     val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : Parcelable
 
@@ -163,6 +166,49 @@ data class ProcessingScreenParams(
     val continueButtonText: Int,
     val retryButtonText: Int,
     val closeButtonText: Int,
+) : Parcelable
+
+@Serializable
+@Parcelize
+data class OrchestratedSelfieCaptureParams(
+    val captureParams: SelfieCaptureParams,
+    val startRoute: Routes = Routes.Selfie.InstructionsScreen(InstructionScreenParams()),
+) : Parcelable
+
+@Serializable
+@Parcelize
+data class OrchestratedBiometricCaptureParams(
+    val captureParams: BiometricKYCParams,
+    val startRoute: Routes = Routes.Orchestrated.SelfieRoute(
+        OrchestratedSelfieCaptureParams(
+            SelfieCaptureParams(
+                userId = captureParams.userId,
+                jobId = captureParams.jobId,
+                showInstructions = captureParams.showInstructions,
+                showAttribution = captureParams.showAttribution,
+                allowAgentMode = captureParams.allowAgentMode,
+                skipApiSubmission = captureParams.skipApiSubmission,
+            ),
+        ),
+    ),
+) : Parcelable
+
+@Serializable
+@Parcelize
+data class OrchestratedDocumentParams(
+    val captureParams: DocumentCaptureParams,
+    val startRoute: Routes = Routes.Orchestrated.SelfieRoute(
+        OrchestratedSelfieCaptureParams(
+            SelfieCaptureParams(
+                userId = captureParams.userId,
+                jobId = captureParams.jobId,
+                showInstructions = captureParams.showInstructions,
+                showAttribution = captureParams.showAttribution,
+                allowAgentMode = captureParams.allowAgentMode,
+                skipApiSubmission = captureParams.skipApiSubmission,
+            ),
+        ),
+    ),
 ) : Parcelable
 
 @Serializable

@@ -1,49 +1,78 @@
 package com.smileidentity.compose.nav
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
+@Serializable object DocScreens
+
+@Serializable object First
+
 @Serializable
-sealed class Routes {
-    // selfie
-    @Serializable
-    data class SelfieCaptureScreenRoute(val params: SelfieCaptureParams) : Routes()
+sealed class Routes : Parcelable {
+    sealed class Selfie : Routes() {
+        @Parcelize
+        @Serializable
+        data class CaptureScreen(val params: SelfieCaptureParams) : Selfie()
 
-    @Serializable
-    data class SelfieCaptureScreenRouteV2(val params: SelfieCaptureParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class CaptureScreenV2(val params: SelfieCaptureParams) : Selfie()
 
-    @Serializable
-    data class SelfieInstructionsScreenRoute(val params: InstructionScreenParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class InstructionsScreen(val params: InstructionScreenParams) : Selfie()
+    }
 
-    @Serializable
-    data class ImageCaptureConfirmDialog(val params: ImageConfirmParams) : Routes()
+    sealed class Document : Routes() {
+        @Parcelize
+        @Serializable
+        data object FrontInstructionScreen : Document()
 
-    // document
-    @Serializable
-    data class DocumentInstructionRoute(val params: DocumentInstructionParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class InstructionScreen(val params: DocumentInstructionParams) : Document()
 
-    @Serializable
-    data class DocumentCaptureFrontRoute(val params: DocumentCaptureParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class CaptureFrontScreen(val params: DocumentCaptureParams) : Document()
 
-    @Serializable
-    data class DocumentCaptureBackRoute(val params: DocumentCaptureParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class CaptureBackScreen(val params: DocumentCaptureParams) : Document()
 
-    @Serializable
-    data class DocumentCaptureScreenContent(val params: DocumentCaptureContentParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class CaptureScreenContent(val params: DocumentCaptureContentParams) : Document()
+    }
 
-    // shared
-    @Serializable
-    data class ProcessingScreenRoute(val params: ProcessingScreenParams) : Routes()
+    sealed class Shared : Routes() {
+        @Parcelize
+        @Serializable
+        data class ProcessingScreen(val params: ProcessingScreenParams) : Shared()
 
-    // orchestrated
-    @Serializable
-    data class OrchestratedSelfieRoute(val params: SelfieCaptureParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class ImageConfirmDialog(val params: ImageConfirmParams) : Selfie()
+    }
 
-    @Serializable
-    data class OrchestratedDocVRoute(val params: DocumentCaptureParams) : Routes()
+    sealed class Orchestrated : Routes() {
+        @Parcelize
+        @Serializable
+        data class SelfieRoute(val params: OrchestratedSelfieCaptureParams) : Orchestrated()
 
-    @Serializable
-    data class OrchestratedEnhancedDocVRoute(val params: DocumentCaptureParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class DocVRoute(val params: OrchestratedDocumentParams) : Orchestrated()
 
-    @Serializable
-    data class OrchestratedBiometricKycRoute(val params: OrchestratedBiometricKYCParams) : Routes()
+        @Parcelize
+        @Serializable
+        data class EnhancedDocVRoute(val params: OrchestratedDocumentParams) : Orchestrated()
+
+        @Parcelize
+        @Serializable
+        data class BiometricKycRoute(
+            val params: OrchestratedBiometricCaptureParams,
+        ) : Orchestrated()
+    }
 }

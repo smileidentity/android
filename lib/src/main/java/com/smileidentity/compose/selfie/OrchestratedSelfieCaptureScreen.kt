@@ -92,7 +92,7 @@ internal fun OrchestratedSelfieCaptureScreen(
         acknowledgedInstructions = true
         resultCallbacks.selfieViewModel = viewModel
         childNavController.navigate(
-            Routes.SelfieCaptureScreenRoute(
+            Routes.Selfie.CaptureScreen(
                 SelfieCaptureParams(
                     userId = userId,
                     jobId = jobId,
@@ -109,7 +109,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     when {
         showInstructions && !acknowledgedInstructions -> {
             childNavController.navigate(
-                Routes.SelfieInstructionsScreenRoute(
+                Routes.Selfie.InstructionsScreen(
                     InstructionScreenParams(showAttribution),
                 ),
             )
@@ -117,7 +117,7 @@ internal fun OrchestratedSelfieCaptureScreen(
 
         uiState.processingState != null -> {
             childNavController.navigate(
-                Routes.ProcessingScreenRoute(
+                Routes.Shared.ProcessingScreen(
                     ProcessingScreenParams(
                         processingState = uiState.processingState,
                         inProgressTitle = R.string.si_smart_selfie_processing_title,
@@ -141,7 +141,7 @@ internal fun OrchestratedSelfieCaptureScreen(
 
         uiState.selfieToConfirm != null -> {
             childNavController.navigate(
-                Routes.ImageCaptureConfirmDialog(
+                Routes.Shared.ImageConfirmDialog(
                     ImageConfirmParams(
                         titleText = R.string.si_smart_selfie_confirmation_dialog_title,
                         subtitleText = R.string.si_smart_selfie_confirmation_dialog_subtitle,

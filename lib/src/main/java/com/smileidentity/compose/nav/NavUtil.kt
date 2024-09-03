@@ -42,7 +42,7 @@ internal fun getDocumentCaptureRoute(
     allowGalleryUpload: Boolean,
 ): Routes {
     val serializableFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) }
-    return Routes.OrchestratedDocVRoute(
+    return Routes.Document.CaptureFrontScreen(
         DocumentCaptureParams(
             userId = params.userId,
             jobId = params.jobId,
@@ -50,11 +50,11 @@ internal fun getDocumentCaptureRoute(
             showAttribution = params.showAttribution,
             allowAgentMode = params.allowAgentMode,
             allowGallerySelection = allowGalleryUpload,
-            showSkipButton = false,
-            instructionsHeroImage = 0,
-            instructionsTitleText = 0,
-            instructionsSubtitleText = 0,
-            captureTitleText = 0,
+            showSkipButton = params.showSkipButton,
+            instructionsHeroImage = params.instructionsHeroImage,
+            instructionsTitleText = params.instructionsTitleText,
+            instructionsSubtitleText = params.instructionsSubtitleText,
+            captureTitleText = params.captureTitleText,
             knownIdAspectRatio = idAspectRatio,
             allowNewEnroll = params.allowNewEnroll,
             countryCode = countryCode,
@@ -68,9 +68,9 @@ internal fun getDocumentCaptureRoute(
 
 internal fun getSelfieCaptureRoute(useStrictMode: Boolean, params: SelfieCaptureParams): Routes {
     return if (useStrictMode) {
-        Routes.SelfieCaptureScreenRouteV2(params)
+        Routes.Selfie.CaptureScreenV2(params)
     } else {
-        Routes.SelfieCaptureScreenRoute(params)
+        Routes.Selfie.CaptureScreen(params)
     }
 }
 

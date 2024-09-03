@@ -13,8 +13,11 @@ import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.nav.BaseSmileIDScreen
+import com.smileidentity.compose.nav.BiometricKYCParams
 import com.smileidentity.compose.nav.DocumentCaptureParams
-import com.smileidentity.compose.nav.OrchestratedBiometricKYCParams
+import com.smileidentity.compose.nav.OrchestratedBiometricCaptureParams
+import com.smileidentity.compose.nav.OrchestratedDocumentParams
+import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.getDocumentCaptureRoute
@@ -87,7 +90,9 @@ fun SmileID.SmartSelfieEnrollment(
         extraPartnerParams,
         true,
     )
-    val orchestratedDestination = Routes.OrchestratedSelfieRoute(commonParams)
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(commonParams),
+    )
     val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
     BaseSmileIDScreen(
         orchestratedDestination,
@@ -151,7 +156,9 @@ fun SmileID.SmartSelfieAuthentication(
         extraPartnerParams,
         isEnroll = false,
     )
-    val orchestratedDestination = Routes.OrchestratedSelfieRoute(commonParams)
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(commonParams),
+    )
     val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
     BaseSmileIDScreen(
         orchestratedDestination,
@@ -237,7 +244,9 @@ fun SmileID.DocumentVerification(
         bypassSelfieCaptureWithFile,
         allowGalleryUpload,
     )
-    val orchestratedDestination = Routes.OrchestratedDocVRoute(commonParams)
+    val orchestratedDestination = Routes.Orchestrated.DocVRoute(
+        params = OrchestratedDocumentParams(commonParams),
+    )
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
@@ -323,7 +332,9 @@ fun SmileID.EnhancedDocumentVerificationScreen(
         bypassSelfieCaptureWithFile,
         allowGalleryUpload,
     )
-    val orchestratedDestination = Routes.OrchestratedEnhancedDocVRoute(commonParams)
+    val orchestratedDestination = Routes.Orchestrated.EnhancedDocVRoute(
+        params = OrchestratedDocumentParams(commonParams),
+    )
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
@@ -374,16 +385,18 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    val orchestratedDestination = Routes.OrchestratedBiometricKycRoute(
-        OrchestratedBiometricKYCParams(
-            idInfo = idInfo,
-            userId = userId,
-            jobId = jobId,
-            showInstructions = showInstructions,
-            showAttribution = showAttribution,
-            allowAgentMode = allowAgentMode,
-            allowNewEnroll = allowNewEnroll,
-            extraPartnerParams = extraPartnerParams,
+    val orchestratedDestination = Routes.Orchestrated.BiometricKycRoute(
+        OrchestratedBiometricCaptureParams(
+            BiometricKYCParams(
+                idInfo = idInfo,
+                userId = userId,
+                jobId = jobId,
+                showInstructions = showInstructions,
+                showAttribution = showAttribution,
+                allowAgentMode = allowAgentMode,
+                allowNewEnroll = allowNewEnroll,
+                extraPartnerParams = extraPartnerParams,
+            ),
         ),
     )
     val selfieCaptureParams = SelfieCaptureParams(
