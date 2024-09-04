@@ -7,6 +7,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class Routes : Parcelable {
 
+    @Parcelize
+    @Serializable
+    data object Root : Routes()
+
+    @Parcelize
+    @Serializable
+    data object BaseOrchestrated : Routes()
+
+    @Parcelize
+    @Serializable
+    data object BaseScreens : Routes()
+
     sealed class Selfie : Routes() {
         @Parcelize
         @Serializable

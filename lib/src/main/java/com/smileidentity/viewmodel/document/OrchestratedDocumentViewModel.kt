@@ -194,6 +194,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 } else {
                     throw e
                 }
+            } catch (e: Exception) {
+                throw e
             }
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")

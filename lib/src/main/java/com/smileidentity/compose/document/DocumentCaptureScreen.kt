@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.LocalMetadata
@@ -23,6 +22,7 @@ import com.smileidentity.compose.nav.ImageConfirmParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.encodeUrl
+import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
@@ -45,7 +45,6 @@ enum class DocumentCaptureSide {
  */
 @Composable
 internal fun DocumentCaptureScreen(
-    navController: NavController,
     resultCallbacks: ResultCallbacks,
     jobId: String,
     side: DocumentCaptureSide,
@@ -105,13 +104,13 @@ internal fun DocumentCaptureScreen(
     }
     resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
         viewModel.onInstructionsAcknowledged()
-        navController.popBackStack()
+        localNavigationState.screensNavigation.getNavController.popBackStack()
     }
     resultCallbacks.onDocumentInstructionSkip = onSkip
     when {
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
-            navController.navigate(
+            localNavigationState.screensNavigation.navigateTo(
                 Routes.Document.InstructionScreen(
                     params = DocumentInstructionParams(
                         heroImage = instructionsHeroImage,
@@ -122,22 +121,21 @@ internal fun DocumentCaptureScreen(
                         showSkipButton = showSkipButton,
                     ),
                 ),
-            ) {
-                launchSingleTop = true
-                restoreState = true
-            }
+                popUpTo = true,
+                popUpToInclusive = true,
+            )
         }
 
         documentImageToConfirm != null -> {
             resultCallbacks.onConfirmCapturedImage = {
                 viewModel.onConfirm(documentImageToConfirm, onConfirm)
-                navController.popBackStack()
+                localNavigationState.screensNavigation.getNavController.popBackStack()
             }
             resultCallbacks.onImageDialogRetake = {
                 viewModel.onRetry()
-                navController.popBackStack()
+                localNavigationState.screensNavigation.getNavController.popBackStack()
             }
-            navController.navigate(
+            localNavigationState.screensNavigation.navigateTo(
                 Routes.Shared.ImageConfirmDialog(
                     ImageConfirmParams(
                         titleText = R.string.si_smart_selfie_confirmation_dialog_title,
@@ -148,10 +146,9 @@ internal fun DocumentCaptureScreen(
                         scaleFactor = 1.0f,
                     ),
                 ),
-            ) {
-                launchSingleTop = true
-                restoreState = true
-            }
+                popUpTo = true,
+                popUpToInclusive = true,
+            )
         }
 
         else -> {

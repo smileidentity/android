@@ -18,11 +18,11 @@ import com.smileidentity.compose.nav.DocumentCaptureParams
 import com.smileidentity.compose.nav.OrchestratedBiometricCaptureParams
 import com.smileidentity.compose.nav.OrchestratedDocumentParams
 import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
+import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.getDocumentCaptureRoute
 import com.smileidentity.compose.nav.getSelfieCaptureRoute
-import com.smileidentity.compose.nav.orchestratedNavGraph
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.IdInfo
@@ -97,12 +97,11 @@ fun SmileID.SmartSelfieEnrollment(
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
+        ResultCallbacks(onSmartSelfieResult = onResult),
         modifier,
         colorScheme,
         typography,
-    ) { mainNavController, childNavController, resultCallBacks, content ->
-        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
-    }
+    )
 }
 
 /**
@@ -163,12 +162,11 @@ fun SmileID.SmartSelfieAuthentication(
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
+        ResultCallbacks(onSmartSelfieResult = onResult),
         modifier,
         colorScheme,
         typography,
-    ) { mainNavController, childNavController, resultCallBacks, content ->
-        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
-    }
+    )
 }
 
 /**
@@ -250,12 +248,11 @@ fun SmileID.DocumentVerification(
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
+        ResultCallbacks(onDocVResult = onResult),
         modifier,
         colorScheme,
         typography,
-    ) { mainNavController, childNavController, resultCallBacks, content ->
-        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
-    }
+    )
 }
 
 /**
@@ -338,12 +335,11 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
+        ResultCallbacks(onEnhancedDocVResult = onResult),
         modifier,
         colorScheme,
         typography,
-    ) { mainNavController, childNavController, resultCallBacks, content ->
-        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
-    }
+    )
 }
 
 /**
@@ -408,17 +404,17 @@ fun SmileID.BiometricKYC(
         showInstructions,
         extraPartnerParams,
         true,
+        skipApiSubmission = true,
     )
     val screenDestination = getSelfieCaptureRoute(false, selfieCaptureParams)
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
+        ResultCallbacks(onBiometricKYCResult = onResult),
         modifier,
         colorScheme,
         typography,
-    ) { mainNavController, childNavController, resultCallBacks, content ->
-        orchestratedNavGraph(mainNavController, childNavController, content, resultCallBacks)
-    }
+    )
 }
 
 /**

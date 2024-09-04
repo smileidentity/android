@@ -1,19 +1,17 @@
 package com.smileidentity.compose.nav
 
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -38,52 +36,66 @@ import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.JobType
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
+import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlin.reflect.typeOf
-
-internal typealias MainGraphType = NavGraphBuilder.(
-    NavHostController,
-    NavHostController,
-    ResultCallbacks,
-    @Composable () -> Unit,
-) -> Unit
 
 @Composable
 internal fun BaseSmileIDScreen(
     orchestratedDestination: Routes,
     screenDestination: Routes,
+    resultCallbacks: ResultCallbacks,
     modifier: Modifier = Modifier,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
-    content: MainGraphType,
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val mainNavController = rememberNavController()
-        val childNavController = rememberNavController()
-        val resultCallbacks = remember { ResultCallbacks() }
+        localNavigationState = MultiNavigationStates(
+            rootNavigation = rememberMultiNavigationAppState(
+                startDestination = Routes.Root,
+            ),
+            orchestratedNavigation = rememberMultiNavigationAppState(
+                startDestination = Routes.BaseOrchestrated,
+            ),
+            screensNavigation = rememberMultiNavigationAppState(
+                startDestination = Routes.BaseScreens,
+            ),
+        )
+        // val rememberResultCallbacks = remember { resultCallbacks }
         val childNavHost: @Composable () -> Unit = {
+            localNavigationState.screensNavigation.setNavController(rememberNavController())
             NavHost(
-                navController = childNavController,
+                navController = localNavigationState.screensNavigation.getNavController,
                 startDestination = screenDestination,
             ) {
-                screensNavGraph(childNavController, resultCallbacks)
+                screensNavGraph(resultCallbacks)
             }
         }
         NavHost(
-            navController = mainNavController,
-            startDestination = orchestratedDestination,
-            modifier = modifier,
+            navController = localNavigationState.rootNavigation.getNavController,
+            startDestination = Routes.BaseOrchestrated,
         ) {
-            content(mainNavController, childNavController, resultCallbacks, childNavHost)
+            composable<Routes.BaseOrchestrated> {
+                localNavigationState.orchestratedNavigation.setNavController(
+                    rememberNavController(),
+                )
+                Box {
+                    NavHost(
+                        navController =
+                        localNavigationState.orchestratedNavigation.getNavController,
+                        startDestination = orchestratedDestination,
+                    ) {
+                        orchestratedNavGraph(childNavHost, resultCallbacks)
+                    }
+                }
+            }
         }
     }
 }
 
 internal fun NavGraphBuilder.orchestratedNavGraph(
-    mainNavController: NavController,
-    childNavController: NavController,
     content: @Composable () -> Unit,
-    resultCallbacks: ResultCallbacks = ResultCallbacks(),
+    resultCallbacks: ResultCallbacks,
 ) {
     composable<Routes.Orchestrated.SelfieRoute>(
         typeMap = mapOf(
@@ -96,7 +108,6 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
         val route = navBackStackEntry.toRoute<Routes.Orchestrated.SelfieRoute>()
         val params = route.params
         OrchestratedSelfieCaptureScreen(
-            childNavController = childNavController,
             resultCallbacks = resultCallbacks,
             content = content,
             userId = params.captureParams.userId,
@@ -108,6 +119,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             showAttribution = params.captureParams.showAttribution,
             showInstructions = params.captureParams.showInstructions,
             extraPartnerParams = params.captureParams.extraPartnerParams,
+            onResult = resultCallbacks.onSmartSelfieResult ?: {},
         )
     }
     composable<Routes.Orchestrated.BiometricKycRoute>(
@@ -120,23 +132,19 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
     ) { backStackEntry ->
         val route = backStackEntry.toRoute<Routes.Orchestrated.BiometricKycRoute>()
         val params = route.params
-        resultCallbacks.biometricKycViewModel?.let {
-            OrchestratedBiometricKYCScreen(
-                mainNavController = mainNavController,
-                childNavController = childNavController,
-                resultCallbacks = resultCallbacks,
-                content = content,
-                idInfo = params.captureParams.idInfo,
-                userId = params.captureParams.userId,
-                jobId = params.captureParams.jobId,
-                allowNewEnroll = params.captureParams.allowNewEnroll,
-                allowAgentMode = params.captureParams.allowAgentMode,
-                showAttribution = params.captureParams.showAttribution,
-                showInstructions = params.captureParams.showInstructions,
-                extraPartnerParams = params.captureParams.extraPartnerParams,
-                viewModel = it,
-            )
-        }
+        OrchestratedBiometricKYCScreen(
+            resultCallbacks = resultCallbacks,
+            content = content,
+            idInfo = params.captureParams.idInfo,
+            userId = params.captureParams.userId,
+            jobId = params.captureParams.jobId,
+            allowNewEnroll = params.captureParams.allowNewEnroll,
+            allowAgentMode = params.captureParams.allowAgentMode,
+            showAttribution = params.captureParams.showAttribution,
+            showInstructions = params.captureParams.showInstructions,
+            extraPartnerParams = params.captureParams.extraPartnerParams,
+            onResult = resultCallbacks.onBiometricKYCResult ?: {},
+        )
     }
     composable<Routes.Orchestrated.DocVRoute>(
         typeMap = mapOf(
@@ -150,8 +158,6 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
         val params = route.params
         val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
-            mainNavController = mainNavController,
-            childNavController = childNavController,
             resultCallbacks = resultCallbacks,
             content = content,
             userId = params.captureParams.userId,
@@ -190,39 +196,49 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
     ) { backStackEntry ->
         val route = backStackEntry.toRoute<Routes.Orchestrated.EnhancedDocVRoute>()
         val params = route.params
-        resultCallbacks.enhancedDocVViewModel?.let {
-            OrchestratedDocumentVerificationScreen(
-                mainNavController = mainNavController,
-                childNavController = childNavController,
-                resultCallbacks = resultCallbacks,
-                content = content,
-                userId = params.captureParams.userId,
-                jobId = params.captureParams.jobId,
-                showAttribution = params.captureParams.showAttribution,
-                allowAgentMode = params.captureParams.allowAgentMode,
-                allowGalleryUpload = params.captureParams.allowGallerySelection,
-                showInstructions = params.captureParams.showInstructions,
-                idAspectRatio = params.captureParams.knownIdAspectRatio,
-                onResult = resultCallbacks.onEnhancedDocVResult ?: {},
-                viewModel = it,
-            )
-        }
+        val metadata = LocalMetadata.current
+        OrchestratedDocumentVerificationScreen(
+            resultCallbacks = resultCallbacks,
+            content = content,
+            userId = params.captureParams.userId,
+            jobId = params.captureParams.jobId,
+            showAttribution = params.captureParams.showAttribution,
+            allowAgentMode = params.captureParams.allowAgentMode,
+            allowGalleryUpload = params.captureParams.allowGallerySelection,
+            showInstructions = params.captureParams.showInstructions,
+            idAspectRatio = params.captureParams.knownIdAspectRatio,
+            onResult = resultCallbacks.onEnhancedDocVResult ?: {},
+            viewModel = viewModel(
+                factory = viewModelFactory {
+                    EnhancedDocumentVerificationViewModel(
+                        jobType = JobType.DocumentVerification,
+                        userId = params.captureParams.userId,
+                        jobId = params.captureParams.jobId,
+                        allowNewEnroll = params.captureParams.allowNewEnroll,
+                        countryCode = params.captureParams.countryCode!!,
+                        documentType = params.captureParams.documentType,
+                        captureBothSides = params.captureParams.captureBothSides,
+                        selfieFile = params.captureParams.selfieFile?.toFile(),
+                        extraPartnerParams = params.captureParams.extraPartnerParams,
+                        metadata = metadata,
+                    )
+                },
+            ),
+        )
     }
 }
 
 internal fun NavGraphBuilder.screensNavGraph(
-    navController: NavController,
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
 ) {
     sharedDestinations(resultCallbacks)
     selfieDestinations(resultCallbacks)
-    documentsDestinations(resultCallbacks, navController)
+    documentParentDestinations(resultCallbacks)
     documentsDestinations(resultCallbacks)
 }
 
-internal fun NavGraphBuilder.documentsDestinations(
+internal fun NavGraphBuilder.documentParentDestinations(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
-    navController: NavController,
 ) {
     composable<Routes.Document.CaptureFrontScreen>(
         typeMap = mapOf(
@@ -235,7 +251,6 @@ internal fun NavGraphBuilder.documentsDestinations(
         val route = backStackEntry.toRoute<Routes.Document.CaptureFrontScreen>()
         val params = route.params
         DocumentCaptureScreen(
-            navController = navController,
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
             showInstructions = params.showInstructions,
@@ -264,7 +279,6 @@ internal fun NavGraphBuilder.documentsDestinations(
         val route = backStackEntry.toRoute<Routes.Document.CaptureBackScreen>()
         val params = route.params
         DocumentCaptureScreen(
-            navController = navController,
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
             showInstructions = params.showInstructions,

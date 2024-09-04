@@ -14,13 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.smileidentity.R
 import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
+import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
@@ -34,8 +34,6 @@ import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 internal fun OrchestratedBiometricKYCScreen(
-    mainNavController: NavController,
-    childNavController: NavController,
     resultCallbacks: ResultCallbacks,
     content: @Composable () -> Unit,
     idInfo: IdInfo,
@@ -70,7 +68,8 @@ internal fun OrchestratedBiometricKYCScreen(
         content()
     }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    resultCallbacks.onBiometricKYCResult = onResult
+    resultCallbacks.onProcessingContinue = { viewModel.onFinished(onResult) }
+    resultCallbacks.onProcessingClose = { viewModel.onFinished(onResult) }
     resultCallbacks.onSmartSelfieResult = {
         when (it) {
             is SmileIDResult.Error -> onResult(it)
@@ -79,10 +78,11 @@ internal fun OrchestratedBiometricKYCScreen(
                 livenessFiles = it.data.livenessFiles,
             )
         }
+        localNavigationState.orchestratedNavigation.getNavController.popBackStack()
     }
     when {
         uiState.processingState != null -> {
-            childNavController.navigate(
+            localNavigationState.screensNavigation.navigateTo(
                 Routes.Shared.ProcessingScreen(
                     ProcessingScreenParams(
                         processingState = uiState.processingState,
@@ -103,24 +103,26 @@ internal fun OrchestratedBiometricKYCScreen(
                         closeButtonText = R.string.si_smart_selfie_processing_close_button,
                     ),
                 ),
+                popUpTo = true,
+                popUpToInclusive = true,
             )
-        }
-
-        else -> mainNavController.navigate(
-            Routes.Orchestrated.SelfieRoute(
-                OrchestratedSelfieCaptureParams(
-                    captureParams = SelfieCaptureParams(
-                        userId = userId,
-                        jobId = jobId,
-                        showInstructions = showInstructions,
-                        showAttribution = showAttribution,
-                        allowAgentMode = allowAgentMode,
-                        allowNewEnroll = allowNewEnroll,
-                        extraPartnerParams = extraPartnerParams,
-                        skipApiSubmission = true,
+        } else -> {
+            localNavigationState.orchestratedNavigation.navigateTo(
+                Routes.Orchestrated.SelfieRoute(
+                    OrchestratedSelfieCaptureParams(
+                        SelfieCaptureParams(
+                            userId = userId,
+                            jobId = jobId,
+                            showInstructions = showInstructions,
+                            showAttribution = showAttribution,
+                            allowAgentMode = allowAgentMode,
+                            skipApiSubmission = true,
+                        ),
                     ),
                 ),
-            ),
-        )
+                popUpTo = true,
+                popUpToInclusive = true,
+            )
+        }
     }
 }

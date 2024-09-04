@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.3.0
+
+* Introduced inflow navigation as well as individual navigation for compose screens 
+
 ## 10.2.5
 
 * Fixed a bug where prep upload would not work for previously attempted API requests

@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.smileidentity.R
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.nav.ImageConfirmParams
@@ -28,6 +27,7 @@ import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.encodeUrl
+import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
@@ -44,7 +44,6 @@ import kotlinx.collections.immutable.persistentMapOf
  */
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
-    childNavController: NavController,
     resultCallbacks: ResultCallbacks,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,13 +84,19 @@ internal fun OrchestratedSelfieCaptureScreen(
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    resultCallbacks.onSmartSelfieResult = onResult
+    resultCallbacks.onProcessingContinue = {
+        viewModel.onFinished(onResult)
+    }
+    resultCallbacks.onProcessingClose = {
+        viewModel.onFinished(onResult)
+    }
+    resultCallbacks.onProcessingRetry = viewModel::onRetry
     resultCallbacks.onConfirmCapturedImage = viewModel::submitJob
     resultCallbacks.onImageDialogRetake = viewModel::onSelfieRejected
     resultCallbacks.onSelfieInstructionScreen = {
         acknowledgedInstructions = true
         resultCallbacks.selfieViewModel = viewModel
-        childNavController.navigate(
+        localNavigationState.screensNavigation.navigateTo(
             Routes.Selfie.CaptureScreen(
                 SelfieCaptureParams(
                     userId = userId,
@@ -104,19 +109,23 @@ internal fun OrchestratedSelfieCaptureScreen(
                     showInstructions = showInstructions,
                 ),
             ),
+            popUpTo = true,
+            popUpToInclusive = true,
         )
     }
     when {
         showInstructions && !acknowledgedInstructions -> {
-            childNavController.navigate(
+            localNavigationState.screensNavigation.navigateTo(
                 Routes.Selfie.InstructionsScreen(
                     InstructionScreenParams(showAttribution),
                 ),
+                popUpTo = true,
+                popUpToInclusive = true,
             )
         }
 
         uiState.processingState != null -> {
-            childNavController.navigate(
+            localNavigationState.screensNavigation.navigateTo(
                 Routes.Shared.ProcessingScreen(
                     ProcessingScreenParams(
                         processingState = uiState.processingState,
@@ -136,11 +145,13 @@ internal fun OrchestratedSelfieCaptureScreen(
                         closeButtonText = R.string.si_smart_selfie_processing_close_button,
                     ),
                 ),
+                popUpTo = true,
+                popUpToInclusive = true,
             )
         }
 
         uiState.selfieToConfirm != null -> {
-            childNavController.navigate(
+            localNavigationState.screensNavigation.navigateTo(
                 Routes.Shared.ImageConfirmDialog(
                     ImageConfirmParams(
                         titleText = R.string.si_smart_selfie_confirmation_dialog_title,
@@ -153,6 +164,8 @@ internal fun OrchestratedSelfieCaptureScreen(
                         scaleFactor = 1.0f,
                     ),
                 ),
+                popUpTo = true,
+                popUpToInclusive = true,
             )
         }
     }
