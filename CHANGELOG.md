@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fixed upload bug to retry in case a job already exists but zip was not uploaded
 * Changed MLKit download modules to throw an exception explicitly if download fails 
 
 ## 10.2.6
