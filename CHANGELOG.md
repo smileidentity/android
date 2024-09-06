@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Changed MLKit download modules to throw an exception explicitly if download fails 
+
 ## 10.2.6
 
 * Make document captured image confirmation to be optional
