@@ -97,6 +97,7 @@ fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
+    showConfirmation: Boolean = true,
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
@@ -166,20 +167,26 @@ fun DocumentCaptureScreen(
                     ColorPainter(Color.Black)
                 }
             }
-            ImageCaptureConfirmationDialog(
-                titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
-                subtitleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_subtitle),
-                painter = painter,
-                scaleFactor = PREVIEW_SCALE_FACTOR,
-                confirmButtonText = stringResource(
-                    id = R.string.si_doc_v_confirmation_dialog_confirm_button,
-                ),
-                onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
-                retakeButtonText = stringResource(
-                    id = R.string.si_doc_v_confirmation_dialog_retake_button,
-                ),
-                onRetake = viewModel::onRetry,
-            )
+            if (showConfirmation) {
+                ImageCaptureConfirmationDialog(
+                    titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
+                    subtitleText = stringResource(
+                        id = R.string.si_doc_v_confirmation_dialog_subtitle,
+                    ),
+                    painter = painter,
+                    scaleFactor = PREVIEW_SCALE_FACTOR,
+                    confirmButtonText = stringResource(
+                        id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+                    ),
+                    onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
+                    retakeButtonText = stringResource(
+                        id = R.string.si_doc_v_confirmation_dialog_retake_button,
+                    ),
+                    onRetake = viewModel::onRetry,
+                )
+            } else {
+                viewModel.onConfirm(documentImageToConfirm, onConfirm)
+            }
         }
 
         else -> {
