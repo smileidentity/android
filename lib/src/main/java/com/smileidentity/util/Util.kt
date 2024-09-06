@@ -268,6 +268,23 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
     proxy(converted)
 }
 
+fun HttpException.toSmileIDException(): SmileIDException {
+    val errorBody = this.response()?.errorBody()?.string()
+    val adapter = moshi.adapter(SmileIDException.Details::class.java)
+
+    return try {
+        val details = adapter.fromJson(errorBody ?: "")
+            ?: SmileIDException.Details(code = this.code().toString(), message = this.message())
+        SmileIDException(details)
+    } catch (e: Exception) {
+        Timber.w(e, "Unable to convert HttpException to SmileIDException")
+        // If parsing fails, create a SmileIDException with the HTTP status code and message
+        SmileIDException(
+            SmileIDException.Details(code = this.code().toString(), message = this.message()),
+        )
+    }
+}
+
 @Stable
 sealed interface StringResource {
     data class Text(val text: String) : StringResource
