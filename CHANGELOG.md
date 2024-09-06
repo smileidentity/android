@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.2.6
+
+* Make document captured image confirmation to be optional
+
 ## 10.2.5
 
 * Fixed a bug where prep upload would not work for previously attempted API requests
