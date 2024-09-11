@@ -60,6 +60,7 @@ internal fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
+    showConfirmation: Boolean = true,
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
@@ -127,28 +128,33 @@ internal fun DocumentCaptureScreen(
         }
 
         documentImageToConfirm != null -> {
-            resultCallbacks.onConfirmCapturedImage = {
-                viewModel.onConfirm(documentImageToConfirm, onConfirm)
-                localNavigationState.screensNavigation.getNavController.popBackStack()
-            }
-            resultCallbacks.onImageDialogRetake = {
-                viewModel.onRetry()
-                localNavigationState.screensNavigation.getNavController.popBackStack()
-            }
-            localNavigationState.screensNavigation.navigateTo(
-                Routes.Shared.ImageConfirmDialog(
-                    ImageConfirmParams(
-                        titleText = R.string.si_smart_selfie_confirmation_dialog_title,
-                        subtitleText = R.string.si_smart_selfie_confirmation_dialog_subtitle,
-                        imageFilePath = encodeUrl(documentImageToConfirm.absolutePath),
-                        confirmButtonText = R.string.si_doc_v_confirmation_dialog_confirm_button,
-                        retakeButtonText = R.string.si_doc_v_confirmation_dialog_retake_button,
-                        scaleFactor = 1.0f,
+            if (showConfirmation) {
+                resultCallbacks.onConfirmCapturedImage = {
+                    viewModel.onConfirm(documentImageToConfirm, onConfirm)
+                    localNavigationState.screensNavigation.getNavController.popBackStack()
+                }
+                resultCallbacks.onImageDialogRetake = {
+                    viewModel.onRetry()
+                    localNavigationState.screensNavigation.getNavController.popBackStack()
+                }
+                localNavigationState.screensNavigation.navigateTo(
+                    Routes.Shared.ImageConfirmDialog(
+                        ImageConfirmParams(
+                            titleText = R.string.si_smart_selfie_confirmation_dialog_title,
+                            subtitleText = R.string.si_smart_selfie_confirmation_dialog_subtitle,
+                            imageFilePath = encodeUrl(documentImageToConfirm.absolutePath),
+                            confirmButtonText =
+                            R.string.si_doc_v_confirmation_dialog_confirm_button,
+                            retakeButtonText = R.string.si_doc_v_confirmation_dialog_retake_button,
+                            scaleFactor = 1.0f,
+                        ),
                     ),
-                ),
-                popUpTo = true,
-                popUpToInclusive = true,
-            )
+                    popUpTo = true,
+                    popUpToInclusive = true,
+                )
+            } else {
+                viewModel.onConfirm(documentImageToConfirm, onConfirm)
+            }
         }
 
         else -> {
@@ -170,4 +176,13 @@ internal fun DocumentCaptureScreen(
             )
         }
     }
+
+    // NavigationBackHandler(
+    //     navController = localNavigationState.screensNavigation.getNavController,
+    // ) { currentDestination ->
+    //     localNavigationState.screensNavigation.getNavController.popBackStack()
+    //     if (compareRouteStrings(startRoute, currentDestination)) {
+    //         onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
+    //     }
+    // }
 }

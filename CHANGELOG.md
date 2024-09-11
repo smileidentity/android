@@ -1,8 +1,12 @@
 # Release Notes
 
+(Unreleased)
 ## 10.3.0
+* Introduced inflow navigation as well as individual navigation for compose screens
 
-* Introduced inflow navigation as well as individual navigation for compose screens 
+## 10.2.6
+
+* Make document captured image confirmation to be optional
 
 ## 10.2.5
 

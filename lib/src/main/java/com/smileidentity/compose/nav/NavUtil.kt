@@ -3,6 +3,7 @@ package com.smileidentity.compose.nav
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.navigation.NavDestination
 import androidx.navigation.NavType
 import java.io.File
 import java.net.URLDecoder
@@ -78,6 +79,22 @@ fun encodeUrl(url: String): String {
     return URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
 }
 
-fun decodeUrl(encodedUrl: String): String {
+internal fun decodeUrl(encodedUrl: String): String {
     return URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.toString())
+}
+
+internal fun compareRouteStrings(
+    routeClass: Routes?,
+    currentDestination: NavDestination?,
+): Boolean {
+    routeClass?.let {
+        val clazz = routeClass::class
+        val routeName = clazz.simpleName ?: return false
+
+        currentDestination?.route?.let { route ->
+            val destinationName = route.split(".")
+                .lastOrNull()?.split("/")?.firstOrNull() ?: return false
+            return routeName == destinationName
+        } ?: return false
+    } ?: return false
 }

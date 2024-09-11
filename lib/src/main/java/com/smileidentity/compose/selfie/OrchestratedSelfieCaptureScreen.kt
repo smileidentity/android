@@ -1,5 +1,6 @@
 package com.smileidentity.compose.selfie
 
+import android.os.OperationCanceledException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,15 +23,18 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.nav.ImageConfirmParams
 import com.smileidentity.compose.nav.InstructionScreenParams
+import com.smileidentity.compose.nav.NavigationBackHandler
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
+import com.smileidentity.compose.nav.compareRouteStrings
 import com.smileidentity.compose.nav.encodeUrl
 import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -81,9 +85,11 @@ internal fun OrchestratedSelfieCaptureScreen(
     ) {
         content()
     }
-
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
+    var showingSelfie by rememberSaveable { mutableStateOf(false) }
+    var startRoute: Routes? by rememberSaveable { mutableStateOf(null) }
+    resultCallbacks.selfieViewModel = viewModel
     resultCallbacks.onProcessingContinue = {
         viewModel.onFinished(onResult)
     }
@@ -91,37 +97,29 @@ internal fun OrchestratedSelfieCaptureScreen(
         viewModel.onFinished(onResult)
     }
     resultCallbacks.onProcessingRetry = viewModel::onRetry
-    resultCallbacks.onConfirmCapturedImage = viewModel::submitJob
-    resultCallbacks.onImageDialogRetake = viewModel::onSelfieRejected
+    resultCallbacks.onConfirmCapturedImage = {
+        localNavigationState.screensNavigation.getNavController.popBackStack()
+        viewModel.submitJob()
+    }
+    resultCallbacks.onImageDialogRetake = {
+        localNavigationState.screensNavigation.getNavController.popBackStack()
+        viewModel.onSelfieRejected()
+    }
     resultCallbacks.onSelfieInstructionScreen = {
         acknowledgedInstructions = true
-        resultCallbacks.selfieViewModel = viewModel
-        localNavigationState.screensNavigation.navigateTo(
-            Routes.Selfie.CaptureScreen(
-                SelfieCaptureParams(
-                    userId = userId,
-                    jobId = jobId,
-                    isEnroll = isEnroll,
-                    allowAgentMode = allowAgentMode,
-                    skipApiSubmission = skipApiSubmission,
-                    showAttribution = showAttribution,
-                    extraPartnerParams = extraPartnerParams,
-                    showInstructions = showInstructions,
-                ),
-            ),
-            popUpTo = true,
-            popUpToInclusive = true,
-        )
     }
     when {
         showInstructions && !acknowledgedInstructions -> {
-            localNavigationState.screensNavigation.navigateTo(
-                Routes.Selfie.InstructionsScreen(
-                    InstructionScreenParams(showAttribution),
-                ),
-                popUpTo = true,
-                popUpToInclusive = true,
+            startRoute = Routes.Selfie.InstructionsScreen(
+                InstructionScreenParams(showAttribution),
             )
+            startRoute?.let {
+                localNavigationState.screensNavigation.navigateTo(
+                    it,
+                    popUpTo = false,
+                    popUpToInclusive = false,
+                )
+            }
         }
 
         uiState.processingState != null -> {
@@ -145,8 +143,8 @@ internal fun OrchestratedSelfieCaptureScreen(
                         closeButtonText = R.string.si_smart_selfie_processing_close_button,
                     ),
                 ),
-                popUpTo = true,
-                popUpToInclusive = true,
+                popUpTo = false,
+                popUpToInclusive = false,
             )
         }
 
@@ -164,9 +162,44 @@ internal fun OrchestratedSelfieCaptureScreen(
                         scaleFactor = 1.0f,
                     ),
                 ),
-                popUpTo = true,
-                popUpToInclusive = true,
+                popUpTo = false,
+                popUpToInclusive = false,
             )
+        }
+
+        else -> {
+            if (!showingSelfie) {
+                showingSelfie = true
+                val selfieRoute = Routes.Selfie.CaptureScreen(
+                    SelfieCaptureParams(
+                        userId = userId,
+                        jobId = jobId,
+                        isEnroll = isEnroll,
+                        allowAgentMode = allowAgentMode,
+                        skipApiSubmission = skipApiSubmission,
+                        showAttribution = showAttribution,
+                        extraPartnerParams = extraPartnerParams,
+                        showInstructions = showInstructions,
+                    ),
+                )
+                if (!showInstructions) {
+                    startRoute = selfieRoute
+                }
+                localNavigationState.screensNavigation.navigateTo(
+                    selfieRoute,
+                    popUpTo = false,
+                    popUpToInclusive = false,
+                )
+            }
+        }
+    }
+
+    NavigationBackHandler(
+        navController = localNavigationState.screensNavigation.getNavController,
+    ) { currentDestination ->
+        localNavigationState.screensNavigation.getNavController.popBackStack()
+        if (compareRouteStrings(startRoute, currentDestination)) {
+            onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
         }
     }
 }

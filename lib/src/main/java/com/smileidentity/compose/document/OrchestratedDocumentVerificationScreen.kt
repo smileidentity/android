@@ -1,5 +1,6 @@
 package com.smileidentity.compose.document
 
+import android.os.OperationCanceledException
 import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,17 +11,22 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smileidentity.R
 import com.smileidentity.compose.nav.DocumentCaptureParams
+import com.smileidentity.compose.nav.NavigationBackHandler
 import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
+import com.smileidentity.compose.nav.compareRouteStrings
 import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
@@ -49,26 +55,12 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     onResult: SmileIDCallback<T> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    var startRoute: Routes? by rememberSaveable { mutableStateOf(null) }
     resultCallbacks.onDocumentFrontCaptureSuccess = viewModel::onDocumentFrontCaptureSuccess
     resultCallbacks.onDocumentBackCaptureSuccess = viewModel::onDocumentBackCaptureSuccess
     resultCallbacks.onDocumentCaptureError = viewModel::onError
     resultCallbacks.onDocumentBackSkip = viewModel::onDocumentBackSkip
     resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
-        Routes.Document.CaptureFrontScreen(
-            DocumentCaptureParams(
-                jobId = jobId,
-                userId = userId,
-                showInstructions = showInstructions,
-                showAttribution = showAttribution,
-                allowGallerySelection = allowGalleryUpload,
-                showSkipButton = false,
-                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
-                instructionsTitleText = R.string.si_doc_v_instruction_title,
-                instructionsSubtitleText = R.string.si_verify_identity_instruction_subtitle,
-                captureTitleText = R.string.si_doc_v_capture_instructions_front_title,
-                knownIdAspectRatio = idAspectRatio,
-            ),
-        )
     }
     resultCallbacks.onProcessingContinue = { viewModel.onFinished(onResult) }
     resultCallbacks.onProcessingClose = { viewModel.onFinished(onResult) }
@@ -89,26 +81,30 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         content()
     }
     when (val currentStep = uiState.currentStep) {
-        DocumentCaptureFlow.FrontDocumentCapture ->
-            localNavigationState.screensNavigation.navigateTo(
-                Routes.Document.CaptureFrontScreen(
-                    DocumentCaptureParams(
-                        jobId = jobId,
-                        userId = userId,
-                        showInstructions = showInstructions,
-                        showAttribution = showAttribution,
-                        allowGallerySelection = allowGalleryUpload,
-                        showSkipButton = false,
-                        instructionsHeroImage = R.drawable.si_doc_v_front_hero,
-                        instructionsTitleText = R.string.si_doc_v_instruction_title,
-                        instructionsSubtitleText = R.string.si_verify_identity_instruction_subtitle,
-                        captureTitleText = R.string.si_doc_v_capture_instructions_front_title,
-                        knownIdAspectRatio = idAspectRatio,
-                    ),
+        DocumentCaptureFlow.FrontDocumentCapture -> {
+            startRoute = Routes.Document.CaptureFrontScreen(
+                DocumentCaptureParams(
+                    jobId = jobId,
+                    userId = userId,
+                    showInstructions = showInstructions,
+                    showAttribution = showAttribution,
+                    allowGallerySelection = allowGalleryUpload,
+                    showSkipButton = false,
+                    instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+                    instructionsTitleText = R.string.si_doc_v_instruction_title,
+                    instructionsSubtitleText = R.string.si_verify_identity_instruction_subtitle,
+                    captureTitleText = R.string.si_doc_v_capture_instructions_front_title,
+                    knownIdAspectRatio = idAspectRatio,
                 ),
-                popUpTo = true,
-                popUpToInclusive = true,
             )
+            startRoute?.let {
+                localNavigationState.screensNavigation.navigateTo(
+                    startRoute as Routes.Document.CaptureFrontScreen,
+                    popUpTo = true,
+                    popUpToInclusive = true,
+                )
+            }
+        }
 
         DocumentCaptureFlow.BackDocumentCapture ->
             localNavigationState.screensNavigation.navigateTo(
@@ -173,5 +169,14 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 popUpTo = true,
                 popUpToInclusive = true,
             )
+    }
+
+    NavigationBackHandler(
+        navController = localNavigationState.screensNavigation.getNavController,
+    ) { currentDestination ->
+        localNavigationState.screensNavigation.getNavController.popBackStack()
+        if (compareRouteStrings(startRoute, currentDestination)) {
+            onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
+        }
     }
 }

@@ -22,8 +22,16 @@ class MultiNavigationAppState(
     private val startDestination: Routes? = null,
 ) {
 
+    // fun observeNavController() {
+    //     val navBackStackEntry = getNavController.currentBackStackEntryAsState()
+    //     navBackStackEntry?.let {
+    //         val currentDestination = navBackStackEntry?.destination
+    //     }
+    // }
+
     fun setNavController(_navController: NavHostController) {
         navController = _navController
+        // observeNavController()
     }
 
     var getStartDestination: Routes = startDestination!!
@@ -52,16 +60,16 @@ class MultiNavigationAppState(
             false
         }
     }
+
     fun navigateTo(route: Routes, popUpTo: Boolean, popUpToInclusive: Boolean) {
         getNavController.navigate(route) {
             launchSingleTop = true
             restoreState = true
-            // if (popUpTo) {
-            //     popUpTo(route) {
-            //         inclusive = popUpToInclusive
-            //         saveState = false
-            //     }
-            // }
+            if (popUpTo) {
+                popUpTo(route) {
+                    inclusive = popUpToInclusive
+                }
+            }
         }
     }
 }
@@ -72,6 +80,7 @@ fun NavHostController.getDestination(): Sequence<NavDestination>? {
     val currentDestination = navBackStackEntry?.destination
     return currentDestination?.hierarchy
 }
+
 data class MultiNavigationStates(
     var rootNavigation: MultiNavigationAppState = MultiNavigationAppState(),
     var orchestratedNavigation: MultiNavigationAppState = MultiNavigationAppState(),

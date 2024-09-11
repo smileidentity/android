@@ -61,7 +61,6 @@ internal fun BaseSmileIDScreen(
                 startDestination = Routes.BaseScreens,
             ),
         )
-        // val rememberResultCallbacks = remember { resultCallbacks }
         val childNavHost: @Composable () -> Unit = {
             localNavigationState.screensNavigation.setNavController(rememberNavController())
             NavHost(
