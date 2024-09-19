@@ -25,7 +25,7 @@ class SelfieCaptureScreenV3Test {
     @Test
     fun testInstructionsScreen() {
         paparazzi.snapshot {
-            SelfieCaptureScreenV3(userId = "")
+            SelfieCaptureScreenV3()
         }
     }
 }
