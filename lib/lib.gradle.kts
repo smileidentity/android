@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.moshix)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.paparazzi)
 }
 
 val groupId = "com.smileidentity"
