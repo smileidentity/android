@@ -81,7 +81,6 @@ fun SelfieCaptureScreen(
         },
     ),
 ) {
-    println("Japhet Ndhlovu is here now with this one")
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)

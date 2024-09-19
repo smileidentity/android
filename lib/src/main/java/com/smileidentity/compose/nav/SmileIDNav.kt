@@ -232,68 +232,7 @@ internal fun NavGraphBuilder.screensNavGraph(
 ) {
     sharedDestinations(resultCallbacks)
     selfieDestinations(resultCallbacks)
-    documentParentDestinations(resultCallbacks)
     documentsDestinations(resultCallbacks)
-}
-
-internal fun NavGraphBuilder.documentParentDestinations(
-    resultCallbacks: ResultCallbacks = ResultCallbacks(),
-) {
-    composable<Routes.Document.CaptureFrontScreen>(
-        typeMap = mapOf(
-            typeOf<DocumentCaptureParams>() to CustomNavType(
-                DocumentCaptureParams::class.java,
-                DocumentCaptureParams.serializer(),
-            ),
-        ),
-    ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.Document.CaptureFrontScreen>()
-        val params = route.params
-        DocumentCaptureScreen(
-            resultCallbacks = resultCallbacks,
-            jobId = params.jobId,
-            showInstructions = params.showInstructions,
-            showAttribution = params.showAttribution,
-            allowGallerySelection = params.allowGallerySelection,
-            showSkipButton = params.showSkipButton,
-            side = DocumentCaptureSide.Front,
-            instructionsHeroImage = params.instructionsHeroImage,
-            instructionsTitleText = stringResource(params.instructionsTitleText),
-            knownIdAspectRatio = params.knownIdAspectRatio,
-            instructionsSubtitleText = stringResource(params.instructionsSubtitleText),
-            captureTitleText = stringResource(params.captureTitleText),
-            onConfirm = resultCallbacks.onDocumentFrontCaptureSuccess ?: {},
-            onError = resultCallbacks.onDocumentCaptureError ?: {},
-        )
-    }
-
-    composable<Routes.Document.CaptureBackScreen>(
-        typeMap = mapOf(
-            typeOf<DocumentCaptureParams>() to CustomNavType(
-                DocumentCaptureParams::class.java,
-                DocumentCaptureParams.serializer(),
-            ),
-        ),
-    ) { backStackEntry ->
-        val route = backStackEntry.toRoute<Routes.Document.CaptureBackScreen>()
-        val params = route.params
-        DocumentCaptureScreen(
-            resultCallbacks = resultCallbacks,
-            jobId = params.jobId,
-            showInstructions = params.showInstructions,
-            showAttribution = params.showAttribution,
-            allowGallerySelection = params.allowGallerySelection,
-            showSkipButton = params.showSkipButton,
-            side = DocumentCaptureSide.Back,
-            instructionsHeroImage = params.instructionsHeroImage,
-            instructionsTitleText = stringResource(params.instructionsTitleText),
-            knownIdAspectRatio = params.knownIdAspectRatio,
-            instructionsSubtitleText = stringResource(params.instructionsSubtitleText),
-            captureTitleText = stringResource(params.captureTitleText),
-            onConfirm = resultCallbacks.onDocumentBackCaptureSuccess ?: {},
-            onError = resultCallbacks.onDocumentCaptureError ?: {},
-        )
-    }
 }
 
 internal fun NavGraphBuilder.documentsDestinations(
@@ -316,13 +255,63 @@ internal fun NavGraphBuilder.documentsDestinations(
             showAttribution = params.showAttribution,
             allowPhotoFromGallery = params.allowPhotoFromGallery,
             showSkipButton = params.showSkipButton,
-            onSkip = resultCallbacks.onDocumentInstructionSkip ?: {},
-            onInstructionsAcknowledgedSelectFromGallery =
-            resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery
-                ?: {},
-            onInstructionsAcknowledgedTakePhoto =
-            resultCallbacks.onInstructionsAcknowledgedTakePhoto
-                ?: {},
+            onSkip = { resultCallbacks.onDocumentInstructionSkip?.invoke() },
+            onInstructionsAcknowledgedSelectFromGallery = {
+                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery?.invoke()
+            },
+            onInstructionsAcknowledgedTakePhoto = {
+                resultCallbacks.onInstructionsAcknowledgedTakePhoto?.invoke()
+            },
+        )
+    }
+
+    composable<Routes.Document.CaptureFrontScreen>(
+        typeMap = mapOf(
+            typeOf<DocumentCaptureParams>() to CustomNavType(
+                DocumentCaptureParams::class.java,
+                DocumentCaptureParams.serializer(),
+            ),
+        ),
+    ) { backStackEntry ->
+        val route = backStackEntry.toRoute<Routes.Document.CaptureFrontScreen>()
+        val params = route.params
+        DocumentCaptureScreen(
+            resultCallbacks = resultCallbacks,
+            jobId = params.jobId,
+            side = DocumentCaptureSide.Front,
+            knownIdAspectRatio = params.knownIdAspectRatio,
+            captureTitleText = stringResource(params.captureTitleText),
+            onConfirm = { file ->
+                resultCallbacks.onDocumentFrontCaptureSuccess?.invoke(file)
+            },
+            onError = { error ->
+                resultCallbacks.onDocumentCaptureError?.invoke(error)
+            },
+        )
+    }
+
+    composable<Routes.Document.CaptureBackScreen>(
+        typeMap = mapOf(
+            typeOf<DocumentCaptureParams>() to CustomNavType(
+                DocumentCaptureParams::class.java,
+                DocumentCaptureParams.serializer(),
+            ),
+        ),
+    ) { backStackEntry ->
+        val route = backStackEntry.toRoute<Routes.Document.CaptureBackScreen>()
+        val params = route.params
+        DocumentCaptureScreen(
+            resultCallbacks = resultCallbacks,
+            jobId = params.jobId,
+            side = DocumentCaptureSide.Front,
+            knownIdAspectRatio = params.knownIdAspectRatio,
+            captureTitleText = stringResource(params.captureTitleText),
+            onConfirm = { file ->
+                resultCallbacks.onDocumentBackCaptureSuccess?.invoke(file)
+            },
+            onError = { error ->
+                resultCallbacks.onDocumentCaptureError?.invoke(error)
+            },
         )
     }
 
@@ -387,7 +376,9 @@ internal fun NavGraphBuilder.selfieDestinations(
         val params = route.params
         SmartSelfieInstructionsScreen(
             showAttribution = params.showAttribution,
-            onInstructionsAcknowledged = resultCallbacks.onSelfieInstructionScreen ?: {},
+            onInstructionsAcknowledged = {
+                resultCallbacks.onSelfieInstructionScreen?.invoke()
+            },
         )
     }
 }

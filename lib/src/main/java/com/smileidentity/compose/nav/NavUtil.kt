@@ -3,8 +3,11 @@ package com.smileidentity.compose.nav
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavType
+import com.smileidentity.R
 import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -33,6 +36,7 @@ class CustomNavType<T : Parcelable>(
     override val name: String = clazz.name
 }
 
+@Composable
 internal fun getDocumentCaptureRoute(
     countryCode: String,
     params: DocumentCaptureParams,
@@ -43,32 +47,48 @@ internal fun getDocumentCaptureRoute(
     allowGalleryUpload: Boolean,
 ): Routes {
     val serializableFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) }
-    return Routes.Document.CaptureFrontScreen(
-        DocumentCaptureParams(
-            userId = params.userId,
-            jobId = params.jobId,
-            showInstructions = params.showInstructions,
-            showAttribution = params.showAttribution,
-            allowAgentMode = params.allowAgentMode,
-            allowGallerySelection = allowGalleryUpload,
-            showSkipButton = params.showSkipButton,
-            instructionsHeroImage = params.instructionsHeroImage,
-            instructionsTitleText = params.instructionsTitleText,
-            instructionsSubtitleText = params.instructionsSubtitleText,
-            captureTitleText = params.captureTitleText,
-            knownIdAspectRatio = idAspectRatio,
-            allowNewEnroll = params.allowNewEnroll,
-            countryCode = countryCode,
-            documentType = documentType,
-            captureBothSides = captureBothSides,
-            selfieFile = serializableFile,
-            extraPartnerParams = params.extraPartnerParams,
-        ),
-    )
+    return if (params.showInstructions) {
+        Routes.Document.InstructionScreen(
+            params = DocumentInstructionParams(
+                R.drawable.si_doc_v_front_hero,
+                stringResource(R.string.si_doc_v_instruction_title),
+                stringResource(R.string.si_verify_identity_instruction_subtitle),
+                params.showAttribution,
+                allowGalleryUpload,
+            ),
+        )
+    } else {
+        Routes.Document.CaptureFrontScreen(
+            DocumentCaptureParams(
+                userId = params.userId,
+                jobId = params.jobId,
+                showInstructions = true,
+                showAttribution = params.showAttribution,
+                allowAgentMode = params.allowAgentMode,
+                allowGallerySelection = allowGalleryUpload,
+                showSkipButton = params.showSkipButton,
+                instructionsHeroImage = params.instructionsHeroImage,
+                instructionsTitleText = params.instructionsTitleText,
+                instructionsSubtitleText = params.instructionsSubtitleText,
+                captureTitleText = params.captureTitleText,
+                knownIdAspectRatio = idAspectRatio,
+                allowNewEnroll = params.allowNewEnroll,
+                countryCode = countryCode,
+                documentType = documentType,
+                captureBothSides = captureBothSides,
+                selfieFile = serializableFile,
+                extraPartnerParams = params.extraPartnerParams,
+            ),
+        )
+    }
 }
 
 internal fun getSelfieCaptureRoute(useStrictMode: Boolean, params: SelfieCaptureParams): Routes {
-    return if (useStrictMode) {
+    return if (params.showInstructions) {
+        Routes.Selfie.InstructionsScreen(
+            InstructionScreenParams(params.showAttribution),
+        )
+    } else if (useStrictMode) {
         Routes.Selfie.CaptureScreenV2(params)
     } else {
         Routes.Selfie.CaptureScreen(params)

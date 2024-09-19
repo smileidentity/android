@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,13 +19,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.nav.ImageConfirmParams
-import com.smileidentity.compose.nav.InstructionScreenParams
 import com.smileidentity.compose.nav.NavigationBackHandler
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
-import com.smileidentity.compose.nav.compareRouteStrings
 import com.smileidentity.compose.nav.encodeUrl
 import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.v2.Metadatum
@@ -55,6 +50,7 @@ internal fun OrchestratedSelfieCaptureScreen(
     jobId: String = rememberSaveable { randomJobId() },
     allowNewEnroll: Boolean = false,
     isEnroll: Boolean = true,
+    useStrictMode: Boolean = false,
     allowAgentMode: Boolean = false,
     skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
@@ -86,9 +82,6 @@ internal fun OrchestratedSelfieCaptureScreen(
         content()
     }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    var showingSelfie by rememberSaveable { mutableStateOf(false) }
-    var startRoute: Routes? by rememberSaveable { mutableStateOf(null) }
     resultCallbacks.selfieViewModel = viewModel
     resultCallbacks.onProcessingContinue = {
         viewModel.onFinished(onResult)
@@ -106,22 +99,32 @@ internal fun OrchestratedSelfieCaptureScreen(
         viewModel.onSelfieRejected()
     }
     resultCallbacks.onSelfieInstructionScreen = {
-        acknowledgedInstructions = true
+        val selfieParams = SelfieCaptureParams(
+            userId = userId,
+            jobId = jobId,
+            isEnroll = isEnroll,
+            allowAgentMode = allowAgentMode,
+            skipApiSubmission = skipApiSubmission,
+            showAttribution = showAttribution,
+            extraPartnerParams = extraPartnerParams,
+            showInstructions = showInstructions,
+        )
+        val selfieRoute = if (useStrictMode) {
+            Routes.Selfie.CaptureScreenV2(
+                selfieParams,
+            )
+        } else {
+            Routes.Selfie.CaptureScreen(
+                selfieParams,
+            )
+        }
+        localNavigationState.screensNavigation.navigateTo(
+            selfieRoute,
+            popUpTo = false,
+            popUpToInclusive = false,
+        )
     }
     when {
-        showInstructions && !acknowledgedInstructions -> {
-            startRoute = Routes.Selfie.InstructionsScreen(
-                InstructionScreenParams(showAttribution),
-            )
-            startRoute?.let {
-                localNavigationState.screensNavigation.navigateTo(
-                    it,
-                    popUpTo = false,
-                    popUpToInclusive = false,
-                )
-            }
-        }
-
         uiState.processingState != null -> {
             localNavigationState.screensNavigation.navigateTo(
                 Routes.Shared.ProcessingScreen(
@@ -166,39 +169,13 @@ internal fun OrchestratedSelfieCaptureScreen(
                 popUpToInclusive = false,
             )
         }
-
-        else -> {
-            if (!showingSelfie) {
-                showingSelfie = true
-                val selfieRoute = Routes.Selfie.CaptureScreen(
-                    SelfieCaptureParams(
-                        userId = userId,
-                        jobId = jobId,
-                        isEnroll = isEnroll,
-                        allowAgentMode = allowAgentMode,
-                        skipApiSubmission = skipApiSubmission,
-                        showAttribution = showAttribution,
-                        extraPartnerParams = extraPartnerParams,
-                        showInstructions = showInstructions,
-                    ),
-                )
-                if (!showInstructions) {
-                    startRoute = selfieRoute
-                }
-                localNavigationState.screensNavigation.navigateTo(
-                    selfieRoute,
-                    popUpTo = false,
-                    popUpToInclusive = false,
-                )
-            }
-        }
     }
 
     NavigationBackHandler(
         navController = localNavigationState.screensNavigation.getNavController,
-    ) { currentDestination ->
+    ) { _, canGoBack ->
         localNavigationState.screensNavigation.getNavController.popBackStack()
-        if (compareRouteStrings(startRoute, currentDestination)) {
+        if (!canGoBack) {
             onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
         }
     }
