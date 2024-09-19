@@ -1,5 +1,6 @@
 package com.smileidentity.compose.biometric
 
+import android.os.OperationCanceledException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.compose.nav.NavigationBackHandler
 import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
@@ -123,6 +125,16 @@ internal fun OrchestratedBiometricKYCScreen(
                 popUpTo = true,
                 popUpToInclusive = true,
             )
+        }
+    }
+
+    NavigationBackHandler(
+        navController = localNavigationState.screensNavigation.getNavController,
+    ) { _, canGoBack ->
+
+        localNavigationState.screensNavigation.getNavController.popBackStack()
+        if (!canGoBack) {
+            onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
         }
     }
 }

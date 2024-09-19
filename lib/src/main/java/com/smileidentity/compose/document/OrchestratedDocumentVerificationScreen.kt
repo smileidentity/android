@@ -61,7 +61,6 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     onResult: SmileIDCallback<T> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var startRoute: Routes? by rememberSaveable { mutableStateOf(null) }
     var acknowledgedBackInstructions by rememberSaveable { mutableStateOf(false) }
 
     resultCallbacks.apply {
