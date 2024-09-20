@@ -3,10 +3,9 @@ package com.smileidentity.fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.compose.content
 import com.smileidentity.SmileID
 import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment.Companion.KEY_REQUEST
@@ -115,25 +114,20 @@ class SmartSelfieAuthenticationFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
-        // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
-        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    ) = content {
         val args = requireArguments()
-        setContent {
-            SmileID.SmartSelfieAuthentication(
-                userId = args.userId,
-                jobId = args.jobId,
-                allowNewEnroll = args.allowNewEnroll,
-                allowAgentMode = args.allowAgentMode,
-                showAttribution = args.showAttribution,
-                showInstructions = args.showInstructions,
-                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
-                onResult = {
-                    setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
-                },
-            )
-        }
+        SmileID.SmartSelfieAuthentication(
+            userId = args.userId,
+            jobId = args.jobId,
+            allowNewEnroll = args.allowNewEnroll,
+            allowAgentMode = args.allowAgentMode,
+            showAttribution = args.showAttribution,
+            showInstructions = args.showInstructions,
+            extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+            onResult = {
+                setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
+            },
+        )
     }
 }
 
