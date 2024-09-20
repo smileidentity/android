@@ -99,8 +99,7 @@ internal fun DocumentCaptureScreen(
         label = "ID Aspect Ratio",
     )
     when {
-        documentImageToConfirm != null ->
-            viewModel.onConfirm(documentImageToConfirm, onConfirm)
+        documentImageToConfirm != null -> viewModel.onConfirm(documentImageToConfirm, onConfirm)
         else -> {
             CaptureScreenContent(
                 titleText = captureTitleText,

@@ -24,7 +24,6 @@ import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.components.SmileThemeSurface
-import com.smileidentity.compose.document.CaptureScreenContent
 import com.smileidentity.compose.document.DocumentCaptureInstructionsScreen
 import com.smileidentity.compose.document.DocumentCaptureScreen
 import com.smileidentity.compose.document.DocumentCaptureSide
@@ -118,7 +117,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             showAttribution = params.captureParams.showAttribution,
             showInstructions = params.captureParams.showInstructions,
             extraPartnerParams = params.captureParams.extraPartnerParams,
-            onResult = resultCallbacks.onSmartSelfieResult ?: {},
+            onResult = { resultCallbacks.onSmartSelfieResult?.invoke(it) },
         )
     }
     composable<Routes.Orchestrated.BiometricKycRoute>(
@@ -142,7 +141,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             showAttribution = params.captureParams.showAttribution,
             showInstructions = params.captureParams.showInstructions,
             extraPartnerParams = params.captureParams.extraPartnerParams,
-            onResult = resultCallbacks.onBiometricKYCResult ?: {},
+            onResult = { resultCallbacks.onBiometricKYCResult?.invoke(it) },
         )
     }
     composable<Routes.Orchestrated.DocVRoute>(
@@ -162,11 +161,12 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             userId = params.captureParams.userId,
             jobId = params.captureParams.jobId,
             showAttribution = params.captureParams.showAttribution,
+            showSkipButton = params.captureParams.showSkipButton,
             allowAgentMode = params.captureParams.allowAgentMode,
             allowGalleryUpload = params.captureParams.allowGallerySelection,
             showInstructions = params.captureParams.showInstructions,
             idAspectRatio = params.captureParams.knownIdAspectRatio,
-            onResult = resultCallbacks.onDocVResult ?: {},
+            onResult = { resultCallbacks.onDocVResult?.invoke(it) },
             viewModel = viewModel(
                 factory = viewModelFactory {
                     DocumentVerificationViewModel(
@@ -202,11 +202,12 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             userId = params.captureParams.userId,
             jobId = params.captureParams.jobId,
             showAttribution = params.captureParams.showAttribution,
+            showSkipButton = params.captureParams.showSkipButton,
             allowAgentMode = params.captureParams.allowAgentMode,
             allowGalleryUpload = params.captureParams.allowGallerySelection,
             showInstructions = params.captureParams.showInstructions,
             idAspectRatio = params.captureParams.knownIdAspectRatio,
-            onResult = resultCallbacks.onEnhancedDocVResult ?: {},
+            onResult = { resultCallbacks.onEnhancedDocVResult?.invoke(it) },
             viewModel = viewModel(
                 factory = viewModelFactory {
                     EnhancedDocumentVerificationViewModel(
@@ -312,29 +313,9 @@ internal fun NavGraphBuilder.documentsDestinations(
             onError = { error ->
                 resultCallbacks.onDocumentCaptureError?.invoke(error)
             },
-        )
-    }
-
-    composable<Routes.Document.CaptureScreenContent>(
-        typeMap = mapOf(
-            typeOf<DocumentCaptureContentParams>() to CustomNavType(
-                DocumentCaptureContentParams::class.java,
-                DocumentCaptureContentParams.serializer(),
-            ),
-        ),
-    ) { navBackStackEntry ->
-        val route = navBackStackEntry.toRoute<Routes.Document.CaptureScreenContent>()
-        val params = route.params
-        CaptureScreenContent(
-            titleText = stringResource(params.titleText),
-            subtitleText = stringResource(params.subtitleText),
-            idAspectRatio = params.idAspectRatio,
-            areEdgesDetected = params.areEdgesDetected,
-            showCaptureInProgress = params.showCaptureInProgress,
-            showManualCaptureButton = params.showManualCaptureButton,
-            onCaptureClicked = resultCallbacks.onCaptureClicked ?: {},
-            imageAnalyzer = resultCallbacks.imageAnalyzer ?: { _, _ -> },
-            onFocusEvent = resultCallbacks.onFocusEvent ?: {},
+            onSkip = {
+                resultCallbacks.onDocumentBackSkip?.invoke()
+            },
         )
     }
 }
@@ -406,11 +387,11 @@ internal fun NavGraphBuilder.sharedDestinations(
             confirmButtonText = stringResource(
                 params.confirmButtonText,
             ),
-            onConfirm = resultCallbacks.onConfirmCapturedImage ?: {},
+            onConfirm = { resultCallbacks.onConfirmCapturedImage?.invoke() },
             retakeButtonText = stringResource(
                 params.retakeButtonText,
             ),
-            onRetake = resultCallbacks.onImageDialogRetake ?: {},
+            onRetake = { resultCallbacks.onImageDialogRetake?.invoke() },
             scaleFactor = 1.25f,
         )
     }
@@ -436,11 +417,11 @@ internal fun NavGraphBuilder.sharedDestinations(
             errorSubtitle = params.errorSubtitle,
             errorIcon = painterResource(R.drawable.si_processing_error),
             continueButtonText = stringResource(params.continueButtonText),
-            onContinue = resultCallbacks.onProcessingContinue ?: {},
+            onContinue = { resultCallbacks.onProcessingContinue?.invoke() },
             retryButtonText = stringResource(params.retryButtonText),
-            onRetry = resultCallbacks.onProcessingRetry ?: {},
+            onRetry = { resultCallbacks.onProcessingRetry?.invoke() },
             closeButtonText = stringResource(params.closeButtonText),
-            onClose = resultCallbacks.onProcessingClose ?: {},
+            onClose = { resultCallbacks.onProcessingClose?.invoke() },
         )
     }
 }

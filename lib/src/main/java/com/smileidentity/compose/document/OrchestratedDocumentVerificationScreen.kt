@@ -50,6 +50,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     resultCallbacks: ResultCallbacks,
     content: @Composable () -> Unit,
     viewModel: OrchestratedDocumentViewModel<T>,
+    showSkipButton: Boolean,
     modifier: Modifier = Modifier,
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
@@ -70,6 +71,10 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         onDocumentBackSkip = viewModel::onDocumentBackSkip
         onProcessingContinue = { viewModel.onFinished(onResult) }
         onProcessingClose = { viewModel.onFinished(onResult) }
+        onProcessingRetry = viewModel::onRetry
+        onImageDialogRetake = {
+            viewModel.onRetry()
+        }
         onSmartSelfieResult = { result ->
             when (result) {
                 is SmileIDResult.Error -> viewModel.onError(result.throwable)
@@ -95,6 +100,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 R.string.si_doc_v_instruction_title,
                 R.string.si_verify_identity_instruction_subtitle,
                 R.string.si_doc_v_capture_instructions_front_title,
+                showSkipButton,
                 userId,
                 jobId,
                 showInstructions,
@@ -117,6 +123,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         showInstructions = showInstructions,
         acknowledgedBackInstructions = acknowledgedBackInstructions,
         showAttribution = showAttribution,
+        showSkipButton = showSkipButton,
         allowGalleryUpload = allowGalleryUpload,
         userId = userId,
         jobId = jobId,
@@ -127,7 +134,6 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     NavigationBackHandler(
         navController = localNavigationState.screensNavigation.getNavController,
     ) { _, canGoBack ->
-
         localNavigationState.screensNavigation.getNavController.popBackStack()
         if (!canGoBack) {
             onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
@@ -142,6 +148,7 @@ private fun HandleDocumentCaptureFlow(
     showInstructions: Boolean,
     acknowledgedBackInstructions: Boolean,
     showAttribution: Boolean,
+    showSkipButton: Boolean,
     allowGalleryUpload: Boolean,
     userId: String,
     jobId: String,
@@ -151,14 +158,7 @@ private fun HandleDocumentCaptureFlow(
     when (currentStep) {
         DocumentCaptureFlow.FrontDocumentCapture -> {
             HandleFrontDocumentCapture(
-                showInstructions,
-                true,
                 uiState.documentFrontFile,
-                showAttribution,
-                allowGalleryUpload,
-                userId,
-                jobId,
-                idAspectRatio,
             )
         }
 
@@ -167,6 +167,7 @@ private fun HandleDocumentCaptureFlow(
             acknowledgedBackInstructions,
             uiState.documentBackFile,
             showAttribution,
+            showSkipButton,
             allowGalleryUpload,
             userId,
             jobId,
@@ -189,16 +190,7 @@ private fun HandleDocumentCaptureFlow(
 }
 
 @Composable
-private fun HandleFrontDocumentCapture(
-    showInstructions: Boolean,
-    acknowledgedFrontInstructions: Boolean,
-    documentFrontFile: File?,
-    showAttribution: Boolean,
-    allowGalleryUpload: Boolean,
-    userId: String,
-    jobId: String,
-    idAspectRatio: Float?,
-) {
+private fun HandleFrontDocumentCapture(documentFrontFile: File?) {
     when {
         documentFrontFile != null -> NavigateToImageConfirmDialog(documentFrontFile)
     }
@@ -210,6 +202,7 @@ private fun HandleBackDocumentCapture(
     acknowledgedBackInstructions: Boolean,
     documentBackFile: File?,
     showAttribution: Boolean,
+    showSkipButton: Boolean,
     allowGalleryUpload: Boolean,
     userId: String,
     jobId: String,
@@ -230,6 +223,7 @@ private fun HandleBackDocumentCapture(
             R.string.si_doc_v_instruction_back_title,
             R.string.si_doc_v_instruction_back_subtitle,
             R.string.si_doc_v_capture_instructions_back_title,
+            showSkipButton,
             userId,
             jobId,
             showInstructions,
@@ -344,6 +338,7 @@ private fun navigateToDocumentCaptureScreen(
     titleRes: Int,
     subtitleRes: Int,
     captureTitleRes: Int,
+    showSkipButton: Boolean,
     userId: String,
     jobId: String,
     showInstructions: Boolean,
@@ -376,7 +371,7 @@ private fun navigateToDocumentCaptureScreen(
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
-                showSkipButton = false,
+                showSkipButton = showSkipButton,
                 instructionsHeroImage = heroImage,
                 instructionsTitleText = titleRes,
                 instructionsSubtitleText = subtitleRes,
@@ -385,7 +380,6 @@ private fun navigateToDocumentCaptureScreen(
             ),
         )
     }
-
     localNavigationState.screensNavigation.navigateTo(
         route,
         popUpTo = true,

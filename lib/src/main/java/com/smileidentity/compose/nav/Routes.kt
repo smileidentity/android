@@ -49,10 +49,6 @@ sealed class Routes : Parcelable {
         @Parcelize
         @Serializable
         data class CaptureBackScreen(val params: DocumentCaptureParams) : Document()
-
-        @Parcelize
-        @Serializable
-        data class CaptureScreenContent(val params: DocumentCaptureContentParams) : Document()
     }
 
     sealed class Shared : Routes() {
