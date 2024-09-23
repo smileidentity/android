@@ -30,7 +30,7 @@ class OrchestratedDocumentVerificationScreenTest {
                     countryCode = "254",
                     documentType = "NATIONAL_ID",
                     captureBothSides = false,
-                    metadata = LocalMetadata.current
+                    metadata = LocalMetadata.current,
                 ),
             )
         }
@@ -55,7 +55,7 @@ class OrchestratedDocumentVerificationScreenTest {
                     countryCode = "254",
                     documentType = "NATIONAL_ID",
                     captureBothSides = false,
-                    metadata = LocalMetadata.current
+                    metadata = LocalMetadata.current,
                 ),
             )
         }
