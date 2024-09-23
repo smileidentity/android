@@ -3,10 +3,9 @@ package com.smileidentity.fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.compose.content
 import com.smileidentity.SmileID
 import com.smileidentity.compose.BiometricKYC
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.KEY_REQUEST
@@ -108,26 +107,21 @@ class BiometricKYCFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
-        // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
-        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    ) = content {
         val args = requireArguments()
-        setContent {
-            SmileID.BiometricKYC(
-                idInfo = args.idInfo,
-                userId = args.userId,
-                jobId = args.jobId,
-                allowNewEnroll = args.allowNewEnroll,
-                allowAgentMode = args.allowAgentMode,
-                showAttribution = args.showAttribution,
-                showInstructions = args.showInstructions,
-                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
-                onResult = {
-                    setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
-                },
-            )
-        }
+        SmileID.BiometricKYC(
+            idInfo = args.idInfo,
+            userId = args.userId,
+            jobId = args.jobId,
+            allowNewEnroll = args.allowNewEnroll,
+            allowAgentMode = args.allowAgentMode,
+            showAttribution = args.showAttribution,
+            showInstructions = args.showInstructions,
+            extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+            onResult = {
+                setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
+            },
+        )
     }
 }
 

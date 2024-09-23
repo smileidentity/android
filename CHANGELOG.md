@@ -1,5 +1,10 @@
 # Release Notes
 
+## 10.3.0
+
+* Changed initialize() to return a deferred result (allow partners to handle errors)
+* Update to Compose Fragment and remove ComposeView
+
 ## 10.2.7
 
 * Fixed upload bug to retry in case a job already exists but zip was not uploaded

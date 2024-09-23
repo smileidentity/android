@@ -3,10 +3,9 @@ package com.smileidentity.fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.compose.content
 import com.smileidentity.SmileID
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_REQUEST
@@ -113,32 +112,27 @@ class EnhancedDocumentVerificationFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        // Dispose of the Composition when the view's LifecycleOwner is destroyed. see:
-        // https://developer.android.com/jetpack/compose/interop/interop-apis#compose-in-fragments
-        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    ) = content {
         val args = requireArguments()
-        setContent {
-            val aspectRatio = args.idAspectRatio
-            SmileID.EnhancedDocumentVerificationScreen(
-                countryCode = args.countryCode,
-                documentType = args.documentType,
-                userId = args.userId,
-                jobId = args.jobId,
-                allowNewEnroll = args.allowNewEnroll,
-                showAttribution = args.showAttribution,
-                allowAgentMode = args.allowAgentMode,
-                allowGalleryUpload = args.allowGalleryUpload,
-                showInstructions = args.showInstructions,
-                captureBothSides = args.captureBothSides,
-                bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
-                idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
-                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
-                onResult = {
-                    setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
-                },
-            )
-        }
+        val aspectRatio = args.idAspectRatio
+        SmileID.EnhancedDocumentVerificationScreen(
+            countryCode = args.countryCode,
+            documentType = args.documentType,
+            userId = args.userId,
+            jobId = args.jobId,
+            allowNewEnroll = args.allowNewEnroll,
+            showAttribution = args.showAttribution,
+            allowAgentMode = args.allowAgentMode,
+            allowGalleryUpload = args.allowGalleryUpload,
+            showInstructions = args.showInstructions,
+            captureBothSides = args.captureBothSides,
+            bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
+            idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
+            extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+            onResult = {
+                setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
+            },
+        )
     }
 }
 
