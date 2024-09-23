@@ -55,11 +55,12 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.net.URL
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
@@ -118,7 +119,7 @@ object SmileID {
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) {
+    ): Deferred<Result<Unit>> {
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
         // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
         if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
@@ -151,13 +152,14 @@ object SmileID {
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
 
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Timber.d("Face Detection Module Exception : ${throwable.message}")
-            throw throwable
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        return scope.async {
+            runCatching {
+                requestFaceDetectionModuleInstallation(context)
+            }.onFailure { throwable ->
+                Timber.d("Face Detection Module Exception: ${throwable.message}")
+            }
         }
-
-        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob() + exceptionHandler)
-        scope.launch { requestFaceDetectionModuleInstallation(context) }
     }
 
     /**
@@ -184,9 +186,18 @@ object SmileID {
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-    ) {
+    ): Deferred<Result<Unit>> {
         SmileID.apiKey = apiKey
-        initialize(context, config, useSandbox, enableCrashReporting, okHttpClient)
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        return scope.async {
+            initialize(
+                context = context,
+                config = config,
+                useSandbox = useSandbox,
+                enableCrashReporting = enableCrashReporting,
+                okHttpClient = okHttpClient,
+            ).await()
+        }
     }
 
     /**

@@ -2,6 +2,7 @@
 
 ## 10.3.0
 
+* Changed initialize() to return a deferred result (allow partners to handle errors)
 * Update to Compose Fragment and remove ComposeView
 
 ## 10.2.7
