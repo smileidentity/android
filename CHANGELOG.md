@@ -1,6 +1,6 @@
 # Release Notes
 
-## 10.2.8
+## 10.3.0
 
 * Update to Compose Fragment and remove ComposeView
 
