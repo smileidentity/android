@@ -82,6 +82,25 @@ internal fun OrchestratedSelfieCaptureScreen(
         content()
     }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val selfieParams = SelfieCaptureParams(
+        userId = userId,
+        jobId = jobId,
+        isEnroll = isEnroll,
+        allowAgentMode = allowAgentMode,
+        skipApiSubmission = skipApiSubmission,
+        showAttribution = showAttribution,
+        extraPartnerParams = extraPartnerParams,
+        showInstructions = showInstructions,
+    )
+    val selfieRoute = if (useStrictMode) {
+        Routes.Selfie.CaptureScreenV2(
+            selfieParams,
+        )
+    } else {
+        Routes.Selfie.CaptureScreen(
+            selfieParams,
+        )
+    }
     resultCallbacks.selfieViewModel = viewModel
     resultCallbacks.onProcessingContinue = {
         viewModel.onFinished(onResult)
@@ -95,29 +114,10 @@ internal fun OrchestratedSelfieCaptureScreen(
         viewModel.submitJob()
     }
     resultCallbacks.onImageDialogRetake = {
-        localNavigationState.screensNavigation.getNavController.popBackStack()
         viewModel.onSelfieRejected()
+        localNavigationState.screensNavigation.getNavController.popBackStack()
     }
     resultCallbacks.onSelfieInstructionScreen = {
-        val selfieParams = SelfieCaptureParams(
-            userId = userId,
-            jobId = jobId,
-            isEnroll = isEnroll,
-            allowAgentMode = allowAgentMode,
-            skipApiSubmission = skipApiSubmission,
-            showAttribution = showAttribution,
-            extraPartnerParams = extraPartnerParams,
-            showInstructions = showInstructions,
-        )
-        val selfieRoute = if (useStrictMode) {
-            Routes.Selfie.CaptureScreenV2(
-                selfieParams,
-            )
-        } else {
-            Routes.Selfie.CaptureScreen(
-                selfieParams,
-            )
-        }
         localNavigationState.screensNavigation.navigateTo(
             selfieRoute,
             popUpTo = false,

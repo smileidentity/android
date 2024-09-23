@@ -1,12 +1,10 @@
 package com.smileidentity.compose.nav
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -14,7 +12,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.smileidentity.R
@@ -367,7 +364,7 @@ internal fun NavGraphBuilder.selfieDestinations(
 internal fun NavGraphBuilder.sharedDestinations(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
 ) {
-    dialog<Routes.Shared.ImageConfirmDialog>(
+    composable<Routes.Shared.ImageConfirmDialog>(
         typeMap = mapOf(
             typeOf<ImageConfirmParams>() to CustomNavType(
                 ImageConfirmParams::class.java,
@@ -378,22 +375,27 @@ internal fun NavGraphBuilder.sharedDestinations(
         val route = navBackStackEntry.toRoute<Routes.Shared.ImageConfirmDialog>()
         val params = route.params
         val selfieUrl = decodeUrl(params.imageFilePath)
-        ImageCaptureConfirmationDialog(
-            titleText = stringResource(params.titleText),
-            subtitleText = stringResource(params.subtitleText),
-            painter = BitmapPainter(
-                BitmapFactory.decodeFile(selfieUrl).asImageBitmap(),
-            ),
-            confirmButtonText = stringResource(
-                params.confirmButtonText,
-            ),
-            onConfirm = { resultCallbacks.onConfirmCapturedImage?.invoke() },
-            retakeButtonText = stringResource(
-                params.retakeButtonText,
-            ),
-            onRetake = { resultCallbacks.onImageDialogRetake?.invoke() },
-            scaleFactor = 1.25f,
-        )
+        selfieUrl?.let {
+            val bitmap = loadBitmap(it)
+            bitmap?.let { bmp ->
+                ImageCaptureConfirmationDialog(
+                    titleText = stringResource(params.titleText),
+                    subtitleText = stringResource(params.subtitleText),
+                    painter = BitmapPainter(
+                        bmp,
+                    ),
+                    confirmButtonText = stringResource(
+                        params.confirmButtonText,
+                    ),
+                    onConfirm = { resultCallbacks.onConfirmCapturedImage?.invoke() },
+                    retakeButtonText = stringResource(
+                        params.retakeButtonText,
+                    ),
+                    onRetake = { resultCallbacks.onImageDialogRetake?.invoke() },
+                    scaleFactor = 1.25f,
+                )
+            }
+        }
     }
     composable<Routes.Shared.ProcessingScreen>(
         typeMap = mapOf(

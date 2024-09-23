@@ -73,7 +73,37 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         onProcessingClose = { viewModel.onFinished(onResult) }
         onProcessingRetry = viewModel::onRetry
         onImageDialogRetake = {
-            viewModel.onRetry()
+            viewModel.onRestart()
+            localNavigationState.screensNavigation.getNavController.popBackStack()
+            if (uiState.currentStep is DocumentCaptureFlow.FrontDocumentCapture) {
+                navigateToDocumentCaptureScreen(
+                    R.drawable.si_doc_v_front_hero,
+                    R.string.si_doc_v_instruction_title,
+                    R.string.si_verify_identity_instruction_subtitle,
+                    R.string.si_doc_v_capture_instructions_front_title,
+                    showSkipButton,
+                    userId,
+                    jobId,
+                    showInstructions,
+                    showAttribution,
+                    allowGalleryUpload,
+                    idAspectRatio,
+                )
+            } else if (uiState.currentStep is DocumentCaptureFlow.BackDocumentCapture) {
+                navigateToDocumentCaptureScreen(
+                    R.drawable.si_doc_v_back_hero,
+                    R.string.si_doc_v_instruction_title,
+                    R.string.si_verify_identity_instruction_subtitle,
+                    R.string.si_doc_v_capture_instructions_back_title,
+                    showSkipButton,
+                    userId,
+                    jobId,
+                    showInstructions,
+                    showAttribution,
+                    allowGalleryUpload,
+                    idAspectRatio,
+                )
+            }
         }
         onSmartSelfieResult = { result ->
             when (result) {
@@ -215,6 +245,7 @@ private fun HandleBackDocumentCapture(
             R.string.si_doc_v_instruction_back_subtitle,
             showAttribution,
             allowGalleryUpload,
+            true,
         )
 
         documentBackFile != null -> NavigateToImageConfirmDialog(documentBackFile)
@@ -298,6 +329,7 @@ private fun NavigateToInstructionScreen(
     subtitleRes: Int,
     showAttribution: Boolean,
     allowGalleryUpload: Boolean,
+    showSkipButton: Boolean,
 ) {
     localNavigationState.screensNavigation.navigateTo(
         Routes.Document.InstructionScreen(
@@ -307,7 +339,7 @@ private fun NavigateToInstructionScreen(
                 subtitle = stringResource(subtitleRes),
                 showAttribution = showAttribution,
                 allowPhotoFromGallery = allowGalleryUpload,
-                showSkipButton = false,
+                showSkipButton = showSkipButton,
             ),
         ),
         popUpTo = true,

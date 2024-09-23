@@ -101,6 +101,24 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
+    fun onRestart() {
+        if (uiState.value.currentStep == DocumentCaptureFlow.FrontDocumentCapture) {
+            uiState.value.documentFrontFile?.delete()
+            _uiState.update {
+                it.copy(
+                    documentFrontFile = null,
+                )
+            }
+        } else {
+            uiState.value.documentBackFile?.delete()
+            _uiState.update {
+                it.copy(
+                    documentBackFile = null,
+                )
+            }
+        }
+    }
+
     fun onDocumentFrontCaptureSuccess() {
         if (captureBothSides) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }

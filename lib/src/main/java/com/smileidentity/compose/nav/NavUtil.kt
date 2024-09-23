@@ -1,9 +1,11 @@
 package com.smileidentity.compose.nav
 
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavType
@@ -14,6 +16,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 
 class CustomNavType<T : Parcelable>(
     private val clazz: Class<T>,
@@ -55,6 +58,7 @@ internal fun getDocumentCaptureRoute(
                 stringResource(R.string.si_verify_identity_instruction_subtitle),
                 params.showAttribution,
                 allowGalleryUpload,
+                showSkipButton = false,
             ),
         )
     } else {
@@ -99,8 +103,15 @@ fun encodeUrl(url: String): String {
     return URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
 }
 
-internal fun decodeUrl(encodedUrl: String): String {
+internal fun decodeUrl(encodedUrl: String?): String? {
     return URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.toString())
+}
+
+internal fun loadBitmap(url: String) = try {
+    BitmapFactory.decodeFile(url)?.asImageBitmap()
+} catch (e: Exception) {
+    Timber.e("ImageConfirmDialog", "Error decoding bitmap: ${e.message}", e)
+    null
 }
 
 internal fun compareRouteStrings(

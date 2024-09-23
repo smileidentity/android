@@ -84,7 +84,7 @@ data class InstructionScreenParams(
 data class ImageConfirmParams(
     val titleText: Int,
     val subtitleText: Int,
-    val imageFilePath: String,
+    val imageFilePath: String? = null,
     val confirmButtonText: Int,
     val retakeButtonText: Int,
     val scaleFactor: Float,
