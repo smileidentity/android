@@ -114,6 +114,8 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             showAttribution = params.captureParams.showAttribution,
             showInstructions = params.captureParams.showInstructions,
             extraPartnerParams = params.captureParams.extraPartnerParams,
+            showStartRoute = params.showStartRoute,
+            startRoute = params.startRoute,
             onResult = { resultCallbacks.onSmartSelfieResult?.invoke(it) },
         )
     }
@@ -254,8 +256,8 @@ internal fun NavGraphBuilder.documentsDestinations(
             allowPhotoFromGallery = params.allowPhotoFromGallery,
             showSkipButton = params.showSkipButton,
             onSkip = { resultCallbacks.onDocumentInstructionSkip?.invoke() },
-            onInstructionsAcknowledgedSelectFromGallery = {
-                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery?.invoke()
+            onInstructionsAcknowledgedSelectFromGallery = { uri ->
+                resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery?.invoke(uri)
             },
             onInstructionsAcknowledgedTakePhoto = {
                 resultCallbacks.onInstructionsAcknowledgedTakePhoto?.invoke()
@@ -273,11 +275,13 @@ internal fun NavGraphBuilder.documentsDestinations(
     ) { backStackEntry ->
         val route = backStackEntry.toRoute<Routes.Document.CaptureFrontScreen>()
         val params = route.params
+        val galleryDocumentUri = decodeUrl(params.galleryDocumentUri)
         DocumentCaptureScreen(
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
             side = DocumentCaptureSide.Front,
             knownIdAspectRatio = params.knownIdAspectRatio,
+            galleryDocumentUri = galleryDocumentUri,
             captureTitleText = stringResource(params.captureTitleText),
             onConfirm = { file ->
                 resultCallbacks.onDocumentFrontCaptureSuccess?.invoke(file)
@@ -298,11 +302,13 @@ internal fun NavGraphBuilder.documentsDestinations(
     ) { backStackEntry ->
         val route = backStackEntry.toRoute<Routes.Document.CaptureBackScreen>()
         val params = route.params
+        val galleryDocumentUri = decodeUrl(params.galleryDocumentUri)
         DocumentCaptureScreen(
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
             side = DocumentCaptureSide.Front,
             knownIdAspectRatio = params.knownIdAspectRatio,
+            galleryDocumentUri = galleryDocumentUri,
             captureTitleText = stringResource(params.captureTitleText),
             onConfirm = { file ->
                 resultCallbacks.onDocumentBackCaptureSuccess?.invoke(file)

@@ -1,9 +1,6 @@
 package com.smileidentity.compose.document
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,7 +14,6 @@ import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.nav.ResultCallbacks
-import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
@@ -26,7 +22,7 @@ import com.smileidentity.util.writeUriToFile
 import com.smileidentity.viewmodel.document.DocumentCaptureViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import java.io.File
-import timber.log.Timber
+import java.net.URISyntaxException
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
@@ -47,6 +43,7 @@ internal fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     knownIdAspectRatio: Float?,
+    galleryDocumentUri: String?,
     modifier: Modifier = Modifier,
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     onSkip: () -> Unit = { },
@@ -63,15 +60,9 @@ internal fun DocumentCaptureScreen(
     ),
 ) {
     val context = LocalContext.current
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            Timber.v("selectedUri: $uri")
-            if (uri == null) {
-                Timber.e("selectedUri is null")
-                context.toast(R.string.si_doc_v_capture_error_subtitle)
-                return@rememberLauncherForActivityResult
-            }
+    galleryDocumentUri?.let {
+        try {
+            val uri = Uri.parse(it)
             if (isValidDocumentImage(context, uri)) {
                 val documentFile = createDocumentFile(jobId, (side == DocumentCaptureSide.Front))
                 writeUriToFile(documentFile, uri, context)
@@ -80,20 +71,14 @@ internal fun DocumentCaptureScreen(
                 SmileIDCrashReporting.hub.addBreadcrumb("Gallery upload document image too small")
                 context.toast(R.string.si_doc_v_validation_image_too_small)
             }
-        },
-    )
+        } catch (e: URISyntaxException) {
+            SmileIDCrashReporting.hub.addBreadcrumb("Gallery upload Invalid URI: ${e.message}")
+        }
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val documentImageToConfirm = uiState.documentImageToConfirm
-    resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery = {
-        Timber.v("onInstructionsAcknowledgedSelectFromGallery")
-        SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
-        photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
-    }
-    resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
-        viewModel.onInstructionsAcknowledged()
-        localNavigationState.screensNavigation.getNavController.popBackStack()
-    }
-    resultCallbacks.onDocumentInstructionSkip = onSkip
+
     val aspectRatio by animateFloatAsState(
         targetValue = uiState.idAspectRatio,
         label = "ID Aspect Ratio",

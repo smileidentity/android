@@ -30,6 +30,7 @@ import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.encodeUrl
+import com.smileidentity.compose.nav.getSelfieCaptureRoute
 import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
@@ -72,10 +73,12 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         onProcessingContinue = { viewModel.onFinished(onResult) }
         onProcessingClose = { viewModel.onFinished(onResult) }
         onProcessingRetry = viewModel::onRetry
+        onDocumentInstructionSkip = viewModel::onDocumentBackSkip
         onImageDialogRetake = {
             viewModel.onRestart()
             localNavigationState.screensNavigation.getNavController.popBackStack()
             if (uiState.currentStep is DocumentCaptureFlow.FrontDocumentCapture) {
+                localNavigationState.screensNavigation.getNavController.popBackStack()
                 navigateToDocumentCaptureScreen(
                     R.drawable.si_doc_v_front_hero,
                     R.string.si_doc_v_instruction_title,
@@ -137,9 +140,26 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 showAttribution,
                 allowGalleryUpload,
                 idAspectRatio,
+                null,
             )
         }
         resultCallbacks.onConfirmCapturedImage = viewModel::onDocumentFrontCaptureSuccess
+        resultCallbacks.onDocumentInstructionAcknowledgedSelectFromGallery = { uri ->
+            navigateToDocumentCaptureScreen(
+                R.drawable.si_doc_v_front_hero,
+                R.string.si_doc_v_instruction_title,
+                R.string.si_verify_identity_instruction_subtitle,
+                R.string.si_doc_v_capture_instructions_front_title,
+                showSkipButton,
+                userId,
+                jobId,
+                showInstructions,
+                showAttribution,
+                allowGalleryUpload,
+                idAspectRatio,
+                uri,
+            )
+        }
     } else if (uiState.currentStep is DocumentCaptureFlow.BackDocumentCapture) {
         resultCallbacks.onInstructionsAcknowledgedTakePhoto = {
             acknowledgedBackInstructions = true
@@ -261,6 +281,7 @@ private fun HandleBackDocumentCapture(
             showAttribution,
             allowGalleryUpload,
             idAspectRatio,
+            null,
             false,
         )
     }
@@ -274,17 +295,22 @@ private fun HandleSelfieCapture(
     showAttribution: Boolean,
     allowAgentMode: Boolean,
 ) {
+    val selfieCaptureParams = SelfieCaptureParams(
+        userId = userId,
+        jobId = jobId,
+        showInstructions = showInstructions,
+        showAttribution = showAttribution,
+        allowAgentMode = allowAgentMode,
+        skipApiSubmission = true,
+    )
+    val selfieStartRoute = getSelfieCaptureRoute(false, selfieCaptureParams)
+
     localNavigationState.orchestratedNavigation.navigateTo(
         Routes.Orchestrated.SelfieRoute(
             OrchestratedSelfieCaptureParams(
-                SelfieCaptureParams(
-                    userId = userId,
-                    jobId = jobId,
-                    showInstructions = showInstructions,
-                    showAttribution = showAttribution,
-                    allowAgentMode = allowAgentMode,
-                    skipApiSubmission = true,
-                ),
+                selfieCaptureParams,
+                startRoute = selfieStartRoute,
+                showStartRoute = true,
             ),
         ),
         popUpTo = false,
@@ -377,6 +403,7 @@ private fun navigateToDocumentCaptureScreen(
     showAttribution: Boolean,
     allowGalleryUpload: Boolean,
     idAspectRatio: Float?,
+    galleryDocumentUri: String? = null,
     front: Boolean = true,
 ) {
     val route = if (front) {
@@ -393,6 +420,7 @@ private fun navigateToDocumentCaptureScreen(
                 instructionsSubtitleText = subtitleRes,
                 captureTitleText = captureTitleRes,
                 knownIdAspectRatio = idAspectRatio,
+                galleryDocumentUri = galleryDocumentUri,
             ),
         )
     } else {
@@ -409,6 +437,7 @@ private fun navigateToDocumentCaptureScreen(
                 instructionsSubtitleText = subtitleRes,
                 captureTitleText = captureTitleRes,
                 knownIdAspectRatio = idAspectRatio,
+                galleryDocumentUri = galleryDocumentUri,
             ),
         )
     }

@@ -104,7 +104,7 @@ fun encodeUrl(url: String): String {
 }
 
 internal fun decodeUrl(encodedUrl: String?): String? {
-    return URLDecoder.decode(encodedUrl, StandardCharsets.UTF_8.toString())
+    return encodedUrl?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.toString()) }
 }
 
 internal fun loadBitmap(url: String) = try {

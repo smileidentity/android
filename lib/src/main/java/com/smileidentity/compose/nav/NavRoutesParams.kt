@@ -38,7 +38,7 @@ internal data class ResultCallbacks(
     var onDocumentCaptureError: ((Throwable) -> Unit)? = null,
     var onDocumentInstructionSkip: (() -> Unit)? = null,
     var onDocumentBackSkip: (() -> Unit)? = null,
-    var onDocumentInstructionAcknowledgedSelectFromGallery: (() -> Unit)? = null,
+    var onDocumentInstructionAcknowledgedSelectFromGallery: ((String?) -> Unit)? = null,
     var onInstructionsAcknowledgedTakePhoto: (() -> Unit)? = null,
 
     var onCaptureClicked: ((CameraState) -> Unit)? = null,
@@ -76,7 +76,7 @@ data class SelfieCaptureParams(
 @Serializable
 @Parcelize
 data class InstructionScreenParams(
-    val showAttribution: Boolean = false,
+    val showAttribution: Boolean = true,
 ) : Parcelable
 
 @Serializable
@@ -108,6 +108,7 @@ data class DocumentCaptureParams(
     val instructionsSubtitleText: Int = R.string.si_verify_identity_instruction_subtitle,
     val captureTitleText: Int = R.string.si_doc_v_capture_instructions_front_title,
     val knownIdAspectRatio: Float? = null,
+    val galleryDocumentUri: String? = null,
     val documentType: String? = null,
     val captureBothSides: Boolean = true,
     val selfieFile: SerializableFile? = null,
@@ -173,6 +174,7 @@ data class ProcessingScreenParams(
 data class OrchestratedSelfieCaptureParams(
     val captureParams: SelfieCaptureParams,
     val startRoute: Routes = Routes.Selfie.InstructionsScreen(InstructionScreenParams()),
+    val showStartRoute: Boolean = false,
 ) : Parcelable
 
 @Serializable

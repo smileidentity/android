@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -55,6 +58,8 @@ internal fun OrchestratedSelfieCaptureScreen(
     skipApiSubmission: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    showStartRoute: Boolean = false,
+    startRoute: Routes? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     viewModel: SelfieViewModel = viewModel(
@@ -82,6 +87,7 @@ internal fun OrchestratedSelfieCaptureScreen(
         content()
     }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    var startRouteShown by rememberSaveable { mutableStateOf(false) }
     val selfieParams = SelfieCaptureParams(
         userId = userId,
         jobId = jobId,
@@ -165,6 +171,15 @@ internal fun OrchestratedSelfieCaptureScreen(
                         scaleFactor = 1.0f,
                     ),
                 ),
+                popUpTo = false,
+                popUpToInclusive = false,
+            )
+        }
+
+        showStartRoute && startRoute != null && !startRouteShown -> {
+            startRouteShown = true
+            localNavigationState.screensNavigation.navigateTo(
+                startRoute,
                 popUpTo = false,
                 popUpToInclusive = false,
             )
