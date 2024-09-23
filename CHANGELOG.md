@@ -1,6 +1,6 @@
 # Release Notes
 
-## 10.2.8
+## 10.3.0
 
 * Changed initialize() to return a deferred result (allow partners to handle errors)
 
