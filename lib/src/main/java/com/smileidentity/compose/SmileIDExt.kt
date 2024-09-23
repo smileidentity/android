@@ -20,7 +20,6 @@ import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
-import com.smileidentity.compose.selfie.v3.SelfieCaptureScreenV3
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.ml.SelfieQualityModel
@@ -157,38 +156,36 @@ fun SmileID.SmartSelfieAuthentication(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        SelfieCaptureScreenV3(
-            modifier = modifier,
-        )
         // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
-        // if (useStrictMode) {
-        //     val context = LocalContext.current
-        //     val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        //     OrchestratedSelfieCaptureScreenV2(
-        //         modifier = modifier,
-        //         userId = userId,
-        //         isEnroll = false,
-        //         allowAgentMode = allowAgentMode,
-        //         showAttribution = showAttribution,
-        //         useStrictMode = useStrictMode,
-        //         selfieQualityModel = selfieQualityModel,
-        //         extraPartnerParams = extraPartnerParams,
-        //         onResult = onResult,
-        //     )
-        // } else {
-        //     OrchestratedSelfieCaptureScreen(
-        //         modifier = modifier,
-        //         userId = userId,
-        //         jobId = jobId,
-        //         allowNewEnroll = allowNewEnroll,
-        //         isEnroll = false,
-        //         allowAgentMode = allowAgentMode,
-        //         showAttribution = showAttribution,
-        //         showInstructions = showInstructions,
-        //         extraPartnerParams = extraPartnerParams,
-        //         onResult = onResult,
-        //     )
-        // }
+        if (useStrictMode) {
+            val context = LocalContext.current
+            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+            OrchestratedSelfieCaptureScreenV2(
+                modifier = modifier,
+                userId = userId,
+                isEnroll = false,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                useStrictMode = useStrictMode,
+                selfieQualityModel = selfieQualityModel,
+                extraPartnerParams = extraPartnerParams,
+                onResult = onResult,
+            )
+        } else {
+            OrchestratedSelfieCaptureScreen(
+                modifier = modifier,
+                userId = userId,
+                jobId = jobId,
+                allowNewEnroll = allowNewEnroll,
+                isEnroll = false,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                extraPartnerParams = extraPartnerParams,
+                onResult = onResult,
+            )
+        }
     }
 }
 

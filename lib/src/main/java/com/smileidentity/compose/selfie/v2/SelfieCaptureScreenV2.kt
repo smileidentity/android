@@ -125,6 +125,7 @@ fun OrchestratedSelfieCaptureScreenV2(
     modifier: Modifier = Modifier,
     useStrictMode: Boolean = false,
     showAttribution: Boolean = true,
+    showInstructions: Boolean = true,
     allowAgentMode: Boolean = false,
     allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
@@ -174,31 +175,37 @@ fun OrchestratedSelfieCaptureScreenV2(
     ) {
         val cameraState = rememberCameraState()
         var camSelector by rememberCamSelector(CamSelector.Front)
-        SmartSelfieV2Screen(
-            selfieState = uiState.selfieState,
-            showAttribution = showAttribution,
-            allowAgentMode = allowAgentMode,
-            isAgentModeEnabled = camSelector == CamSelector.Back,
-            onCamSelectorChange = { camSelector = camSelector.inverse },
-            modifier = modifier,
-            onRetry = viewModel::onRetry,
-            onResult = onResult,
-            cameraPreview = {
-                CameraPreview(
-                    cameraState = cameraState,
-                    camSelector = camSelector,
-                    implementationMode = ImplementationMode.Compatible,
-                    scaleType = ScaleType.FillCenter,
-                    imageAnalyzer = cameraState.rememberImageAnalyzer(
-                        analyze = { viewModel.analyzeImage(it, camSelector) },
-                    ),
-                    isImageAnalysisEnabled = true,
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .scale(VIEWFINDER_SCALE),
-                )
-            },
-        )
+        if (showInstructions) {
+            SelfieCaptureInstructionScreenV2(
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            SmartSelfieV2Screen(
+                selfieState = uiState.selfieState,
+                showAttribution = showAttribution,
+                allowAgentMode = allowAgentMode,
+                isAgentModeEnabled = camSelector == CamSelector.Back,
+                onCamSelectorChange = { camSelector = camSelector.inverse },
+                modifier = modifier,
+                onRetry = viewModel::onRetry,
+                onResult = onResult,
+                cameraPreview = {
+                    CameraPreview(
+                        cameraState = cameraState,
+                        camSelector = camSelector,
+                        implementationMode = ImplementationMode.Compatible,
+                        scaleType = ScaleType.FillCenter,
+                        imageAnalyzer = cameraState.rememberImageAnalyzer(
+                            analyze = { viewModel.analyzeImage(it, camSelector) },
+                        ),
+                        isImageAnalysisEnabled = true,
+                        modifier = Modifier
+                            .padding(32.dp)
+                            .scale(VIEWFINDER_SCALE),
+                    )
+                },
+            )
+        }
     }
 }
 
