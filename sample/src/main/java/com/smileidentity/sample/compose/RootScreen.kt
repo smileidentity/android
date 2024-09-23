@@ -29,6 +29,7 @@ import com.smileidentity.sample.toast
 import com.smileidentity.sample.viewmodel.RootViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.coroutines.delay
+import timber.log.Timber
 
 /**
  * *****Note to Partners*****
@@ -63,16 +64,30 @@ fun RootScreen(
                     useSandbox = false,
                     enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,
-                )
+                ).await()
+                    .fold(
+                        onSuccess = {},
+                        onFailure = { exception ->
+                            Timber.d("Face Detection Module: $exception")
+                        },
+                    )
             }
+
             context.isConfigDefineInAssets() -> {
                 SmileID.initialize(
                     context = context,
                     useSandbox = false,
                     enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,
-                )
+                ).await()
+                    .fold(
+                        onSuccess = {},
+                        onFailure = { exception ->
+                            Timber.d("Face Detection Module failed: $exception")
+                        },
+                    )
             }
+
             else -> {
                 value = InitializationState.NoConfig
                 return@produceState
@@ -92,6 +107,7 @@ fun RootScreen(
                         }
                     }
                 }
+
                 InitializationState.NoConfig -> {
                     WelcomeScreen(
                         partnerId = uiState.partnerId,
@@ -112,6 +128,7 @@ fun RootScreen(
                             .navigationBarsPadding(),
                     )
                 }
+
                 InitializationState.NotInitialized -> {
                     Column(
                         modifier = Modifier

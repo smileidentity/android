@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.2.8
+
+* Changed initialize() to return a deferred result (allow partners to handle errors)
+
 ## 10.2.7
 
 * Fixed upload bug to retry in case a job already exists but zip was not uploaded
