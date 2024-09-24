@@ -1,8 +1,13 @@
 # Release Notes
 
+
 (Unreleased)
+* Added inflow navigation as well as individual navigation for compose screens
+* 
 ## 10.3.0
-* Introduced inflow navigation as well as individual navigation for compose screens
+
+* Changed initialize() to return a deferred result (allow partners to handle errors)
+* Update to Compose Fragment and remove ComposeView
 
 ## 10.2.7
 

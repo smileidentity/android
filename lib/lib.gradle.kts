@@ -161,6 +161,7 @@ dependencies {
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
+    implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.annotation.experimental)
 
