@@ -3,13 +3,13 @@ package com.smileidentity.compose.selfie
 import app.cash.paparazzi.DeviceConfig.Companion.PIXEL_5
 import app.cash.paparazzi.Paparazzi
 import com.airbnb.lottie.LottieTask
-import com.smileidentity.compose.selfie.v3.SelfieCaptureScreenV3
+import com.smileidentity.compose.selfie.v2.SelfieCaptureInstructionScreenV2
 import java.util.concurrent.Executor
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class SelfieCaptureScreenV3Test {
+class SelfieCaptureInstructionScreenV2Test {
 
     @get:Rule
     val paparazzi = Paparazzi(
@@ -25,7 +25,7 @@ class SelfieCaptureScreenV3Test {
     @Test
     fun testInstructionsScreen() {
         paparazzi.snapshot {
-            SelfieCaptureScreenV3()
+            SelfieCaptureInstructionScreenV2()
         }
     }
 }
