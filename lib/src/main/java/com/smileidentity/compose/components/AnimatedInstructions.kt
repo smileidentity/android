@@ -13,11 +13,13 @@ import com.smileidentity.R
 
 @Composable
 fun LottieInstruction(modifier: Modifier = Modifier, startFrame: Int = 0, endFrame: Int = 286) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.si_anim_selfie))
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.si_anim_instruction_screen),
+    )
     val progress by animateLottieCompositionAsState(
         composition = composition,
         clipSpec = LottieClipSpec.Frame(startFrame, endFrame),
-        reverseOnRepeat = true,
+        reverseOnRepeat = false,
         ignoreSystemAnimatorScale = true,
         iterations = LottieConstants.IterateForever,
     )

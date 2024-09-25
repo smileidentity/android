@@ -15,15 +15,17 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -164,23 +167,26 @@ fun OrchestratedSelfieCaptureScreenV2(
     }
     ForceBrightness()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
+
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.tertiaryContainer)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .background(color = Color.White)
+            // .background(color = MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .consumeWindowInsets(WindowInsets.statusBars)
+            .fillMaxSize(),
     ) {
         val cameraState = rememberCameraState()
         var camSelector by rememberCamSelector(CamSelector.Front)
-        if (showInstructions) {
-            SelfieCaptureInstructionScreenV2(
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            SmartSelfieV2Screen(
+
+        when {
+            showInstructions && !acknowledgedInstructions -> SelfieCaptureInstructionScreenV2(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                acknowledgedInstructions = true
+            }
+            else -> SmartSelfieV2Screen(
                 selfieState = uiState.selfieState,
                 showAttribution = showAttribution,
                 allowAgentMode = allowAgentMode,
@@ -226,7 +232,7 @@ fun OrchestratedSelfieCaptureScreenV2(
  * @param allowAgentMode Whether to allow the user to switch to agent mode (back camera)
  */
 @Composable
-fun ColumnScope.SmartSelfieV2Screen(
+fun SmartSelfieV2Screen(
     selfieState: SelfieState,
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
