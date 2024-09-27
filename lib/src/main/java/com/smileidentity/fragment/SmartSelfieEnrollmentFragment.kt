@@ -15,9 +15,9 @@ import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.result
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
-import com.smileidentity.util.getSerializableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
+import com.squareup.moshi.Types
 import kotlinx.collections.immutable.toImmutableMap
 
 /**
@@ -128,6 +128,8 @@ class SmartSelfieEnrollmentFragment : Fragment() {
     }
 }
 
+private val moshi = SmileID.moshi
+
 private const val KEY_ALLOW_AGENT_MODE = "allowAgentMode"
 private var Bundle.allowAgentMode: Boolean
     get() = getBoolean(KEY_ALLOW_AGENT_MODE)
@@ -159,9 +161,12 @@ private var Bundle.showInstructions: Boolean
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
-private var Bundle.extraPartnerParams: HashMap<String, String>?
-    get() = getSerializableCompat(KEY_EXTRA_PARTNER_PARAMS)
-    set(value) = putSerializable(KEY_EXTRA_PARTNER_PARAMS, value)
+private val type =
+    Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
+private val adapter = moshi.adapter<Map<String, String>>(type)
+private var Bundle.extraPartnerParams: Map<String, String>?
+    get() = getString(KEY_EXTRA_PARTNER_PARAMS)?.let { adapter.fromJson(it) }
+    set(value) = putString(KEY_EXTRA_PARTNER_PARAMS, value?.let { adapter.toJson(it) })
 
 private var Bundle.smileIdResult: SmileIDResult<SmartSelfieResult>
     get() = getParcelableCompat(KEY_RESULT)!!
