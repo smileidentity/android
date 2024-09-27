@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 10.3.1
 
 * Fix insecure object serialization on fragments
 
