@@ -20,6 +20,7 @@ import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
+import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
@@ -496,6 +497,7 @@ object SmileID {
             .add(StringifiedBooleanAdapter)
             .add(MetadataAdapter)
             .add(FileNameAdapter)
+            .add(FileAdapter)
             .add(SmartSelfieJobResultAdapter)
             .add(DocumentVerificationJobResultAdapter)
             .add(BiometricKycJobResultAdapter)

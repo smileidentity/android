@@ -1,12 +1,16 @@
 # Release Notes
 
-
 (Unreleased)
+
 * Added inflow navigation as well as individual navigation for compose screens
-* 
+
+## 10.3.1
+
+* Fix insecure object serialization on fragments
+
 ## 10.3.0
 
-* Changed initialize() to return a deferred result (allow partners to handle errors)
+* Changed `initialize()` to return a deferred result (allow partners to handle errors)
 * Update to Compose Fragment and remove ComposeView
 
 ## 10.2.7
