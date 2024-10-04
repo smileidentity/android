@@ -166,6 +166,7 @@ fun SmileID.SmartSelfieAuthentication(
                 isEnroll = false,
                 allowAgentMode = allowAgentMode,
                 showAttribution = showAttribution,
+                showInstructions = showInstructions,
                 useStrictMode = useStrictMode,
                 selfieQualityModel = selfieQualityModel,
                 extraPartnerParams = extraPartnerParams,
