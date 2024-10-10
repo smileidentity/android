@@ -1,9 +1,9 @@
 # Release Notes
 
-
 (Unreleased)
+
 * Added inflow navigation as well as individual navigation for compose screens
-* 
+
 ## 10.3.1
 
 * Fix insecure object serialization on fragments
