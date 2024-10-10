@@ -313,8 +313,6 @@ private fun HandleSelfieCapture(
                 showStartRoute = true,
             ),
         ),
-        popUpTo = false,
-        popUpToInclusive = false,
     )
 }
 
@@ -343,8 +341,6 @@ private fun HandleProcessingScreen(
                 closeButtonText = R.string.si_smart_selfie_processing_close_button,
             ),
         ),
-        popUpTo = true,
-        popUpToInclusive = true,
     )
 }
 
@@ -368,8 +364,6 @@ private fun NavigateToInstructionScreen(
                 showSkipButton = showSkipButton,
             ),
         ),
-        popUpTo = true,
-        popUpToInclusive = true,
     )
 }
 
@@ -386,8 +380,6 @@ private fun NavigateToImageConfirmDialog(documentFile: File) {
                 scaleFactor = 1.0f,
             ),
         ),
-        popUpTo = false,
-        popUpToInclusive = false,
     )
 }
 
@@ -443,7 +435,5 @@ private fun navigateToDocumentCaptureScreen(
     }
     localNavigationState.screensNavigation.navigateTo(
         route,
-        popUpTo = true,
-        popUpToInclusive = true,
     )
 }

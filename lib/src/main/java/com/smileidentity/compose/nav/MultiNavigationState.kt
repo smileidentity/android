@@ -1,5 +1,6 @@
 package com.smileidentity.compose.nav
 
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,19 +20,10 @@ fun rememberMultiNavigationAppState(
 
 class MultiNavigationAppState(
     private var navController: NavHostController? = null,
-    private val startDestination: Routes? = null,
+    startDestination: Routes? = null,
 ) {
-
-    // fun observeNavController() {
-    //     val navBackStackEntry = getNavController.currentBackStackEntryAsState()
-    //     navBackStackEntry?.let {
-    //         val currentDestination = navBackStackEntry?.destination
-    //     }
-    // }
-
-    fun setNavController(_navController: NavHostController) {
-        navController = _navController
-        // observeNavController()
+    fun setNavController(navController: NavHostController) {
+        this.navController = navController
     }
 
     var getStartDestination: Routes = startDestination!!
@@ -43,33 +35,11 @@ class MultiNavigationAppState(
         }
         private set
 
-    fun setStartDestination(route: Routes) {
-        getStartDestination = route
-    }
-
-    @Composable
-    fun isRouteActive(route: String): Boolean {
-        var navHostController = navController
-
-        return if (navHostController != null) {
-            val destination = navHostController.getDestination()
-            return destination?.any {
-                (it.route.equals(route))
-            } ?: false
-        } else {
-            false
-        }
-    }
-
-    fun navigateTo(route: Routes, popUpTo: Boolean, popUpToInclusive: Boolean) {
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun navigateTo(route: Routes) {
         getNavController.navigate(route) {
             launchSingleTop = true
             restoreState = true
-            // if (popUpTo) {
-            //     popUpTo(route) {
-            //         inclusive = popUpToInclusive
-            //     }
-            // }
         }
     }
 }

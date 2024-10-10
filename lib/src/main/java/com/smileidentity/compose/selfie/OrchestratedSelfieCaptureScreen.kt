@@ -126,8 +126,6 @@ internal fun OrchestratedSelfieCaptureScreen(
     resultCallbacks.onSelfieInstructionScreen = {
         localNavigationState.screensNavigation.navigateTo(
             selfieRoute,
-            popUpTo = false,
-            popUpToInclusive = false,
         )
     }
     when {
@@ -152,8 +150,6 @@ internal fun OrchestratedSelfieCaptureScreen(
                         closeButtonText = R.string.si_smart_selfie_processing_close_button,
                     ),
                 ),
-                popUpTo = false,
-                popUpToInclusive = false,
             )
         }
 
@@ -171,8 +167,6 @@ internal fun OrchestratedSelfieCaptureScreen(
                         scaleFactor = 1.0f,
                     ),
                 ),
-                popUpTo = false,
-                popUpToInclusive = false,
             )
         }
 
@@ -180,8 +174,6 @@ internal fun OrchestratedSelfieCaptureScreen(
             startRouteShown = true
             localNavigationState.screensNavigation.navigateTo(
                 startRoute,
-                popUpTo = false,
-                popUpToInclusive = false,
             )
         }
     }

@@ -105,8 +105,6 @@ internal fun OrchestratedBiometricKYCScreen(
                         closeButtonText = R.string.si_smart_selfie_processing_close_button,
                     ),
                 ),
-                popUpTo = true,
-                popUpToInclusive = true,
             )
         } else -> {
             localNavigationState.orchestratedNavigation.navigateTo(
@@ -122,8 +120,6 @@ internal fun OrchestratedBiometricKYCScreen(
                         ),
                     ),
                 ),
-                popUpTo = true,
-                popUpToInclusive = true,
             )
         }
     }
