@@ -65,11 +65,11 @@ class MultiNavigationAppState(
         getNavController.navigate(route) {
             launchSingleTop = true
             restoreState = true
-            if (popUpTo) {
-                popUpTo(route) {
-                    inclusive = popUpToInclusive
-                }
-            }
+            // if (popUpTo) {
+            //     popUpTo(route) {
+            //         inclusive = popUpToInclusive
+            //     }
+            // }
         }
     }
 }

@@ -42,7 +42,7 @@ jobs:
       - name: Copy CHANGELOG.md to Release Notes
         run: cp android/CHANGELOG.md docs/integration-options/mobile/android-v10/release-notes.md
       - name: Create docs PR
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GH_PAT }}
           path: docs

@@ -119,6 +119,15 @@ object FileNameAdapter {
 }
 
 @Suppress("unused")
+object FileAdapter {
+    @ToJson
+    fun toJson(file: File): String = file.absolutePath
+
+    @FromJson
+    fun fromJson(path: String): File = File(path)
+}
+
+@Suppress("unused")
 object JobResultAdapter {
     @FromJson
     fun fromJson(@Suppress("UNUSED_PARAMETER") result: JobResult): JobResult =
