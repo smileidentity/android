@@ -1,6 +1,7 @@
 package com.smileidentity.util
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -214,12 +215,33 @@ internal fun postProcessImageBitmap(
  * Post-processes the image stored in [file] in-place
  */
 internal fun postProcessImage(
+    context: Context,
     file: File,
     processRotation: Boolean = true,
     compressionQuality: Int = 100,
     desiredAspectRatio: Float? = null,
 ): File {
-    val options = Options().apply { inMutable = true }
+    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val memoryInfo = ActivityManager.MemoryInfo()
+    activityManager.getMemoryInfo(memoryInfo)
+
+    val availableMemory = memoryInfo.availMem
+
+    val maxMemoryForBitmap = (availableMemory * 0.40).toLong()
+    val options = Options().apply {
+        inJustDecodeBounds = true
+    }
+    BitmapFactory.decodeFile(file.absolutePath, options)
+    val imageByteSize = options.outWidth * options.outHeight * 4L // ARGB
+    val scaleFactor = if (imageByteSize > maxMemoryForBitmap) {
+        Math.sqrt(imageByteSize.toDouble() / maxMemoryForBitmap).toInt()
+    } else {
+        1 // No downscaling needed
+    }
+    options.inJustDecodeBounds = false
+    options.inMutable = true
+    options.inSampleSize = scaleFactor // Set the calculated sample size based on memory
+
     val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
     return postProcessImageBitmap(
         bitmap = bitmap,
@@ -321,6 +343,7 @@ sealed interface StringResource {
                     exception.details.message
                 }
             }
+
             is Text -> text
         }
     }

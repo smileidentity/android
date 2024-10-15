@@ -1,5 +1,6 @@
 package com.smileidentity.compose.document
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -64,6 +65,7 @@ import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
+import com.ujizin.camposer.state.ImplementationMode
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
@@ -218,14 +220,15 @@ private fun CaptureScreenContent(
     areEdgesDetected: Boolean,
     showCaptureInProgress: Boolean,
     showManualCaptureButton: Boolean,
-    onCaptureClicked: (CameraState) -> Unit,
-    imageAnalyzer: (ImageProxy, CameraState) -> Unit,
+    onCaptureClicked: (Context, CameraState) -> Unit,
+    imageAnalyzer: (Context, ImageProxy, CameraState) -> Unit,
     onFocusEvent: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     cameraState.controller.tapToFocusState.observe(lifecycleOwner, onFocusEvent)
     Column(modifier.fillMaxSize()) {
         Box(
@@ -239,8 +242,9 @@ private fun CaptureScreenContent(
                 camSelector = camSelector,
                 scaleType = ScaleType.FillCenter,
                 isImageAnalysisEnabled = true,
+                implementationMode = ImplementationMode.Performance,
                 imageAnalyzer = cameraState.rememberImageAnalyzer(
-                    analyze = { imageAnalyzer(it, cameraState) },
+                    analyze = { imageAnalyzer(context, it, cameraState) },
                     // Guarantees only one image will be delivered for analysis at a time
                     imageAnalysisBackpressureStrategy = KeepOnlyLatest,
                 ),
@@ -296,7 +300,7 @@ private fun CaptureScreenContent(
                 if (showCaptureInProgress) {
                     CircularProgressIndicator(modifier = Modifier.fillMaxSize())
                 } else if (showManualCaptureButton) {
-                    CaptureDocumentButton { onCaptureClicked(cameraState) }
+                    CaptureDocumentButton { onCaptureClicked(context, cameraState) }
                 }
             }
         }
@@ -324,8 +328,8 @@ private fun CaptureScreenContentPreview() {
             areEdgesDetected = true,
             showCaptureInProgress = false,
             showManualCaptureButton = true,
-            onCaptureClicked = {},
-            imageAnalyzer = { _, _ -> },
+            onCaptureClicked = { _, _ -> },
+            imageAnalyzer = { _, _, _ -> },
             onFocusEvent = {},
         )
     }

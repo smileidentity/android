@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.3.2
+
+* Document capture scale bitmaps based on available memory
+
 ## 10.3.1
 
 * Fix insecure object serialization on fragments

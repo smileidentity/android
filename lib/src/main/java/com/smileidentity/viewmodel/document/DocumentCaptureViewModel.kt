@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel.document
 
+import android.content.Context
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
@@ -126,16 +127,16 @@ class DocumentCaptureViewModel(
         }
     }
 
-    fun captureDocumentManually(cameraState: CameraState) {
+    fun captureDocumentManually(context: Context, cameraState: CameraState) {
         documentImageOrigin = DocumentImageOriginValue.CameraManualCapture
-        captureDocument(cameraState)
+        captureDocument(context, cameraState)
     }
 
     /**
      * To be called when auto capture determines the image quality is sufficient or when the user
      * taps the manual capture button.
      */
-    fun captureDocument(cameraState: CameraState) {
+    fun captureDocument(context: Context, cameraState: CameraState) {
         if (isCapturing || uiState.value.documentImageToConfirm != null) {
             Timber.v("Already capturing. Skipping duplicate capture request")
             return
@@ -151,6 +152,7 @@ class DocumentCaptureViewModel(
                     _uiState.update {
                         it.copy(
                             documentImageToConfirm = postProcessImage(
+                                context,
                                 documentFile,
                                 desiredAspectRatio = uiState.value.idAspectRatio,
                             ),
@@ -233,7 +235,7 @@ class DocumentCaptureViewModel(
     }
 
     @OptIn(ExperimentalGetImage::class)
-    fun analyze(imageProxy: ImageProxy, cameraState: CameraState) {
+    fun analyze(context: Context, imageProxy: ImageProxy, cameraState: CameraState) {
         // YUV_420_888 is the format produced by CameraX
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val image = imageProxy.image
@@ -296,7 +298,7 @@ class DocumentCaptureViewModel(
                 ) {
                     captureNextAnalysisFrame = false
                     documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
-                    captureDocument(cameraState)
+                    captureDocument(context, cameraState)
                 }
             }
             .addOnFailureListener {

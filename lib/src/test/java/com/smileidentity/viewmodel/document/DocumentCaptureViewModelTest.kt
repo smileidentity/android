@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel.document
 
+import android.content.Context
 import androidx.camera.view.CameraController
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.smileidentity.SmileID
@@ -66,10 +67,11 @@ class DocumentCaptureViewModelTest {
     fun `should set state when starting capture`() {
         // given
         val cameraState: CameraState = mockk()
+        val mockContext = mockk<Context>()
         every { cameraState.takePicture(any(File::class), any()) } just Runs
 
         // when
-        subject.captureDocument(cameraState)
+        subject.captureDocument(mockContext, cameraState)
 
         // then
         assertTrue(subject.uiState.value.showCaptureInProgress)
@@ -80,9 +82,10 @@ class DocumentCaptureViewModelTest {
     fun `should set state when capture failed`() {
         // given
         val cameraState: CameraState = mockk()
+        val mockContext = mockk<Context>()
         val slot = slot<(ImageCaptureResult) -> Unit>()
         every { cameraState.takePicture(any(File::class), capture(slot)) } just Runs
-        subject.captureDocument(cameraState)
+        subject.captureDocument(mockContext, cameraState)
         val expectedError = Exception("")
         val captureResult = ImageCaptureResult.Error(expectedError)
 
