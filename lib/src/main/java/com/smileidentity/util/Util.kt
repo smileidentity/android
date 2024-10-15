@@ -1,7 +1,6 @@
 package com.smileidentity.util
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -215,34 +214,43 @@ internal fun postProcessImageBitmap(
  * Post-processes the image stored in [file] in-place
  */
 internal fun postProcessImage(
-    context: Context,
+    availableMemory: Long? = null,
     file: File,
     processRotation: Boolean = true,
     compressionQuality: Int = 100,
     desiredAspectRatio: Float? = null,
 ): File {
-    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    val memoryInfo = ActivityManager.MemoryInfo()
-    activityManager.getMemoryInfo(memoryInfo)
-
-    val availableMemory = memoryInfo.availMem
-
-    val maxMemoryForBitmap = (availableMemory * 0.40).toLong()
-    val options = Options().apply {
+    // Create BitmapFactory options to fetch image bounds first
+    val options = BitmapFactory.Options().apply {
         inJustDecodeBounds = true
     }
+
+    // Decode the file only to get its dimensions
     BitmapFactory.decodeFile(file.absolutePath, options)
-    val imageByteSize = options.outWidth * options.outHeight * 4L // ARGB
-    val scaleFactor = if (imageByteSize > maxMemoryForBitmap) {
-        Math.sqrt(imageByteSize.toDouble() / maxMemoryForBitmap).toInt()
-    } else {
-        1 // No downscaling needed
-    }
+
+    // Initialize variables for memory-based processing
+    val imageByteSize = options.outWidth * options.outHeight * 4L // ARGB bytes
+
+    // Calculate scale factor based on available memory (if provided)
+    val scaleFactor = availableMemory?.let { memory ->
+        val maxMemoryForBitmap = (memory * 0.70).toLong()
+        if (imageByteSize > maxMemoryForBitmap) {
+            // Calculate the downscaling factor to fit within memory limits
+            Math.sqrt(imageByteSize.toDouble() / maxMemoryForBitmap).toInt()
+        } else {
+            1 // No downscaling needed
+        }
+    } ?: 1 // Default to no downscaling if memory is not provided
+
+    // Set decoding options for actual processing
     options.inJustDecodeBounds = false
     options.inMutable = true
-    options.inSampleSize = scaleFactor // Set the calculated sample size based on memory
+    options.inSampleSize = scaleFactor // Apply the calculated sample size
 
+    // Decode the file into a bitmap
     val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
+
+    // Proceed with post-processing the decoded bitmap
     return postProcessImageBitmap(
         bitmap = bitmap,
         file = file,

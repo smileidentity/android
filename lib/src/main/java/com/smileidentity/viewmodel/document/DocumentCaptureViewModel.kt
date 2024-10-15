@@ -1,6 +1,5 @@
 package com.smileidentity.viewmodel.document
 
-import android.content.Context
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
@@ -73,6 +72,7 @@ class DocumentCaptureViewModel(
     var documentImageOrigin: DocumentImageOriginValue? = null
         private set
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
+    lateinit var onAvailableMemory: () -> Long
     val uiState = _uiState.asStateFlow()
     private var lastAnalysisTimeMs = 0L
     private var isCapturing = false
@@ -127,16 +127,16 @@ class DocumentCaptureViewModel(
         }
     }
 
-    fun captureDocumentManually(context: Context, cameraState: CameraState) {
+    fun captureDocumentManually(cameraState: CameraState) {
         documentImageOrigin = DocumentImageOriginValue.CameraManualCapture
-        captureDocument(context, cameraState)
+        captureDocument(cameraState)
     }
 
     /**
      * To be called when auto capture determines the image quality is sufficient or when the user
      * taps the manual capture button.
      */
-    fun captureDocument(context: Context, cameraState: CameraState) {
+    fun captureDocument(cameraState: CameraState) {
         if (isCapturing || uiState.value.documentImageToConfirm != null) {
             Timber.v("Already capturing. Skipping duplicate capture request")
             return
@@ -149,10 +149,15 @@ class DocumentCaptureViewModel(
         cameraState.takePicture(documentFile) { result ->
             when (result) {
                 is ImageCaptureResult.Success -> {
+                    val availableMemory = if (::onAvailableMemory.isInitialized) {
+                        onAvailableMemory()
+                    } else {
+                        null
+                    }
                     _uiState.update {
                         it.copy(
                             documentImageToConfirm = postProcessImage(
-                                context,
+                                availableMemory,
                                 documentFile,
                                 desiredAspectRatio = uiState.value.idAspectRatio,
                             ),
@@ -235,7 +240,7 @@ class DocumentCaptureViewModel(
     }
 
     @OptIn(ExperimentalGetImage::class)
-    fun analyze(context: Context, imageProxy: ImageProxy, cameraState: CameraState) {
+    fun analyze(imageProxy: ImageProxy, cameraState: CameraState) {
         // YUV_420_888 is the format produced by CameraX
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val image = imageProxy.image
@@ -298,7 +303,7 @@ class DocumentCaptureViewModel(
                 ) {
                     captureNextAnalysisFrame = false
                     documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
-                    captureDocument(context, cameraState)
+                    captureDocument(cameraState)
                 }
             }
             .addOnFailureListener {

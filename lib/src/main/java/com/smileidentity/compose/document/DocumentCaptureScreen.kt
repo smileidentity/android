@@ -1,6 +1,5 @@
 package com.smileidentity.compose.document
 
-import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -27,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -55,6 +55,7 @@ import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.util.MemoryUtil
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -115,6 +116,12 @@ fun DocumentCaptureScreen(
     ),
 ) {
     val context = LocalContext.current
+    val memUtil = remember { MemoryUtil(context) }
+    LaunchedEffect(Unit) {
+        viewModel.onAvailableMemory = {
+            memUtil.getAvailableMemory()
+        }
+    }
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
@@ -220,15 +227,14 @@ private fun CaptureScreenContent(
     areEdgesDetected: Boolean,
     showCaptureInProgress: Boolean,
     showManualCaptureButton: Boolean,
-    onCaptureClicked: (Context, CameraState) -> Unit,
-    imageAnalyzer: (Context, ImageProxy, CameraState) -> Unit,
+    onCaptureClicked: (CameraState) -> Unit,
+    imageAnalyzer: (ImageProxy, CameraState) -> Unit,
     onFocusEvent: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraState = rememberCameraState()
     val camSelector by rememberCamSelector(CamSelector.Back)
     val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
     cameraState.controller.tapToFocusState.observe(lifecycleOwner, onFocusEvent)
     Column(modifier.fillMaxSize()) {
         Box(
@@ -244,7 +250,7 @@ private fun CaptureScreenContent(
                 isImageAnalysisEnabled = true,
                 implementationMode = ImplementationMode.Performance,
                 imageAnalyzer = cameraState.rememberImageAnalyzer(
-                    analyze = { imageAnalyzer(context, it, cameraState) },
+                    analyze = { imageAnalyzer(it, cameraState) },
                     // Guarantees only one image will be delivered for analysis at a time
                     imageAnalysisBackpressureStrategy = KeepOnlyLatest,
                 ),
@@ -300,7 +306,7 @@ private fun CaptureScreenContent(
                 if (showCaptureInProgress) {
                     CircularProgressIndicator(modifier = Modifier.fillMaxSize())
                 } else if (showManualCaptureButton) {
-                    CaptureDocumentButton { onCaptureClicked(context, cameraState) }
+                    CaptureDocumentButton { onCaptureClicked(cameraState) }
                 }
             }
         }
@@ -328,8 +334,8 @@ private fun CaptureScreenContentPreview() {
             areEdgesDetected = true,
             showCaptureInProgress = false,
             showManualCaptureButton = true,
-            onCaptureClicked = { _, _ -> },
-            imageAnalyzer = { _, _, _ -> },
+            onCaptureClicked = { _ -> },
+            imageAnalyzer = { _, _ -> },
             onFocusEvent = {},
         )
     }
