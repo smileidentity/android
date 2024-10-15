@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.smileidentity.SmileID
+import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.SmileIDApplication
 import com.smileidentity.sample.isInternetAvailable
@@ -61,7 +62,7 @@ fun RootScreen(
                     context = context,
                     config = runtimeConfig!!,
                     useSandbox = false,
-                    enableCrashReporting = true,
+                    enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,
                 ).await()
                     .fold(
@@ -76,7 +77,7 @@ fun RootScreen(
                 SmileID.initialize(
                     context = context,
                     useSandbox = false,
-                    enableCrashReporting = true,
+                    enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,
                 ).await()
                     .fold(
