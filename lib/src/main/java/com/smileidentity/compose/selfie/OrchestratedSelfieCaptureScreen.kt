@@ -27,6 +27,7 @@ import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
+import com.smileidentity.compose.nav.compareRouteStrings
 import com.smileidentity.compose.nav.encodeUrl
 import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.v2.Metadatum
@@ -116,7 +117,6 @@ internal fun OrchestratedSelfieCaptureScreen(
     }
     resultCallbacks.onProcessingRetry = viewModel::onRetry
     resultCallbacks.onConfirmCapturedImage = {
-        localNavigationState.screensNavigation.getNavController.popBackStack()
         viewModel.submitJob()
     }
     resultCallbacks.onImageDialogRetake = {
@@ -180,9 +180,13 @@ internal fun OrchestratedSelfieCaptureScreen(
 
     NavigationBackHandler(
         navController = localNavigationState.screensNavigation.getNavController,
-    ) { _, canGoBack ->
+    ) { currentDestination, canGoBack ->
+        var isLastDestination = !canGoBack
+        if (compareRouteStrings(startRoute, currentDestination)) {
+            isLastDestination = false
+        }
         localNavigationState.screensNavigation.getNavController.popBackStack()
-        if (!canGoBack) {
+        if (!isLastDestination) {
             onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
         }
     }

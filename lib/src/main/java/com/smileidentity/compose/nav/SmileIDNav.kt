@@ -1,5 +1,7 @@
 package com.smileidentity.compose.nav
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
@@ -62,6 +64,8 @@ internal fun BaseSmileIDScreen(
             NavHost(
                 navController = localNavigationState.screensNavigation.getNavController,
                 startDestination = screenDestination,
+                enterTransition = { EnterTransition.None },
+                exitTransition = { ExitTransition.None },
             ) {
                 screensNavGraph(resultCallbacks)
             }
@@ -69,6 +73,8 @@ internal fun BaseSmileIDScreen(
         NavHost(
             navController = localNavigationState.rootNavigation.getNavController,
             startDestination = Routes.BaseOrchestrated,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
         ) {
             composable<Routes.BaseOrchestrated> {
                 localNavigationState.orchestratedNavigation.setNavController(
@@ -79,6 +85,8 @@ internal fun BaseSmileIDScreen(
                         navController =
                         localNavigationState.orchestratedNavigation.getNavController,
                         startDestination = orchestratedDestination,
+                        enterTransition = { EnterTransition.None },
+                        exitTransition = { ExitTransition.None },
                     ) {
                         orchestratedNavGraph(childNavHost, resultCallbacks)
                     }
