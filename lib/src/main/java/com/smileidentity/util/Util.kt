@@ -213,6 +213,7 @@ internal fun postProcessImageBitmap(
 /**
  * Post-processes the image stored in [file] in-place
  */
+@Throws(IOException::class, OutOfMemoryError::class)
 internal fun postProcessImage(
     file: File,
     processRotation: Boolean = true,
@@ -221,6 +222,8 @@ internal fun postProcessImage(
 ): File {
     val options = Options().apply { inMutable = true }
     val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
+        ?: throw IOException("Failed to decode file: ${file.absolutePath}")
+
     return postProcessImageBitmap(
         bitmap = bitmap,
         file = file,

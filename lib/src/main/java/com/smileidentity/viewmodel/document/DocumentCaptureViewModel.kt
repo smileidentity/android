@@ -15,6 +15,7 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.models.v2.Metadatum
@@ -23,15 +24,20 @@ import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
+import io.sentry.Breadcrumb
+import io.sentry.SentryLevel
 import java.io.File
+import java.io.IOException
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
@@ -148,19 +154,63 @@ class DocumentCaptureViewModel(
         cameraState.takePicture(documentFile) { result ->
             when (result) {
                 is ImageCaptureResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            documentImageToConfirm = postProcessImage(
-                                documentFile,
-                                desiredAspectRatio = uiState.value.idAspectRatio,
-                            ),
-                            showCaptureInProgress = false,
-                        )
+                    viewModelScope.launch {
+                        try {
+                            val processedImage = withContext(Dispatchers.Default) {
+                                postProcessImage(
+                                    documentFile,
+                                    desiredAspectRatio = uiState.value.idAspectRatio,
+                                )
+                            }
+                            _uiState.update {
+                                it.copy(
+                                    documentImageToConfirm = processedImage,
+                                    showCaptureInProgress = false,
+                                )
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e, "IOException processing captured image")
+                            SmileIDCrashReporting.hub.captureException(e) {
+                                it.level = SentryLevel.INFO
+                                it.addBreadcrumb(
+                                    Breadcrumb(
+                                        "Smile ID DocumentCaptureViewModel " +
+                                            "IOException",
+                                    ),
+                                )
+                            }
+                            _uiState.update {
+                                it.copy(captureError = e, showCaptureInProgress = false)
+                            }
+                        } catch (e: OutOfMemoryError) {
+                            Timber.e(e, "OutOfMemoryError processing captured image")
+                            SmileIDCrashReporting.hub.captureException(e) {
+                                it.level = SentryLevel.INFO
+                                it.addBreadcrumb(
+                                    Breadcrumb(
+                                        "Smile ID DocumentCaptureViewModel " +
+                                            "OutOfMemoryError",
+                                    ),
+                                )
+                            }
+                            _uiState.update {
+                                it.copy(captureError = e, showCaptureInProgress = false)
+                            }
+                        }
                     }
                 }
 
                 is ImageCaptureResult.Error -> {
-                    Timber.e("Error capturing document", result.throwable)
+                    Timber.e("ImageCaptureResult.Error capturing document", result.throwable)
+                    SmileIDCrashReporting.hub.captureException(result.throwable) {
+                        it.level = SentryLevel.INFO
+                        it.addBreadcrumb(
+                            Breadcrumb(
+                                "Smile ID DocumentCaptureViewModel " +
+                                    "ImageCaptureResult.Error",
+                            ),
+                        )
+                    }
                     _uiState.update {
                         it.copy(captureError = result.throwable, showCaptureInProgress = false)
                     }
