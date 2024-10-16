@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -45,9 +44,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -74,9 +73,7 @@ import com.smileidentity.compose.components.LottieFace
 import com.smileidentity.compose.components.LottieFaceLookingLeft
 import com.smileidentity.compose.components.LottieFaceLookingRight
 import com.smileidentity.compose.components.LottieFaceLookingUp
-import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
-import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.selfie.AgentModeSwitch
@@ -254,11 +251,6 @@ fun SmartSelfieV2Screen(
     ) {
         DirectiveHaptics(selfieState)
 
-        // Could be loading indicator, composable animation, animated image, or static image
-        DirectiveVisual(
-            selfieState = selfieState,
-            modifier = Modifier.size(80.dp),
-        )
         Text(
             text = when (selfieState) {
                 is SelfieState.Analyzing -> stringResource(selfieState.hint.text)
@@ -283,48 +275,60 @@ fun SmartSelfieV2Screen(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(horizontal = 32.dp, vertical = 16.dp)
-                .aspectRatio(0.75f) // 480 x 640 -> 3/4 -> 0.75
+                .aspectRatio(1f)
                 .clip(roundedCornerShape)
                 // We draw borders as a individual layers in the Box (as opposed to Modifier.border)
                 // because we need multiple colors, and eventually we will need to animate them for
                 // Active Liveness feedback
                 .drawWithCache {
-                    val roundRect = RoundRect(size.toRect(), CornerRadius(32.dp.toPx()))
+                    val circlePath = Path().apply {
+                        addOval(Rect(Offset.Zero, Size(size.width, size.height)))
+                    }
                     onDrawWithContent {
                         drawContent()
+                        // Draw the main border
                         drawPath(
-                            path = Path().apply { addRoundRect(roundRect) },
+                            path = circlePath,
                             color = mainBorderColor,
-                            style = Stroke(width = 20.dp.toPx()),
-                        )
-                        cameraFrameCornerBorder(
-                            cornerRadius = 32.dp.toPx(),
-                            strokeWidth = 20.dp.toPx(),
-                            color = accentBorderColor,
-                        )
-                        drawPath(
-                            path = Path().apply { addRoundRect(roundRect) },
-                            color = mainBorderColor,
-                            style = Stroke(width = 12.dp.toPx()),
+                            style = Stroke(width = 8.dp.toPx()),
                         )
                     }
+                    // val roundRect = RoundRect(size.toRect(), CornerRadius(32.dp.toPx()))
+                    // onDrawWithContent {
+                    //     drawContent()
+                    //     drawPath(
+                    //         path = Path().apply { addRoundRect(roundRect) },
+                    //         color = mainBorderColor,
+                    //         style = Stroke(width = 20.dp.toPx()),
+                    //     )
+                    //     cameraFrameCornerBorder(
+                    //         cornerRadius = 32.dp.toPx(),
+                    //         strokeWidth = 20.dp.toPx(),
+                    //         color = accentBorderColor,
+                    //     )
+                    //     drawPath(
+                    //         path = Path().apply { addRoundRect(roundRect) },
+                    //         color = mainBorderColor,
+                    //         style = Stroke(width = 12.dp.toPx()),
+                    //     )
+                    // }
                 }
                 .weight(1f, fill = false),
         ) {
             cameraPreview()
 
-            if (selfieState !is SelfieState.Analyzing) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.8f)),
-                )
-            } else {
-                OvalCutout(
-                    faceFillPercent = 0.6f,
-                    backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f),
-                )
-            }
+            //     if (selfieState !is SelfieState.Analyzing) {
+            //         Box(
+            //             modifier = Modifier
+            //                 .fillMaxSize()
+            //                 .background(Color.Black.copy(alpha = 0.8f)),
+            //         )
+            //     } else {
+            //         OvalCutout(
+            //             faceFillPercent = 0.6f,
+            //             backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f),
+            //         )
+            //     }
         }
         if (selfieState is SelfieState.Error) {
             // Displaying these Buttons may cause a re-layout/element shift on smaller screens.
@@ -358,7 +362,7 @@ fun SmartSelfieV2Screen(
 }
 
 @Composable
-private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modifier = Modifier) {
+fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modifier = Modifier) {
     when (selfieState) {
         is SelfieState.Analyzing -> when (val hint = selfieState.hint) {
             SelfieHint.NeedLight -> AnimatedImageFromSelfieHint(hint, modifier = modifier)
@@ -408,7 +412,7 @@ private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modi
  */
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
-private fun AnimatedImageFromSelfieHint(selfieHint: SelfieHint, modifier: Modifier = Modifier) {
+fun AnimatedImageFromSelfieHint(selfieHint: SelfieHint, modifier: Modifier = Modifier) {
     var atEnd by remember(selfieHint) { mutableStateOf(false) }
     // The extra key() is needed otherwise there are weird artifacts
     // see: https://stackoverflow.com/a/71123697
