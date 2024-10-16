@@ -213,44 +213,17 @@ internal fun postProcessImageBitmap(
 /**
  * Post-processes the image stored in [file] in-place
  */
+@Throws(IOException::class, OutOfMemoryError::class)
 internal fun postProcessImage(
-    availableMemory: Long? = null,
     file: File,
     processRotation: Boolean = true,
     compressionQuality: Int = 100,
     desiredAspectRatio: Float? = null,
 ): File {
-    // Create BitmapFactory options to fetch image bounds first
-    val options = BitmapFactory.Options().apply {
-        inJustDecodeBounds = true
-    }
-
-    // Decode the file only to get its dimensions
-    BitmapFactory.decodeFile(file.absolutePath, options)
-
-    // Initialize variables for memory-based processing
-    val imageByteSize = options.outWidth * options.outHeight * 4L // ARGB bytes
-
-    // Calculate scale factor based on available memory (if provided)
-    val scaleFactor = availableMemory?.let { memory ->
-        val maxMemoryForBitmap = (memory * 0.70).toLong()
-        if (imageByteSize > maxMemoryForBitmap) {
-            // Calculate the downscaling factor to fit within memory limits
-            Math.sqrt(imageByteSize.toDouble() / maxMemoryForBitmap).toInt()
-        } else {
-            1 // No downscaling needed
-        }
-    } ?: 1 // Default to no downscaling if memory is not provided
-
-    // Set decoding options for actual processing
-    options.inJustDecodeBounds = false
-    options.inMutable = true
-    options.inSampleSize = scaleFactor // Apply the calculated sample size
-
-    // Decode the file into a bitmap
+    val options = Options().apply { inMutable = true }
     val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
+        ?: throw IOException("Failed to decode file: ${file.absolutePath}")
 
-    // Proceed with post-processing the decoded bitmap
     return postProcessImageBitmap(
         bitmap = bitmap,
         file = file,
@@ -351,7 +324,6 @@ sealed interface StringResource {
                     exception.details.message
                 }
             }
-
             is Text -> text
         }
     }

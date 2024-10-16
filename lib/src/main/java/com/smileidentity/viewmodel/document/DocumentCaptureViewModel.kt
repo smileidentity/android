@@ -24,14 +24,17 @@ import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
+import java.io.IOException
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
@@ -72,7 +75,6 @@ class DocumentCaptureViewModel(
     var documentImageOrigin: DocumentImageOriginValue? = null
         private set
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
-    lateinit var onAvailableMemory: () -> Long
     val uiState = _uiState.asStateFlow()
     private var lastAnalysisTimeMs = 0L
     private var isCapturing = false
@@ -149,20 +151,31 @@ class DocumentCaptureViewModel(
         cameraState.takePicture(documentFile) { result ->
             when (result) {
                 is ImageCaptureResult.Success -> {
-                    val availableMemory = if (::onAvailableMemory.isInitialized) {
-                        onAvailableMemory()
-                    } else {
-                        null
-                    }
-                    _uiState.update {
-                        it.copy(
-                            documentImageToConfirm = postProcessImage(
-                                availableMemory,
-                                documentFile,
-                                desiredAspectRatio = uiState.value.idAspectRatio,
-                            ),
-                            showCaptureInProgress = false,
-                        )
+                    viewModelScope.launch {
+                        try {
+                            val processedImage = withContext(Dispatchers.Default) {
+                                postProcessImage(
+                                    documentFile,
+                                    desiredAspectRatio = uiState.value.idAspectRatio,
+                                )
+                            }
+                            _uiState.update {
+                                it.copy(
+                                    documentImageToConfirm = processedImage,
+                                    showCaptureInProgress = false,
+                                )
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e, "Error processing captured image")
+                            _uiState.update {
+                                it.copy(captureError = e, showCaptureInProgress = false)
+                            }
+                        } catch (e: OutOfMemoryError) {
+                            Timber.e(e, "Out of memory while processing captured image")
+                            _uiState.update {
+                                it.copy(captureError = e, showCaptureInProgress = false)
+                            }
+                        }
                     }
                 }
 

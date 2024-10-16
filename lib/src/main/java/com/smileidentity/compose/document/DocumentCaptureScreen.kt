@@ -26,7 +26,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -55,7 +54,6 @@ import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.v2.Metadatum
-import com.smileidentity.util.MemoryUtil
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -66,7 +64,6 @@ import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageAnalysisBackpressureStrategy.KeepOnlyLatest
-import com.ujizin.camposer.state.ImplementationMode
 import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
@@ -116,12 +113,6 @@ fun DocumentCaptureScreen(
     ),
 ) {
     val context = LocalContext.current
-    val memUtil = remember { MemoryUtil(context) }
-    LaunchedEffect(Unit) {
-        viewModel.onAvailableMemory = {
-            memUtil.getAvailableMemory()
-        }
-    }
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
@@ -248,7 +239,6 @@ private fun CaptureScreenContent(
                 camSelector = camSelector,
                 scaleType = ScaleType.FillCenter,
                 isImageAnalysisEnabled = true,
-                implementationMode = ImplementationMode.Performance,
                 imageAnalyzer = cameraState.rememberImageAnalyzer(
                     analyze = { imageAnalyzer(it, cameraState) },
                     // Guarantees only one image will be delivered for analysis at a time
@@ -334,7 +324,7 @@ private fun CaptureScreenContentPreview() {
             areEdgesDetected = true,
             showCaptureInProgress = false,
             showManualCaptureButton = true,
-            onCaptureClicked = { _ -> },
+            onCaptureClicked = {},
             imageAnalyzer = { _, _ -> },
             onFocusEvent = {},
         )
