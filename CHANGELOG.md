@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.3.2
+
+* Document capture throw OOM when encountered
+
 ## 10.3.1
 
 * Fix insecure object serialization on fragments
