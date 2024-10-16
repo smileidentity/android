@@ -2,7 +2,7 @@
 
 ## 10.3.2
 
-* Document capture throw OOO when encountered
+* Document capture throw OOM when encountered
 
 ## 10.3.1
 
