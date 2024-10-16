@@ -2,7 +2,7 @@
 
 ## 10.3.2
 
-* Document capture scale bitmaps based on available memory
+* Document capture throw OOO when encountered
 
 ## 10.3.1
 
