@@ -1,5 +1,9 @@
 package com.smileidentity.compose.document
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -16,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,11 +28,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.CameraPermissionButton
 import com.smileidentity.compose.components.SmileIDAttribution
+import com.smileidentity.compose.nav.encodeUrl
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.util.isValidDocumentImage
+import com.smileidentity.util.toast
+import timber.log.Timber
 
 /**
  * Instructions for taking a good quality document photo. Optionally, allows user to select a
@@ -43,9 +53,28 @@ fun DocumentCaptureInstructionsScreen(
     allowPhotoFromGallery: Boolean = false,
     showSkipButton: Boolean = true,
     onSkip: () -> Unit = { },
-    onInstructionsAcknowledgedSelectFromGallery: () -> Unit = { },
+    onInstructionsAcknowledgedSelectFromGallery: (String?) -> Unit = { },
     onInstructionsAcknowledgedTakePhoto: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            Timber.v("selectedUri: $uri")
+            if (uri == null) {
+                Timber.e("selectedUri is null")
+                context.toast(R.string.si_doc_v_capture_error_subtitle)
+                return@rememberLauncherForActivityResult
+            }
+            if (isValidDocumentImage(context, uri)) {
+                onInstructionsAcknowledgedSelectFromGallery(encodeUrl(uri.toString()))
+            } else {
+                SmileIDCrashReporting.hub.addBreadcrumb("Gallery upload document image too small")
+                context.toast(R.string.si_doc_v_capture_error_subtitle)
+            }
+        },
+    )
+
     BottomPinnedColumn(
         scrollableContent = {
             Image(
@@ -118,7 +147,12 @@ fun DocumentCaptureInstructionsScreen(
             )
             if (allowPhotoFromGallery) {
                 OutlinedButton(
-                    onClick = onInstructionsAcknowledgedSelectFromGallery,
+                    onClick = {
+                        SmileIDCrashReporting.hub.addBreadcrumb(
+                            "Selecting document photo from gallery",
+                        )
+                        photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
+                    },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(stringResource(R.string.si_doc_v_instruction_upload_button))

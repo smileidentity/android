@@ -7,6 +7,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.io.File
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * This class represents info.json
@@ -34,6 +35,7 @@ data class UploadImageInfo(
  * @param entered Whether to submit the verification to the ID authority or not. For Biometric KYC
  * jobs, this should be set to true
  */
+@Serializable
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class IdInfo(
