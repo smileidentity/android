@@ -1,8 +1,10 @@
 # Release Notes
-
 (Unreleased)
 
 * Added inflow navigation as well as individual navigation for compose screens
+## 10.3.2
+
+* Document capture throw OOM when encountered
 
 ## 10.3.1
 
