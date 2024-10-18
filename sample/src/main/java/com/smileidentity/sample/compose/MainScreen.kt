@@ -62,6 +62,7 @@ import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
@@ -287,7 +288,11 @@ fun MainScreen(
                             jobId = jobId,
                         ) { result ->
                             viewModel.onBiometricKycResult(userId, jobId, result)
-                            navController.popBackStack()
+                            if (result is SmileIDResult.Success) {
+                                navController.popBackStack()
+                            } else {
+                                idInfo = null
+                            }
                         }
                     }
                 }
@@ -317,10 +322,14 @@ fun MainScreen(
                         allowGalleryUpload = true,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
-                        navController.popBackStack(
-                            route = BottomNavigationScreen.Home.route,
-                            inclusive = false,
-                        )
+                        if (result is SmileIDResult.Success) {
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        } else {
+                            navController.popBackStack()
+                        }
                     }
                 }
                 composable(ProductScreen.EnhancedDocumentVerification.route) {
@@ -345,10 +354,18 @@ fun MainScreen(
                             allowGalleryUpload = true,
                         ) { result ->
                             viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
-                            navController.popBackStack(
-                                route = BottomNavigationScreen.Home.route,
-                                inclusive = false,
-                            )
+                            if (result is SmileIDResult.Success) {
+                                navController.popBackStack(
+                                    route = BottomNavigationScreen.Home.route,
+                                    inclusive = false,
+                                )
+                            } else {
+                                idInfo = null
+                                navController.popBackStack()
+                                navController.navigate(
+                                    route = ProductScreen.EnhancedDocumentVerification.route,
+                                )
+                            }
                         }
                     }
                 }
