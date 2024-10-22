@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.rule.GrantPermissionRule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -14,6 +15,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
 import com.smileidentity.R
+import com.smileidentity.compose.nav.ResultCallbacks
 import org.junit.Rule
 import org.junit.Test
 
@@ -33,11 +35,14 @@ class DocumentCaptureScreenTest {
         // given
         val cameraPreviewTag = "document_camera_preview"
         val instructionsTag = "document_capture_instructions_screen"
+        lateinit var navController: TestNavHostController
 
         // when
         composeTestRule.setContent {
             permissionState = rememberPermissionState(Manifest.permission.CAMERA)
             DocumentCaptureScreen(
+                navController = navController,
+                resultCallbacks = ResultCallbacks(),
                 jobId = "jobId",
                 side = DocumentCaptureSide.Front,
                 showInstructions = true,
@@ -67,10 +72,13 @@ class DocumentCaptureScreenTest {
         val titleText = "Front of ID"
         val subtitleText = "Make sure all the corners are visible and there is no glare"
         val captureTitle = "captureTitle"
+        lateinit var navController: TestNavHostController
 
         // when
         composeTestRule.setContent {
             DocumentCaptureScreen(
+                navController = navController,
+                resultCallbacks = ResultCallbacks(),
                 jobId = "jobId",
                 side = DocumentCaptureSide.Front,
                 showInstructions = true,
