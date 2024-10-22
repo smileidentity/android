@@ -91,6 +91,8 @@ internal fun BaseSmileIDScreen(
                         startDestination = orchestratedDestination,
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None },
+                        popEnterTransition = { EnterTransition.None },
+                        popExitTransition = { ExitTransition.None },
                     ) {
                         orchestratedNavGraph(childNavHost, resultCallbacks)
                     }
