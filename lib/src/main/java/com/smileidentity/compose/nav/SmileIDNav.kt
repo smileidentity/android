@@ -66,6 +66,8 @@ internal fun BaseSmileIDScreen(
                 startDestination = screenDestination,
                 enterTransition = { EnterTransition.None },
                 exitTransition = { ExitTransition.None },
+                popEnterTransition = { EnterTransition.None },
+                popExitTransition = { ExitTransition.None },
             ) {
                 screensNavGraph(resultCallbacks)
             }
@@ -75,6 +77,8 @@ internal fun BaseSmileIDScreen(
             startDestination = Routes.BaseOrchestrated,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None },
         ) {
             composable<Routes.BaseOrchestrated> {
                 localNavigationState.orchestratedNavigation.setNavController(
