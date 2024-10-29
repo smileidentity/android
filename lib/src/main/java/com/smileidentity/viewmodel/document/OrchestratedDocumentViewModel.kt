@@ -52,6 +52,10 @@ import timber.log.Timber
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
     val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
+    val selfieToConfirm: File? = null,
+    val documentFrontFile: File? = null,
+    val documentBackFile: File? = null,
+    val livenessFiles: List<File>? = null,
 )
 
 /**
@@ -70,21 +74,55 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val metadata: MutableList<Metadatum>,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
+    private val _uiState = MutableStateFlow(
+        OrchestratedDocumentUiState(
+            selfieToConfirm = selfieFile,
+        ),
+    )
     val uiState = _uiState.asStateFlow()
     var result: SmileIDResult<T> = SmileIDResult.Error(
         IllegalStateException("Document Capture incomplete"),
     )
-    private var documentFrontFile: File? = null
-    private var documentBackFile: File? = null
-    private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
-    fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
-        documentFrontFile = documentImageFile
+    fun onFrontDocCaptured(documentImageFile: File) {
+        _uiState.update {
+            it.copy(
+                documentFrontFile = documentImageFile,
+            )
+        }
+    }
+
+    fun onBackDocCaptured(documentImageFile: File) {
+        _uiState.update {
+            it.copy(
+                documentBackFile = documentImageFile,
+            )
+        }
+    }
+
+    fun onRestart() {
+        if (uiState.value.currentStep == DocumentCaptureFlow.FrontDocumentCapture) {
+            uiState.value.documentFrontFile?.delete()
+            _uiState.update {
+                it.copy(
+                    documentFrontFile = null,
+                )
+            }
+        } else {
+            uiState.value.documentBackFile?.delete()
+            _uiState.update {
+                it.copy(
+                    documentBackFile = null,
+                )
+            }
+        }
+    }
+
+    fun onDocumentFrontCaptureSuccess() {
         if (captureBothSides) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
-        } else if (selfieFile == null) {
+        } else if (uiState.value.selfieToConfirm == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
@@ -92,25 +130,28 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     }
 
     fun onDocumentBackSkip() {
-        if (selfieFile == null) {
+        if (uiState.value.selfieToConfirm == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
     }
 
-    fun onDocumentBackCaptureSuccess(documentImageFile: File) {
-        documentBackFile = documentImageFile
-        if (selfieFile == null) {
+    fun onDocumentBackCaptureSuccess() {
+        if (uiState.value.selfieToConfirm == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
     }
 
-    fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
-        selfieFile = it.data.selfieFile
-        livenessFiles = it.data.livenessFiles
+    fun onSelfieCaptureSuccess(result: SmileIDResult.Success<SmartSelfieResult>) {
+        _uiState.update {
+            it.copy(
+                selfieToConfirm = result.data.selfieFile,
+                livenessFiles = result.data.livenessFiles,
+            )
+        }
         submitJob()
     }
 
@@ -123,7 +164,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     )
 
     private fun submitJob() {
-        val documentFrontFile = documentFrontFile
+        val documentFrontFile = uiState.value.documentFrontFile
             ?: throw IllegalStateException("documentFrontFile is null")
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
@@ -137,12 +178,14 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 jobId = jobId,
             )
             val frontImageInfo = documentFrontFile.asDocumentFrontImage()
-            val backImageInfo = documentBackFile?.asDocumentBackImage()
-            val selfieImageInfo = selfieFile?.asSelfieImage() ?: throw IllegalStateException(
-                "Selfie file is null",
-            )
+            val backImageInfo = uiState.value.documentBackFile?.asDocumentBackImage()
+            val selfieImageInfo = uiState.value.selfieToConfirm?.asSelfieImage()
+                ?: throw IllegalStateException(
+                    "Selfie file is null",
+                )
             // Liveness files will be null when the partner bypasses our Selfie capture with a file
-            val livenessImageInfo = livenessFiles.orEmpty().map { it.asLivenessImage() }
+            val livenessImageInfo =
+                uiState.value.livenessFiles.orEmpty().map { it.asLivenessImage() }
             val uploadRequest = UploadRequest(
                 images = listOfNotNull(
                     frontImageInfo,
@@ -207,7 +250,11 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
-            sendResult(documentFrontFile, documentBackFile, livenessFiles)
+            sendResult(
+                documentFrontFile,
+                uiState.value.documentBackFile,
+                uiState.value.livenessFiles,
+            )
         }
     }
 
@@ -216,7 +263,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         documentBackFile: File? = null,
         livenessFiles: List<File>? = null,
     ) {
-        var selfieFileResult: File = selfieFile ?: run {
+        var selfieFileResult: File = uiState.value.selfieToConfirm ?: run {
             Timber.w("Selfie file not found for job ID: $jobId")
             throw Exception("Selfie file not found for job ID: $jobId")
         }
@@ -268,8 +315,12 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onError(throwable: Throwable) {
         val didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable)
         if (didMoveToSubmitted) {
-            this.selfieFile = getFileByType(jobId, FileType.SELFIE)
-            this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
+            _uiState.update {
+                it.copy(
+                    selfieToConfirm = getFileByType(jobId, FileType.SELFIE),
+                    livenessFiles = getFilesByType(jobId, FileType.LIVENESS),
+                )
+            }
         }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
@@ -286,12 +337,13 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 )
             }
             saveResult(
-                selfieImage = selfieFile ?: throw IllegalStateException("Selfie file is null"),
-                documentFrontFile = documentFrontFile ?: throw IllegalStateException(
+                selfieImage = uiState.value.selfieToConfirm
+                    ?: throw IllegalStateException("Selfie file is null"),
+                documentFrontFile = uiState.value.documentFrontFile ?: throw IllegalStateException(
                     "Document front file is null",
                 ),
-                documentBackFile = documentBackFile,
-                livenessFiles = livenessFiles,
+                documentBackFile = uiState.value.documentBackFile,
+                livenessFiles = uiState.value.livenessFiles,
                 didSubmitJob = false,
             )
         } else {

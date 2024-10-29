@@ -5,26 +5,27 @@ package com.smileidentity.compose
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
-import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
-import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
-import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
+import com.smileidentity.compose.nav.BaseSmileIDScreen
+import com.smileidentity.compose.nav.BiometricKYCParams
+import com.smileidentity.compose.nav.DocumentCaptureParams
+import com.smileidentity.compose.nav.OrchestratedBiometricCaptureParams
+import com.smileidentity.compose.nav.OrchestratedDocumentParams
+import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
+import com.smileidentity.compose.nav.ResultCallbacks
+import com.smileidentity.compose.nav.Routes
+import com.smileidentity.compose.nav.SelfieCaptureParams
+import com.smileidentity.compose.nav.getDocumentCaptureRoute
+import com.smileidentity.compose.nav.getSelfieCaptureRoute
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
-import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -32,9 +33,6 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
-import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
-import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
-import com.smileidentity.viewmodel.viewModelFactory
 import java.io.File
 import java.net.URL
 import kotlinx.collections.immutable.ImmutableMap
@@ -81,38 +79,29 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
-        if (useStrictMode) {
-            val context = LocalContext.current
-            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-            OrchestratedSelfieCaptureScreenV2(
-                modifier = modifier,
-                userId = userId,
-                allowNewEnroll = allowNewEnroll,
-                isEnroll = true,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                useStrictMode = useStrictMode,
-                selfieQualityModel = selfieQualityModel,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        } else {
-            OrchestratedSelfieCaptureScreen(
-                modifier = modifier,
-                userId = userId,
-                jobId = jobId,
-                allowNewEnroll = allowNewEnroll,
-                isEnroll = true,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        }
-    }
+    // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+    val commonParams = SelfieCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        true,
+    )
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(commonParams),
+    )
+    val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        ResultCallbacks(onSmartSelfieResult = onResult),
+        modifier,
+        colorScheme,
+        typography,
+    )
 }
 
 /**
@@ -155,37 +144,29 @@ fun SmileID.SmartSelfieAuthentication(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
-        if (useStrictMode) {
-            val context = LocalContext.current
-            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-            OrchestratedSelfieCaptureScreenV2(
-                modifier = modifier,
-                userId = userId,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                useStrictMode = useStrictMode,
-                selfieQualityModel = selfieQualityModel,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        } else {
-            OrchestratedSelfieCaptureScreen(
-                modifier = modifier,
-                userId = userId,
-                jobId = jobId,
-                allowNewEnroll = allowNewEnroll,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                extraPartnerParams = extraPartnerParams,
-                onResult = onResult,
-            )
-        }
-    }
+    // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
+    val commonParams = SelfieCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        isEnroll = false,
+    )
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(commonParams),
+    )
+    val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        ResultCallbacks(onSmartSelfieResult = onResult),
+        modifier,
+        colorScheme,
+        typography,
+    )
 }
 
 /**
@@ -242,36 +223,36 @@ fun SmileID.DocumentVerification(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val metadata = LocalMetadata.current
-        OrchestratedDocumentVerificationScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            showAttribution = showAttribution,
-            allowAgentMode = allowAgentMode,
-            allowGalleryUpload = allowGalleryUpload,
-            showInstructions = showInstructions,
-            idAspectRatio = idAspectRatio,
-            onResult = onResult,
-            viewModel = viewModel(
-                factory = viewModelFactory {
-                    DocumentVerificationViewModel(
-                        jobType = JobType.DocumentVerification,
-                        userId = userId,
-                        jobId = jobId,
-                        allowNewEnroll = allowNewEnroll,
-                        countryCode = countryCode,
-                        documentType = documentType,
-                        captureBothSides = captureBothSides,
-                        selfieFile = bypassSelfieCaptureWithFile,
-                        extraPartnerParams = extraPartnerParams,
-                        metadata = metadata,
-                    )
-                },
-            ),
-        )
-    }
+    val commonParams = DocumentCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        countryCode = countryCode,
+    )
+    val screenDestination = getDocumentCaptureRoute(
+        countryCode,
+        commonParams,
+        documentType,
+        captureBothSides,
+        idAspectRatio,
+        bypassSelfieCaptureWithFile,
+        allowGalleryUpload,
+    )
+    val orchestratedDestination = Routes.Orchestrated.DocVRoute(
+        params = OrchestratedDocumentParams(commonParams),
+    )
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        ResultCallbacks(onDocVResult = onResult),
+        modifier,
+        colorScheme,
+        typography,
+    )
 }
 
 /**
@@ -329,36 +310,36 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val metadata = LocalMetadata.current
-        OrchestratedDocumentVerificationScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            showAttribution = showAttribution,
-            allowAgentMode = allowAgentMode,
-            allowGalleryUpload = allowGalleryUpload,
-            showInstructions = showInstructions,
-            idAspectRatio = idAspectRatio,
-            onResult = onResult,
-            viewModel = viewModel(
-                factory = viewModelFactory {
-                    EnhancedDocumentVerificationViewModel(
-                        jobType = JobType.EnhancedDocumentVerification,
-                        userId = userId,
-                        jobId = jobId,
-                        allowNewEnroll = allowNewEnroll,
-                        countryCode = countryCode,
-                        documentType = documentType,
-                        captureBothSides = captureBothSides,
-                        selfieFile = bypassSelfieCaptureWithFile,
-                        extraPartnerParams = extraPartnerParams,
-                        metadata = metadata,
-                    )
-                },
-            ),
-        )
-    }
+    val commonParams = DocumentCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        countryCode = countryCode,
+    )
+    val screenDestination = getDocumentCaptureRoute(
+        countryCode,
+        commonParams,
+        documentType,
+        captureBothSides,
+        idAspectRatio,
+        bypassSelfieCaptureWithFile,
+        allowGalleryUpload,
+    )
+    val orchestratedDestination = Routes.Orchestrated.EnhancedDocVRoute(
+        params = OrchestratedDocumentParams(commonParams),
+    )
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        ResultCallbacks(onEnhancedDocVResult = onResult),
+        modifier,
+        colorScheme,
+        typography,
+    )
 }
 
 /**
@@ -400,20 +381,40 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        OrchestratedBiometricKYCScreen(
-            modifier = modifier,
-            idInfo = idInfo,
-            userId = userId,
-            jobId = jobId,
-            allowNewEnroll = allowNewEnroll,
-            allowAgentMode = allowAgentMode,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
-    }
+    val orchestratedDestination = Routes.Orchestrated.BiometricKycRoute(
+        OrchestratedBiometricCaptureParams(
+            BiometricKYCParams(
+                idInfo = idInfo,
+                userId = userId,
+                jobId = jobId,
+                showInstructions = showInstructions,
+                showAttribution = showAttribution,
+                allowAgentMode = allowAgentMode,
+                allowNewEnroll = allowNewEnroll,
+                extraPartnerParams = extraPartnerParams,
+            ),
+        ),
+    )
+    val selfieCaptureParams = SelfieCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        true,
+        skipApiSubmission = true,
+    )
+    val screenDestination = getSelfieCaptureRoute(false, selfieCaptureParams)
+    BaseSmileIDScreen(
+        orchestratedDestination,
+        screenDestination,
+        ResultCallbacks(onBiometricKYCResult = onResult),
+        modifier,
+        colorScheme,
+        typography,
+    )
 }
 
 /**
