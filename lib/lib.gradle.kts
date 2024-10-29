@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.moshix)
     alias(libs.plugins.parcelize)
-    alias(libs.plugins.paparazzi)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val groupId = "com.smileidentity"
@@ -206,6 +206,9 @@ dependencies {
     // Lottie Compose component
     implementation(libs.lottie)
 
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
     // Unbundled model -- will be dynamically downloaded via Google Play Services
     implementation(libs.play.services.mlkit.face.detection)
 
@@ -221,6 +224,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.rules)
