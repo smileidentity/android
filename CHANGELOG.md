@@ -1,4 +1,9 @@
 # Release Notes
+
+## Unreleased
+
+* Bump up the compileSdk to 35
+
 ## 10.3.3
 * Added inflow navigation as well as individual navigation for compose screens
 
