@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.smileidentity.sample"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.smileidentity.sample"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
         versionName = "1.6_" + project(":lib").version.toString()
