@@ -44,7 +44,7 @@ tflite-support = "0.4.4"
 timber = "5.0.1"
 truth = "1.4.4"
 uiautomator = "2.3.0"
-kotlinxSerializationJson = "1.6.3"
+kotlinxSerializationJson = "1.7.3"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
