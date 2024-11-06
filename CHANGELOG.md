@@ -1,8 +1,9 @@
 # Release Notes
 
-## Unreleased
+## 10.3.4
 
 * Bump up the compileSdk to 35
+* Add skipApiSubmission when true will capture smartselfie and return file paths for selfie and liveness images without submitting the job to SmilID
 
 ## 10.3.3
 * Added inflow navigation as well as individual navigation for compose screens
