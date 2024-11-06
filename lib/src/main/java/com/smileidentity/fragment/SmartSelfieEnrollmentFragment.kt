@@ -91,6 +91,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
             extraPartnerParams: HashMap<String, String>? = null,
+            skipApiSubmission: Boolean = false,
         ) = SmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
@@ -100,6 +101,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
                 this.extraPartnerParams = extraPartnerParams
+                this.skipApiSubmission = skipApiSubmission
             }
         }
 
@@ -121,6 +123,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
             showAttribution = args.showAttribution,
             showInstructions = args.showInstructions,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+            skipApiSubmission = args.skipApiSubmission,
             onResult = {
                 setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
             },
@@ -159,6 +162,11 @@ private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
 private var Bundle.showInstructions: Boolean
     get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
+
+private const val KEY_SKIP_API_SUBMISSION = "skipApiSubmission"
+private var Bundle.skipApiSubmission: Boolean
+    get() = getBoolean(KEY_SKIP_API_SUBMISSION)
+    set(value) = putBoolean(KEY_SKIP_API_SUBMISSION, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private val type =
