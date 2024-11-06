@@ -75,6 +75,7 @@ fun SmileID.SmartSelfieEnrollment(
     showInstructions: Boolean = true,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    skipApiSubmission: Boolean = false,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
@@ -89,6 +90,7 @@ fun SmileID.SmartSelfieEnrollment(
         showInstructions,
         extraPartnerParams,
         true,
+        skipApiSubmission,
     )
     val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
         params = OrchestratedSelfieCaptureParams(commonParams),
@@ -140,6 +142,7 @@ fun SmileID.SmartSelfieAuthentication(
     showInstructions: Boolean = true,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    skipApiSubmission: Boolean = false,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
@@ -154,6 +157,7 @@ fun SmileID.SmartSelfieAuthentication(
         showInstructions,
         extraPartnerParams,
         isEnroll = false,
+        skipApiSubmission,
     )
     val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
         params = OrchestratedSelfieCaptureParams(commonParams),
