@@ -21,6 +21,7 @@ import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
 import com.smileidentity.compose.nav.SelfieCaptureParams
+import com.smileidentity.compose.nav.SerializableFile
 import com.smileidentity.compose.nav.getDocumentCaptureRoute
 import com.smileidentity.compose.nav.getSelfieCaptureRoute
 import com.smileidentity.compose.theme.colorScheme
@@ -92,10 +93,14 @@ fun SmileID.SmartSelfieEnrollment(
         true,
         skipApiSubmission,
     )
-    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
-        params = OrchestratedSelfieCaptureParams(commonParams),
-    )
     val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(
+            commonParams,
+            startRoute = screenDestination,
+            showStartRoute = true,
+        ),
+    )
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
@@ -159,10 +164,14 @@ fun SmileID.SmartSelfieAuthentication(
         isEnroll = false,
         skipApiSubmission,
     )
-    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
-        params = OrchestratedSelfieCaptureParams(commonParams),
-    )
     val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(
+            commonParams,
+            startRoute = screenDestination,
+            showStartRoute = true,
+        ),
+    )
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
@@ -228,23 +237,22 @@ fun SmileID.DocumentVerification(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     val commonParams = DocumentCaptureParams(
-        userId,
-        jobId,
-        allowNewEnroll,
-        allowAgentMode,
-        showAttribution,
-        showInstructions,
-        extraPartnerParams,
+        userId = userId,
+        jobId = jobId,
+        showInstructions = showInstructions,
+        showAttribution = showAttribution,
+        allowAgentMode = allowAgentMode,
+        allowGallerySelection = allowGalleryUpload,
+        knownIdAspectRatio = idAspectRatio,
+        allowNewEnroll = allowNewEnroll,
         countryCode = countryCode,
+        documentType = documentType,
+        captureBothSides = captureBothSides,
+        selfieFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) },
+        extraPartnerParams = extraPartnerParams,
     )
     val screenDestination = getDocumentCaptureRoute(
-        countryCode,
         commonParams,
-        documentType,
-        captureBothSides,
-        idAspectRatio,
-        bypassSelfieCaptureWithFile,
-        allowGalleryUpload,
     )
     val orchestratedDestination = Routes.Orchestrated.DocVRoute(
         params = OrchestratedDocumentParams(commonParams),
@@ -315,23 +323,22 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     val commonParams = DocumentCaptureParams(
-        userId,
-        jobId,
-        allowNewEnroll,
-        allowAgentMode,
-        showAttribution,
-        showInstructions,
-        extraPartnerParams,
+        userId = userId,
+        jobId = jobId,
+        showInstructions = showInstructions,
+        showAttribution = showAttribution,
+        allowAgentMode = allowAgentMode,
+        allowGallerySelection = allowGalleryUpload,
+        knownIdAspectRatio = idAspectRatio,
+        allowNewEnroll = allowNewEnroll,
         countryCode = countryCode,
+        documentType = documentType,
+        captureBothSides = captureBothSides,
+        selfieFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) },
+        extraPartnerParams = extraPartnerParams,
     )
     val screenDestination = getDocumentCaptureRoute(
-        countryCode,
         commonParams,
-        documentType,
-        captureBothSides,
-        idAspectRatio,
-        bypassSelfieCaptureWithFile,
-        allowGalleryUpload,
     )
     val orchestratedDestination = Routes.Orchestrated.EnhancedDocVRoute(
         params = OrchestratedDocumentParams(commonParams),
@@ -385,6 +392,25 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
+    val commonParams = SelfieCaptureParams(
+        userId,
+        jobId,
+        allowNewEnroll,
+        allowAgentMode,
+        showAttribution,
+        showInstructions,
+        extraPartnerParams,
+        true,
+        skipApiSubmission = true,
+    )
+    val selfieDestination = getSelfieCaptureRoute(false, commonParams)
+    val screenDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(
+            commonParams,
+            startRoute = selfieDestination,
+            showStartRoute = true,
+        ),
+    )
     val orchestratedDestination = Routes.Orchestrated.BiometricKycRoute(
         OrchestratedBiometricCaptureParams(
             BiometricKYCParams(
@@ -397,23 +423,13 @@ fun SmileID.BiometricKYC(
                 allowNewEnroll = allowNewEnroll,
                 extraPartnerParams = extraPartnerParams,
             ),
+            startRoute = screenDestination,
+            showStartRoute = true,
         ),
     )
-    val selfieCaptureParams = SelfieCaptureParams(
-        userId,
-        jobId,
-        allowNewEnroll,
-        allowAgentMode,
-        showAttribution,
-        showInstructions,
-        extraPartnerParams,
-        true,
-        skipApiSubmission = true,
-    )
-    val screenDestination = getSelfieCaptureRoute(false, selfieCaptureParams)
     BaseSmileIDScreen(
         orchestratedDestination,
-        screenDestination,
+        selfieDestination,
         ResultCallbacks(onBiometricKYCResult = onResult),
         modifier,
         colorScheme,

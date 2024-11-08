@@ -149,10 +149,9 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             idInfo = params.captureParams.idInfo,
             userId = params.captureParams.userId,
             jobId = params.captureParams.jobId,
+            startRoute = params.startRoute,
+            showStartRoute = params.showStartRoute,
             allowNewEnroll = params.captureParams.allowNewEnroll,
-            allowAgentMode = params.captureParams.allowAgentMode,
-            showAttribution = params.captureParams.showAttribution,
-            showInstructions = params.captureParams.showInstructions,
             extraPartnerParams = params.captureParams.extraPartnerParams,
             onResult = { resultCallbacks.onBiometricKYCResult?.invoke(it) },
         )
@@ -224,7 +223,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             viewModel = viewModel(
                 factory = viewModelFactory {
                     EnhancedDocumentVerificationViewModel(
-                        jobType = JobType.DocumentVerification,
+                        jobType = JobType.EnhancedDocumentVerification,
                         userId = params.captureParams.userId,
                         jobId = params.captureParams.jobId,
                         allowNewEnroll = params.captureParams.allowNewEnroll,
