@@ -10,18 +10,19 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.nav.NavigationBackHandler
-import com.smileidentity.compose.nav.OrchestratedSelfieCaptureParams
 import com.smileidentity.compose.nav.ProcessingScreenParams
 import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.compose.nav.Routes
-import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.localNavigationState
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
@@ -43,9 +44,8 @@ internal fun OrchestratedBiometricKYCScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     allowNewEnroll: Boolean = false,
-    allowAgentMode: Boolean = false,
-    showAttribution: Boolean = true,
-    showInstructions: Boolean = true,
+    showStartRoute: Boolean = false,
+    startRoute: Routes? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: BiometricKycViewModel = viewModel(
         factory = viewModelFactory {
@@ -70,6 +70,7 @@ internal fun OrchestratedBiometricKYCScreen(
         content()
     }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    var startRouteShown by rememberSaveable { mutableStateOf(false) }
     resultCallbacks.onProcessingContinue = { viewModel.onFinished(onResult) }
     resultCallbacks.onProcessingClose = { viewModel.onFinished(onResult) }
     resultCallbacks.onSmartSelfieResult = {
@@ -106,20 +107,10 @@ internal fun OrchestratedBiometricKYCScreen(
                     ),
                 ),
             )
-        } else -> {
+        } showStartRoute && startRoute != null && !startRouteShown -> {
+            startRouteShown = true
             localNavigationState.orchestratedNavigation.navigateTo(
-                Routes.Orchestrated.SelfieRoute(
-                    OrchestratedSelfieCaptureParams(
-                        SelfieCaptureParams(
-                            userId = userId,
-                            jobId = jobId,
-                            showInstructions = showInstructions,
-                            showAttribution = showAttribution,
-                            allowAgentMode = allowAgentMode,
-                            skipApiSubmission = true,
-                        ),
-                    ),
-                ),
+                startRoute,
             )
         }
     }

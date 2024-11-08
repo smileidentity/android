@@ -3,6 +3,8 @@
 ## 10.3.5
 
 * Fix the camera is closed bug on document capture flow
+* Enhanced doc v submitted as doc v
+* Correct flow for selfie when showInstructions is false
 
 ## 10.3.4
 

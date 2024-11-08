@@ -23,6 +23,13 @@
                 android:text="@string/si_smart_selfie_authentication_product_name" />
 
         <Button
+                android:id="@+id/button_biometric_authentication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/si_biometric_kyc_product_name" />
+
+        <Button
                 android:id="@+id/button_document_verification"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
