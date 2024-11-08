@@ -15,7 +15,6 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
-import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.models.v2.Metadatum
@@ -24,10 +23,7 @@ import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
-import io.sentry.Breadcrumb
-import io.sentry.SentryLevel
 import java.io.File
-import java.io.IOException
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
@@ -146,78 +142,73 @@ class DocumentCaptureViewModel(
             Timber.v("Already capturing. Skipping duplicate capture request")
             return
         }
-        isCapturing = true
-        _uiState.update {
-            it.copy(showCaptureInProgress = true, directive = DocumentDirective.Capturing)
-        }
-        val documentFile = createDocumentFile(jobId, (side == DocumentCaptureSide.Front))
-        cameraState.takePicture(documentFile) { result ->
-            when (result) {
-                is ImageCaptureResult.Success -> {
-                    viewModelScope.launch {
-                        try {
-                            val processedImage = withContext(Dispatchers.Default) {
-                                postProcessImage(
-                                    documentFile,
-                                    desiredAspectRatio = uiState.value.idAspectRatio,
+
+        viewModelScope.launch {
+            try {
+                isCapturing = true
+                _uiState.update {
+                    it.copy(showCaptureInProgress = true, directive = DocumentDirective.Capturing)
+                }
+
+                val documentFile = createDocumentFile(jobId, (side == DocumentCaptureSide.Front))
+
+                cameraState.takePicture(documentFile) { result ->
+                    when (result) {
+                        is ImageCaptureResult.Success -> {
+                            viewModelScope.launch {
+                                try {
+                                    val processedImage = withContext(Dispatchers.Default) {
+                                        postProcessImage(
+                                            documentFile,
+                                            desiredAspectRatio = uiState.value.idAspectRatio,
+                                        )
+                                    }
+                                    _uiState.update {
+                                        it.copy(
+                                            documentImageToConfirm = processedImage,
+                                            showCaptureInProgress = false,
+                                        )
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Error processing captured image")
+                                    handleCaptureError(e)
+                                }
+                            }
+                        }
+
+                        is ImageCaptureResult.Error -> {
+                            // Only handle the error if we haven't already processed an image successfully
+                            if (uiState.value.documentImageToConfirm == null) {
+                                Timber.e(result.throwable, "Error capturing image")
+                                handleCaptureError(result.throwable)
+                            } else {
+                                // Log but ignore camera errors if we already have the image
+                                Timber.w(
+                                    result.throwable,
+                                    "Ignorable camera error after successful capture",
                                 )
-                            }
-                            _uiState.update {
-                                it.copy(
-                                    documentImageToConfirm = processedImage,
-                                    showCaptureInProgress = false,
-                                )
-                            }
-                        } catch (e: IOException) {
-                            Timber.e(e, "IOException processing captured image")
-                            SmileIDCrashReporting.hub.captureException(e) {
-                                it.level = SentryLevel.INFO
-                                it.addBreadcrumb(
-                                    Breadcrumb(
-                                        "Smile ID DocumentCaptureViewModel " +
-                                            "IOException",
-                                    ),
-                                )
-                            }
-                            _uiState.update {
-                                it.copy(captureError = e, showCaptureInProgress = false)
-                            }
-                        } catch (e: OutOfMemoryError) {
-                            Timber.e(e, "OutOfMemoryError processing captured image")
-                            SmileIDCrashReporting.hub.captureException(e) {
-                                it.level = SentryLevel.INFO
-                                it.addBreadcrumb(
-                                    Breadcrumb(
-                                        "Smile ID DocumentCaptureViewModel " +
-                                            "OutOfMemoryError",
-                                    ),
-                                )
-                            }
-                            _uiState.update {
-                                it.copy(captureError = e, showCaptureInProgress = false)
                             }
                         }
                     }
+                    isCapturing = false
                 }
-
-                is ImageCaptureResult.Error -> {
-                    Timber.e("ImageCaptureResult.Error capturing document", result.throwable)
-                    SmileIDCrashReporting.hub.captureException(result.throwable) {
-                        it.level = SentryLevel.INFO
-                        it.addBreadcrumb(
-                            Breadcrumb(
-                                "Smile ID DocumentCaptureViewModel " +
-                                    "ImageCaptureResult.Error",
-                            ),
-                        )
-                    }
-                    _uiState.update {
-                        it.copy(captureError = result.throwable, showCaptureInProgress = false)
-                    }
-                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error during capture setup")
+                handleCaptureError(e)
+                isCapturing = false
             }
-            // NB: This should be set to false last after processing is done for the captured image
-            isCapturing = false
+        }
+    }
+
+    private fun handleCaptureError(error: Throwable) {
+        // Only update error state if we don't have a successful capture
+        if (uiState.value.documentImageToConfirm == null) {
+            _uiState.update {
+                it.copy(
+                    captureError = error,
+                    showCaptureInProgress = false,
+                )
+            }
         }
     }
 
@@ -308,52 +299,56 @@ class DocumentCaptureViewModel(
         _uiState.update { it.copy(directive = DocumentDirective.DefaultInstructions) }
         val rotation = imageProxy.imageInfo.rotationDegrees
         val inputImage = InputImage.fromMediaImage(image, rotation)
+
+        // Create a separate variable to close later
+        val proxyToClose = imageProxy
+
         objectDetector.process(inputImage)
-            .addOnSuccessListener {
-                if (it.isEmpty()) {
+            .addOnSuccessListener { objects ->
+                if (objects.isEmpty()) {
                     resetBoundingBox()
-                    return@addOnSuccessListener
-                }
-                val bBox = it.first().boundingBox
-
-                val isCentered = isBoundingBoxCentered(
-                    boundingBox = bBox,
-                    imageWidth = inputImage.width,
-                    imageHeight = inputImage.height,
-                    imageRotation = rotation,
-                )
-
-                val detectedAspectRatio = bBox.width().toFloat() / bBox.height()
-                val isCorrectAspectRatio = isCorrectAspectRatio(
-                    detectedAspectRatio = detectedAspectRatio,
-                )
-                val idAspectRatio = if (rotation == 90 || rotation == 270) {
-                    knownAspectRatio ?: detectedAspectRatio
                 } else {
-                    1 / (knownAspectRatio ?: detectedAspectRatio)
-                }
+                    val bBox = objects.first().boundingBox
 
-                val areEdgesDetected = isCentered && isCorrectAspectRatio
-                _uiState.update {
-                    it.copy(
-                        areEdgesDetected = areEdgesDetected,
-                        idAspectRatio = idAspectRatio,
+                    val isCentered = isBoundingBoxCentered(
+                        boundingBox = bBox,
+                        imageWidth = inputImage.width,
+                        imageHeight = inputImage.height,
+                        imageRotation = rotation,
                     )
-                }
 
-                if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing && !isFocusing &&
-                    uiState.value.documentImageToConfirm == null
-                ) {
-                    captureNextAnalysisFrame = false
-                    documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
-                    captureDocument(cameraState)
+                    val detectedAspectRatio = bBox.width().toFloat() / bBox.height()
+                    val isCorrectAspectRatio = isCorrectAspectRatio(
+                        detectedAspectRatio = detectedAspectRatio,
+                    )
+                    val idAspectRatio = if (rotation == 90 || rotation == 270) {
+                        knownAspectRatio ?: detectedAspectRatio
+                    } else {
+                        1 / (knownAspectRatio ?: detectedAspectRatio)
+                    }
+
+                    val areEdgesDetected = isCentered && isCorrectAspectRatio
+                    _uiState.update {
+                        it.copy(
+                            areEdgesDetected = areEdgesDetected,
+                            idAspectRatio = idAspectRatio,
+                        )
+                    }
+
+                    if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing &&
+                        !isFocusing && uiState.value.documentImageToConfirm == null
+                    ) {
+                        captureNextAnalysisFrame = false
+                        documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
+                        captureDocument(cameraState)
+                    }
                 }
             }
-            .addOnFailureListener {
-                Timber.e(it)
+            .addOnFailureListener { e ->
+                Timber.e(e, "ML Kit object detection failed")
                 resetBoundingBox()
             }
-            .addOnCompleteListener { imageProxy.close() }
+            .addOnCompleteListener { proxyToClose.close() }
     }
 
     private fun resetBoundingBox() {
