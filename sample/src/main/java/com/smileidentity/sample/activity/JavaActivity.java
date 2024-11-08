@@ -11,10 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.smileidentity.SmileID;
+import com.smileidentity.fragment.BiometricKYCFragment;
 import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
+import com.smileidentity.models.IdInfo;
+import com.smileidentity.results.BiometricKycResult;
 import com.smileidentity.results.DocumentVerificationResult;
 import com.smileidentity.results.SmartSelfieResult;
 import com.smileidentity.results.SmileIDResult;
@@ -44,10 +47,53 @@ public class JavaActivity extends FragmentActivity {
             .setOnClickListener(v -> doSmartSelfieAuthentication());
         findViewById(R.id.button_smart_selfie_enrollment)
             .setOnClickListener(v -> doSmartSelfieEnrollment());
+        findViewById(R.id.button_biometric_authentication)
+            .setOnClickListener(v -> doBiometricKYC());
         findViewById(R.id.button_document_verification)
             .setOnClickListener(v -> doDocumentVerification());
         findViewById(R.id.button_enhanced_document_verification)
             .setOnClickListener(v -> doEnhancedDocumentVerification());
+    }
+
+    private void doBiometricKYC() {
+        IdInfo idInfo = new IdInfo("GH", "PASSPORT", "1234567890",
+            null, null, null, null, null, null);
+        BiometricKYCFragment biometricKYCFragment = BiometricKYCFragment
+            .newInstance(idInfo);
+        getSupportFragmentManager().setFragmentResultListener(
+            BiometricKYCFragment.KEY_REQUEST,
+            this,
+            (requestKey, result) -> {
+                SmileIDResult<BiometricKycResult> biometricKycResult =
+                    BiometricKYCFragment.resultFromBundle(result);
+                Timber.v("BiometricKYCFragment Result: %s", biometricKycResult);
+                if (biometricKycResult instanceof SmileIDResult.Success<BiometricKycResult> successResult) {
+                    File selfieFile = successResult.getData().getSelfieFile();
+                    List<File> livenessFiles = successResult.getData().getLivenessFiles();
+                    boolean jobSubmitted = successResult.getData().getDidSubmitBiometricKycJob();
+                    // When offline mode is enabled, the job is saved offline and can be submitted later.
+                    if (jobSubmitted) {
+                        Timber.v("BiometricKYCFragment Job Submitted");
+                    } else {
+                        Timber.v("BiometricKYCFragment Job saved offline.");
+                    }
+                } else if (biometricKycResult instanceof SmileIDResult.Error error) {
+                    Throwable throwable = error.getThrowable();
+                    Timber.v("BiometricKYCFragment Error: %s", throwable.getMessage());
+                }
+                getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(biometricKYCFragment)
+                    .commit();
+                hideProductFragment();
+            }
+        );
+
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.fragment_container, biometricKYCFragment)
+            .commit();
+        showProductFragment();
     }
 
     private void doSmartSelfieEnrollment() {
