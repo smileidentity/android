@@ -92,10 +92,14 @@ fun SmileID.SmartSelfieEnrollment(
         true,
         skipApiSubmission,
     )
-    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
-        params = OrchestratedSelfieCaptureParams(commonParams),
-    )
     val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(
+            commonParams,
+            startRoute = screenDestination,
+            showStartRoute = true,
+        ),
+    )
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
@@ -159,10 +163,14 @@ fun SmileID.SmartSelfieAuthentication(
         isEnroll = false,
         skipApiSubmission,
     )
-    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
-        params = OrchestratedSelfieCaptureParams(commonParams),
-    )
     val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
+        params = OrchestratedSelfieCaptureParams(
+            commonParams,
+            startRoute = screenDestination,
+            showStartRoute = true,
+        ),
+    )
     BaseSmileIDScreen(
         orchestratedDestination,
         screenDestination,
@@ -323,6 +331,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
         showInstructions,
         extraPartnerParams,
         countryCode = countryCode,
+        documentType = documentType,
     )
     val screenDestination = getDocumentCaptureRoute(
         countryCode,

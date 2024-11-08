@@ -224,7 +224,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             viewModel = viewModel(
                 factory = viewModelFactory {
                     EnhancedDocumentVerificationViewModel(
-                        jobType = JobType.DocumentVerification,
+                        jobType = JobType.EnhancedDocumentVerification,
                         userId = params.captureParams.userId,
                         jobId = params.captureParams.jobId,
                         allowNewEnroll = params.captureParams.allowNewEnroll,
