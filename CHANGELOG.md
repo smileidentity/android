@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.3.5
+
+* Fix the camera is closed bug on document capture flow
+
 ## 10.3.4
 
 * Bump up the compileSdk to 35
