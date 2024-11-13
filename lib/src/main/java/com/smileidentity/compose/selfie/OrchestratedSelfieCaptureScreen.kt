@@ -99,15 +99,9 @@ internal fun OrchestratedSelfieCaptureScreen(
         extraPartnerParams = extraPartnerParams,
         showInstructions = showInstructions,
     )
-    val selfieRoute = if (useStrictMode) {
-        Routes.Selfie.CaptureScreenV2(
-            selfieParams,
-        )
-    } else {
-        Routes.Selfie.CaptureScreen(
-            selfieParams,
-        )
-    }
+    val selfieRoute = Routes.Selfie.CaptureScreen(
+        selfieParams,
+    )
     resultCallbacks.selfieViewModel = viewModel
     resultCallbacks.onProcessingContinue = {
         viewModel.onFinished(onResult)

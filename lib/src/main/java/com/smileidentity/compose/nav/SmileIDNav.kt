@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,8 +32,10 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.SelfieCaptureScreen
 import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
+import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.JobType
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
@@ -69,7 +73,7 @@ internal fun BaseSmileIDScreen(
                 popEnterTransition = { EnterTransition.None },
                 popExitTransition = { ExitTransition.None },
             ) {
-                screensNavGraph(resultCallbacks)
+                screensNavGraph(resultCallbacks, modifier)
             }
         }
         NavHost(
@@ -94,7 +98,7 @@ internal fun BaseSmileIDScreen(
                         popEnterTransition = { EnterTransition.None },
                         popExitTransition = { ExitTransition.None },
                     ) {
-                        orchestratedNavGraph(childNavHost, resultCallbacks)
+                        orchestratedNavGraph(childNavHost, resultCallbacks, modifier)
                     }
                 }
             }
@@ -105,6 +109,7 @@ internal fun BaseSmileIDScreen(
 internal fun NavGraphBuilder.orchestratedNavGraph(
     content: @Composable () -> Unit,
     resultCallbacks: ResultCallbacks,
+    modifier: Modifier,
 ) {
     composable<Routes.Orchestrated.SelfieRoute>(
         typeMap = mapOf(
@@ -117,6 +122,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
         val route = navBackStackEntry.toRoute<Routes.Orchestrated.SelfieRoute>()
         val params = route.params
         OrchestratedSelfieCaptureScreen(
+            modifier = modifier,
             resultCallbacks = resultCallbacks,
             content = content,
             userId = params.captureParams.userId,
@@ -129,7 +135,33 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             showInstructions = params.captureParams.showInstructions,
             extraPartnerParams = params.captureParams.extraPartnerParams,
             showStartRoute = params.showStartRoute,
+            useStrictMode = params.captureParams.useStrictMode,
             startRoute = params.startRoute,
+            onResult = { resultCallbacks.onSmartSelfieResult?.invoke(it) },
+        )
+    }
+    composable<Routes.Orchestrated.CaptureScreenV2>(
+        typeMap = mapOf(
+            typeOf<SelfieCaptureParams>() to CustomNavType(
+                SelfieCaptureParams::class.java,
+                SelfieCaptureParams.serializer(),
+            ),
+        ),
+    ) { navBackStackEntry ->
+        val route = navBackStackEntry.toRoute<Routes.Orchestrated.CaptureScreenV2>()
+        val params = route.params
+        val context = LocalContext.current
+        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+        OrchestratedSelfieCaptureScreenV2(
+            modifier = modifier,
+            userId = params.userId,
+            isEnroll = params.isEnroll,
+            allowAgentMode = params.allowAgentMode,
+            selfieQualityModel = selfieQualityModel,
+            useStrictMode = params.useStrictMode,
+            showAttribution = params.showAttribution,
+            allowNewEnroll = params.allowNewEnroll,
+            extraPartnerParams = params.extraPartnerParams,
             onResult = { resultCallbacks.onSmartSelfieResult?.invoke(it) },
         )
     }
@@ -144,6 +176,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
         val route = backStackEntry.toRoute<Routes.Orchestrated.BiometricKycRoute>()
         val params = route.params
         OrchestratedBiometricKYCScreen(
+            modifier = modifier,
             resultCallbacks = resultCallbacks,
             content = content,
             idInfo = params.captureParams.idInfo,
@@ -168,6 +201,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
         val params = route.params
         val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
+            modifier = modifier,
             resultCallbacks = resultCallbacks,
             content = content,
             userId = params.captureParams.userId,
@@ -209,6 +243,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
         val params = route.params
         val metadata = LocalMetadata.current
         OrchestratedDocumentVerificationScreen(
+            modifier = modifier,
             resultCallbacks = resultCallbacks,
             content = content,
             userId = params.captureParams.userId,
@@ -242,14 +277,16 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
 
 internal fun NavGraphBuilder.screensNavGraph(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
+    modifier: Modifier,
 ) {
-    sharedDestinations(resultCallbacks)
-    selfieDestinations(resultCallbacks)
-    documentsDestinations(resultCallbacks)
+    sharedDestinations(resultCallbacks, modifier)
+    selfieDestinations(resultCallbacks, modifier)
+    documentsDestinations(resultCallbacks, modifier)
 }
 
 internal fun NavGraphBuilder.documentsDestinations(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
+    modifier: Modifier,
 ) {
     composable<Routes.Document.InstructionScreen>(
         typeMap = mapOf(
@@ -262,6 +299,7 @@ internal fun NavGraphBuilder.documentsDestinations(
         val route = navBackStackEntry.toRoute<Routes.Document.InstructionScreen>()
         val params = route.params
         DocumentCaptureInstructionsScreen(
+            modifier = modifier,
             heroImage = params.heroImage,
             title = params.title,
             subtitle = params.subtitle,
@@ -290,6 +328,7 @@ internal fun NavGraphBuilder.documentsDestinations(
         val params = route.params
         val galleryDocumentUri = decodeUrl(params.galleryDocumentUri)
         DocumentCaptureScreen(
+            modifier = modifier,
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
             side = DocumentCaptureSide.Front,
@@ -317,6 +356,7 @@ internal fun NavGraphBuilder.documentsDestinations(
         val params = route.params
         val galleryDocumentUri = decodeUrl(params.galleryDocumentUri)
         DocumentCaptureScreen(
+            modifier = modifier,
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
             side = DocumentCaptureSide.Front,
@@ -338,6 +378,7 @@ internal fun NavGraphBuilder.documentsDestinations(
 
 internal fun NavGraphBuilder.selfieDestinations(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
+    modifier: Modifier,
 ) {
     composable<Routes.Selfie.CaptureScreen>(
         typeMap = mapOf(
@@ -351,6 +392,7 @@ internal fun NavGraphBuilder.selfieDestinations(
         val params = route.params
         resultCallbacks.selfieViewModel?.let {
             SelfieCaptureScreen(
+                modifier = modifier,
                 userId = params.userId,
                 jobId = params.jobId,
                 isEnroll = params.isEnroll,
@@ -372,6 +414,7 @@ internal fun NavGraphBuilder.selfieDestinations(
         val route = navBackStackEntry.toRoute<Routes.Selfie.InstructionsScreen>()
         val params = route.params
         SmartSelfieInstructionsScreen(
+            modifier = modifier,
             showAttribution = params.showAttribution,
             onInstructionsAcknowledged = {
                 resultCallbacks.onSelfieInstructionScreen?.invoke()
@@ -382,6 +425,7 @@ internal fun NavGraphBuilder.selfieDestinations(
 
 internal fun NavGraphBuilder.sharedDestinations(
     resultCallbacks: ResultCallbacks = ResultCallbacks(),
+    modifier: Modifier,
 ) {
     composable<Routes.Shared.ImageConfirmDialog>(
         typeMap = mapOf(

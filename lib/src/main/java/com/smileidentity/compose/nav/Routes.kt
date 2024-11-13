@@ -26,10 +26,6 @@ sealed class Routes : Parcelable {
 
         @Parcelize
         @Serializable
-        data class CaptureScreenV2(val params: SelfieCaptureParams) : Selfie()
-
-        @Parcelize
-        @Serializable
         data class InstructionsScreen(val params: InstructionScreenParams) : Selfie()
     }
 
@@ -65,6 +61,10 @@ sealed class Routes : Parcelable {
         @Parcelize
         @Serializable
         data class SelfieRoute(val params: OrchestratedSelfieCaptureParams) : Orchestrated()
+
+        @Parcelize
+        @Serializable
+        data class CaptureScreenV2(val params: SelfieCaptureParams) : Orchestrated()
 
         @Parcelize
         @Serializable

@@ -12,6 +12,7 @@ import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.SelfieViewModel
+import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
 import com.ujizin.camposer.state.CameraState
@@ -53,6 +54,7 @@ internal data class ResultCallbacks(
 
     // view models
     var selfieViewModel: SelfieViewModel? = null,
+    var smartSelfieV2ViewModel: SmartSelfieV2ViewModel? = null,
     var documentViewModel: DocumentVerificationViewModel? = null,
     var enhancedDocVViewModel: EnhancedDocumentVerificationViewModel? = null,
     var biometricKycViewModel: BiometricKycViewModel? = null,

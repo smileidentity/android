@@ -82,8 +82,6 @@ internal fun getSelfieCaptureRoute(useStrictMode: Boolean, params: SelfieCapture
         Routes.Selfie.InstructionsScreen(
             InstructionScreenParams(params.showAttribution),
         )
-    } else if (useStrictMode) {
-        Routes.Selfie.CaptureScreenV2(params)
     } else {
         Routes.Selfie.CaptureScreen(params)
     }

@@ -219,7 +219,7 @@ fun OrchestratedSelfieCaptureScreenV2(
  * @param allowAgentMode Whether to allow the user to switch to agent mode (back camera)
  */
 @Composable
-fun ColumnScope.SmartSelfieV2Screen(
+fun SmartSelfieV2Screen(
     selfieState: SelfieState,
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
