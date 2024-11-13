@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -145,6 +146,11 @@ fun OrchestratedSelfieCaptureScreenV2(
     ),
 ) {
     BackHandler { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) }
+    DisposableEffect(Unit) {
+        onDispose {
+            selfieQualityModel.close()
+        }
+    }
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
         if (!granted) {
@@ -371,7 +377,12 @@ private fun ColumnScope.DirectiveVisual(selfieState: SelfieState, modifier: Modi
             SelfieHint.LookUp -> LottieFaceLookingUp(modifier = modifier)
             SelfieHint.MoveBack -> FaceMovingBack(modifier = modifier)
             SelfieHint.MoveCloser -> FaceMovingCloser(modifier = modifier)
-            SelfieHint.LookStraight -> LottieFace(startFrame = 0, endFrame = 0, modifier = modifier)
+            SelfieHint.LookStraight -> LottieFace(
+                startFrame = 0,
+                endFrame = 0,
+                modifier = modifier,
+            )
+
             SelfieHint.Smile -> LottieFace(startFrame = 0, endFrame = 0, modifier = modifier)
         }
 
