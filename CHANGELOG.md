@@ -1,5 +1,9 @@
 # Release Notes
 
+## (Unreleased)
+
+* Fix, strict mode for SmartSelfie™ enrollment and authentication with the navigation flow
+
 ## 10.3.5
 
 * Fix the camera is closed bug on document capture flow
