@@ -162,7 +162,7 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             showAttribution = params.showAttribution,
             allowNewEnroll = params.allowNewEnroll,
             extraPartnerParams = params.extraPartnerParams,
-            onResult = { resultCallbacks.onSmartSelfieResult?.invoke(it) },
+            onResult = { result -> resultCallbacks.onSmartSelfieResult?.invoke(result) },
         )
     }
     composable<Routes.Orchestrated.BiometricKycRoute>(
@@ -359,7 +359,7 @@ internal fun NavGraphBuilder.documentsDestinations(
             modifier = modifier,
             resultCallbacks = resultCallbacks,
             jobId = params.jobId,
-            side = DocumentCaptureSide.Front,
+            side = DocumentCaptureSide.Back,
             knownIdAspectRatio = params.knownIdAspectRatio,
             galleryDocumentUri = galleryDocumentUri,
             captureTitleText = stringResource(params.captureTitleText),
