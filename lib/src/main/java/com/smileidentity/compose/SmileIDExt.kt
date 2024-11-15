@@ -231,6 +231,7 @@ fun SmileID.DocumentVerification(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    skipApiSubmission: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -248,6 +249,7 @@ fun SmileID.DocumentVerification(
         countryCode = countryCode,
         documentType = documentType,
         captureBothSides = captureBothSides,
+        skipApiSubmission = skipApiSubmission,
         selfieFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) },
         extraPartnerParams = extraPartnerParams,
     )
@@ -317,6 +319,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    skipApiSubmission: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -334,6 +337,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
         countryCode = countryCode,
         documentType = documentType,
         captureBothSides = captureBothSides,
+        skipApiSubmission = skipApiSubmission,
         selfieFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) },
         extraPartnerParams = extraPartnerParams,
     )

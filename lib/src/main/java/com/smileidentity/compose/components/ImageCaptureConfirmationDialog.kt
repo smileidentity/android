@@ -52,6 +52,7 @@ fun ImageCaptureConfirmationDialog(
     onConfirm: () -> Unit,
     retakeButtonText: String,
     onRetake: () -> Unit,
+    modifier: Modifier = Modifier,
     scaleFactor: Float = 1f,
 ) {
     AlertDialog(

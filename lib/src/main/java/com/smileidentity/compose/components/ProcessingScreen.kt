@@ -93,6 +93,7 @@ fun ProcessingScreen(
     onRetry: () -> Unit,
     closeButtonText: String,
     onClose: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (processingState) {
         ProcessingState.InProgress -> ProcessingInProgressScreen(

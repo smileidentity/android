@@ -45,10 +45,10 @@ import timber.log.Timber
  */
 @Composable
 fun DocumentCaptureInstructionsScreen(
-    @DrawableRes heroImage: Int,
-    title: String,
-    subtitle: String,
     modifier: Modifier = Modifier,
+    @DrawableRes heroImage: Int = R.drawable.si_doc_v_front_hero,
+    title: String = stringResource(R.string.si_doc_v_instruction_title),
+    subtitle: String = stringResource(R.string.si_verify_identity_instruction_subtitle),
     showAttribution: Boolean = true,
     allowPhotoFromGallery: Boolean = false,
     showSkipButton: Boolean = true,
@@ -143,7 +143,9 @@ fun DocumentCaptureInstructionsScreen(
             CameraPermissionButton(
                 text = stringResource(R.string.si_doc_v_instruction_ready_button),
                 onGranted = onInstructionsAcknowledgedTakePhoto,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("document_instructions_ready_button"),
             )
             if (allowPhotoFromGallery) {
                 OutlinedButton(

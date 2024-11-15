@@ -70,6 +70,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val countryCode: String,
     private val documentType: String? = null,
     private val captureBothSides: Boolean,
+    protected val skipApiSubmission: Boolean = false,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val metadata: MutableList<Metadatum>,
@@ -166,6 +167,16 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private fun submitJob() {
         val documentFrontFile = uiState.value.documentFrontFile
             ?: throw IllegalStateException("documentFrontFile is null")
+
+        if (skipApiSubmission) {
+            sendResult(
+                documentFrontFile,
+                uiState.value.documentBackFile,
+                uiState.value.livenessFiles,
+            )
+            return
+        }
+
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
         }
@@ -391,6 +402,7 @@ internal class DocumentVerificationViewModel(
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
+    skipApiSubmission: Boolean = false,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: MutableList<Metadatum>,
@@ -403,6 +415,7 @@ internal class DocumentVerificationViewModel(
     documentType = documentType,
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
+    skipApiSubmission = skipApiSubmission,
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
 ) {
@@ -434,6 +447,7 @@ internal class EnhancedDocumentVerificationViewModel(
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
+    skipApiSubmission: Boolean = false,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: MutableList<Metadatum>,
@@ -445,6 +459,7 @@ internal class EnhancedDocumentVerificationViewModel(
     countryCode = countryCode,
     documentType = documentType,
     captureBothSides = captureBothSides,
+    skipApiSubmission = skipApiSubmission,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
