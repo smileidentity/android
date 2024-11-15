@@ -60,7 +60,6 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
-    skipApiSubmission: Boolean = false,
     onResult: SmileIDCallback<T> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

@@ -182,7 +182,6 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             allowGalleryUpload = params.captureParams.allowGallerySelection,
             showInstructions = params.captureParams.showInstructions,
             idAspectRatio = params.captureParams.knownIdAspectRatio,
-            skipApiSubmission = params.captureParams.skipApiSubmission,
             onResult = { resultCallbacks.onDocVResult?.invoke(it) },
             viewModel = viewModel(
                 factory = viewModelFactory {
@@ -226,7 +225,6 @@ internal fun NavGraphBuilder.orchestratedNavGraph(
             allowGalleryUpload = params.captureParams.allowGallerySelection,
             showInstructions = params.captureParams.showInstructions,
             idAspectRatio = params.captureParams.knownIdAspectRatio,
-            skipApiSubmission = params.captureParams.skipApiSubmission,
             onResult = { resultCallbacks.onEnhancedDocVResult?.invoke(it) },
             viewModel = viewModel(
                 factory = viewModelFactory {
