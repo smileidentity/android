@@ -1,5 +1,11 @@
 # Release Notes
 
+## 10.3.6
+
+* Modify access for document capture and selfie capture
+* Allow skipApiSubmission for both document capture and selfie capture flows to allow for capture
+  and return of file paths without submitting the job to SmileID
+
 ## 10.3.5
 
 * Fix the camera is closed bug on document capture flow
@@ -9,9 +15,11 @@
 ## 10.3.4
 
 * Bump up the compileSdk to 35
-* Add skipApiSubmission when true will capture smartselfie and return file paths for selfie and liveness images without submitting the job to SmilID
+* Add skipApiSubmission when true will capture smartselfie and return file paths for selfie and
+  liveness images without submitting the job to SmilID
 
 ## 10.3.3
+
 * Added inflow navigation as well as individual navigation for compose screens
 
 ## 10.3.2
@@ -30,7 +38,7 @@
 ## 10.2.7
 
 * Fixed upload bug to retry in case a job already exists but zip was not uploaded
-* Changed MLKit download modules to throw an exception explicitly if download fails 
+* Changed MLKit download modules to throw an exception explicitly if download fails
 
 ## 10.2.6
 
@@ -43,9 +51,11 @@
 ## 10.2.4
 
 #### Fixed
+
 * Job status history full data parsing causing a crash during polling
 
 ### Changed
+
 * Removed `SmileID.setEnvironment()` since the API Keys are no longer shared between environments
 
 ## 10.2.3
@@ -56,7 +66,8 @@
 
 ## 10.2.2
 
-* Fixed a bug where the `BiometricKycViewModel` would succeed but use the default error message as it was not being updated when changing state
+* Fixed a bug where the `BiometricKycViewModel` would succeed but use the default error message as
+  it was not being updated when changing state
 * Fixed a bug where `SmileID.submitJob` would not work for previously attempted API requests
 
 ## 10.2.1
@@ -66,7 +77,9 @@
 
 ## 10.2.0
 
-* Added an optional "Strict Mode" to SmartSelfie Enrollment and Authentication to achieve better pass rates. Set `useStrictMode=true` to enable this new, streamlined UI and associated active liveness tasks
+* Added an optional "Strict Mode" to SmartSelfie Enrollment and Authentication to achieve better
+  pass rates. Set `useStrictMode=true` to enable this new, streamlined UI and associated active
+  liveness tasks
 
 ## 10.1.7
 
@@ -91,7 +104,7 @@
 * Update to K2 (aka Kotlin `2.0.0`)
 * Update Compose BOM to 2024.05.00
 * Update AndroidX to 1.13.1
-* Update Activity to 1.9.0 
+* Update Activity to 1.9.0
 * Update Fragment to 1.7.1
 * Update Datastore to 1.1.1
 * Update Sentry to 7.9.0
@@ -109,9 +122,12 @@
 
 ## 10.1.0
 
-* Added an Offline Mode, enabled by calling `SmileID.setAllowOfflineMode(true)`. If a job is attempted while the device is offline, and offline mode has been enabled, the UI will complete successfully and the job can be submitted at a later time by calling `SmileID.submitJob(jobId)`
+* Added an Offline Mode, enabled by calling `SmileID.setAllowOfflineMode(true)`. If a job is
+  attempted while the device is offline, and offline mode has been enabled, the UI will complete
+  successfully and the job can be submitted at a later time by calling `SmileID.submitJob(jobId)`
 * Improved SmartSelfie Enrollment and Authentication times by moving to a synchronous API endpoint
-* Made `KEY_RESULT` constants in `Fragment`s `internal` to remove a footgun where the constant was easily confused with `KEY_REQUEST`
+* Made `KEY_RESULT` constants in `Fragment`s `internal` to remove a footgun where the constant was
+  easily confused with `KEY_REQUEST`
 * Improved back button behavior on image confirmation and processing dialogs
 * Fixed a bug where network retries would occasionally fail
 * Bump Compose BOM to 2024.04.00
@@ -153,6 +169,7 @@
 * Bump Sentry to 7.0.0
 
 ### Removed
+
 * Removed `model_parameters` from `PrepUploadRequest`
 
 ## 10.0.0-beta14
@@ -261,10 +278,10 @@
 * Renamed `getDocVJobStatus` to `getDocumentVerificationJobStatus`
 * Renamed `pollDocVJobStatus` to `pollDocumentVerificationJobStatus`
 * New sealed interface hierarchy for JobResult
-  * Renamed `DocVEntry` to `DocumentVerificationJobResult.Entry`
-  * Renamed `JobResult.Entry` to `SmartSelfieJobResult.Entry`
-  * Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
-  * `JobResult.Entry` is now an interface for all job types
+    * Renamed `DocVEntry` to `DocumentVerificationJobResult.Entry`
+    * Renamed `JobResult.Entry` to `SmartSelfieJobResult.Entry`
+    * Renamed `BiometricKycEntry` to `BiometricKycJobResult.Entry`
+    * `JobResult.Entry` is now an interface for all job types
 * Bump Sentry to 6.29.0
 * Bump Compose BOM to 2023.09.01
 * Bump AndroidX Core to 1.12.0
@@ -273,7 +290,8 @@
 
 #### Removed
 
-* Removed `Document` model, so you now pass `countryCode` and `documentType` as separate params in `SmileID.DocumentVerification`
+* Removed `Document` model, so you now pass `countryCode` and `documentType` as separate params in
+  `SmileID.DocumentVerification`
 * `filename` property from `PrepUploadRequest`, as it is no longer required
 
 ## 10.0.0-beta07
@@ -336,7 +354,9 @@
 
 #### Removed
 
-* Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The returned `SmileIDResult`s will now contain only the immediate result of job status without waiting for job completion
+* Removed polling from SmartSelfie Authentication, Document Verification, and Biometric KYC. The
+  returned `SmileIDResult`s will now contain only the immediate result of job status without waiting
+  for job completion
 
 ## 10.0.0-beta04
 
@@ -384,7 +404,8 @@
 * Minor update to default colours to add contrast
 * Submit colour liveness images instead of greyscale
 * Update SmartSelfie™ directives copy to be more succinct
-* Changed the order of arguments in Composables to ensure required arguments come first and so that Modifier is the first optional argument
+* Changed the order of arguments in Composables to ensure required arguments come first and so that
+  Modifier is the first optional argument
 * Compile against API level 34
 * Bump Gradle to 8.0.2
 * Bump Kotlin to 1.8.22

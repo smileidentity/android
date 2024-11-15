@@ -70,6 +70,7 @@ internal fun getDocumentCaptureRoute(params: DocumentCaptureParams): Routes {
                 countryCode = params.countryCode,
                 documentType = params.documentType,
                 captureBothSides = params.captureBothSides,
+                skipApiSubmission = params.skipApiSubmission,
                 selfieFile = params.selfieFile,
                 extraPartnerParams = params.extraPartnerParams,
             ),
