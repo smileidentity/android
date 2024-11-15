@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   assign-author:
-    if: github.event.pull_request.assignees == null
+    if: ${{ !contains(github.event.pull_request.assignees, '') }}
     runs-on: ubuntu-latest
     steps:
       - uses: toshimaru/auto-author-assign@v2.1.1
