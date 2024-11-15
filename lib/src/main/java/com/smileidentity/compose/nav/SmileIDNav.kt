@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
@@ -59,6 +60,7 @@ internal fun BaseSmileIDScreen(
                 startDestination = Routes.BaseScreens,
             ),
         )
+        val composedModifier = remember { modifier }
         val childNavHost: @Composable () -> Unit = {
             localNavigationState.screensNavigation.setNavController(rememberNavController())
             NavHost(
@@ -69,7 +71,7 @@ internal fun BaseSmileIDScreen(
                 popEnterTransition = { EnterTransition.None },
                 popExitTransition = { ExitTransition.None },
             ) {
-                screensNavGraph(resultCallbacks, modifier)
+                screensNavGraph(resultCallbacks, composedModifier)
             }
         }
         NavHost(
@@ -94,7 +96,7 @@ internal fun BaseSmileIDScreen(
                         popEnterTransition = { EnterTransition.None },
                         popExitTransition = { ExitTransition.None },
                     ) {
-                        orchestratedNavGraph(childNavHost, resultCallbacks, modifier)
+                        orchestratedNavGraph(childNavHost, resultCallbacks, composedModifier)
                     }
                 }
             }
