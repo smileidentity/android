@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie
+package com.smileidentity.compose
 
 import android.Manifest
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -14,6 +14,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
+import com.smileidentity.compose.selfie.SelfieCaptureScreen
 import com.smileidentity.viewmodel.SelfieViewModel
 import io.mockk.Runs
 import io.mockk.every
@@ -133,7 +134,7 @@ class SelfieCaptureScreenTest {
         // given
         val takePictureTag = "takePictureButton"
         val viewModel: SelfieViewModel = spyk()
-        every { viewModel.analyzeImage(any(), any()) } just Runs
+        every { viewModel.analyzeImage(any(), camSelector) } just Runs
 
         // when
         composeTestRule.apply {
@@ -142,6 +143,6 @@ class SelfieCaptureScreenTest {
         }
 
         // then
-        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any(), any()) }
+        verify(atLeast = 1, timeout = 1000) { viewModel.analyzeImage(any(), camSelector) }
     }
 }

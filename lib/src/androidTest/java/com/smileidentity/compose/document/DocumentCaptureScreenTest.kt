@@ -14,6 +14,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
+import com.smileidentity.R
+import com.smileidentity.compose.nav.ResultCallbacks
 import org.junit.Rule
 import org.junit.Test
 
@@ -22,10 +24,7 @@ class DocumentCaptureScreenTest {
     val composeTestRule = createComposeRule()
 
     @get:Rule
-    val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.CAMERA,
-        android.Manifest.permission.POST_NOTIFICATIONS,
-    )
+    val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @OptIn(ExperimentalPermissionsApi::class)
     private lateinit var permissionState: PermissionState
@@ -36,16 +35,27 @@ class DocumentCaptureScreenTest {
         // given
         val cameraPreviewTag = "document_camera_preview"
         val instructionsTag = "document_capture_instructions_screen"
+        lateinit var navController: TestNavHostController
 
         // when
         composeTestRule.setContent {
             permissionState = rememberPermissionState(Manifest.permission.CAMERA)
             DocumentCaptureScreen(
+                navController = navController,
+                resultCallbacks = ResultCallbacks(),
                 jobId = "jobId",
                 side = DocumentCaptureSide.Front,
+                showInstructions = true,
+                showAttribution = true,
+                allowGallerySelection = true,
+                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+                instructionsTitleText = "",
+                instructionsSubtitleText = "",
                 captureTitleText = "",
                 knownIdAspectRatio = null,
                 onConfirm = {},
+                onError = {},
+                showSkipButton = true,
             )
         }
 
@@ -67,11 +77,21 @@ class DocumentCaptureScreenTest {
         // when
         composeTestRule.setContent {
             DocumentCaptureScreen(
+                navController = navController,
+                resultCallbacks = ResultCallbacks(),
                 jobId = "jobId",
                 side = DocumentCaptureSide.Front,
+                showInstructions = true,
+                showAttribution = true,
+                allowGallerySelection = true,
+                instructionsHeroImage = R.drawable.si_doc_v_front_hero,
+                instructionsTitleText = titleText,
+                instructionsSubtitleText = subtitleText,
                 captureTitleText = "",
                 knownIdAspectRatio = null,
                 onConfirm = {},
+                onError = {},
+                showSkipButton = true,
             )
         }
 

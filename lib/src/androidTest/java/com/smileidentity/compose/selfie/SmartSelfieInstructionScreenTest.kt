@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie
+package com.smileidentity.compose
 
 import android.Manifest
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,8 +10,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
-import com.smileidentity.compose.denyPermissionInDialog
-import com.smileidentity.compose.grantPermissionInDialog
+import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
 import org.junit.Rule
 import org.junit.Test
 
