@@ -306,6 +306,7 @@ internal fun NavGraphBuilder.documentsDestinations(
             galleryDocumentUri = galleryDocumentUri,
             modifier = modifier,
             captureTitleText = stringResource(params.captureTitleText),
+            onError = { resultCallbacks.onDocumentCaptureError?.invoke(it) },
             onConfirm = { file ->
                 resultCallbacks.onDocumentFrontCaptureSuccess?.invoke(file)
             },
@@ -330,11 +331,9 @@ internal fun NavGraphBuilder.documentsDestinations(
             galleryDocumentUri = galleryDocumentUri,
             captureTitleText = stringResource(params.captureTitleText),
             modifier = modifier,
+            onError = { resultCallbacks.onDocumentCaptureError?.invoke(it) },
             onConfirm = { file ->
                 resultCallbacks.onDocumentBackCaptureSuccess?.invoke(file)
-            },
-            onSkip = {
-                resultCallbacks.onDocumentBackSkip?.invoke()
             },
         )
     }

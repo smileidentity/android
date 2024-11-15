@@ -37,13 +37,13 @@ enum class DocumentCaptureSide {
 fun DocumentCaptureScreen(
     jobId: String,
     side: DocumentCaptureSide,
+    onError: (Throwable) -> Unit,
     captureTitleText: String,
     onConfirm: (File) -> Unit,
     modifier: Modifier = Modifier,
     knownIdAspectRatio: Float? = null,
     galleryDocumentUri: String? = null,
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
-    onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
         factory = viewModelFactory {
             DocumentCaptureViewModel(
@@ -80,7 +80,9 @@ fun DocumentCaptureScreen(
         targetValue = uiState.idAspectRatio,
         label = "ID Aspect Ratio",
     )
+    val captureError = uiState.captureError
     when {
+        captureError != null -> onError(captureError)
         documentImageToConfirm != null -> viewModel.onConfirm(documentImageToConfirm, onConfirm)
         else -> {
             CaptureScreenContent(
