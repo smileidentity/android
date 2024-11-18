@@ -13,7 +13,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.LocalMetadata
-import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
@@ -35,18 +34,16 @@ enum class DocumentCaptureSide {
  * This handles Instructions + Capture + Confirmation for a single side of a document
  */
 @Composable
-internal fun DocumentCaptureScreen(
-    resultCallbacks: ResultCallbacks,
+fun DocumentCaptureScreen(
     jobId: String,
     side: DocumentCaptureSide,
+    onError: (Throwable) -> Unit,
     captureTitleText: String,
     onConfirm: (File) -> Unit,
-    onError: (Throwable) -> Unit,
-    knownIdAspectRatio: Float?,
-    galleryDocumentUri: String?,
     modifier: Modifier = Modifier,
+    knownIdAspectRatio: Float? = null,
+    galleryDocumentUri: String? = null,
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
-    onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
         factory = viewModelFactory {
             DocumentCaptureViewModel(
@@ -83,7 +80,9 @@ internal fun DocumentCaptureScreen(
         targetValue = uiState.idAspectRatio,
         label = "ID Aspect Ratio",
     )
+    val captureError = uiState.captureError
     when {
+        captureError != null -> onError(captureError)
         documentImageToConfirm != null -> viewModel.onConfirm(documentImageToConfirm, onConfirm)
         else -> {
             CaptureScreenContent(

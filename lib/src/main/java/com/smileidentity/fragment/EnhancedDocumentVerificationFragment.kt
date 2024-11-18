@@ -84,6 +84,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
+            skipApiSubmission: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = EnhancedDocumentVerificationFragment().apply {
@@ -99,6 +100,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.skipApiSubmission = skipApiSubmission
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
@@ -126,6 +128,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             allowGalleryUpload = args.allowGalleryUpload,
             showInstructions = args.showInstructions,
             captureBothSides = args.captureBothSides,
+            skipApiSubmission = args.skipApiSubmission,
             bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
             idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
@@ -202,6 +205,11 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
+
+private const val KEY_SKIP_API_SUBMISSION = "skipApiSubmission"
+private var Bundle.skipApiSubmission: Boolean
+    get() = getBoolean(KEY_SKIP_API_SUBMISSION)
+    set(value) = putBoolean(KEY_SKIP_API_SUBMISSION, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private val type = Types.newParameterizedType(

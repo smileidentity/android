@@ -193,6 +193,7 @@ data class OrchestratedBiometricCaptureParams(
             ),
         ),
     ),
+    val showStartRoute: Boolean = false,
 ) : Parcelable
 
 @Serializable

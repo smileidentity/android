@@ -86,6 +86,7 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
+            skipApiSubmission: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = DocumentVerificationFragment().apply {
@@ -101,6 +102,7 @@ class DocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.skipApiSubmission = skipApiSubmission
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
@@ -129,6 +131,7 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions = args.showInstructions,
             idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
             captureBothSides = args.captureBothSides,
+            skipApiSubmission = args.skipApiSubmission,
             bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
             onResult = {
@@ -197,6 +200,11 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
+
+private const val KEY_SKIP_API_SUBMISSION = "skipApiSubmission"
+private var Bundle.skipApiSubmission: Boolean
+    get() = getBoolean(KEY_SKIP_API_SUBMISSION)
+    set(value) = putBoolean(KEY_SKIP_API_SUBMISSION, value)
 
 private const val KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE = "bypassSelfieCaptureWithFile"
 private val fileAdapter = moshi.adapter(File::class.java)

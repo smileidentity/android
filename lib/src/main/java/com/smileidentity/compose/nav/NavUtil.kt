@@ -10,7 +10,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavType
 import com.smileidentity.R
-import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -40,16 +39,7 @@ class CustomNavType<T : Parcelable>(
 }
 
 @Composable
-internal fun getDocumentCaptureRoute(
-    countryCode: String,
-    params: DocumentCaptureParams,
-    documentType: String?,
-    captureBothSides: Boolean,
-    idAspectRatio: Float?,
-    bypassSelfieCaptureWithFile: File?,
-    allowGalleryUpload: Boolean,
-): Routes {
-    val serializableFile = bypassSelfieCaptureWithFile?.let { SerializableFile.fromFile(it) }
+internal fun getDocumentCaptureRoute(params: DocumentCaptureParams): Routes {
     return if (params.showInstructions) {
         Routes.Document.InstructionScreen(
             params = DocumentInstructionParams(
@@ -57,7 +47,7 @@ internal fun getDocumentCaptureRoute(
                 stringResource(R.string.si_doc_v_instruction_title),
                 stringResource(R.string.si_verify_identity_instruction_subtitle),
                 params.showAttribution,
-                allowGalleryUpload,
+                params.allowGallerySelection,
                 showSkipButton = false,
             ),
         )
@@ -69,18 +59,19 @@ internal fun getDocumentCaptureRoute(
                 showInstructions = true,
                 showAttribution = params.showAttribution,
                 allowAgentMode = params.allowAgentMode,
-                allowGallerySelection = allowGalleryUpload,
+                allowGallerySelection = params.allowGallerySelection,
                 showSkipButton = params.showSkipButton,
                 instructionsHeroImage = params.instructionsHeroImage,
                 instructionsTitleText = params.instructionsTitleText,
                 instructionsSubtitleText = params.instructionsSubtitleText,
                 captureTitleText = params.captureTitleText,
-                knownIdAspectRatio = idAspectRatio,
+                knownIdAspectRatio = params.knownIdAspectRatio,
                 allowNewEnroll = params.allowNewEnroll,
-                countryCode = countryCode,
-                documentType = documentType,
-                captureBothSides = captureBothSides,
-                selfieFile = serializableFile,
+                countryCode = params.countryCode,
+                documentType = params.documentType,
+                captureBothSides = params.captureBothSides,
+                skipApiSubmission = params.skipApiSubmission,
+                selfieFile = params.selfieFile,
                 extraPartnerParams = params.extraPartnerParams,
             ),
         )
