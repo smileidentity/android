@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,11 +30,14 @@ import com.smileidentity.compose.document.DocumentCaptureScreen
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.compose.selfie.SelfieCaptureScreen
-import com.smileidentity.compose.selfie.SmartSelfieInstructionsScreen
+import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
+import com.smileidentity.compose.selfie.v2.SelfieCaptureInstructionScreenV2
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.JobType
+import com.smileidentity.models.v2.Metadata
+import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -355,15 +359,38 @@ internal fun NavGraphBuilder.selfieDestinations(
     ) { navBackStackEntry ->
         val route = navBackStackEntry.toRoute<Routes.Selfie.CaptureScreen>()
         val params = route.params
+        val context = LocalContext.current
+        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
         resultCallbacks.selfieViewModel?.let {
-            SelfieCaptureScreen(
+            // SelfieCaptureScreen(
+            //     modifier = modifier,
+            //     userId = params.userId,
+            //     jobId = params.jobId,
+            //     isEnroll = params.isEnroll,
+            //     allowAgentMode = params.allowAgentMode,
+            //     skipApiSubmission = params.skipApiSubmission,
+            //     viewModel = it,
+            // )
+
+            OrchestratedSelfieCaptureScreenV2(
                 modifier = modifier,
                 userId = params.userId,
-                jobId = params.jobId,
                 isEnroll = params.isEnroll,
-                allowAgentMode = params.allowAgentMode,
-                skipApiSubmission = params.skipApiSubmission,
-                viewModel = it,
+                viewModel = viewModel(
+                    factory = viewModelFactory {
+                        SmartSelfieV2ViewModel(
+                            userId = params.userId,
+                            isEnroll = params.isEnroll,
+                            useStrictMode = params.useStrictMode,
+                            selfieQualityModel = selfieQualityModel,
+                            allowNewEnroll = params.allowNewEnroll,
+                            metadata = Metadata.default().items.toMutableList(),
+                            onResult = {},
+                        )
+                    },
+                ),
+                onResult = {},
+                selfieQualityModel = selfieQualityModel,
             )
         }
     }
@@ -378,7 +405,15 @@ internal fun NavGraphBuilder.selfieDestinations(
     ) { navBackStackEntry ->
         val route = navBackStackEntry.toRoute<Routes.Selfie.InstructionsScreen>()
         val params = route.params
-        SmartSelfieInstructionsScreen(
+        // SmartSelfieInstructionsScreen(
+        //     modifier = modifier,
+        //     showAttribution = params.showAttribution,
+        //     onInstructionsAcknowledged = {
+        //         resultCallbacks.onSelfieInstructionScreen?.invoke()
+        //     },
+        // )
+
+        SelfieCaptureInstructionScreenV2(
             modifier = modifier,
             showAttribution = params.showAttribution,
             onInstructionsAcknowledged = {

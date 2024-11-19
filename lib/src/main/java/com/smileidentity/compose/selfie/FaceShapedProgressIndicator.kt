@@ -44,7 +44,9 @@ fun FaceShapedProgressIndicator(
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
 ) {
     val stroke = with(LocalDensity.current) { Stroke(width = strokeWidth.toPx()) }
-    Canvas(modifier = modifier.progressSemantics(progress).fillMaxSize()) {
+    Canvas(modifier = modifier
+        .progressSemantics(progress)
+        .fillMaxSize()) {
         val faceShapeBounds = FaceShape.path.getBounds()
         // Scale the face shape to the desired size
         val faceArea = faceShapeBounds.width * faceShapeBounds.height

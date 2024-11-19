@@ -467,7 +467,11 @@ class SmartSelfieV2ViewModel(
                         _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
                         // Delay to ensure the completion icon is shown for a little bit
                         delay(COMPLETED_DELAY_MS)
-                        val result = SmartSelfieResult(selfieFile, livenessFiles, apiResponse)
+                        val result = SmartSelfieResult(
+                            selfieFile = selfieFile,
+                            livenessFiles = livenessFiles,
+                            apiResponse = apiResponse,
+                        )
                         onResult(SmileIDResult.Success(result))
                     },
                     async {

@@ -83,31 +83,34 @@ fun SmileID.SmartSelfieEnrollment(
 ) {
     // TODO: Eventually use the new UI even for nonStrictMode, but with active liveness disabled
     val commonParams = SelfieCaptureParams(
-        userId,
-        jobId,
-        allowNewEnroll,
-        allowAgentMode,
-        showAttribution,
-        showInstructions,
-        extraPartnerParams,
-        true,
-        skipApiSubmission,
+        userId = userId,
+        jobId = jobId,
+        allowNewEnroll = allowNewEnroll,
+        allowAgentMode = allowAgentMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        extraPartnerParams = extraPartnerParams,
+        isEnroll = true,
+        skipApiSubmission = skipApiSubmission,
     )
-    val screenDestination = getSelfieCaptureRoute(useStrictMode, commonParams)
+    val screenDestination = getSelfieCaptureRoute(
+        useStrictMode = useStrictMode,
+        params = commonParams,
+    )
     val orchestratedDestination = Routes.Orchestrated.SelfieRoute(
         params = OrchestratedSelfieCaptureParams(
-            commonParams,
+            captureParams = commonParams,
             startRoute = screenDestination,
             showStartRoute = true,
         ),
     )
     BaseSmileIDScreen(
-        orchestratedDestination,
-        screenDestination,
-        ResultCallbacks(onSmartSelfieResult = onResult),
-        modifier,
-        colorScheme,
-        typography,
+        orchestratedDestination = orchestratedDestination,
+        screenDestination = screenDestination,
+        resultCallbacks = ResultCallbacks(onSmartSelfieResult = onResult),
+        modifier = modifier,
+        colorScheme = colorScheme,
+        typography = typography,
     )
 }
 
