@@ -97,10 +97,9 @@ import kotlinx.coroutines.delay
  * @param useStrictMode Whether to use strict mode for the selfie capture. Strict mode is stricter
  * about what constitutes a good selfie capture and results in better pass rates.
  * @param showAttribution Whether to show the Smile ID attribution
- * @param allowAgentMode Whether to allow the user to switch to agent mode (back camera)
  * @param allowNewEnroll Whether to allow new enrollments
  * @param extraPartnerParams Extra partner_params to send to the API
- * @param viewModel The viewmodel to use for the selfie capture (should not be explicitly passed in)
+ * @param viewModel The viewmodel to use for te selfie capture (should not be explicitly passed in)
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -113,7 +112,6 @@ fun OrchestratedSelfieCaptureScreenV2(
     useStrictMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
-    allowAgentMode: Boolean = false,
     allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
@@ -162,7 +160,7 @@ fun OrchestratedSelfieCaptureScreenV2(
             .fillMaxSize(),
     ) {
         val cameraState = rememberCameraState()
-        var camSelector by rememberCamSelector(CamSelector.Front)
+        val camSelector by rememberCamSelector(CamSelector.Front)
 
         when {
             showInstructions && !acknowledgedInstructions -> SelfieCaptureInstructionScreenV2(
@@ -206,11 +204,8 @@ fun OrchestratedSelfieCaptureScreenV2(
  * @param onRetry The callback to invoke when the user wants to retry on error
  * @param onResult The callback to invoke when the selfie capture is complete
  * @param cameraPreview The composable slot to display the camera preview
- * @param isAgentModeEnabled Whether agent mode is enabled
- * @param onCamSelectorChange The callback to invoke when the user wants to switch cameras
  * @param modifier The modifier to apply to this composable
  * @param showAttribution Whether to show the Smile ID attribution
- * @param allowAgentMode Whether to allow the user to switch to agent mode (back camera)
  */
 @Composable
 fun SmartSelfieV2Screen(
@@ -274,7 +269,6 @@ fun SmartSelfieV2Screen(
             Box(
                 contentAlignment = Alignment.BottomCenter,
             ) {
-
                 val animatedProgress by animateFloatAsState(
                     targetValue = 0.5F,
                     animationSpec = tween(easing = LinearEasing),
@@ -293,7 +287,9 @@ fun SmartSelfieV2Screen(
                 Text(
                     text = when (selfieState) {
                         is SelfieState.Analyzing -> stringResource(selfieState.hint.text)
-                        SelfieState.Processing -> stringResource(R.string.si_smart_selfie_v2_submitting)
+                        SelfieState.Processing -> stringResource(
+                            R.string.si_smart_selfie_v2_submitting,
+                        )
                         is SelfieState.Error -> stringResource(
                             R.string.si_smart_selfie_v2_submission_failed,
                         )
