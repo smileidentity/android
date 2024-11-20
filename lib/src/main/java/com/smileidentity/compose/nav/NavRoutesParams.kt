@@ -67,6 +67,7 @@ data class SelfieCaptureParams(
     val allowAgentMode: Boolean = false,
     val showAttribution: Boolean = true,
     val showInstructions: Boolean = true,
+    @Serializable(with = PersistentMapSerializer::class)
     val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     val isEnroll: Boolean = true,
     val skipApiSubmission: Boolean = false,
@@ -99,6 +100,7 @@ data class DocumentCaptureParams(
     val allowAgentMode: Boolean = false,
     val showAttribution: Boolean = true,
     val showInstructions: Boolean = true,
+    @Serializable(with = PersistentMapSerializer::class)
     val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     val allowGallerySelection: Boolean = false,
     val showSkipButton: Boolean = false,
@@ -148,6 +150,7 @@ data class BiometricKYCParams(
     val showAttribution: Boolean = true,
     val showInstructions: Boolean = true,
     val skipApiSubmission: Boolean = false,
+    @Serializable(with = PersistentMapSerializer::class)
     val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : Parcelable
 

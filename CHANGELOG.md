@@ -1,4 +1,7 @@
 # Release Notes
+## 10.3.
+
+* Fixed extraPartnerParams serialization issues
 
 ## 10.3.6
 
