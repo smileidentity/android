@@ -68,6 +68,10 @@
     <string name="si_smart_selfie_v2_submission_successful">Submission Successful</string>
     <string name="si_smart_selfie_v2_submission_failed">Submission Failed</string>
 
+    <!--  SmartSelfie V2  -->
+    <string name="si_smart_selfie_v3_get_started">Get Started</string>
+    <string name="si_smart_selfie_v3_instructions">Position your head in the camera view. Then move in the direction that is indicated</string>
+
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>
     <string name="si_doc_v_instruction_skip_back_id">Skip Back of ID</string>

@@ -9,6 +9,7 @@ import androidx.core.view.WindowCompat
 import com.smileidentity.SmileID
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.compose.theme.typographyv2
 
 @Composable
 fun SmileIDTheme(content: @Composable () -> Unit) {
@@ -22,7 +23,7 @@ fun SmileIDTheme(content: @Composable () -> Unit) {
 
     MaterialTheme(
         colorScheme = SmileID.colorScheme,
-        typography = SmileID.typography,
+        typography = SmileID.typographyv2,
         content = content,
     )
 }
