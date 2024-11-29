@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -58,6 +59,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.LocalMetadata
+import com.smileidentity.compose.components.AnimatedInstructions
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
@@ -181,7 +183,12 @@ fun OrchestratedSelfieCaptureScreenV2(
                         implementationMode = ImplementationMode.Compatible,
                         scaleType = ScaleType.FillCenter,
                         imageAnalyzer = cameraState.rememberImageAnalyzer(
-                            analyze = { viewModel.analyzeImage(it, camSelector) },
+                            analyze = {
+                                viewModel.analyzeImage(
+                                    imageProxy = it,
+                                    camSelector = camSelector,
+                                )
+                            },
                         ),
                         isImageAnalysisEnabled = true,
                         modifier = Modifier
@@ -283,6 +290,20 @@ fun SmartSelfieV2Screen(
                         .fillMaxSize()
                         .testTag("selfie_progress_indicator"),
                 )
+
+                when (selfieState) {
+                    is SelfieState.Analyzing -> {
+                        AnimatedInstructions(
+                            modifier = Modifier
+                                .size(200.dp)
+                                .align(Alignment.Center),
+                            animation = selfieState.hint.animation,
+                            startFrame = selfieState.hint.startFrame,
+                            endFrame = selfieState.hint.endFrame
+                        )
+                    }
+                    else -> {}
+                }
 
                 Text(
                     text = when (selfieState) {

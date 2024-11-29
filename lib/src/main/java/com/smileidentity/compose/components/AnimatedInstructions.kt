@@ -1,5 +1,6 @@
 package com.smileidentity.compose.components
 
+import androidx.annotation.RawRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -12,9 +13,14 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.smileidentity.R
 
 @Composable
-fun LottieInstruction(modifier: Modifier = Modifier, startFrame: Int = 0, endFrame: Int = 286) {
+fun AnimatedInstructions(
+    modifier: Modifier = Modifier,
+    @RawRes animation: Int = R.raw.si_anim_instruction_screen,
+    startFrame: Int = 0,
+    endFrame: Int = 286,
+) {
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.si_anim_instruction_screen),
+        LottieCompositionSpec.RawRes(animation),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
