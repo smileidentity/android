@@ -20,8 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smileidentity.R
-import com.smileidentity.compose.components.ContinueButton
 import com.smileidentity.compose.components.AnimatedInstructions
+import com.smileidentity.compose.components.ContinueButton
 import com.smileidentity.compose.components.SmileIDAttribution
 
 @Composable

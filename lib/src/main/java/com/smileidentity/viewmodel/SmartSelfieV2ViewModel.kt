@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
-import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
@@ -101,86 +100,23 @@ sealed interface SelfieState {
 }
 
 enum class SelfieHint(
-    @RawRes val animation: Int = R.raw.si_anim_instruction_screen,
-    val startFrame: Int,
-    val endFrame: Int,
     @StringRes val text: Int,
 ) {
-    NeedLight(
-        animation = R.raw.si_anim_light,
-        startFrame = -1,
-        endFrame = -1,
-        text = R.string.si_smart_selfie_v2_directive_need_more_light,
-    ),
-    SearchingForFace(
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 0,
-        endFrame = 60,
-        text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
-    ),
-    MoveBack(
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 82,
-        endFrame = 145,
-        text = R.string.si_smart_selfie_v2_directive_move_back,
-    ),
-    MoveCloser(
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 157,
-        endFrame = 216,
-        text = R.string.si_smart_selfie_v2_directive_move_closer,
-    ),
-    LookLeft(
-        animation = R.raw.si_anim_face,
-        startFrame = 0,
-        endFrame = 115,
-        text = R.string.si_smart_selfie_v2_directive_look_left,
-    ),
-    LookRight(
-        animation = R.raw.si_anim_face,
-        startFrame = 115,
-        endFrame = 183,
-        text = R.string.si_smart_selfie_v2_directive_look_right,
-    ),
-    LookUp(
-        animation = R.raw.si_anim_face,
-        startFrame = 184,
-        endFrame = 286,
-        text = R.string.si_smart_selfie_v2_directive_look_up,
-    ),
-    EnsureDeviceUpright(
-        startFrame = -1,
-        endFrame = -1,
-        text = R.string.si_smart_selfie_v2_directive_ensure_device_upright,
-    ),
-    OnlyOneFace(
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 0,
-        endFrame = 60,
-        text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
-    ),
+    NeedLight(text = R.string.si_smart_selfie_v2_directive_need_more_light),
+    SearchingForFace(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    MoveBack(text = R.string.si_smart_selfie_v2_directive_move_back),
+    MoveCloser(text = R.string.si_smart_selfie_v2_directive_move_closer),
+    LookLeft(text = R.string.si_smart_selfie_v2_directive_look_left),
+    LookRight(text = R.string.si_smart_selfie_v2_directive_look_right),
+    LookUp(text = R.string.si_smart_selfie_v2_directive_look_up),
+    EnsureDeviceUpright(text = R.string.si_smart_selfie_v2_directive_ensure_device_upright),
+    OnlyOneFace(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
     EnsureEntireFaceVisible(
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 0,
-        endFrame = 60,
         text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
     ),
-    PoorImageQuality(
-        startFrame = -1,
-        endFrame = -1,
-        text = R.string.si_smart_selfie_v2_directive_poor_image_quality,
-    ),
-    LookStraight(
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 0,
-        endFrame = 60,
-        text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
-    ),
-    Smile(
-        startFrame = -1,
-        endFrame = -1,
-        text = R.string.si_smart_selfie_v2_directive_smile,
-    ),
+    PoorImageQuality(text = R.string.si_smart_selfie_v2_directive_poor_image_quality),
+    LookStraight(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    Smile(text = R.string.si_smart_selfie_v2_directive_smile),
 }
 
 data class SmartSelfieV2UiState(

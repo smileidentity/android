@@ -5,9 +5,11 @@ package com.smileidentity.compose
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
@@ -24,8 +26,10 @@ import com.smileidentity.compose.nav.SelfieCaptureParams
 import com.smileidentity.compose.nav.SerializableFile
 import com.smileidentity.compose.nav.getDocumentCaptureRoute
 import com.smileidentity.compose.nav.getSelfieCaptureRoute
+import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
@@ -114,6 +118,37 @@ fun SmileID.SmartSelfieEnrollment(
     )
 }
 
+@Composable
+fun SmileID.SmartSelfieEnrollmentV2(
+    modifier: Modifier = Modifier,
+    userId: String = rememberSaveable { randomUserId() },
+    allowNewEnroll: Boolean = false,
+    showAttribution: Boolean = true,
+    showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<SmartSelfieResult> = {},
+) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        val context = LocalContext.current
+        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+        OrchestratedSelfieCaptureScreenV2(
+            modifier = modifier,
+            userId = userId,
+            allowNewEnroll = allowNewEnroll,
+            showInstructions = showInstructions,
+            isEnroll = true,
+            showAttribution = showAttribution,
+            useStrictMode = useStrictMode,
+            selfieQualityModel = selfieQualityModel,
+            extraPartnerParams = extraPartnerParams,
+            onResult = onResult,
+        )
+    }
+}
+
 /**
  * Perform a SmartSelfie™ Authentication
  *
@@ -183,6 +218,37 @@ fun SmileID.SmartSelfieAuthentication(
         colorScheme,
         typography,
     )
+}
+
+@Composable
+fun SmileID.SmartSelfieAuthenticationV2(
+    userId: String,
+    modifier: Modifier = Modifier,
+    allowNewEnroll: Boolean = false,
+    showAttribution: Boolean = true,
+    showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
+    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    colorScheme: ColorScheme = SmileID.colorScheme,
+    typography: Typography = SmileID.typography,
+    onResult: SmileIDCallback<SmartSelfieResult> = {},
+) {
+    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+        val context = LocalContext.current
+        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+        OrchestratedSelfieCaptureScreenV2(
+            modifier = modifier,
+            userId = userId,
+            isEnroll = false,
+            allowNewEnroll = allowNewEnroll,
+            showAttribution = showAttribution,
+            showInstructions = showInstructions,
+            useStrictMode = useStrictMode,
+            selfieQualityModel = selfieQualityModel,
+            extraPartnerParams = extraPartnerParams,
+            onResult = onResult,
+        )
+    }
 }
 
 /**

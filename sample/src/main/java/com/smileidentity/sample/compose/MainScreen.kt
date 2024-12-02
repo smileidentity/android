@@ -59,7 +59,9 @@ import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
+import com.smileidentity.compose.SmartSelfieAuthenticationV2
 import com.smileidentity.compose.SmartSelfieEnrollment
+import com.smileidentity.compose.SmartSelfieEnrollmentV2
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
@@ -215,7 +217,7 @@ fun MainScreen(
                 }
                 composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                    SmileID.SmartSelfieEnrollment(useStrictMode = true) {
+                    SmileID.SmartSelfieEnrollmentV2(useStrictMode = true) {
                         viewModel.onSmartSelfieEnrollmentV2Result(it)
                         navController.popBackStack()
                     }
@@ -237,7 +239,7 @@ fun MainScreen(
                 composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.SmartSelfieAuthentication(userId = userId, useStrictMode = true) {
+                    SmileID.SmartSelfieAuthenticationV2(userId = userId, useStrictMode = true) {
                         viewModel.onSmartSelfieAuthenticationV2Result(it)
                         navController.popBackStack()
                     }

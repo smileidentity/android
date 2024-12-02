@@ -43,9 +43,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,9 +55,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
+import com.smileidentity.compose.components.DirectiveHaptics
+import com.smileidentity.compose.components.DirectiveVisual
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.LocalMetadata
-import com.smileidentity.compose.components.AnimatedInstructions
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
@@ -85,7 +84,6 @@ import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.coroutines.delay
 
 /**
  * Orchestrates the Selfie Capture Flow. Requests permissions, sets brightness, handles back press,
@@ -170,6 +168,7 @@ fun OrchestratedSelfieCaptureScreenV2(
             ) {
                 acknowledgedInstructions = true
             }
+
             else -> SmartSelfieV2Screen(
                 selfieState = uiState.selfieState,
                 showAttribution = showAttribution,
@@ -215,7 +214,7 @@ fun OrchestratedSelfieCaptureScreenV2(
  * @param showAttribution Whether to show the Smile ID attribution
  */
 @Composable
-fun SmartSelfieV2Screen(
+private fun SmartSelfieV2Screen(
     selfieState: SelfieState,
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
@@ -277,7 +276,7 @@ fun SmartSelfieV2Screen(
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 val animatedProgress by animateFloatAsState(
-                    targetValue = 0.5F,
+                    targetValue = 0.0F,
                     animationSpec = tween(easing = LinearEasing),
                     label = "selfie_progress",
                 )
@@ -291,19 +290,12 @@ fun SmartSelfieV2Screen(
                         .testTag("selfie_progress_indicator"),
                 )
 
-                when (selfieState) {
-                    is SelfieState.Analyzing -> {
-                        AnimatedInstructions(
-                            modifier = Modifier
-                                .size(200.dp)
-                                .align(Alignment.Center),
-                            animation = selfieState.hint.animation,
-                            startFrame = selfieState.hint.startFrame,
-                            endFrame = selfieState.hint.endFrame
-                        )
-                    }
-                    else -> {}
-                }
+                DirectiveVisual(
+                    selfieState = selfieState,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .align(Alignment.Center),
+                )
 
                 Text(
                     text = when (selfieState) {
@@ -311,6 +303,7 @@ fun SmartSelfieV2Screen(
                         SelfieState.Processing -> stringResource(
                             R.string.si_smart_selfie_v2_submitting,
                         )
+
                         is SelfieState.Error -> stringResource(
                             R.string.si_smart_selfie_v2_submission_failed,
                         )
@@ -328,28 +321,6 @@ fun SmartSelfieV2Screen(
         }
         if (showAttribution) {
             SmileIDAttribution(modifier = Modifier.padding(top = 4.dp))
-        }
-    }
-}
-
-/**
- * Provide custom haptic feedback based on the selfie hint.
- */
-@Composable
-private fun DirectiveHaptics(selfieState: SelfieState) {
-    val haptic = LocalHapticFeedback.current
-    if (selfieState is SelfieState.Analyzing) {
-        if (selfieState.hint == SelfieHint.LookUp ||
-            selfieState.hint == SelfieHint.LookRight ||
-            selfieState.hint == SelfieHint.LookLeft
-        ) {
-            LaunchedEffect(selfieState.hint) {
-                // Custom vibration pattern
-                for (i in 0..2) {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    delay(100)
-                }
-            }
         }
     }
 }
