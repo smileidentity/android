@@ -48,7 +48,7 @@ fun DirectiveVisual(selfieState: SelfieState, modifier: Modifier = Modifier) {
 @Composable
 private fun LottieFace(
     modifier: Modifier = Modifier,
-    @RawRes animation: Int = R.raw.ic_anim_positioning,
+    @RawRes animation: Int = R.raw.si_anim_positioning,
     startFrame: Int = -1,
     endFrame: Int = -1,
 ) {
@@ -80,7 +80,7 @@ fun LottieFaceNeedLight(modifier: Modifier = Modifier) {
 fun LottieFaceSearchingForFace(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
+        animation = R.raw.si_anim_positioning,
         startFrame = 0,
         endFrame = 60,
     )
@@ -90,7 +90,7 @@ fun LottieFaceSearchingForFace(modifier: Modifier = Modifier) {
 fun LottieFaceMoveBack(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
+        animation = R.raw.si_anim_positioning,
         startFrame = 82,
         endFrame = 145,
     )
@@ -100,7 +100,7 @@ fun LottieFaceMoveBack(modifier: Modifier = Modifier) {
 fun LottieFaceMoveCloser(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
+        animation = R.raw.si_anim_positioning,
         startFrame = 157,
         endFrame = 216,
     )
@@ -110,9 +110,9 @@ fun LottieFaceMoveCloser(modifier: Modifier = Modifier) {
 fun LottieFaceLookingLeft(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 0,
-        endFrame = 115,
+        animation = R.raw.si_anim_face,
+        startFrame = 120,
+        endFrame = 153,
     )
 }
 
@@ -120,9 +120,9 @@ fun LottieFaceLookingLeft(modifier: Modifier = Modifier) {
 fun LottieFaceLookingRight(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 115,
-        endFrame = 183,
+        animation = R.raw.si_anim_face,
+        startFrame = 30,
+        endFrame = 80,
     )
 }
 
@@ -130,9 +130,9 @@ fun LottieFaceLookingRight(modifier: Modifier = Modifier) {
 fun LottieFaceLookingUp(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
-        startFrame = 184,
-        endFrame = 286,
+        animation = R.raw.si_anim_face,
+        startFrame = 180,
+        endFrame = 260,
     )
 }
 
@@ -145,7 +145,7 @@ fun LottieFaceEnsureDeviceUpright(modifier: Modifier = Modifier) {
 fun LottieFaceOnlyOneFace(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
+        animation = R.raw.si_anim_positioning,
         startFrame = 0,
         endFrame = 60,
     )
@@ -155,7 +155,7 @@ fun LottieFaceOnlyOneFace(modifier: Modifier = Modifier) {
 fun LottieFaceEnsureEntireFaceVisible(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
+        animation = R.raw.si_anim_positioning,
         startFrame = 0,
         endFrame = 60,
     )
@@ -170,7 +170,7 @@ fun LottieFacePoorImageQuality(modifier: Modifier = Modifier) {
 fun LottieFaceLookStraight(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
-        animation = R.raw.ic_anim_positioning,
+        animation = R.raw.si_anim_positioning,
         startFrame = 0,
         endFrame = 60,
     )
