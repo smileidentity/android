@@ -12,7 +12,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.smileidentity.R
 
 @Composable
-fun LottieInstruction(modifier: Modifier = Modifier, startFrame: Int = 0, endFrame: Int = 286) {
+fun AnimatedInstructions(modifier: Modifier = Modifier, startFrame: Int = 0, endFrame: Int = 286) {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.si_anim_instruction_screen),
     )

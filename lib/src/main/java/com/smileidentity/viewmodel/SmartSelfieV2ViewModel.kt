@@ -3,7 +3,6 @@ package com.smileidentity.viewmodel
 import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
-import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
@@ -77,7 +76,7 @@ by the liveness task
 const val VIEWFINDER_SCALE = 1.3f
 private const val COMPLETED_DELAY_MS = 1500L
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val FORCED_FAILURE_TIMEOUT_MS = 20_000L
+private const val FORCED_FAILURE_TIMEOUT_MS = 120_000L
 private const val IGNORE_FACES_SMALLER_THAN = 0.03f
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 private const val LIVENESS_IMAGE_SIZE = 320
@@ -100,29 +99,24 @@ sealed interface SelfieState {
     data class Success(val result: SmartSelfieResponse) : SelfieState
 }
 
-enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int) {
-    SearchingForFace(
-        R.drawable.si_tf_face_search,
-        R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
+enum class SelfieHint(
+    @StringRes val text: Int,
+) {
+    NeedLight(text = R.string.si_smart_selfie_v2_directive_need_more_light),
+    SearchingForFace(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    MoveBack(text = R.string.si_smart_selfie_v2_directive_move_back),
+    MoveCloser(text = R.string.si_smart_selfie_v2_directive_move_closer),
+    LookLeft(text = R.string.si_smart_selfie_v2_directive_look_left),
+    LookRight(text = R.string.si_smart_selfie_v2_directive_look_right),
+    LookUp(text = R.string.si_smart_selfie_v2_directive_look_up),
+    EnsureDeviceUpright(text = R.string.si_smart_selfie_v2_directive_ensure_device_upright),
+    OnlyOneFace(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    EnsureEntireFaceVisible(
+        text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
     ),
-    EnsureDeviceUpright(
-        R.drawable.si_tf_face_search,
-        R.string.si_smart_selfie_v2_directive_ensure_device_upright,
-    ),
-    OnlyOneFace(-1, R.string.si_smart_selfie_v2_directive_ensure_one_face),
-    EnsureEntireFaceVisible(-1, R.string.si_smart_selfie_v2_directive_ensure_entire_face_visible),
-    NeedLight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_need_more_light),
-    MoveBack(-1, R.string.si_smart_selfie_v2_directive_move_back),
-    MoveCloser(-1, R.string.si_smart_selfie_v2_directive_move_closer),
-    PoorImageQuality(
-        R.drawable.si_tf_light_flash,
-        R.string.si_smart_selfie_v2_directive_poor_image_quality,
-    ),
-    LookLeft(-1, R.string.si_smart_selfie_v2_directive_look_left),
-    LookRight(-1, R.string.si_smart_selfie_v2_directive_look_right),
-    LookUp(-1, R.string.si_smart_selfie_v2_directive_look_up),
-    LookStraight(-1, R.string.si_smart_selfie_v2_directive_keep_looking),
-    Smile(-1, R.string.si_smart_selfie_v2_directive_smile),
+    PoorImageQuality(text = R.string.si_smart_selfie_v2_directive_poor_image_quality),
+    LookStraight(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    Smile(text = R.string.si_smart_selfie_v2_directive_smile),
 }
 
 data class SmartSelfieV2UiState(
@@ -467,7 +461,11 @@ class SmartSelfieV2ViewModel(
                         _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
                         // Delay to ensure the completion icon is shown for a little bit
                         delay(COMPLETED_DELAY_MS)
-                        val result = SmartSelfieResult(selfieFile, livenessFiles, apiResponse)
+                        val result = SmartSelfieResult(
+                            selfieFile = selfieFile,
+                            livenessFiles = livenessFiles,
+                            apiResponse = apiResponse,
+                        )
                         onResult(SmileIDResult.Success(result))
                     },
                     async {
