@@ -76,7 +76,7 @@ by the liveness task
 const val VIEWFINDER_SCALE = 1.3f
 private const val COMPLETED_DELAY_MS = 1500L
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val FORCED_FAILURE_TIMEOUT_MS = 20_000L
+private const val FORCED_FAILURE_TIMEOUT_MS = 120_000L
 private const val IGNORE_FACES_SMALLER_THAN = 0.03f
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 private const val LIVENESS_IMAGE_SIZE = 320

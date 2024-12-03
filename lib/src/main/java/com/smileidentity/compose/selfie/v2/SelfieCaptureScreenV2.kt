@@ -63,7 +63,6 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.compose.selfie.FaceShapedProgressIndicator
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
@@ -281,13 +280,10 @@ private fun SmartSelfieV2Screen(
                     label = "selfie_progress",
                 )
 
-                FaceShapedProgressIndicator(
+                DirectionalFaceProgress(
+                    selfieState = selfieState,
                     progress = animatedProgress,
                     faceFillPercent = faceFillPercent,
-                    backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag("selfie_progress_indicator"),
                 )
 
                 DirectiveVisual(
@@ -323,6 +319,29 @@ private fun SmartSelfieV2Screen(
             SmileIDAttribution(modifier = Modifier.padding(top = 4.dp))
         }
     }
+}
+
+@Composable
+fun DirectionalFaceProgress(
+    selfieState: SelfieState,
+    progress: Float,
+    faceFillPercent: Float,
+    modifier: Modifier = Modifier,
+) {
+    FaceShapedProgressIndicatorV2(
+        progress = progress,
+        faceFillPercent = faceFillPercent,
+        backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
+        showLeftCutout = selfieState is SelfieState.Analyzing &&
+            selfieState.hint == SelfieHint.LookLeft,
+        showRightCutout = selfieState is SelfieState.Analyzing &&
+            selfieState.hint == SelfieHint.LookRight,
+        showTopCutout = selfieState is SelfieState.Analyzing &&
+            selfieState.hint == SelfieHint.LookUp,
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("selfie_progress_indicator"),
+    )
 }
 
 @SmilePreviews
