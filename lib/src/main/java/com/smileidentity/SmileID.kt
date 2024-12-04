@@ -16,7 +16,6 @@ import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
-import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -33,14 +32,14 @@ import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
-import com.smileidentity.networking.asDocumentBackImage
-import com.smileidentity.networking.asDocumentFrontImage
-import com.smileidentity.networking.asLivenessImage
-import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.submissions.utils.getIdInfo
+import com.smileidentity.submissions.utils.submitBiometricKYCJob
+import com.smileidentity.submissions.utils.submitDocumentVerificationJob
+import com.smileidentity.submissions.utils.submitEnhancedDocumentVerification
+import com.smileidentity.submissions.utils.submitSmartSelfieJob
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
-import com.smileidentity.util.UPLOAD_REQUEST_FILE
 import com.smileidentity.util.cleanupJobs
 import com.smileidentity.util.doGetSubmittedJobs
 import com.smileidentity.util.doGetUnsubmittedJobs
@@ -49,11 +48,7 @@ import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.getSmileTempFile
 import com.smileidentity.util.handleOfflineJobFailure
-import com.smileidentity.util.moveJobToSubmitted
-import com.smileidentity.util.toSmileIDException
 import com.squareup.moshi.Moshi
-import io.sentry.Breadcrumb
-import io.sentry.SentryLevel
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +62,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -322,112 +316,99 @@ object SmileID {
             }
             ?: run {
                 Timber.v(
-                    "Error decoding AuthenticationRequest JSON to class: " +
-                        authRequestJsonString,
+                    "Error decoding AuthenticationRequest JSON to class:" +
+                        " $authRequestJsonString",
                 )
                 throw IllegalArgumentException("Invalid jobId information")
             }
-
-        val authResponse = api.authenticate(authRequest)
-
         val prepUploadRequestJsonString = getSmileTempFile(
             jobId,
             PREP_UPLOAD_REQUEST_FILE,
             true,
         ).useLines { it.joinToString("\n") }
-        val savedPrepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
+        val prepUploadRequest = moshi.adapter(PrepUploadRequest::class.java)
             .fromJson(prepUploadRequestJsonString)
             ?: run {
                 Timber.v(
-                    "Error decoding PrepUploadRequest JSON to class: " +
-                        prepUploadRequestJsonString,
+                    "Error decoding PrepUploadRequest JSON to class:" +
+                        " $prepUploadRequestJsonString",
                 )
                 throw IllegalArgumentException("Invalid jobId information")
             }
+        val idInfo: IdInfo?
+        // Get the required files
+        val selfieFile = getFileByType(jobId, FileType.SELFIE, submitted = false)
+            ?: throw IllegalArgumentException("Selfie file not found")
+        val livenessFiles = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
+        when (authRequest.jobType) {
+            JobType.SmartSelfieAuthentication, JobType.SmartSelfieEnrollment ->
+                submitSmartSelfieJob(
+                    selfieFile,
+                    livenessFiles,
+                    jobId,
+                    authRequest,
+                    prepUploadRequest,
+                    deleteFilesOnSuccess,
+                )
 
-        val prepUploadRequest = savedPrepUploadRequest.copy(
-            timestamp = authResponse.timestamp,
-            signature = authResponse.signature,
-        )
-
-        val prepUploadResponse = runCatching {
-            api.prepUpload(prepUploadRequest)
-        }.recoverCatching { throwable ->
-            when {
-                throwable is HttpException -> {
-                    val smileIDException = throwable.toSmileIDException()
-                    if (smileIDException.details.code == "2215") {
-                        api.prepUpload(prepUploadRequest.copy(retry = true))
-                    } else {
-                        throw smileIDException
-                    }
+            JobType.BiometricKyc -> {
+                idInfo = getIdInfo(jobId)
+                if (idInfo == null) {
+                    throw IllegalArgumentException("IdInfo is required for Biometric KYC")
                 }
-
-                else -> {
-                    throw throwable
-                }
-            }
-        }.getOrThrow()
-
-        val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
-        val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
-        val documentFrontFileResult =
-            getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
-        val documentBackFileResult =
-            getFileByType(jobId, FileType.DOCUMENT_BACK, submitted = false)
-
-        val selfieImageInfo = selfieFileResult?.asSelfieImage()
-        val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
-        val frontImageInfo = documentFrontFileResult?.asDocumentFrontImage()
-        val backImageInfo = documentBackFileResult?.asDocumentBackImage()
-
-        var idInfo: IdInfo? = null
-        if (authRequest.jobType == JobType.BiometricKyc ||
-            authRequest.jobType == JobType.DocumentVerification ||
-            authRequest.jobType == JobType.EnhancedDocumentVerification
-        ) {
-            val uploadRequestJson = getSmileTempFile(
-                jobId,
-                UPLOAD_REQUEST_FILE,
-                true,
-            ).useLines { it.joinToString("\n") }
-            val savedUploadRequestJson = moshi.adapter(UploadRequest::class.java)
-                .fromJson(uploadRequestJson)
-                ?: run {
-                    Timber.v(
-                        "Error decoding UploadRequest JSON to class: " +
-                            uploadRequestJson,
-                    )
-                    throw IllegalArgumentException("Invalid jobId information")
-                }
-            idInfo = savedUploadRequestJson.idInfo
-        }
-
-        val uploadRequest = UploadRequest(
-            images = listOfNotNull(
-                frontImageInfo,
-                backImageInfo,
-                selfieImageInfo,
-            ) + livenessImageInfo,
-            idInfo = idInfo,
-        )
-        api.upload(prepUploadResponse.uploadUrl, uploadRequest)
-        if (deleteFilesOnSuccess) {
-            cleanup(jobId)
-        } else {
-            val copySuccess = moveJobToSubmitted(jobId)
-            if (!copySuccess) {
-                Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.hub.addBreadcrumb(
-                    Breadcrumb().apply {
-                        category = "Offline Mode"
-                        message = "Failed to move job $jobId to complete"
-                        level = SentryLevel.INFO
-                    },
+                submitBiometricKYCJob(
+                    selfieFile,
+                    livenessFiles,
+                    jobId,
+                    idInfo,
+                    authRequest,
+                    prepUploadRequest,
+                    deleteFilesOnSuccess,
                 )
             }
+
+            JobType.DocumentVerification -> {
+                idInfo = getIdInfo(jobId)
+                if (idInfo == null) {
+                    throw IllegalArgumentException(
+                        "IdInfo is required for DocumentVerification KYC",
+                    )
+                }
+                submitDocumentVerificationJob(
+                    selfieFile,
+                    livenessFiles,
+                    getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
+                        ?: throw IllegalArgumentException("Document front file not found"),
+                    jobId,
+                    idInfo.country,
+                    authRequest,
+                    prepUploadRequest,
+                    deleteFilesOnSuccess,
+                )
+            }
+
+            JobType.EnhancedDocumentVerification -> {
+                idInfo = getIdInfo(jobId)
+                if (idInfo == null) {
+                    throw IllegalArgumentException(
+                        "IdInfo is required for Enhanced Document Verification",
+                    )
+                }
+                submitEnhancedDocumentVerification(
+                    selfieFile,
+                    livenessFiles,
+                    getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
+                        ?: throw IllegalArgumentException("Document front file not found"),
+                    jobId,
+                    idInfo,
+                    authRequest,
+                    prepUploadRequest,
+                    deleteFilesOnSuccess,
+                )
+            }
+
+            else -> throw IllegalArgumentException("Unsupported job type: ${authRequest.jobType}")
         }
-        Timber.d("Upload finished")
     }
 
     /**

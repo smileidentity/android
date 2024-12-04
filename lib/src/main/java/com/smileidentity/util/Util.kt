@@ -324,6 +324,7 @@ sealed interface StringResource {
                     exception.details.message
                 }
             }
+
             is Text -> text
         }
     }
