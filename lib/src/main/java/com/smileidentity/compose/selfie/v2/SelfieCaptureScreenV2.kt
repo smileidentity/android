@@ -3,9 +3,6 @@ package com.smileidentity.compose.selfie.v2
 import android.Manifest
 import android.os.OperationCanceledException
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -285,30 +282,9 @@ private fun SmartSelfieV2Screen(
                     Box(
                         contentAlignment = Alignment.BottomCenter,
                     ) {
-                        val topProgress by animateFloatAsState(
-                            targetValue = state.topProgress,
-                            animationSpec = tween(easing = LinearEasing),
-                            label = "selfie_progress",
-                        )
-
-                        val rightProgress by animateFloatAsState(
-                            targetValue = state.rightProgress,
-                            animationSpec = tween(easing = LinearEasing),
-                            label = "selfie_progress",
-                        )
-
-                        val leftProgress by animateFloatAsState(
-                            targetValue = state.leftProgress,
-                            animationSpec = tween(easing = LinearEasing),
-                            label = "selfie_progress",
-                        )
-
                         OvalCutout(
-                            topProgress = topProgress,
-                            rightProgress = rightProgress,
-                            leftProgress = leftProgress,
                             faceFillPercent = faceFillPercent,
-                            selfieState = state.selfieState,
+                            state = state,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .testTag("selfie_progress_indicator"),
@@ -412,7 +388,7 @@ private fun SmartSelfieV2ScreenPreview() {
                     topProgress = 0.8f,
                     rightProgress = 0.5f,
                     leftProgress = 0.3f,
-                    selfieState = SelfieState.Analyzing(SelfieHint.LookLeft),
+                    selfieState = SelfieState.Analyzing(SelfieHint.LookRight),
                 ),
                 onResult = {},
                 onRetry = {},

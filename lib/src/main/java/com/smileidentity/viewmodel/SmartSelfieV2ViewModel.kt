@@ -75,7 +75,7 @@ by the liveness task
 const val VIEWFINDER_SCALE = 1.3f
 private const val COMPLETED_DELAY_MS = 1500L
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val FORCED_FAILURE_TIMEOUT_MS = 20_000L
+private const val FORCED_FAILURE_TIMEOUT_MS = 120_000L
 private const val IGNORE_FACES_SMALLER_THAN = 0.03f
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 private const val LIVENESS_IMAGE_SIZE = 320
@@ -122,9 +122,9 @@ enum class SelfieHint(
 }
 
 data class SmartSelfieV2UiState(
-    val topProgress: Float = 0f,
-    val rightProgress: Float = 0f,
-    val leftProgress: Float = 0f,
+    val topProgress: Float = 0F,
+    val rightProgress: Float = 0F,
+    val leftProgress: Float = 0F,
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
 )
 
@@ -566,14 +566,7 @@ class SmartSelfieV2ViewModel(
     }
 
     private fun resetCaptureProgress(reason: SelfieHint) {
-        _uiState.update {
-            it.copy(
-                topProgress = 0F,
-                rightProgress = 0F,
-                leftProgress = 0F,
-                selfieState = SelfieState.Analyzing(reason),
-            )
-        }
+        _uiState.update { it.copy(selfieState = SelfieState.Analyzing(reason)) }
         selfieQualityHistory.clear()
         livenessFiles.removeAll { it.delete() }
         selfieFile?.delete()

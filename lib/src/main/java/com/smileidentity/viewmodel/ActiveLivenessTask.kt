@@ -66,9 +66,7 @@ internal class ActiveLivenessTask(
      * @param face The face detected in the image
      */
     fun doesFaceMeetCurrentActiveLivenessTask(face: Face): Boolean {
-        val direction = orderedFaceDirections[currentDirectionIdx]
-        val progressIncrement = if (direction is Midpoint) 0.5f else 0.5f
-        val isLookingRightDirection = when (direction) {
+        val isLookingRightDirection = when (orderedFaceDirections[currentDirectionIdx]) {
             is LeftMid -> {
                 val isCorrect = face.isLookingLeft(
                     minAngle = MIDWAY_LR_ANGLE_MIN,
@@ -76,7 +74,10 @@ internal class ActiveLivenessTask(
                     verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
                 )
                 if (isCorrect) {
-                    leftProgress = minOf(1f, leftProgress + progressIncrement)
+                    leftProgress = minOf(1F, leftProgress + 0.5F)
+                    updateProgress(leftProgress, 0F, 0F)
+                } else {
+                    leftProgress = 0F
                     updateProgress(leftProgress, 0F, 0F)
                 }
                 isCorrect
@@ -89,7 +90,10 @@ internal class ActiveLivenessTask(
                     verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
                 )
                 if (isCorrect) {
-                    leftProgress = minOf(1f, leftProgress + progressIncrement)
+                    leftProgress = minOf(1F, leftProgress + 0.5F)
+                    updateProgress(leftProgress, 0F, 0F)
+                } else {
+                    leftProgress = 0F
                     updateProgress(leftProgress, 0F, 0F)
                 }
                 isCorrect
@@ -102,7 +106,10 @@ internal class ActiveLivenessTask(
                     verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
                 )
                 if (isCorrect) {
-                    rightProgress = minOf(1f, rightProgress + progressIncrement)
+                    rightProgress = minOf(1F, rightProgress + 0.5F)
+                    updateProgress(0F, rightProgress, 0F)
+                } else {
+                    rightProgress = 0F
                     updateProgress(0F, rightProgress, 0F)
                 }
                 isCorrect
@@ -115,7 +122,10 @@ internal class ActiveLivenessTask(
                     verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
                 )
                 if (isCorrect) {
-                    rightProgress = minOf(1f, rightProgress + progressIncrement)
+                    rightProgress = minOf(1F, rightProgress + 0.5F)
+                    updateProgress(0F, rightProgress, 0F)
+                } else {
+                    rightProgress = 0F
                     updateProgress(0F, rightProgress, 0F)
                 }
                 isCorrect
@@ -128,7 +138,10 @@ internal class ActiveLivenessTask(
                     horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
                 )
                 if (isCorrect) {
-                    topProgress = minOf(1f, topProgress + progressIncrement)
+                    topProgress = minOf(1F, topProgress + 0.5F)
+                    updateProgress(0F, 0F, topProgress)
+                } else {
+                    topProgress = 0F
                     updateProgress(0F, 0F, topProgress)
                 }
                 isCorrect
@@ -141,7 +154,10 @@ internal class ActiveLivenessTask(
                     horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
                 )
                 if (isCorrect) {
-                    topProgress = minOf(1f, topProgress + progressIncrement)
+                    topProgress = minOf(1F, topProgress + 0.5F)
+                    updateProgress(0F, 0F, topProgress)
+                } else {
+                    topProgress = 0F
                     updateProgress(0F, 0F, topProgress)
                 }
                 isCorrect
@@ -171,6 +187,11 @@ internal class ActiveLivenessTask(
      * @return true if there are more directions to satisfy, false otherwise
      */
     fun markCurrentDirectionSatisfied(): Boolean {
+        when (orderedFaceDirections[currentDirectionIdx]) {
+            is Left -> leftProgress = 0f
+            is Right -> rightProgress = 0f
+            is Up -> topProgress = 0f
+        }
         currentDirectionIdx += 1
         return currentDirectionIdx < orderedFaceDirections.size
     }
@@ -183,6 +204,7 @@ internal class ActiveLivenessTask(
      */
     fun restart() {
         currentDirectionIdx = 0
+        updateProgress(0F, 0F, 0F)
         resetLivenessStabilityTime()
     }
 
