@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,8 +21,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +48,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,10 +59,13 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
+import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.compose.components.CameraPermissionButton
 import com.smileidentity.compose.components.DirectiveHaptics
 import com.smileidentity.compose.components.DirectiveVisual
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.LocalMetadata
+import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
@@ -72,6 +79,7 @@ import com.smileidentity.util.toast
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieHint
 import com.smileidentity.viewmodel.SelfieState
+import com.smileidentity.viewmodel.SmartSelfieV2UiState
 import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.smileidentity.viewmodel.VIEWFINDER_SCALE
 import com.ujizin.camposer.CameraPreview
@@ -169,7 +177,7 @@ fun OrchestratedSelfieCaptureScreenV2(
             }
 
             else -> SmartSelfieV2Screen(
-                selfieState = uiState.selfieState,
+                state = uiState,
                 showAttribution = showAttribution,
                 modifier = modifier,
                 onRetry = viewModel::onRetry,
@@ -190,7 +198,7 @@ fun OrchestratedSelfieCaptureScreenV2(
                         ),
                         isImageAnalysisEnabled = true,
                         modifier = Modifier
-                            .padding(32.dp)
+                            .padding(12.dp)
                             .scale(VIEWFINDER_SCALE),
                     )
                 },
@@ -214,7 +222,7 @@ fun OrchestratedSelfieCaptureScreenV2(
  */
 @Composable
 private fun SmartSelfieV2Screen(
-    selfieState: SelfieState,
+    state: SmartSelfieV2UiState,
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
     cameraPreview: @Composable (BoxScope.() -> Unit),
@@ -224,123 +232,172 @@ private fun SmartSelfieV2Screen(
     ForceBrightness()
     val viewfinderZoom = 1.1f
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .height(IntrinsicSize.Min)
+    BottomPinnedColumn(
+        modifier = Modifier
             .background(MaterialTheme.colorScheme.tertiaryContainer)
             .padding(16.dp),
-    ) {
-        DirectiveHaptics(selfieState)
+        scrollableContent = {
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier
+                    .fillMaxSize()
+                    .height(IntrinsicSize.Min),
+            ) {
+                DirectiveHaptics(selfieState = state.selfieState)
 
-        val roundedCornerShape = RoundedCornerShape(32.dp)
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .padding(16.dp)
-                .aspectRatio(0.75f) // 480 x 640 -> 3/4 -> 0.75
-                .clip(roundedCornerShape)
-                // We draw borders as a individual layers in the Box (as opposed to Modifier.border)
-                // because we need multiple colors, and eventually we will need to animate them for
-                // Active Liveness feedback
-                .drawWithCache {
-                    val roundRect = RoundRect(
-                        rect = size.toRect(),
-                        cornerRadius = CornerRadius(32.dp.toPx()),
-                    )
-                    onDrawWithContent {
-                        drawContent()
-                        drawPath(
-                            path = Path().apply { addRoundRect(roundRect = roundRect) },
-                            color = Color.Transparent,
-                            style = Stroke(width = 20.dp.toPx()),
+                val roundedCornerShape = RoundedCornerShape(32.dp)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .aspectRatio(0.75f) // 480 x 640 -> 3/4 -> 0.75
+                        .clip(roundedCornerShape)
+                        // We draw borders as a individual layers in the Box (as opposed to Modifier.border)
+                        // because we need multiple colors, and eventually we will need to animate them for
+                        // Active Liveness feedback
+                        .drawWithCache {
+                            val roundRect = RoundRect(
+                                rect = size.toRect(),
+                                cornerRadius = CornerRadius(32.dp.toPx()),
+                            )
+                            onDrawWithContent {
+                                drawContent()
+                                drawPath(
+                                    path = Path().apply { addRoundRect(roundRect = roundRect) },
+                                    color = Color.Transparent,
+                                    style = Stroke(width = 20.dp.toPx()),
+                                )
+                                cameraFrameCornerBorder(
+                                    cornerRadius = 32.dp.toPx(),
+                                    strokeWidth = 20.dp.toPx(),
+                                )
+                                drawPath(
+                                    path = Path().apply { addRoundRect(roundRect = roundRect) },
+                                    color = Color.Transparent,
+                                    style = Stroke(width = 12.dp.toPx()),
+                                )
+                            }
+                        }
+                        .weight(1f, fill = false),
+                ) {
+                    cameraPreview()
+                    Box(
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        val topProgress by animateFloatAsState(
+                            targetValue = state.topProgress,
+                            animationSpec = tween(easing = LinearEasing),
+                            label = "selfie_progress",
                         )
-                        cameraFrameCornerBorder(
-                            cornerRadius = 32.dp.toPx(),
-                            strokeWidth = 20.dp.toPx(),
+
+                        val rightProgress by animateFloatAsState(
+                            targetValue = state.rightProgress,
+                            animationSpec = tween(easing = LinearEasing),
+                            label = "selfie_progress",
                         )
-                        drawPath(
-                            path = Path().apply { addRoundRect(roundRect = roundRect) },
-                            color = Color.Transparent,
-                            style = Stroke(width = 12.dp.toPx()),
+
+                        val leftProgress by animateFloatAsState(
+                            targetValue = state.leftProgress,
+                            animationSpec = tween(easing = LinearEasing),
+                            label = "selfie_progress",
+                        )
+
+                        OvalCutout(
+                            topProgress = topProgress,
+                            rightProgress = rightProgress,
+                            leftProgress = leftProgress,
+                            faceFillPercent = faceFillPercent,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag("selfie_progress_indicator"),
+                        )
+
+                        when (state.selfieState) {
+                            is SelfieState.Analyzing -> {
+                                DirectiveVisual(
+                                    selfieState = state.selfieState,
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .align(Alignment.Center),
+                                )
+                            }
+
+                            is SelfieState.Error -> {
+                                Image(
+                                    painter = painterResource(R.drawable.si_selfie_failed),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .align(Alignment.Center),
+                                )
+                            }
+
+                            SelfieState.Processing -> {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier
+                                        .align(Alignment.Center),
+                                )
+                            }
+
+                            is SelfieState.Success -> {
+                                Image(
+                                    painter = painterResource(R.drawable.si_selfie_success),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .align(Alignment.Center),
+                                )
+                                onResult(
+                                    SmileIDResult.Success(
+                                        SmartSelfieResult(
+                                            selfieFile = state.selfieState.selfieFile,
+                                            livenessFiles = state.selfieState.livenessFiles,
+                                            apiResponse = state.selfieState.result,
+                                        ),
+                                    ),
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = when (state.selfieState) {
+                                is SelfieState.Analyzing -> stringResource(
+                                    state.selfieState.hint.text,
+                                )
+
+                                SelfieState.Processing -> stringResource(
+                                    R.string.si_smart_selfie_v2_submitting,
+                                )
+
+                                is SelfieState.Error -> stringResource(
+                                    R.string.si_smart_selfie_v2_submission_failed,
+                                )
+
+                                is SelfieState.Success -> stringResource(
+                                    R.string.si_smart_selfie_v2_submission_successful,
+                                )
+                            },
+                            style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 12.dp),
                         )
                     }
                 }
-                .weight(1f, fill = false),
-        ) {
-            cameraPreview()
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                val animatedProgress by animateFloatAsState(
-                    targetValue = 0.0F,
-                    animationSpec = tween(easing = LinearEasing),
-                    label = "selfie_progress",
-                )
-
-                DirectionalFaceProgress(
-                    selfieState = selfieState,
-                    progress = animatedProgress,
-                    faceFillPercent = faceFillPercent,
-                )
-
-                DirectiveVisual(
-                    selfieState = selfieState,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .align(Alignment.Center),
-                )
-
-                Text(
-                    text = when (selfieState) {
-                        is SelfieState.Analyzing -> stringResource(selfieState.hint.text)
-                        SelfieState.Processing -> stringResource(
-                            R.string.si_smart_selfie_v2_submitting,
-                        )
-
-                        is SelfieState.Error -> stringResource(
-                            R.string.si_smart_selfie_v2_submission_failed,
-                        )
-
-                        is SelfieState.Success -> stringResource(
-                            R.string.si_smart_selfie_v2_submission_successful,
-                        )
-                    },
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 16.dp),
+                if (showAttribution) {
+                    SmileIDAttribution(modifier = Modifier.padding(top = 4.dp))
+                }
+            }
+        },
+        pinnedContent = {
+            if (state.selfieState is SelfieState.Error) {
+                CameraPermissionButton(
+                    text = stringResource(R.string.si_smart_selfie_processing_retry_button),
+                    modifier = Modifier.width(320.dp),
+                    onGranted = onRetry,
                 )
             }
-        }
-        if (showAttribution) {
-            SmileIDAttribution(modifier = Modifier.padding(top = 4.dp))
-        }
-    }
-}
-
-@Composable
-fun DirectionalFaceProgress(
-    selfieState: SelfieState,
-    progress: Float,
-    faceFillPercent: Float,
-    modifier: Modifier = Modifier,
-) {
-    FaceShapedProgressIndicatorV2(
-        progress = progress,
-        faceFillPercent = faceFillPercent,
-        backgroundColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.2f),
-        showLeftCutout = selfieState is SelfieState.Analyzing &&
-            selfieState.hint == SelfieHint.LookLeft,
-        showRightCutout = selfieState is SelfieState.Analyzing &&
-            selfieState.hint == SelfieHint.LookRight,
-        showTopCutout = selfieState is SelfieState.Analyzing &&
-            selfieState.hint == SelfieHint.LookUp,
-        modifier = modifier
-            .fillMaxSize()
-            .testTag("selfie_progress_indicator"),
+        },
     )
 }
 
@@ -350,7 +407,12 @@ private fun SmartSelfieV2ScreenPreview() {
     Preview {
         Column {
             SmartSelfieV2Screen(
-                selfieState = SelfieState.Analyzing(SelfieHint.LookUp),
+                state = SmartSelfieV2UiState(
+                    topProgress = 0.8f,
+                    rightProgress = 0.5f,
+                    leftProgress = 0.3f,
+                    selfieState = SelfieState.Analyzing(SelfieHint.LookLeft),
+                ),
                 onResult = {},
                 onRetry = {},
                 showAttribution = true,

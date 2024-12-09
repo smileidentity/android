@@ -38,7 +38,6 @@ fun DirectiveVisual(selfieState: SelfieState, modifier: Modifier = Modifier) {
 
             SelfieHint.PoorImageQuality -> LottieFacePoorImageQuality(modifier = modifier)
             SelfieHint.LookStraight -> LottieFaceLookStraight(modifier = modifier)
-            SelfieHint.Smile -> LottieFaceSmile(modifier = modifier)
         }
         // ignore every other state that is not analyzing
         else -> {}
@@ -138,7 +137,10 @@ fun LottieFaceLookingUp(modifier: Modifier = Modifier) {
 
 @Composable
 fun LottieFaceEnsureDeviceUpright(modifier: Modifier = Modifier) {
-    LottieFace(modifier = modifier)
+    LottieFace(
+        modifier = modifier,
+        animation = R.raw.si_anim_device_orientation,
+    )
 }
 
 @Composable

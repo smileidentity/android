@@ -45,7 +45,6 @@ import com.smileidentity.viewmodel.SelfieHint.NeedLight
 import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
 import com.smileidentity.viewmodel.SelfieHint.PoorImageQuality
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
-import com.smileidentity.viewmodel.SelfieHint.Smile
 import com.ujizin.camposer.state.CamSelector
 import java.io.File
 import java.io.IOException
@@ -76,7 +75,7 @@ by the liveness task
 const val VIEWFINDER_SCALE = 1.3f
 private const val COMPLETED_DELAY_MS = 1500L
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val FORCED_FAILURE_TIMEOUT_MS = 120_000L
+private const val FORCED_FAILURE_TIMEOUT_MS = 20_000L
 private const val IGNORE_FACES_SMALLER_THAN = 0.03f
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 private const val LIVENESS_IMAGE_SIZE = 320
@@ -96,7 +95,11 @@ sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
     data object Processing : SelfieState
     data class Error(val throwable: Throwable) : SelfieState
-    data class Success(val result: SmartSelfieResponse) : SelfieState
+    data class Success(
+        val result: SmartSelfieResponse,
+        val selfieFile: File,
+        val livenessFiles: List<File>,
+    ) : SelfieState
 }
 
 enum class SelfieHint(
@@ -116,10 +119,12 @@ enum class SelfieHint(
     ),
     PoorImageQuality(text = R.string.si_smart_selfie_v2_directive_poor_image_quality),
     LookStraight(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
-    Smile(text = R.string.si_smart_selfie_v2_directive_smile),
 }
 
 data class SmartSelfieV2UiState(
+    val topProgress: Float = 0f,
+    val rightProgress: Float = 0f,
+    val leftProgress: Float = 0f,
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
 )
 
@@ -142,13 +147,21 @@ class SmartSelfieV2ViewModel(
     ),
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
-    private val activeLiveness = ActiveLivenessTask()
+    private val activeLiveness = ActiveLivenessTask { leftProgress, rightProgress, topProgress ->
+        _uiState.update {
+            it.copy(
+                leftProgress = leftProgress,
+                rightProgress = rightProgress,
+                topProgress = topProgress,
+            )
+        }
+    }
 
     private val _uiState = MutableStateFlow(SmartSelfieV2UiState())
     val uiState = _uiState.asStateFlow().sample(500).stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        _uiState.value,
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = _uiState.value,
     )
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
@@ -417,18 +430,11 @@ class SmartSelfieV2ViewModel(
             )
             livenessFiles.add(livenessFile)
 
-            if (shouldUseActiveLiveness) {
-                if (!activeLiveness.isFinished) {
-                    _uiState.update {
-                        it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
-                    }
-                    return@addOnSuccessListener
+            if (!activeLiveness.isFinished) {
+                _uiState.update {
+                    it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
                 }
-            } else {
-                if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                    _uiState.update { it.copy(selfieState = SelfieState.Analyzing(Smile)) }
-                    return@addOnSuccessListener
-                }
+                return@addOnSuccessListener
             }
 
             shouldAnalyzeImages = false
@@ -458,7 +464,15 @@ class SmartSelfieV2ViewModel(
                     async {
                         val apiResponse = submitJob(selfieFile)
                         done = true
-                        _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
+                        _uiState.update {
+                            it.copy(
+                                selfieState = SelfieState.Success(
+                                    result = apiResponse,
+                                    selfieFile = selfieFile,
+                                    livenessFiles = livenessFiles,
+                                ),
+                            )
+                        }
                         // Delay to ensure the completion icon is shown for a little bit
                         delay(COMPLETED_DELAY_MS)
                         val result = SmartSelfieResult(
@@ -552,7 +566,14 @@ class SmartSelfieV2ViewModel(
     }
 
     private fun resetCaptureProgress(reason: SelfieHint) {
-        _uiState.update { it.copy(selfieState = SelfieState.Analyzing(reason)) }
+        _uiState.update {
+            it.copy(
+                topProgress = 0F,
+                rightProgress = 0F,
+                leftProgress = 0F,
+                selfieState = SelfieState.Analyzing(reason),
+            )
+        }
         selfieQualityHistory.clear()
         livenessFiles.removeAll { it.delete() }
         selfieFile?.delete()
