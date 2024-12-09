@@ -12,9 +12,7 @@ internal class FaceShape : Shape {
         size: Size,
         layoutDirection: LayoutDirection,
         density: Density,
-    ): Outline {
-        return Outline.Generic(path)
-    }
+    ): Outline = Outline.Generic(path)
 
     companion object {
         /**

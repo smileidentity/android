@@ -22,13 +22,6 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieClipSpec
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.smileidentity.R
 import com.smileidentity.compose.preview.Preview
 import kotlin.math.min
 import kotlin.math.sin
@@ -247,48 +240,6 @@ private fun FacePreview() {
                     .padding(2.dp)
                     .size(64.dp),
             )
-        }
-    }
-}
-
-@Composable
-fun LottieFace(modifier: Modifier = Modifier, startFrame: Int = 0, endFrame: Int = 185) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.si_anim_face))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        clipSpec = LottieClipSpec.Frame(startFrame, endFrame),
-        reverseOnRepeat = true,
-        ignoreSystemAnimatorScale = true,
-        iterations = LottieConstants.IterateForever,
-    )
-    LottieAnimation(
-        modifier = modifier,
-        composition = composition,
-        progress = { progress },
-    )
-}
-
-@Composable
-fun LottieFaceLookingLeft(modifier: Modifier = Modifier) {
-    LottieFace(modifier = modifier, startFrame = 0, endFrame = 30)
-}
-
-@Composable
-fun LottieFaceLookingRight(modifier: Modifier = Modifier) {
-    LottieFace(modifier = modifier, startFrame = 60, endFrame = 90)
-}
-
-@Composable
-fun LottieFaceLookingUp(modifier: Modifier = Modifier) {
-    LottieFace(modifier = modifier, startFrame = 120, endFrame = 149)
-}
-
-@Preview
-@Composable
-private fun LottieFacePreview() {
-    Preview {
-        Surface {
-            LottieFaceLookingUp()
         }
     }
 }

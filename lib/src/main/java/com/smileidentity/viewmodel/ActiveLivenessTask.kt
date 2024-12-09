@@ -25,6 +25,7 @@ private const val ORTHOGONAL_ANGLE_BUFFER = 90f
  */
 internal class ActiveLivenessTask(
     shouldCaptureMidTrack: Boolean = true,
+    private val updateProgress: (Float, Float, Float) -> Unit,
 ) {
     private sealed interface FaceDirection
     private sealed interface Left : FaceDirection
@@ -38,6 +39,10 @@ internal class ActiveLivenessTask(
     private data object RightMid : Right, Midpoint
     private data object UpEnd : Up, Endpoint(UpMid)
     private data object UpMid : Up, Midpoint
+
+    private var leftProgress = 0F
+    private var rightProgress = 0F
+    private var topProgress = 0F
 
     private val orderedFaceDirections = listOf(LeftEnd, RightEnd, UpEnd)
         .shuffled()
@@ -62,41 +67,101 @@ internal class ActiveLivenessTask(
      */
     fun doesFaceMeetCurrentActiveLivenessTask(face: Face): Boolean {
         val isLookingRightDirection = when (orderedFaceDirections[currentDirectionIdx]) {
-            is LeftMid -> face.isLookingLeft(
-                minAngle = MIDWAY_LR_ANGLE_MIN,
-                maxAngle = MIDWAY_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+            is LeftMid -> {
+                val isCorrect = face.isLookingLeft(
+                    minAngle = MIDWAY_LR_ANGLE_MIN,
+                    maxAngle = MIDWAY_LR_ANGLE_MAX,
+                    verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                )
+                if (isCorrect) {
+                    leftProgress = minOf(1F, leftProgress + 0.5F)
+                    updateProgress(leftProgress, 0F, 0F)
+                } else {
+                    leftProgress = 0F
+                    updateProgress(leftProgress, 0F, 0F)
+                }
+                isCorrect
+            }
 
-            is LeftEnd -> face.isLookingLeft(
-                minAngle = END_LR_ANGLE_MIN,
-                maxAngle = END_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+            is LeftEnd -> {
+                val isCorrect = face.isLookingLeft(
+                    minAngle = END_LR_ANGLE_MIN,
+                    maxAngle = END_LR_ANGLE_MAX,
+                    verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                )
+                if (isCorrect) {
+                    leftProgress = minOf(1F, leftProgress + 0.5F)
+                    updateProgress(leftProgress, 0F, 0F)
+                } else {
+                    leftProgress = 0F
+                    updateProgress(leftProgress, 0F, 0F)
+                }
+                isCorrect
+            }
 
-            is RightMid -> face.isLookingRight(
-                minAngle = MIDWAY_LR_ANGLE_MIN,
-                maxAngle = MIDWAY_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+            is RightMid -> {
+                val isCorrect = face.isLookingRight(
+                    minAngle = MIDWAY_LR_ANGLE_MIN,
+                    maxAngle = MIDWAY_LR_ANGLE_MAX,
+                    verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                )
+                if (isCorrect) {
+                    rightProgress = minOf(1F, rightProgress + 0.5F)
+                    updateProgress(0F, rightProgress, 0F)
+                } else {
+                    rightProgress = 0F
+                    updateProgress(0F, rightProgress, 0F)
+                }
+                isCorrect
+            }
 
-            is RightEnd -> face.isLookingRight(
-                minAngle = END_LR_ANGLE_MIN,
-                maxAngle = END_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+            is RightEnd -> {
+                val isCorrect = face.isLookingRight(
+                    minAngle = END_LR_ANGLE_MIN,
+                    maxAngle = END_LR_ANGLE_MAX,
+                    verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                )
+                if (isCorrect) {
+                    rightProgress = minOf(1F, rightProgress + 0.5F)
+                    updateProgress(0F, rightProgress, 0F)
+                } else {
+                    rightProgress = 0F
+                    updateProgress(0F, rightProgress, 0F)
+                }
+                isCorrect
+            }
 
-            is UpMid -> face.isLookingUp(
-                minAngle = MIDWAY_UP_ANGLE_MIN,
-                maxAngle = MIDWAY_UP_ANGLE_MAX,
-                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+            is UpMid -> {
+                val isCorrect = face.isLookingUp(
+                    minAngle = MIDWAY_UP_ANGLE_MIN,
+                    maxAngle = MIDWAY_UP_ANGLE_MAX,
+                    horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                )
+                if (isCorrect) {
+                    topProgress = minOf(1F, topProgress + 0.5F)
+                    updateProgress(0F, 0F, topProgress)
+                } else {
+                    topProgress = 0F
+                    updateProgress(0F, 0F, topProgress)
+                }
+                isCorrect
+            }
 
-            is UpEnd -> face.isLookingUp(
-                minAngle = END_UP_ANGLE_MIN,
-                maxAngle = END_UP_ANGLE_MAX,
-                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+            is UpEnd -> {
+                val isCorrect = face.isLookingUp(
+                    minAngle = END_UP_ANGLE_MIN,
+                    maxAngle = END_UP_ANGLE_MAX,
+                    horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+                )
+                if (isCorrect) {
+                    topProgress = minOf(1F, topProgress + 0.5F)
+                    updateProgress(0F, 0F, topProgress)
+                } else {
+                    topProgress = 0F
+                    updateProgress(0F, 0F, topProgress)
+                }
+                isCorrect
+            }
         }
         if (!isLookingRightDirection) {
             resetLivenessStabilityTime()
@@ -122,6 +187,11 @@ internal class ActiveLivenessTask(
      * @return true if there are more directions to satisfy, false otherwise
      */
     fun markCurrentDirectionSatisfied(): Boolean {
+        when (orderedFaceDirections[currentDirectionIdx]) {
+            is Left -> leftProgress = 0f
+            is Right -> rightProgress = 0f
+            is Up -> topProgress = 0f
+        }
         currentDirectionIdx += 1
         return currentDirectionIdx < orderedFaceDirections.size
     }
@@ -134,6 +204,7 @@ internal class ActiveLivenessTask(
      */
     fun restart() {
         currentDirectionIdx = 0
+        updateProgress(0F, 0F, 0F)
         resetLivenessStabilityTime()
     }
 
