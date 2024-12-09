@@ -19,6 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.smileidentity.compose.preview.Preview
+import com.smileidentity.viewmodel.SelfieHint
+import com.smileidentity.viewmodel.SelfieState
 
 @Composable
 fun OvalCutout(
@@ -26,12 +28,33 @@ fun OvalCutout(
     rightProgress: Float,
     leftProgress: Float,
     @FloatRange(from = 0.0, to = 1.0) faceFillPercent: Float,
+    selfieState: SelfieState,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 8.dp,
     backgroundColor: Color = MaterialTheme.colorScheme.scrim,
     arcBackgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     arcColor: Color = MaterialTheme.colorScheme.tertiary,
 ) {
+    val color = when (selfieState) {
+        is SelfieState.Analyzing -> {
+            when (selfieState.hint) {
+                SelfieHint.NeedLight, SelfieHint.SearchingForFace, SelfieHint.MoveBack,
+                SelfieHint.MoveCloser, SelfieHint.EnsureDeviceUpright, SelfieHint.OnlyOneFace,
+                SelfieHint.EnsureEntireFaceVisible, SelfieHint.PoorImageQuality,
+                SelfieHint.LookStraight,
+                    -> MaterialTheme.colorScheme.error
+
+                SelfieHint.LookLeft, SelfieHint.LookRight,
+                SelfieHint.LookUp,
+                    -> MaterialTheme.colorScheme.tertiary
+            }
+        }
+
+        is SelfieState.Error -> MaterialTheme.colorScheme.error
+        SelfieState.Processing -> MaterialTheme.colorScheme.tertiary
+        is SelfieState.Success -> MaterialTheme.colorScheme.tertiary
+    }
+
     Canvas(modifier.fillMaxSize()) {
         val ovalAspectRatio = 480f / 640f
         val newSize = size * faceFillPercent
@@ -59,7 +82,7 @@ fun OvalCutout(
 
         drawPath(
             path = ovalPath,
-            color = arcBackgroundColor,
+            color = color,
             style = Stroke(width = strokeWidth.toPx()),
         )
 
@@ -159,7 +182,8 @@ private fun OvalCutoutPreview() {
             topProgress = 0.8f,
             rightProgress = 0.5f,
             leftProgress = 0.3f,
-            faceFillPercent = 0.25f,
+            faceFillPercent = 0.45f,
+            selfieState = SelfieState.Analyzing(SelfieHint.NeedLight),
         )
     }
 }

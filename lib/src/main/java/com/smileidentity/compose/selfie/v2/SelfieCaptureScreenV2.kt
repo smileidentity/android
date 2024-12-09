@@ -308,6 +308,7 @@ private fun SmartSelfieV2Screen(
                             rightProgress = rightProgress,
                             leftProgress = leftProgress,
                             faceFillPercent = faceFillPercent,
+                            selfieState = state.selfieState,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .testTag("selfie_progress_indicator"),
