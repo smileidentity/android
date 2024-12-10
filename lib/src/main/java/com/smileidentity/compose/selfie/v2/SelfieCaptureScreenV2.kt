@@ -247,12 +247,29 @@ private fun SmartSelfieV2Screen(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(bottom = 8.dp)
+                        // .graphicsLayer {
+                        //     clip = true
+                        //     shape = roundedCornerShape
+                        // }
+                        // .drawBehind {
+                        //     drawIntoCanvas { canvas ->
+                        //         val paint = Paint()
+                        //         val frameworkPaint = paint.asFrameworkPaint()
+                        //         frameworkPaint.maskFilter = BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL)
+                        //         canvas.drawRect(
+                        //             Rect(
+                        //                 offset = Offset(0f, size.height - 25.dp.toPx()),
+                        //                 size = Size(size.width, 30.dp.toPx())
+                        //             ),
+                        //             paint.apply {
+                        //                 color = Color.Black.copy(alpha = 0.4f)
+                        //             }
+                        //         )
+                        //     }
+                        // }
                         .aspectRatio(0.75f) // 480 x 640 -> 3/4 -> 0.75
                         .clip(roundedCornerShape)
-                        // We draw borders as a individual layers in the Box (as opposed to Modifier.border)
-                        // because we need multiple colors, and eventually we will need to animate them for
-                        // Active Liveness feedback
                         .drawWithCache {
                             val roundRect = RoundRect(
                                 rect = size.toRect(),
@@ -260,7 +277,6 @@ private fun SmartSelfieV2Screen(
                             )
                             onDrawWithContent {
                                 drawContent()
-                                // drawRect(color = Color(0XFF2D2B2A).copy(alpha = 0.7F))
                                 drawPath(
                                     path = Path().apply { addRoundRect(roundRect = roundRect) },
                                     color = Color.Transparent,
@@ -280,6 +296,7 @@ private fun SmartSelfieV2Screen(
                         .weight(1f, fill = false),
                 ) {
                     cameraPreview()
+
                     Box(
                         contentAlignment = Alignment.BottomCenter,
                     ) {
@@ -291,6 +308,7 @@ private fun SmartSelfieV2Screen(
                                 is SelfieState.Success -> state.selfieState.selfieFile
                                 else -> null
                             },
+                            backgroundColor = Color(0xFF2D2B2A).copy(alpha = 0.8f),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .testTag("selfie_progress_indicator"),

@@ -74,7 +74,7 @@ fun OvalCutout(
     }
 
     val progressAnimationSpec = tween<Float>(
-        durationMillis = 200,
+        durationMillis = 100,
         easing = FastOutSlowInEasing,
     )
 
@@ -99,7 +99,6 @@ fun OvalCutout(
     Canvas(modifier.fillMaxSize()) {
         val ovalAspectRatio = 480f / 640f
         val newSize = size * faceFillPercent
-        // Constrain either the height or the width of newSize to match ovalAspectRatio
         val newAspectRatio = newSize.width / newSize.height
         val constrainedSize = if (newAspectRatio > ovalAspectRatio) {
             Size(width = newSize.height * ovalAspectRatio, height = newSize.height)

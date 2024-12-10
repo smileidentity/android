@@ -20,8 +20,8 @@ private const val MIDWAY_UP_ANGLE_MIN = 7f
 private const val ORTHOGONAL_ANGLE_BUFFER = 90f
 private const val MID_POINT_TARGET = 0.5f
 private const val END_POINT_TARGET = 1.0f
-private const val PROGRESS_INCREMENT = 0.08f
-private const val PROGRESS_DECREMENT = 0.1f
+private const val PROGRESS_INCREMENT = 0.12f
+private const val PROGRESS_DECREMENT = 0.15f
 private const val FAILURE_THRESHOLD = 5
 
 /**
