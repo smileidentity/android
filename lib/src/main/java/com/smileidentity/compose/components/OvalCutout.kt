@@ -155,7 +155,7 @@ fun OvalCutout(
                     SelfieHint.LookRight -> {
                         drawArc(
                             color = arcBackgroundColor,
-                            startAngle = 330f,
+                            startAngle = -30f,
                             sweepAngle = 60f,
                             useCenter = false,
                             topLeft = arcTopLeft,
@@ -164,8 +164,8 @@ fun OvalCutout(
                         )
                         drawArc(
                             color = arcColor,
-                            startAngle = 330f,
-                            sweepAngle = 60f * rightProgress,
+                            startAngle = 30f,
+                            sweepAngle = -60f * rightProgress,
                             useCenter = false,
                             topLeft = arcTopLeft,
                             size = arcSize,
@@ -210,8 +210,8 @@ private fun OvalCutoutPreview() {
         OvalCutout(
             faceFillPercent = 0.45F,
             state = SmartSelfieV2UiState(
-                leftProgress = 0.5F,
-                selfieState = SelfieState.Analyzing(SelfieHint.LookLeft),
+                rightProgress = 0.5F,
+                selfieState = SelfieState.Analyzing(SelfieHint.LookRight),
             ),
         )
     }
