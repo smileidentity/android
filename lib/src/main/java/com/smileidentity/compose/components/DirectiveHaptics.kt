@@ -27,5 +27,13 @@ internal fun DirectiveHaptics(selfieState: SelfieState) {
                 }
             }
         }
+    } else if (selfieState is SelfieState.Processing) {
+        LaunchedEffect(selfieState) {
+            // Custom vibration pattern
+            for (i in 0..2) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                delay(100)
+            }
+        }
     }
 }
