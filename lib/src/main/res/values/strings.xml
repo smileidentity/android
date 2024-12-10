@@ -49,8 +49,8 @@
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
     <!--  SmartSelfie V2  -->
-    <string name="si_smart_selfie_v2_auth_product_name">SmartSelfie™ Authentication\n(Strict Mode)</string>
-    <string name="si_smart_selfie_v2_enroll_product_name">SmartSelfie™ Enrollment\n(Strict Mode)</string>
+    <string name="si_smart_selfie_v2_auth_product_name">SmartSelfie™ Authentication\n(Enhanced)</string>
+    <string name="si_smart_selfie_v2_enroll_product_name">SmartSelfie™ Enrollment\n(Enhanced)</string>
     <string name="si_smart_selfie_v2_directive_place_entire_head_in_frame">Position your head in view</string>
     <string name="si_smart_selfie_v2_directive_ensure_device_upright">Ensure your device is upright</string>
     <string name="si_smart_selfie_v2_directive_ensure_one_face">Ensure only 1 face is visible</string>
