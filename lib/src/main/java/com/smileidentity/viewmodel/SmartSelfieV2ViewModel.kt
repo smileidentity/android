@@ -125,6 +125,7 @@ data class SmartSelfieV2UiState(
     val topProgress: Float = 0F,
     val rightProgress: Float = 0F,
     val leftProgress: Float = 0F,
+    val selfieFile: File? = null,
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
 )
 
@@ -471,6 +472,7 @@ class SmartSelfieV2ViewModel(
                                     selfieFile = selfieFile,
                                     livenessFiles = livenessFiles,
                                 ),
+                                selfieFile = selfieFile,
                             )
                         }
                         // Delay to ensure the completion icon is shown for a little bit
@@ -485,7 +487,12 @@ class SmartSelfieV2ViewModel(
                     async {
                         delay(LOADING_INDICATOR_DELAY_MS)
                         if (!done) {
-                            _uiState.update { it.copy(selfieState = SelfieState.Processing) }
+                            _uiState.update {
+                                it.copy(
+                                    selfieFile = selfieFile,
+                                    selfieState = SelfieState.Processing,
+                                )
+                            }
                         }
                     },
                 )

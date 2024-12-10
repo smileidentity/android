@@ -260,6 +260,7 @@ private fun SmartSelfieV2Screen(
                             )
                             onDrawWithContent {
                                 drawContent()
+                                // drawRect(color = Color(0XFF2D2B2A).copy(alpha = 0.7F))
                                 drawPath(
                                     path = Path().apply { addRoundRect(roundRect = roundRect) },
                                     color = Color.Transparent,
@@ -285,6 +286,11 @@ private fun SmartSelfieV2Screen(
                         OvalCutout(
                             faceFillPercent = faceFillPercent,
                             state = state,
+                            selfieFile = when (state.selfieState) {
+                                is SelfieState.Processing -> state.selfieFile
+                                is SelfieState.Success -> state.selfieState.selfieFile
+                                else -> null
+                            },
                             modifier = Modifier
                                 .fillMaxSize()
                                 .testTag("selfie_progress_indicator"),

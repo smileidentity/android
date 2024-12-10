@@ -47,7 +47,7 @@ fun SelfieCaptureInstructionScreenV2(
         ) {
             AnimatedInstructions(
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(256.dp)
                     .padding(bottom = 16.dp),
             )
             Text(

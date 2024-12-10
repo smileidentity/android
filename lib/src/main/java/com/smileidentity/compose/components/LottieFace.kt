@@ -101,7 +101,7 @@ fun LottieFaceMoveCloser(modifier: Modifier = Modifier) {
         modifier = modifier,
         animation = R.raw.si_anim_positioning,
         startFrame = 157,
-        endFrame = 216,
+        endFrame = 215,
     )
 }
 

@@ -18,8 +18,11 @@ private const val MIDWAY_LR_ANGLE_MIN = 9f
 private const val MIDWAY_UP_ANGLE_MAX = 90f
 private const val MIDWAY_UP_ANGLE_MIN = 7f
 private const val ORTHOGONAL_ANGLE_BUFFER = 90f
-private const val PROGRESS_INCREMENT = 0.5f
-private const val FAILURE_THRESHOLD = 3
+private const val MID_POINT_TARGET = 0.5f
+private const val END_POINT_TARGET = 1.0f
+private const val PROGRESS_INCREMENT = 0.08f
+private const val PROGRESS_DECREMENT = 0.1f
+private const val FAILURE_THRESHOLD = 5
 
 /**
  * Determines a randomized set of directions for the user to look in
@@ -141,28 +144,40 @@ internal class ActiveLivenessTask(
             return false
         }
 
+        val currentProgress = currentDirection.getProgress(this)
+
         return if (currentDirection is Midpoint) {
-            true
+            currentProgress >= MID_POINT_TARGET
         } else {
-            checkEndpointStability()
+            currentProgress >= END_POINT_TARGET && checkEndpointStability()
         }
     }
 
     private fun updateProgressForDirection(direction: FaceDirection, isCorrect: Boolean) {
         if (isCorrect) {
             consecutiveFailedFrames = 0
+            val targetProgress = if (direction is Midpoint) MID_POINT_TARGET else END_POINT_TARGET
+
             when (direction) {
-                is Left -> leftProgress = minOf(1f, leftProgress + PROGRESS_INCREMENT)
-                is Right -> rightProgress = minOf(1f, rightProgress + PROGRESS_INCREMENT)
-                is Up -> topProgress = minOf(1f, topProgress + PROGRESS_INCREMENT)
+                is Left -> {
+                    leftProgress = minOf(targetProgress, leftProgress + PROGRESS_INCREMENT)
+                }
+
+                is Right -> {
+                    rightProgress = minOf(targetProgress, rightProgress + PROGRESS_INCREMENT)
+                }
+
+                is Up -> {
+                    topProgress = minOf(targetProgress, topProgress + PROGRESS_INCREMENT)
+                }
             }
         } else {
             consecutiveFailedFrames++
             if (consecutiveFailedFrames >= FAILURE_THRESHOLD) {
                 when (direction) {
-                    is Left -> leftProgress = 0f
-                    is Right -> rightProgress = 0f
-                    is Up -> topProgress = 0f
+                    is Left -> leftProgress = maxOf(0f, leftProgress - PROGRESS_DECREMENT)
+                    is Right -> rightProgress = maxOf(0f, rightProgress - PROGRESS_DECREMENT)
+                    is Up -> topProgress = maxOf(0f, topProgress - PROGRESS_DECREMENT)
                 }
                 consecutiveFailedFrames = 0
             }
@@ -188,11 +203,20 @@ internal class ActiveLivenessTask(
      * @return true if there are more directions to satisfy, false otherwise
      */
     fun markCurrentDirectionSatisfied(): Boolean {
-        when (orderedFaceDirections[currentDirectionIdx]) {
-            is Left -> leftProgress = 0f
-            is Right -> rightProgress = 0f
-            is Up -> topProgress = 0f
+        val currentDirection = orderedFaceDirections[currentDirectionIdx]
+        val nextDirection = orderedFaceDirections.getOrNull(currentDirectionIdx + 1)
+
+        if (nextDirection == null ||
+            (currentDirection is Endpoint && nextDirection !is Midpoint) ||
+            (currentDirection is Midpoint && nextDirection !is Endpoint)
+        ) {
+            when (currentDirection) {
+                is Left -> leftProgress = 0f
+                is Right -> rightProgress = 0f
+                is Up -> topProgress = 0f
+            }
         }
+
         currentDirectionIdx++
         return currentDirectionIdx < orderedFaceDirections.size
     }
