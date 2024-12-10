@@ -18,17 +18,7 @@ private val fontProvider = GoogleFont.Provider(
     certificates = R.array.si_com_google_android_gms_fonts_certs,
 )
 
-private val epilogueGoogleFont = GoogleFont(name = "Epilogue")
 private val dmSansGoogleFont = GoogleFont(name = "DM Sans")
-
-private val epilogue = FontFamily(
-    Font(epilogueGoogleFont, fontProvider, FontWeight.Light, FontStyle.Normal),
-    Font(epilogueGoogleFont, fontProvider, FontWeight.Normal, FontStyle.Normal),
-    Font(epilogueGoogleFont, fontProvider, FontWeight.ExtraBold, FontStyle.Normal),
-    Font(epilogueGoogleFont, fontProvider, FontWeight.Light, FontStyle.Italic),
-    Font(epilogueGoogleFont, fontProvider, FontWeight.Normal, FontStyle.Italic),
-    Font(epilogueGoogleFont, fontProvider, FontWeight.ExtraBold, FontStyle.Italic),
-)
 
 private val dmSans = FontFamily(
     Font(dmSansGoogleFont, fontProvider, FontWeight.Normal, FontStyle.Normal),
@@ -47,15 +37,15 @@ val SmileID.typography: Typography
     @Composable
     @ReadOnlyComposable
     get() = Typography(
-        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = epilogue),
-        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = epilogue),
-        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = epilogue),
-        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = epilogue),
-        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = epilogue),
-        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = epilogue),
-        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = epilogue),
-        titleMedium = MaterialTheme.typography.titleMedium.copy(fontFamily = epilogue),
-        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = epilogue),
+        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = dmSans),
+        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = dmSans),
+        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = dmSans),
+        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = dmSans),
+        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = dmSans),
+        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = dmSans),
+        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = dmSans),
+        titleMedium = MaterialTheme.typography.titleMedium.copy(fontFamily = dmSans),
+        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = dmSans),
         bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontFamily = dmSans),
         bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontFamily = dmSans),
         bodySmall = MaterialTheme.typography.bodySmall.copy(fontFamily = dmSans),
@@ -78,14 +68,14 @@ val SmileID.typographyv2: Typography
         titleMedium = MaterialTheme.typography.titleMedium.copy(fontFamily = dmSans),
 
         // reworking this
-        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = epilogue),
-        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = epilogue),
-        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = epilogue),
-        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = epilogue),
-        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = epilogue),
-        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = epilogue),
-        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = epilogue),
-        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = epilogue),
+        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = dmSans),
+        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = dmSans),
+        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = dmSans),
+        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = dmSans),
+        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = dmSans),
+        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = dmSans),
+        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = dmSans),
+        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = dmSans),
         bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontFamily = dmSans),
         bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontFamily = dmSans),
         bodySmall = MaterialTheme.typography.bodySmall.copy(fontFamily = dmSans),

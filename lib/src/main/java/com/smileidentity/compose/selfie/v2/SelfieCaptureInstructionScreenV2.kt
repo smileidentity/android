@@ -20,8 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smileidentity.R
+import com.smileidentity.compose.components.AnimatedInstructions
 import com.smileidentity.compose.components.ContinueButton
-import com.smileidentity.compose.components.LottieInstruction
 import com.smileidentity.compose.components.SmileIDAttribution
 
 @Composable
@@ -45,9 +45,9 @@ fun SelfieCaptureInstructionScreenV2(
                 .verticalScroll(rememberScrollState())
                 .weight(1f),
         ) {
-            LottieInstruction(
+            AnimatedInstructions(
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(256.dp)
                     .padding(bottom = 16.dp),
             )
             Text(

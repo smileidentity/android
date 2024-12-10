@@ -73,7 +73,7 @@ private const val SELFIE_IMAGE_SIZE = 640
 private const val NO_FACE_RESET_DELAY_MS = 3000
 private const val FACE_ROTATION_THRESHOLD = 0.75f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
-const val MAX_FACE_AREA_THRESHOLD = 0.25f
+const val MAX_FACE_AREA_THRESHOLD = 0.30f
 private const val SMILE_THRESHOLD = 0.8f
 
 data class SelfieUiState(

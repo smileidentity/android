@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 fun CameraFrameCornerBorder(
     cornerRadius: Dp,
     strokeWidth: Dp,
-    color: Color,
     modifier: Modifier = Modifier,
+    color: Color = Color.Transparent,
     extendCornerBy: Dp = cornerRadius,
 ) {
     Canvas(modifier) {
@@ -43,7 +43,7 @@ fun CameraFrameCornerBorder(
 fun DrawScope.cameraFrameCornerBorder(
     cornerRadius: Float,
     strokeWidth: Float,
-    color: Color,
+    color: Color = Color.Transparent,
     extendCornerBy: Float = cornerRadius,
 ) {
     val radius = CornerRadius(cornerRadius)
