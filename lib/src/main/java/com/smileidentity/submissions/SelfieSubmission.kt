@@ -94,24 +94,26 @@ class SelfieSubmission(
         result: SmartSelfieResponse?,
     ): SmileIDResult.Success<SmartSelfieResult> {
         // Move files from unsubmitted to submitted directories
-        val copySuccess = moveJobToSubmitted(jobId)
-        if (copySuccess) {
-            val selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
-                Timber.w("Selfie file not found for job ID: $jobId")
-                throw IllegalStateException("Selfie file not found for job ID: $jobId")
+        if (result != null) {
+            val copySuccess = moveJobToSubmitted(jobId)
+            if (copySuccess) {
+                val selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+                    Timber.w("Selfie file not found for job ID: $jobId")
+                    throw IllegalStateException("Selfie file not found for job ID: $jobId")
+                }
+                val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+                selfieFileResult to livenessFilesResult
+            } else {
+                Timber.w("Failed to move job $jobId to complete")
+                SmileIDCrashReporting.hub.addBreadcrumb(
+                    Breadcrumb().apply {
+                        category = "Offline Mode"
+                        message = "Failed to move job $jobId to complete"
+                        level = SentryLevel.INFO
+                    },
+                )
+                selfieFile to livenessFiles
             }
-            val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
-            selfieFileResult to livenessFilesResult
-        } else {
-            Timber.w("Failed to move job $jobId to complete")
-            SmileIDCrashReporting.hub.addBreadcrumb(
-                Breadcrumb().apply {
-                    category = "Offline Mode"
-                    message = "Failed to move job $jobId to complete"
-                    level = SentryLevel.INFO
-                },
-            )
-            selfieFile to livenessFiles
         }
         return SmileIDResult.Success(
             SmartSelfieResult(

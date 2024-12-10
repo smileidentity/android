@@ -21,7 +21,8 @@ abstract class BaseSynchronousJobSubmission<T : Parcelable, R : Parcelable>(jobI
     }
 
     override suspend fun createSuccessResult(didSubmit: Boolean): SmileIDResult.Success<T> {
-        return createSynchronousRes(getApiResponse())
+        val apiResponse = if (didSubmit) getApiResponse() else null
+        return createSynchronousRes(apiResponse)
     }
 
     protected abstract suspend fun getApiResponse(): R?

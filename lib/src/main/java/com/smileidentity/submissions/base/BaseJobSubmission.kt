@@ -23,6 +23,7 @@ abstract class BaseJobSubmission<T : Parcelable>(
     protected abstract fun createPrepUploadRequest(
         authResponse: AuthenticationResponse? = null,
     ): PrepUploadRequest
+
     protected abstract fun createUploadRequest(authResponse: AuthenticationResponse?): UploadRequest
     protected abstract suspend fun createSuccessResult(didSubmit: Boolean): SmileIDResult.Success<T>
 
@@ -113,6 +114,8 @@ abstract class BaseJobSubmission<T : Parcelable>(
             } else {
                 throw smileIDException
             }
+        } catch (e: Exception) {
+            throw e
         }
     }
 
