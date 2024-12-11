@@ -21,7 +21,6 @@ private const val ORTHOGONAL_ANGLE_BUFFER = 90f
 private const val MID_POINT_TARGET = 0.5f
 private const val END_POINT_TARGET = 1.0f
 private const val PROGRESS_INCREMENT = 0.12f
-private const val PROGRESS_DECREMENT = 0.15f
 private const val FAILURE_THRESHOLD = 5
 
 /**
@@ -149,7 +148,12 @@ internal class ActiveLivenessTask(
         return if (currentDirection is Midpoint) {
             currentProgress >= MID_POINT_TARGET
         } else {
-            currentProgress >= END_POINT_TARGET && checkEndpointStability()
+            val animatedProgress = when (currentDirection) {
+                is Left -> leftProgress
+                is Right -> rightProgress
+                is Up -> topProgress
+            }
+            animatedProgress >= END_POINT_TARGET && checkEndpointStability()
         }
     }
 
@@ -162,11 +166,9 @@ internal class ActiveLivenessTask(
                 is Left -> {
                     leftProgress = minOf(targetProgress, leftProgress + PROGRESS_INCREMENT)
                 }
-
                 is Right -> {
                     rightProgress = minOf(targetProgress, rightProgress + PROGRESS_INCREMENT)
                 }
-
                 is Up -> {
                     topProgress = minOf(targetProgress, topProgress + PROGRESS_INCREMENT)
                 }
@@ -175,9 +177,9 @@ internal class ActiveLivenessTask(
             consecutiveFailedFrames++
             if (consecutiveFailedFrames >= FAILURE_THRESHOLD) {
                 when (direction) {
-                    is Left -> leftProgress = maxOf(0f, leftProgress - PROGRESS_DECREMENT)
-                    is Right -> rightProgress = maxOf(0f, rightProgress - PROGRESS_DECREMENT)
-                    is Up -> topProgress = maxOf(0f, topProgress - PROGRESS_DECREMENT)
+                    is Left -> leftProgress = 0f
+                    is Right -> rightProgress = 0f
+                    is Up -> topProgress = 0f
                 }
                 consecutiveFailedFrames = 0
             }
