@@ -180,6 +180,8 @@ class SmartSelfieV2ViewModel(
         startStrictModeTimerIfNecessary()
     }
 
+    private fun isPortraitOrientation(degrees: Int): Boolean = degrees == 270
+
     /**
      * In strict mode, the user has a certain amount of time to finish the active liveness task. If
      * the user exceeds this time limit, the job will be explicitly failed by setting a flag on the
@@ -232,9 +234,9 @@ class SmartSelfieV2ViewModel(
             return
         }
 
-        // We want to hold the orientation constant for the duration of the capture
-        val desiredOrientation = selfieCameraOrientation ?: imageProxy.imageInfo.rotationDegrees
-        if (imageProxy.imageInfo.rotationDegrees != desiredOrientation) {
+        // We want to hold the orientation on portrait only :)
+        val currentOrientation = imageProxy.imageInfo.rotationDegrees
+        if (!isPortraitOrientation(currentOrientation)) {
             val message = "Camera orientation changed. Resetting progress"
             Timber.d(message)
             SmileIDCrashReporting.hub.addBreadcrumb(message)
