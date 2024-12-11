@@ -15,11 +15,18 @@ import timber.log.Timber
 fun ForceBrightness(brightness: Float = 1f) {
     val activity = LocalContext.current.getActivity() ?: return
     DisposableEffect(Unit) {
-        val attributes = activity.window.attributes
+        val window = activity.window
+        val attributes = window.attributes
         val originalBrightness = attributes.screenBrightness
-        activity.window.attributes = attributes.apply { screenBrightness = brightness }
+        window.attributes = attributes.apply {
+            screenBrightness = brightness
+            flags = flags or android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        }
         onDispose {
-            activity.window.attributes = attributes.apply { screenBrightness = originalBrightness }
+            window.attributes = attributes.apply {
+                screenBrightness = originalBrightness
+                flags = flags and android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON.inv()
+            }
         }
     }
 }
