@@ -61,7 +61,7 @@ val SmileID.typography: Typography
  * Define the typography by taking the default defined typographies and overriding the font family
  */
 @Suppress("UnusedReceiverParameter")
-val SmileID.typographyv2: Typography
+val SmileID.typographyV2: Typography
     @Composable
     @ReadOnlyComposable
     get() = Typography(

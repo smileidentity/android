@@ -217,7 +217,7 @@ fun MainScreen(
                 }
                 composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                    SmileID.SmartSelfieEnrollmentV2(useStrictMode = true) {
+                    SmileID.SmartSelfieEnrollmentV2 {
                         viewModel.onSmartSelfieEnrollmentV2Result(it)
                         navController.popBackStack()
                     }
@@ -239,7 +239,7 @@ fun MainScreen(
                 composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.SmartSelfieAuthenticationV2(userId = userId, useStrictMode = true) {
+                    SmileID.SmartSelfieAuthenticationV2(userId = userId) {
                         viewModel.onSmartSelfieAuthenticationV2Result(it)
                         navController.popBackStack()
                     }

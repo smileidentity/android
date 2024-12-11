@@ -134,7 +134,6 @@ data class SmartSelfieV2UiState(
 class SmartSelfieV2ViewModel(
     private val userId: String,
     private val isEnroll: Boolean,
-    private val useStrictMode: Boolean,
     private val selfieQualityModel: SelfieQualityModel,
     private val metadata: MutableList<Metadatum>,
     private val allowNewEnroll: Boolean? = null,
@@ -174,7 +173,7 @@ class SmartSelfieV2ViewModel(
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
-    private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
+    private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
 
     init {
@@ -189,17 +188,15 @@ class SmartSelfieV2ViewModel(
      * API request. Static liveness images will be captured for this
      */
     private fun startStrictModeTimerIfNecessary() {
-        if (useStrictMode) {
-            viewModelScope.launch {
-                delay(FORCED_FAILURE_TIMEOUT_MS)
-                val selfieState = uiState.value.selfieState
-                // These 2 conditions should theoretically both be true at the same time
-                if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
-                    SmileIDCrashReporting.hub.addBreadcrumb("Strict Mode force fail timer expired")
-                    Timber.d("Strict Mode forced failure timer expired")
-                    forcedFailureTimerExpired = true
-                    resetCaptureProgress(LookStraight)
-                }
+        viewModelScope.launch {
+            delay(FORCED_FAILURE_TIMEOUT_MS)
+            val selfieState = uiState.value.selfieState
+            // These 2 conditions should theoretically both be true at the same time
+            if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
+                SmileIDCrashReporting.hub.addBreadcrumb("Strict Mode force fail timer expired")
+                Timber.d("Strict Mode forced failure timer expired")
+                forcedFailureTimerExpired = true
+                resetCaptureProgress(LookStraight)
             }
         }
     }

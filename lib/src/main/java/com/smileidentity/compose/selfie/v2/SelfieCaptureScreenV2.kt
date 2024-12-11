@@ -98,7 +98,6 @@ import kotlinx.collections.immutable.persistentMapOf
  * @param selfieQualityModel The model to use for selfie quality analysis
  * @param onResult The callback to invoke when the selfie capture is complete
  * @param modifier The modifier to apply to this composable
- * @param useStrictMode Whether to use strict mode for the selfie capture. Strict mode is stricter
  * about what constitutes a good selfie capture and results in better pass rates.
  * @param showAttribution Whether to show the Smile ID attribution
  * @param allowNewEnroll Whether to allow new enrollments
@@ -113,7 +112,6 @@ fun OrchestratedSelfieCaptureScreenV2(
     selfieQualityModel: SelfieQualityModel,
     onResult: SmileIDCallback<SmartSelfieResult>,
     modifier: Modifier = Modifier,
-    useStrictMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
     allowNewEnroll: Boolean? = null,
@@ -125,7 +123,6 @@ fun OrchestratedSelfieCaptureScreenV2(
                 userId = userId,
                 isEnroll = isEnroll,
                 allowNewEnroll = allowNewEnroll,
-                useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
                 metadata = metadata,
@@ -158,7 +155,6 @@ fun OrchestratedSelfieCaptureScreenV2(
     Box(
         modifier = Modifier
             .background(color = Color.White)
-            // .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
@@ -248,26 +244,6 @@ private fun SmartSelfieV2Screen(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .padding(bottom = 8.dp)
-                        // .graphicsLayer {
-                        //     clip = true
-                        //     shape = roundedCornerShape
-                        // }
-                        // .drawBehind {
-                        //     drawIntoCanvas { canvas ->
-                        //         val paint = Paint()
-                        //         val frameworkPaint = paint.asFrameworkPaint()
-                        //         frameworkPaint.maskFilter = BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL)
-                        //         canvas.drawRect(
-                        //             Rect(
-                        //                 offset = Offset(0f, size.height - 25.dp.toPx()),
-                        //                 size = Size(size.width, 30.dp.toPx())
-                        //             ),
-                        //             paint.apply {
-                        //                 color = Color.Black.copy(alpha = 0.4f)
-                        //             }
-                        //         )
-                        //     }
-                        // }
                         .aspectRatio(0.75f) // 480 x 640 -> 3/4 -> 0.75
                         .clip(roundedCornerShape)
                         .drawWithCache {
