@@ -26,6 +26,7 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
             listOf(
                 Metadatum.Sdk,
                 Metadatum.SdkVersion,
+                Metadatum.ActiveLivenessVersion,
                 Metadatum.ClientIP,
                 Metadatum.Fingerprint,
                 Metadatum.DeviceModel,
@@ -51,6 +52,13 @@ open class Metadatum(
 
     @Parcelize
     data object SdkVersion : Metadatum("sdk_version", BuildConfig.VERSION_NAME)
+
+    @Parcelize
+    data class ActiveLivenessType(val type: LivenessType) :
+        Metadatum("active_liveness_type", type.value)
+
+    @Parcelize
+    data object ActiveLivenessVersion : Metadatum("active_liveness_version", "1.0.0")
 
     @Parcelize
     data object ClientIP : Metadatum("client_ip", getIPAddress(useIPv4 = true))
@@ -107,6 +115,12 @@ open class Metadatum(
     @Parcelize
     data class DocumentBackCaptureDuration(val duration: Duration) :
         Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
+}
+
+enum class LivenessType(val value: String) {
+    HeadPose("head_pose"),
+
+    Smile("smile"),
 }
 
 enum class DocumentImageOriginValue(val value: String) {

@@ -19,6 +19,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
+import com.smileidentity.models.v2.LivenessType
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
@@ -117,7 +118,7 @@ enum class SelfieHint(
     EnsureEntireFaceVisible(
         text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
     ),
-    PoorImageQuality(text = R.string.si_smart_selfie_v2_directive_poor_image_quality),
+    PoorImageQuality(text = R.string.si_smart_selfie_v2_directive_need_more_light),
     LookStraight(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
 }
 
@@ -510,6 +511,7 @@ class SmartSelfieV2ViewModel(
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
+        metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(

@@ -55,7 +55,7 @@
     <string name="si_smart_selfie_v2_directive_ensure_device_upright">Ensure your device is upright</string>
     <string name="si_smart_selfie_v2_directive_ensure_one_face">Ensure only 1 face is visible</string>
     <string name="si_smart_selfie_v2_directive_ensure_entire_face_visible">Ensure your entire face is visible</string>
-    <string name="si_smart_selfie_v2_directive_need_more_light">Need more light</string>
+    <string name="si_smart_selfie_v2_directive_need_more_light">Move to a well lit room</string>
     <string name="si_smart_selfie_v2_directive_move_back">Move back</string>
     <string name="si_smart_selfie_v2_directive_move_closer">Move closer</string>
     <string name="si_smart_selfie_v2_directive_poor_image_quality">Poor image quality</string>
