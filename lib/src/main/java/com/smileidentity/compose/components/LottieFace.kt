@@ -140,6 +140,8 @@ fun LottieFaceEnsureDeviceUpright(modifier: Modifier = Modifier) {
     LottieFace(
         modifier = modifier,
         animation = R.raw.si_anim_device_orientation,
+        startFrame = 0,
+        endFrame = 88,
     )
 }
 

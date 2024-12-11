@@ -74,7 +74,7 @@ fun OvalCutout(
     }
 
     val progressAnimationSpec = tween<Float>(
-        durationMillis = 100,
+        durationMillis = 50,
         easing = FastOutSlowInEasing,
     )
 
