@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -373,6 +376,30 @@ private fun SmartSelfieEnhancedScreen(
                     modifier = Modifier.width(320.dp),
                     onGranted = onRetry,
                 )
+
+                TextButton(
+                    onClick = { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) },
+                    modifier = Modifier
+                        .testTag("selfie_screen_cancel_button")
+                        .fillMaxWidth(),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.si_cancel),
+                        color = colorResource(id = R.color.si_color_material_error_container),
+                    )
+                }
+            } else if (state.selfieState is SelfieState.Analyzing) {
+                TextButton(
+                    onClick = { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) },
+                    modifier = Modifier
+                        .testTag("selfie_screen_cancel_button")
+                        .fillMaxWidth(),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.si_cancel),
+                        color = colorResource(id = R.color.si_color_material_error_container),
+                    )
+                }
             }
         },
     )
