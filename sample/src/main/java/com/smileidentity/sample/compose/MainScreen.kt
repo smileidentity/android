@@ -59,9 +59,9 @@ import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
-import com.smileidentity.compose.SmartSelfieAuthenticationV2
+import com.smileidentity.compose.SmartSelfieAuthenticationEnhanced
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.compose.SmartSelfieEnrollmentV2
+import com.smileidentity.compose.SmartSelfieEnrollmentEnhanced
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
@@ -215,14 +215,14 @@ fun MainScreen(
                         navController.popBackStack()
                     }
                 }
-                composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
+                composable(ProductScreen.SmartSelfieEnrollmentEnhanced.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                    SmileID.SmartSelfieEnrollmentV2 {
+                    SmileID.SmartSelfieEnrollmentEnhanced {
                         viewModel.onSmartSelfieEnrollmentV2Result(it)
                         navController.popBackStack()
                     }
                 }
-                dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
+                dialog(ProductScreen.SmartSelfieAuthenticationEnhanced.route) {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     SmartSelfieAuthenticationUserIdInputDialog(
                         onDismiss = {
@@ -231,15 +231,15 @@ fun MainScreen(
                         },
                         onConfirm = { userId ->
                             navController.navigate(
-                                "${ProductScreen.SmartSelfieAuthenticationV2.route}/$userId",
+                                "${ProductScreen.SmartSelfieAuthenticationEnhanced.route}/$userId",
                             ) { popUpTo(BottomNavigationScreen.Home.route) }
                         },
                     )
                 }
-                composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
+                composable(ProductScreen.SmartSelfieAuthenticationEnhanced.route + "/{userId}") {
                     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
                     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                    SmileID.SmartSelfieAuthenticationV2(userId = userId) {
+                    SmileID.SmartSelfieAuthenticationEnhanced(userId = userId) {
                         viewModel.onSmartSelfieAuthenticationV2Result(it)
                         navController.popBackStack()
                     }

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.SmileThemeSurface
-import com.smileidentity.compose.selfie.v2.OrchestratedSelfieCaptureScreenV2
+import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typographyV2
 import com.smileidentity.ml.SelfieQualityModel
@@ -40,7 +40,7 @@ import kotlinx.collections.immutable.persistentMapOf
  * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
-fun SmileID.SmartSelfieEnrollmentV2(
+fun SmileID.SmartSelfieEnrollmentEnhanced(
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     allowNewEnroll: Boolean = false,
@@ -54,7 +54,7 @@ fun SmileID.SmartSelfieEnrollmentV2(
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        OrchestratedSelfieCaptureScreenV2(
+        OrchestratedSelfieCaptureScreenEnhanced(
             modifier = modifier,
             userId = userId,
             allowNewEnroll = allowNewEnroll,
@@ -87,7 +87,7 @@ fun SmileID.SmartSelfieEnrollmentV2(
  * @param onResult Callback to be invoked when the SmartSelfie™ Enrollment is complete.
  */
 @Composable
-fun SmileID.SmartSelfieAuthenticationV2(
+fun SmileID.SmartSelfieAuthenticationEnhanced(
     userId: String,
     modifier: Modifier = Modifier,
     allowNewEnroll: Boolean = false,
@@ -101,7 +101,7 @@ fun SmileID.SmartSelfieAuthenticationV2(
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        OrchestratedSelfieCaptureScreenV2(
+        OrchestratedSelfieCaptureScreenEnhanced(
             modifier = modifier,
             userId = userId,
             isEnroll = false,

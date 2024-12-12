@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie.v2
+package com.smileidentity.compose.selfie.enhanced
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule

@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie.v2
+package com.smileidentity.compose.selfie.enhanced
 
 import android.Manifest
 import android.os.OperationCanceledException
@@ -76,8 +76,8 @@ import com.smileidentity.util.toast
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieHint
 import com.smileidentity.viewmodel.SelfieState
+import com.smileidentity.viewmodel.SmartSelfieEnhancedViewModel
 import com.smileidentity.viewmodel.SmartSelfieV2UiState
-import com.smileidentity.viewmodel.SmartSelfieV2ViewModel
 import com.smileidentity.viewmodel.VIEWFINDER_SCALE
 import com.ujizin.camposer.CameraPreview
 import com.ujizin.camposer.state.CamSelector
@@ -106,7 +106,7 @@ import kotlinx.collections.immutable.persistentMapOf
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun OrchestratedSelfieCaptureScreenV2(
+fun OrchestratedSelfieCaptureScreenEnhanced(
     userId: String,
     isEnroll: Boolean,
     selfieQualityModel: SelfieQualityModel,
@@ -117,9 +117,9 @@ fun OrchestratedSelfieCaptureScreenV2(
     allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
-    viewModel: SmartSelfieV2ViewModel = viewModel(
+    viewModel: SmartSelfieEnhancedViewModel = viewModel(
         initializer = {
-            SmartSelfieV2ViewModel(
+            SmartSelfieEnhancedViewModel(
                 userId = userId,
                 isEnroll = isEnroll,
                 allowNewEnroll = allowNewEnroll,
@@ -163,13 +163,13 @@ fun OrchestratedSelfieCaptureScreenV2(
         val camSelector by rememberCamSelector(CamSelector.Front)
 
         when {
-            showInstructions && !acknowledgedInstructions -> SelfieCaptureInstructionScreenV2(
+            showInstructions && !acknowledgedInstructions -> SelfieCaptureInstructionScreenEnhanced(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 acknowledgedInstructions = true
             }
 
-            else -> SmartSelfieV2Screen(
+            else -> SmartSelfieEnhancedScreen(
                 state = uiState,
                 showAttribution = showAttribution,
                 modifier = modifier,
@@ -214,7 +214,7 @@ fun OrchestratedSelfieCaptureScreenV2(
  * @param showAttribution Whether to show the Smile ID attribution
  */
 @Composable
-private fun SmartSelfieV2Screen(
+private fun SmartSelfieEnhancedScreen(
     state: SmartSelfieV2UiState,
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
@@ -343,15 +343,15 @@ private fun SmartSelfieV2Screen(
                                 )
 
                                 SelfieState.Processing -> stringResource(
-                                    R.string.si_smart_selfie_v2_submitting,
+                                    R.string.si_smart_selfie_enhanced_submitting,
                                 )
 
                                 is SelfieState.Error -> stringResource(
-                                    R.string.si_smart_selfie_v2_submission_failed,
+                                    R.string.si_smart_selfie_enhanced_submission_failed,
                                 )
 
                                 is SelfieState.Success -> stringResource(
-                                    R.string.si_smart_selfie_v2_submission_successful,
+                                    R.string.si_smart_selfie_enhanced_submission_successful,
                                 )
                             },
                             style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
@@ -380,10 +380,10 @@ private fun SmartSelfieV2Screen(
 
 @SmilePreviews
 @Composable
-private fun SmartSelfieV2ScreenPreview() {
+private fun SmartSelfieEnhancedScreenPreview() {
     Preview {
         Column {
-            SmartSelfieV2Screen(
+            SmartSelfieEnhancedScreen(
                 state = SmartSelfieV2UiState(
                     topProgress = 0.8f,
                     rightProgress = 0.5f,

@@ -106,20 +106,20 @@ sealed interface SelfieState {
 enum class SelfieHint(
     @StringRes val text: Int,
 ) {
-    NeedLight(text = R.string.si_smart_selfie_v2_directive_need_more_light),
-    SearchingForFace(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
-    MoveBack(text = R.string.si_smart_selfie_v2_directive_move_back),
-    MoveCloser(text = R.string.si_smart_selfie_v2_directive_move_closer),
-    LookLeft(text = R.string.si_smart_selfie_v2_directive_look_left),
-    LookRight(text = R.string.si_smart_selfie_v2_directive_look_right),
-    LookUp(text = R.string.si_smart_selfie_v2_directive_look_up),
-    EnsureDeviceUpright(text = R.string.si_smart_selfie_v2_directive_ensure_device_upright),
-    OnlyOneFace(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    NeedLight(text = R.string.si_smart_selfie_enhanced_directive_need_more_light),
+    SearchingForFace(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
+    MoveBack(text = R.string.si_smart_selfie_enhanced_directive_move_back),
+    MoveCloser(text = R.string.si_smart_selfie_enhanced_directive_move_closer),
+    LookLeft(text = R.string.si_smart_selfie_enhanced_directive_look_left),
+    LookRight(text = R.string.si_smart_selfie_enhanced_directive_look_right),
+    LookUp(text = R.string.si_smart_selfie_enhanced_directive_look_up),
+    EnsureDeviceUpright(text = R.string.si_smart_selfie_enhanced_directive_ensure_device_upright),
+    OnlyOneFace(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
     EnsureEntireFaceVisible(
-        text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
+        text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame,
     ),
-    PoorImageQuality(text = R.string.si_smart_selfie_v2_directive_need_more_light),
-    LookStraight(text = R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame),
+    PoorImageQuality(text = R.string.si_smart_selfie_enhanced_directive_need_more_light),
+    LookStraight(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
 }
 
 data class SmartSelfieV2UiState(
@@ -131,7 +131,7 @@ data class SmartSelfieV2UiState(
 )
 
 @kotlin.OptIn(FlowPreview::class)
-class SmartSelfieV2ViewModel(
+class SmartSelfieEnhancedViewModel(
     private val userId: String,
     private val isEnroll: Boolean,
     private val selfieQualityModel: SelfieQualityModel,

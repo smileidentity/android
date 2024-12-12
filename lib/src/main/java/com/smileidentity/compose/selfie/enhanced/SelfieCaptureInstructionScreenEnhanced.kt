@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie.v2
+package com.smileidentity.compose.selfie.enhanced
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,9 +23,11 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.AnimatedInstructions
 import com.smileidentity.compose.components.ContinueButton
 import com.smileidentity.compose.components.SmileIDAttribution
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
-fun SelfieCaptureInstructionScreenV2(
+fun SelfieCaptureInstructionScreenEnhanced(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },
@@ -51,7 +53,7 @@ fun SelfieCaptureInstructionScreenV2(
                     .padding(bottom = 16.dp),
             )
             Text(
-                text = stringResource(R.string.si_smart_selfie_v3_instructions),
+                text = stringResource(R.string.si_smart_selfie_enhanced_instructions),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 16.sp,
@@ -60,7 +62,7 @@ fun SelfieCaptureInstructionScreenV2(
                 ),
                 modifier = Modifier
                     .padding(24.dp)
-                    .testTag("smart_selfie_instructions_v2_instructions_text"),
+                    .testTag("smart_selfie_instructions_enhanced_instructions_text"),
             )
         }
         Column(
@@ -70,15 +72,25 @@ fun SelfieCaptureInstructionScreenV2(
                 .padding(8.dp),
         ) {
             ContinueButton(
-                buttonText = stringResource(R.string.si_smart_selfie_v3_get_started),
+                buttonText = stringResource(R.string.si_smart_selfie_enhanced_get_started),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("smart_selfie_instructions_v2_get_started_button"),
+                    .testTag("smart_selfie_instructions_enhanced_get_started_button"),
                 onClick = onInstructionsAcknowledged,
             )
             if (showAttribution) {
                 SmileIDAttribution()
             }
+        }
+    }
+}
+
+@SmilePreviews
+@Composable
+private fun SelfieCaptureInstructionScreenEnhancedPreview() {
+    Preview {
+        Column {
+            SelfieCaptureInstructionScreenEnhanced {}
         }
     }
 }
