@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.smileidentity.compose.components.LocalMetadata
+import com.smileidentity.compose.nav.ResultCallbacks
 import com.smileidentity.models.JobType
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
@@ -22,6 +23,9 @@ class OrchestratedDocumentVerificationScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
+                content = {},
+                resultCallbacks = ResultCallbacks(),
+                showSkipButton = false,
                 viewModel = DocumentVerificationViewModel(
                     jobType = JobType.DocumentVerification,
                     userId = randomUserId(),
@@ -47,6 +51,9 @@ class OrchestratedDocumentVerificationScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedDocumentVerificationScreen(
+                content = {},
+                resultCallbacks = ResultCallbacks(),
+                showSkipButton = false,
                 viewModel = DocumentVerificationViewModel(
                     jobType = JobType.DocumentVerification,
                     userId = randomUserId(),
