@@ -21,6 +21,7 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
+import com.smileidentity.models.v2.LivenessType
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
@@ -281,6 +282,7 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
+        metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
@@ -435,6 +437,7 @@ class SelfieViewModel(
             submitJob(selfieFile!!, livenessFiles)
         } else {
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
+            metadata.removeAll { it is Metadatum.ActiveLivenessType }
             metadata.removeAll { it is Metadatum.SelfieImageOrigin }
             shouldAnalyzeImages = true
             _uiState.update {

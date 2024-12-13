@@ -25,6 +25,7 @@ import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.asNetworkRequest
+import com.smileidentity.models.v2.model
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -538,6 +539,7 @@ class SmartSelfieEnhancedViewModel(
      * file IO scenario.
      */
     fun onRetry() {
+        metadata.removeAll { it is Metadatum.CameraName }
         metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
         metadata.removeAll { it is Metadatum.SelfieImageOrigin }
         resetCaptureProgress(SearchingForFace)
@@ -548,9 +550,17 @@ class SmartSelfieEnhancedViewModel(
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
         metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        metadata.removeAll { it is Metadatum.CameraName }
         when (camSelector) {
-            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
-            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+            CamSelector.Front -> {
+                metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
+                metadata.add(Metadatum.CameraName("""$model (Front Camera)"""))
+            }
+
+            CamSelector.Back -> {
+                metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+                metadata.add(Metadatum.CameraName("""$model (Back Camera)"""))
+            }
         }
     }
 

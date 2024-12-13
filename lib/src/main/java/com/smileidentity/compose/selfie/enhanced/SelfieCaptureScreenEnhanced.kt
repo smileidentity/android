@@ -378,7 +378,11 @@ private fun SmartSelfieEnhancedScreen(
                 )
 
                 TextButton(
-                    onClick = { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) },
+                    onClick = {
+                        onResult(
+                            SmileIDResult.Error(OperationCanceledException("User cancelled")),
+                        )
+                    },
                     modifier = Modifier
                         .testTag("selfie_screen_cancel_button")
                         .fillMaxWidth(),
@@ -390,7 +394,11 @@ private fun SmartSelfieEnhancedScreen(
                 }
             } else if (state.selfieState is SelfieState.Analyzing) {
                 TextButton(
-                    onClick = { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) },
+                    onClick = {
+                        onResult(
+                            SmileIDResult.Error(OperationCanceledException("User cancelled")),
+                        )
+                    },
                     modifier = Modifier
                         .testTag("selfie_screen_cancel_button")
                         .fillMaxWidth(),

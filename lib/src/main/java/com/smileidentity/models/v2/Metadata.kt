@@ -73,6 +73,10 @@ open class Metadatum(
     data object Fingerprint : Metadatum("fingerprint", SmileID.fingerprint)
 
     @Parcelize
+    data class CameraName(val cameraName: String) :
+        Metadatum("camera_name", cameraName)
+
+    @Parcelize
     data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :
         Metadatum("selfie_image_origin", origin.value)
 
@@ -168,7 +172,7 @@ private val isEmulator: Boolean
  * Returns the model of the device. If the device is an emulator, it returns "emulator". Any errors
  * result in "unknown"
  */
-private val model: String
+val model: String
     get() {
         try {
             val manufacturer = Build.MANUFACTURER
