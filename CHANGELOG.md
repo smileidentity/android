@@ -1,4 +1,10 @@
 # Release Notes
+
+## 10.4.0
+
+* Introduce screens for the new Enhanced Selfie Capture Enrollment and Authentication Products.
+* Fixed inconsistent document type parameters on sample app
+
 ## 10.3.7
 
 * Fixed extraPartnerParams serialization issues

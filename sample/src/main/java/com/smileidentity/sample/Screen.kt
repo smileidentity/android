@@ -35,18 +35,16 @@ enum class ProductScreen(
         com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
         R.drawable.smart_selfie_authentication,
     ),
-
-    // SmartSelfieEnrollmentV2(
-    //     "smart_selfie_enrollment_v2",
-    //     com.smileidentity.R.string.si_smart_selfie_v2_enroll_product_name,
-    //     R.drawable.smart_selfie_enrollment_v2,
-    // ),
-    // SmartSelfieAuthenticationV2(
-    //     "smart_selfie_authentication_v2",
-    //     com.smileidentity.R.string.si_smart_selfie_v2_auth_product_name,
-    //     R.drawable.smart_selfie_authentication_v2,
-    // ),
-
+    SmartSelfieEnrollmentEnhanced(
+        "smart_selfie_enrollment_enhanced",
+        com.smileidentity.R.string.si_smart_selfie_enhanced_enroll_product_name,
+        R.drawable.smart_selfie_enrollment_enhanced,
+    ),
+    SmartSelfieAuthenticationEnhanced(
+        "smart_selfie_authentication_enhanced",
+        com.smileidentity.R.string.si_smart_selfie_enhanced_auth_product_name,
+        R.drawable.smart_selfie_authentication_enhanced,
+    ),
     BiometricKyc(
         "biometric_kyc",
         com.smileidentity.R.string.si_biometric_kyc_product_name,

@@ -186,7 +186,7 @@ data class OrchestratedBiometricCaptureParams(
     val captureParams: BiometricKYCParams,
     val startRoute: Routes = Routes.Orchestrated.SelfieRoute(
         OrchestratedSelfieCaptureParams(
-            SelfieCaptureParams(
+            captureParams = SelfieCaptureParams(
                 userId = captureParams.userId,
                 jobId = captureParams.jobId,
                 showInstructions = captureParams.showInstructions,

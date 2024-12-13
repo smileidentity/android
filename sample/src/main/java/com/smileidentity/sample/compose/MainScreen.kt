@@ -59,7 +59,9 @@ import com.smileidentity.compose.BvnConsentScreen
 import com.smileidentity.compose.DocumentVerification
 import com.smileidentity.compose.EnhancedDocumentVerificationScreen
 import com.smileidentity.compose.SmartSelfieAuthentication
+import com.smileidentity.compose.SmartSelfieAuthenticationEnhanced
 import com.smileidentity.compose.SmartSelfieEnrollment
+import com.smileidentity.compose.SmartSelfieEnrollmentEnhanced
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
@@ -213,35 +215,35 @@ fun MainScreen(
                         navController.popBackStack()
                     }
                 }
-                // composable(ProductScreen.SmartSelfieEnrollmentV2.route) {
-                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
-                //     SmileID.SmartSelfieEnrollment(useStrictMode = true) {
-                //         viewModel.onSmartSelfieEnrollmentV2Result(it)
-                //         navController.popBackStack()
-                //     }
-                // }
-                // dialog(ProductScreen.SmartSelfieAuthenticationV2.route) {
-                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
-                //     SmartSelfieAuthenticationUserIdInputDialog(
-                //         onDismiss = {
-                //             viewModel.onHomeSelected()
-                //             navController.popBackStack()
-                //         },
-                //         onConfirm = { userId ->
-                //             navController.navigate(
-                //                 "${ProductScreen.SmartSelfieAuthenticationV2.route}/$userId",
-                //             ) { popUpTo(BottomNavigationScreen.Home.route) }
-                //         },
-                //     )
-                // }
-                // composable(ProductScreen.SmartSelfieAuthenticationV2.route + "/{userId}") {
-                //     LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
-                //     val userId = rememberSaveable { it.arguments?.getString("userId")!! }
-                //     SmileID.SmartSelfieAuthentication(userId = userId, useStrictMode = true) {
-                //         viewModel.onSmartSelfieAuthenticationV2Result(it)
-                //         navController.popBackStack()
-                //     }
-                // }
+                composable(ProductScreen.SmartSelfieEnrollmentEnhanced.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieEnrollmentV2Selected() }
+                    SmileID.SmartSelfieEnrollmentEnhanced {
+                        viewModel.onSmartSelfieEnrollmentV2Result(it)
+                        navController.popBackStack()
+                    }
+                }
+                dialog(ProductScreen.SmartSelfieAuthenticationEnhanced.route) {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
+                    SmartSelfieAuthenticationUserIdInputDialog(
+                        onDismiss = {
+                            viewModel.onHomeSelected()
+                            navController.popBackStack()
+                        },
+                        onConfirm = { userId ->
+                            navController.navigate(
+                                "${ProductScreen.SmartSelfieAuthenticationEnhanced.route}/$userId",
+                            ) { popUpTo(BottomNavigationScreen.Home.route) }
+                        },
+                    )
+                }
+                composable(ProductScreen.SmartSelfieAuthenticationEnhanced.route + "/{userId}") {
+                    LaunchedEffect(Unit) { viewModel.onSmartSelfieAuthenticationV2Selected() }
+                    val userId = rememberSaveable { it.arguments?.getString("userId")!! }
+                    SmileID.SmartSelfieAuthenticationEnhanced(userId = userId) {
+                        viewModel.onSmartSelfieAuthenticationV2Result(it)
+                        navController.popBackStack()
+                    }
+                }
                 composable(ProductScreen.EnhancedKyc.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedKycSelected() }
                     val userId = rememberSaveable { randomUserId() }
@@ -307,7 +309,7 @@ fun MainScreen(
                 }
                 composable(
                     ProductScreen.DocumentVerification.route +
-                        "/{countryCode}/{idType}/{captureBothSides}",
+                        "/{country}/{idType}/{captureBothSides}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
@@ -315,8 +317,8 @@ fun MainScreen(
                     SmileID.DocumentVerification(
                         userId = userId,
                         jobId = jobId,
-                        countryCode = it.arguments?.getString("countryCode")!!,
-                        documentType = it.arguments?.getString("documentType"),
+                        countryCode = it.arguments?.getString("country")!!,
+                        documentType = it.arguments?.getString("idType"),
                         captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
                         showInstructions = true,
                         allowGalleryUpload = true,
