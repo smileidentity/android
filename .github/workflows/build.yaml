@@ -66,3 +66,4 @@ jobs:
         continue-on-error: true
         with:
           ktlint-version: "1.2.1"
+          level: 'warning'
