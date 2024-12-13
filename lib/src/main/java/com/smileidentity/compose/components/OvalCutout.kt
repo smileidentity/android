@@ -50,12 +50,17 @@ fun OvalCutout(
     val color = when (state.selfieState) {
         is SelfieState.Analyzing -> {
             when (state.selfieState.hint) {
-                SelfieHint.NeedLight, SelfieHint.SearchingForFace, SelfieHint.MoveBack,
-                SelfieHint.MoveCloser, SelfieHint.EnsureDeviceUpright, SelfieHint.OnlyOneFace,
-                SelfieHint.EnsureEntireFaceVisible, SelfieHint.PoorImageQuality,
+                SelfieHint.NeedLight -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.SearchingForFace -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.MoveBack -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.MoveCloser -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.EnsureDeviceUpright -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.OnlyOneFace -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.EnsureEntireFaceVisible -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.PoorImageQuality -> MaterialTheme.colorScheme.errorContainer
                 SelfieHint.LookStraight -> MaterialTheme.colorScheme.errorContainer
-
-                SelfieHint.LookLeft, SelfieHint.LookRight,
+                SelfieHint.LookLeft -> MaterialTheme.colorScheme.tertiary
+                SelfieHint.LookRight -> MaterialTheme.colorScheme.tertiary
                 SelfieHint.LookUp -> MaterialTheme.colorScheme.tertiary
             }
         }
