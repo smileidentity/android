@@ -1,12 +1,13 @@
 # Release Notes
-## 10.3.7
-
-* Fixed extraPartnerParams serialization issues
 
 ## 10.4.0
 
-* Added the new enhanced biometric screens
+* Introduce screens for the new Enhanced Selfie Capture Enrollment and Authentication Products.
 * Fixed inconsistent document type parameters on sample app
+
+## 10.3.7
+
+* Fixed extraPartnerParams serialization issues
 
 ## 10.3.6
 
