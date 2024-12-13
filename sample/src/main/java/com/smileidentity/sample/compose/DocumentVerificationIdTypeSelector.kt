@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
@@ -103,14 +102,14 @@ fun DocumentVerificationIdTypeSelector(
 
         idTypesForCountry?.let { idTypesForCountry ->
             IdTypeSelector(idTypesForCountry = idTypesForCountry) {
-                onIdTypeSelected(selectedCountry!!.country.code, it.name, it.hasBack)
+                onIdTypeSelected(selectedCountry!!.country.code, it.code, it.hasBack)
             }
         }
     }
 }
 
 @Suppress("UnusedReceiverParameter")
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ColumnScope.CountrySelector(
     validDocuments: ImmutableList<ValidDocument>,

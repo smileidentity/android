@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie.v2
+package com.smileidentity.compose.selfie.enhanced
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,7 +10,7 @@ import com.smileidentity.compose.theme.typography
 import org.junit.Rule
 import org.junit.Test
 
-class SelfieCaptureScreenV2Test {
+class SelfieCaptureScreenEnhancedTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -26,7 +26,7 @@ class SelfieCaptureScreenV2Test {
                 SmileID.colorScheme,
                 SmileID.typography,
             ) {
-                SelfieCaptureInstructionScreenV2 {}
+                SelfieCaptureInstructionScreenEnhanced {}
             }
         }
 

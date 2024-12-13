@@ -26,6 +26,7 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
             listOf(
                 Metadatum.Sdk,
                 Metadatum.SdkVersion,
+                Metadatum.ActiveLivenessVersion,
                 Metadatum.ClientIP,
                 Metadatum.Fingerprint,
                 Metadatum.DeviceModel,
@@ -53,6 +54,13 @@ open class Metadatum(
     data object SdkVersion : Metadatum("sdk_version", BuildConfig.VERSION_NAME)
 
     @Parcelize
+    data class ActiveLivenessType(val type: LivenessType) :
+        Metadatum("active_liveness_type", type.value)
+
+    @Parcelize
+    data object ActiveLivenessVersion : Metadatum("active_liveness_version", "1.0.0")
+
+    @Parcelize
     data object ClientIP : Metadatum("client_ip", getIPAddress(useIPv4 = true))
 
     @Parcelize
@@ -63,6 +71,10 @@ open class Metadatum(
 
     @Parcelize
     data object Fingerprint : Metadatum("fingerprint", SmileID.fingerprint)
+
+    @Parcelize
+    data class CameraName(val cameraName: String) :
+        Metadatum("camera_name", cameraName)
 
     @Parcelize
     data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :
@@ -107,6 +119,12 @@ open class Metadatum(
     @Parcelize
     data class DocumentBackCaptureDuration(val duration: Duration) :
         Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
+}
+
+enum class LivenessType(val value: String) {
+    HeadPose("head_pose"),
+
+    Smile("smile"),
 }
 
 enum class DocumentImageOriginValue(val value: String) {
@@ -154,7 +172,7 @@ private val isEmulator: Boolean
  * Returns the model of the device. If the device is an emulator, it returns "emulator". Any errors
  * result in "unknown"
  */
-private val model: String
+val model: String
     get() {
         try {
             val manufacturer = Build.MANUFACTURER

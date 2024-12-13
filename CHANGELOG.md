@@ -1,5 +1,10 @@
 # Release Notes
 
+## 10.4.0
+
+* Added the new enhanced biometric screens
+* Fixed inconsistent document type parameters on sample app
+
 ## 10.3.6
 
 * Modify access for document capture and selfie capture

@@ -11,7 +11,7 @@ import com.smileidentity.SmileIDOptIn
 @Preview(
     name = "A/Phone",
     group = "phone-preview",
-    device = "spec:shape=Normal,width=360,height=640,unit=dp,dpi=480",
+    device = "spec:width=360dp,height=640dp,dpi=480",
 )
 @Preview(
     name = "E/Dark mode",

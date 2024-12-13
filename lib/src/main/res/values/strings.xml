@@ -48,29 +48,27 @@
     <string name="si_smart_selfie_processing_retry_button">Retry</string>
     <string name="si_smart_selfie_processing_close_button">Close</string>
 
-    <!--  SmartSelfie V2  -->
-    <string name="si_smart_selfie_v2_auth_product_name">SmartSelfie™ Authentication\n(Strict Mode)</string>
-    <string name="si_smart_selfie_v2_enroll_product_name">SmartSelfie™ Enrollment\n(Strict Mode)</string>
-    <string name="si_smart_selfie_v2_directive_place_entire_head_in_frame">Place entire head in frame</string>
-    <string name="si_smart_selfie_v2_directive_ensure_device_upright">Ensure your device is upright</string>
-    <string name="si_smart_selfie_v2_directive_ensure_one_face">Ensure only 1 face is visible</string>
-    <string name="si_smart_selfie_v2_directive_ensure_entire_face_visible">Ensure your entire face is visible</string>
-    <string name="si_smart_selfie_v2_directive_need_more_light">Need more light</string>
-    <string name="si_smart_selfie_v2_directive_move_back">Move back</string>
-    <string name="si_smart_selfie_v2_directive_move_closer">Move closer</string>
-    <string name="si_smart_selfie_v2_directive_poor_image_quality">Poor image quality</string>
-    <string name="si_smart_selfie_v2_directive_look_left">Look left</string>
-    <string name="si_smart_selfie_v2_directive_look_right">Look right</string>
-    <string name="si_smart_selfie_v2_directive_look_up">Look up</string>
-    <string name="si_smart_selfie_v2_directive_keep_looking">Look at the camera</string>
-    <string name="si_smart_selfie_v2_directive_smile">Smile!</string>
-    <string name="si_smart_selfie_v2_submitting">Submitting…</string>
-    <string name="si_smart_selfie_v2_submission_successful">Submission Successful</string>
-    <string name="si_smart_selfie_v2_submission_failed">Submission Failed</string>
-
-    <!--  SmartSelfie V2  -->
-    <string name="si_smart_selfie_v3_get_started">Get Started</string>
-    <string name="si_smart_selfie_v3_instructions">Position your head in the camera view. Then move in the direction that is indicated</string>
+    <!--  SmartSelfie Enhanced  -->
+    <string name="si_smart_selfie_enhanced_get_started">Get Started</string>
+    <string name="si_smart_selfie_enhanced_instructions">Position your head in the camera view. Then move in the direction that is indicated.</string>
+    <string name="si_smart_selfie_enhanced_auth_product_name">SmartSelfie™ Authentication\n(Enhanced)</string>
+    <string name="si_smart_selfie_enhanced_enroll_product_name">SmartSelfie™ Enrollment\n(Enhanced)</string>
+    <string name="si_smart_selfie_enhanced_directive_place_entire_head_in_frame">Position your head in view</string>
+    <string name="si_smart_selfie_enhanced_directive_ensure_device_upright">Ensure your device is upright</string>
+    <string name="si_smart_selfie_enhanced_directive_ensure_one_face">Ensure only 1 face is visible</string>
+    <string name="si_smart_selfie_enhanced_directive_ensure_entire_face_visible">Ensure your entire face is visible</string>
+    <string name="si_smart_selfie_enhanced_directive_need_more_light">Move to a well lit room</string>
+    <string name="si_smart_selfie_enhanced_directive_move_back">Move back</string>
+    <string name="si_smart_selfie_enhanced_directive_move_closer">Move closer</string>
+    <string name="si_smart_selfie_enhanced_directive_poor_image_quality">Poor image quality</string>
+    <string name="si_smart_selfie_enhanced_directive_look_left">Turn your head to the left</string>
+    <string name="si_smart_selfie_enhanced_directive_look_right">Turn your head to the right</string>
+    <string name="si_smart_selfie_enhanced_directive_look_up">Turn your head slightly up</string>
+    <string name="si_smart_selfie_enhanced_directive_keep_looking">Look at the camera</string>
+    <string name="si_smart_selfie_enhanced_directive_smile">Smile!</string>
+    <string name="si_smart_selfie_enhanced_submitting">Submitting…</string>
+    <string name="si_smart_selfie_enhanced_submission_successful">Submission Successful</string>
+    <string name="si_smart_selfie_enhanced_submission_failed">Submission Failed</string>
 
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>

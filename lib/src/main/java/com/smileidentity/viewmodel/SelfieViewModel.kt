@@ -21,6 +21,7 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
+import com.smileidentity.models.v2.LivenessType
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
@@ -73,7 +74,7 @@ private const val SELFIE_IMAGE_SIZE = 640
 private const val NO_FACE_RESET_DELAY_MS = 3000
 private const val FACE_ROTATION_THRESHOLD = 0.75f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
-const val MAX_FACE_AREA_THRESHOLD = 0.25f
+const val MAX_FACE_AREA_THRESHOLD = 0.30f
 private const val SMILE_THRESHOLD = 0.8f
 
 data class SelfieUiState(
@@ -281,6 +282,7 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
+        metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
@@ -435,6 +437,7 @@ class SelfieViewModel(
             submitJob(selfieFile!!, livenessFiles)
         } else {
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
+            metadata.removeAll { it is Metadatum.ActiveLivenessType }
             metadata.removeAll { it is Metadatum.SelfieImageOrigin }
             shouldAnalyzeImages = true
             _uiState.update {

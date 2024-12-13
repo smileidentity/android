@@ -18,6 +18,10 @@ private const val MIDWAY_LR_ANGLE_MIN = 9f
 private const val MIDWAY_UP_ANGLE_MAX = 90f
 private const val MIDWAY_UP_ANGLE_MIN = 7f
 private const val ORTHOGONAL_ANGLE_BUFFER = 90f
+private const val MID_POINT_TARGET = 0.5f
+private const val END_POINT_TARGET = 1.0f
+private const val PROGRESS_INCREMENT = 0.12f
+private const val FAILURE_THRESHOLD = 5
 
 /**
  * Determines a randomized set of directions for the user to look in
@@ -25,19 +29,89 @@ private const val ORTHOGONAL_ANGLE_BUFFER = 90f
  */
 internal class ActiveLivenessTask(
     shouldCaptureMidTrack: Boolean = true,
+    private val updateProgress: (Float, Float, Float) -> Unit,
 ) {
-    private sealed interface FaceDirection
-    private sealed interface Left : FaceDirection
-    private sealed interface Right : FaceDirection
-    private sealed interface Up : FaceDirection
+    private sealed interface FaceDirection {
+        fun getProgress(task: ActiveLivenessTask): Float
+        fun updateProgress(task: ActiveLivenessTask)
+        fun checkFaceAngle(face: Face): Boolean
+    }
+
+    private sealed interface Left : FaceDirection {
+        override fun getProgress(task: ActiveLivenessTask) = task.leftProgress
+        override fun updateProgress(task: ActiveLivenessTask) =
+            task.updateProgress(task.leftProgress, task.rightProgress, task.topProgress)
+    }
+
+    private sealed interface Right : FaceDirection {
+        override fun getProgress(task: ActiveLivenessTask) = task.rightProgress
+        override fun updateProgress(task: ActiveLivenessTask) =
+            task.updateProgress(task.leftProgress, task.rightProgress, task.topProgress)
+    }
+
+    private sealed interface Up : FaceDirection {
+        override fun getProgress(task: ActiveLivenessTask) = task.topProgress
+        override fun updateProgress(task: ActiveLivenessTask) =
+            task.updateProgress(task.leftProgress, task.rightProgress, task.topProgress)
+    }
+
     private sealed interface Midpoint : FaceDirection
     private sealed class Endpoint(val midpoint: Midpoint) : FaceDirection
-    private data object LeftEnd : Left, Endpoint(LeftMid)
-    private data object LeftMid : Left, Midpoint
-    private data object RightEnd : Right, Endpoint(RightMid)
-    private data object RightMid : Right, Midpoint
-    private data object UpEnd : Up, Endpoint(UpMid)
-    private data object UpMid : Up, Midpoint
+
+    private data object LeftEnd : Left, Endpoint(LeftMid) {
+        override fun checkFaceAngle(face: Face) = face.isLookingLeft(
+            minAngle = END_LR_ANGLE_MIN,
+            maxAngle = END_LR_ANGLE_MAX,
+            verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+        )
+    }
+
+    private data object LeftMid : Left, Midpoint {
+        override fun checkFaceAngle(face: Face) = face.isLookingLeft(
+            minAngle = MIDWAY_LR_ANGLE_MIN,
+            maxAngle = MIDWAY_LR_ANGLE_MAX,
+            verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+        )
+    }
+
+    private data object RightEnd : Right, Endpoint(RightMid) {
+        override fun checkFaceAngle(face: Face) = face.isLookingRight(
+            minAngle = END_LR_ANGLE_MIN,
+            maxAngle = END_LR_ANGLE_MAX,
+            verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+        )
+    }
+
+    private data object RightMid : Right, Midpoint {
+        override fun checkFaceAngle(face: Face) = face.isLookingRight(
+            minAngle = MIDWAY_LR_ANGLE_MIN,
+            maxAngle = MIDWAY_LR_ANGLE_MAX,
+            verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+        )
+    }
+
+    private data object UpEnd : Up, Endpoint(UpMid) {
+        override fun checkFaceAngle(face: Face) = face.isLookingUp(
+            minAngle = END_UP_ANGLE_MIN,
+            maxAngle = END_UP_ANGLE_MAX,
+            horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+        )
+    }
+
+    private data object UpMid : Up, Midpoint {
+        override fun checkFaceAngle(face: Face) = face.isLookingUp(
+            minAngle = MIDWAY_UP_ANGLE_MIN,
+            maxAngle = MIDWAY_UP_ANGLE_MAX,
+            horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
+        )
+    }
+
+    private var leftProgress = 0f
+    private var rightProgress = 0f
+    private var topProgress = 0f
+    private var consecutiveFailedFrames = 0
+    private var currentDirectionIdx = 0
+    private var currentDirectionInitiallySatisfiedAt = Long.MAX_VALUE
 
     private val orderedFaceDirections = listOf(LeftEnd, RightEnd, UpEnd)
         .shuffled()
@@ -48,8 +122,6 @@ internal class ActiveLivenessTask(
                 listOf(it)
             }
         }
-    private var currentDirectionIdx = 0
-    private var currentDirectionInitiallySatisfiedAt = Long.MAX_VALUE
 
     /**
      * Determines if conditions are met for the current active liveness task
@@ -61,50 +133,61 @@ internal class ActiveLivenessTask(
      * @param face The face detected in the image
      */
     fun doesFaceMeetCurrentActiveLivenessTask(face: Face): Boolean {
-        val isLookingRightDirection = when (orderedFaceDirections[currentDirectionIdx]) {
-            is LeftMid -> face.isLookingLeft(
-                minAngle = MIDWAY_LR_ANGLE_MIN,
-                maxAngle = MIDWAY_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+        val currentDirection = orderedFaceDirections[currentDirectionIdx]
+        val isCorrect = currentDirection.checkFaceAngle(face)
 
-            is LeftEnd -> face.isLookingLeft(
-                minAngle = END_LR_ANGLE_MIN,
-                maxAngle = END_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
+        updateProgressForDirection(currentDirection, isCorrect)
 
-            is RightMid -> face.isLookingRight(
-                minAngle = MIDWAY_LR_ANGLE_MIN,
-                maxAngle = MIDWAY_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
-
-            is RightEnd -> face.isLookingRight(
-                minAngle = END_LR_ANGLE_MIN,
-                maxAngle = END_LR_ANGLE_MAX,
-                verticalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
-
-            is UpMid -> face.isLookingUp(
-                minAngle = MIDWAY_UP_ANGLE_MIN,
-                maxAngle = MIDWAY_UP_ANGLE_MAX,
-                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
-
-            is UpEnd -> face.isLookingUp(
-                minAngle = END_UP_ANGLE_MIN,
-                maxAngle = END_UP_ANGLE_MAX,
-                horizontalAngleBuffer = ORTHOGONAL_ANGLE_BUFFER,
-            )
-        }
-        if (!isLookingRightDirection) {
+        if (!isCorrect) {
             resetLivenessStabilityTime()
             return false
         }
-        if (orderedFaceDirections[currentDirectionIdx] is Midpoint) {
-            return true
+
+        val currentProgress = currentDirection.getProgress(this)
+
+        return if (currentDirection is Midpoint) {
+            currentProgress >= MID_POINT_TARGET
+        } else {
+            val animatedProgress = when (currentDirection) {
+                is Left -> leftProgress
+                is Right -> rightProgress
+                is Up -> topProgress
+            }
+            animatedProgress >= END_POINT_TARGET && checkEndpointStability()
         }
+    }
+
+    private fun updateProgressForDirection(direction: FaceDirection, isCorrect: Boolean) {
+        if (isCorrect) {
+            consecutiveFailedFrames = 0
+            val targetProgress = if (direction is Midpoint) MID_POINT_TARGET else END_POINT_TARGET
+
+            when (direction) {
+                is Left -> {
+                    leftProgress = minOf(targetProgress, leftProgress + PROGRESS_INCREMENT)
+                }
+                is Right -> {
+                    rightProgress = minOf(targetProgress, rightProgress + PROGRESS_INCREMENT)
+                }
+                is Up -> {
+                    topProgress = minOf(targetProgress, topProgress + PROGRESS_INCREMENT)
+                }
+            }
+        } else {
+            consecutiveFailedFrames++
+            if (consecutiveFailedFrames >= FAILURE_THRESHOLD) {
+                when (direction) {
+                    is Left -> leftProgress = 0f
+                    is Right -> rightProgress = 0f
+                    is Up -> topProgress = 0f
+                }
+                consecutiveFailedFrames = 0
+            }
+        }
+        direction.updateProgress(task = this)
+    }
+
+    private fun checkEndpointStability(): Boolean {
         if (currentDirectionInitiallySatisfiedAt > System.currentTimeMillis()) {
             currentDirectionInitiallySatisfiedAt = System.currentTimeMillis()
         }
@@ -122,7 +205,21 @@ internal class ActiveLivenessTask(
      * @return true if there are more directions to satisfy, false otherwise
      */
     fun markCurrentDirectionSatisfied(): Boolean {
-        currentDirectionIdx += 1
+        val currentDirection = orderedFaceDirections[currentDirectionIdx]
+        val nextDirection = orderedFaceDirections.getOrNull(currentDirectionIdx + 1)
+
+        if (nextDirection == null ||
+            (currentDirection is Endpoint && nextDirection !is Midpoint) ||
+            (currentDirection is Midpoint && nextDirection !is Endpoint)
+        ) {
+            when (currentDirection) {
+                is Left -> leftProgress = 0f
+                is Right -> rightProgress = 0f
+                is Up -> topProgress = 0f
+            }
+        }
+
+        currentDirectionIdx++
         return currentDirectionIdx < orderedFaceDirections.size
     }
 
@@ -134,6 +231,8 @@ internal class ActiveLivenessTask(
      */
     fun restart() {
         currentDirectionIdx = 0
+        consecutiveFailedFrames = 0
+        updateProgress(0f, 0f, 0f)
         resetLivenessStabilityTime()
     }
 
@@ -142,12 +241,9 @@ internal class ActiveLivenessTask(
      */
     val selfieHint
         get() = when (orderedFaceDirections[currentDirectionIdx]) {
-            is LeftMid -> LookLeft
-            is LeftEnd -> LookLeft
-            is RightMid -> LookRight
-            is RightEnd -> LookRight
-            is UpMid -> LookUp
-            is UpEnd -> LookUp
+            is Left -> LookLeft
+            is Right -> LookRight
+            is Up -> LookUp
         }
 
     /**

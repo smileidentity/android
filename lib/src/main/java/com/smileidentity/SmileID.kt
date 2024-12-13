@@ -296,7 +296,7 @@ object SmileID {
      * to handle potential network responses, including success, failure, or error cases.
      */
     @JvmStatic
-    suspend fun submitJob(
+    fun submitJob(
         jobId: String,
         deleteFilesOnSuccess: Boolean = true,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO),

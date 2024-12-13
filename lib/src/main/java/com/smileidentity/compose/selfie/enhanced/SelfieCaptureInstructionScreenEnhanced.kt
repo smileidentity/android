@@ -1,5 +1,6 @@
-package com.smileidentity.compose.selfie.v2
+package com.smileidentity.compose.selfie.enhanced
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,18 +15,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smileidentity.R
+import com.smileidentity.compose.components.AnimatedInstructions
 import com.smileidentity.compose.components.ContinueButton
-import com.smileidentity.compose.components.LottieInstruction
 import com.smileidentity.compose.components.SmileIDAttribution
+import com.smileidentity.compose.preview.Preview
+import com.smileidentity.compose.preview.SmilePreviews
 
 @Composable
-fun SelfieCaptureInstructionScreenV2(
+fun SelfieCaptureInstructionScreenEnhanced(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },
@@ -45,13 +49,13 @@ fun SelfieCaptureInstructionScreenV2(
                 .verticalScroll(rememberScrollState())
                 .weight(1f),
         ) {
-            LottieInstruction(
+            AnimatedInstructions(
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(256.dp)
                     .padding(bottom = 16.dp),
             )
             Text(
-                text = stringResource(R.string.si_smart_selfie_v3_instructions),
+                text = stringResource(R.string.si_smart_selfie_enhanced_instructions),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 16.sp,
@@ -60,7 +64,7 @@ fun SelfieCaptureInstructionScreenV2(
                 ),
                 modifier = Modifier
                     .padding(24.dp)
-                    .testTag("smart_selfie_instructions_v2_instructions_text"),
+                    .testTag("smart_selfie_instructions_enhanced_instructions_text"),
             )
         }
         Column(
@@ -70,15 +74,29 @@ fun SelfieCaptureInstructionScreenV2(
                 .padding(8.dp),
         ) {
             ContinueButton(
-                buttonText = stringResource(R.string.si_smart_selfie_v3_get_started),
+                buttonText = stringResource(R.string.si_smart_selfie_enhanced_get_started),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("smart_selfie_instructions_v2_get_started_button"),
+                    .testTag("smart_selfie_instructions_enhanced_get_started_button"),
                 onClick = onInstructionsAcknowledged,
             )
             if (showAttribution) {
                 SmileIDAttribution()
             }
+        }
+    }
+}
+
+@SmilePreviews
+@Composable
+private fun SelfieCaptureInstructionScreenEnhancedPreview() {
+    Preview {
+        Column {
+            SelfieCaptureInstructionScreenEnhanced(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Gray),
+            ) {}
         }
     }
 }

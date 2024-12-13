@@ -3,7 +3,6 @@ package com.smileidentity.viewmodel
 import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
-import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
@@ -20,11 +19,13 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
+import com.smileidentity.models.v2.LivenessType
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.asNetworkRequest
+import com.smileidentity.models.v2.model
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -46,7 +47,6 @@ import com.smileidentity.viewmodel.SelfieHint.NeedLight
 import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
 import com.smileidentity.viewmodel.SelfieHint.PoorImageQuality
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
-import com.smileidentity.viewmodel.SelfieHint.Smile
 import com.ujizin.camposer.state.CamSelector
 import java.io.File
 import java.io.IOException
@@ -77,7 +77,7 @@ by the liveness task
 const val VIEWFINDER_SCALE = 1.3f
 private const val COMPLETED_DELAY_MS = 1500L
 private const val FACE_QUALITY_THRESHOLD = 0.5f
-private const val FORCED_FAILURE_TIMEOUT_MS = 20_000L
+private const val FORCED_FAILURE_TIMEOUT_MS = 120_000L
 private const val IGNORE_FACES_SMALLER_THAN = 0.03f
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
 private const val LIVENESS_IMAGE_SIZE = 320
@@ -97,43 +97,44 @@ sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
     data object Processing : SelfieState
     data class Error(val throwable: Throwable) : SelfieState
-    data class Success(val result: SmartSelfieResponse) : SelfieState
+    data class Success(
+        val result: SmartSelfieResponse,
+        val selfieFile: File,
+        val livenessFiles: List<File>,
+    ) : SelfieState
 }
 
-enum class SelfieHint(@DrawableRes val animation: Int, @StringRes val text: Int) {
-    SearchingForFace(
-        R.drawable.si_tf_face_search,
-        R.string.si_smart_selfie_v2_directive_place_entire_head_in_frame,
+enum class SelfieHint(
+    @StringRes val text: Int,
+) {
+    NeedLight(text = R.string.si_smart_selfie_enhanced_directive_need_more_light),
+    SearchingForFace(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
+    MoveBack(text = R.string.si_smart_selfie_enhanced_directive_move_back),
+    MoveCloser(text = R.string.si_smart_selfie_enhanced_directive_move_closer),
+    LookLeft(text = R.string.si_smart_selfie_enhanced_directive_look_left),
+    LookRight(text = R.string.si_smart_selfie_enhanced_directive_look_right),
+    LookUp(text = R.string.si_smart_selfie_enhanced_directive_look_up),
+    EnsureDeviceUpright(text = R.string.si_smart_selfie_enhanced_directive_ensure_device_upright),
+    OnlyOneFace(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
+    EnsureEntireFaceVisible(
+        text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame,
     ),
-    EnsureDeviceUpright(
-        R.drawable.si_tf_face_search,
-        R.string.si_smart_selfie_v2_directive_ensure_device_upright,
-    ),
-    OnlyOneFace(-1, R.string.si_smart_selfie_v2_directive_ensure_one_face),
-    EnsureEntireFaceVisible(-1, R.string.si_smart_selfie_v2_directive_ensure_entire_face_visible),
-    NeedLight(R.drawable.si_tf_light_flash, R.string.si_smart_selfie_v2_directive_need_more_light),
-    MoveBack(-1, R.string.si_smart_selfie_v2_directive_move_back),
-    MoveCloser(-1, R.string.si_smart_selfie_v2_directive_move_closer),
-    PoorImageQuality(
-        R.drawable.si_tf_light_flash,
-        R.string.si_smart_selfie_v2_directive_poor_image_quality,
-    ),
-    LookLeft(-1, R.string.si_smart_selfie_v2_directive_look_left),
-    LookRight(-1, R.string.si_smart_selfie_v2_directive_look_right),
-    LookUp(-1, R.string.si_smart_selfie_v2_directive_look_up),
-    LookStraight(-1, R.string.si_smart_selfie_v2_directive_keep_looking),
-    Smile(-1, R.string.si_smart_selfie_v2_directive_smile),
+    PoorImageQuality(text = R.string.si_smart_selfie_enhanced_directive_need_more_light),
+    LookStraight(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
 }
 
 data class SmartSelfieV2UiState(
+    val topProgress: Float = 0F,
+    val rightProgress: Float = 0F,
+    val leftProgress: Float = 0F,
+    val selfieFile: File? = null,
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
 )
 
 @kotlin.OptIn(FlowPreview::class)
-class SmartSelfieV2ViewModel(
+class SmartSelfieEnhancedViewModel(
     private val userId: String,
     private val isEnroll: Boolean,
-    private val useStrictMode: Boolean,
     private val selfieQualityModel: SelfieQualityModel,
     private val metadata: MutableList<Metadatum>,
     private val allowNewEnroll: Boolean? = null,
@@ -148,13 +149,21 @@ class SmartSelfieV2ViewModel(
     ),
     private val onResult: SmileIDCallback<SmartSelfieResult>,
 ) : ViewModel() {
-    private val activeLiveness = ActiveLivenessTask()
+    private val activeLiveness = ActiveLivenessTask { leftProgress, rightProgress, topProgress ->
+        _uiState.update {
+            it.copy(
+                leftProgress = leftProgress,
+                rightProgress = rightProgress,
+                topProgress = topProgress,
+            )
+        }
+    }
 
     private val _uiState = MutableStateFlow(SmartSelfieV2UiState())
     val uiState = _uiState.asStateFlow().sample(500).stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        _uiState.value,
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = _uiState.value,
     )
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
@@ -165,12 +174,14 @@ class SmartSelfieV2ViewModel(
     private val modelInputSize = intArrayOf(1, 120, 120, 3)
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
-    private val shouldUseActiveLiveness: Boolean get() = useStrictMode && !forcedFailureTimerExpired
+    private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
 
     init {
         startStrictModeTimerIfNecessary()
     }
+
+    private fun isPortraitOrientation(degrees: Int): Boolean = degrees == 270
 
     /**
      * In strict mode, the user has a certain amount of time to finish the active liveness task. If
@@ -178,17 +189,15 @@ class SmartSelfieV2ViewModel(
      * API request. Static liveness images will be captured for this
      */
     private fun startStrictModeTimerIfNecessary() {
-        if (useStrictMode) {
-            viewModelScope.launch {
-                delay(FORCED_FAILURE_TIMEOUT_MS)
-                val selfieState = uiState.value.selfieState
-                // These 2 conditions should theoretically both be true at the same time
-                if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
-                    SmileIDCrashReporting.hub.addBreadcrumb("Strict Mode force fail timer expired")
-                    Timber.d("Strict Mode forced failure timer expired")
-                    forcedFailureTimerExpired = true
-                    resetCaptureProgress(LookStraight)
-                }
+        viewModelScope.launch {
+            delay(FORCED_FAILURE_TIMEOUT_MS)
+            val selfieState = uiState.value.selfieState
+            // These 2 conditions should theoretically both be true at the same time
+            if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
+                SmileIDCrashReporting.hub.addBreadcrumb("Strict Mode force fail timer expired")
+                Timber.d("Strict Mode forced failure timer expired")
+                forcedFailureTimerExpired = true
+                resetCaptureProgress(LookStraight)
             }
         }
     }
@@ -224,9 +233,9 @@ class SmartSelfieV2ViewModel(
             return
         }
 
-        // We want to hold the orientation constant for the duration of the capture
-        val desiredOrientation = selfieCameraOrientation ?: imageProxy.imageInfo.rotationDegrees
-        if (imageProxy.imageInfo.rotationDegrees != desiredOrientation) {
+        // We want to hold the orientation on portrait only :)
+        val currentOrientation = imageProxy.imageInfo.rotationDegrees
+        if (!isPortraitOrientation(currentOrientation)) {
             val message = "Camera orientation changed. Resetting progress"
             Timber.d(message)
             SmileIDCrashReporting.hub.addBreadcrumb(message)
@@ -423,18 +432,11 @@ class SmartSelfieV2ViewModel(
             )
             livenessFiles.add(livenessFile)
 
-            if (shouldUseActiveLiveness) {
-                if (!activeLiveness.isFinished) {
-                    _uiState.update {
-                        it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
-                    }
-                    return@addOnSuccessListener
+            if (!activeLiveness.isFinished) {
+                _uiState.update {
+                    it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
                 }
-            } else {
-                if (livenessFiles.size < NUM_LIVENESS_IMAGES) {
-                    _uiState.update { it.copy(selfieState = SelfieState.Analyzing(Smile)) }
-                    return@addOnSuccessListener
-                }
+                return@addOnSuccessListener
             }
 
             shouldAnalyzeImages = false
@@ -464,16 +466,34 @@ class SmartSelfieV2ViewModel(
                     async {
                         val apiResponse = submitJob(selfieFile)
                         done = true
-                        _uiState.update { it.copy(selfieState = SelfieState.Success(apiResponse)) }
+                        _uiState.update {
+                            it.copy(
+                                selfieState = SelfieState.Success(
+                                    result = apiResponse,
+                                    selfieFile = selfieFile,
+                                    livenessFiles = livenessFiles,
+                                ),
+                                selfieFile = selfieFile,
+                            )
+                        }
                         // Delay to ensure the completion icon is shown for a little bit
                         delay(COMPLETED_DELAY_MS)
-                        val result = SmartSelfieResult(selfieFile, livenessFiles, apiResponse)
+                        val result = SmartSelfieResult(
+                            selfieFile = selfieFile,
+                            livenessFiles = livenessFiles,
+                            apiResponse = apiResponse,
+                        )
                         onResult(SmileIDResult.Success(result))
                     },
                     async {
                         delay(LOADING_INDICATOR_DELAY_MS)
                         if (!done) {
-                            _uiState.update { it.copy(selfieState = SelfieState.Processing) }
+                            _uiState.update {
+                                it.copy(
+                                    selfieFile = selfieFile,
+                                    selfieState = SelfieState.Processing,
+                                )
+                            }
                         }
                     },
                 )
@@ -489,6 +509,7 @@ class SmartSelfieV2ViewModel(
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
+        metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(
@@ -518,6 +539,7 @@ class SmartSelfieV2ViewModel(
      * file IO scenario.
      */
     fun onRetry() {
+        metadata.removeAll { it is Metadatum.CameraName }
         metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
         metadata.removeAll { it is Metadatum.SelfieImageOrigin }
         resetCaptureProgress(SearchingForFace)
@@ -528,9 +550,17 @@ class SmartSelfieV2ViewModel(
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
         metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        metadata.removeAll { it is Metadatum.CameraName }
         when (camSelector) {
-            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
-            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+            CamSelector.Front -> {
+                metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
+                metadata.add(Metadatum.CameraName("""$model (Front Camera)"""))
+            }
+
+            CamSelector.Back -> {
+                metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+                metadata.add(Metadatum.CameraName("""$model (Back Camera)"""))
+            }
         }
     }
 
