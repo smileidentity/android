@@ -53,12 +53,10 @@ fun OvalCutout(
                 SelfieHint.NeedLight, SelfieHint.SearchingForFace, SelfieHint.MoveBack,
                 SelfieHint.MoveCloser, SelfieHint.EnsureDeviceUpright, SelfieHint.OnlyOneFace,
                 SelfieHint.EnsureEntireFaceVisible, SelfieHint.PoorImageQuality,
-                SelfieHint.LookStraight,
-                    -> MaterialTheme.colorScheme.errorContainer
+                SelfieHint.LookStraight -> MaterialTheme.colorScheme.errorContainer
 
                 SelfieHint.LookLeft, SelfieHint.LookRight,
-                SelfieHint.LookUp,
-                    -> MaterialTheme.colorScheme.tertiary
+                SelfieHint.LookUp -> MaterialTheme.colorScheme.tertiary
             }
         }
 
