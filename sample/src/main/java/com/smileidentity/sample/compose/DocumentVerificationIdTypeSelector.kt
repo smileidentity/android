@@ -103,14 +103,14 @@ fun DocumentVerificationIdTypeSelector(
 
         idTypesForCountry?.let { idTypesForCountry ->
             IdTypeSelector(idTypesForCountry = idTypesForCountry) {
-                onIdTypeSelected(selectedCountry!!.country.code, it.name, it.hasBack)
+                onIdTypeSelected(selectedCountry!!.country.code, it.code, it.hasBack)
             }
         }
     }
 }
 
 @Suppress("UnusedReceiverParameter")
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ColumnScope.CountrySelector(
     validDocuments: ImmutableList<ValidDocument>,

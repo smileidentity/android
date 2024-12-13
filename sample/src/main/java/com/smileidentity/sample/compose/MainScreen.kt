@@ -309,7 +309,7 @@ fun MainScreen(
                 }
                 composable(
                     ProductScreen.DocumentVerification.route +
-                        "/{countryCode}/{idType}/{captureBothSides}",
+                        "/{country}/{idType}/{captureBothSides}",
                 ) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
                     val userId = rememberSaveable { randomUserId() }
@@ -317,8 +317,8 @@ fun MainScreen(
                     SmileID.DocumentVerification(
                         userId = userId,
                         jobId = jobId,
-                        countryCode = it.arguments?.getString("countryCode")!!,
-                        documentType = it.arguments?.getString("documentType"),
+                        countryCode = it.arguments?.getString("country")!!,
+                        documentType = it.arguments?.getString("idType"),
                         captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
                         showInstructions = true,
                         allowGalleryUpload = true,
