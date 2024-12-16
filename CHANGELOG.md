@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.4.1
+
+* Remove FileName Moshi adapter and use FileAdapter which uses absolute path
+
 ## 10.4.0
 
 * Introduce screens for the new Enhanced Selfie Capture Enrollment and Authentication Products.
