@@ -109,15 +109,6 @@ fun List<File>.asFormDataParts(
     mediaType: String? = null,
 ): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
 
-@Suppress("unused", "UNUSED_PARAMETER")
-object FileNameAdapter {
-    @ToJson
-    fun toJson(file: File): String = file.name
-
-    @FromJson
-    fun fromJson(fileName: String): File = File(fileName)
-}
-
 @Suppress("unused")
 object FileAdapter {
     @ToJson
