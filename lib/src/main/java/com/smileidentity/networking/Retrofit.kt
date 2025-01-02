@@ -7,6 +7,7 @@ import com.smileidentity.models.JobResult
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.SmartSelfieJobResult
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.Metadatum
@@ -17,6 +18,7 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import java.io.File
+import java.io.IOException
 import java.lang.reflect.Type
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -78,7 +80,19 @@ object UploadRequestConverterFactory : Converter.Factory() {
             return null
         }
         return Converter<UploadRequest, RequestBody> {
-            it.zip().asRequestBody("application/zip".toMediaType())
+            try {
+                it.zip().asRequestBody("application/zip".toMediaType())
+            } catch (e: IOException) {
+                throw SmileIDException(
+                    SmileIDException.Details(
+                        code = null,
+                        message = e.message ?: (
+                            "Your device is running low on storage. " +
+                                "Please free up space and try again"
+                            ),
+                    ),
+                )
+            }
         }
     }
 }
@@ -109,7 +123,7 @@ fun List<File>.asFormDataParts(
     mediaType: String? = null,
 ): List<MultipartBody.Part> = map { it.asFormDataPart(partName, mediaType) }
 
-@Suppress("unused", "UNUSED_PARAMETER")
+@Suppress("unused")
 object FileNameAdapter {
     @ToJson
     fun toJson(file: File): String = file.name
