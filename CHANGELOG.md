@@ -2,7 +2,7 @@
 
 ## 10.4.1 (Unreleased)
 
-* Throw IOException in the mileIDResult.Error class
+* Throw IOException in the SmileIDResult.Error class
 
 ## 10.4.0
 
