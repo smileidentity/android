@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.4.1 (Unreleased)
+
+* Throw IOException in the mileIDResult.Error class
+
 ## 10.4.0
 
 * Introduce screens for the new Enhanced Selfie Capture Enrollment and Authentication Products.
