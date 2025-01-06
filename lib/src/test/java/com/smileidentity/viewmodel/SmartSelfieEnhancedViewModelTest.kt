@@ -10,16 +10,15 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SmartSelfieV2ViewModelTest {
-    private lateinit var subject: SmartSelfieV2ViewModel
+class SmartSelfieEnhancedViewModelTest {
+    private lateinit var subject: SmartSelfieEnhancedViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = SmartSelfieV2ViewModel(
+        subject = SmartSelfieEnhancedViewModel(
             userId = "userId",
             isEnroll = false,
-            useStrictMode = false,
             extraPartnerParams = persistentMapOf(),
             selfieQualityModel = mockk(),
             faceDetector = mockk(),
