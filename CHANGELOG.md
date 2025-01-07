@@ -1,6 +1,6 @@
 # Release Notes
 
-## 10.4.1 (Unreleased)
+## 10.4.1
 
 * Throw IOException in the SmileIDResult.Error class
 * Fixed document back file returned as null in the results for DocV and Enhanced DocV
