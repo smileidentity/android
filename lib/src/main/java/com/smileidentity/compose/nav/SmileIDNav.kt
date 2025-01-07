@@ -328,7 +328,7 @@ internal fun NavGraphBuilder.documentsDestinations(
         val galleryDocumentUri = decodeUrl(params.galleryDocumentUri)
         DocumentCaptureScreen(
             jobId = params.jobId,
-            side = DocumentCaptureSide.Front,
+            side = DocumentCaptureSide.Back,
             knownIdAspectRatio = params.knownIdAspectRatio,
             galleryDocumentUri = galleryDocumentUri,
             captureTitleText = stringResource(params.captureTitleText),
