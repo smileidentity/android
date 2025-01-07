@@ -38,7 +38,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Build, Test, Lint, Assemble, Publish Snapshot
         # NB! The "lint" gradle action here is different than ktLint
-        run: ./gradlew build assembleDebug publish
+        run: ./gradlew lint build assembleDebug publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -57,13 +57,11 @@ jobs:
           name: Sample App APK
           path: sample/build/outputs/apk/debug/sample-debug.apk
 
-#  lint:
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 1
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: musichin/ktlint-check@v3
-#        continue-on-error: true
-#        with:
-#          ktlint-version: "1.2.1"
-#          level: 'warning'
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: musichin/ktlint-check@v3
+        with:
+          ktlint-version: "1.2.1"
