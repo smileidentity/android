@@ -57,11 +57,12 @@ jobs:
           name: Sample App APK
           path: sample/build/outputs/apk/debug/sample-debug.apk
 
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pinterest/ktlint-github-action@v1.2.0
-        with:
-          ktlint-version: "1.2.1"
+# this plugin is a bit outdated
+#  lint:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 1
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: musichin/ktlint-check@v3
+#        with:
+#          ktlint-version: "1.2.1"
