@@ -1,6 +1,6 @@
 [versions]
 accompanist-permissions = "0.37.0"
-android-gradle-plugin = "8.7.3"
+android-gradle-plugin = "8.8.0"
 androidx-activity = "1.9.3"
 androidx-annotation-experimental = "1.4.1"
 androidx-compose-bom = "2024.12.01"
