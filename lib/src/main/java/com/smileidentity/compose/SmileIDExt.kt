@@ -36,8 +36,6 @@ import java.net.URL
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
-// todo useStrictMode and skipApiSubmission
-
 /**
  * Perform a SmartSelfie™ Enrollment
  *
@@ -55,8 +53,6 @@ import kotlinx.collections.immutable.persistentMapOf
  * front camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
- * @param useStrictMode Whether to use strict mode or not. Strict mode enables an advanced, more
- * secure, and more accurate UX for higher pass rates. [showInstructions] will be ignored
  * @param extraPartnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
@@ -110,8 +106,6 @@ fun SmileID.SmartSelfieEnrollment(
  * front camera will be used.
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
- * @param useStrictMode Whether to use strict mode or not. Strict mode enables an advanced, more
- * secure, and more accurate UX for higher pass rates. [showInstructions] will be ignored
  * @param extraPartnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
