@@ -215,9 +215,19 @@ dependencies {
     // Bundled model
     implementation(libs.mlkit.obj.detection)
 
-    implementation(libs.tflite)
-    implementation(libs.tflite.metadata)
-    implementation(libs.tflite.support)
+    // tflite
+    // the new tflite version depends on a newer version of tflite api, resulting in conflicts
+    // we exclude the dependency, then force the tflite-api to the latest version
+    implementation(libs.tflite) {
+        exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+    }
+    implementation(libs.tflite.metadata) {
+        exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+    }
+    implementation(libs.tflite.support) {
+        exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+    }
+    implementation(libs.tflite.api)
 
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
