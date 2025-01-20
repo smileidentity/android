@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.4.2 (Unreleased)
+
+* Android correct variable names for to match smile_config.json
+
 ## 10.4.1
 
 * Throw IOException in the SmileIDResult.Error class
