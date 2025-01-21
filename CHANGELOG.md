@@ -1,6 +1,6 @@
 # Release Notes
 
-## 10.4.2 (Unreleased)
+## 10.4.2
 
 * Android correct variable names for to match smile_config.json
 
