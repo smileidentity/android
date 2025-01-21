@@ -4,6 +4,7 @@ android-gradle-plugin = "8.8.0"
 androidx-activity = "1.9.3"
 androidx-annotation-experimental = "1.4.1"
 androidx-compose-bom = "2024.12.01"
+compose-destinations = "2.1.0-beta15"
 androidx-core = "1.15.0"
 androidx-core-splashscreen = "1.0.1"
 androidx-fragment = "1.8.5"
@@ -72,6 +73,8 @@ androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-destinations = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose-destinations" }
+compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose-destinations" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
