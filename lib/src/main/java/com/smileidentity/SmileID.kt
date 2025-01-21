@@ -135,7 +135,7 @@ object SmileID {
         }
 
         SmileID.useSandbox = useSandbox
-        val url = if (useSandbox) config.sandboxBaseUrl else config.prodBaseUrl
+        val url = if (useSandbox) config.testLambdaUrl else config.prodLambdaUrl
 
         retrofit = Retrofit.Builder()
             .baseUrl(url)

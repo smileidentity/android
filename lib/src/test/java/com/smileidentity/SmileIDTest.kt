@@ -52,8 +52,8 @@ class SmileIDTest {
         SmileID.config = Config(
             partnerId = "partnerId",
             authToken = "authToken",
-            prodBaseUrl = "prodBaseUrl",
-            sandboxBaseUrl = "sandboxBaseUrl",
+            prodLambdaUrl = "prodBaseUrl",
+            testLambdaUrl = "sandboxBaseUrl",
         )
     }
 

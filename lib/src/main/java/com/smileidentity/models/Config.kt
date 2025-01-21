@@ -19,8 +19,8 @@ import okio.source
 data class Config(
     @Json(name = "partner_id") val partnerId: String,
     @Json(name = "auth_token") val authToken: String,
-    @Json(name = "prod_lambda_url") val prodBaseUrl: String,
-    @Json(name = "test_lambda_url") val sandboxBaseUrl: String,
+    @Json(name = "prod_lambda_url") val prodLambdaUrl: String,
+    @Json(name = "test_lambda_url") val testLambdaUrl: String,
 ) : Parcelable {
     companion object {
         fun fromAssets(context: Context): Config {
