@@ -1,8 +1,13 @@
 # Release Notes
 
-## 10.4.1 (Unreleased)
+## 10.4.2
+
+* Android correct variable names for to match smile_config.json
+
+## 10.4.1
 
 * Throw IOException in the SmileIDResult.Error class
+* Fixed document back file returned as null in the results for DocV and Enhanced DocV
 
 ## 10.4.0
 

@@ -61,8 +61,8 @@ class DocumentViewModelTest {
         SmileID.config = Config(
             partnerId = "partnerId",
             authToken = "authToken",
-            prodBaseUrl = "prodBaseUrl",
-            sandboxBaseUrl = "sandboxBaseUrl",
+            prodLambdaUrl = "prodBaseUrl",
+            testLambdaUrl = "sandboxBaseUrl",
         )
     }
 
@@ -91,8 +91,7 @@ class DocumentViewModelTest {
         }
 
         // when
-        subject.onFrontDocCaptured(documentFrontFile)
-        subject.onDocumentFrontCaptureSuccess()
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
 
         // then
         // the submitJob coroutine won't have finished executing yet, so should still be processing
@@ -111,8 +110,7 @@ class DocumentViewModelTest {
         coEvery { SmileID.api.authenticate(any()) } throws RuntimeException()
 
         // when
-        subject.onFrontDocCaptured(documentFrontFile)
-        subject.onDocumentFrontCaptureSuccess()
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
 
         // then
         val currentStep = subject.uiState.value.currentStep
@@ -153,8 +151,7 @@ class DocumentViewModelTest {
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
 
         // when
-        subject.onFrontDocCaptured(documentFrontFile)
-        subject.onDocumentFrontCaptureSuccess()
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
 
         // then
         assertNotNull(uploadBodySlot.captured.idInfo)
@@ -199,8 +196,7 @@ class DocumentViewModelTest {
         coEvery { SmileID.api.upload(any(), capture(uploadBodySlot)) } just Runs
 
         // when
-        subject.onFrontDocCaptured(documentFrontFile)
-        subject.onDocumentFrontCaptureSuccess()
+        subject.onDocumentFrontCaptureSuccess(documentFrontFile)
         subject.onSelfieCaptureSuccess(SmileIDResult.Success(selfieResult))
 
         // then

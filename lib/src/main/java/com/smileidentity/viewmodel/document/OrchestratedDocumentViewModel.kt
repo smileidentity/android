@@ -38,10 +38,6 @@ import timber.log.Timber
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
     val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
-    val selfieToConfirm: File? = null,
-    val documentFrontFile: File? = null,
-    val documentBackFile: File? = null,
-    val livenessFiles: List<File>? = null,
 )
 
 /**
@@ -56,61 +52,29 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     protected val countryCode: String,
     protected val documentType: String? = null,
     private val captureBothSides: Boolean,
-    protected val skipApiSubmission: Boolean = false,
+    private val skipApiSubmission: Boolean = false,
     protected var selfieFile: File? = null,
     protected var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     protected val metadata: MutableList<Metadatum>,
 ) : BaseSubmissionViewModel<T>() {
     private val _uiState = MutableStateFlow(
-        OrchestratedDocumentUiState(
-            selfieToConfirm = selfieFile,
-        ),
+        OrchestratedDocumentUiState(),
     )
     val uiState = _uiState.asStateFlow()
 
     // var result: SmileIDResult<T> = SmileIDResult.Error(
     //     IllegalStateException("Document Capture incomplete"),
     // )
+    protected var documentFrontFile: File? = null
+    private var documentBackFile: File? = null
+    protected var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
-    fun onFrontDocCaptured(documentImageFile: File) {
-        _uiState.update {
-            it.copy(
-                documentFrontFile = documentImageFile,
-            )
-        }
-    }
-
-    fun onBackDocCaptured(documentImageFile: File) {
-        _uiState.update {
-            it.copy(
-                documentBackFile = documentImageFile,
-            )
-        }
-    }
-
-    fun onRestart() {
-        if (uiState.value.currentStep == DocumentCaptureFlow.FrontDocumentCapture) {
-            uiState.value.documentFrontFile?.delete()
-            _uiState.update {
-                it.copy(
-                    documentFrontFile = null,
-                )
-            }
-        } else {
-            uiState.value.documentBackFile?.delete()
-            _uiState.update {
-                it.copy(
-                    documentBackFile = null,
-                )
-            }
-        }
-    }
-
-    fun onDocumentFrontCaptureSuccess() {
+    fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
+        documentFrontFile = documentImageFile
         if (captureBothSides) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.BackDocumentCapture) }
-        } else if (uiState.value.selfieToConfirm == null) {
+        } else if (selfieFile == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
@@ -118,28 +82,25 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     }
 
     fun onDocumentBackSkip() {
-        if (uiState.value.selfieToConfirm == null) {
+        if (selfieFile == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
     }
 
-    fun onDocumentBackCaptureSuccess() {
-        if (uiState.value.selfieToConfirm == null) {
+    fun onDocumentBackCaptureSuccess(documentImageFile: File) {
+        documentBackFile = documentImageFile
+        if (selfieFile == null) {
             _uiState.update { it.copy(currentStep = DocumentCaptureFlow.SelfieCapture) }
         } else {
             submitJob()
         }
     }
 
-    fun onSelfieCaptureSuccess(result: SmileIDResult.Success<SmartSelfieResult>) {
-        _uiState.update {
-            it.copy(
-                selfieToConfirm = result.data.selfieFile,
-                livenessFiles = result.data.livenessFiles,
-            )
-        }
+    fun onSelfieCaptureSuccess(it: SmileIDResult.Success<SmartSelfieResult>) {
+        selfieFile = it.data.selfieFile
+        livenessFiles = it.data.livenessFiles
         submitJob()
     }
 
@@ -160,7 +121,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         documentBackFile: File? = null,
         livenessFiles: List<File>? = null,
     ) {
-        var selfieFileResult: File = uiState.value.selfieToConfirm ?: run {
+        var selfieFileResult: File = selfieFile ?: run {
             Timber.w("Selfie file not found for job ID: $jobId")
             throw Exception("Selfie file not found for job ID: $jobId")
         }
@@ -212,12 +173,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     fun onError(throwable: Throwable) {
         val didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable)
         if (didMoveToSubmitted) {
-            _uiState.update {
-                it.copy(
-                    selfieToConfirm = getFileByType(jobId, FileType.SELFIE),
-                    livenessFiles = getFilesByType(jobId, FileType.LIVENESS),
-                )
-            }
+            this.selfieFile = getFileByType(jobId, FileType.SELFIE)
+            this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
         }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
@@ -260,10 +217,10 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
     override fun handleSuccess(data: T) {
         sendResult(
-            uiState.value.documentFrontFile
+            documentFrontFile
                 ?: throw IllegalStateException("Document front file is null"),
-            uiState.value.documentBackFile,
-            uiState.value.livenessFiles,
+            documentBackFile,
+            livenessFiles,
         )
     }
 
@@ -293,13 +250,13 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
         }
         saveResult(
-            selfieImage = uiState.value.selfieToConfirm
+            selfieImage = selfieFile
                 ?: throw IllegalStateException("Selfie file is null"),
-            documentFrontFile = uiState.value.documentFrontFile ?: throw IllegalStateException(
+            documentFrontFile = documentFrontFile ?: throw IllegalStateException(
                 "Document front file is null",
             ),
-            documentBackFile = uiState.value.documentBackFile,
-            livenessFiles = uiState.value.livenessFiles,
+            documentBackFile = documentBackFile,
+            livenessFiles = livenessFiles,
             didSubmitJob = false,
         )
     }
@@ -313,7 +270,6 @@ internal class DocumentVerificationViewModel(
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
-    skipApiSubmission: Boolean = false,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: MutableList<Metadatum>,
@@ -326,7 +282,6 @@ internal class DocumentVerificationViewModel(
     documentType = documentType,
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
-    skipApiSubmission = skipApiSubmission,
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
 ) {
@@ -337,10 +292,10 @@ internal class DocumentVerificationViewModel(
             jobId = jobId,
             countryCode = countryCode,
             allowNewEnroll = allowNewEnroll,
-            documentFrontFile = uiState.value.documentFrontFile
+            documentFrontFile = documentFrontFile
                 ?: throw IllegalStateException("Document front file is null"),
-            livenessFiles = uiState.value.livenessFiles.orEmpty(),
-            selfieFile = uiState.value.selfieToConfirm
+            livenessFiles = livenessFiles.orEmpty(),
+            selfieFile = selfieFile
                 ?: throw IllegalStateException("Selfie file is null"),
             extraPartnerParams = extraPartnerParams,
             metadata = metadata,
@@ -374,7 +329,6 @@ internal class EnhancedDocumentVerificationViewModel(
     countryCode: String,
     documentType: String? = null,
     captureBothSides: Boolean,
-    skipApiSubmission: Boolean = false,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: MutableList<Metadatum>,
@@ -386,7 +340,6 @@ internal class EnhancedDocumentVerificationViewModel(
     countryCode = countryCode,
     documentType = documentType,
     captureBothSides = captureBothSides,
-    skipApiSubmission = skipApiSubmission,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
@@ -397,10 +350,10 @@ internal class EnhancedDocumentVerificationViewModel(
             userId = userId,
             jobId = jobId,
             allowNewEnroll = allowNewEnroll,
-            documentFrontFile = uiState.value.documentFrontFile
+            documentFrontFile = documentFrontFile
                 ?: throw IllegalStateException("Document front file is null"),
-            livenessFiles = uiState.value.livenessFiles.orEmpty(),
-            selfieFile = uiState.value.selfieToConfirm
+            livenessFiles = livenessFiles.orEmpty(),
+            selfieFile = selfieFile
                 ?: throw IllegalStateException("Selfie file is null"),
             countryCode = countryCode,
             documentType = documentType,
