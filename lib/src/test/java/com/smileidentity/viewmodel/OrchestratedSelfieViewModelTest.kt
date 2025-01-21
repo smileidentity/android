@@ -2,6 +2,8 @@ package com.smileidentity.viewmodel
 
 import androidx.camera.core.ImageProxy
 import com.smileidentity.R
+import com.smileidentity.compose.selfie.viewmodel.OrchestratedSelfieViewModel
+import com.smileidentity.compose.selfie.viewmodel.SelfieDirective
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
@@ -20,13 +22,13 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SelfieViewModelTest {
-    private lateinit var subject: SelfieViewModel
+class OrchestratedSelfieViewModelTest {
+    private lateinit var subject: OrchestratedSelfieViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        subject = SelfieViewModel(
+        subject = OrchestratedSelfieViewModel(
             isEnroll = true,
             userId = randomUserId(),
             jobId = randomJobId(),
