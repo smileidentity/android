@@ -70,13 +70,13 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.compose.selfie.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.toast
-import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieHint
 import com.smileidentity.viewmodel.SelfieState
 import com.smileidentity.viewmodel.SmartSelfieEnhancedViewModel

@@ -13,19 +13,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ramcosta.composedestinations.annotation.Destination
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
-import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.BiometricKycViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+
+@Destination<BiometricGraph>(start = true)
+@Composable
+internal fun OrchestratedSelfieCaptureScreengg() {
+}
 
 @Composable
 fun OrchestratedBiometricKYCScreen(
@@ -80,22 +84,24 @@ fun OrchestratedBiometricKYCScreen(
                 onClose = { viewModel.onFinished(onResult) },
             )
 
-            else -> OrchestratedSelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                skipApiSubmission = true,
-            ) {
-                when (it) {
-                    is SmileIDResult.Error -> onResult(it)
-                    is SmileIDResult.Success -> viewModel.onSelfieCaptured(
-                        selfieFile = it.data.selfieFile,
-                        livenessFiles = it.data.livenessFiles,
-                    )
-                }
-            }
+            else -> {}
+
+            //     OrchestratedSelfieCaptureScreen(
+            //     userId = userId,
+            //     jobId = jobId,
+            //     allowAgentMode = allowAgentMode,
+            //     showAttribution = showAttribution,
+            //     showInstructions = showInstructions,
+            //     // skipApiSubmission = true,  //todo fix me
+            // ) {
+            //     when (it) {
+            //         is SmileIDResult.Error -> onResult(it)
+            //         is SmileIDResult.Success -> viewModel.onSelfieCaptured(
+            //             selfieFile = it.data.selfieFile,
+            //             livenessFiles = it.data.livenessFiles,
+            //         )
+            //     }
+            // }
         }
     }
 }

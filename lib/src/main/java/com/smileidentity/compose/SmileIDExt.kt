@@ -5,10 +5,19 @@ package com.smileidentity.compose
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.defaults.DefaultFadingTransitions
+import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.OrchestratedSelfieCaptureScreenDestinationNavArgs
+import com.ramcosta.composedestinations.generated.navgraphs.SelfieNavGraph
+import com.ramcosta.composedestinations.navigation.dependency
+import com.ramcosta.composedestinations.navigation.navGraph
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.components.LocalMetadata
@@ -16,7 +25,7 @@ import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.navigation.currentNavigator
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.IdInfo
@@ -75,18 +84,42 @@ fun SmileID.SmartSelfieEnrollment(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        OrchestratedSelfieCaptureScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            allowNewEnroll = allowNewEnroll,
-            isEnroll = true,
-            allowAgentMode = allowAgentMode,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+        val navController = rememberNavController()
+        CompositionLocalProvider {
+            DestinationsNavHost(
+                navController = navController,
+                navGraph = NavGraphs.root,
+                start = SelfieNavGraph(
+                    navArgs = OrchestratedSelfieCaptureScreenDestinationNavArgs(
+                        userId = userId,
+                        jobId = jobId,
+                        allowNewEnroll = allowNewEnroll,
+                        isEnroll = allowNewEnroll,
+                        allowAgentMode = allowAgentMode,
+                        showAttribution = showAttribution,
+                        showInstructions = showInstructions,
+                    ),
+                ),
+                defaultTransitions = DefaultFadingTransitions,
+                dependenciesContainerBuilder = {
+                    dependency(dependency = currentNavigator())
+                    navGraph(navGraph = SelfieNavGraph) {}
+                },
+            )
+        }
+
+        // OrchestratedSelfieCaptureScreen(
+        //     modifier = modifier,
+        //     userId = userId,
+        //     jobId = jobId,
+        //     allowNewEnroll = allowNewEnroll,
+        //     isEnroll = true,
+        //     allowAgentMode = allowAgentMode,
+        //     showAttribution = showAttribution,
+        //     showInstructions = showInstructions,
+        //     extraPartnerParams = extraPartnerParams,
+        //     onResult = onResult,
+        // )
     }
 }
 
@@ -128,18 +161,41 @@ fun SmileID.SmartSelfieAuthentication(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        OrchestratedSelfieCaptureScreen(
-            modifier = modifier,
-            userId = userId,
-            jobId = jobId,
-            allowNewEnroll = allowNewEnroll,
-            isEnroll = false,
-            allowAgentMode = allowAgentMode,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+        val navController = rememberNavController()
+        CompositionLocalProvider {
+            DestinationsNavHost(
+                navController = navController,
+                navGraph = NavGraphs.root,
+                start = SelfieNavGraph(
+                    navArgs = OrchestratedSelfieCaptureScreenDestinationNavArgs(
+                        userId = userId,
+                        jobId = jobId,
+                        allowNewEnroll = allowNewEnroll,
+                        isEnroll = allowNewEnroll,
+                        allowAgentMode = allowAgentMode,
+                        showAttribution = showAttribution,
+                        showInstructions = showInstructions,
+                    ),
+                ),
+                defaultTransitions = DefaultFadingTransitions,
+                dependenciesContainerBuilder = {
+                    dependency(dependency = currentNavigator())
+                    navGraph(navGraph = SelfieNavGraph) {}
+                },
+            )
+        }
+        // OrchestratedSelfieCaptureScreen(
+        //     modifier = modifier,
+        //     userId = userId,
+        //     jobId = jobId,
+        //     allowNewEnroll = allowNewEnroll,
+        //     isEnroll = false,
+        //     allowAgentMode = allowAgentMode,
+        //     showAttribution = showAttribution,
+        //     showInstructions = showInstructions,
+        //     extraPartnerParams = extraPartnerParams,
+        //     onResult = onResult,
+        // )
     }
 }
 

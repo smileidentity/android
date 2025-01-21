@@ -18,10 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
-import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
@@ -93,20 +91,22 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 onSkip = viewModel::onDocumentBackSkip,
             )
 
-            DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                skipApiSubmission = true,
-            ) {
-                when (it) {
-                    is SmileIDResult.Error -> viewModel.onError(it.throwable)
-                    is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
-                }
-            }
+            DocumentCaptureFlow.SelfieCapture -> {}
+            //
+            //     OrchestratedSelfieCaptureScreen(
+            //     userId = userId,
+            //     jobId = jobId,
+            //     isEnroll = false,
+            //     allowAgentMode = allowAgentMode,
+            //     showAttribution = showAttribution,
+            //     showInstructions = showInstructions,
+            //     //skipApiSubmission = true, //todo fix me
+            // ) {
+            //     when (it) {
+            //         is SmileIDResult.Error -> viewModel.onError(it.throwable)
+            //         is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
+            //     }
+            // }
 
             is DocumentCaptureFlow.ProcessingScreen -> ProcessingScreen(
                 processingState = currentStep.processingState,
