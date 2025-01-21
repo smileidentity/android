@@ -86,7 +86,6 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
-            skipApiSubmission: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = DocumentVerificationFragment().apply {
@@ -102,7 +101,6 @@ class DocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
-                this.skipApiSubmission = skipApiSubmission
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
@@ -131,7 +129,6 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions = args.showInstructions,
             idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
             captureBothSides = args.captureBothSides,
-            skipApiSubmission = args.skipApiSubmission,
             bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
             onResult = {
@@ -179,19 +176,16 @@ private var Bundle.showInstructions: Boolean
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
 
 private const val KEY_COUNTRY_CODE = "countryCode"
-
 private var Bundle.countryCode: String
     get() = getString(KEY_COUNTRY_CODE)!!
     set(value) = putString(KEY_COUNTRY_CODE, value)
 
 private const val KEY_DOCUMENT_TYPE = "documentType"
-
 private var Bundle.documentType: String?
     get() = getString(KEY_DOCUMENT_TYPE)
     set(value) = putString(KEY_DOCUMENT_TYPE, value)
 
 private const val KEY_ID_ASPECT_RATIO = "idAspectRatio"
-
 private var Bundle.idAspectRatio: Float
     get() = getFloat(KEY_ID_ASPECT_RATIO)
     set(value) = putFloat(KEY_ID_ASPECT_RATIO, value)
@@ -200,11 +194,6 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
-
-private const val KEY_SKIP_API_SUBMISSION = "skipApiSubmission"
-private var Bundle.skipApiSubmission: Boolean
-    get() = getBoolean(KEY_SKIP_API_SUBMISSION)
-    set(value) = putBoolean(KEY_SKIP_API_SUBMISSION, value)
 
 private const val KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE = "bypassSelfieCaptureWithFile"
 private val fileAdapter = moshi.adapter(File::class.java)
@@ -218,6 +207,7 @@ private val type = Types.newParameterizedType(
     String::class.java,
     String::class.java,
 )
+
 private val adapter = moshi.adapter<Map<String, String>>(type)
 private var Bundle.extraPartnerParams: Map<String, String>?
     get() = getString(KEY_EXTRA_PARTNER_PARAMS)?.let { adapter.fromJson(it) }
