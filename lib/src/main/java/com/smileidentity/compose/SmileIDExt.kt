@@ -6,6 +6,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -14,8 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.DefaultFadingTransitions
 import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.OrchestratedSelfieCaptureScreenDestinationNavArgs
-import com.ramcosta.composedestinations.generated.navgraphs.SelfieNavGraph
+import com.ramcosta.composedestinations.generated.destinations.OrchestratedSelfieCaptureScreenDestination
 import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.navigation.navGraph
 import com.smileidentity.SmileID
@@ -26,6 +26,7 @@ import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.navigation.currentNavigator
+import com.smileidentity.compose.selfie.viewmodel.OrchestratedSelfieViewModel
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.models.IdInfo
@@ -39,6 +40,7 @@ import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
+import com.smileidentity.viewmodel.smileViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import java.io.File
 import java.net.URL
@@ -83,43 +85,37 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(modifier = modifier, colorScheme = colorScheme, typography = typography) {
         val navController = rememberNavController()
         CompositionLocalProvider {
             DestinationsNavHost(
                 navController = navController,
-                navGraph = NavGraphs.root,
-                start = SelfieNavGraph(
-                    navArgs = OrchestratedSelfieCaptureScreenDestinationNavArgs(
-                        userId = userId,
-                        jobId = jobId,
-                        allowNewEnroll = allowNewEnroll,
-                        isEnroll = allowNewEnroll,
-                        allowAgentMode = allowAgentMode,
-                        showAttribution = showAttribution,
-                        showInstructions = showInstructions,
-                    ),
+                navGraph = NavGraphs.selfieRoute,
+                start = OrchestratedSelfieCaptureScreenDestination(
+                    userId = userId,
+                    jobId = jobId,
+                    allowNewEnroll = allowNewEnroll,
+                    isEnroll = true,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    showInstructions = showInstructions,
                 ),
                 defaultTransitions = DefaultFadingTransitions,
                 dependenciesContainerBuilder = {
                     dependency(dependency = currentNavigator())
-                    navGraph(navGraph = SelfieNavGraph) {}
+                    navGraph(navGraph = NavGraphs.selfieRoute) {
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(route = NavGraphs.selfieRoute)
+                        }
+                        dependency(
+                            smileViewModel<OrchestratedSelfieViewModel>(
+                                viewModelStoreOwner = parentEntry,
+                            ),
+                        )
+                    }
                 },
             )
         }
-
-        // OrchestratedSelfieCaptureScreen(
-        //     modifier = modifier,
-        //     userId = userId,
-        //     jobId = jobId,
-        //     allowNewEnroll = allowNewEnroll,
-        //     isEnroll = true,
-        //     allowAgentMode = allowAgentMode,
-        //     showAttribution = showAttribution,
-        //     showInstructions = showInstructions,
-        //     extraPartnerParams = extraPartnerParams,
-        //     onResult = onResult,
-        // )
     }
 }
 
@@ -160,42 +156,37 @@ fun SmileID.SmartSelfieAuthentication(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+    SmileThemeSurface(modifier = modifier, colorScheme = colorScheme, typography = typography) {
         val navController = rememberNavController()
         CompositionLocalProvider {
             DestinationsNavHost(
                 navController = navController,
-                navGraph = NavGraphs.root,
-                start = SelfieNavGraph(
-                    navArgs = OrchestratedSelfieCaptureScreenDestinationNavArgs(
-                        userId = userId,
-                        jobId = jobId,
-                        allowNewEnroll = allowNewEnroll,
-                        isEnroll = allowNewEnroll,
-                        allowAgentMode = allowAgentMode,
-                        showAttribution = showAttribution,
-                        showInstructions = showInstructions,
-                    ),
+                navGraph = NavGraphs.selfieRoute,
+                start = OrchestratedSelfieCaptureScreenDestination(
+                    userId = userId,
+                    jobId = jobId,
+                    allowNewEnroll = allowNewEnroll,
+                    isEnroll = false,
+                    allowAgentMode = allowAgentMode,
+                    showAttribution = showAttribution,
+                    showInstructions = showInstructions,
                 ),
                 defaultTransitions = DefaultFadingTransitions,
                 dependenciesContainerBuilder = {
                     dependency(dependency = currentNavigator())
-                    navGraph(navGraph = SelfieNavGraph) {}
+                    navGraph(navGraph = NavGraphs.selfieRoute) {
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(route = NavGraphs.selfieRoute)
+                        }
+                        dependency(
+                            smileViewModel<OrchestratedSelfieViewModel>(
+                                viewModelStoreOwner = parentEntry,
+                            ),
+                        )
+                    }
                 },
             )
         }
-        // OrchestratedSelfieCaptureScreen(
-        //     modifier = modifier,
-        //     userId = userId,
-        //     jobId = jobId,
-        //     allowNewEnroll = allowNewEnroll,
-        //     isEnroll = false,
-        //     allowAgentMode = allowAgentMode,
-        //     showAttribution = showAttribution,
-        //     showInstructions = showInstructions,
-        //     extraPartnerParams = extraPartnerParams,
-        //     onResult = onResult,
-        // )
     }
 }
 

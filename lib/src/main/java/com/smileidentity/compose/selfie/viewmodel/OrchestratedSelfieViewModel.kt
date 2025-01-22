@@ -2,6 +2,7 @@ package com.smileidentity.compose.selfie.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ramcosta.composedestinations.generated.destinations.OrchestratedSelfieCaptureScreenDestinationNavArgs
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
@@ -17,7 +18,6 @@ import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
-import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.StringResource
@@ -47,11 +47,8 @@ internal data class SelfieUiState(
 )
 
 internal class OrchestratedSelfieViewModel(
-    private val isEnroll: Boolean,
-    private val userId: String,
-    private val jobId: String,
-    private val allowNewEnroll: Boolean,
-    private val metadata: MutableList<Metadatum>,
+    private val navArgs: OrchestratedSelfieCaptureScreenDestinationNavArgs,
+    private val metadata: MutableList<Metadatum> = mutableListOf(),
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -101,24 +98,28 @@ internal class OrchestratedSelfieViewModel(
         viewModelScope.launch(getExceptionHandler(proxy)) {
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode
-                val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
+                val jobType = if (navArgs.isEnroll) {
+                    SmartSelfieEnrollment
+                } else {
+                    SmartSelfieAuthentication
+                }
                 val authRequest = AuthenticationRequest(
                     jobType = jobType,
-                    enrollment = isEnroll,
-                    userId = userId,
-                    jobId = jobId,
+                    enrollment = navArgs.isEnroll,
+                    userId = navArgs.userId,
+                    jobId = navArgs.jobId,
                 )
-                createAuthenticationRequestFile(jobId, authRequest)
+                createAuthenticationRequestFile(navArgs.jobId, authRequest)
                 createPrepUploadFile(
-                    jobId,
-                    PrepUploadRequest(
+                    jobId = navArgs.jobId,
+                    prepUploadRequest = PrepUploadRequest(
                         partnerParams = PartnerParams(
                             jobType = jobType,
-                            jobId = jobId,
-                            userId = userId,
+                            jobId = navArgs.jobId,
+                            userId = navArgs.userId,
                             extras = extraPartnerParams,
                         ),
-                        allowNewEnroll = allowNewEnroll.toString(),
+                        allowNewEnroll = navArgs.allowNewEnroll.toString(),
                         metadata = metadata,
                         timestamp = "",
                         signature = "",
@@ -126,39 +127,45 @@ internal class OrchestratedSelfieViewModel(
                 )
             }
 
-            val apiResponse = if (isEnroll) {
+            val apiResponse = if (navArgs.isEnroll) {
                 SmileID.api.doSmartSelfieEnrollment(
                     selfieImage = selfieFile,
                     livenessImages = livenessFiles,
-                    userId = userId,
+                    userId = navArgs.userId,
                     partnerParams = extraPartnerParams,
-                    allowNewEnroll = allowNewEnroll,
+                    allowNewEnroll = navArgs.allowNewEnroll,
                     metadata = metadata.asNetworkRequest(),
                 )
             } else {
                 SmileID.api.doSmartSelfieAuthentication(
                     selfieImage = selfieFile,
                     livenessImages = livenessFiles,
-                    userId = userId,
+                    userId = navArgs.userId,
                     partnerParams = extraPartnerParams,
                     metadata = metadata.asNetworkRequest(),
                 )
             }
             // Move files from unsubmitted to submitted directories
-            val copySuccess = moveJobToSubmitted(jobId)
+            val copySuccess = moveJobToSubmitted(folderName = navArgs.jobId)
             val (selfieFileResult, livenessFilesResult) = if (copySuccess) {
-                val selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
-                    Timber.w("Selfie file not found for job ID: $jobId")
-                    throw IllegalStateException("Selfie file not found for job ID: $jobId")
+                val selfieFileResult = getFileByType(
+                    folderName = navArgs.jobId,
+                    fileType = FileType.SELFIE,
+                ) ?: run {
+                    Timber.w("Selfie file not found for job ID: $navArgs.jobId")
+                    throw IllegalStateException("Selfie file not found for job ID: $navArgs.jobId")
                 }
-                val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
+                val livenessFilesResult = getFilesByType(
+                    folderName = navArgs.jobId,
+                    fileType = FileType.LIVENESS,
+                )
                 selfieFileResult to livenessFilesResult
             } else {
-                Timber.w("Failed to move job $jobId to complete")
+                Timber.w("Failed to move job $navArgs.jobId to complete")
                 SmileIDCrashReporting.hub.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
-                        message = "Failed to move job $jobId to complete"
+                        message = "Failed to move job $navArgs.jobId to complete"
                         level = SentryLevel.INFO
                     },
                 )
@@ -180,9 +187,5 @@ internal class OrchestratedSelfieViewModel(
                 )
             }
         }
-    }
-
-    fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
-        callback(result!!)
     }
 }

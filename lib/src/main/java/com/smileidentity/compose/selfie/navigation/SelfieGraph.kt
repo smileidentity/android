@@ -1,12 +1,15 @@
 package com.smileidentity.compose.selfie.navigation
 
-import com.ramcosta.composedestinations.annotation.NavGraph
-import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.annotation.NavHostGraph
+import com.ramcosta.composedestinations.annotation.parameters.CodeGenVisibility
 
-@NavGraph<RootGraph>(start = true)
+@NavHostGraph(
+    route = "selfie_route",
+    visibility = CodeGenVisibility.INTERNAL,
+)
 internal annotation class SelfieGraph
 
-interface SelfieGraphNavigation {
+internal interface SelfieGraphNavigation {
     fun navigateToSmileSmartSelfieInstructionsScreen(showAttribution: Boolean)
     fun navigateToSmileSelfieCaptureScreen()
     fun navigateToSmileProcessingScreen()

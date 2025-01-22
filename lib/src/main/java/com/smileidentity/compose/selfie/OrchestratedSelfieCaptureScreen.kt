@@ -9,25 +9,22 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.SmileSelfieCaptureScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SmileSmartSelfieInstructionsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.selfie.navigation.SelfieGraph
 import com.smileidentity.compose.selfie.ui.SelfieCaptureScreen
 import com.smileidentity.compose.selfie.ui.SmartSelfieInstructionsScreen
 import com.smileidentity.compose.selfie.viewmodel.OrchestratedSelfieViewModel
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
-import com.smileidentity.viewmodel.viewModelFactory
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
+import com.smileidentity.util.randomJobId
+import com.smileidentity.util.randomUserId
+import com.smileidentity.viewmodel.smileViewModel
+import timber.log.Timber
 
 /**
  * Orchestrates the selfie capture flow - navigates between instructions, requesting permissions,
@@ -37,28 +34,17 @@ import kotlinx.collections.immutable.persistentMapOf
 @Composable
 internal fun OrchestratedSelfieCaptureScreen(
     navigator: DestinationsNavigator,
+    // extraPartnerParams: ImmutableMap<String, String>,
+    // metadata: ImmutableList<Metadatum>,
     modifier: Modifier = Modifier,
-    userId: String = "randomUserId()",
-    jobId: String = "randomJobId()",
+    viewModel: OrchestratedSelfieViewModel = smileViewModel(),
+    userId: String = randomUserId(),
+    jobId: String = randomJobId(),
     allowNewEnroll: Boolean = false,
     isEnroll: Boolean = true,
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
-    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
-    viewModel: OrchestratedSelfieViewModel = viewModel(
-        factory = viewModelFactory {
-            OrchestratedSelfieViewModel(
-                isEnroll = isEnroll,
-                userId = userId,
-                jobId = jobId,
-                allowNewEnroll = allowNewEnroll,
-                metadata = metadata,
-                extraPartnerParams = extraPartnerParams,
-            )
-        },
-    ),
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -70,7 +56,19 @@ internal fun OrchestratedSelfieCaptureScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        navigator.navigate(SmileSmartSelfieInstructionsScreenDestination(showAttribution = true))
+        // todo - maybe make this a destination wrapper?
+        navigator.navigate(
+            direction = SmileSmartSelfieInstructionsScreenDestination(showAttribution = true),
+        )
+
+        Timber.d("Juuuma debug 1 $userId")
+        Timber.d("Juuuma debug 2 $jobId")
+        Timber.d("Juuuma debug 3 $allowNewEnroll")
+        Timber.d("Juuuma debug 4 $isEnroll")
+        Timber.d("Juuuma debug 5 $allowAgentMode")
+        Timber.d("Juuuma debug 6 $showAttribution")
+        Timber.d("Juuuma debug 7 $showInstructions")
+
         // navigator.navigate(SmileSmartSelfieInstructionsScreenDestination)
         // when {
         //     // showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
