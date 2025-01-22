@@ -24,7 +24,6 @@ import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.smileViewModel
-import timber.log.Timber
 
 /**
  * Orchestrates the selfie capture flow - navigates between instructions, requesting permissions,
@@ -60,14 +59,6 @@ internal fun OrchestratedSelfieCaptureScreen(
         navigator.navigate(
             direction = SmileSmartSelfieInstructionsScreenDestination(showAttribution = true),
         )
-
-        Timber.d("Juuuma debug 1 $userId")
-        Timber.d("Juuuma debug 2 $jobId")
-        Timber.d("Juuuma debug 3 $allowNewEnroll")
-        Timber.d("Juuuma debug 4 $isEnroll")
-        Timber.d("Juuuma debug 5 $allowAgentMode")
-        Timber.d("Juuuma debug 6 $showAttribution")
-        Timber.d("Juuuma debug 7 $showInstructions")
 
         // navigator.navigate(SmileSmartSelfieInstructionsScreenDestination)
         // when {
