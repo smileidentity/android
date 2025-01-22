@@ -26,8 +26,8 @@ class DataStoreRepositoryTest {
         val expected = Config(
             partnerId = "partnerId",
             authToken = "authToken",
-            prodBaseUrl = "prodBaseUrl",
-            sandboxBaseUrl = "sandboxBaseUrl",
+            prodLambdaUrl = "prodBaseUrl",
+            testLambdaUrl = "sandboxBaseUrl",
         )
 
         // when
@@ -44,8 +44,8 @@ class DataStoreRepositoryTest {
         val expected = Config(
             partnerId = "partnerId",
             authToken = "authToken",
-            prodBaseUrl = "prodBaseUrl",
-            sandboxBaseUrl = "sandboxBaseUrl",
+            prodLambdaUrl = "prodBaseUrl",
+            testLambdaUrl = "sandboxBaseUrl",
         )
         DataStoreRepository.setConfig(expected)
 
