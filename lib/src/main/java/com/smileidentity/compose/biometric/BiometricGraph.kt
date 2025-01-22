@@ -1,7 +1,10 @@
 package com.smileidentity.compose.biometric
 
-import com.ramcosta.composedestinations.annotation.NavGraph
-import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.annotation.NavHostGraph
+import com.ramcosta.composedestinations.annotation.parameters.CodeGenVisibility
 
-@NavGraph<RootGraph>
+@NavHostGraph(
+    route = "biometric_route",
+    visibility = CodeGenVisibility.INTERNAL,
+)
 internal annotation class BiometricGraph
