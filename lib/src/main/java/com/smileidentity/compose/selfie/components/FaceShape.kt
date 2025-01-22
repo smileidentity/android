@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie
+package com.smileidentity.compose.selfie.components
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline

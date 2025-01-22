@@ -195,6 +195,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Compose Destinations
+    implementation(libs.compose.destinations)
+    ksp(libs.compose.destinations.ksp)
     // Test rules
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     // UI Tests (Needed for createAndroidComposeRule, but not createComposeRule)

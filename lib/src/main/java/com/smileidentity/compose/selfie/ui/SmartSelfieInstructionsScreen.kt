@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie
+package com.smileidentity.compose.selfie.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

@@ -12,6 +12,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
+import com.smileidentity.compose.selfie.ui.SelfieCaptureScreen
 import org.junit.Rule
 import org.junit.Test
 

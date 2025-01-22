@@ -204,7 +204,6 @@ internal fun ProcessingSuccessScreen(
     )
 }
 
-@VisibleForTesting
 @Composable
 internal fun ProcessingErrorScreen(
     icon: Painter,
