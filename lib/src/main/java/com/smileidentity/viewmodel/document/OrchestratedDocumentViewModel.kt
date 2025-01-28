@@ -237,7 +237,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             documentBackFileResult = getFileByType(jobId, FileType.DOCUMENT_BACK)
         } else {
             Timber.w("Failed to move job $jobId to complete")
-            SmileIDCrashReporting.hub.addBreadcrumb(
+            SmileIDCrashReporting.scope.addBreadcrumb(
                 Breadcrumb().apply {
                     category = "Offline Mode"
                     message = "Failed to move job $jobId to complete"

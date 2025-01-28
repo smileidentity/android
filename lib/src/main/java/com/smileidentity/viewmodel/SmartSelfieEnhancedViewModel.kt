@@ -194,7 +194,7 @@ class SmartSelfieEnhancedViewModel(
             val selfieState = uiState.value.selfieState
             // These 2 conditions should theoretically both be true at the same time
             if (!activeLiveness.isFinished && selfieState is SelfieState.Analyzing) {
-                SmileIDCrashReporting.hub.addBreadcrumb("Strict Mode force fail timer expired")
+                SmileIDCrashReporting.scope.addBreadcrumb("Strict Mode force fail timer expired")
                 Timber.d("Strict Mode forced failure timer expired")
                 forcedFailureTimerExpired = true
                 resetCaptureProgress(LookStraight)
@@ -228,7 +228,7 @@ class SmartSelfieEnhancedViewModel(
 
         val image = imageProxy.image ?: run {
             Timber.w("ImageProxy has no image")
-            SmileIDCrashReporting.hub.addBreadcrumb("ImageProxy has no image")
+            SmileIDCrashReporting.scope.addBreadcrumb("ImageProxy has no image")
             imageProxy.close()
             return
         }
@@ -238,7 +238,7 @@ class SmartSelfieEnhancedViewModel(
         if (!isPortraitOrientation(currentOrientation)) {
             val message = "Camera orientation changed. Resetting progress"
             Timber.d(message)
-            SmileIDCrashReporting.hub.addBreadcrumb(message)
+            SmileIDCrashReporting.scope.addBreadcrumb(message)
             resetCaptureProgress(EnsureDeviceUpright)
             imageProxy.close()
             selfieCameraOrientation = null
@@ -451,7 +451,7 @@ class SmartSelfieEnhancedViewModel(
                     e is HttpException && e.code() in 500..599 -> {
                         val message = "Received 5xx error, asking user to retry"
                         Timber.w(e, message)
-                        SmileIDCrashReporting.hub.addBreadcrumb(message)
+                        SmileIDCrashReporting.scope.addBreadcrumb(message)
                         _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
                     }
 
@@ -500,7 +500,7 @@ class SmartSelfieEnhancedViewModel(
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error analyzing image")
-            SmileIDCrashReporting.hub.addBreadcrumb("Error analyzing image")
+            SmileIDCrashReporting.scope.addBreadcrumb("Error analyzing image")
             onResult(SmileIDResult.Error(exception))
         }.addOnCompleteListener {
             // Closing the proxy allows the next image to be delivered to the analyzer

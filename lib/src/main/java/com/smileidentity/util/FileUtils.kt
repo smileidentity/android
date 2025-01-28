@@ -422,7 +422,7 @@ internal fun moveJobToSubmitted(
     if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
         val message = "Unsubmitted directory does not exist or is not a directory"
         Timber.v(message)
-        SmileIDCrashReporting.hub.addBreadcrumb(message)
+        SmileIDCrashReporting.scope.addBreadcrumb(message)
         return false
     }
 
