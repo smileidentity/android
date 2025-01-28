@@ -1,42 +1,30 @@
 package com.smileidentity.viewmodel.document
 
 import android.os.Parcelable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.DocumentCaptureFlow
-import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
-import com.smileidentity.models.PartnerParams
-import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
-import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.v2.Metadatum
-import com.smileidentity.networking.asDocumentBackImage
-import com.smileidentity.networking.asDocumentFrontImage
-import com.smileidentity.networking.asLivenessImage
-import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.submissions.DocumentVerificationSubmission
+import com.smileidentity.submissions.EnhancedDocumentVerificationSubmission
+import com.smileidentity.submissions.base.BaseJobSubmission
+import com.smileidentity.submissions.base.BaseSubmissionViewModel
 import com.smileidentity.util.FileType
 import com.smileidentity.util.StringResource
-import com.smileidentity.util.createAuthenticationRequestFile
-import com.smileidentity.util.createPrepUploadFile
-import com.smileidentity.util.createUploadRequestFile
-import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
-import com.smileidentity.util.toSmileIDException
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
@@ -45,8 +33,6 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
 internal data class OrchestratedDocumentUiState(
@@ -59,25 +45,29 @@ internal data class OrchestratedDocumentUiState(
  * be performed
  */
 internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
-    private val jobType: JobType,
-    private val userId: String,
+    protected val userId: String,
+    protected val jobType: JobType,
     protected val jobId: String,
-    private val allowNewEnroll: Boolean,
-    private val countryCode: String,
-    private val documentType: String? = null,
+    protected val allowNewEnroll: Boolean,
+    protected val countryCode: String,
+    protected val documentType: String? = null,
     private val captureBothSides: Boolean,
+    private val skipApiSubmission: Boolean = false,
     protected var selfieFile: File? = null,
-    private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    private val metadata: MutableList<Metadatum>,
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
-    val uiState = _uiState.asStateFlow()
-    var result: SmileIDResult<T> = SmileIDResult.Error(
-        IllegalStateException("Document Capture incomplete"),
+    protected var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    protected val metadata: MutableList<Metadatum>,
+) : BaseSubmissionViewModel<T>() {
+    private val _uiState = MutableStateFlow(
+        OrchestratedDocumentUiState(),
     )
-    private var documentFrontFile: File? = null
+    val uiState = _uiState.asStateFlow()
+
+    // var result: SmileIDResult<T> = SmileIDResult.Error(
+    //     IllegalStateException("Document Capture incomplete"),
+    // )
+    protected var documentFrontFile: File? = null
     private var documentBackFile: File? = null
-    private var livenessFiles: List<File>? = null
+    protected var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
@@ -123,92 +113,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     )
 
     private fun submitJob() {
-        val documentFrontFile = documentFrontFile
-            ?: throw IllegalStateException("documentFrontFile is null")
-        _uiState.update {
-            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
-        }
-
-        viewModelScope.launch(getExceptionHandler(::onError)) {
-            val authRequest = AuthenticationRequest(
-                jobType = jobType,
-                enrollment = false,
-                userId = userId,
-                jobId = jobId,
-            )
-            val frontImageInfo = documentFrontFile.asDocumentFrontImage()
-            val backImageInfo = documentBackFile?.asDocumentBackImage()
-            val selfieImageInfo = selfieFile?.asSelfieImage() ?: throw IllegalStateException(
-                "Selfie file is null",
-            )
-            // Liveness files will be null when the partner bypasses our Selfie capture with a file
-            val livenessImageInfo = livenessFiles.orEmpty().map { it.asLivenessImage() }
-            val uploadRequest = UploadRequest(
-                images = listOfNotNull(
-                    frontImageInfo,
-                    backImageInfo,
-                    selfieImageInfo,
-                ) + livenessImageInfo,
-                idInfo = IdInfo(countryCode, documentType),
-            )
-
-            if (SmileID.allowOfflineMode) {
-                createAuthenticationRequestFile(jobId, authRequest)
-                createPrepUploadFile(
-                    jobId = jobId,
-                    prepUploadRequest = PrepUploadRequest(
-                        partnerParams = PartnerParams(
-                            jobType = jobType,
-                            jobId = jobId,
-                            userId = userId,
-                            extras = extraPartnerParams,
-                        ),
-                        allowNewEnroll = allowNewEnroll.toString(),
-                        metadata = metadata,
-                        timestamp = "",
-                        signature = "",
-                    ),
-                )
-                createUploadRequestFile(
-                    jobId,
-                    uploadRequest,
-                )
-            }
-
-            val authResponse = SmileID.api.authenticate(authRequest)
-
-            val prepUploadRequest = PrepUploadRequest(
-                partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-                // TODO : Michael will change this to boolean
-                allowNewEnroll = allowNewEnroll.toString(),
-                metadata = metadata,
-                signature = authResponse.signature,
-                timestamp = authResponse.timestamp,
-            )
-
-            val prepUploadResponse = runCatching {
-                SmileID.api.prepUpload(prepUploadRequest)
-            }.recoverCatching { throwable ->
-                when {
-                    throwable is HttpException -> {
-                        val smileIDException = throwable.toSmileIDException()
-                        if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
-                        } else {
-                            throw smileIDException
-                        }
-                    }
-
-                    else -> {
-                        throw throwable
-                    }
-                }
-            }.getOrThrow()
-
-            SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
-            Timber.d("Upload finished")
-            sendResult(documentFrontFile, documentBackFile, livenessFiles)
-        }
+        submitJob(jobId, skipApiSubmission, SmileID.allowOfflineMode)
     }
 
     private fun sendResult(
@@ -278,36 +183,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 errorMessage = StringResource.ResId(R.string.si_processing_error_subtitle),
             )
         }
-        if (SmileID.allowOfflineMode && isNetworkFailure(throwable)) {
-            _uiState.update {
-                it.copy(
-                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
-                    errorMessage = StringResource.ResId(R.string.si_offline_message),
-                )
-            }
-            saveResult(
-                selfieImage = selfieFile ?: throw IllegalStateException("Selfie file is null"),
-                documentFrontFile = documentFrontFile ?: throw IllegalStateException(
-                    "Document front file is null",
-                ),
-                documentBackFile = documentBackFile,
-                livenessFiles = livenessFiles,
-                didSubmitJob = false,
-            )
-        } else {
-            val errorMessage: StringResource = when {
-                isNetworkFailure(throwable) -> StringResource.ResId(R.string.si_no_internet)
-                throwable is SmileIDException -> StringResource.ResIdFromSmileIDException(throwable)
-                else -> StringResource.ResId(R.string.si_processing_error_subtitle)
-            }
-            result = SmileIDResult.Error(throwable)
-            _uiState.update {
-                it.copy(
-                    currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
-                    errorMessage = errorMessage,
-                )
-            }
-        }
     }
 
     /**
@@ -328,7 +203,63 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         }
     }
 
-    fun onFinished(callback: SmileIDCallback<T>) = callback(result)
+    fun onFinished(callback: SmileIDCallback<T>) = callback(result!!)
+
+    override fun createSubmission(): BaseJobSubmission<T> {
+        throw NotImplementedError("This method should not be called")
+    }
+
+    override fun processingState() {
+        _uiState.update {
+            it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
+        }
+    }
+
+    override fun handleSuccess(data: T) {
+        sendResult(
+            documentFrontFile
+                ?: throw IllegalStateException("Document front file is null"),
+            documentBackFile,
+            livenessFiles,
+        )
+    }
+
+    override fun handleError(error: Throwable) {
+        val errorMessage: StringResource = when {
+            isNetworkFailure(error) -> StringResource.ResId(R.string.si_no_internet)
+            error is SmileIDException -> StringResource.ResIdFromSmileIDException(error)
+            else -> StringResource.ResId(R.string.si_processing_error_subtitle)
+        }
+        result = SmileIDResult.Error(error)
+        _uiState.update {
+            it.copy(
+                currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Error),
+                errorMessage = errorMessage,
+            )
+        }
+    }
+
+    override fun handleSubmissionFiles(jobId: String) {
+    }
+
+    override fun handleOfflineSuccess() {
+        _uiState.update {
+            it.copy(
+                currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.Success),
+                errorMessage = StringResource.ResId(R.string.si_offline_message),
+            )
+        }
+        saveResult(
+            selfieImage = selfieFile
+                ?: throw IllegalStateException("Selfie file is null"),
+            documentFrontFile = documentFrontFile ?: throw IllegalStateException(
+                "Document front file is null",
+            ),
+            documentBackFile = documentBackFile,
+            livenessFiles = livenessFiles,
+            didSubmitJob = false,
+        )
+    }
 }
 
 internal class DocumentVerificationViewModel(
@@ -354,6 +285,22 @@ internal class DocumentVerificationViewModel(
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
 ) {
+
+    override fun createSubmission(): BaseJobSubmission<DocumentVerificationResult> {
+        return DocumentVerificationSubmission(
+            userId = userId,
+            jobId = jobId,
+            countryCode = countryCode,
+            allowNewEnroll = allowNewEnroll,
+            documentFrontFile = documentFrontFile
+                ?: throw IllegalStateException("Document front file is null"),
+            livenessFiles = livenessFiles.orEmpty(),
+            selfieFile = selfieFile
+                ?: throw IllegalStateException("Selfie file is null"),
+            extraPartnerParams = extraPartnerParams,
+            metadata = metadata,
+        )
+    }
 
     override fun saveResult(
         selfieImage: File,
@@ -397,6 +344,23 @@ internal class EnhancedDocumentVerificationViewModel(
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
 ) {
+
+    override fun createSubmission(): BaseJobSubmission<EnhancedDocumentVerificationResult> {
+        return EnhancedDocumentVerificationSubmission(
+            userId = userId,
+            jobId = jobId,
+            allowNewEnroll = allowNewEnroll,
+            documentFrontFile = documentFrontFile
+                ?: throw IllegalStateException("Document front file is null"),
+            livenessFiles = livenessFiles.orEmpty(),
+            selfieFile = selfieFile
+                ?: throw IllegalStateException("Selfie file is null"),
+            countryCode = countryCode,
+            documentType = documentType,
+            extraPartnerParams = extraPartnerParams,
+            metadata = metadata,
+        )
+    }
 
     override fun saveResult(
         selfieImage: File,
