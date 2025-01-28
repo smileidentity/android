@@ -1,17 +1,22 @@
+@file:Suppress("UnstableApiUsage")
+
 package com.smileidentity
 
 import android.os.Build
 import com.smileidentity.SmileIDCrashReporting.disable
 import io.sentry.Hint
-import io.sentry.Hub
-import io.sentry.IHub
-import io.sentry.NoOpHub
+import io.sentry.IScope
+import io.sentry.NoOpScope
+import io.sentry.Scope
+import io.sentry.Scopes
+import io.sentry.SentryClient
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.SentryOptions.BeforeSendCallback
 import io.sentry.UncaughtExceptionHandlerIntegration
 import io.sentry.protocol.User
 import timber.log.Timber
+
 
 private const val TAG_BRAND = "brand"
 private const val TAG_DEBUG_MODE = "debug_mode"
@@ -32,7 +37,7 @@ private const val TAG_SDK_VERSION = "sdk_version"
  */
 object SmileIDCrashReporting {
     private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
-    internal var hub: IHub = NoOpHub.getInstance()
+    internal var scope: IScope = NoOpScope.getInstance()
 
     @JvmStatic
     fun enable(isInDebugMode: Boolean = false) {
@@ -60,7 +65,7 @@ object SmileIDCrashReporting {
             }
         }
 
-        hub = Hub(options).apply {
+        scope = Scope(options).apply {
             setTag(TAG_BRAND, Build.BRAND)
             setTag(TAG_DEBUG_MODE, isInDebugMode.toString())
             setTag(TAG_CPU_ABI, Build.SUPPORTED_ABIS?.first() ?: "unknown")
@@ -80,23 +85,31 @@ object SmileIDCrashReporting {
             }
         }
 
+        val globalScope = Scope(options)
+        val isolationScope = Scope(options)
+        val scope = Scope(options)
+
+        globalScope.bindClient(SentryClient(options))
+
+        val scopes = Scopes(scope, isolationScope, globalScope, "SmileID")
+
         // Once this UncaughtExceptionHandler handles the exception, it will pass the exception on
         // to any previously set handlers (if any). If someone registers a new handler after we
         // register ours, and they don't pass it on to us, we may not be notified of the crash.
         val integration = UncaughtExceptionHandlerIntegration()
         options.addIntegration(integration)
-        integration.register(hub, options)
+        integration.register(scopes, options)
     }
 
     @JvmStatic
     fun disable() {
-        hub.options.isEnableUncaughtExceptionHandler = false
-        for (it in hub.options.integrations) {
+        scope.options.isEnableUncaughtExceptionHandler = false
+        for (it in scope.options.integrations) {
             if (it is UncaughtExceptionHandlerIntegration) {
                 it.close()
             }
         }
-        hub = NoOpHub.getInstance()
+        scope = NoOpScope.getInstance()
     }
 
     /**

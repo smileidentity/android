@@ -127,7 +127,7 @@ fun DocumentCaptureScreen(
                 writeUriToFile(documentFile, uri, context)
                 viewModel.onPhotoSelectedFromGallery(documentFile)
             } else {
-                SmileIDCrashReporting.hub.addBreadcrumb("Gallery upload document image too small")
+                SmileIDCrashReporting.scope.addBreadcrumb("Gallery upload document image too small")
                 context.toast(R.string.si_doc_v_validation_image_too_small)
             }
         },
@@ -147,7 +147,7 @@ fun DocumentCaptureScreen(
                 showSkipButton = showSkipButton,
                 onInstructionsAcknowledgedSelectFromGallery = {
                     Timber.v("onInstructionsAcknowledgedSelectFromGallery")
-                    SmileIDCrashReporting.hub.addBreadcrumb("Selecting document photo from gallery")
+                    SmileIDCrashReporting.scope.addBreadcrumb("Selecting document photo from gallery")
                     photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
                 },
                 onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,
@@ -161,8 +161,8 @@ fun DocumentCaptureScreen(
                 try {
                     BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
                 } catch (e: Exception) {
-                    SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
-                    SmileIDCrashReporting.hub.captureException(e)
+                    SmileIDCrashReporting.scope.addBreadcrumb("Error loading document image at $path")
+                    SmileIDCrashReporting.scope.captureException(e)
                     onError(e)
                     ColorPainter(Color.Black)
                 }

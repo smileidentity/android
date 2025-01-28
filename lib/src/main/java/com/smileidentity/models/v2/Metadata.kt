@@ -186,7 +186,7 @@ val model: String
             }
         } catch (e: Exception) {
             Timber.w(e, "Error getting device model")
-            SmileIDCrashReporting.hub.addBreadcrumb("Error getting device model: $e")
+            SmileIDCrashReporting.scope.addBreadcrumb("Error getting device model: $e")
             return "unknown"
         }
     }
