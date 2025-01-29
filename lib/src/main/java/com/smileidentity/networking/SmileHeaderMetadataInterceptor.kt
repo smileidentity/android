@@ -11,6 +11,7 @@ object SmileHeaderMetadataInterceptor : Interceptor {
         request.getCustomAnnotation(SmileHeaderMetadata::class.java)
             ?: return chain.proceed(request)
         val newRequest = request.newBuilder()
+            .header("Connection", "Keep-Alive")
             .header("SmileID-Source-SDK", "android")
             .header("SmileID-Source-SDK-Version", BuildConfig.VERSION_NAME)
             .build()
