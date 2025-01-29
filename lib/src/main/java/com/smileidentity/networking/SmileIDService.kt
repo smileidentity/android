@@ -51,7 +51,7 @@ interface SmileIDService {
      * necessary only when using the [com.smileidentity.models.Config.authToken] and
      * *not* using the API key.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/auth_smile")
     suspend fun authenticate(@Body request: AuthenticationRequest): AuthenticationResponse
 
@@ -59,7 +59,7 @@ interface SmileIDService {
      * Used by Job Types that need to upload a file to the server. The response contains the URL
      * [PrepUploadResponse.uploadUrl] that the file should eventually be uploaded to (via [upload]).
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/upload")
     suspend fun prepUpload(@Body request: PrepUploadRequest): PrepUploadResponse
 
@@ -68,7 +68,7 @@ interface SmileIDService {
      * uploaded in the order they are provided in [UploadRequest.images], and will be zipped
      * together by [UploadRequestConverterFactory] and [FileNameAdapter]
      */
-    @SmileSecure
+    @SmileIDSecurity
     @PUT
     suspend fun upload(@Url url: String, @Body request: UploadRequest)
 
@@ -81,7 +81,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
-    @SmileSecure
+    @SmileIDSecurity
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-enroll")
@@ -107,7 +107,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
-    @SmileSecure
+    @SmileIDSecurity
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")
@@ -131,7 +131,7 @@ interface SmileIDService {
      * This will be done synchronously, and the result will be returned in the response. If the ID
      * provider is unavailable, the response will be an error.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
 
@@ -142,7 +142,7 @@ interface SmileIDService {
      * If the ID provider is unavailable, the response will be delivered to the callback URL once
      * the ID provider is available again.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/async_id_verification")
     suspend fun doEnhancedKycAsync(@Body request: EnhancedKycRequest): EnhancedKycAsyncResponse
 
@@ -151,7 +151,7 @@ interface SmileIDService {
      * whether it was successful. This should be called when the Job is known to be a
      * SmartSelfie Authentication/Registration.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/job_status")
     suspend fun getSmartSelfieJobStatus(
         @Body request: JobStatusRequest,
@@ -162,7 +162,7 @@ interface SmileIDService {
      * whether it was successful. This should be called when the Job is known to be a
      * Document Verification.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/job_status")
     suspend fun getDocumentVerificationJobStatus(
         @Body request: JobStatusRequest,
@@ -172,7 +172,7 @@ interface SmileIDService {
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
      * whether it was successful. This should be called when the Job is known to be a Biometric KYC.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/job_status")
     suspend fun getBiometricKycJobStatus(
         @Body request: JobStatusRequest,
@@ -182,7 +182,7 @@ interface SmileIDService {
      * Fetches the status of a Job. This can be used to check if a Job is complete, and if so,
      * whether it was successful. This should be called when the Job is known to be Enhanced DocV.
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/job_status")
     suspend fun getEnhancedDocumentVerificationJobStatus(
         @Body request: JobStatusRequest,
@@ -192,42 +192,42 @@ interface SmileIDService {
      * Returns the ID types that are enabled for authenticated partner and which of those require
      * consent
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/products_config")
     suspend fun getProductsConfig(@Body request: ProductsConfigRequest): ProductsConfigResponse
 
     /**
      * Returns Global DocV supported products and metadata
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/valid_documents")
     suspend fun getValidDocuments(@Body request: ProductsConfigRequest): ValidDocumentsResponse
 
     /**
      * Returns supported products and metadata
      */
-    @SmileSecure
+    @SmileIDSecurity
     @GET("/v1/services")
     suspend fun getServices(): ServicesResponse
 
     /**
      * Returns the different modes of getting the BVN OTP, either via sms or email
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/totp_consent")
     suspend fun requestBvnTotpMode(@Body request: BvnTotpRequest): BvnTotpResponse
 
     /**
      * Returns the BVN OTP via the selected mode
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/totp_consent/mode")
     suspend fun requestBvnOtp(@Body request: BvnTotpModeRequest): BvnTotpModeResponse
 
     /**
      * Submits the BVN OTP for verification
      */
-    @SmileSecure
+    @SmileIDSecurity
     @POST("/v1/totp_consent/otp")
     suspend fun submitBvnOtp(@Body request: SubmitBvnTotpRequest): SubmitBvnTotpResponse
 }
