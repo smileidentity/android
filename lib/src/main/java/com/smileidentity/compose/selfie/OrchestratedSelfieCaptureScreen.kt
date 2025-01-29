@@ -116,7 +116,7 @@ fun OrchestratedSelfieCaptureScreen(
                 confirmButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_confirm_button,
                 ),
-                onConfirm = viewModel::submitJob,
+                onConfirm = { viewModel.submitJob() },
                 retakeButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_retake_button,
                 ),

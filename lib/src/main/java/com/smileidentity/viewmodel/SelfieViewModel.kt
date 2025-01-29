@@ -447,6 +447,13 @@ class SelfieViewModel(
     }
 
     fun submitJob() {
+        if (selfieFile == null || livenessFiles.isEmpty()) {
+            Timber.e(
+                "Attempted to submit incomplete job selfieFile=$selfieFile, " +
+                    "livenessCount=${livenessFiles.size}",
+            )
+            return
+        }
         submitJob(selfieFile!!, livenessFiles)
     }
 
