@@ -115,8 +115,8 @@ class SelfieViewModel(
     )
     var result: SmileIDResult<SmartSelfieResult>? = null
 
-    private val livenessFiles = mutableListOf<File>()
-    private var selfieFile: File? = null
+    val livenessFiles = mutableListOf<File>()
+    var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
     private var previousHeadRotationX = Float.POSITIVE_INFINITY
     private var previousHeadRotationY = Float.POSITIVE_INFINITY
@@ -447,6 +447,13 @@ class SelfieViewModel(
     }
 
     fun submitJob() {
+        if (selfieFile == null || livenessFiles.isEmpty()) {
+            Timber.e(
+                "Attempted to submit incomplete job selfieFile=$selfieFile, " +
+                    "livenessCount=${livenessFiles.size}",
+            )
+            return
+        }
         submitJob(selfieFile!!, livenessFiles)
     }
 
