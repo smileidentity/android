@@ -31,6 +31,7 @@ import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDService
+import com.smileidentity.networking.SmileSecureInterceptor
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
 import com.smileidentity.networking.asDocumentBackImage
@@ -437,12 +438,13 @@ object SmileID {
     @JvmStatic
     fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
         retryOnConnectionFailure(true)
-        callTimeout(120, TimeUnit.SECONDS)
-        connectTimeout(30, TimeUnit.SECONDS)
-        readTimeout(30, TimeUnit.SECONDS)
-        writeTimeout(30, TimeUnit.SECONDS)
-        addInterceptor(SmileHeaderAuthInterceptor)
-        addInterceptor(SmileHeaderMetadataInterceptor)
+        callTimeout(timeout = 120, unit = TimeUnit.SECONDS)
+        connectTimeout(timeout = 30, unit = TimeUnit.SECONDS)
+        readTimeout(timeout = 30, unit = TimeUnit.SECONDS)
+        writeTimeout(timeout = 30, unit = TimeUnit.SECONDS)
+        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
+        addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
+        addInterceptor(interceptor = SmileSecureInterceptor)
         addInterceptor(
             Interceptor { chain: Interceptor.Chain ->
                 // Retry on exception (network error) and 5xx
