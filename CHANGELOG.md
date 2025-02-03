@@ -1,5 +1,9 @@
 # Release Notes
 
+## 10.4.3 (Unreleased)
+
+* Pass ConsentInformation in info.json file
+
 ## 10.4.2
 
 * Android correct variable names for to match smile_config.json
