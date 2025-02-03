@@ -19,6 +19,7 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
@@ -324,6 +325,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-kyc)
  *
  * @param idInfo The ID information to look up in the ID Authority
+ * @param consentInformation We need you to pass the consent from the user
  * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
  * @param jobId The job ID to associate with the Biometric KYC. Most often, this will correspond
@@ -343,6 +345,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
 @Composable
 fun SmileID.BiometricKYC(
     idInfo: IdInfo,
+    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -359,6 +362,7 @@ fun SmileID.BiometricKYC(
         OrchestratedBiometricKYCScreen(
             modifier = modifier,
             idInfo = idInfo,
+            consentInformation = consentInformation,
             userId = userId,
             jobId = jobId,
             allowNewEnroll = allowNewEnroll,
@@ -395,7 +399,7 @@ fun SmileID.BvnConsentScreen(
     partnerIcon: Painter,
     partnerName: String,
     partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
+    onConsentGranted: (ConsentInformation) -> Unit,
     onConsentDenied: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
@@ -423,7 +427,7 @@ fun SmileID.ConsentScreen(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
+    onConsentGranted: (ConsentInformation) -> Unit,
     onConsentDenied: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,

@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 data class UploadRequest(
     @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "id_info") val idInfo: IdInfo? = null,
+    @Json(name = "consent_information") val consentInformation: ConsentInformation? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -48,6 +49,18 @@ data class IdInfo(
     @Json(name = "dob") val dob: String? = null,
     @Json(name = "bank_code") val bankCode: String? = null,
     @Json(name = "entered") val entered: Boolean? = null,
+) : Parcelable
+
+@Serializable
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class ConsentInformation(
+    @Json(name = "consent_granted_date") val consentGrantedDate: String,
+    @Json(name = "personal_details_consent_granted") val personalDetailsConsentGranted: Boolean,
+    @Json(name = "contact_information_consent_granted") val contactInformationConsentGranted:
+    Boolean,
+    @Json(name = "document_information_consent_granted") val documentInformationConsentGranted:
+    Boolean,
 ) : Parcelable
 
 enum class ImageType {

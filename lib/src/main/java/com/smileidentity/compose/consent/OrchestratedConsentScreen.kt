@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import com.smileidentity.models.ConsentInformation
 import java.net.URL
 
 /**
@@ -18,7 +19,7 @@ fun OrchestratedConsentScreen(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
+    onConsentGranted: (ConsentInformation) -> Unit,
     onConsentDenied: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,

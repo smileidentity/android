@@ -16,6 +16,7 @@ import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDResult
@@ -79,6 +80,7 @@ class BiometricKYCFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             idInfo: IdInfo,
+            consentInformation: ConsentInformation,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             allowNewEnroll: Boolean = false,
@@ -89,6 +91,7 @@ class BiometricKYCFragment : Fragment() {
         ) = BiometricKYCFragment().apply {
             arguments = Bundle().apply {
                 this.idInfo = idInfo
+                this.consentInformation = consentInformation
                 this.userId = userId
                 this.jobId = jobId
                 this.allowNewEnroll = allowNewEnroll
@@ -111,6 +114,7 @@ class BiometricKYCFragment : Fragment() {
         val args = requireArguments()
         SmileID.BiometricKYC(
             idInfo = args.idInfo,
+            consentInformation = args.consentInformation,
             userId = args.userId,
             jobId = args.jobId,
             allowNewEnroll = args.allowNewEnroll,
@@ -131,6 +135,11 @@ private const val KEY_ID_INFO = "idInfo"
 private var Bundle.idInfo: IdInfo
     get() = getParcelableCompat(KEY_ID_INFO)!!
     set(value) = putParcelable(KEY_ID_INFO, value)
+
+private const val KEY_CONSENT_INFORMATION = "consentInformation"
+private var Bundle.consentInformation: ConsentInformation
+    get() = getParcelableCompat(KEY_CONSENT_INFORMATION)!!
+    set(value) = putParcelable(KEY_CONSENT_INFORMATION, value)
 
 private const val KEY_USER_ID = "userId"
 private var Bundle.userId: String

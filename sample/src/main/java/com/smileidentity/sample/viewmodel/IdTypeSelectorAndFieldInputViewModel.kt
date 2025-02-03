@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AvailableIdType
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.CountryInfo
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.IdTypes
@@ -31,6 +32,13 @@ import timber.log.Timber
 data class IdTypeSelectorAndFieldInputUiState(
     val showLoading: Boolean = true,
     val showConsent: Boolean = false,
+    val consentInformation: ConsentInformation = ConsentInformation(
+        // Japhet's PR
+        consentGrantedDate = "",
+        personalDetailsConsentGranted = false,
+        contactInformationConsentGranted = false,
+        documentInformationConsentGranted = false,
+    ),
     val countries: ImmutableList<SearchableInputFieldItem>? = null,
     val selectedCountry: SearchableInputFieldItem? = null,
     val idTypesForCountry: List<AvailableIdType>? = null,
@@ -137,8 +145,8 @@ class IdTypeSelectorAndFieldInputViewModel(
         }
     }
 
-    fun onConsentGranted() {
-        _uiState.update { it.copy(showConsent = false) }
+    fun onConsentGranted(consentInformation: ConsentInformation) {
+        _uiState.update { it.copy(showConsent = false, consentInformation = consentInformation) }
     }
 
     fun onCountrySelected(selectedCountry: SearchableInputFieldItem) {
@@ -208,6 +216,9 @@ class IdTypeSelectorAndFieldInputViewModel(
             bankCode = _uiState.value.idInputFieldValues[RequiredField.BankCode],
             entered = true,
         )
+
+    val currentConsentInformation
+        get() = _uiState.value.consentInformation
 
     fun getInputFieldUi(requiredField: RequiredField) = when (requiredField) {
         RequiredField.IdNumber -> InputFieldUi(

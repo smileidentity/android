@@ -7,6 +7,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
@@ -49,6 +50,7 @@ data class BiometricKycUiState(
 
 class BiometricKycViewModel(
     private val idInfo: IdInfo,
+    private val consentInformation: ConsentInformation,
     private val userId: String,
     private val jobId: String,
     private val allowNewEnroll: Boolean,
@@ -133,6 +135,7 @@ class BiometricKycViewModel(
                         images = livenessFiles.map { it.asLivenessImage() } +
                             selfieFile.asSelfieImage(),
                         idInfo = idInfo.copy(entered = true),
+                        consentInformation = consentInformation,
                     ),
                 )
             }
@@ -171,6 +174,7 @@ class BiometricKycViewModel(
             val uploadRequest = UploadRequest(
                 images = livenessImagesInfo + selfieImageInfo,
                 idInfo = idInfo.copy(entered = true),
+                consentInformation = consentInformation,
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
