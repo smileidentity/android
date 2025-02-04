@@ -57,8 +57,8 @@ fun OrchestratedEnhancedKycScreen(
             userId = userId,
             jobId = jobId,
             jobType = JobType.EnhancedKyc,
-            onResult = { idInfo, _ ->
-                viewModel.onIdInfoReceived(idInfo)
+            onResult = { idInfo, consentInformation ->
+                viewModel.onIdInfoReceived(idInfo = idInfo, consentInformation = consentInformation)
             },
             modifier = modifier,
             onConsentDenied = onConsentDenied,
