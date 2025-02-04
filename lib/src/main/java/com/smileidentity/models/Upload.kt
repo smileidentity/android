@@ -57,10 +57,8 @@ data class IdInfo(
 data class ConsentInformation(
     @Json(name = "consent_granted_date") val consentGrantedDate: String,
     @Json(name = "personal_details_consent_granted") val personalDetailsConsentGranted: Boolean,
-    @Json(name = "contact_information_consent_granted") val contactInformationConsentGranted:
-    Boolean,
-    @Json(name = "document_information_consent_granted") val documentInformationConsentGranted:
-    Boolean,
+    @Json(name = "contact_information_consent_granted") val contactInformationConsentGranted: Boolean,
+    @Json(name = "document_information_consent_granted") val documentInformationConsentGranted: Boolean,
 ) : Parcelable
 
 enum class ImageType {
