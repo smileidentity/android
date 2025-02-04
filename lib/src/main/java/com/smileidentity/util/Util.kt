@@ -491,7 +491,7 @@ internal fun Face.isLookingUp(
  */
 internal fun getCurrentIsoTimestamp(): String {
     val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-    val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+    val sdf = SimpleDateFormat(pattern, Locale.US)
     sdf.timeZone = TimeZone.getTimeZone("UTC")
     return sdf.format(Date())
 }
