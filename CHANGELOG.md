@@ -2,7 +2,7 @@
 ## Unreleased
 
 ### Changed
-* timestamp in `ProductsConfig ` to be iso format instead of epoch
+* Timestamp consistency from date epoch to iso format 
 
 ## 10.4.2
 

@@ -2,6 +2,7 @@ package com.smileidentity.models
 
 import com.smileidentity.SmileID
 import com.smileidentity.networking.calculateSignature
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -19,7 +20,7 @@ data class BvnTotpRequest(
     @Json(name = "partner_id")
     val partnerId: String = SmileID.config.partnerId,
     @Json(name = "timestamp")
-    val timestamp: String = System.currentTimeMillis().toString(),
+    val timestamp: String = getCurrentIsoTimestamp(),
     @Json(name = "signature")
     val signature: String = calculateSignature(timestamp),
 )
