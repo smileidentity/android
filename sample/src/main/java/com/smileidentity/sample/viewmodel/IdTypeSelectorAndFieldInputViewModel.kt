@@ -19,6 +19,7 @@ import com.smileidentity.models.ProductsConfigRequest
 import com.smileidentity.models.RequiredField
 import com.smileidentity.sample.compose.components.SearchableInputFieldItem
 import com.smileidentity.sample.countryDetails
+import com.smileidentity.sample.getCurrentIsoTimestamp
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.randomUserId
 import kotlinx.collections.immutable.ImmutableList
@@ -33,8 +34,7 @@ data class IdTypeSelectorAndFieldInputUiState(
     val showLoading: Boolean = true,
     val showConsent: Boolean = false,
     val consentInformation: ConsentInformation = ConsentInformation(
-        // Japhet's PR
-        consentGrantedDate = "",
+        consentGrantedDate = getCurrentIsoTimestamp(),
         personalDetailsConsentGranted = false,
         contactInfoConsentGranted = false,
         documentInfoConsentGranted = false,

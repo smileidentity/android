@@ -34,6 +34,7 @@ import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.ConsentInformation
+import com.smileidentity.util.getCurrentIsoTimestamp
 import java.net.URL
 
 /**
@@ -142,8 +143,7 @@ fun ConsentScreen(
                 onClick = {
                     onContinue(
                         ConsentInformation(
-                            // needs Japhet's PR
-                            consentGrantedDate = "",
+                            consentGrantedDate = getCurrentIsoTimestamp(),
                             personalDetailsConsentGranted = true,
                             contactInfoConsentGranted = true,
                             documentInfoConsentGranted = true,

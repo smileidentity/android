@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.models.ConsentInformation
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.viewmodel.BvnConsentScreens
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -61,8 +62,7 @@ internal fun OrchestratedBvnConsentScreen(
                 onSuccessfulBvnVerification = {
                     onConsentGranted(
                         ConsentInformation(
-                            // needs Japhet's PR
-                            consentGrantedDate = "",
+                            consentGrantedDate = getCurrentIsoTimestamp(),
                             personalDetailsConsentGranted = true,
                             contactInfoConsentGranted = true,
                             documentInfoConsentGranted = true,
