@@ -1,4 +1,4 @@
-@file:Suppress("unused", "ktlint:standard:max-line-length")
+@file:Suppress("unused")
 
 package com.smileidentity.models
 
