@@ -145,8 +145,8 @@ fun ConsentScreen(
                             // needs Japhet's PR
                             consentGrantedDate = "",
                             personalDetailsConsentGranted = true,
-                            contactInformationConsentGranted = true,
-                            documentInformationConsentGranted = true,
+                            contactInfoConsentGranted = true,
+                            documentInfoConsentGranted = true,
                         ),
                     )
                 },

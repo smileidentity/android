@@ -36,8 +36,8 @@ data class IdTypeSelectorAndFieldInputUiState(
         // Japhet's PR
         consentGrantedDate = "",
         personalDetailsConsentGranted = false,
-        contactInformationConsentGranted = false,
-        documentInformationConsentGranted = false,
+        contactInfoConsentGranted = false,
+        documentInfoConsentGranted = false,
     ),
     val countries: ImmutableList<SearchableInputFieldItem>? = null,
     val selectedCountry: SearchableInputFieldItem? = null,

@@ -35,8 +35,8 @@ class EnhancedKycTest {
             consentInformation = ConsentInformation(
                 consentGrantedDate = "somedate",
                 personalDetailsConsentGranted = true,
-                contactInformationConsentGranted = true,
-                documentInformationConsentGranted = true,
+                contactInfoConsentGranted = true,
+                documentInfoConsentGranted = true,
             ),
         )
 
