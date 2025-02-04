@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
+import com.smileidentity.models.ConsentInformation
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.viewmodel.BvnConsentScreens
 import com.smileidentity.viewmodel.BvnConsentViewModel
 import com.smileidentity.viewmodel.viewModelFactory
@@ -26,7 +28,7 @@ internal fun OrchestratedBvnConsentScreen(
     partnerIcon: Painter,
     partnerName: String,
     partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
+    onConsentGranted: (ConsentInformation) -> Unit,
     onConsentDenied: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
@@ -49,7 +51,7 @@ internal fun OrchestratedBvnConsentScreen(
                 productName = "BVN",
                 partnerPrivacyPolicy = partnerPrivacyPolicy,
                 showAttribution = showAttribution,
-                onConsentGranted = viewModel::onConsentGranted,
+                onConsentGranted = { viewModel.onConsentGranted() },
                 onConsentDenied = onConsentDenied,
             )
 
@@ -57,7 +59,16 @@ internal fun OrchestratedBvnConsentScreen(
             BvnConsentScreens.ChooseOtpDeliveryScreen -> ChooseOtpDeliveryScreen(userId = userId)
             BvnConsentScreens.VerifyOtpScreen -> VerifyOtpScreen(
                 userId = userId,
-                onSuccessfulBvnVerification = onConsentGranted,
+                onSuccessfulBvnVerification = {
+                    onConsentGranted(
+                        ConsentInformation(
+                            consentGrantedDate = getCurrentIsoTimestamp(),
+                            personalDetailsConsentGranted = true,
+                            contactInfoConsentGranted = true,
+                            documentInfoConsentGranted = true,
+                        ),
+                    )
+                },
             )
         }
     }

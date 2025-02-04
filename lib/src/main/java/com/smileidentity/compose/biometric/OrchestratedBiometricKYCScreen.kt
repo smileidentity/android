@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
@@ -30,6 +31,7 @@ import kotlinx.collections.immutable.persistentMapOf
 @Composable
 fun OrchestratedBiometricKYCScreen(
     idInfo: IdInfo,
+    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -46,6 +48,7 @@ fun OrchestratedBiometricKYCScreen(
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
                 extraPartnerParams = extraPartnerParams,
+                consentInformation = consentInformation,
             )
         },
     ),
