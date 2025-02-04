@@ -14,6 +14,7 @@ data class EnhancedKycRequest(
     @Json(name = "country") val country: String,
     @Json(name = "id_type") val idType: String,
     @Json(name = "id_number") val idNumber: String,
+    @Json(name = "id_number") val consentInformation: ConsentInformation,
     @Json(name = "first_name") val firstName: String? = null,
     @Json(name = "middle_name") val middleName: String? = null,
     @Json(name = "last_name") val lastName: String? = null,

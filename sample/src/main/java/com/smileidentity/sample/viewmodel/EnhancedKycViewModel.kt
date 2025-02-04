@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
@@ -29,10 +30,12 @@ class EnhancedKycViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private lateinit var idInfo: IdInfo
+    private lateinit var consentInformation: ConsentInformation
     private var result: SmileIDResult<EnhancedKycResult>? = null
 
-    fun onIdInfoReceived(idInfo: IdInfo) {
+    fun onIdInfoReceived(idInfo: IdInfo, consentInformation: ConsentInformation) {
         this.idInfo = idInfo
+        this.consentInformation = consentInformation
         doEnhancedKyc()
     }
 
@@ -63,6 +66,7 @@ class EnhancedKycViewModel : ViewModel() {
                 lastName = idInfo.lastName,
                 dob = idInfo.dob,
                 bankCode = idInfo.bankCode,
+                consentInformation = consentInformation,
             )
             val response = SmileID.api.doEnhancedKyc(enhancedKycRequest)
             result = SmileIDResult.Success(EnhancedKycResult(enhancedKycRequest, response))
