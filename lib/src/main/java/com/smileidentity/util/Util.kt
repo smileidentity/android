@@ -37,6 +37,10 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import java.io.Serializable
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
 import kotlinx.collections.immutable.toImmutableList
@@ -479,4 +483,15 @@ internal fun Face.isLookingUp(
     horizontalAngleBuffer: Float,
 ): Boolean {
     return headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
+}
+
+/**
+ * Converts current time to ISO8601 string with milliseconds in UTC
+ * Format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+ */
+internal fun getCurrentIsoTimestamp(): String {
+    val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    val sdf = SimpleDateFormat(pattern, Locale.US)
+    sdf.timeZone = TimeZone.getTimeZone("UTC")
+    return sdf.format(Date())
 }

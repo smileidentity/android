@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
 import com.smileidentity.networking.calculateSignature
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
@@ -25,7 +26,7 @@ data class EnhancedKycRequest(
     @Json(name = "partner_id") val partnerId: String = SmileID.config.partnerId,
     @Json(name = "source_sdk") val sourceSdk: String = "android",
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
-    @Json(name = "timestamp") val timestamp: String = System.currentTimeMillis().toString(),
+    @Json(name = "timestamp") val timestamp: String = getCurrentIsoTimestamp(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
 ) : Parcelable
 
