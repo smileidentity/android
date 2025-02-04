@@ -1,4 +1,8 @@
 # Release Notes
+## Unreleased
+
+### Changed
+* timestamp in `ProductsConfig ` to be iso format instead of epoch
 
 ## 10.4.2
 
