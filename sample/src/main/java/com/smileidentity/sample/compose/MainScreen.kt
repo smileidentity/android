@@ -342,38 +342,43 @@ fun MainScreen(
                 }
                 composable(ProductScreen.EnhancedDocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                    var consentInformation: ConsentInformation? by remember { mutableStateOf(null) }
                     if (idInfo == null) {
                         IdTypeSelectorScreen(
                             jobType = JobType.EnhancedDocumentVerification,
-                            onResult = { idInfo = it },
+                            onResult = { id, consent ->
+                                idInfo = id
+                                consentInformation = consent
+                            },
                         )
                     }
-                    idInfo?.let {
-                        val userId = rememberSaveable { randomUserId() }
-                        val jobId = rememberSaveable { randomJobId() }
-                        SmileID.EnhancedDocumentVerificationScreen(
-                            userId = userId,
-                            jobId = jobId,
-                            countryCode = it.country,
-                            documentType = it.idType,
-                            captureBothSides = true,
-                            showInstructions = true,
-                            allowGalleryUpload = true,
-                        ) { result ->
-                            viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
-                            if (result is SmileIDResult.Success) {
-                                navController.popBackStack(
-                                    route = BottomNavigationScreen.Home.route,
-                                    inclusive = false,
-                                )
-                            } else {
-                                idInfo = null
-                                navController.popBackStack()
-                                navController.navigate(
-                                    route = ProductScreen.EnhancedDocumentVerification.route,
-                                )
-                            }
+                    val id = idInfo ?: return@composable
+                    val consent = consentInformation ?: return@composable
+                    SmileID.EnhancedDocumentVerificationScreen(
+                        userId = userId,
+                        consentInformation = consent,
+                        jobId = jobId,
+                        countryCode = id.country,
+                        documentType = id.idType,
+                        captureBothSides = true,
+                        showInstructions = true,
+                        allowGalleryUpload = true,
+                    ) { result ->
+                        viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
+                        if (result is SmileIDResult.Success) {
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        } else {
+                            idInfo = null
+                            navController.popBackStack()
+                            navController.navigate(
+                                route = ProductScreen.EnhancedDocumentVerification.route,
+                            )
                         }
                     }
                 }

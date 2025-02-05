@@ -8,6 +8,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
@@ -65,6 +66,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
+    private val consentInformation: ConsentInformation? = null,
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
@@ -150,6 +152,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     selfieImageInfo,
                 ) + livenessImageInfo,
                 idInfo = IdInfo(countryCode, documentType),
+                consentInformation = consentInformation,
             )
 
             if (SmileID.allowOfflineMode) {
@@ -170,8 +173,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     ),
                 )
                 createUploadRequestFile(
-                    jobId,
-                    uploadRequest,
+                    jobId = jobId,
+                    uploadRequest = uploadRequest,
                 )
             }
 
@@ -381,6 +384,7 @@ internal class EnhancedDocumentVerificationViewModel(
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
+    consentInformation: ConsentInformation,
     captureBothSides: Boolean,
     selfieFile: File? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
@@ -392,6 +396,7 @@ internal class EnhancedDocumentVerificationViewModel(
     allowNewEnroll = allowNewEnroll,
     countryCode = countryCode,
     documentType = documentType,
+    consentInformation = consentInformation,
     captureBothSides = captureBothSides,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
