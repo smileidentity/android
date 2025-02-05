@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.toast
@@ -19,7 +20,7 @@ fun IdTypeSelectorScreen(
     viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
         factory = viewModelFactory { IdTypeSelectorAndFieldInputViewModel(jobType) },
     ),
-    onResult: (IdInfo) -> Unit,
+    onResult: (IdInfo, ConsentInformation) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     when {
@@ -34,7 +35,7 @@ fun IdTypeSelectorScreen(
             modifier = modifier,
             onNext = {
                 viewModel.onIdTypeConfirmed()
-                onResult(viewModel.currentIdInfo)
+                onResult(viewModel.currentIdInfo, viewModel.currentConsentInformation)
             },
         )
     }
