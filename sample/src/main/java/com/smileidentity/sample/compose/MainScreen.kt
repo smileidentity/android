@@ -72,6 +72,7 @@ import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.compose.components.IdTypeSelectorScreen
 import com.smileidentity.sample.compose.jobs.OrchestratedJobsScreen
+import com.smileidentity.sample.getCurrentIsoTimestamp
 import com.smileidentity.sample.viewmodel.MainScreenUiState.Companion.startScreen
 import com.smileidentity.sample.viewmodel.MainScreenViewModel
 import com.smileidentity.util.randomJobId
@@ -352,8 +353,16 @@ fun MainScreen(
                     idInfo?.let {
                         val userId = rememberSaveable { randomUserId() }
                         val jobId = rememberSaveable { randomJobId() }
+                        // we need to fetch consent from the services endpoint
+                        val consentInformation = ConsentInformation(
+                            consentGrantedDate = getCurrentIsoTimestamp(),
+                            personalDetailsConsentGranted = true,
+                            contactInfoConsentGranted = true,
+                            documentInfoConsentGranted = true,
+                        )
                         SmileID.EnhancedDocumentVerificationScreen(
                             userId = userId,
+                            consentInformation = consentInformation,
                             jobId = jobId,
                             countryCode = it.country,
                             documentType = it.idType,

@@ -236,6 +236,7 @@ fun SmileID.DocumentVerification(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
  *
  * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ *  @param consentInformation We need you to pass the consent from the user
  * @param documentType An optional document type of the document
  * @param captureBothSides Determines if the document has a back side
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
@@ -268,6 +269,7 @@ fun SmileID.DocumentVerification(
 @Composable
 fun SmileID.EnhancedDocumentVerificationScreen(
     countryCode: String,
+    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
@@ -306,6 +308,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         allowNewEnroll = allowNewEnroll,
                         countryCode = countryCode,
                         documentType = documentType,
+                        consentInformation = consentInformation,
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
