@@ -360,6 +360,7 @@ fun MainScreen(
                             captureBothSides = true,
                             showInstructions = true,
                             allowGalleryUpload = true,
+                            useStrictMode = true,
                         ) { result ->
                             viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
                             if (result is SmileIDResult.Success) {

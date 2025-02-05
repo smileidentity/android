@@ -123,6 +123,7 @@ fun SmileID.SmartSelfieAuthentication(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -193,6 +194,7 @@ fun SmileID.DocumentVerification(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -280,6 +282,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -296,6 +299,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
+            useStrictMode = useStrictMode,
             onResult = onResult,
             viewModel = viewModel(
                 factory = viewModelFactory {
@@ -354,6 +358,7 @@ fun SmileID.BiometricKYC(
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    useStrictMode: Boolean = false,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
@@ -369,6 +374,7 @@ fun SmileID.BiometricKYC(
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             showInstructions = showInstructions,
+            useStrictMode = useStrictMode,
             extraPartnerParams = extraPartnerParams,
             onResult = onResult,
         )

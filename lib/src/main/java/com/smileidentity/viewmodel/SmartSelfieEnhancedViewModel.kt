@@ -98,7 +98,7 @@ sealed interface SelfieState {
     data object Processing : SelfieState
     data class Error(val throwable: Throwable) : SelfieState
     data class Success(
-        val result: SmartSelfieResponse,
+        val result: SmartSelfieResponse?,
         val selfieFile: File,
         val livenessFiles: List<File>,
     ) : SelfieState
@@ -138,6 +138,7 @@ class SmartSelfieEnhancedViewModel(
     private val selfieQualityModel: SelfieQualityModel,
     private val metadata: MutableList<Metadatum>,
     private val allowNewEnroll: Boolean? = null,
+    private val skipApiSubmission: Boolean,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val faceDetector: FaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder().apply {
@@ -462,41 +463,45 @@ class SmartSelfieEnhancedViewModel(
                 var done = false
                 // Start submitting the job right away, but show the spinner after a small delay
                 // to make it feel like the API call is a bit faster
-                awaitAll(
-                    async {
-                        val apiResponse = submitJob(selfieFile)
-                        done = true
-                        _uiState.update {
-                            it.copy(
-                                selfieState = SelfieState.Success(
-                                    result = apiResponse,
-                                    selfieFile = selfieFile,
-                                    livenessFiles = livenessFiles,
-                                ),
-                                selfieFile = selfieFile,
-                            )
-                        }
-                        // Delay to ensure the completion icon is shown for a little bit
-                        delay(COMPLETED_DELAY_MS)
-                        val result = SmartSelfieResult(
-                            selfieFile = selfieFile,
-                            livenessFiles = livenessFiles,
-                            apiResponse = apiResponse,
-                        )
-                        onResult(SmileIDResult.Success(result))
-                    },
-                    async {
-                        delay(LOADING_INDICATOR_DELAY_MS)
-                        if (!done) {
+                if (skipApiSubmission) {
+                    onSkipApiSubmission(selfieFile)
+                } else {
+                    awaitAll(
+                        async {
+                            val apiResponse = submitJob(selfieFile)
+                            done = true
                             _uiState.update {
                                 it.copy(
+                                    selfieState = SelfieState.Success(
+                                        result = apiResponse,
+                                        selfieFile = selfieFile,
+                                        livenessFiles = livenessFiles,
+                                    ),
                                     selfieFile = selfieFile,
-                                    selfieState = SelfieState.Processing,
                                 )
                             }
-                        }
-                    },
-                )
+                            // Delay to ensure the completion icon is shown for a little bit
+                            delay(COMPLETED_DELAY_MS)
+                            val result = SmartSelfieResult(
+                                selfieFile = selfieFile,
+                                livenessFiles = livenessFiles,
+                                apiResponse = apiResponse,
+                            )
+                            onResult(SmileIDResult.Success(result))
+                        },
+                        async {
+                            delay(LOADING_INDICATOR_DELAY_MS)
+                            if (!done) {
+                                _uiState.update {
+                                    it.copy(
+                                        selfieFile = selfieFile,
+                                        selfieState = SelfieState.Processing,
+                                    )
+                                }
+                            }
+                        },
+                    )
+                }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error analyzing image")
@@ -506,6 +511,27 @@ class SmartSelfieEnhancedViewModel(
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
         }
+    }
+
+    private suspend fun onSkipApiSubmission(selfieFile: File) {
+        _uiState.update {
+            it.copy(
+                selfieState = SelfieState.Success(
+                    result = null,
+                    selfieFile = selfieFile,
+                    livenessFiles = livenessFiles,
+                ),
+                selfieFile = selfieFile,
+            )
+        }
+        // Delay to ensure the completion icon is shown for a little bit
+        delay(COMPLETED_DELAY_MS)
+        val result = SmartSelfieResult(
+            selfieFile = selfieFile,
+            livenessFiles = livenessFiles,
+            apiResponse = null,
+        )
+        onResult(SmileIDResult.Success(result))
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {

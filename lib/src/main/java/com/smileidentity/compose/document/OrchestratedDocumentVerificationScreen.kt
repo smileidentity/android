@@ -11,14 +11,18 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
+import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -41,9 +45,47 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     onResult: SmileIDCallback<T> = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val selfieCaptureScreen = @Composable {
+        if (useStrictMode) {
+            val context = LocalContext.current
+            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+            OrchestratedSelfieCaptureScreenEnhanced(
+                userId = userId,
+                allowNewEnroll = false,
+                showInstructions = showInstructions,
+                isEnroll = false,
+                showAttribution = showAttribution,
+                selfieQualityModel = selfieQualityModel,
+                skipApiSubmission = true,
+                onResult = { result ->
+                    when (result) {
+                        is SmileIDResult.Error -> viewModel.onError(result.throwable)
+                        is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(result)
+                    }
+                },
+            )
+        } else {
+            OrchestratedSelfieCaptureScreen(
+                userId = userId,
+                jobId = jobId,
+                isEnroll = false,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                skipApiSubmission = true,
+                onResult = { result ->
+                    when (result) {
+                        is SmileIDResult.Error -> viewModel.onError(result.throwable)
+                        is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(result)
+                    }
+                },
+            )
+        }
+    }
     Box(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background)
@@ -93,20 +135,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 onSkip = viewModel::onDocumentBackSkip,
             )
 
-            DocumentCaptureFlow.SelfieCapture -> OrchestratedSelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                isEnroll = false,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                skipApiSubmission = true,
-            ) {
-                when (it) {
-                    is SmileIDResult.Error -> viewModel.onError(it.throwable)
-                    is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(it)
-                }
-            }
+            DocumentCaptureFlow.SelfieCapture -> selfieCaptureScreen()
 
             is DocumentCaptureFlow.ProcessingScreen -> ProcessingScreen(
                 processingState = currentStep.processingState,
