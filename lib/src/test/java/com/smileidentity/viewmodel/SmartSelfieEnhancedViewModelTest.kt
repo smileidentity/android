@@ -21,6 +21,7 @@ class SmartSelfieEnhancedViewModelTest {
             isEnroll = false,
             extraPartnerParams = persistentMapOf(),
             selfieQualityModel = mockk(),
+            skipApiSubmission = true,
             faceDetector = mockk(),
             metadata = mutableListOf(),
             onResult = {},
