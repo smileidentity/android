@@ -4,6 +4,7 @@
 
 * Pass ConsentInformation in EnhancedDocV, EnhancedKYC and BiometricKYC
 * Timestamp consistency from date epoch to iso format
+* Add enhancedSelfieCapture to the BiomtericKYC, DocumentVerification and EnhancedDocV
 
 ## 10.4.2
 
