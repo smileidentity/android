@@ -4,6 +4,8 @@
 
 * Pass ConsentInformation in EnhancedDocV, EnhancedKYC and BiometricKYC
 * Timestamp consistency from date epoch to iso format
+* Removed network retries on OKHTTP
+* Updated timeouts to 60 seconds
 
 ## 10.4.2
 

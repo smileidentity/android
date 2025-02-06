@@ -64,7 +64,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.HttpException
@@ -436,35 +435,12 @@ object SmileID {
      */
     @JvmStatic
     fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
-        retryOnConnectionFailure(true)
-        callTimeout(120, TimeUnit.SECONDS)
-        connectTimeout(30, TimeUnit.SECONDS)
-        readTimeout(30, TimeUnit.SECONDS)
-        writeTimeout(30, TimeUnit.SECONDS)
-        addInterceptor(SmileHeaderAuthInterceptor)
-        addInterceptor(SmileHeaderMetadataInterceptor)
-        addInterceptor(
-            Interceptor { chain: Interceptor.Chain ->
-                // Retry on exception (network error) and 5xx
-                val request = chain.request()
-                for (attempt in 1..3) {
-                    try {
-                        Timber.v("Smile ID SDK network attempt #$attempt")
-                        val response = chain.proceed(request)
-                        if (response.code < 500) {
-                            return@Interceptor response
-                        }
-                        // Must close the response before retrying
-                        // see: https://github.com/square/retrofit/issues/3478
-                        response.close()
-                    } catch (e: Exception) {
-                        Timber.w(e, "Smile ID SDK network attempt #$attempt failed")
-                        // Network failures end up here. These will be retried
-                    }
-                }
-                return@Interceptor chain.proceed(request)
-            },
-        )
+        callTimeout(timeout = 120, TimeUnit.SECONDS)
+        connectTimeout(timeout = 60, unit = TimeUnit.SECONDS)
+        readTimeout(timeout = 60, unit = TimeUnit.SECONDS)
+        writeTimeout(timeout = 60, unit = TimeUnit.SECONDS)
+        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
+        addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
