@@ -193,8 +193,11 @@ public class JavaActivity extends FragmentActivity {
     }
 
     private void doEnhancedDocumentVerification() {
+        ConsentInformation consentInformation = new ConsentInformation(
+            "", true, true, true
+        );
         EnhancedDocumentVerificationFragment enhancedDocVFragment = EnhancedDocumentVerificationFragment
-            .newInstance("GH", "DRIVERS_LICENSE");
+            .newInstance("GH", consentInformation, "DRIVERS_LICENSE");
         getSupportFragmentManager().setFragmentResultListener(
             EnhancedDocumentVerificationFragment.KEY_REQUEST,
             this,
