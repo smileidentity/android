@@ -221,6 +221,7 @@ fun SmileID.DocumentVerification(
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
+                        useStrictMode = useStrictMode,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
                         metadata = metadata,
