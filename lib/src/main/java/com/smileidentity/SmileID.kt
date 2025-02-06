@@ -435,12 +435,12 @@ object SmileID {
      */
     @JvmStatic
     fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
-        callTimeout(120, TimeUnit.SECONDS)
-        connectTimeout(35, TimeUnit.SECONDS)
-        readTimeout(35, TimeUnit.SECONDS)
-        writeTimeout(35, TimeUnit.SECONDS)
-        addInterceptor(SmileHeaderAuthInterceptor)
-        addInterceptor(SmileHeaderMetadataInterceptor)
+        callTimeout(timeout = 120, TimeUnit.SECONDS)
+        connectTimeout(timeout = 60, unit = TimeUnit.SECONDS)
+        readTimeout(timeout = 60, unit = TimeUnit.SECONDS)
+        writeTimeout(timeout = 60, unit = TimeUnit.SECONDS)
+        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
+        addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
