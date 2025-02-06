@@ -65,6 +65,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val allowNewEnroll: Boolean,
     private val countryCode: String,
     private val documentType: String? = null,
+    private val useStrictMode: Boolean = false,
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
@@ -128,7 +129,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
         }
-
         viewModelScope.launch(getExceptionHandler(::onError)) {
             val authRequest = AuthenticationRequest(
                 jobType = jobType,
@@ -223,9 +223,16 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         var livenessFilesResult = livenessFiles
         var documentFrontFileResult = documentFrontFile
         var documentBackFileResult = documentBackFile
-        val copySuccess = moveJobToSubmitted(jobId)
+        val copySuccess: Boolean
+        if (useStrictMode) {
+            copySuccess = moveJobToSubmitted(jobId) && moveJobToSubmitted(userId)
+        } else {
+            copySuccess = moveJobToSubmitted(jobId)
+        }
         if (copySuccess) {
-            selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+            // strict mode uses userId as the file location, otherwise uses jobId
+            val fileLocation = if (useStrictMode) userId else jobId
+            selfieFileResult = getFileByType(fileLocation, FileType.SELFIE) ?: run {
                 Timber.w("Selfie file not found for job ID: $jobId")
                 throw IllegalStateException("Selfie file not found for job ID: $jobId")
             }
@@ -266,7 +273,13 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
      * Trigger the display of the Error dialog
      */
     fun onError(throwable: Throwable) {
-        val didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable)
+        val didMoveToSubmitted: Boolean
+        if (useStrictMode) {
+            didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable) &&
+                handleOfflineJobFailure(userId, throwable)
+        } else {
+            didMoveToSubmitted = handleOfflineJobFailure(jobId, throwable)
+        }
         if (didMoveToSubmitted) {
             this.selfieFile = getFileByType(jobId, FileType.SELFIE)
             this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
@@ -340,6 +353,7 @@ internal class DocumentVerificationViewModel(
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
@@ -350,6 +364,7 @@ internal class DocumentVerificationViewModel(
     countryCode = countryCode,
     documentType = documentType,
     captureBothSides = captureBothSides,
+    useStrictMode = useStrictMode,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,
@@ -383,6 +398,7 @@ internal class EnhancedDocumentVerificationViewModel(
     documentType: String? = null,
     captureBothSides: Boolean,
     selfieFile: File? = null,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
@@ -393,6 +409,7 @@ internal class EnhancedDocumentVerificationViewModel(
     countryCode = countryCode,
     documentType = documentType,
     captureBothSides = captureBothSides,
+    useStrictMode = useStrictMode,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
     metadata = metadata,

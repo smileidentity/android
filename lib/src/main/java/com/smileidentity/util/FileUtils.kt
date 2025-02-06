@@ -275,7 +275,6 @@ fun getFilesByType(
 ): List<File> {
     val stateDirectory = if (submitted) SUBMITTED_PATH else UNSUBMITTED_PATH
     val directory = File(savePath, "$stateDirectory/$folderName")
-
     if (!directory.exists() || !directory.isDirectory) {
         Timber.w("The path provided is not a valid directory.")
         throw IllegalArgumentException("The path provided is not a valid directory.")

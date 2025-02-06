@@ -52,6 +52,7 @@ fun OrchestratedBiometricKYCScreen(
                 userId = userId,
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
+                useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 consentInformation = consentInformation,
             )
@@ -74,11 +75,15 @@ fun OrchestratedBiometricKYCScreen(
                 skipApiSubmission = true,
                 onResult = { result ->
                     when (result) {
-                        is SmileIDResult.Error -> onResult(result)
-                        is SmileIDResult.Success -> viewModel.onSelfieCaptured(
-                            selfieFile = result.data.selfieFile,
-                            livenessFiles = result.data.livenessFiles,
-                        )
+                        is SmileIDResult.Error -> {
+                            onResult(result)
+                        }
+                        is SmileIDResult.Success -> {
+                            viewModel.onSelfieCaptured(
+                                selfieFile = result.data.selfieFile,
+                                livenessFiles = result.data.livenessFiles,
+                            )
+                        }
                     }
                 },
             )

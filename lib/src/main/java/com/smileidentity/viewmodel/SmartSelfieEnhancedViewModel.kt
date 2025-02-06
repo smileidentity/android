@@ -442,30 +442,32 @@ class SmartSelfieEnhancedViewModel(
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
-            val proxy = { e: Throwable ->
-                when {
-                    e is IOException -> {
-                        Timber.w(e, "Received IOException, asking user to retry")
-                        _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
-                    }
+            if (skipApiSubmission) {
+                onSkipApiSubmission(selfieFile)
+                return@addOnSuccessListener
+            } else {
+                val proxy = { e: Throwable ->
+                    when {
+                        e is IOException -> {
+                            Timber.w(e, "Received IOException, asking user to retry")
+                            _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
+                        }
 
-                    e is HttpException && e.code() in 500..599 -> {
-                        val message = "Received 5xx error, asking user to retry"
-                        Timber.w(e, message)
-                        SmileIDCrashReporting.hub.addBreadcrumb(message)
-                        _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
-                    }
+                        e is HttpException && e.code() in 500..599 -> {
+                            val message = "Received 5xx error, asking user to retry"
+                            Timber.w(e, message)
+                            SmileIDCrashReporting.hub.addBreadcrumb(message)
+                            _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
+                        }
 
-                    else -> onResult(SmileIDResult.Error(e))
+                        else -> onResult(SmileIDResult.Error(e))
+                    }
                 }
-            }
-            viewModelScope.launch(getExceptionHandler(proxy)) {
-                var done = false
-                // Start submitting the job right away, but show the spinner after a small delay
-                // to make it feel like the API call is a bit faster
-                if (skipApiSubmission) {
-                    onSkipApiSubmission(selfieFile)
-                } else {
+                viewModelScope.launch(getExceptionHandler(proxy)) {
+                    Timber.d("viewModelScope.launch started")
+                    // Start submitting the job right away, but show the spinner after a small delay
+                    // to make it feel like the API call is a bit faster
+                    var done = false
                     awaitAll(
                         async {
                             val apiResponse = submitJob(selfieFile)
@@ -513,19 +515,7 @@ class SmartSelfieEnhancedViewModel(
         }
     }
 
-    private suspend fun onSkipApiSubmission(selfieFile: File) {
-        _uiState.update {
-            it.copy(
-                selfieState = SelfieState.Success(
-                    result = null,
-                    selfieFile = selfieFile,
-                    livenessFiles = livenessFiles,
-                ),
-                selfieFile = selfieFile,
-            )
-        }
-        // Delay to ensure the completion icon is shown for a little bit
-        delay(COMPLETED_DELAY_MS)
+    private fun onSkipApiSubmission(selfieFile: File) {
         val result = SmartSelfieResult(
             selfieFile = selfieFile,
             livenessFiles = livenessFiles,

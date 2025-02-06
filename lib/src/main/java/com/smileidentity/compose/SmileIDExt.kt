@@ -123,7 +123,6 @@ fun SmileID.SmartSelfieAuthentication(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
-    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -312,6 +311,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         documentType = documentType,
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
+                        useStrictMode = useStrictMode,
                         extraPartnerParams = extraPartnerParams,
                         metadata = metadata,
                     )

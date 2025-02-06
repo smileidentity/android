@@ -294,6 +294,7 @@ fun MainScreen(
                         idInfo = id,
                         consentInformation = consent,
                         userId = userId,
+                        useStrictMode = true,
                         jobId = jobId,
                     ) { result ->
                         viewModel.onBiometricKycResult(userId, jobId, result)
@@ -327,6 +328,7 @@ fun MainScreen(
                         documentType = it.arguments?.getString("idType"),
                         captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
                         showInstructions = true,
+                        useStrictMode = true,
                         allowGalleryUpload = true,
                     ) { result ->
                         viewModel.onDocumentVerificationResult(userId, jobId, result)
