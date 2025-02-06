@@ -436,9 +436,9 @@ object SmileID {
     @JvmStatic
     fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
         callTimeout(120, TimeUnit.SECONDS)
-        connectTimeout(30, TimeUnit.SECONDS)
-        readTimeout(30, TimeUnit.SECONDS)
-        writeTimeout(30, TimeUnit.SECONDS)
+        connectTimeout(35, TimeUnit.SECONDS)
+        readTimeout(35, TimeUnit.SECONDS)
+        writeTimeout(35, TimeUnit.SECONDS)
         addInterceptor(SmileHeaderAuthInterceptor)
         addInterceptor(SmileHeaderMetadataInterceptor)
         addInterceptor(
