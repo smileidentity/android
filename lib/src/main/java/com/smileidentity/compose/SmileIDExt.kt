@@ -209,6 +209,7 @@ fun SmileID.DocumentVerification(
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
+            useStrictMode = useStrictMode,
             idAspectRatio = idAspectRatio,
             onResult = onResult,
             viewModel = viewModel(
