@@ -98,7 +98,7 @@ sealed interface SelfieState {
     data object Processing : SelfieState
     data class Error(val throwable: Throwable) : SelfieState
     data class Success(
-        val result: SmartSelfieResponse,
+        val result: SmartSelfieResponse?,
         val selfieFile: File,
         val livenessFiles: List<File>,
     ) : SelfieState
@@ -138,6 +138,7 @@ class SmartSelfieEnhancedViewModel(
     private val selfieQualityModel: SelfieQualityModel,
     private val metadata: MutableList<Metadatum>,
     private val allowNewEnroll: Boolean? = null,
+    private val skipApiSubmission: Boolean,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val faceDetector: FaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder().apply {
@@ -441,62 +442,68 @@ class SmartSelfieEnhancedViewModel(
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
-            val proxy = { e: Throwable ->
-                when {
-                    e is IOException -> {
-                        Timber.w(e, "Received IOException, asking user to retry")
-                        _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
-                    }
-
-                    e is HttpException && e.code() in 500..599 -> {
-                        val message = "Received 5xx error, asking user to retry"
-                        Timber.w(e, message)
-                        SmileIDCrashReporting.hub.addBreadcrumb(message)
-                        _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
-                    }
-
-                    else -> onResult(SmileIDResult.Error(e))
-                }
-            }
-            viewModelScope.launch(getExceptionHandler(proxy)) {
-                var done = false
-                // Start submitting the job right away, but show the spinner after a small delay
-                // to make it feel like the API call is a bit faster
-                awaitAll(
-                    async {
-                        val apiResponse = submitJob(selfieFile)
-                        done = true
-                        _uiState.update {
-                            it.copy(
-                                selfieState = SelfieState.Success(
-                                    result = apiResponse,
-                                    selfieFile = selfieFile,
-                                    livenessFiles = livenessFiles,
-                                ),
-                                selfieFile = selfieFile,
-                            )
+            if (skipApiSubmission) {
+                onSkipApiSubmission(selfieFile)
+                return@addOnSuccessListener
+            } else {
+                val proxy = { e: Throwable ->
+                    when {
+                        e is IOException -> {
+                            Timber.w(e, "Received IOException, asking user to retry")
+                            _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
                         }
-                        // Delay to ensure the completion icon is shown for a little bit
-                        delay(COMPLETED_DELAY_MS)
-                        val result = SmartSelfieResult(
-                            selfieFile = selfieFile,
-                            livenessFiles = livenessFiles,
-                            apiResponse = apiResponse,
-                        )
-                        onResult(SmileIDResult.Success(result))
-                    },
-                    async {
-                        delay(LOADING_INDICATOR_DELAY_MS)
-                        if (!done) {
+
+                        e is HttpException && e.code() in 500..599 -> {
+                            val message = "Received 5xx error, asking user to retry"
+                            Timber.w(e, message)
+                            SmileIDCrashReporting.hub.addBreadcrumb(message)
+                            _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
+                        }
+
+                        else -> onResult(SmileIDResult.Error(e))
+                    }
+                }
+                viewModelScope.launch(getExceptionHandler(proxy)) {
+                    Timber.d("viewModelScope.launch started")
+                    // Start submitting the job right away, but show the spinner after a small delay
+                    // to make it feel like the API call is a bit faster
+                    var done = false
+                    awaitAll(
+                        async {
+                            val apiResponse = submitJob(selfieFile)
+                            done = true
                             _uiState.update {
                                 it.copy(
+                                    selfieState = SelfieState.Success(
+                                        result = apiResponse,
+                                        selfieFile = selfieFile,
+                                        livenessFiles = livenessFiles,
+                                    ),
                                     selfieFile = selfieFile,
-                                    selfieState = SelfieState.Processing,
                                 )
                             }
-                        }
-                    },
-                )
+                            // Delay to ensure the completion icon is shown for a little bit
+                            delay(COMPLETED_DELAY_MS)
+                            val result = SmartSelfieResult(
+                                selfieFile = selfieFile,
+                                livenessFiles = livenessFiles,
+                                apiResponse = apiResponse,
+                            )
+                            onResult(SmileIDResult.Success(result))
+                        },
+                        async {
+                            delay(LOADING_INDICATOR_DELAY_MS)
+                            if (!done) {
+                                _uiState.update {
+                                    it.copy(
+                                        selfieFile = selfieFile,
+                                        selfieState = SelfieState.Processing,
+                                    )
+                                }
+                            }
+                        },
+                    )
+                }
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error analyzing image")
@@ -506,6 +513,15 @@ class SmartSelfieEnhancedViewModel(
             // Closing the proxy allows the next image to be delivered to the analyzer
             imageProxy.close()
         }
+    }
+
+    private fun onSkipApiSubmission(selfieFile: File) {
+        val result = SmartSelfieResult(
+            selfieFile = selfieFile,
+            livenessFiles = livenessFiles,
+            apiResponse = null,
+        )
+        onResult(SmileIDResult.Success(result))
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
