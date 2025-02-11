@@ -7,6 +7,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationRequest
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
@@ -49,9 +50,11 @@ data class BiometricKycUiState(
 
 class BiometricKycViewModel(
     private val idInfo: IdInfo,
+    private val consentInformation: ConsentInformation,
     private val userId: String,
     private val jobId: String,
     private val allowNewEnroll: Boolean,
+    private val useStrictMode: Boolean = false,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricKycUiState())
@@ -70,7 +73,13 @@ class BiometricKycViewModel(
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
         val proxy = fun(e: Throwable) {
-            val didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
+            val didMoveToSubmitted: Boolean
+            if (useStrictMode) {
+                didMoveToSubmitted =
+                    handleOfflineJobFailure(jobId, e) && handleOfflineJobFailure(userId, e)
+            } else {
+                didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
+            }
             if (didMoveToSubmitted) {
                 this.selfieFile = getFileByType(jobId, FileType.SELFIE)
                 this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
@@ -133,6 +142,7 @@ class BiometricKycViewModel(
                         images = livenessFiles.map { it.asLivenessImage() } +
                             selfieFile.asSelfieImage(),
                         idInfo = idInfo.copy(entered = true),
+                        consentInformation = consentInformation,
                     ),
                 )
             }
@@ -171,6 +181,7 @@ class BiometricKycViewModel(
             val uploadRequest = UploadRequest(
                 images = livenessImagesInfo + selfieImageInfo,
                 idInfo = idInfo.copy(entered = true),
+                consentInformation = consentInformation,
             )
             SmileID.api.upload(prepUploadResponse.uploadUrl, uploadRequest)
             Timber.d("Upload finished")
@@ -178,9 +189,16 @@ class BiometricKycViewModel(
             var selfieFileResult = selfieFile
             var livenessFilesResult = livenessFiles
             // if we've gotten this far, we move files to complete from pending
-            val copySuccess = moveJobToSubmitted(jobId)
+            val copySuccess: Boolean
+            if (useStrictMode) {
+                copySuccess = moveJobToSubmitted(jobId) && moveJobToSubmitted(userId)
+            } else {
+                copySuccess = moveJobToSubmitted(jobId)
+            }
             if (copySuccess) {
-                selfieFileResult = getFileByType(jobId, FileType.SELFIE) ?: run {
+                // strict mode uses userId as the file location, otherwise uses jobId
+                val fileLocation = if (useStrictMode) userId else jobId
+                selfieFileResult = getFileByType(fileLocation, FileType.SELFIE) ?: run {
                     Timber.w("Selfie file not found for job ID: $jobId")
                     throw IllegalStateException("Selfie file not found for job ID: $jobId")
                 }

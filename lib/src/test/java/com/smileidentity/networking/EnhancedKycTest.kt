@@ -1,6 +1,7 @@
 package com.smileidentity.networking
 
 import com.smileidentity.SmileID
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.EnhancedKycAsyncResponse
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.JobType.EnhancedKyc
@@ -31,6 +32,12 @@ class EnhancedKycTest {
             partnerId = "partnerId",
             signature = "signature",
             partnerParams = PartnerParams(EnhancedKyc),
+            consentInformation = ConsentInformation(
+                consentGrantedDate = "somedate",
+                personalDetailsConsentGranted = true,
+                contactInfoConsentGranted = true,
+                documentInfoConsentGranted = true,
+            ),
         )
 
         // when

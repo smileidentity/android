@@ -1,5 +1,13 @@
 # Release Notes
 
+## 10.5.0 (Unreleased)
+
+* Pass ConsentInformation in EnhancedDocV, EnhancedKYC and BiometricKYC
+* Timestamp consistency from date epoch to iso format
+* Removed network retries on OKHTTP
+* Updated timeouts to 60 seconds
+* Add enhancedSelfieCapture to the BiometricKYC, DocumentVerification and EnhancedDocV
+
 ## 10.4.2
 
 * Android correct variable names for to match smile_config.json

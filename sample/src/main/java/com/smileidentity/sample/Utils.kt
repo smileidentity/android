@@ -10,6 +10,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.compose.components.SearchableInputFieldItem
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -19,6 +23,13 @@ fun Context.toast(message: String) {
 
 fun Context.toast(@StringRes message: Int) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+}
+
+fun getCurrentIsoTimestamp(): String {
+    val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    val sdf = SimpleDateFormat(pattern, Locale.US)
+    sdf.timeZone = TimeZone.getTimeZone("UTC")
+    return sdf.format(Date())
 }
 
 // From https://stackoverflow.com/a/70510760

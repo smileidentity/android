@@ -5,6 +5,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.Config
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.JobType
@@ -57,6 +58,12 @@ class EnhancedDocumentVerificationViewModelTest {
             selfieFile = selfieFile,
             captureBothSides = false,
             metadata = mutableListOf(),
+            consentInformation = ConsentInformation(
+                consentGrantedDate = "somedate",
+                personalDetailsConsentGranted = true,
+                contactInfoConsentGranted = true,
+                documentInfoConsentGranted = true,
+            ),
         )
         SmileID.config = Config(
             partnerId = "partnerId",
