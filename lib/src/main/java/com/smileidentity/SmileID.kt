@@ -30,7 +30,6 @@ import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
-import com.smileidentity.networking.SmileIDSecurityInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
