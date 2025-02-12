@@ -1,6 +1,6 @@
 # Release Notes
 
-## 10.5.0 (Unreleased)
+## 10.5.0
 
 * Pass ConsentInformation in EnhancedDocV, EnhancedKYC and BiometricKYC
 * Timestamp consistency from date epoch to iso format
