@@ -19,6 +19,7 @@ import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
@@ -192,6 +193,7 @@ fun SmileID.DocumentVerification(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -207,6 +209,7 @@ fun SmileID.DocumentVerification(
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
+            useStrictMode = useStrictMode,
             idAspectRatio = idAspectRatio,
             onResult = onResult,
             viewModel = viewModel(
@@ -219,6 +222,7 @@ fun SmileID.DocumentVerification(
                         countryCode = countryCode,
                         documentType = documentType,
                         captureBothSides = captureBothSides,
+                        useStrictMode = useStrictMode,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
                         metadata = metadata,
@@ -235,6 +239,7 @@ fun SmileID.DocumentVerification(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
  *
  * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ *  @param consentInformation We need you to pass the consent from the user
  * @param documentType An optional document type of the document
  * @param captureBothSides Determines if the document has a back side
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
@@ -267,6 +272,7 @@ fun SmileID.DocumentVerification(
 @Composable
 fun SmileID.EnhancedDocumentVerificationScreen(
     countryCode: String,
+    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
@@ -279,6 +285,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
@@ -295,6 +302,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             allowGalleryUpload = allowGalleryUpload,
             showInstructions = showInstructions,
             idAspectRatio = idAspectRatio,
+            useStrictMode = useStrictMode,
             onResult = onResult,
             viewModel = viewModel(
                 factory = viewModelFactory {
@@ -305,8 +313,10 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         allowNewEnroll = allowNewEnroll,
                         countryCode = countryCode,
                         documentType = documentType,
+                        consentInformation = consentInformation,
                         captureBothSides = captureBothSides,
                         selfieFile = bypassSelfieCaptureWithFile,
+                        useStrictMode = useStrictMode,
                         extraPartnerParams = extraPartnerParams,
                         metadata = metadata,
                     )
@@ -324,6 +334,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-kyc)
  *
  * @param idInfo The ID information to look up in the ID Authority
+ * @param consentInformation We need you to pass the consent from the user
  * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
  * @param jobId The job ID to associate with the Biometric KYC. Most often, this will correspond
@@ -343,6 +354,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
 @Composable
 fun SmileID.BiometricKYC(
     idInfo: IdInfo,
+    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -351,6 +363,7 @@ fun SmileID.BiometricKYC(
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    useStrictMode: Boolean = false,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
@@ -359,12 +372,14 @@ fun SmileID.BiometricKYC(
         OrchestratedBiometricKYCScreen(
             modifier = modifier,
             idInfo = idInfo,
+            consentInformation = consentInformation,
             userId = userId,
             jobId = jobId,
             allowNewEnroll = allowNewEnroll,
             allowAgentMode = allowAgentMode,
             showAttribution = showAttribution,
             showInstructions = showInstructions,
+            useStrictMode = useStrictMode,
             extraPartnerParams = extraPartnerParams,
             onResult = onResult,
         )
@@ -395,7 +410,7 @@ fun SmileID.BvnConsentScreen(
     partnerIcon: Painter,
     partnerName: String,
     partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
+    onConsentGranted: (ConsentInformation) -> Unit,
     onConsentDenied: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
@@ -423,7 +438,7 @@ fun SmileID.ConsentScreen(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
-    onConsentGranted: () -> Unit,
+    onConsentGranted: (ConsentInformation) -> Unit,
     onConsentDenied: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,

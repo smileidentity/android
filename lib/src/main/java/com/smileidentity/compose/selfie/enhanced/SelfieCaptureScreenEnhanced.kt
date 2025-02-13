@@ -119,6 +119,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
     showInstructions: Boolean = true,
     allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    skipApiSubmission: Boolean = false,
     metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     viewModel: SmartSelfieEnhancedViewModel = viewModel(
         initializer = {
@@ -128,6 +129,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                 allowNewEnroll = allowNewEnroll,
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
+                skipApiSubmission = skipApiSubmission,
                 metadata = metadata,
                 onResult = onResult,
             )

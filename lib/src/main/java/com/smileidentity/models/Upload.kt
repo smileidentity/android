@@ -3,6 +3,7 @@
 package com.smileidentity.models
 
 import android.os.Parcelable
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.io.File
@@ -16,6 +17,7 @@ import kotlinx.serialization.Serializable
 data class UploadRequest(
     @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "id_info") val idInfo: IdInfo? = null,
+    @Json(name = "consent_information") val consentInformation: ConsentInformation? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -48,6 +50,16 @@ data class IdInfo(
     @Json(name = "dob") val dob: String? = null,
     @Json(name = "bank_code") val bankCode: String? = null,
     @Json(name = "entered") val entered: Boolean? = null,
+) : Parcelable
+
+@Serializable
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class ConsentInformation(
+    @Json(name = "consent_granted_date") val consentGrantedDate: String = getCurrentIsoTimestamp(),
+    @Json(name = "personal_details_consent_granted") val personalDetailsConsentGranted: Boolean,
+    @Json(name = "contact_information_consent_granted") val contactInfoConsentGranted: Boolean,
+    @Json(name = "document_information_consent_granted") val documentInfoConsentGranted: Boolean,
 ) : Parcelable
 
 enum class ImageType {

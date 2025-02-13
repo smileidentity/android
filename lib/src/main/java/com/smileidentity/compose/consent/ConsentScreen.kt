@@ -33,6 +33,8 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.annotatedStringResource
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.models.ConsentInformation
+import com.smileidentity.util.getCurrentIsoTimestamp
 import java.net.URL
 
 /**
@@ -44,7 +46,7 @@ fun ConsentScreen(
     partnerName: String,
     productName: String,
     partnerPrivacyPolicy: URL,
-    onContinue: () -> Unit,
+    onContinue: (ConsentInformation) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
@@ -138,7 +140,16 @@ fun ConsentScreen(
                 modifier = Modifier.padding(bottom = 24.dp),
             )
             Button(
-                onClick = onContinue,
+                onClick = {
+                    onContinue(
+                        ConsentInformation(
+                            consentGrantedDate = getCurrentIsoTimestamp(),
+                            personalDetailsConsentGranted = true,
+                            contactInfoConsentGranted = true,
+                            documentInfoConsentGranted = true,
+                        ),
+                    )
+                },
                 modifier = Modifier
                     .testTag("consent_screen_continue_button")
                     .fillMaxWidth(),

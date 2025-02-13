@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.ConsentScreen
 import com.smileidentity.compose.components.BottomPinnedColumn
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.R
@@ -56,7 +57,7 @@ fun IdTypeSelectorAndFieldInputScreen(
     viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
         factory = viewModelFactory { IdTypeSelectorAndFieldInputViewModel(jobType) },
     ),
-    onResult: (IdInfo) -> Unit,
+    onResult: (IdInfo, ConsentInformation) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     Box(
@@ -103,7 +104,7 @@ fun IdTypeSelectorAndFieldInputScreen(
 
             else -> IdInputScreen(
                 modifier = Modifier,
-                onNext = { onResult(viewModel.currentIdInfo) },
+                onNext = { onResult(viewModel.currentIdInfo, viewModel.currentConsentInformation) },
             )
         }
     }

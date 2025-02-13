@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -16,6 +18,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
+import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDCallback
@@ -30,6 +35,7 @@ import kotlinx.collections.immutable.persistentMapOf
 @Composable
 fun OrchestratedBiometricKYCScreen(
     idInfo: IdInfo,
+    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -37,6 +43,7 @@ fun OrchestratedBiometricKYCScreen(
     allowAgentMode: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     viewModel: BiometricKycViewModel = viewModel(
         factory = viewModelFactory {
@@ -45,13 +52,62 @@ fun OrchestratedBiometricKYCScreen(
                 userId = userId,
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
+                useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
+                consentInformation = consentInformation,
             )
         },
     ),
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val selfieCaptureScreen = @Composable {
+        if (useStrictMode) {
+            val context = LocalContext.current
+            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+            OrchestratedSelfieCaptureScreenEnhanced(
+                userId = userId,
+                allowNewEnroll = false,
+                showInstructions = showInstructions,
+                isEnroll = false,
+                showAttribution = showAttribution,
+                selfieQualityModel = selfieQualityModel,
+                skipApiSubmission = true,
+                onResult = { result ->
+                    when (result) {
+                        is SmileIDResult.Error -> {
+                            onResult(result)
+                        }
+                        is SmileIDResult.Success -> {
+                            viewModel.onSelfieCaptured(
+                                selfieFile = result.data.selfieFile,
+                                livenessFiles = result.data.livenessFiles,
+                            )
+                        }
+                    }
+                },
+            )
+        } else {
+            OrchestratedSelfieCaptureScreen(
+                userId = userId,
+                jobId = jobId,
+                isEnroll = false,
+                allowAgentMode = allowAgentMode,
+                showAttribution = showAttribution,
+                showInstructions = showInstructions,
+                skipApiSubmission = true,
+                onResult = { result ->
+                    when (result) {
+                        is SmileIDResult.Error -> onResult(result)
+                        is SmileIDResult.Success -> viewModel.onSelfieCaptured(
+                            selfieFile = result.data.selfieFile,
+                            livenessFiles = result.data.livenessFiles,
+                        )
+                    }
+                },
+            )
+        }
+    }
     Box(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
@@ -80,22 +136,7 @@ fun OrchestratedBiometricKYCScreen(
                 onClose = { viewModel.onFinished(onResult) },
             )
 
-            else -> OrchestratedSelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                allowAgentMode = allowAgentMode,
-                showAttribution = showAttribution,
-                showInstructions = showInstructions,
-                skipApiSubmission = true,
-            ) {
-                when (it) {
-                    is SmileIDResult.Error -> onResult(it)
-                    is SmileIDResult.Success -> viewModel.onSelfieCaptured(
-                        selfieFile = it.data.selfieFile,
-                        livenessFiles = it.data.livenessFiles,
-                    )
-                }
-            }
+            else -> selfieCaptureScreen()
         }
     }
 }

@@ -62,6 +62,7 @@ import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieAuthenticationEnhanced
 import com.smileidentity.compose.SmartSelfieEnrollment
 import com.smileidentity.compose.SmartSelfieEnrollmentEnhanced
+import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
@@ -268,6 +269,7 @@ fun MainScreen(
                     val userId = rememberSaveable { randomUserId() }
                     val jobId = rememberSaveable { randomJobId() }
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                    var consentInformation: ConsentInformation? by remember { mutableStateOf(null) }
                     if (idInfo == null) {
                         IdTypeSelectorAndFieldInputScreen(
                             userId = userId,
@@ -280,21 +282,25 @@ fun MainScreen(
                                     inclusive = false,
                                 )
                             },
-                            onResult = { idInfo = it },
+                            onResult = { id, consent ->
+                                idInfo = id
+                                consentInformation = consent
+                            },
                         )
                     }
-                    idInfo?.let {
-                        SmileID.BiometricKYC(
-                            idInfo = it,
-                            userId = userId,
-                            jobId = jobId,
-                        ) { result ->
-                            viewModel.onBiometricKycResult(userId, jobId, result)
-                            if (result is SmileIDResult.Success) {
-                                navController.popBackStack()
-                            } else {
-                                idInfo = null
-                            }
+                    val id = idInfo ?: return@composable
+                    val consent = consentInformation ?: return@composable
+                    SmileID.BiometricKYC(
+                        idInfo = id,
+                        consentInformation = consent,
+                        userId = userId,
+                        jobId = jobId,
+                    ) { result ->
+                        viewModel.onBiometricKycResult(userId, jobId, result)
+                        if (result is SmileIDResult.Success) {
+                            navController.popBackStack()
+                        } else {
+                            idInfo = null
                         }
                     }
                 }
@@ -336,38 +342,43 @@ fun MainScreen(
                 }
                 composable(ProductScreen.EnhancedDocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }
+                    val userId = rememberSaveable { randomUserId() }
+                    val jobId = rememberSaveable { randomJobId() }
                     var idInfo: IdInfo? by remember { mutableStateOf(null) }
+                    var consentInformation: ConsentInformation? by remember { mutableStateOf(null) }
                     if (idInfo == null) {
                         IdTypeSelectorScreen(
                             jobType = JobType.EnhancedDocumentVerification,
-                            onResult = { idInfo = it },
+                            onResult = { id, consent ->
+                                idInfo = id
+                                consentInformation = consent
+                            },
                         )
                     }
-                    idInfo?.let {
-                        val userId = rememberSaveable { randomUserId() }
-                        val jobId = rememberSaveable { randomJobId() }
-                        SmileID.EnhancedDocumentVerificationScreen(
-                            userId = userId,
-                            jobId = jobId,
-                            countryCode = it.country,
-                            documentType = it.idType,
-                            captureBothSides = true,
-                            showInstructions = true,
-                            allowGalleryUpload = true,
-                        ) { result ->
-                            viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
-                            if (result is SmileIDResult.Success) {
-                                navController.popBackStack(
-                                    route = BottomNavigationScreen.Home.route,
-                                    inclusive = false,
-                                )
-                            } else {
-                                idInfo = null
-                                navController.popBackStack()
-                                navController.navigate(
-                                    route = ProductScreen.EnhancedDocumentVerification.route,
-                                )
-                            }
+                    val id = idInfo ?: return@composable
+                    val consent = consentInformation ?: return@composable
+                    SmileID.EnhancedDocumentVerificationScreen(
+                        userId = userId,
+                        consentInformation = consent,
+                        jobId = jobId,
+                        countryCode = id.country,
+                        documentType = id.idType,
+                        captureBothSides = true,
+                        showInstructions = true,
+                        allowGalleryUpload = true,
+                    ) { result ->
+                        viewModel.onEnhancedDocumentVerificationResult(userId, jobId, result)
+                        if (result is SmileIDResult.Success) {
+                            navController.popBackStack(
+                                route = BottomNavigationScreen.Home.route,
+                                inclusive = false,
+                            )
+                        } else {
+                            idInfo = null
+                            navController.popBackStack()
+                            navController.navigate(
+                                route = ProductScreen.EnhancedDocumentVerification.route,
+                            )
                         }
                     }
                 }

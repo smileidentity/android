@@ -16,6 +16,7 @@ import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
+import com.smileidentity.models.ConsentInformation;
 import com.smileidentity.models.IdInfo;
 import com.smileidentity.results.BiometricKycResult;
 import com.smileidentity.results.DocumentVerificationResult;
@@ -58,8 +59,11 @@ public class JavaActivity extends FragmentActivity {
     private void doBiometricKYC() {
         IdInfo idInfo = new IdInfo("GH", "PASSPORT", "1234567890",
             null, null, null, null, null, null);
+        ConsentInformation consentInformation = new ConsentInformation(
+            "", true, true, true
+        );
         BiometricKYCFragment biometricKYCFragment = BiometricKYCFragment
-            .newInstance(idInfo);
+            .newInstance(idInfo, consentInformation);
         getSupportFragmentManager().setFragmentResultListener(
             BiometricKYCFragment.KEY_REQUEST,
             this,
@@ -189,8 +193,11 @@ public class JavaActivity extends FragmentActivity {
     }
 
     private void doEnhancedDocumentVerification() {
+        ConsentInformation consentInformation = new ConsentInformation(
+            "", true, true, true
+        );
         EnhancedDocumentVerificationFragment enhancedDocVFragment = EnhancedDocumentVerificationFragment
-            .newInstance("GH", "DRIVERS_LICENSE");
+            .newInstance("GH", consentInformation, "DRIVERS_LICENSE");
         getSupportFragmentManager().setFragmentResultListener(
             EnhancedDocumentVerificationFragment.KEY_REQUEST,
             this,
