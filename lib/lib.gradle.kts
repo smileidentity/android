@@ -90,7 +90,9 @@ moshi {
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
+    if (!version.toString().endsWith("SNAPSHOT")) {
+        signAllPublications()
+    }
     coordinates(groupId, artifactId, project.version.toString())
     pom {
         name = "Smile ID Android SDK"
