@@ -149,7 +149,6 @@ object SmileID {
 
         // Primary: /storage/emulated/0/Android/data/<package name>/files/SmileID
         // Fallback: /data/user/0/<package name>/app_SmileID
-        // fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
         fileSavePath = context.getExternalFilesDir("SmileID")?.absolutePath
             ?: context.getDir("SmileID", MODE_PRIVATE).absolutePath
         // ANDROID_ID may be null. Since Android 8, each app has a different value
