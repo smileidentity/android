@@ -1,5 +1,6 @@
 package com.smileidentity.compose.selfie
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,14 +13,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.smileidentity.SmileIDCrashReporting
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
@@ -110,9 +115,23 @@ fun OrchestratedSelfieCaptureScreen(
                 subtitleText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_subtitle,
                 ),
-                painter = BitmapPainter(
-                    BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath).asImageBitmap(),
-                ),
+                painter = remember {
+                    val path = uiState.selfieToConfirm.absolutePath
+                    try {
+                        BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
+                            BitmapPainter(bitmap.asImageBitmap())
+                        } ?: run {
+                            SmileIDCrashReporting.hub.addBreadcrumb("Failed to decode selfie image at $path")
+                            viewModel.onSelfieRejected() // Retry if image loading fails
+                            ColorPainter(Color.Black)
+                        }
+                    } catch (e: Exception) {
+                        SmileIDCrashReporting.hub.addBreadcrumb("Error loading selfie image at $path")
+                        SmileIDCrashReporting.hub.captureException(e)
+                        viewModel.onSelfieRejected()
+                        ColorPainter(Color.Black)
+                    }
+                },
                 confirmButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_confirm_button,
                 ),
