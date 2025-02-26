@@ -122,7 +122,7 @@ fun OrchestratedSelfieCaptureScreen(
                             BitmapPainter(bitmap.asImageBitmap())
                         } ?: run {
                             SmileIDCrashReporting.hub.addBreadcrumb(
-                                "Failed to decode selfie image at $path"
+                                "Failed to decode selfie image at $path",
                             )
                             viewModel.onSelfieRejected() // Retry if image loading fails
                             ColorPainter(Color.Black)
