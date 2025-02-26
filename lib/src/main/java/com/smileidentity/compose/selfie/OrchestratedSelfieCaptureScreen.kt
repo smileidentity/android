@@ -24,10 +24,10 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.smileidentity.SmileIDCrashReporting
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.ProcessingScreen
@@ -121,12 +121,16 @@ fun OrchestratedSelfieCaptureScreen(
                         BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
                             BitmapPainter(bitmap.asImageBitmap())
                         } ?: run {
-                            SmileIDCrashReporting.hub.addBreadcrumb("Failed to decode selfie image at $path")
+                            SmileIDCrashReporting.hub.addBreadcrumb(
+                                "Failed to decode selfie image at $path"
+                            )
                             viewModel.onSelfieRejected() // Retry if image loading fails
                             ColorPainter(Color.Black)
                         }
                     } catch (e: Exception) {
-                        SmileIDCrashReporting.hub.addBreadcrumb("Error loading selfie image at $path")
+                        SmileIDCrashReporting.hub.addBreadcrumb(
+                            "Error loading selfie image at $path",
+                        )
                         SmileIDCrashReporting.hub.captureException(e)
                         viewModel.onSelfieRejected()
                         ColorPainter(Color.Black)
