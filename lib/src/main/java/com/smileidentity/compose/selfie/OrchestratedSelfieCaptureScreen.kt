@@ -115,27 +115,7 @@ fun OrchestratedSelfieCaptureScreen(
                 subtitleText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_subtitle,
                 ),
-                painter = remember {
-                    val path = uiState.selfieToConfirm.absolutePath
-                    try {
-                        BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
-                            BitmapPainter(bitmap.asImageBitmap())
-                        } ?: run {
-                            SmileIDCrashReporting.hub.addBreadcrumb(
-                                "Failed to decode selfie image at $path",
-                            )
-                            viewModel.onSelfieRejected() // Retry if image loading fails
-                            ColorPainter(Color.Black)
-                        }
-                    } catch (e: Exception) {
-                        SmileIDCrashReporting.hub.addBreadcrumb(
-                            "Error loading selfie image at $path",
-                        )
-                        SmileIDCrashReporting.hub.captureException(e)
-                        viewModel.onSelfieRejected()
-                        ColorPainter(Color.Black)
-                    }
-                },
+                painter = BitmapPainter(uiState.selfieToConfirm.asImageBitmap()),
                 confirmButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_confirm_button,
                 ),
