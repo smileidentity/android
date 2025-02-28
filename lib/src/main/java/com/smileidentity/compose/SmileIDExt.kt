@@ -272,7 +272,6 @@ fun SmileID.DocumentVerification(
 @Composable
 fun SmileID.EnhancedDocumentVerificationScreen(
     countryCode: String,
-    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
@@ -287,6 +286,12 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     showInstructions: Boolean = true,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    consentInformation: ConsentInformation = ConsentInformation(
+        consentGrantedDate = "",
+        personalDetailsConsentGranted = false,
+        contactInfoConsentGranted = false,
+        documentInfoConsentGranted = false,
+    ),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
@@ -354,7 +359,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
 @Composable
 fun SmileID.BiometricKYC(
     idInfo: IdInfo,
-    consentInformation: ConsentInformation,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -364,6 +368,12 @@ fun SmileID.BiometricKYC(
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     useStrictMode: Boolean = false,
+    consentInformation: ConsentInformation = ConsentInformation(
+        consentGrantedDate = "",
+        personalDetailsConsentGranted = false,
+        contactInfoConsentGranted = false,
+        documentInfoConsentGranted = false,
+    ),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
