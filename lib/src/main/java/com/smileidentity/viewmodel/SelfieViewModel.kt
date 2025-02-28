@@ -1,6 +1,5 @@
 package com.smileidentity.viewmodel
 
-import android.graphics.Bitmap
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -81,7 +80,7 @@ private const val SMILE_THRESHOLD = 0.8f
 data class SelfieUiState(
     val directive: SelfieDirective = SelfieDirective.InitialInstruction,
     val progress: Float = 0f,
-    val selfieToConfirm: Bitmap? = null,
+    val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
     val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
 )
@@ -243,7 +242,7 @@ class SelfieViewModel(
                 _uiState.update {
                     it.copy(
                         progress = 1f,
-                        selfieToConfirm = bitmap,
+                        selfieToConfirm = selfieFile,
                         errorMessage = StringResource.ResId(
                             R.string.si_smart_selfie_processing_success_subtitle,
                         ),
