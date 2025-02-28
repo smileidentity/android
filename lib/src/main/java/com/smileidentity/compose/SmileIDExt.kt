@@ -239,7 +239,6 @@ fun SmileID.DocumentVerification(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
  *
  * @param countryCode The ISO 3166-1 alpha-3 country code of the document
- *  @param consentInformation We need you to pass the consent from the user
  * @param documentType An optional document type of the document
  * @param captureBothSides Determines if the document has a back side
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
@@ -263,6 +262,7 @@ fun SmileID.DocumentVerification(
  * @param showInstructions Whether to deactivate capture screen's instructions for Document
  * Verification (NB! If instructions are disabled, gallery upload won't be possible)
  * @param extraPartnerParams Custom values specific to partners
+ * @param consentInformation We need you to pass the consent from the user
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -339,7 +339,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-kyc)
  *
  * @param idInfo The ID information to look up in the ID Authority
- * @param consentInformation We need you to pass the consent from the user
  * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
  * @param jobId The job ID to associate with the Biometric KYC. Most often, this will correspond
@@ -350,6 +349,8 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
  * @param extraPartnerParams Custom values specific to partners
+ * @param useStrictMode Strict mode will use enhanced SmartSelfie™
+ * @param consentInformation We need you to pass the consent from the user
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
