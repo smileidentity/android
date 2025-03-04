@@ -27,6 +27,7 @@ import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
@@ -287,7 +288,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     consentInformation: ConsentInformation = ConsentInformation(
-        consentGrantedDate = "",
+        consentGrantedDate = getCurrentIsoTimestamp(),
         personalDetailsConsentGranted = false,
         contactInfoConsentGranted = false,
         documentInfoConsentGranted = false,
@@ -370,7 +371,7 @@ fun SmileID.BiometricKYC(
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     useStrictMode: Boolean = false,
     consentInformation: ConsentInformation = ConsentInformation(
-        consentGrantedDate = "",
+        consentGrantedDate = getCurrentIsoTimestamp(),
         personalDetailsConsentGranted = false,
         contactInfoConsentGranted = false,
         documentInfoConsentGranted = false,
