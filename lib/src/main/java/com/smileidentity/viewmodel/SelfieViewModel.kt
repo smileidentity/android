@@ -34,6 +34,7 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.area
+import com.smileidentity.util.checkFileValidity
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createPrepUploadFile
@@ -239,25 +240,25 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
-                if (selfieFile == null) {
-                    val exception = IllegalStateException("Selfie file is null")
-                    SmileIDCrashReporting.hub.captureException(exception)
-                    result = SmileIDResult.Error(exception)
-                    _uiState.update {
-                        it.copy(
-                            processingState = ProcessingState.Error,
-                            errorMessage = StringResource.ResId(
-                                R.string.si_something_went_wrong,
-                            ),
-                        )
-                    }
-                } else {
+                if (checkFileValidity(selfieFile)) {
                     _uiState.update {
                         it.copy(
                             progress = 1f,
                             selfieToConfirm = selfieFile,
                             errorMessage = StringResource.ResId(
                                 R.string.si_smart_selfie_processing_success_subtitle,
+                            ),
+                        )
+                    }
+                } else {
+                    val exception = IllegalStateException("Selfie file is null or empty")
+                    SmileIDCrashReporting.hub.captureException(exception)
+                    result = SmileIDResult.Error(exception)
+                    _uiState.update {
+                        it.copy(
+                            processingState = ProcessingState.Error,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_processing_error_subtitle,
                             ),
                         )
                     }

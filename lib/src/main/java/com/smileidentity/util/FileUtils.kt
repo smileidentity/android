@@ -528,4 +528,14 @@ internal fun createAuthenticationRequestFile(
     return file
 }
 
+internal fun checkFileValidity(file: File?): Boolean {
+    if (file == null) return false
+
+    if (!file.exists() || !file.isFile || file.length() <= 0) {
+        return false
+    }
+
+    return true
+}
+
 enum class DeleteScope { Unsubmitted, Submitted, All }
