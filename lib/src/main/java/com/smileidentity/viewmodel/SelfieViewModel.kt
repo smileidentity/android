@@ -239,8 +239,10 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
-
                 if (selfieFile == null) {
+                    val exception = IllegalStateException("Selfie file is null")
+                    SmileIDCrashReporting.hub.captureException(exception)
+                    result = SmileIDResult.Error(exception)
                     _uiState.update {
                         it.copy(
                             processingState = ProcessingState.Error,
