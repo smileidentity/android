@@ -239,14 +239,26 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
-                _uiState.update {
-                    it.copy(
-                        progress = 1f,
-                        selfieToConfirm = selfieFile,
-                        errorMessage = StringResource.ResId(
-                            R.string.si_smart_selfie_processing_success_subtitle,
-                        ),
-                    )
+
+                if (selfieFile == null) {
+                    _uiState.update {
+                        it.copy(
+                            processingState = ProcessingState.Error,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_something_went_wrong
+                            ),
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            progress = 1f,
+                            selfieToConfirm = selfieFile,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_smart_selfie_processing_success_subtitle,
+                            ),
+                        )
+                    }
                 }
             }
         }.addOnFailureListener { exception ->

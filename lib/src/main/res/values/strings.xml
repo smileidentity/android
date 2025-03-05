@@ -176,6 +176,7 @@
     <!--  SDK Errors  -->
     <string name="si_processing_error_subtitle">This could be because of image quality or internet connectivity</string>
     <string name="si_no_internet">Please check your internet connectivity</string>
+    <string name="si_something_went_wrong">Something went wrong</string>
     <string name="si_error_message_2201"></string>
     <string name="si_error_message_2301"></string>
     <string name="si_error_message_2401"></string>
