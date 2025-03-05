@@ -247,7 +247,7 @@ class SelfieViewModel(
                         it.copy(
                             processingState = ProcessingState.Error,
                             errorMessage = StringResource.ResId(
-                                R.string.si_something_went_wrong
+                                R.string.si_something_went_wrong,
                             ),
                         )
                     }
