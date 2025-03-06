@@ -81,7 +81,12 @@ class BiometricKYCFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             idInfo: IdInfo,
-            consentInformation: ConsentInformation? = createDefaultConsentInformation(),
+            consentInformation: ConsentInformation = ConsentInformation(
+                consentGrantedDate = getCurrentIsoTimestamp(),
+                personalDetailsConsentGranted = false,
+                contactInfoConsentGranted = false,
+                documentInfoConsentGranted = false,
+            ),
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             allowNewEnroll: Boolean = false,
@@ -91,10 +96,9 @@ class BiometricKYCFragment : Fragment() {
             useStrictMode: Boolean = false,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = BiometricKYCFragment().apply {
-            val finalConsentInformation = consentInformation ?: createDefaultConsentInformation()
             arguments = Bundle().apply {
                 this.idInfo = idInfo
-                this.consentInformation = finalConsentInformation
+                this.consentInformation = consentInformation
                 this.userId = userId
                 this.jobId = jobId
                 this.allowNewEnroll = allowNewEnroll
@@ -108,13 +112,6 @@ class BiometricKYCFragment : Fragment() {
 
         @JvmStatic
         fun resultFromBundle(bundle: Bundle) = bundle.smileIDResult
-
-        private fun createDefaultConsentInformation() = ConsentInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetailsConsentGranted = false,
-            contactInfoConsentGranted = false,
-            documentInfoConsentGranted = false,
-        )
     }
 
     override fun onCreateView(

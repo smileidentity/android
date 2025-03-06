@@ -76,7 +76,12 @@ class EnhancedDocumentVerificationFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             countryCode: String,
-            consentInformation: ConsentInformation? = createDefaultConsentInformation(),
+            consentInformation: ConsentInformation = ConsentInformation(
+                consentGrantedDate = getCurrentIsoTimestamp(),
+                personalDetailsConsentGranted = false,
+                contactInfoConsentGranted = false,
+                documentInfoConsentGranted = false,
+            ),
             documentType: String? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
@@ -91,7 +96,6 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = EnhancedDocumentVerificationFragment().apply {
-            val finalConsentInformation = consentInformation ?: createDefaultConsentInformation()
             arguments = Bundle().apply {
                 this.userId = userId
                 this.jobId = jobId
@@ -101,7 +105,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
                 this.allowGalleryUpload = allowGalleryUpload
                 this.showInstructions = showInstructions
                 this.countryCode = countryCode
-                this.consentInformation = finalConsentInformation
+                this.consentInformation = consentInformation
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
@@ -113,13 +117,6 @@ class EnhancedDocumentVerificationFragment : Fragment() {
 
         @JvmStatic
         fun resultFromBundle(bundle: Bundle) = bundle.smileIDResult
-
-        private fun createDefaultConsentInformation() = ConsentInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetailsConsentGranted = false,
-            contactInfoConsentGranted = false,
-            documentInfoConsentGranted = false,
-        )
     }
 
     override fun onCreateView(
