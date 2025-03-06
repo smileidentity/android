@@ -3,6 +3,8 @@
 ## 10.5.1
 
 * Make ConsentInformation optional in EnhancedDocV, EnhancedKYC and BiometricKYC
+* Add strict mode to enable Enhanced SmartSelfie™ capture on the BiometricKYC, 
+  DocumentVerification and EnhancedDocV fragments
 
 ## 10.5.0
 
