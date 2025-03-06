@@ -17,6 +17,7 @@ import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.result
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
@@ -75,7 +76,12 @@ class EnhancedDocumentVerificationFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             countryCode: String,
-            consentInformation: ConsentInformation,
+            consentInformation: ConsentInformation = ConsentInformation(
+                consentGrantedDate = getCurrentIsoTimestamp(),
+                personalDetailsConsentGranted = false,
+                contactInfoConsentGranted = false,
+                documentInfoConsentGranted = false,
+            ),
             documentType: String? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
@@ -84,6 +90,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             allowAgentMode: Boolean = false,
             allowGalleryUpload: Boolean = false,
             showInstructions: Boolean = true,
+            useStrictMode: Boolean = false,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
@@ -102,6 +109,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.useStrictMode = useStrictMode
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
@@ -129,6 +137,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
             allowAgentMode = args.allowAgentMode,
             allowGalleryUpload = args.allowGalleryUpload,
             showInstructions = args.showInstructions,
+            useStrictMode = args.useStrictMode,
             captureBothSides = args.captureBothSides,
             bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
             idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
@@ -207,6 +216,11 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
+
+private const val KEY_USE_STRICT_MODE = "useStrictMode"
+private var Bundle.useStrictMode: Boolean
+    get() = getBoolean(KEY_USE_STRICT_MODE)
+    set(value) = putBoolean(KEY_USE_STRICT_MODE, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private val type = Types.newParameterizedType(

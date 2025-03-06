@@ -20,6 +20,7 @@ import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
@@ -80,13 +81,19 @@ class BiometricKYCFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             idInfo: IdInfo,
-            consentInformation: ConsentInformation,
+            consentInformation: ConsentInformation = ConsentInformation(
+                consentGrantedDate = getCurrentIsoTimestamp(),
+                personalDetailsConsentGranted = false,
+                contactInfoConsentGranted = false,
+                documentInfoConsentGranted = false,
+            ),
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             allowNewEnroll: Boolean = false,
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
+            useStrictMode: Boolean = false,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = BiometricKYCFragment().apply {
             arguments = Bundle().apply {
@@ -98,6 +105,7 @@ class BiometricKYCFragment : Fragment() {
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
+                this.useStrictMode = useStrictMode
                 this.extraPartnerParams = extraPartnerParams
             }
         }
@@ -121,6 +129,7 @@ class BiometricKYCFragment : Fragment() {
             allowAgentMode = args.allowAgentMode,
             showAttribution = args.showAttribution,
             showInstructions = args.showInstructions,
+            useStrictMode = args.useStrictMode,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
             onResult = {
                 setFragmentResult(KEY_REQUEST, Bundle().apply { smileIDResult = it })
@@ -170,6 +179,11 @@ private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
 private var Bundle.showInstructions: Boolean
     get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
+
+private const val KEY_USE_STRICT_MODE = "useStrictMode"
+private var Bundle.useStrictMode: Boolean
+    get() = getBoolean(KEY_USE_STRICT_MODE)
+    set(value) = putBoolean(KEY_USE_STRICT_MODE, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private val type = Types.newParameterizedType(

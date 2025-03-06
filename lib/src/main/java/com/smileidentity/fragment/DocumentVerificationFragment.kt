@@ -86,6 +86,7 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions: Boolean = true,
             idAspectRatio: Float? = null,
             captureBothSides: Boolean = false,
+            useStrictMode: Boolean = false,
             bypassSelfieCaptureWithFile: File? = null,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = DocumentVerificationFragment().apply {
@@ -101,6 +102,7 @@ class DocumentVerificationFragment : Fragment() {
                 this.documentType = documentType
                 this.idAspectRatio = idAspectRatio ?: -1f
                 this.captureBothSides = captureBothSides
+                this.useStrictMode = useStrictMode
                 this.bypassSelfieCaptureWithFile = bypassSelfieCaptureWithFile
                 this.extraPartnerParams = extraPartnerParams
             }
@@ -129,6 +131,7 @@ class DocumentVerificationFragment : Fragment() {
             showInstructions = args.showInstructions,
             idAspectRatio = if (aspectRatio > 0) aspectRatio else null,
             captureBothSides = args.captureBothSides,
+            useStrictMode = args.useStrictMode,
             bypassSelfieCaptureWithFile = args.bypassSelfieCaptureWithFile,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
             onResult = {
@@ -194,6 +197,11 @@ private const val KEY_CAPTURE_BOTH_SIDES = "captureBothSides"
 private var Bundle.captureBothSides: Boolean
     get() = getBoolean(KEY_CAPTURE_BOTH_SIDES)
     set(value) = putBoolean(KEY_CAPTURE_BOTH_SIDES, value)
+
+private const val KEY_USE_STRICT_MODE = "useStrictMode"
+private var Bundle.useStrictMode: Boolean
+    get() = getBoolean(KEY_USE_STRICT_MODE)
+    set(value) = putBoolean(KEY_USE_STRICT_MODE, value)
 
 private const val KEY_BYPASS_SELFIE_CAPTURE_WITH_FILE = "bypassSelfieCaptureWithFile"
 private val fileAdapter = moshi.adapter(File::class.java)
