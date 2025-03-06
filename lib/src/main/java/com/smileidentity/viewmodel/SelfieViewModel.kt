@@ -251,14 +251,16 @@ class SelfieViewModel(
                         )
                     }
                 } else {
+                    livenessFiles.removeAll { it.delete() }
                     val exception = IllegalStateException("Selfie file is null or empty")
                     SmileIDCrashReporting.hub.captureException(exception)
                     result = SmileIDResult.Error(exception)
                     _uiState.update {
                         it.copy(
+                            progress = 0f,
                             processingState = ProcessingState.Error,
                             errorMessage = StringResource.ResId(
-                                R.string.si_processing_error_subtitle,
+                                R.string.si_something_went_wrong,
                             ),
                         )
                     }
