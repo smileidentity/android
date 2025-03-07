@@ -34,6 +34,7 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.area
+import com.smileidentity.util.checkFileValidity
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createPrepUploadFile
@@ -239,14 +240,30 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
-                _uiState.update {
-                    it.copy(
-                        progress = 1f,
-                        selfieToConfirm = selfieFile,
-                        errorMessage = StringResource.ResId(
-                            R.string.si_smart_selfie_processing_success_subtitle,
-                        ),
-                    )
+                if (checkFileValidity(selfieFile)) {
+                    _uiState.update {
+                        it.copy(
+                            progress = 1f,
+                            selfieToConfirm = selfieFile,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_smart_selfie_processing_success_subtitle,
+                            ),
+                        )
+                    }
+                } else {
+                    livenessFiles.removeAll { it.delete() }
+                    val exception = IllegalStateException("Selfie file is null or empty")
+                    SmileIDCrashReporting.hub.captureException(exception)
+                    result = SmileIDResult.Error(exception)
+                    _uiState.update {
+                        it.copy(
+                            progress = 0f,
+                            processingState = ProcessingState.Error,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_something_went_wrong,
+                            ),
+                        )
+                    }
                 }
             }
         }.addOnFailureListener { exception ->
