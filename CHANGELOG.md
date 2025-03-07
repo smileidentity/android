@@ -2,9 +2,6 @@
 
 ## [Unreleased]
 
-### Changed
-* Use app-specific external storage directory to store files in the SDK but default to internal storage if that's not available for whatever reason.
-
 ### Added
 * Show processing error if selfie file is not valid before presenting the image confirmation dialog.
 
