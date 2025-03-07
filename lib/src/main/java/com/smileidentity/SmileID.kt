@@ -147,10 +147,8 @@ object SmileID {
 
         api = retrofit.create(SmileIDService::class.java)
 
-        // Primary: /storage/emulated/0/Android/data/<package name>/files/SmileID
-        // Fallback: /data/user/0/<package name>/app_SmileID
-        fileSavePath = context.getExternalFilesDir("SmileID")?.absolutePath
-            ?: context.getDir("SmileID", MODE_PRIVATE).absolutePath
+        // Usually looks like: /data/user/0/<package name>/app_SmileID
+        fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
 
