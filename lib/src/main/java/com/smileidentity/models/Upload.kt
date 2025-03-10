@@ -20,6 +20,15 @@ data class UploadRequest(
     @Json(name = "consent_information") val consentInformation: ConsentInformation? = null,
 )
 
+/**
+ * This class represents security_info.json
+ */
+@JsonClass(generateAdapter = true)
+data class SecurityInfo(
+    @Json(name = "timestamp") val timestamp: String,
+    @Json(name = "mac") val mac: String,
+)
+
 @JsonClass(generateAdapter = true)
 data class UploadImageInfo(
     @Json(name = "image_type_id") val imageTypeId: ImageType,
