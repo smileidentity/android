@@ -30,6 +30,7 @@ import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
+import com.smileidentity.networking.SmileIDSecurityInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -311,9 +312,9 @@ object SmileID {
             throw IllegalArgumentException("Invalid jobId or not found")
         }
         val authRequestJsonString = getSmileTempFile(
-            jobId,
-            AUTH_REQUEST_FILE,
-            true,
+            folderName = jobId,
+            fileName = AUTH_REQUEST_FILE,
+            isUnsubmitted = true,
         ).useLines { it.joinToString("\n") }
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)?.apply {
@@ -439,8 +440,9 @@ object SmileID {
         connectTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         readTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         writeTimeout(timeout = 60, unit = TimeUnit.SECONDS)
-        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
+        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
+        addInterceptor(interceptor = SmileIDSecurityInterceptor)
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
