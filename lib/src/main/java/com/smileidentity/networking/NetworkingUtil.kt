@@ -3,6 +3,7 @@ package com.smileidentity.networking
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.ImageType
+import com.smileidentity.models.SecurityInfo
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
 import java.io.BufferedOutputStream
@@ -54,6 +55,12 @@ fun UploadRequest.zip(): File {
     zipOutputStream.putNextEntry(ZipEntry("info.json"))
     val infoJson = moshi.adapter(UploadRequest::class.java).toJson(uploadRequest)
     zipOutputStream.write(infoJson.toByteArray())
+    zipOutputStream.closeEntry()
+
+    // Write security_info.json
+    zipOutputStream.putNextEntry(ZipEntry("security_info.json"))
+    val securityInfoJson = moshi.adapter(UploadRequest::class.java).toJson(uploadRequest)
+    zipOutputStream.write(securityInfoJson.toByteArray())
     zipOutputStream.closeEntry()
 
     // Write images
