@@ -34,7 +34,6 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.FileType
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.area
-import com.smileidentity.util.checkFileValidity
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createPrepUploadFile
@@ -44,6 +43,7 @@ import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
+import com.smileidentity.util.isNull
 import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
@@ -232,7 +232,7 @@ class SelfieViewModel(
             } else {
                 selfieFile = createSelfieFile(jobId)
                 Timber.v("Capturing selfie image to $selfieFile")
-                postProcessImageBitmap(
+                val selfie = postProcessImageBitmap(
                     bitmap = bitmap,
                     file = selfieFile!!,
                     compressionQuality = 80,
@@ -240,17 +240,8 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
-                if (checkFileValidity(selfieFile)) {
-                    _uiState.update {
-                        it.copy(
-                            progress = 1f,
-                            selfieToConfirm = selfieFile,
-                            errorMessage = StringResource.ResId(
-                                R.string.si_smart_selfie_processing_success_subtitle,
-                            ),
-                        )
-                    }
-                } else {
+
+                if (selfie.isNull()) {
                     livenessFiles.removeAll { it.delete() }
                     val exception = IllegalStateException("Selfie file is null or empty")
                     SmileIDCrashReporting.hub.captureException(exception)
@@ -261,6 +252,16 @@ class SelfieViewModel(
                             processingState = ProcessingState.Error,
                             errorMessage = StringResource.ResId(
                                 R.string.si_something_went_wrong,
+                            ),
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            progress = 1f,
+                            selfieToConfirm = selfie,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_smart_selfie_processing_success_subtitle,
                             ),
                         )
                     }

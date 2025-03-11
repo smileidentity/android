@@ -34,6 +34,7 @@ import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.util.isNull
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -110,13 +111,13 @@ fun OrchestratedSelfieCaptureScreen(
                 onClose = { viewModel.onFinished(onResult) },
             )
 
-            uiState.selfieToConfirm != null -> ImageCaptureConfirmationDialog(
+            !uiState.selfieToConfirm.isNull() -> ImageCaptureConfirmationDialog(
                 titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
                 subtitleText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_subtitle,
                 ),
                 painter = remember {
-                    val path = uiState.selfieToConfirm.absolutePath
+                    val path = uiState.selfieToConfirm?.absolutePath
                     try {
                         BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
                             BitmapPainter(bitmap.asImageBitmap())

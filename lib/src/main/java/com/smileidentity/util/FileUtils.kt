@@ -528,10 +528,10 @@ internal fun createAuthenticationRequestFile(
     return file
 }
 
-internal fun checkFileValidity(file: File?): Boolean {
-    if (file == null) return false
+internal fun File?.isNull(): Boolean {
+    if (this == null) return false
 
-    if (!file.exists() || !file.isFile || file.length() <= 0) {
+    if (!this.exists() || !this.isFile || this.length() <= 0) {
         return false
     }
 
