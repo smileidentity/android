@@ -4,12 +4,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,83 +78,92 @@ fun OrchestratedSelfieCaptureScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    Box(
+    Column (
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        when {
-            showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
-                showAttribution = showAttribution,
-            ) {
-                acknowledgedInstructions = true
-            }
+        Text("The count is ${uiState.counttt}")
+        SelfieCaptureScreen(
+            userId = userId,
+            jobId = jobId,
+            isEnroll = isEnroll,
+            allowAgentMode = allowAgentMode,
+            skipApiSubmission = skipApiSubmission,
+        )
 
-            uiState.processingState != null -> ProcessingScreen(
-                processingState = uiState.processingState,
-                inProgressTitle = stringResource(R.string.si_smart_selfie_processing_title),
-                inProgressSubtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
-                inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
-                successTitle = stringResource(R.string.si_smart_selfie_processing_success_title),
-                successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-                    ?: stringResource(R.string.si_smart_selfie_processing_success_subtitle),
-                successIcon = painterResource(R.drawable.si_processing_success),
-                errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),
-                errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
-                    ?: stringResource(id = R.string.si_processing_error_subtitle),
-                errorIcon = painterResource(R.drawable.si_processing_error),
-                continueButtonText = stringResource(R.string.si_continue),
-                onContinue = { viewModel.onFinished(onResult) },
-                retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
-                onRetry = viewModel::onRetry,
-                closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
-                onClose = { viewModel.onFinished(onResult) },
-            )
-
-            !uiState.selfieToConfirm.isNull() -> ImageCaptureConfirmationDialog(
-                titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
-                subtitleText = stringResource(
-                    R.string.si_smart_selfie_confirmation_dialog_subtitle,
-                ),
-                painter = remember {
-                    val path = uiState.selfieToConfirm?.absolutePath
-                    try {
-                        BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
-                            BitmapPainter(bitmap.asImageBitmap())
-                        } ?: run {
-                            SmileIDCrashReporting.hub.addBreadcrumb(
-                                "Failed to decode selfie image at $path",
-                            )
-                            ColorPainter(Color.Black)
-                        }
-                    } catch (e: Exception) {
-                        SmileIDCrashReporting.hub.addBreadcrumb(
-                            "Error loading selfie image at $path",
-                        )
-                        SmileIDCrashReporting.hub.captureException(e)
-                        ColorPainter(Color.Black)
-                    }
-                },
-                confirmButtonText = stringResource(
-                    R.string.si_smart_selfie_confirmation_dialog_confirm_button,
-                ),
-                onConfirm = viewModel::submitJob,
-                retakeButtonText = stringResource(
-                    R.string.si_smart_selfie_confirmation_dialog_retake_button,
-                ),
-                onRetake = viewModel::onSelfieRejected,
-                scaleFactor = 1.25f,
-            )
-
-            else -> SelfieCaptureScreen(
-                userId = userId,
-                jobId = jobId,
-                isEnroll = isEnroll,
-                allowAgentMode = allowAgentMode,
-                skipApiSubmission = skipApiSubmission,
-            )
-        }
+        // when {
+        //     showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
+        //         showAttribution = showAttribution,
+        //     ) {
+        //         acknowledgedInstructions = true
+        //     }
+        //
+        //     uiState.processingState != null -> ProcessingScreen(
+        //         processingState = uiState.processingState,
+        //         inProgressTitle = stringResource(R.string.si_smart_selfie_processing_title),
+        //         inProgressSubtitle = stringResource(R.string.si_smart_selfie_processing_subtitle),
+        //         inProgressIcon = painterResource(R.drawable.si_smart_selfie_processing_hero),
+        //         successTitle = stringResource(R.string.si_smart_selfie_processing_success_title),
+        //         successSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+        //             ?: stringResource(R.string.si_smart_selfie_processing_success_subtitle),
+        //         successIcon = painterResource(R.drawable.si_processing_success),
+        //         errorTitle = stringResource(R.string.si_smart_selfie_processing_error_title),
+        //         errorSubtitle = uiState.errorMessage.resolve().takeIf { it.isNotEmpty() }
+        //             ?: stringResource(id = R.string.si_processing_error_subtitle),
+        //         errorIcon = painterResource(R.drawable.si_processing_error),
+        //         continueButtonText = stringResource(R.string.si_continue),
+        //         onContinue = { viewModel.onFinished(onResult) },
+        //         retryButtonText = stringResource(R.string.si_smart_selfie_processing_retry_button),
+        //         onRetry = viewModel::onRetry,
+        //         closeButtonText = stringResource(R.string.si_smart_selfie_processing_close_button),
+        //         onClose = { viewModel.onFinished(onResult) },
+        //     )
+        //
+        //     // !uiState.selfieToConfirm.isNull() -> ImageCaptureConfirmationDialog(
+        //     //     titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
+        //     //     subtitleText = stringResource(
+        //     //         R.string.si_smart_selfie_confirmation_dialog_subtitle,
+        //     //     ),
+        //     //     painter = remember {
+        //     //         val path = uiState.selfieToConfirm?.absolutePath
+        //     //         try {
+        //     //             BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
+        //     //                 BitmapPainter(bitmap.asImageBitmap())
+        //     //             } ?: run {
+        //     //                 SmileIDCrashReporting.hub.addBreadcrumb(
+        //     //                     "Failed to decode selfie image at $path",
+        //     //                 )
+        //     //                 ColorPainter(Color.Black)
+        //     //             }
+        //     //         } catch (e: Exception) {
+        //     //             SmileIDCrashReporting.hub.addBreadcrumb(
+        //     //                 "Error loading selfie image at $path",
+        //     //             )
+        //     //             SmileIDCrashReporting.hub.captureException(e)
+        //     //             ColorPainter(Color.Black)
+        //     //         }
+        //     //     },
+        //     //     confirmButtonText = stringResource(
+        //     //         R.string.si_smart_selfie_confirmation_dialog_confirm_button,
+        //     //     ),
+        //     //     onConfirm = viewModel::submitJob,
+        //     //     retakeButtonText = stringResource(
+        //     //         R.string.si_smart_selfie_confirmation_dialog_retake_button,
+        //     //     ),
+        //     //     onRetake = viewModel::onSelfieRejected,
+        //     //     scaleFactor = 1.25f,
+        //     // )
+        //
+        //     else -> SelfieCaptureScreen(
+        //         userId = userId,
+        //         jobId = jobId,
+        //         isEnroll = isEnroll,
+        //         allowAgentMode = allowAgentMode,
+        //         skipApiSubmission = skipApiSubmission,
+        //     )
+        // }
     }
 }
