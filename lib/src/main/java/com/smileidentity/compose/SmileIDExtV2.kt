@@ -82,6 +82,7 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
  * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
+ * @param skipApiSubmission Whether to skip the API submission and return the result of capture only
  * @param extraPartnerParams Custom values specific to partners
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
@@ -96,6 +97,7 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
+    skipApiSubmission: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typographyV2,
@@ -111,6 +113,7 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
             allowNewEnroll = allowNewEnroll,
             showAttribution = showAttribution,
             showInstructions = showInstructions,
+            skipApiSubmission = skipApiSubmission,
             selfieQualityModel = selfieQualityModel,
             extraPartnerParams = extraPartnerParams,
             onResult = onResult,
