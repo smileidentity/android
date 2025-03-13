@@ -8,6 +8,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.compose.content
 import com.smileidentity.SmileID
 import com.smileidentity.compose.SmartSelfieEnrollment
+import com.smileidentity.compose.SmartSelfieEnrollmentEnhanced
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.newInstance
@@ -79,6 +80,8 @@ class SmartSelfieEnrollmentFragment : Fragment() {
          * only the front camera will be used.
          * @param showAttribution Whether to show the Smile ID attribution or not.
          * @param showInstructions Whether to deactivate capture screen's instructions for
+         * @param useStrictMode Whether to use the enhanced version of the SmartSelfie™ Enrollment
+         * @param skipApiSubmission Whether to skip the API submission and return the result of capture only
          * SmartSelfie.
          */
         @JvmStatic
@@ -90,6 +93,8 @@ class SmartSelfieEnrollmentFragment : Fragment() {
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
+            useStrictMode: Boolean = false,
+            skipApiSubmission: Boolean = false,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = SmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
@@ -99,6 +104,8 @@ class SmartSelfieEnrollmentFragment : Fragment() {
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
+                this.useStrictMode = useStrictMode
+                this.skipApiSubmission = skipApiSubmission
                 this.extraPartnerParams = extraPartnerParams
             }
         }
@@ -113,18 +120,34 @@ class SmartSelfieEnrollmentFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val args = requireArguments()
-        SmileID.SmartSelfieEnrollment(
-            userId = args.userId,
-            jobId = args.jobId,
-            allowNewEnroll = args.allowNewEnroll,
-            allowAgentMode = args.allowAgentMode,
-            showAttribution = args.showAttribution,
-            showInstructions = args.showInstructions,
-            extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
-            onResult = {
-                setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
-            },
-        )
+        val useStrictMode = args.useStrictMode
+        if (useStrictMode) {
+            SmileID.SmartSelfieEnrollmentEnhanced(
+                userId = args.userId,
+                allowNewEnroll = args.allowNewEnroll,
+                showAttribution = args.showAttribution,
+                showInstructions = args.showInstructions,
+                skipApiSubmission = args.skipApiSubmission,
+                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+                onResult = {
+                    setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
+                },
+            )
+        } else {
+            SmileID.SmartSelfieEnrollment(
+                userId = args.userId,
+                jobId = args.jobId,
+                allowNewEnroll = args.allowNewEnroll,
+                allowAgentMode = args.allowAgentMode,
+                showAttribution = args.showAttribution,
+                showInstructions = args.showInstructions,
+                skipApiSubmission = args.skipApiSubmission,
+                extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
+                onResult = {
+                    setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
+                },
+            )
+        }
     }
 }
 
@@ -159,6 +182,16 @@ private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
 private var Bundle.showInstructions: Boolean
     get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
+
+private const val KEY_USE_STRICT_MODE = "useStrictMode"
+private var Bundle.useStrictMode: Boolean
+    get() = getBoolean(KEY_USE_STRICT_MODE)
+    set(value) = putBoolean(KEY_USE_STRICT_MODE, value)
+
+private const val KEY_SKIP_API_SUBMISSION = "skipApiSubmission"
+private var Bundle.skipApiSubmission: Boolean
+    get() = getBoolean(KEY_SKIP_API_SUBMISSION)
+    set(value) = putBoolean(KEY_SKIP_API_SUBMISSION, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private val type =
