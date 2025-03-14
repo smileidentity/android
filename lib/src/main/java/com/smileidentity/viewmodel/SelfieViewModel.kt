@@ -1,5 +1,7 @@
 package com.smileidentity.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -43,8 +45,10 @@ import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
 import com.smileidentity.util.handleOfflineJobFailure
 import com.smileidentity.util.isNetworkFailure
+import com.smileidentity.util.isNull
 import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
+import com.smileidentity.util.randomJobId
 import com.smileidentity.util.rotated
 import com.ujizin.camposer.state.CamSelector
 import io.sentry.Breadcrumb
@@ -80,6 +84,7 @@ private const val SMILE_THRESHOLD = 0.8f
 data class SelfieUiState(
     val directive: SelfieDirective = SelfieDirective.InitialInstruction,
     val progress: Float = 0f,
+    val counttt: Int = 0,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
     val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
@@ -133,6 +138,27 @@ class SelfieViewModel(
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+
+    internal fun juma(bitmap: Bitmap) {
+        repeat(100) {
+            selfieFile = createSelfieFile(randomJobId())
+            Timber.d("Juma - Capturing selfie image to $selfieFile")
+            val selfie = postProcessImageBitmap(
+                bitmap = bitmap,
+                file = selfieFile!!,
+                compressionQuality = 80,
+                resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
+            )
+            val total = SmileID.getUnsubmittedJobs().size
+            Timber.d("Juma - the selfie file is $selfie")
+            Timber.d("Juma - the selfie count is $total")
+            _uiState.update {
+                it.copy(
+                    counttt = total,
+                )
+            }
+        }
+    }
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
@@ -231,7 +257,7 @@ class SelfieViewModel(
             } else {
                 selfieFile = createSelfieFile(jobId)
                 Timber.v("Capturing selfie image to $selfieFile")
-                postProcessImageBitmap(
+                val selfie = postProcessImageBitmap(
                     bitmap = bitmap,
                     file = selfieFile!!,
                     compressionQuality = 80,
@@ -239,14 +265,31 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
-                _uiState.update {
-                    it.copy(
-                        progress = 1f,
-                        selfieToConfirm = selfieFile,
-                        errorMessage = StringResource.ResId(
-                            R.string.si_smart_selfie_processing_success_subtitle,
-                        ),
-                    )
+
+                if (selfie.isNull()) {
+                    livenessFiles.removeAll { it.delete() }
+                    val exception = IllegalStateException("Selfie file is null or empty")
+                    SmileIDCrashReporting.hub.captureException(exception)
+                    result = SmileIDResult.Error(exception)
+                    _uiState.update {
+                        it.copy(
+                            progress = 0f,
+                            processingState = ProcessingState.Error,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_something_went_wrong,
+                            ),
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            progress = 1f,
+                            selfieToConfirm = selfie,
+                            errorMessage = StringResource.ResId(
+                                R.string.si_smart_selfie_processing_success_subtitle,
+                            ),
+                        )
+                    }
                 }
             }
         }.addOnFailureListener { exception ->

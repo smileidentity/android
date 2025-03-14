@@ -1,5 +1,6 @@
 package com.smileidentity.compose.document
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -55,6 +56,7 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
+import com.smileidentity.util.isNull
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
 import com.smileidentity.util.writeUriToFile
@@ -155,37 +157,49 @@ fun DocumentCaptureScreen(
             )
         }
 
-        documentImageToConfirm != null -> {
+        !documentImageToConfirm.isNull() -> {
             val painter = remember {
-                val path = documentImageToConfirm.absolutePath
+                val path = documentImageToConfirm?.absolutePath
                 try {
-                    BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
+                    BitmapFactory.decodeFile(path)?.let { bitmap: Bitmap ->
+                        BitmapPainter(bitmap.asImageBitmap())
+                    } ?: run {
+                        SmileIDCrashReporting.hub.addBreadcrumb(
+                            "Failed to decode document image at $path",
+                        )
+                        ColorPainter(Color.Black)
+                    }
                 } catch (e: Exception) {
-                    SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
+                    SmileIDCrashReporting.hub.addBreadcrumb(
+                        "Error loading document image at $path",
+                    )
                     SmileIDCrashReporting.hub.captureException(e)
-                    onError(e)
                     ColorPainter(Color.Black)
                 }
             }
-            if (showConfirmation) {
-                ImageCaptureConfirmationDialog(
-                    titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
-                    subtitleText = stringResource(
-                        id = R.string.si_doc_v_confirmation_dialog_subtitle,
-                    ),
-                    painter = painter,
-                    scaleFactor = PREVIEW_SCALE_FACTOR,
-                    confirmButtonText = stringResource(
-                        id = R.string.si_doc_v_confirmation_dialog_confirm_button,
-                    ),
-                    onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
-                    retakeButtonText = stringResource(
-                        id = R.string.si_doc_v_confirmation_dialog_retake_button,
-                    ),
-                    onRetake = viewModel::onRetry,
-                )
-            } else {
-                viewModel.onConfirm(documentImageToConfirm, onConfirm)
+            documentImageToConfirm?.let {
+                if (showConfirmation) {
+                    ImageCaptureConfirmationDialog(
+                        titleText = stringResource(
+                            id = R.string.si_doc_v_confirmation_dialog_title,
+                        ),
+                        subtitleText = stringResource(
+                            id = R.string.si_doc_v_confirmation_dialog_subtitle,
+                        ),
+                        painter = painter,
+                        scaleFactor = PREVIEW_SCALE_FACTOR,
+                        confirmButtonText = stringResource(
+                            id = R.string.si_doc_v_confirmation_dialog_confirm_button,
+                        ),
+                        onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
+                        retakeButtonText = stringResource(
+                            id = R.string.si_doc_v_confirmation_dialog_retake_button,
+                        ),
+                        onRetake = viewModel::onRetry,
+                    )
+                } else {
+                    viewModel.onConfirm(documentImageToConfirm, onConfirm)
+                }
             }
         }
 

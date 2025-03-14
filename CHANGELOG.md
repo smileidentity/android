@@ -1,5 +1,13 @@
 # Release Notes
 
+## [Unreleased]
+
+### Added
+* Show processing error if selfie file is not valid before presenting the image confirmation dialog.
+
+### Fixed
+* `BitmapFactory.decodeFile()` operation leading to a crash when the selfie file is null.
+
 ## 10.5.1
 
 * Make ConsentInformation optional in EnhancedDocV, EnhancedKYC and BiometricKYC

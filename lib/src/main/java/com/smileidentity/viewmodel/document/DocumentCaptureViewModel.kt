@@ -15,11 +15,13 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
+import com.smileidentity.util.isNull
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -27,13 +29,11 @@ import java.io.File
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
@@ -156,22 +156,29 @@ class DocumentCaptureViewModel(
                     when (result) {
                         is ImageCaptureResult.Success -> {
                             viewModelScope.launch {
-                                try {
-                                    val processedImage = withContext(Dispatchers.Default) {
-                                        postProcessImage(
-                                            documentFile,
-                                            desiredAspectRatio = uiState.value.idAspectRatio,
-                                        )
-                                    }
+                                val document =
+                                    postProcessImage(
+                                        documentFile,
+                                        desiredAspectRatio = uiState.value.idAspectRatio,
+                                    )
+
+                                if (document.isNull()) {
+                                    val exception =
+                                        IllegalStateException("Document file is null or empty")
+                                    SmileIDCrashReporting.hub.captureException(exception)
                                     _uiState.update {
                                         it.copy(
-                                            documentImageToConfirm = processedImage,
+                                            captureError = exception,
                                             showCaptureInProgress = false,
                                         )
                                     }
-                                } catch (e: Exception) {
-                                    Timber.e(e, "Error processing captured image")
-                                    handleCaptureError(e)
+                                } else {
+                                    _uiState.update {
+                                        it.copy(
+                                            documentImageToConfirm = document,
+                                            showCaptureInProgress = false,
+                                        )
+                                    }
                                 }
                             }
                         }
