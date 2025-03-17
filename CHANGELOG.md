@@ -2,7 +2,8 @@
 
 ## 10.5.2
 
-* Added SmartSelfie™ capture only option for for Enhanced SmartSelfie™ and SmartSelfie™ capture flows without submission accessible with `skipApiSubmission=true` on enroll and authentication products
+* Added Enhanced SmartSelfie™ Capture for enroll and authentication fragments 
+*  Added an option to capture a selfie without submitting to the API. This is available in Enhanced SmartSelfie™ and SmartSelfie™ capture flows by setting `skipApiSubmission=true` in enroll and authentication products.
 
 ## 10.5.1
 

@@ -8,10 +8,11 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.compose.content
 import com.smileidentity.SmileID
 import com.smileidentity.compose.SmartSelfieEnrollment
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_RESULT
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.newInstance
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
+import com.smileidentity.compose.SmartSelfieEnrollmentEnhanced
+import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
+import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment.Companion.KEY_RESULT
+import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment.Companion.newInstance
+import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
@@ -54,7 +55,7 @@ import kotlinx.collections.immutable.toImmutableMap
  *   );
  * ```
  */
-class SmartSelfieEnrollmentFragment : Fragment() {
+class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
     companion object {
         const val KEY_REQUEST = "SmartSelfieEnrollmentRequest"
 
@@ -65,7 +66,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
         internal const val KEY_RESULT = "SmartSelfieEnrollmentResult"
 
         /**
-         * Creates a new instance of [SmartSelfieEnrollmentFragment] which wraps the
+         * Creates a new instance of [EnhancedSmartSelfieEnrollmentFragment] which wraps the
          * [SmileID.SmartSelfieEnrollment] Composable under the hood
          *
          * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often,
@@ -93,7 +94,7 @@ class SmartSelfieEnrollmentFragment : Fragment() {
             showInstructions: Boolean = true,
             skipApiSubmission: Boolean = false,
             extraPartnerParams: HashMap<String, String>? = null,
-        ) = SmartSelfieEnrollmentFragment().apply {
+        ) = EnhancedSmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
                 this.jobId = jobId
@@ -116,11 +117,9 @@ class SmartSelfieEnrollmentFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val args = requireArguments()
-        SmileID.SmartSelfieEnrollment(
+        SmileID.SmartSelfieEnrollmentEnhanced(
             userId = args.userId,
-            jobId = args.jobId,
             allowNewEnroll = args.allowNewEnroll,
-            allowAgentMode = args.allowAgentMode,
             showAttribution = args.showAttribution,
             showInstructions = args.showInstructions,
             skipApiSubmission = args.skipApiSubmission,
