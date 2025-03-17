@@ -71,9 +71,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
          * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
          * random user ID will be generated.
-         * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
-         * displayed allowing toggling between the back camera and front camera. If not allowed,
-         * only the front camera will be used.
          * @param showAttribution Whether to show the Smile ID attribution or not.
          * @param showInstructions Whether to deactivate capture screen's instructions for
          * @param skipApiSubmission Whether to skip the API submission and return the result of capture only
@@ -84,7 +81,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
         fun newInstance(
             userId: String = randomUserId(),
             allowNewEnroll: Boolean = false,
-            allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
             skipApiSubmission: Boolean = false,
@@ -93,7 +89,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
             arguments = Bundle().apply {
                 this.userId = userId
                 this.allowNewEnroll = allowNewEnroll
-                this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
                 this.skipApiSubmission = skipApiSubmission
@@ -126,11 +121,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
 }
 
 private val moshi = SmileID.moshi
-
-private const val KEY_ALLOW_AGENT_MODE = "allowAgentMode"
-private var Bundle.allowAgentMode: Boolean
-    get() = getBoolean(KEY_ALLOW_AGENT_MODE)
-    set(value) = putBoolean(KEY_ALLOW_AGENT_MODE, value)
 
 private const val KEY_USER_ID = "userId"
 private var Bundle.userId: String

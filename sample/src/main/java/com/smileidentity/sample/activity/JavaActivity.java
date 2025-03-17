@@ -215,9 +215,8 @@ public class JavaActivity extends FragmentActivity {
 
     private void doEnhancedSmartSelfieAuthentication() {
         String userId = randomUserId();
-        boolean allowAgentMode = false;
         EnhancedSmartSelfieAuthenticationFragment smartSelfieFragment = EnhancedSmartSelfieAuthenticationFragment
-            .newInstance(userId, allowAgentMode);
+            .newInstance(userId);
         getSupportFragmentManager().setFragmentResultListener(
             EnhancedSmartSelfieAuthenticationFragment.KEY_REQUEST,
             this,
