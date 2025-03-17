@@ -16,11 +16,25 @@
                 android:text="@string/si_smart_selfie_enrollment_product_name" />
 
         <Button
+                android:id="@+id/button_enhanced_smart_selfie_enrollment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/si_smart_selfie_enrollment_enhanced_product_name" />
+
+        <Button
                 android:id="@+id/button_smart_selfie_authentication"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/si_smart_selfie_authentication_product_name" />
+
+        <Button
+                android:id="@+id/button_enhanced_smart_selfie_authentication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/si_smart_selfie_authentication_enhanced_product_name" />
 
         <Button
                 android:id="@+id/button_biometric_authentication"

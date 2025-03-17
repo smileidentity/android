@@ -1,5 +1,10 @@
 # Release Notes
 
+## 10.5.2
+
+* Added Enhanced SmartSelfie™ Capture for enroll and authentication fragments 
+* Added an option to capture a selfie without submitting to the API. This is available in Enhanced SmartSelfie™ and SmartSelfie™ capture flows by setting `skipApiSubmission=true` in enroll and authentication products.
+
 ## 10.5.1
 
 * Make ConsentInformation optional in EnhancedDocV, EnhancedKYC and BiometricKYC
