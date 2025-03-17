@@ -16,7 +16,6 @@ import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment.Companio
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getParcelableCompat
-import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.squareup.moshi.Types
 import kotlinx.collections.immutable.toImmutableMap
@@ -72,9 +71,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
          * @param userId The user ID to associate with the SmartSelfie™ Enrollment. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
          * random user ID will be generated.
-         * @param jobId The job ID to associate with the SmartSelfie™ Enrollment. Most often, this
-         * will correspond to a unique Job ID within your own system. If not provided, a random job ID
-         * will be generated.
          * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be
          * displayed allowing toggling between the back camera and front camera. If not allowed,
          * only the front camera will be used.
@@ -87,7 +83,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             userId: String = randomUserId(),
-            jobId: String = randomJobId(),
             allowNewEnroll: Boolean = false,
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
@@ -97,7 +92,6 @@ class EnhancedSmartSelfieEnrollmentFragment : Fragment() {
         ) = EnhancedSmartSelfieEnrollmentFragment().apply {
             arguments = Bundle().apply {
                 this.userId = userId
-                this.jobId = jobId
                 this.allowNewEnroll = allowNewEnroll
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
@@ -142,11 +136,6 @@ private const val KEY_USER_ID = "userId"
 private var Bundle.userId: String
     get() = getString(KEY_USER_ID)!!
     set(value) = putString(KEY_USER_ID, value)
-
-private const val KEY_JOB_ID = "jobId"
-private var Bundle.jobId: String
-    get() = getString(KEY_JOB_ID)!!
-    set(value) = putString(KEY_JOB_ID, value)
 
 private const val KEY_ALLOW_NEW_ENROLL = "allowNewEnroll"
 private var Bundle.allowNewEnroll: Boolean

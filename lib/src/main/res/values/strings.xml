@@ -26,7 +26,9 @@
 
     <!--  SmartSelfie  -->
     <string name="si_smart_selfie_enrollment_product_name">SmartSelfie™ Enrollment</string>
+    <string name="si_smart_selfie_enrollment_enhanced_product_name">Enhanced SmartSelfie™ Enrollment</string>
     <string name="si_smart_selfie_authentication_product_name">SmartSelfie™ Authentication</string>
+    <string name="si_smart_selfie_authentication_enhanced_product_name">Enhanced SmartSelfie™ Authentication</string>
     <string name="si_smart_selfie_instruction_title">Next, we\'ll take a quick selfie</string>
     <string name="si_smart_selfie_instruction_ready_button">I\'m Ready</string>
     <string name="si_smart_selfie_instructions">Put your face inside the oval frame and wait until it turns green</string>

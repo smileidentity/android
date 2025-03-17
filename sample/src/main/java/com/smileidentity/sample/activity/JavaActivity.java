@@ -14,6 +14,9 @@ import com.smileidentity.SmileID;
 import com.smileidentity.fragment.BiometricKYCFragment;
 import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
+import com.smileidentity.fragment.EnhancedSmartSelfieAuthenticationFragment;
+import com.smileidentity.fragment.EnhancedSmartSelfieAuthenticationFragmentKt;
+import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
 import com.smileidentity.models.ConsentInformation;
@@ -46,8 +49,12 @@ public class JavaActivity extends FragmentActivity {
         hideProductFragment();
         findViewById(R.id.button_smart_selfie_authentication)
             .setOnClickListener(v -> doSmartSelfieAuthentication());
+        findViewById(R.id.button_enhanced_smart_selfie_authentication)
+            .setOnClickListener(v -> doEnhancedSmartSelfieAuthentication());
         findViewById(R.id.button_smart_selfie_enrollment)
             .setOnClickListener(v -> doSmartSelfieEnrollment());
+        findViewById(R.id.button_enhanced_smart_selfie_enrollment)
+            .setOnClickListener(v -> doEnhancedSmartSelfieEnrollment());
         findViewById(R.id.button_biometric_authentication)
             .setOnClickListener(v -> doBiometricKYC());
         findViewById(R.id.button_document_verification)
@@ -139,6 +146,45 @@ public class JavaActivity extends FragmentActivity {
         showProductFragment();
     }
 
+    private void doEnhancedSmartSelfieEnrollment() {
+        EnhancedSmartSelfieEnrollmentFragment smartSelfieFragment = EnhancedSmartSelfieEnrollmentFragment
+            .newInstance();
+        getSupportFragmentManager().setFragmentResultListener(
+            EnhancedSmartSelfieEnrollmentFragment.KEY_REQUEST,
+            this,
+            (requestKey, result) -> {
+                SmileIDResult<SmartSelfieResult> smartSelfieResult =
+                    EnhancedSmartSelfieEnrollmentFragment.resultFromBundle(result);
+                Timber.v("EnhancedSmartSelfieEnrollment Result: %s", smartSelfieResult);
+                if (smartSelfieResult instanceof SmileIDResult.Success<SmartSelfieResult> successResult) {
+                    File selfieFile = successResult.getData().getSelfieFile();
+                    List<File> livenessFiles = successResult.getData().getLivenessFiles();
+                    boolean jobSubmitted = successResult.getData().getApiResponse() != null;
+                    // When offline mode is enabled, the job is saved offline and can be submitted later.
+                    if (jobSubmitted) {
+                        Timber.v("EnhancedSmartSelfieEnrollment Job Submitted");
+                    } else {
+                        Timber.v("EnhancedSmartSelfieEnrollment Job saved offline.");
+                    }
+                } else if (smartSelfieResult instanceof SmileIDResult.Error error) {
+                    Throwable throwable = error.getThrowable();
+                    Timber.v("EnhancedSmartSelfieEnrollment Error: %s", throwable.getMessage());
+                }
+                getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(smartSelfieFragment)
+                    .commit();
+                hideProductFragment();
+            }
+        );
+
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.fragment_container, smartSelfieFragment)
+            .commit();
+        showProductFragment();
+    }
+
     private void doSmartSelfieAuthentication() {
         String userId = randomUserId();
         String jobId = randomJobId();
@@ -146,12 +192,39 @@ public class JavaActivity extends FragmentActivity {
         SmartSelfieAuthenticationFragment smartSelfieFragment = SmartSelfieAuthenticationFragment
             .newInstance(userId, jobId, allowAgentMode);
         getSupportFragmentManager().setFragmentResultListener(
-            SmartSelfieEnrollmentFragment.KEY_REQUEST,
+            SmartSelfieAuthenticationFragment.KEY_REQUEST,
             this,
             (requestKey, result) -> {
                 SmileIDResult<SmartSelfieResult> smartSelfieResult =
                     SmartSelfieAuthenticationFragment.resultFromBundle(result);
                 Timber.v("SmartSelfieAuthentication Result: %s", smartSelfieResult);
+                getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(smartSelfieFragment)
+                    .commit();
+                hideProductFragment();
+            }
+        );
+
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.fragment_container, smartSelfieFragment)
+            .commit();
+        showProductFragment();
+    }
+
+    private void doEnhancedSmartSelfieAuthentication() {
+        String userId = randomUserId();
+        boolean allowAgentMode = false;
+        EnhancedSmartSelfieAuthenticationFragment smartSelfieFragment = EnhancedSmartSelfieAuthenticationFragment
+            .newInstance(userId, allowAgentMode);
+        getSupportFragmentManager().setFragmentResultListener(
+            EnhancedSmartSelfieAuthenticationFragment.KEY_REQUEST,
+            this,
+            (requestKey, result) -> {
+                SmileIDResult<SmartSelfieResult> smartSelfieResult =
+                    EnhancedSmartSelfieAuthenticationFragment.resultFromBundle(result);
+                Timber.v("EnhancedSmartSelfieAuthentication Result: %s", smartSelfieResult);
                 getSupportFragmentManager()
                     .beginTransaction()
                     .remove(smartSelfieFragment)
