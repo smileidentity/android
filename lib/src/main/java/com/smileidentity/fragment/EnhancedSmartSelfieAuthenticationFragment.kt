@@ -25,7 +25,7 @@ import kotlinx.collections.immutable.toImmutableMap
  *
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-authentication)
  *
- * A [Fragment] wrapper for the [SmartSelfieAuthentication] to be used if not using Jetpack
+ * A [Fragment] wrapper for the [SmartSelfieAuthenticationEnhanced] to be used if not using Jetpack
  * Compose. New instances *must* be created via [newInstance]. Results are communicated back to the
  * caller via [setFragmentResult]. Therefore, the caller must use
  * [androidx.fragment.app.FragmentManager.setFragmentResultListener] to listen for the result. If
@@ -38,13 +38,13 @@ import kotlinx.collections.immutable.toImmutableMap
  *
  * Usage example:
  * ```java
- * SmartSelfieAuthenticationFragment smartSelfieFragment = SmartSelfieAuthenticationFragment
+ * EnhancedSmartSelfieAuthenticationFragment smartSelfieFragment = EnhancedSmartSelfieAuthenticationFragment
  *  .newInstance();
  * getSupportFragmentManager().setFragmentResultListener(
- *   SmartSelfieAuthenticationFragment.KEY_REQUEST,
+ *   EnhancedSmartSelfieAuthenticationFragment.KEY_REQUEST,
  *   this,
  *   (requestKey, result) -> {
- *     SmartSelfieResult smartSelfieResult = SmartSelfieAuthenticationFragment
+ *     SmartSelfieResult smartSelfieResult = EnhancedSmartSelfieAuthenticationFragment
  *       .resultFromBundle(result);
  *     getSupportFragmentManager()
  *       .beginTransaction()
