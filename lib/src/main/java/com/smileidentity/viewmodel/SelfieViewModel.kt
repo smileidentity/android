@@ -21,10 +21,10 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
-import com.smileidentity.models.v2.LivenessType
-import com.smileidentity.models.v2.Metadatum
-import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
-import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.models.v2.metadata.LivenessType
+import com.smileidentity.models.v2.metadata.Metadatum
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
