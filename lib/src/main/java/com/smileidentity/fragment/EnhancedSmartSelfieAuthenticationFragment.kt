@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.compose.content
 import com.smileidentity.SmileID
-import com.smileidentity.compose.SmartSelfieAuthentication
 import com.smileidentity.compose.SmartSelfieAuthenticationEnhanced
 import com.smileidentity.fragment.EnhancedSmartSelfieAuthenticationFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.EnhancedSmartSelfieAuthenticationFragment.Companion.KEY_RESULT
@@ -21,7 +20,7 @@ import com.squareup.moshi.Types
 import kotlinx.collections.immutable.toImmutableMap
 
 /**
- * Perform a SmartSelfie™ Authentication
+ * Perform a Enhanced SmartSelfie™ Authentication
  *
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-authentication)
  *
@@ -66,9 +65,9 @@ class EnhancedSmartSelfieAuthenticationFragment : Fragment() {
 
         /**
          * Creates a new instance of [EnhancedSmartSelfieAuthenticationFragment] which wraps the
-         * [SmileID.SmartSelfieAuthentication] Composable under the hood
+         * [SmileID.SmartSelfieAuthenticationEnhanced] Composable under the hood
          *
-         * @param userId The user ID to associate with the SmartSelfie™ Authentication. Most often,
+         * @param userId The user ID to associate with the Enhanced SmartSelfie™ Authentication. Most often,
          * this will correspond to a unique User ID within your own system. If not provided, a
          * random user ID will be generated.
          * @param allowNewEnroll Whether to allow new enrollments
