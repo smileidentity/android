@@ -3,7 +3,6 @@ package com.smileidentity.networking
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.ImageType
-import com.smileidentity.models.SecurityInfo
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
 import java.io.BufferedOutputStream
