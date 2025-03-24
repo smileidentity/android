@@ -16,6 +16,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
@@ -71,7 +72,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    private val metadata: MutableList<Metadatum>,
+    private val metadata: List<Metadatum> = MetadataManager.collectAllMetadata(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
@@ -359,7 +360,6 @@ internal class DocumentVerificationViewModel(
     selfieFile: File? = null,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -371,7 +371,6 @@ internal class DocumentVerificationViewModel(
     useStrictMode = useStrictMode,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
-    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -405,7 +404,6 @@ internal class EnhancedDocumentVerificationViewModel(
     selfieFile: File? = null,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -418,7 +416,6 @@ internal class EnhancedDocumentVerificationViewModel(
     useStrictMode = useStrictMode,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
-    metadata = metadata,
 ) {
 
     override fun saveResult(

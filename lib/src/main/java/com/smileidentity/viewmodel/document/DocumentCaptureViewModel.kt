@@ -17,6 +17,7 @@ import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.models.v2.metadata.DocumentImageOriginValue
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.Metadatum
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
@@ -64,7 +65,7 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
-    private val metadata: MutableList<Metadatum>,
+    private val metadata: MutableList<Metadatum> = MetadataManager.collectAllMetadata().toMutableList(),
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
