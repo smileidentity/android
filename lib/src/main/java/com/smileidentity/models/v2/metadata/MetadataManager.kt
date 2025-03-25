@@ -30,6 +30,13 @@ object MetadataManager {
         register(NetworkMetadataProvider())
     }
 
+    fun launch() {
+        /*
+        This function is just here so we can start the collection of metadata from providers which
+        is triggered by initialising the object.
+        */
+    }
+
     fun register(provider: MetadataProvider) {
         providers.add(provider)
     }

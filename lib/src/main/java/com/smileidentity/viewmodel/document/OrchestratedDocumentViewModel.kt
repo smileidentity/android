@@ -72,8 +72,11 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    private val metadata: List<Metadatum> = MetadataManager.collectAllMetadata(),
 ) : ViewModel() {
+    init {
+        MetadataManager.launch()
+    }
+
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
     var result: SmileIDResult<T> = SmileIDResult.Error(
@@ -157,6 +160,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 consentInformation = consentInformation,
             )
 
+            val metadata = MetadataManager.collectAllMetadata()
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
