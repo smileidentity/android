@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
+import androidx.compose.material3.MediumTopAppBar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
@@ -26,6 +27,8 @@ import com.smileidentity.models.v2.metadata.Metadatum
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.asNetworkRequest
+import com.smileidentity.models.v2.metadata.MetadataKey
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -101,7 +104,6 @@ class SelfieViewModel(
     private val jobId: String,
     private val allowNewEnroll: Boolean,
     private val skipApiSubmission: Boolean,
-    private val metadata: MutableList<Metadatum>,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -265,10 +267,12 @@ class SelfieViewModel(
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
-        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        MetadataManager.removeMetadata(MetadataKey.SelfieImageOrigin)
         when (camSelector) {
-            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
-            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+            CamSelector.Front ->
+                MetadataManager.addMetadata(MetadataKey.SelfieImageOrigin, FrontCamera.value)
+            CamSelector.Back ->
+                MetadataManager.addMetadata(MetadataKey.SelfieImageOrigin, BackCamera.value)
         }
     }
 
@@ -282,8 +286,11 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
-        metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
-        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
+        MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.Smile.value)
+        MetadataManager.addMetadata(
+            MetadataKey.SelfieCaptureDuration,
+            metadataTimerStart.elapsedNow().inWholeMilliseconds
+        )
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -436,9 +443,9 @@ class SelfieViewModel(
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
             submitJob(selfieFile!!, livenessFiles)
         } else {
-            metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
-            metadata.removeAll { it is Metadatum.ActiveLivenessType }
-            metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+            MetadataManager.removeMetadata(MetadataKey.SelfieCaptureDuration)
+            MetadataManager.removeMetadata(MetadataKey.ActiveLivenessType)
+            MetadataManager.removeMetadata(MetadataKey.SelfieImageOrigin)
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)

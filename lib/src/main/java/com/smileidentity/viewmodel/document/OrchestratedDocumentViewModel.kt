@@ -17,7 +17,6 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.v2.metadata.MetadataManager
-import com.smileidentity.models.v2.metadata.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage

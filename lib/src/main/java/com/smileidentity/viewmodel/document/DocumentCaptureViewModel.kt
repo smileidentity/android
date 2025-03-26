@@ -255,7 +255,7 @@ class DocumentCaptureViewModel(
                 documentImageOrigin?.let {
                     MetadataManager.addMetadata(
                         MetadataKey.DocumentFrontImageOrigin,
-                        documentImageOrigin.value
+                        (documentImageOrigin as DocumentImageOriginValue).value
                     )
                 }
             }
@@ -269,7 +269,7 @@ class DocumentCaptureViewModel(
                 documentImageOrigin?.let {
                     MetadataManager.addMetadata(
                         MetadataKey.DocumentBackImageOrigin,
-                        documentImageOrigin.value
+                        (documentImageOrigin as DocumentImageOriginValue).value
                     )
                 }
             }
