@@ -14,9 +14,11 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SecurityInfo
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.networking.SmileIDCryptoManager
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -30,7 +32,9 @@ import com.smileidentity.util.FileType
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createPrepUploadFile
+import com.smileidentity.util.createSecurityInfoFile
 import com.smileidentity.util.createUploadRequestFile
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.getExceptionHandler
 import com.smileidentity.util.getFileByType
 import com.smileidentity.util.getFilesByType
@@ -154,6 +158,21 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 ) + livenessImageInfo,
                 idInfo = IdInfo(countryCode, documentType),
                 consentInformation = consentInformation,
+            )
+
+            val timestamp = getCurrentIsoTimestamp()
+            val mac = SmileIDCryptoManager.shared.sign(
+                timestamp = timestamp,
+                files = listOfNotNull(
+                    frontImageInfo,
+                    backImageInfo,
+                    selfieImageInfo,
+                ) + livenessImageInfo,
+            )
+
+            createSecurityInfoFile(
+                jobId = jobId,
+                securityInfo = SecurityInfo(timestamp = timestamp, mac = mac),
             )
 
             if (SmileID.allowOfflineMode) {

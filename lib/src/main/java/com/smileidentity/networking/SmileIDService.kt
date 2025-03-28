@@ -78,6 +78,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDSecurity
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-enroll")
@@ -103,6 +104,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDSecurity
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")
@@ -136,6 +138,7 @@ interface SmileIDService {
      * If the ID provider is unavailable, the response will be delivered to the callback URL once
      * the ID provider is available again.
      */
+    @SmileIDSecurity
     @POST("/v1/async_id_verification")
     suspend fun doEnhancedKycAsync(@Body request: EnhancedKycRequest): EnhancedKycAsyncResponse
 
