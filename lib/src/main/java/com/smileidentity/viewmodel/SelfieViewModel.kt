@@ -23,10 +23,8 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.Metadatum
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
-import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.networking.doSmartSelfieAuthentication
@@ -106,6 +104,10 @@ class SelfieViewModel(
     private val skipApiSubmission: Boolean,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
+    init {
+        MetadataManager.launch()
+    }
+
     private val _uiState = MutableStateFlow(SelfieUiState())
 
     // Debounce to avoid spamming SelfieDirective updates so that they can be read by the user
@@ -338,6 +340,7 @@ class SelfieViewModel(
         }
 
         viewModelScope.launch(getExceptionHandler(proxy)) {
+            val metadata = MetadataManager.collectAllMetadata()
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode
                 val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
@@ -372,7 +375,7 @@ class SelfieViewModel(
                     userId = userId,
                     partnerParams = extraPartnerParams,
                     allowNewEnroll = allowNewEnroll,
-                    metadata = metadata.asNetworkRequest(),
+                    metadata = metadata,
                 )
             } else {
                 SmileID.api.doSmartSelfieAuthentication(
@@ -380,7 +383,7 @@ class SelfieViewModel(
                     livenessImages = livenessFiles,
                     userId = userId,
                     partnerParams = extraPartnerParams,
-                    metadata = metadata.asNetworkRequest(),
+                    metadata = metadata,
                 )
             }
             // Move files from unsubmitted to submitted directories
