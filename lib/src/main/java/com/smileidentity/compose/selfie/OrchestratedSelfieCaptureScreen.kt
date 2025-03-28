@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -24,9 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
-import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
@@ -52,7 +49,6 @@ fun OrchestratedSelfieCaptureScreen(
     showAttribution: Boolean = true,
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
     viewModel: SelfieViewModel = viewModel(
         factory = viewModelFactory {
             SelfieViewModel(
@@ -61,7 +57,6 @@ fun OrchestratedSelfieCaptureScreen(
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
                 skipApiSubmission = skipApiSubmission,
-                metadata = metadata,
                 extraPartnerParams = extraPartnerParams,
             )
         },

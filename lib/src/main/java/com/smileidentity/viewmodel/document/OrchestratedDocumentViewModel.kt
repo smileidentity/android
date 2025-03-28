@@ -16,7 +16,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -71,8 +71,11 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private val captureBothSides: Boolean,
     protected var selfieFile: File? = null,
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    private val metadata: MutableList<Metadatum>,
 ) : ViewModel() {
+    init {
+        MetadataManager.launch()
+    }
+
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
     val uiState = _uiState.asStateFlow()
     var result: SmileIDResult<T> = SmileIDResult.Error(
@@ -156,6 +159,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 consentInformation = consentInformation,
             )
 
+            val metadata = MetadataManager.collectAllMetadata()
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
@@ -359,7 +363,6 @@ internal class DocumentVerificationViewModel(
     selfieFile: File? = null,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<DocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -371,7 +374,6 @@ internal class DocumentVerificationViewModel(
     useStrictMode = useStrictMode,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
-    metadata = metadata,
 ) {
 
     override fun saveResult(
@@ -405,7 +407,6 @@ internal class EnhancedDocumentVerificationViewModel(
     selfieFile: File? = null,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    metadata: MutableList<Metadatum>,
 ) : OrchestratedDocumentViewModel<EnhancedDocumentVerificationResult>(
     jobType = jobType,
     userId = userId,
@@ -418,7 +419,6 @@ internal class EnhancedDocumentVerificationViewModel(
     useStrictMode = useStrictMode,
     selfieFile = selfieFile,
     extraPartnerParams = extraPartnerParams,
-    metadata = metadata,
 ) {
 
     override fun saveResult(
