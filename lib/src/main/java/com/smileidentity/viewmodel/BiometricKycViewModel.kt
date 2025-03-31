@@ -14,6 +14,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.BiometricKycResult
@@ -57,6 +58,10 @@ class BiometricKycViewModel(
     private val useStrictMode: Boolean = false,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
+    init {
+        MetadataManager.launch()
+    }
+
     private val _uiState = MutableStateFlow(BiometricKycUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -120,6 +125,7 @@ class BiometricKycViewModel(
                 jobId = jobId,
             )
 
+            val metadata = MetadataManager.collectAllMetadata()
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
@@ -132,6 +138,7 @@ class BiometricKycViewModel(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll.toString(),
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -153,6 +160,7 @@ class BiometricKycViewModel(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 // TODO : Michael will change this to boolean
                 allowNewEnroll = allowNewEnroll.toString(),
+                metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
