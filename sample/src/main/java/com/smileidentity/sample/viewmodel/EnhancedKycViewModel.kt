@@ -9,6 +9,7 @@ import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -26,6 +27,10 @@ data class EnhancedKycUiState(
 )
 
 class EnhancedKycViewModel : ViewModel() {
+    init {
+        MetadataManager.launch()
+    }
+
     private val _uiState = MutableStateFlow(EnhancedKycUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -55,6 +60,7 @@ class EnhancedKycViewModel : ViewModel() {
                 jobId = randomJobId(),
             )
             val authResponse = SmileID.api.authenticate(authRequest)
+            val metadata = MetadataManager.collectAllMetadata()
             val enhancedKycRequest = EnhancedKycRequest(
                 partnerParams = authResponse.partnerParams,
                 signature = authResponse.signature,
@@ -67,6 +73,7 @@ class EnhancedKycViewModel : ViewModel() {
                 dob = idInfo.dob,
                 bankCode = idInfo.bankCode,
                 consentInformation = consentInformation,
+                metadata = metadata,
             )
             val response = SmileID.api.doEnhancedKyc(enhancedKycRequest)
             result = SmileIDResult.Success(EnhancedKycResult(enhancedKycRequest, response))
