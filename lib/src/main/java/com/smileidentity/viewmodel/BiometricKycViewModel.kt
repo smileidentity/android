@@ -137,7 +137,7 @@ class BiometricKycViewModel(
                             userId = userId,
                             extras = extraPartnerParams,
                         ),
-                        allowNewEnroll = allowNewEnroll.toString(),
+                        allowNewEnroll = allowNewEnroll,
                         metadata = metadata,
                         timestamp = "",
                         signature = "",
@@ -158,8 +158,7 @@ class BiometricKycViewModel(
 
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-                // TODO : Michael will change this to boolean
-                allowNewEnroll = allowNewEnroll.toString(),
+                allowNewEnroll = allowNewEnroll,
                 metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,

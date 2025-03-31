@@ -1,9 +1,16 @@
 # Release Notes
 
+## 10.6.0
+* Changes the `allow_new_enroll` flag to be a real boolean instead of a string for prepUpload
+  requests and multi-part requests. This is a breaking change for stored offline jobs, where the job
+  is written using an older sdk version and then submission is attempted using this version.
+
 ## 10.5.2
 
-* Added Enhanced SmartSelfie™ Capture for enroll and authentication fragments 
-* Added an option to capture a selfie without submitting to the API. This is available in Enhanced SmartSelfie™ and SmartSelfie™ capture flows by setting `skipApiSubmission=true` in enroll and authentication products.
+* Added Enhanced SmartSelfie™ Capture for enroll and authentication fragments
+* Added an option to capture a selfie without submitting to the API. This is available in Enhanced
+  SmartSelfie™ and SmartSelfie™ capture flows by setting `skipApiSubmission=true` in enroll and
+  authentication products.
 
 ## 10.5.1
 
