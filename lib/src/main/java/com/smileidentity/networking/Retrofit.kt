@@ -9,8 +9,6 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.Metadata
-import com.smileidentity.models.v2.Metadatum
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
@@ -272,19 +270,4 @@ object StringifiedBooleanAdapter {
     @FromJson
     @StringifiedBoolean
     fun fromJson(value: String): Boolean = value.toBoolean()
-}
-
-/**
- * Mainly necessary so that requests that need multipart form data are formatted correctly, since
- * directly including a List type changes how Retrofit handles the parameter. While this can be
- * used for other JSON request bodies, it's not necessary and you can simply use `List<Metadatum>`
- */
-@Suppress("unused")
-object MetadataAdapter {
-    @ToJson
-    fun toJson(writer: JsonWriter, metadata: Metadata, delegate: JsonAdapter<List<Metadatum>>) =
-        delegate.toJson(writer, metadata.items)
-
-    @FromJson
-    fun fromJson(value: String): Metadata = throw NotImplementedError("MetadataAdapter.fromJson")
 }
