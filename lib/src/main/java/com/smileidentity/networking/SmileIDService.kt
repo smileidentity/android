@@ -31,6 +31,7 @@ import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.Metadatum
 import java.io.File
 import kotlin.time.Duration
@@ -92,7 +93,7 @@ interface SmileIDService {
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
-        @Part("metadata") metadata: List<Metadatum> = MetadataManager.getDefaultMetadata(),
+        @Part("metadata") metadata: Metadata? = MetadataManager.getDefaultMetadata(),
     ): SmartSelfieResponse
 
     /**
@@ -116,7 +117,7 @@ interface SmileIDService {
         @Part("failure_reason") failureReason: FailureReason? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
-        @Part("metadata") metadata: List<Metadatum> = MetadataManager.getDefaultMetadata(),
+        @Part("metadata") metadata: Metadata? = MetadataManager.getDefaultMetadata(),
     ): SmartSelfieResponse
 
     /**
@@ -238,7 +239,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     allowNewEnroll: Boolean? = null,
-    metadata: List<Metadatum> = MetadataManager.getDefaultMetadata(),
+    metadata: Metadata? = MetadataManager.getDefaultMetadata(),
 ) = doSmartSelfieEnrollment(
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
     livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
@@ -271,7 +272,7 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     failureReason: FailureReason? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
-    metadata: List<Metadatum> = MetadataManager.getDefaultMetadata(),
+    metadata: Metadata? = MetadataManager.getDefaultMetadata(),
 ) = doSmartSelfieAuthentication(
     userId = userId,
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),

@@ -25,6 +25,7 @@ import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
+import com.smileidentity.networking.MetadataAdapter
 import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
@@ -470,6 +471,7 @@ object SmileID {
             .add(JobTypeAdapter)
             .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
+            .add(MetadataAdapter)
             .add(FileNameAdapter)
             .add(FileAdapter)
             .add(SmartSelfieJobResultAdapter)

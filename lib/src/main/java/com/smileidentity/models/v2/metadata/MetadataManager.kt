@@ -49,10 +49,11 @@ object MetadataManager {
         staticMetadata.remove(key)
     }
 
-    fun getDefaultMetadata(): List<Metadatum> {
-        return staticMetadata.map { (key, value) ->
+    fun getDefaultMetadata(): Metadata {
+        val metadata = staticMetadata.map { (key, value) ->
             Metadatum(key.key, value)
         }
+        return Metadata(metadata)
     }
 
     fun collectAllMetadata(): List<Metadatum> {

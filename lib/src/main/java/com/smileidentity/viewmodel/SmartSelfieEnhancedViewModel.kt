@@ -20,7 +20,7 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.Metadatum
+import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.SmartSelfieResponse
@@ -539,7 +539,7 @@ class SmartSelfieEnhancedViewModel(
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata,
+                metadata = Metadata(metadata),
             )
         } else {
             SmileID.api.doSmartSelfieAuthentication(
@@ -548,7 +548,7 @@ class SmartSelfieEnhancedViewModel(
                 livenessImages = livenessFiles,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata,
+                metadata = Metadata(metadata),
             )
         }
     }
