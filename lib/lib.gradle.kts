@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.vanniktech.maven.publish.SonatypeHost
+
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose.compiler)
@@ -14,7 +17,8 @@ plugins {
 
 val groupId = "com.smileidentity"
 val artifactId = "android-sdk"
-project.version = findProperty("VERSION_NAME") as? String ?: file("VERSION").readText().trim()
+project.version = findProperty("VERSION_NAME") as? String
+    ?: file("VERSION").readText().trim().toString()
 
 android {
     namespace = groupId
@@ -89,9 +93,9 @@ moshi {
 }
 
 mavenPublishing {
-    publishToMavenCentral(automaticRelease = true)
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     signAllPublications()
-    coordinates(groupId, artifactId, project.version.toString())
+    coordinates(groupId, artifactId)
     pom {
         name = "Smile ID Android SDK"
         description = "The Official Smile ID Android SDK"
