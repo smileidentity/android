@@ -10,6 +10,8 @@ import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -28,7 +30,8 @@ data class EnhancedKycUiState(
 
 class EnhancedKycViewModel : ViewModel() {
     init {
-        MetadataManager.launch()
+        (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+            as? NetworkMetadataProvider)?.startMonitoring()
     }
 
     private val _uiState = MutableStateFlow(EnhancedKycUiState())
@@ -61,6 +64,9 @@ class EnhancedKycViewModel : ViewModel() {
             )
             val authResponse = SmileID.api.authenticate(authRequest)
             val metadata = MetadataManager.collectAllMetadata()
+            // We can stop monitoring the network traffic after we have collected the metadata
+            (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider)?.stopMonitoring()
             val enhancedKycRequest = EnhancedKycRequest(
                 partnerParams = authResponse.partnerParams,
                 signature = authResponse.signature,

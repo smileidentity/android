@@ -7,35 +7,39 @@ import android.os.Build
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.json.JSONArray
+import timber.log.Timber
 
-class NetworkMetadataProvider() : MetadataProvider {
+class NetworkMetadataProvider(context: Context) : MetadataProvider {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var coroutineScope: CoroutineScope? = null
     private val connectionTypes = MutableStateFlow<List<String>>(emptyList())
 
-    init {
-        startMonitoring()
-    }
+    fun startMonitoring() {
+        // Check if the coroutine scope is already active to avoid starting multiple coroutines
+        if (coroutineScope?.isActive == true) return
 
-    private fun startMonitoring() {
-        coroutineScope.launch {
+        Timber.d("Starting network connection monitoring")
+        coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        coroutineScope?.launch {
             while (isActive) {
                 val connection = getCurrentConnectionType()
                 connection?.let { connection ->
                     val currentList = connectionTypes.value
                     if (currentList.lastOrNull() != connection) {
+                        Timber.d("Connection type changed to $connection. Adding to the list.")
                         connectionTypes.value = currentList + connection
                     }
                 }
-                // we check the connection every second if there has been a change
+                // We check the connection every second if there has been a change
                 delay(1000)
             }
         }
     }
 
     fun stopMonitoring() {
-        coroutineScope.cancel()
+        Timber.d("Stopping network connection monitoring")
+        coroutineScope?.cancel()
     }
 
     @Suppress("Deprecation")

@@ -5,15 +5,19 @@ import com.smileidentity.SmileID
 
 interface MetadataProvider {
     fun collectMetadata(): Map<MetadataKey, Any>
+
+    enum class MetadataProviderType {
+        Network,
+    }
 }
 
 object MetadataManager {
-    private val providers: MutableList<MetadataProvider> = mutableListOf()
+    val providers: MutableMap<MetadataProvider.MetadataProviderType, MetadataProvider> =
+        mutableMapOf()
     private val staticMetadata: MutableMap<MetadataKey, String> = mutableMapOf()
 
     init {
         setDefaultMetadata()
-        registerDefaultProviders()
     }
 
     private fun setDefaultMetadata() {
@@ -26,19 +30,8 @@ object MetadataManager {
         addMetadata(MetadataKey.DeviceOS, os)
     }
 
-    private fun registerDefaultProviders() {
-        register(NetworkMetadataProvider())
-    }
-
-    fun launch() {
-        /*
-        This function is just here so we can start the collection of metadata from providers which
-        is triggered by initialising the object.
-        */
-    }
-
-    fun register(provider: MetadataProvider) {
-        providers.add(provider)
+    fun register(type: MetadataProvider.MetadataProviderType, provider: MetadataProvider) {
+        providers[type] = provider
     }
 
     fun addMetadata(key: MetadataKey, value: Any) {
@@ -61,7 +54,7 @@ object MetadataManager {
             putAll(staticMetadata)
         }
 
-        for (provider in providers) {
+        for ((_, provider) in providers) {
             val providerMetadata = provider.collectMetadata()
             for ((key, value) in providerMetadata) {
                 allMetadata[key] = value.toString()

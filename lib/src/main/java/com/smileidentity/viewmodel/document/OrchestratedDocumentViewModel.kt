@@ -17,6 +17,8 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -73,7 +75,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     init {
-        MetadataManager.launch()
+        (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+            as? NetworkMetadataProvider)?.startMonitoring()
     }
 
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
@@ -160,6 +163,10 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
 
             val metadata = MetadataManager.collectAllMetadata()
+            // We can stop monitoring the network traffic after we have collected the metadata
+            (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider)?.stopMonitoring()
+
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(

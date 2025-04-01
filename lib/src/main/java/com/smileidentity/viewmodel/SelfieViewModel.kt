@@ -28,6 +28,8 @@ import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.Metadata
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -106,7 +108,8 @@ class SelfieViewModel(
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     init {
-        MetadataManager.launch()
+        (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+            as? NetworkMetadataProvider)?.startMonitoring()
     }
 
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -342,6 +345,10 @@ class SelfieViewModel(
 
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val metadata = MetadataManager.collectAllMetadata()
+            // We can stop monitoring the network traffic after we have collected the metadata
+            (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider)?.stopMonitoring()
+
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode
                 val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
