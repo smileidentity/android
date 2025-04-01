@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
-import androidx.compose.material3.MediumTopAppBar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
@@ -23,13 +22,13 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
-import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
-import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -108,8 +107,10 @@ class SelfieViewModel(
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     init {
-        (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
-            as? NetworkMetadataProvider)?.startMonitoring()
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider
+            )?.startMonitoring()
     }
 
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -295,7 +296,7 @@ class SelfieViewModel(
         MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.Smile.value)
         MetadataManager.addMetadata(
             MetadataKey.SelfieCaptureDuration,
-            metadataTimerStart.elapsedNow().inWholeMilliseconds
+            metadataTimerStart.elapsedNow().inWholeMilliseconds,
         )
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
@@ -346,8 +347,10 @@ class SelfieViewModel(
         viewModelScope.launch(getExceptionHandler(proxy)) {
             val metadata = MetadataManager.collectAllMetadata()
             // We can stop monitoring the network traffic after we have collected the metadata
-            (MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
-                as? NetworkMetadataProvider)?.stopMonitoring()
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                    as? NetworkMetadataProvider
+                )?.stopMonitoring()
 
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode

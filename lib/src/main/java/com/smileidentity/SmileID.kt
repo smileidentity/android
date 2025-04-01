@@ -158,7 +158,7 @@ object SmileID {
         val networkMetadataProvider = NetworkMetadataProvider(context)
         MetadataManager.register(
             MetadataProvider.MetadataProviderType.Network,
-            networkMetadataProvider
+            networkMetadataProvider,
         )
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())

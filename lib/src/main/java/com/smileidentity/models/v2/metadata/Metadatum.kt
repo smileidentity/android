@@ -15,7 +15,6 @@ open class Metadatum(
     @Json(name = "value") val value: String,
 ) : Parcelable
 
-
 /**
  * Wrap Metadatum in a list. This allows for easy conversion with Moshi and the format the
  * backend expects

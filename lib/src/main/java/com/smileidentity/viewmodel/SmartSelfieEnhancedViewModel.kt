@@ -19,13 +19,13 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
+import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.metadata.LivenessType
 import com.smileidentity.models.v2.metadata.Metadata
-import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
-import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
-import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.metadata.model
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
@@ -528,7 +528,7 @@ class SmartSelfieEnhancedViewModel(
         MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.HeadPose.value)
         MetadataManager.addMetadata(
             MetadataKey.SelfieCaptureDuration,
-            metadataTimerStart.elapsedNow().inWholeMilliseconds
+            metadataTimerStart.elapsedNow().inWholeMilliseconds,
         )
         val metadata = MetadataManager.collectAllMetadata()
         return if (isEnroll) {

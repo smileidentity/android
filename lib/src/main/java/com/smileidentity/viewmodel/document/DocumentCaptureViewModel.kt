@@ -250,12 +250,12 @@ class DocumentCaptureViewModel(
                 MetadataManager.addMetadata(MetadataKey.DocumentFrontCaptureRetries, retryCount)
                 MetadataManager.addMetadata(
                     MetadataKey.DocumentFrontCaptureDuration,
-                    elapsed.inWholeMilliseconds
+                    elapsed.inWholeMilliseconds,
                 )
                 documentImageOrigin?.let {
                     MetadataManager.addMetadata(
                         MetadataKey.DocumentFrontImageOrigin,
-                        (documentImageOrigin as DocumentImageOriginValue).value
+                        (documentImageOrigin as DocumentImageOriginValue).value,
                     )
                 }
             }
@@ -264,12 +264,12 @@ class DocumentCaptureViewModel(
                 MetadataManager.addMetadata(MetadataKey.DocumentBackCaptureRetries, retryCount)
                 MetadataManager.addMetadata(
                     MetadataKey.DocumentBackCaptureDuration,
-                    elapsed.inWholeMilliseconds
+                    elapsed.inWholeMilliseconds,
                 )
                 documentImageOrigin?.let {
                     MetadataManager.addMetadata(
                         MetadataKey.DocumentBackImageOrigin,
-                        (documentImageOrigin as DocumentImageOriginValue).value
+                        (documentImageOrigin as DocumentImageOriginValue).value,
                     )
                 }
             }

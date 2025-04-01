@@ -13,8 +13,7 @@ internal fun SmileThemeSurface(
     typography: Typography,
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(
-    ) {
+    CompositionLocalProvider {
         MaterialTheme(colorScheme = colorScheme, typography = typography) {
             Surface(content = content)
         }

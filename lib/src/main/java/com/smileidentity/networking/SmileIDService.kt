@@ -29,10 +29,9 @@ import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.FailureReason
-import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.metadata.Metadata
-import com.smileidentity.models.v2.metadata.Metadatum
+import com.smileidentity.models.v2.metadata.MetadataManager
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
