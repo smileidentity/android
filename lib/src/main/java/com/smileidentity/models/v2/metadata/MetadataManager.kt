@@ -27,7 +27,7 @@ object MetadataManager {
     }
 
     private fun registerDefaultProviders() {
-        //register(NetworkMetadataProvider())
+        register(NetworkMetadataProvider())
     }
 
     fun launch() {
