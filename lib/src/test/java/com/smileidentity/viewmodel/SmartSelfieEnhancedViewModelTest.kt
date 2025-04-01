@@ -23,7 +23,6 @@ class SmartSelfieEnhancedViewModelTest {
             selfieQualityModel = mockk(),
             skipApiSubmission = true,
             faceDetector = mockk(),
-            metadata = mutableListOf(),
             onResult = {},
         )
     }
