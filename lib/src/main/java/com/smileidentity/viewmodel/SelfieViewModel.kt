@@ -20,16 +20,12 @@ import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
-import com.smileidentity.models.SecurityInfo
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.LivenessType
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.asNetworkRequest
-import com.smileidentity.networking.SmileIDCryptoManager
-import com.smileidentity.networking.asLivenessImage
-import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -41,7 +37,6 @@ import com.smileidentity.util.area
 import com.smileidentity.util.createAuthenticationRequestFile
 import com.smileidentity.util.createLivenessFile
 import com.smileidentity.util.createPrepUploadFile
-import com.smileidentity.util.createSecurityInfoFile
 import com.smileidentity.util.createSelfieFile
 import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.getExceptionHandler
@@ -365,17 +360,17 @@ class SelfieViewModel(
             }
 
             val timestamp = getCurrentIsoTimestamp()
-            val mac = SmileIDCryptoManager.shared.sign(
-                timestamp = timestamp,
-                files = listOfNotNull(
-                    selfieFile.asSelfieImage(),
-                ) + livenessFiles.map { it.asLivenessImage() },
-            )
-
-            createSecurityInfoFile(
-                jobId = jobId,
-                securityInfo = SecurityInfo(timestamp = timestamp, mac = mac),
-            )
+            // val mac = SmileIDCryptoManager.shared.sign(
+            //     timestamp = timestamp,
+            //     files = listOfNotNull(
+            //         selfieFile.asSelfieImage(),
+            //     ) + livenessFiles.map { it.asLivenessImage() },
+            // )
+            //
+            // createSecurityInfoFile(
+            //     jobId = jobId,
+            //     securityInfo = SecurityInfo(timestamp = timestamp, mac = mac),
+            // )
 
             val apiResponse = if (isEnroll) {
                 SmileID.api.doSmartSelfieEnrollment(

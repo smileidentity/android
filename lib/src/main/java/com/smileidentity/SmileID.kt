@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.SmileID.initialize
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
@@ -30,7 +31,6 @@ import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
-import com.smileidentity.networking.SmileIDSecurityInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -38,6 +38,7 @@ import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.secure.interceptor.SmileIDSecurityInterceptor
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE

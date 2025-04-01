@@ -31,6 +31,7 @@ import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.secure.interceptor.SmileIDSecurity
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

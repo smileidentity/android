@@ -159,6 +159,8 @@ dependencies {
     api(libs.kotlin.immutable.collections)
     implementation(libs.coroutines.core)
 
+    implementation(libs.smile)
+
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.fragment.compose)
