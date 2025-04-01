@@ -82,6 +82,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
          * only the front camera will be used.
          * @param showAttribution Whether to show the Smile ID attribution or not.
          * @param showInstructions Whether to show the instructions or not.
+         * @param skipApiSubmission Whether to skip the API submission and return the result of capture only
          * @param extraPartnerParams Custom values specific to partners
          */
         @JvmStatic
@@ -93,6 +94,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
             allowAgentMode: Boolean = false,
             showAttribution: Boolean = true,
             showInstructions: Boolean = true,
+            skipApiSubmission: Boolean = false,
             extraPartnerParams: HashMap<String, String>? = null,
         ) = SmartSelfieAuthenticationFragment().apply {
             arguments = Bundle().apply {
@@ -102,6 +104,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
                 this.allowAgentMode = allowAgentMode
                 this.showAttribution = showAttribution
                 this.showInstructions = showInstructions
+                this.skipApiSubmission = skipApiSubmission
                 this.extraPartnerParams = extraPartnerParams
             }
         }
@@ -123,6 +126,7 @@ class SmartSelfieAuthenticationFragment : Fragment() {
             allowAgentMode = args.allowAgentMode,
             showAttribution = args.showAttribution,
             showInstructions = args.showInstructions,
+            skipApiSubmission = args.skipApiSubmission,
             extraPartnerParams = (args.extraPartnerParams ?: mapOf()).toImmutableMap(),
             onResult = {
                 setFragmentResult(KEY_REQUEST, Bundle().apply { smileIdResult = it })
@@ -162,6 +166,11 @@ private const val KEY_SHOW_INSTRUCTIONS = "showInstructions"
 private var Bundle.showInstructions: Boolean
     get() = getBoolean(KEY_SHOW_INSTRUCTIONS)
     set(value) = putBoolean(KEY_SHOW_INSTRUCTIONS, value)
+
+private const val KEY_SKIP_API_SUBMISSION = "skipApiSubmission"
+private var Bundle.skipApiSubmission: Boolean
+    get() = getBoolean(KEY_SKIP_API_SUBMISSION)
+    set(value) = putBoolean(KEY_SKIP_API_SUBMISSION, value)
 
 private const val KEY_EXTRA_PARTNER_PARAMS = "extraPartnerParams"
 private val type = Types.newParameterizedType(

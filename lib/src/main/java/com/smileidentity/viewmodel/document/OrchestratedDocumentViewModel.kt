@@ -182,7 +182,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                             userId = userId,
                             extras = extraPartnerParams,
                         ),
-                        allowNewEnroll = allowNewEnroll.toString(),
+                        allowNewEnroll = allowNewEnroll,
                         metadata = metadata,
                         timestamp = "",
                         signature = "",
@@ -198,8 +198,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
-                // TODO : Michael will change this to boolean
-                allowNewEnroll = allowNewEnroll.toString(),
+                allowNewEnroll = allowNewEnroll,
                 metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,

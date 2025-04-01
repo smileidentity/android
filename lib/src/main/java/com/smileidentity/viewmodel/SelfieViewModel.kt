@@ -351,7 +351,7 @@ class SelfieViewModel(
                             userId = userId,
                             extras = extraPartnerParams,
                         ),
-                        allowNewEnroll = allowNewEnroll.toString(),
+                        allowNewEnroll = allowNewEnroll,
                         metadata = metadata,
                         timestamp = "",
                         signature = "",
