@@ -14,7 +14,7 @@ fun getIPAddress(useIPv4: Boolean): String {
             val addresses: List<InetAddress> = Collections.list(networkInterface.inetAddresses)
             for (item in addresses) {
                 if (!item.isLoopbackAddress) {
-                    val address = item.hostAddress
+                    val address = item.hostAddress ?: continue
                     val isIPv4 = address.indexOf(':') < 0
 
                     if (useIPv4) {
