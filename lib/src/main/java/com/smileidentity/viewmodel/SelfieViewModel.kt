@@ -21,11 +21,14 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
-import com.smileidentity.models.v2.LivenessType
-import com.smileidentity.models.v2.Metadatum
-import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
-import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
-import com.smileidentity.models.v2.asNetworkRequest
+import com.smileidentity.models.v2.metadata.LivenessType
+import com.smileidentity.models.v2.metadata.Metadata
+import com.smileidentity.models.v2.metadata.MetadataKey
+import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
+import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -101,9 +104,15 @@ class SelfieViewModel(
     private val jobId: String,
     private val allowNewEnroll: Boolean,
     private val skipApiSubmission: Boolean,
-    private val metadata: MutableList<Metadatum>,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
+    init {
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider
+            )?.startMonitoring()
+    }
+
     private val _uiState = MutableStateFlow(SelfieUiState())
 
     // Debounce to avoid spamming SelfieDirective updates so that they can be read by the user
@@ -265,10 +274,12 @@ class SelfieViewModel(
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
-        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        MetadataManager.removeMetadata(MetadataKey.SelfieImageOrigin)
         when (camSelector) {
-            CamSelector.Front -> metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
-            CamSelector.Back -> metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
+            CamSelector.Front ->
+                MetadataManager.addMetadata(MetadataKey.SelfieImageOrigin, FrontCamera.value)
+            CamSelector.Back ->
+                MetadataManager.addMetadata(MetadataKey.SelfieImageOrigin, BackCamera.value)
         }
     }
 
@@ -282,8 +293,11 @@ class SelfieViewModel(
     }
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
-        metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
-        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
+        MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.Smile.value)
+        MetadataManager.addMetadata(
+            MetadataKey.SelfieCaptureDuration,
+            metadataTimerStart.elapsedNow().inWholeMilliseconds,
+        )
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -331,6 +345,13 @@ class SelfieViewModel(
         }
 
         viewModelScope.launch(getExceptionHandler(proxy)) {
+            val metadata = MetadataManager.collectAllMetadata()
+            // We can stop monitoring the network traffic after we have collected the metadata
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                    as? NetworkMetadataProvider
+                )?.stopMonitoring()
+
             if (SmileID.allowOfflineMode) {
                 // For the moment, we continue to use the async API endpoints for offline mode
                 val jobType = if (isEnroll) SmartSelfieEnrollment else SmartSelfieAuthentication
@@ -365,7 +386,7 @@ class SelfieViewModel(
                     userId = userId,
                     partnerParams = extraPartnerParams,
                     allowNewEnroll = allowNewEnroll,
-                    metadata = metadata.asNetworkRequest(),
+                    metadata = Metadata(metadata),
                 )
             } else {
                 SmileID.api.doSmartSelfieAuthentication(
@@ -373,7 +394,7 @@ class SelfieViewModel(
                     livenessImages = livenessFiles,
                     userId = userId,
                     partnerParams = extraPartnerParams,
-                    metadata = metadata.asNetworkRequest(),
+                    metadata = Metadata(metadata),
                 )
             }
             // Move files from unsubmitted to submitted directories
@@ -436,9 +457,9 @@ class SelfieViewModel(
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
             submitJob(selfieFile!!, livenessFiles)
         } else {
-            metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
-            metadata.removeAll { it is Metadatum.ActiveLivenessType }
-            metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+            MetadataManager.removeMetadata(MetadataKey.SelfieCaptureDuration)
+            MetadataManager.removeMetadata(MetadataKey.ActiveLivenessType)
+            MetadataManager.removeMetadata(MetadataKey.SelfieImageOrigin)
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)
