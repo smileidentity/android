@@ -56,12 +56,6 @@ fun UploadRequest.zip(): File {
     zipOutputStream.write(infoJson.toByteArray())
     zipOutputStream.closeEntry()
 
-    // Write security_info.json
-    zipOutputStream.putNextEntry(ZipEntry("security_info.json"))
-    val securityInfoJson = moshi.adapter(UploadRequest::class.java).toJson(uploadRequest)
-    zipOutputStream.write(securityInfoJson.toByteArray())
-    zipOutputStream.closeEntry()
-
     // Write images
     uploadRequest.images.forEach { imageInfo ->
         zipOutputStream.putNextEntry(ZipEntry(imageInfo.image.name))

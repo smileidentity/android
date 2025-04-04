@@ -162,7 +162,7 @@ dependencies {
     api(libs.kotlin.immutable.collections)
     implementation(libs.coroutines.core)
 
-    implementation(libs.smile)
+    implementation(libs.smileid.security)
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
