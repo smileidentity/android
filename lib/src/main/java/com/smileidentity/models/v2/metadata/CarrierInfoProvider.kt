@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.TelephonyManager
 
-
 class CarrierInfoProvider(context: Context) : MetadataProvider {
     private val packageManager = context.packageManager
     private val telephonyManager =
@@ -49,5 +48,3 @@ class CarrierInfoProvider(context: Context) : MetadataProvider {
         return mapOf(MetadataKey.CarrierInfo to carrierInfo)
     }
 }
-
-
