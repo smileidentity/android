@@ -1,6 +1,6 @@
 # Release Notes
 
-## (Unreleased)
+## 10.6.1
 * Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    
 
 ## 10.6.0
