@@ -31,6 +31,7 @@ import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.secure.interceptor.SmileIDSecurity
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -78,6 +79,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDSecurity
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-enroll")
@@ -103,6 +105,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDSecurity
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")
@@ -126,6 +129,7 @@ interface SmileIDService {
      * This will be done synchronously, and the result will be returned in the response. If the ID
      * provider is unavailable, the response will be an error.
      */
+    @SmileIDSecurity
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
 

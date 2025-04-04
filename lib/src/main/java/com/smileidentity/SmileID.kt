@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.SmileID.initialize
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
@@ -37,6 +38,7 @@ import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.secure.interceptor.SmileIDSecurityInterceptor
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
@@ -311,9 +313,9 @@ object SmileID {
             throw IllegalArgumentException("Invalid jobId or not found")
         }
         val authRequestJsonString = getSmileTempFile(
-            jobId,
-            AUTH_REQUEST_FILE,
-            true,
+            folderName = jobId,
+            fileName = AUTH_REQUEST_FILE,
+            isUnsubmitted = true,
         ).useLines { it.joinToString("\n") }
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)?.apply {
@@ -439,8 +441,9 @@ object SmileID {
         connectTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         readTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         writeTimeout(timeout = 60, unit = TimeUnit.SECONDS)
-        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
+        addInterceptor(interceptor = SmileHeaderAuthInterceptor)
+        addInterceptor(interceptor = SmileIDSecurityInterceptor)
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
