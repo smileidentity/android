@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 
 plugins {
     alias(libs.plugins.android.library)
@@ -81,7 +82,7 @@ android {
 }
 
 composeCompiler {
-    enableStrongSkippingMode = true
+    featureFlags.addAll(ComposeFeatureFlag.StrongSkipping)
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }
