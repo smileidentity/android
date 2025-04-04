@@ -4,6 +4,7 @@ enum class MetadataKey(val key: String) {
     ActiveLivenessType("active_liveness_type"),
     ActiveLivenessVersion("active_liveness_version"),
     CameraName("camera_name"),
+    CarrierInfo("carrier_info"),
     ClientIP("client_ip"),
     DeviceModel("device_model"),
     DeviceOS("device_os"),
