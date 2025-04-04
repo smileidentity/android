@@ -89,6 +89,7 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
+import kotlin.text.isNotEmpty
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -351,9 +352,11 @@ private fun SmartSelfieEnhancedScreen(
                                     R.string.si_smart_selfie_enhanced_submitting,
                                 )
 
-                                is SelfieState.Error -> stringResource(
-                                    R.string.si_smart_selfie_enhanced_submission_failed,
-                                )
+                                is SelfieState.Error ->
+                                    state.selfieState.throwable.message?.takeIf { it.isNotEmpty() }
+                                        ?: stringResource(
+                                            R.string.si_smart_selfie_enhanced_submission_failed,
+                                        )
 
                                 is SelfieState.Success -> stringResource(
                                     R.string.si_smart_selfie_enhanced_submission_successful,
