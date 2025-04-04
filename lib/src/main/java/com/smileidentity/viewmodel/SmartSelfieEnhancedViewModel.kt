@@ -450,18 +450,15 @@ class SmartSelfieEnhancedViewModel(
                     when {
                         e is IOException -> {
                             Timber.w(e, "Received IOException, asking user to retry")
-                            _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
                         }
 
                         e is HttpException && e.code() in 500..599 -> {
                             val message = "Received 5xx error, asking user to retry"
                             Timber.w(e, message)
                             SmileIDCrashReporting.hub.addBreadcrumb(message)
-                            _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
                         }
-
-                        else -> onResult(SmileIDResult.Error(e))
                     }
+                    _uiState.update { it.copy(selfieState = SelfieState.Error(e)) }
                 }
                 viewModelScope.launch(getExceptionHandler(proxy)) {
                     Timber.d("viewModelScope.launch started")
