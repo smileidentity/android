@@ -1,5 +1,8 @@
 # Release Notes
 
+## (Unreleased)
+* Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    
+
 ## 10.6.0
 * Changes the `allow_new_enroll` flag to be a real boolean instead of a string for prepUpload
   requests and multi-part requests. This is a breaking change for stored offline jobs, where the job
