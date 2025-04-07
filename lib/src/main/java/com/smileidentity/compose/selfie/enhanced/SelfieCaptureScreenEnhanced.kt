@@ -426,8 +426,8 @@ private fun SmartSelfieEnhancedScreen(
 @Composable
 private fun UserInstructionsView(
     instruction: String,
+    message: String?,
     modifier: Modifier = Modifier,
-    message: String? = null,
 ) {
     Column(modifier = modifier.padding(vertical = 12.dp)) {
         Text(
