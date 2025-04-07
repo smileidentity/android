@@ -4,6 +4,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import java.net.InetSocketAddress
+import java.net.NetworkInterface
+import java.net.Proxy
+import java.net.ProxySelector
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -71,8 +76,72 @@ class NetworkMetadataProvider(context: Context) : MetadataProvider {
         }
     }
 
+    fun isProxyDetected(): Boolean {
+        val proxyProperties = System.getProperty("http.proxyHost") ?:
+        System.getProperty("https.proxyHost")
+        if (!proxyProperties.isNullOrEmpty()) {
+            return true
+        }
+
+        val proxyPort = System.getProperty("http.proxyPort") ?:
+        System.getProperty("https.proxyPort")
+        if (!proxyPort.isNullOrEmpty() && proxyPort.toIntOrNull() != 0) {
+            return true
+        }
+
+        try {
+            val defaultProxy = ProxySelector
+                .getDefault()
+                .select(URI("https://api.smileidentity.com/v1/ping"))
+            if (defaultProxy != null) {
+                for (proxy in defaultProxy) {
+                    if (proxy.type() != Proxy.Type.DIRECT) {
+                        val address = proxy.address()
+                        if (address is InetSocketAddress) {
+                            if (!address.hostName.isNullOrEmpty() && address.port != 0) {
+                                return true
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // do nothing, we're just checking for proxy
+        }
+
+        return false
+    }
+
+    @Suppress("Deprecation")
+    fun isVPNActive(): Boolean {
+        val isVpnUsingNetworkType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // API 23+ (Marshmallow and above)
+            val network = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(network)
+            capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
+        } else {
+            // For API 21-22 (Lollipop)
+            connectivityManager.activeNetworkInfo?.type == ConnectivityManager.TYPE_VPN
+        }
+
+        // Check for VPN interfaces (Works across all API levels)
+        val vpnInterfacePrefixes = listOf("tun", "tap", "ppp", "ipsec", "utun")
+        val isVpnUsingInterfaces = NetworkInterface.getNetworkInterfaces()?.toList()?.any {
+            networkInterface ->
+            vpnInterfacePrefixes.any { prefix -> networkInterface.name.startsWith(prefix) }
+        } == true
+
+        return isVpnUsingNetworkType || isVpnUsingInterfaces
+    }
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         val jsonArray = JSONArray(connectionTypes.value)
-        return mapOf(MetadataKey.NetworkConnection to jsonArray)
+        val isVpnActive = isVPNActive()
+        val isProxyDetected = isProxyDetected()
+        return mapOf(
+            MetadataKey.NetworkConnection to jsonArray,
+            MetadataKey.VPNDetected to isVpnActive,
+            MetadataKey.ProxyDetected to isProxyDetected,
+        )
     }
 }

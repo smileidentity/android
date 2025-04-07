@@ -15,8 +15,10 @@ enum class MetadataKey(val key: String) {
     DocumentFrontImageOrigin("document_front_image_origin"),
     Fingerprint("fingerprint"),
     NetworkConnection("network_connection"),
+    ProxyDetected("proxy"),
     SelfieCaptureDuration("selfie_capture_duration_ms"),
     SelfieImageOrigin("selfie_image_origin"),
     Sdk("sdk"),
     SdkVersion("sdk_version"),
+    VPNDetected("vpn"),
 }
