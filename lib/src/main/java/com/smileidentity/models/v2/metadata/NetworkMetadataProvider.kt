@@ -127,7 +127,7 @@ class NetworkMetadataProvider(context: Context) : MetadataProvider {
         // Check for VPN interfaces (Works across all API levels)
         val vpnInterfacePrefixes = listOf("tun", "tap", "ppp", "ipsec", "utun")
         val isVpnUsingInterfaces = NetworkInterface.getNetworkInterfaces()?.toList()?.any {
-            networkInterface ->
+                networkInterface ->
             vpnInterfacePrefixes.any { prefix -> networkInterface.name.startsWith(prefix) }
         } == true
 
