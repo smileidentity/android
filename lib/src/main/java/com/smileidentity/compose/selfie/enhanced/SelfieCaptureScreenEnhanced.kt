@@ -429,7 +429,10 @@ private fun UserInstructionsView(
     message: String?,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.padding(vertical = 12.dp)) {
+    Column(
+        modifier = modifier.padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Text(
             text = instruction,
             style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
