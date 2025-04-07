@@ -420,8 +420,8 @@ private fun SmartSelfieEnhancedScreen(
  * The Selfie Capture Instruction Screen. This screen is responsible for displaying the
  * instructions to the user based on the current selfie state.
  * @param instruction Main instruction to display (title)
- * @param modifier The modifier to apply to this composable
  * @param message Subtitle message to display (optional)
+ * @param modifier The modifier to apply to this composable
  */
 @Composable
 private fun UserInstructionsView(
