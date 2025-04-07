@@ -77,14 +77,14 @@ class NetworkMetadataProvider(context: Context) : MetadataProvider {
     }
 
     fun isProxyDetected(): Boolean {
-        val proxyProperties = System.getProperty("http.proxyHost") ?:
-        System.getProperty("https.proxyHost")
+        val proxyProperties =
+            System.getProperty("http.proxyHost") ?: System.getProperty("https.proxyHost")
         if (!proxyProperties.isNullOrEmpty()) {
             return true
         }
 
-        val proxyPort = System.getProperty("http.proxyPort") ?:
-        System.getProperty("https.proxyPort")
+        val proxyPort =
+            System.getProperty("http.proxyPort") ?: System.getProperty("https.proxyPort")
         if (!proxyPort.isNullOrEmpty() && proxyPort.toIntOrNull() != 0) {
             return true
         }
