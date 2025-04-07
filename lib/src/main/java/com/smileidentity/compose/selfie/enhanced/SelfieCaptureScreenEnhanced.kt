@@ -89,7 +89,6 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import kotlin.text.isNotEmpty
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -341,9 +340,8 @@ private fun SmartSelfieEnhancedScreen(
                                 )
                             }
                         }
-
-                        Text(
-                            text = when (state.selfieState) {
+                        UserInstructionsView(
+                            instruction = when (state.selfieState) {
                                 is SelfieState.Analyzing -> stringResource(
                                     state.selfieState.hint.text,
                                 )
@@ -352,20 +350,20 @@ private fun SmartSelfieEnhancedScreen(
                                     R.string.si_smart_selfie_enhanced_submitting,
                                 )
 
-                                is SelfieState.Error ->
-                                    state.selfieState.throwable.message?.takeIf { it.isNotEmpty() }
-                                        ?: stringResource(
-                                            R.string.si_smart_selfie_enhanced_submission_failed,
-                                        )
+                                is SelfieState.Error -> stringResource(
+                                    R.string.si_smart_selfie_enhanced_submission_failed,
+                                )
 
                                 is SelfieState.Success -> stringResource(
                                     R.string.si_smart_selfie_enhanced_submission_successful,
                                 )
                             },
-                            style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 12.dp),
+                            message = when (state.selfieState) {
+                                is SelfieState.Error ->
+                                    state.selfieState.throwable.message?.takeIf { it.isNotEmpty() }
+
+                                else -> null
+                            },
                         )
                     }
                 }
@@ -416,6 +414,36 @@ private fun SmartSelfieEnhancedScreen(
             }
         },
     )
+}
+
+/**
+ * The Selfie Capture Instruction Screen. This screen is responsible for displaying the
+ * instructions to the user based on the current selfie state.
+ * @param instruction Main instruction to display (title)
+ * @param modifier The modifier to apply to this composable
+ * @param message Subtitle message to display (optional)
+ */
+@Composable
+private fun UserInstructionsView(
+    instruction: String,
+    modifier: Modifier = Modifier,
+    message: String? = null,
+) {
+    Column(modifier = modifier.padding(vertical = 12.dp)) {
+        Text(
+            text = instruction,
+            style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+        )
+        message?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodySmall.copy(color = Color.White),
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
 }
 
 @SmilePreviews
