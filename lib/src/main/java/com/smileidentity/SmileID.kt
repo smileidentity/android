@@ -161,6 +161,7 @@ object SmileID {
             MetadataProvider.MetadataProviderType.Network,
             networkMetadataProvider,
         )
+
         val carrierInfoProvider = CarrierInfoProvider(context)
         MetadataManager.register(
             MetadataProvider.MetadataProviderType.CarrierInfo,
