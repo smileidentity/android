@@ -29,6 +29,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        externalNativeBuild {
+            cmake {
+                cppFlags("")
+            }
+        }
+
+        ndk {
+            // Add libs for ndk, here is log
+            ldLibs?.add("log")
+        }
     }
 
     buildTypes {
@@ -50,6 +60,12 @@ android {
 
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1,LICENSE*}"
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("CMakeLists.txt")
+        }
     }
 
     compileOptions {
