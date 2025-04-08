@@ -68,9 +68,9 @@
     <string name="si_smart_selfie_enhanced_directive_look_up">Turn your head slightly up</string>
     <string name="si_smart_selfie_enhanced_directive_keep_looking">Look at the camera</string>
     <string name="si_smart_selfie_enhanced_directive_smile">Smile!</string>
-    <string name="si_smart_selfie_enhanced_submitting">Submitting…</string>
-    <string name="si_smart_selfie_enhanced_submission_successful">Submission Successful</string>
-    <string name="si_smart_selfie_enhanced_submission_failed">Submission Failed</string>
+    <string name="si_smart_selfie_enhanced_submitting">Submitting</string>
+    <string name="si_smart_selfie_enhanced_submission_successful">Successful</string>
+    <string name="si_smart_selfie_enhanced_submission_failed">Failed</string>
 
     <!--  Document Verification  -->
     <string name="si_doc_v_product_name">Document Verification</string>

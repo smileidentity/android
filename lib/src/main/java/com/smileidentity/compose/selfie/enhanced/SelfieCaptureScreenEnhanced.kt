@@ -340,9 +340,8 @@ private fun SmartSelfieEnhancedScreen(
                                 )
                             }
                         }
-
-                        Text(
-                            text = when (state.selfieState) {
+                        UserInstructionsView(
+                            instruction = when (state.selfieState) {
                                 is SelfieState.Analyzing -> stringResource(
                                     state.selfieState.hint.text,
                                 )
@@ -359,10 +358,12 @@ private fun SmartSelfieEnhancedScreen(
                                     R.string.si_smart_selfie_enhanced_submission_successful,
                                 )
                             },
-                            style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 12.dp),
+                            message = when (state.selfieState) {
+                                is SelfieState.Error ->
+                                    state.selfieState.throwable.message?.takeIf { it.isNotEmpty() }
+
+                                else -> null
+                            },
                         )
                     }
                 }
@@ -413,6 +414,39 @@ private fun SmartSelfieEnhancedScreen(
             }
         },
     )
+}
+
+/**
+ * The Selfie Capture Instruction Screen. This screen is responsible for displaying the
+ * instructions to the user based on the current selfie state.
+ * @param instruction Main instruction to display (title)
+ * @param message Subtitle message to display (optional)
+ * @param modifier The modifier to apply to this composable
+ */
+@Composable
+private fun UserInstructionsView(
+    instruction: String,
+    message: String?,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = instruction,
+            style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+        )
+        message?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodySmall.copy(color = Color.White),
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
 }
 
 @SmilePreviews
