@@ -16,8 +16,9 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
-import com.smileidentity.models.v2.DocumentImageOriginValue
-import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.metadata.DocumentImageOriginValue
+import com.smileidentity.models.v2.metadata.MetadataKey
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -64,7 +65,6 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
-    private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
@@ -218,15 +218,15 @@ class DocumentCaptureViewModel(
         uiState.value.documentImageToConfirm?.delete()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.removeAll { it is Metadatum.DocumentFrontCaptureRetries }
-                metadata.removeAll { it is Metadatum.DocumentFrontCaptureDuration }
-                metadata.removeAll { it is Metadatum.DocumentFrontImageOrigin }
+                MetadataManager.removeMetadata(MetadataKey.DocumentFrontCaptureRetries)
+                MetadataManager.removeMetadata(MetadataKey.DocumentFrontCaptureDuration)
+                MetadataManager.removeMetadata(MetadataKey.DocumentFrontImageOrigin)
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.removeAll { it is Metadatum.DocumentBackCaptureRetries }
-                metadata.removeAll { it is Metadatum.DocumentBackCaptureDuration }
-                metadata.removeAll { it is Metadatum.DocumentBackImageOrigin }
+                MetadataManager.removeMetadata(MetadataKey.DocumentBackCaptureRetries)
+                MetadataManager.removeMetadata(MetadataKey.DocumentBackCaptureDuration)
+                MetadataManager.removeMetadata(MetadataKey.DocumentBackImageOrigin)
             }
         }
         isCapturing = false
@@ -247,15 +247,31 @@ class DocumentCaptureViewModel(
         val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.add(Metadatum.DocumentFrontCaptureRetries(retryCount))
-                metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
-                documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
+                MetadataManager.addMetadata(MetadataKey.DocumentFrontCaptureRetries, retryCount)
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentFrontCaptureDuration,
+                    elapsed.inWholeMilliseconds,
+                )
+                documentImageOrigin?.let {
+                    MetadataManager.addMetadata(
+                        MetadataKey.DocumentFrontImageOrigin,
+                        (documentImageOrigin as DocumentImageOriginValue).value,
+                    )
+                }
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.add(Metadatum.DocumentBackCaptureRetries(retryCount))
-                metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
-                documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
+                MetadataManager.addMetadata(MetadataKey.DocumentBackCaptureRetries, retryCount)
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentBackCaptureDuration,
+                    elapsed.inWholeMilliseconds,
+                )
+                documentImageOrigin?.let {
+                    MetadataManager.addMetadata(
+                        MetadataKey.DocumentBackImageOrigin,
+                        (documentImageOrigin as DocumentImageOriginValue).value,
+                    )
+                }
             }
         }
         onConfirm(documentImageToConfirm)

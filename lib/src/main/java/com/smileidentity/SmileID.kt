@@ -17,6 +17,9 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -151,6 +154,12 @@ object SmileID {
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
+
+        val networkMetadataProvider = NetworkMetadataProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.Network,
+            networkMetadataProvider,
+        )
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {

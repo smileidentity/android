@@ -9,8 +9,8 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.Metadata
-import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.metadata.Metadata
+import com.smileidentity.models.v2.metadata.Metadatum
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
