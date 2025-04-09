@@ -61,7 +61,7 @@ fun SettingsScreen(
                     SmileID.initialize(
                         context = context,
                         config = config,
-                        useSandbox = false,
+                        useSandbox = true,
                         enableCrashReporting = !BuildConfig.DEBUG,
                         okHttpClient = client,
                     )

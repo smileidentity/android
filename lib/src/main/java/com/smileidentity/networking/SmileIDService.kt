@@ -31,7 +31,7 @@ import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
-import com.smileidentity.secure.interceptor.SmileIDSecurity
+import com.smileidentity.security.interceptor.SmileIDSecurity
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -59,6 +59,8 @@ interface SmileIDService {
      * Used by Job Types that need to upload a file to the server. The response contains the URL
      * [PrepUploadResponse.uploadUrl] that the file should eventually be uploaded to (via [upload]).
      */
+    @SmileHeaderMetadata
+    @SmileIDSecurity
     @POST("/v1/upload")
     suspend fun prepUpload(@Body request: PrepUploadRequest): PrepUploadResponse
 
@@ -129,6 +131,7 @@ interface SmileIDService {
      * This will be done synchronously, and the result will be returned in the response. If the ID
      * provider is unavailable, the response will be an error.
      */
+    @SmileHeaderMetadata
     @SmileIDSecurity
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse

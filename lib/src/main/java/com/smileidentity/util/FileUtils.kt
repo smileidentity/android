@@ -4,7 +4,6 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.PrepUploadRequest
-import com.smileidentity.models.SecurityInfo
 import com.smileidentity.models.UploadRequest
 import java.io.File
 import java.io.IOException
@@ -28,7 +27,6 @@ private const val SUBMITTED_PATH = "/submitted"
 const val AUTH_REQUEST_FILE = "authentication_request.json"
 const val PREP_UPLOAD_REQUEST_FILE = "prep_upload.json"
 const val UPLOAD_REQUEST_FILE = "info.json"
-const val SECURITY_INFO_FILE = "security_info.json"
 
 // Enum defining the types of files managed within the job processing system.
 // This categorization helps in filtering and processing files based on their content or purpose.
@@ -494,14 +492,6 @@ internal fun createUploadRequestFile(jobId: String, uploadRequest: UploadRequest
     val file = createSmileJsonFile(UPLOAD_REQUEST_FILE, jobId)
     file.sink().buffer().use { sink ->
         SmileID.moshi.adapter(UploadRequest::class.java).toJson(sink, uploadRequest)
-    }
-    return file
-}
-
-internal fun createSecurityInfoFile(jobId: String, securityInfo: SecurityInfo): File {
-    val file = createSmileJsonFile(SECURITY_INFO_FILE, jobId)
-    file.sink().buffer().use { sink ->
-        SmileID.moshi.adapter(SecurityInfo::class.java).toJson(sink, securityInfo)
     }
     return file
 }

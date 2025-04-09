@@ -61,7 +61,7 @@ fun RootScreen(
                 SmileID.initialize(
                     context = context,
                     config = runtimeConfig!!,
-                    useSandbox = false,
+                    useSandbox = true,
                     enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,
                 ).await()
@@ -76,7 +76,7 @@ fun RootScreen(
             context.isConfigDefineInAssets() -> {
                 SmileID.initialize(
                     context = context,
-                    useSandbox = false,
+                    useSandbox = true,
                     enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,
                 ).await()

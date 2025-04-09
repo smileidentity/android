@@ -11,6 +11,15 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 /**
+ * This class represents security_info.json
+ */
+@JsonClass(generateAdapter = true)
+data class SecurityInfoRequest(
+    @Json(name = "timestamp") val timestamp: String,
+    @Json(name = "mac") val mac: String,
+)
+
+/**
  * This class represents info.json
  */
 @JsonClass(generateAdapter = true)
@@ -18,15 +27,6 @@ data class UploadRequest(
     @Json(name = "images") val images: List<UploadImageInfo>,
     @Json(name = "id_info") val idInfo: IdInfo? = null,
     @Json(name = "consent_information") val consentInformation: ConsentInformation? = null,
-)
-
-/**
- * This class represents security_info.json
- */
-@JsonClass(generateAdapter = true)
-data class SecurityInfo(
-    @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "mac") val mac: String,
 )
 
 @JsonClass(generateAdapter = true)
