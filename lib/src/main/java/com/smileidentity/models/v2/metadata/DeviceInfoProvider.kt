@@ -69,9 +69,8 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
             else -> {
                 // If orientation is unknown, default to rotation
                 when (rotation) {
-                    Surface.ROTATION_0 -> "Portrait"
+                    Surface.ROTATION_0, Surface.ROTATION_180 -> "Portrait"
                     Surface.ROTATION_90, Surface.ROTATION_270 -> "Landscape"
-                    Surface.ROTATION_180 -> "PortraitUpsideDown"
                     else -> "unknown"
                 }
             }
