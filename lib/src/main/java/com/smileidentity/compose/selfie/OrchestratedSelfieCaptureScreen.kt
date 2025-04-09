@@ -1,9 +1,7 @@
 package com.smileidentity.compose.selfie
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -13,30 +11,21 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
-import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.LocalMetadata
-import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
-import com.smileidentity.util.isNull
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -78,7 +67,7 @@ fun OrchestratedSelfieCaptureScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    Column (
+    Column(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
@@ -86,13 +75,30 @@ fun OrchestratedSelfieCaptureScreen(
             .fillMaxSize(),
     ) {
         Text("The count is ${uiState.counttt}")
-        SelfieCaptureScreen(
-            userId = userId,
-            jobId = jobId,
-            isEnroll = isEnroll,
-            allowAgentMode = allowAgentMode,
-            skipApiSubmission = skipApiSubmission,
-        )
+
+        Text("The usedMemInMB is ${uiState.usedMemInMB}")
+
+        Text("The maxHeapSizeInMB is ${uiState.maxHeapSizeInMB}")
+
+        Text("The availHeapSizeInMB is ${uiState.availHeapSizeInMB}")
+
+        val context = LocalContext.current
+        LaunchedEffect(viewModel) {
+            viewModel.juma(
+                bitmap = BitmapFactory.decodeResource(
+                    context.resources,
+                    R.drawable.batman,
+                ),
+            )
+        }
+
+        // SelfieCaptureScreen(
+        //     userId = userId,
+        //     jobId = jobId,
+        //     isEnroll = isEnroll,
+        //     allowAgentMode = allowAgentMode,
+        //     skipApiSubmission = skipApiSubmission,
+        // )
 
         // when {
         //     showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(

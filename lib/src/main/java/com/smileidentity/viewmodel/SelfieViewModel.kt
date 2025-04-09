@@ -1,7 +1,6 @@
 package com.smileidentity.viewmodel
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -85,6 +84,9 @@ data class SelfieUiState(
     val directive: SelfieDirective = SelfieDirective.InitialInstruction,
     val progress: Float = 0f,
     val counttt: Int = 0,
+    val usedMemInMB: Long = 0,
+    val maxHeapSizeInMB: Long = 0,
+    val availHeapSizeInMB: Long = 0,
     val selfieToConfirm: File? = null,
     val processingState: ProcessingState? = null,
     val errorMessage: StringResource = StringResource.ResId(R.string.si_processing_error_subtitle),
@@ -141,6 +143,12 @@ class SelfieViewModel(
 
     internal fun juma(bitmap: Bitmap) {
         repeat(100) {
+            // read memory usage here
+            val runtime = Runtime.getRuntime()
+            val usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L
+            val maxHeapSizeInMB = runtime.maxMemory() / 1048576L
+            val availHeapSizeInMB: Long = maxHeapSizeInMB - usedMemInMB
+
             selfieFile = createSelfieFile(randomJobId())
             Timber.d("Juma - Capturing selfie image to $selfieFile")
             val selfie = postProcessImageBitmap(
@@ -150,13 +158,29 @@ class SelfieViewModel(
                 resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
             )
             val total = SmileID.getUnsubmittedJobs().size
+
             Timber.d("Juma - the selfie file is $selfie")
             Timber.d("Juma - the selfie count is $total")
+            Timber.d("Juma - the usedMemInMB $usedMemInMB")
+            Timber.d("Juma - the maxHeapSizeInMB $maxHeapSizeInMB")
+            Timber.d("Juma - the availHeapSizeInMB $availHeapSizeInMB")
+
+            SmileIDCrashReporting.hub.addBreadcrumb("Juma - the selfie file is $selfie")
+            SmileIDCrashReporting.hub.addBreadcrumb("Juma - the selfie count is $total")
+            SmileIDCrashReporting.hub.addBreadcrumb("Juma - the usedMemInMB $usedMemInMB")
+            SmileIDCrashReporting.hub.addBreadcrumb("Juma - the maxHeapSizeInMB $maxHeapSizeInMB")
+            SmileIDCrashReporting.hub.addBreadcrumb("Juma - the availHeapSizeInMB $availHeapSizeInMB")
+
             _uiState.update {
                 it.copy(
                     counttt = total,
+                    usedMemInMB = usedMemInMB,
+                    maxHeapSizeInMB = maxHeapSizeInMB,
+                    availHeapSizeInMB = availHeapSizeInMB,
                 )
             }
+
+
         }
     }
 

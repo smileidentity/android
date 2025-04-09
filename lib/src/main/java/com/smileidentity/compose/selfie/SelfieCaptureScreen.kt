@@ -1,6 +1,5 @@
 package com.smileidentity.compose.selfie
 
-import android.graphics.BitmapFactory
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -19,7 +18,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -91,10 +88,7 @@ fun SelfieCaptureScreen(
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
     // Force maximum brightness in order to light up the user's face
     ForceBrightness()
-    val context = LocalContext.current
-    LaunchedEffect(viewModel) {
-        viewModel.juma(bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.batman))
-    }
+
 
     Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
