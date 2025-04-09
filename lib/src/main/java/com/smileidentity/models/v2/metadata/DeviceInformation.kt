@@ -82,3 +82,12 @@ internal val locale: String
             "unknown"
         }
     }
+
+/**
+ * Returns the system architecture of the device. If an error occurs, it returns "unknown".
+ */
+internal val systemArchitecture: String
+    get() {
+    val abis = Build.SUPPORTED_ABIS
+    return abis.firstOrNull() ?: "unknown"
+}

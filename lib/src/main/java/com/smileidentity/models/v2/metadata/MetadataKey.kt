@@ -25,6 +25,7 @@ enum class MetadataKey(val key: String) {
     SelfieImageOrigin("selfie_image_origin"),
     Sdk("sdk"),
     SdkVersion("sdk_version"),
+    SystemArchitecture("system_architecture"),
     Timezone("timezone"),
     VPNDetected("vpn"),
 }
