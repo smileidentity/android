@@ -29,6 +29,7 @@ object MetadataManager {
         addMetadata(MetadataKey.Fingerprint, SmileID.fingerprint)
         addMetadata(MetadataKey.DeviceModel, model)
         addMetadata(MetadataKey.DeviceOS, os)
+        addMetadata(MetadataKey.Timezone, timezone)
     }
 
     fun register(type: MetadataProvider.MetadataProviderType, provider: MetadataProvider) {
