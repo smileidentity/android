@@ -117,7 +117,7 @@ object SmileID {
     fun initialize(
         context: Context,
         config: Config = Config.fromAssets(context),
-        useSandbox: Boolean = true,
+        useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ): Deferred<Result<Unit>> {
