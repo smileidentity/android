@@ -6,7 +6,6 @@ import android.util.DisplayMetrics
 import android.view.WindowManager
 import android.view.WindowMetrics
 
-
 class DeviceInfoProvider(context: Context) : MetadataProvider {
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
