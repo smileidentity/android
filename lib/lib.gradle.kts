@@ -188,6 +188,10 @@ dependencies {
     androidTestImplementation(composeBom)
     lintChecks(libs.compose.lint.checks)
 
+    // Compose Destinations for Navigation
+    implementation(libs.compose.destinations)
+    ksp(libs.compose.destinations.ksp)
+
     // Material Design components (ColorScheme and Typography exposed, hence api vs implementation)
     api(libs.androidx.compose.material3)
     // Jetpack Compose UI
