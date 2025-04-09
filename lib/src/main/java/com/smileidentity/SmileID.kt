@@ -11,7 +11,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
-import com.smileidentity.SmileID.initialize
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
@@ -38,7 +37,7 @@ import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
-import com.smileidentity.security.interceptor.SmileIDSecurityInterceptor
+import com.smileidentity.security.interceptor.SmileSecurityInterceptor
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
@@ -443,7 +442,7 @@ object SmileID {
         writeTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
         addInterceptor(interceptor = SmileHeaderAuthInterceptor)
-        addInterceptor(interceptor = SmileIDSecurityInterceptor)
+        addInterceptor(interceptor = SmileSecurityInterceptor)
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
