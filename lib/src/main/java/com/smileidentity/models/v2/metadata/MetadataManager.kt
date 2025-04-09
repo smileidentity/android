@@ -30,6 +30,7 @@ object MetadataManager {
         addMetadata(MetadataKey.DeviceModel, model)
         addMetadata(MetadataKey.DeviceOS, os)
         addMetadata(MetadataKey.Timezone, timezone)
+        addMetadata(MetadataKey.Locale, locale)
     }
 
     fun register(type: MetadataProvider.MetadataProviderType, provider: MetadataProvider) {

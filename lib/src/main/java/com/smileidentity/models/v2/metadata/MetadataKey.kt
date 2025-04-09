@@ -15,6 +15,7 @@ enum class MetadataKey(val key: String) {
     DocumentFrontCaptureDuration("document_front_capture_duration_ms"),
     DocumentFrontImageOrigin("document_front_image_origin"),
     Fingerprint("fingerprint"),
+    Locale("locale"),
     NetworkConnection("network_connection"),
     ProxyDetected("proxy"),
     SelfieCaptureDuration("selfie_capture_duration_ms"),
