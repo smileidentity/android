@@ -65,6 +65,7 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.TensorImage
 import retrofit2.HttpException
@@ -129,6 +130,14 @@ data class SmartSelfieV2UiState(
     val leftProgress: Float = 0F,
     val selfieFile: File? = null,
     val selfieState: SelfieState = SelfieState.Analyzing(SearchingForFace),
+)
+
+@Serializable
+data class SmartSelfieParams(
+    val userId: String,
+    val isEnroll: Boolean,
+    val allowNewEnroll: Boolean? = null,
+    val skipApiSubmission: Boolean,
 )
 
 @kotlin.OptIn(FlowPreview::class)

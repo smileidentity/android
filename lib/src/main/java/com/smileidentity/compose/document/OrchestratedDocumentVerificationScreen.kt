@@ -21,7 +21,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
-import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
@@ -53,21 +52,21 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
         if (useStrictMode) {
             val context = LocalContext.current
             val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-            OrchestratedSelfieCaptureScreenEnhanced(
-                userId = userId,
-                allowNewEnroll = false,
-                showInstructions = showInstructions,
-                isEnroll = false,
-                showAttribution = showAttribution,
-                selfieQualityModel = selfieQualityModel,
-                skipApiSubmission = true,
-                onResult = { result ->
-                    when (result) {
-                        is SmileIDResult.Error -> viewModel.onError(result.throwable)
-                        is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(result)
-                    }
-                },
-            )
+            // OrchestratedSelfieCaptureScreenEnhanced(
+            //     userId = userId,
+            //     allowNewEnroll = false,
+            //     showInstructions = showInstructions,
+            //     isEnroll = false,
+            //     showAttribution = showAttribution,
+            //     selfieQualityModel = selfieQualityModel,
+            //     skipApiSubmission = true,
+            //     onResult = { result ->
+            //         when (result) {
+            //             is SmileIDResult.Error -> viewModel.onError(result.throwable)
+            //             is SmileIDResult.Success -> viewModel.onSelfieCaptureSuccess(result)
+            //         }
+            //     },
+            // )
         } else {
             OrchestratedSelfieCaptureScreen(
                 userId = userId,

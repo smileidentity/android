@@ -33,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
@@ -65,7 +63,6 @@ import com.smileidentity.compose.components.CameraPermissionButton
 import com.smileidentity.compose.components.DirectiveHaptics
 import com.smileidentity.compose.components.DirectiveVisual
 import com.smileidentity.compose.components.ForceBrightness
-import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
@@ -73,11 +70,10 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.compose.selfie.enhanced.composables.EnhancedSelfieCaptureInstructionScreen
 import com.smileidentity.compose.selfie.enhanced.graph.EnhancedSelfieGraph
-import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.randomUserId
 import com.smileidentity.util.toast
 import com.smileidentity.viewmodel.MAX_FACE_AREA_THRESHOLD
 import com.smileidentity.viewmodel.SelfieHint
@@ -92,8 +88,6 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
 
 /**
  * Orchestrates the Enhanced Selfie Capture Flow. Requests permissions, sets brightness, handles
@@ -116,31 +110,13 @@ import kotlinx.collections.immutable.persistentMapOf
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun OrchestratedSelfieCaptureScreenEnhanced(
-    userId: String,
-    isEnroll: Boolean,
-    selfieQualityModel: SelfieQualityModel,
-    onResult: SmileIDCallback<SmartSelfieResult>,
     modifier: Modifier = Modifier,
-    showAttribution: Boolean = true,
-    showInstructions: Boolean = true,
+    userId: String = randomUserId(),
     allowNewEnroll: Boolean? = null,
-    extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    skipApiSubmission: Boolean = false,
-    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
-    viewModel: SmartSelfieEnhancedViewModel = viewModel(
-        initializer = {
-            SmartSelfieEnhancedViewModel(
-                userId = userId,
-                isEnroll = isEnroll,
-                allowNewEnroll = allowNewEnroll,
-                extraPartnerParams = extraPartnerParams,
-                selfieQualityModel = selfieQualityModel,
-                skipApiSubmission = skipApiSubmission,
-                metadata = metadata,
-                onResult = onResult,
-            )
-        },
-    ),
+    showInstructions: Boolean = true,
+    showAttribution: Boolean = true,
+    onResult: SmileIDCallback<SmartSelfieResult> = {},
+    viewModel: SmartSelfieEnhancedViewModel = injectedViewModel(),
 ) {
     BackHandler { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) }
     val context = LocalContext.current

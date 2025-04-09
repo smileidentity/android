@@ -10,18 +10,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.OrchestratedSelfieCaptureScreenEnhancedDestination
+import com.ramcosta.composedestinations.navigation.dependency
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.SmileThemeSurface
-import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typographyV2
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomUserId
+import com.smileidentity.viewmodel.SmartSelfieEnhancedViewModel
+import com.smileidentity.viewmodel.createSmileViewModel
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -61,27 +65,45 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
         val navController = rememberNavController()
+
         DestinationsNavHost(
             navController = navController,
-            navGraph = NavGraphs.enhancedSelfie(
-                userId = userId,
-                isEnroll = true,
-            ),
+            navGraph = NavGraphs.enhancedSelfie,
             start = OrchestratedSelfieCaptureScreenEnhancedDestination(
                 userId = userId,
                 allowNewEnroll = allowNewEnroll,
                 showInstructions = showInstructions,
-                isEnroll = true,
                 showAttribution = showAttribution,
-                skipApiSubmission = skipApiSubmission,
             ),
             dependenciesContainerBuilder = {
-
+                dependency(
+                    createSmileViewModel<SmartSelfieEnhancedViewModel>(
+                        navController = navController,
+                        navGraphRoute = NavGraphs.enhancedSelfie.route,
+                        navBackStackEntry = navBackStackEntry,
+                    ) { parentEntry ->
+                        SmartSelfieEnhancedViewModel(
+                            userId = userId,
+                            isEnroll = true,
+                            selfieQualityModel = selfieQualityModel,
+                            metadata = mutableListOf(),
+                            allowNewEnroll = allowNewEnroll,
+                            skipApiSubmission = skipApiSubmission,
+                            extraPartnerParams = extraPartnerParams,
+                            faceDetector = FaceDetection.getClient(
+                                FaceDetectorOptions.Builder().apply {
+                                    setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                                    setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+                                    setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+                                    setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+                                }.build(),
+                            ),
+                            onResult = onResult,
+                        )
+                    },
+                )
             },
-        ) {
-
-        }
-
+        )
     }
 }
 
@@ -120,17 +142,17 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        OrchestratedSelfieCaptureScreenEnhanced(
-            modifier = modifier,
-            userId = userId,
-            isEnroll = false,
-            allowNewEnroll = allowNewEnroll,
-            showAttribution = showAttribution,
-            showInstructions = showInstructions,
-            skipApiSubmission = skipApiSubmission,
-            selfieQualityModel = selfieQualityModel,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+        // OrchestratedSelfieCaptureScreenEnhanced(
+        //     modifier = modifier,
+        //     userId = userId,
+        //     isEnroll = false,
+        //     allowNewEnroll = allowNewEnroll,
+        //     showAttribution = showAttribution,
+        //     showInstructions = showInstructions,
+        //     skipApiSubmission = skipApiSubmission,
+        //     selfieQualityModel = selfieQualityModel,
+        //     extraPartnerParams = extraPartnerParams,
+        //     onResult = onResult,
+        // )
     }
 }
