@@ -156,21 +156,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 consentInformation = consentInformation,
             )
 
-            // val timestamp = getCurrentIsoTimestamp()
-            // val mac = SmileIDCryptoManager.shared.sign(
-            //     timestamp = timestamp,
-            //     files = listOfNotNull(
-            //         frontImageInfo,
-            //         backImageInfo,
-            //         selfieImageInfo,
-            //     ) + livenessImageInfo,
-            // )
-            //
-            // createSecurityInfoFile(
-            //     jobId = jobId,
-            //     securityInfo = SecurityInfo(timestamp = timestamp, mac = mac),
-            // )
-
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
