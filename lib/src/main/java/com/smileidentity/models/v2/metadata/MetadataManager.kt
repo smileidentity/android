@@ -9,6 +9,7 @@ interface MetadataProvider {
     enum class MetadataProviderType {
         Network,
         CarrierInfo,
+        DeviceInfo,
     }
 }
 

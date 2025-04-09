@@ -18,6 +18,7 @@ enum class MetadataKey(val key: String) {
     Locale("locale"),
     NetworkConnection("network_connection"),
     ProxyDetected("proxy"),
+    ScreenResolution("screen_resolution"),
     SelfieCaptureDuration("selfie_capture_duration_ms"),
     SelfieImageOrigin("selfie_image_origin"),
     Sdk("sdk"),
