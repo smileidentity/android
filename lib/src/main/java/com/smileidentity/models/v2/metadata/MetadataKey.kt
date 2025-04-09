@@ -7,6 +7,7 @@ enum class MetadataKey(val key: String) {
     CarrierInfo("carrier_info"),
     ClientIP("client_ip"),
     DeviceModel("device_model"),
+    DeviceOrientation("device_orientation"),
     DeviceOS("device_os"),
     DocumentBackCaptureRetries("document_back_capture_retries"),
     DocumentBackCaptureDuration("document_back_capture_duration_ms"),

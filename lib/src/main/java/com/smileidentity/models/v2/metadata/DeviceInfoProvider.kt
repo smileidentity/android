@@ -2,16 +2,19 @@ package com.smileidentity.models.v2.metadata
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.util.DisplayMetrics
+import android.view.Surface
 import android.view.WindowManager
 import android.view.WindowMetrics
 
-class DeviceInfoProvider(context: Context) : MetadataProvider {
+class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+    private val configuration = context.resources.configuration
 
     private fun getScreenResolution(): String {
         windowManager?.let {
@@ -35,7 +38,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider {
     }
 
     private fun getTotalMemoryInMB(): String {
-        activityManager?.let{
+        activityManager?.let {
             val memoryInfo = ActivityManager.MemoryInfo()
             activityManager.getMemoryInfo(memoryInfo)
 
@@ -45,12 +48,44 @@ class DeviceInfoProvider(context: Context) : MetadataProvider {
         return "unknown"
     }
 
+    private fun getDeviceOrientation(): String {
+        val rotation: Int? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // API 30+: use context.display
+            context.display.rotation
+        } else {
+            // Below API 30: use defaultDisplay
+            @Suppress("DEPRECATION")
+            windowManager?.defaultDisplay?.rotation
+        }
+        val orientation = configuration.orientation
+
+        return when (orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> {
+                "Portrait"
+            }
+            Configuration.ORIENTATION_LANDSCAPE -> {
+                "Landscape"
+            }
+            else -> {
+                // If orientation is unknown, default to rotation
+                when (rotation) {
+                    Surface.ROTATION_0 -> "Portrait"
+                    Surface.ROTATION_90, Surface.ROTATION_270 -> "Landscape"
+                    Surface.ROTATION_180 -> "PortraitUpsideDown"
+                    else -> "unknown"
+                }
+            }
+        }
+    }
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
+        val deviceOrientation = getDeviceOrientation()
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
+            MetadataKey.DeviceOrientation to deviceOrientation,
         )
     }
 }
