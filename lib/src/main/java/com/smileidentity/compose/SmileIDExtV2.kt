@@ -9,6 +9,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.rememberNavController
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.OrchestratedSelfieCaptureScreenEnhancedDestination
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
@@ -56,18 +60,28 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        OrchestratedSelfieCaptureScreenEnhanced(
-            modifier = modifier,
-            userId = userId,
-            allowNewEnroll = allowNewEnroll,
-            showInstructions = showInstructions,
-            isEnroll = true,
-            showAttribution = showAttribution,
-            skipApiSubmission = skipApiSubmission,
-            selfieQualityModel = selfieQualityModel,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
+        val navController = rememberNavController()
+        DestinationsNavHost(
+            navController = navController,
+            navGraph = NavGraphs.enhancedSelfie(
+                userId = userId,
+                isEnroll = true,
+            ),
+            start = OrchestratedSelfieCaptureScreenEnhancedDestination(
+                userId = userId,
+                allowNewEnroll = allowNewEnroll,
+                showInstructions = showInstructions,
+                isEnroll = true,
+                showAttribution = showAttribution,
+                skipApiSubmission = skipApiSubmission,
+            ),
+            dependenciesContainerBuilder = {
+
+            },
+        ) {
+
+        }
+
     }
 }
 

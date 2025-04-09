@@ -58,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.ramcosta.composedestinations.annotation.Destination
 import com.smileidentity.R
 import com.smileidentity.compose.components.BottomPinnedColumn
 import com.smileidentity.compose.components.CameraPermissionButton
@@ -70,6 +71,8 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.compose.selfie.enhanced.composables.EnhancedSelfieCaptureInstructionScreen
+import com.smileidentity.compose.selfie.enhanced.graph.EnhancedSelfieGraph
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
@@ -93,8 +96,8 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
 /**
- * Orchestrates the Selfie Capture Flow. Requests permissions, sets brightness, handles back press,
- * shows the view, and handling the viewmodel.
+ * Orchestrates the Enhanced Selfie Capture Flow. Requests permissions, sets brightness, handles
+ * back press, shows the view, and handling the viewmodel.
  *
  * @param userId The user ID to associate with the selfie capture
  * @param isEnroll Whether this selfie capture is for enrollment
@@ -107,9 +110,12 @@ import kotlinx.collections.immutable.persistentMapOf
  * @param extraPartnerParams Extra partner_params to send to the API
  * @param viewModel The viewmodel to use for te selfie capture (should not be explicitly passed in)
  */
+@Destination<EnhancedSelfieGraph>(
+    start = true,
+)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun OrchestratedSelfieCaptureScreenEnhanced(
+internal fun OrchestratedSelfieCaptureScreenEnhanced(
     userId: String,
     isEnroll: Boolean,
     selfieQualityModel: SelfieQualityModel,
@@ -168,7 +174,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
         val camSelector by rememberCamSelector(CamSelector.Front)
 
         when {
-            showInstructions && !acknowledgedInstructions -> SelfieCaptureInstructionScreenEnhanced(
+            showInstructions && !acknowledgedInstructions -> EnhancedSelfieCaptureInstructionScreen(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 acknowledgedInstructions = true
@@ -211,7 +217,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
  * attribution, and agent mode switch.
  * This composable relies on the caller to make camera changes and perform image analysis.
  *
- * @param selfieState The state of the selfie capture
+ * @param state The state of the selfie capture
  * @param onRetry The callback to invoke when the user wants to retry on error
  * @param onResult The callback to invoke when the selfie capture is complete
  * @param cameraPreview The composable slot to display the camera preview

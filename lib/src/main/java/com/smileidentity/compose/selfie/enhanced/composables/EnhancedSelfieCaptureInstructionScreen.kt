@@ -1,4 +1,4 @@
-package com.smileidentity.compose.selfie.enhanced
+package com.smileidentity.compose.selfie.enhanced.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +28,15 @@ import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
+/**
+ * The Enhanced Selfie Capture Instruction Screen. This screen is responsible for displaying the
+ * instructions to the user based on the current selfie state.
+ * @param modifier The modifier to apply to this composable
+ * @param showAttribution Whether to show the SmileID attribution
+ * @param onInstructionsAcknowledged Callback Invoked when instructions are acknowledged
+ */
 @Composable
-fun SelfieCaptureInstructionScreenEnhanced(
+fun EnhancedSelfieCaptureInstructionScreen(
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
     onInstructionsAcknowledged: () -> Unit = { },
@@ -89,10 +96,10 @@ fun SelfieCaptureInstructionScreenEnhanced(
 
 @SmilePreviews
 @Composable
-private fun SelfieCaptureInstructionScreenEnhancedPreview() {
+private fun EnhancedSelfieCaptureInstructionScreenPreview() {
     Preview {
         Column {
-            SelfieCaptureInstructionScreenEnhanced(
+            EnhancedSelfieCaptureInstructionScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Gray),
