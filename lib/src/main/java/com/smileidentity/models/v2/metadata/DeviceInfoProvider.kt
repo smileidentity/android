@@ -1,5 +1,6 @@
 package com.smileidentity.models.v2.metadata
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.util.DisplayMetrics
@@ -9,6 +10,8 @@ import android.view.WindowMetrics
 class DeviceInfoProvider(context: Context) : MetadataProvider {
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
+    private val activityManager =
+        context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
 
     private fun getScreenResolution(): String {
         windowManager?.let {
@@ -31,8 +34,23 @@ class DeviceInfoProvider(context: Context) : MetadataProvider {
         return "unknown"
     }
 
+    private fun getTotalMemoryInMB(): String {
+        activityManager?.let{
+            val memoryInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memoryInfo)
+
+            val totalMemoryInMB = memoryInfo.totalMem / (1024 * 1024)
+            return "$totalMemoryInMB"
+        }
+        return "unknown"
+    }
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         val screenResolution = getScreenResolution()
-        return mapOf(MetadataKey.ScreenResolution to screenResolution)
+        val totalMemory = getTotalMemoryInMB()
+        return mapOf(
+            MetadataKey.ScreenResolution to screenResolution,
+            MetadataKey.MemoryInfo to totalMemory,
+        )
     }
 }

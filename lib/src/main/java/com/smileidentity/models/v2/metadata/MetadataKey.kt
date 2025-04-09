@@ -16,6 +16,7 @@ enum class MetadataKey(val key: String) {
     DocumentFrontImageOrigin("document_front_image_origin"),
     Fingerprint("fingerprint"),
     Locale("locale"),
+    MemoryInfo("memory_info"),
     NetworkConnection("network_connection"),
     ProxyDetected("proxy"),
     ScreenResolution("screen_resolution"),
