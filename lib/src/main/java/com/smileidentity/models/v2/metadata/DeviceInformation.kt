@@ -88,6 +88,6 @@ internal val locale: String
  */
 internal val systemArchitecture: String
     get() {
-    val abis = Build.SUPPORTED_ABIS
-    return abis.firstOrNull() ?: "unknown"
-}
+        val abis = Build.SUPPORTED_ABIS
+        return abis.firstOrNull() ?: "unknown"
+    }
