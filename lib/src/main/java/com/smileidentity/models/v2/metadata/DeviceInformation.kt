@@ -88,6 +88,9 @@ internal val locale: String
  */
 internal val systemArchitecture: String
     get() {
-        val abis = Build.SUPPORTED_ABIS
-        return abis.firstOrNull() ?: "unknown"
+        return try {
+            Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"
+        } catch (e: Throwable) {
+            "unknown"
+        }
     }
