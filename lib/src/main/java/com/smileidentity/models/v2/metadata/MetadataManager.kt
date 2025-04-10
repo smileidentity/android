@@ -12,6 +12,7 @@ interface MetadataProvider {
         Network,
         CarrierInfo,
         DeviceInfo,
+        ApplicationInfo,
     }
 }
 
