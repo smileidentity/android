@@ -8,6 +8,7 @@ import android.util.DisplayMetrics
 import android.view.Surface
 import android.view.WindowManager
 import android.view.WindowMetrics
+import org.json.JSONArray
 
 class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     private val windowManager =
@@ -15,6 +16,7 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
     private val configuration = context.resources.configuration
+    private val orientations: MutableList<String> = mutableListOf()
 
     private fun getScreenResolution(): String {
         windowManager?.let {
@@ -46,6 +48,10 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
             return "$totalMemoryInMB"
         }
         return "unknown"
+    }
+
+    fun recordDeviceOrientation() {
+        orientations.add(getDeviceOrientation())
     }
 
     private fun getDeviceOrientation(): String {
@@ -80,11 +86,11 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     override fun collectMetadata(): Map<MetadataKey, Any> {
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
-        val deviceOrientation = getDeviceOrientation()
+        val jsonArray = JSONArray(orientations)
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
-            MetadataKey.DeviceOrientation to deviceOrientation,
+            MetadataKey.DeviceOrientation to jsonArray,
         )
     }
 }
