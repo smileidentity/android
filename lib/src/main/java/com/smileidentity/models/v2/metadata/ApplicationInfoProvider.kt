@@ -1,6 +1,5 @@
 package com.smileidentity.models.v2.metadata
 
-
 import android.content.Context
 
 class ApplicationInfoProvider(context: Context) : MetadataProvider {
