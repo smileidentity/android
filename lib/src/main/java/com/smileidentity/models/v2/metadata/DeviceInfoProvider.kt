@@ -3,6 +3,7 @@ package com.smileidentity.models.v2.metadata
 import android.app.ActivityManager
 import android.content.Context
 import android.content.res.Configuration
+import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.Surface
@@ -15,6 +16,7 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+    private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager?
     private val configuration = context.resources.configuration
     private val orientations: MutableList<String> = mutableListOf()
 
@@ -83,14 +85,25 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         }
     }
 
+    private fun getNumberOfCameras(): String {
+        return try {
+            val numberOfCameras = cameraManager?.cameraIdList?.size
+            numberOfCameras.toString()
+        } catch (e: Exception) {
+            "unknown"
+        }
+    }
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
         val jsonArray = JSONArray(orientations)
+        val numberOfCameras = getNumberOfCameras()
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
             MetadataKey.DeviceOrientation to jsonArray,
+            MetadataKey.NumberOfCameras to numberOfCameras,
         )
     }
 }
