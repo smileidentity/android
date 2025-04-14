@@ -159,8 +159,10 @@ fun DocumentCaptureScreen(
             val hasRecordedOrientation = remember { mutableStateOf(false) }
             LaunchedEffect(Unit) {
                 if (!hasRecordedOrientation.value) {
-                    (MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                        as? DeviceInfoProvider)?.recordDeviceOrientation()
+                    (
+                        MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                            as? DeviceInfoProvider
+                        )?.recordDeviceOrientation()
                     hasRecordedOrientation.value = true
                 }
             }
@@ -205,8 +207,10 @@ fun DocumentCaptureScreen(
             val hasRecordedOrientation = remember { mutableStateOf(false) }
             LaunchedEffect(Unit) {
                 if (!hasRecordedOrientation.value) {
-                    (MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                        as? DeviceInfoProvider)?.recordDeviceOrientation()
+                    (
+                        MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                            as? DeviceInfoProvider
+                        )?.recordDeviceOrientation()
                     hasRecordedOrientation.value = true
                 }
             }
