@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -154,6 +155,8 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
     ForceBrightness()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
+    val hasRecordedOrientationAtCaptureStart = remember { mutableStateOf(false) }
+    val hasRecordedOrientationAtCaptureEnd = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -173,15 +176,14 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
             }
 
             else -> {
-                val hasRecordedOrientation = remember { mutableStateOf(false) }
                 LaunchedEffect(Unit) {
-                    if (!hasRecordedOrientation.value) {
+                    if (!hasRecordedOrientationAtCaptureStart.value) {
                         (
                             MetadataManager.providers[
                                 MetadataProvider.MetadataProviderType.DeviceInfo,
                             ] as? DeviceInfoProvider
                             )?.recordDeviceOrientation()
-                        hasRecordedOrientation.value = true
+                        hasRecordedOrientationAtCaptureStart.value = true
                     }
                 }
                 val screen = SmartSelfieEnhancedScreen(
@@ -190,6 +192,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                     modifier = modifier,
                     onRetry = viewModel::onRetry,
                     onResult = onResult,
+                    hasRecordedOrientationAtCaptureEnd = hasRecordedOrientationAtCaptureEnd,
                     cameraPreview = {
                         CameraPreview(
                             cameraState = cameraState,
@@ -236,6 +239,7 @@ private fun SmartSelfieEnhancedScreen(
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
     cameraPreview: @Composable (BoxScope.() -> Unit),
+    hasRecordedOrientationAtCaptureEnd: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
 ) {
@@ -341,16 +345,15 @@ private fun SmartSelfieEnhancedScreen(
                                     modifier = Modifier
                                         .align(Alignment.Center),
                                 )
-                                val hasRecordedOrientation = remember { mutableStateOf(false) }
                                 LaunchedEffect(Unit) {
-                                    if (!hasRecordedOrientation.value) {
+                                    if (!hasRecordedOrientationAtCaptureEnd.value) {
                                         (
                                             MetadataManager.providers[
                                                 MetadataProvider.MetadataProviderType.DeviceInfo,
                                             ]
                                                 as? DeviceInfoProvider
                                             )?.recordDeviceOrientation()
-                                        hasRecordedOrientation.value = true
+                                        hasRecordedOrientationAtCaptureEnd.value = true
                                     }
                                 }
                                 onResult(

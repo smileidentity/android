@@ -70,6 +70,8 @@ fun OrchestratedSelfieCaptureScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
+    val hasRecordedOrientationAtCaptureStart = remember { mutableStateOf(false) }
+    val hasRecordedOrientationAtCaptureEnd = remember { mutableStateOf(false) }
     Box(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background)
@@ -106,15 +108,14 @@ fun OrchestratedSelfieCaptureScreen(
             )
 
             uiState.selfieToConfirm != null -> {
-                val hasRecordedOrientation = remember { mutableStateOf(false) }
                 LaunchedEffect(Unit) {
-                    if (!hasRecordedOrientation.value) {
+                    if (!hasRecordedOrientationAtCaptureEnd.value) {
                         (
                             MetadataManager.providers[
                                 MetadataProvider.MetadataProviderType.DeviceInfo,
                             ] as? DeviceInfoProvider
                             )?.recordDeviceOrientation()
-                        hasRecordedOrientation.value = true
+                        hasRecordedOrientationAtCaptureEnd.value = true
                     }
                 }
                 val screen = ImageCaptureConfirmationDialog(
@@ -133,22 +134,30 @@ fun OrchestratedSelfieCaptureScreen(
                     retakeButtonText = stringResource(
                         R.string.si_smart_selfie_confirmation_dialog_retake_button,
                     ),
-                    onRetake = viewModel::onSelfieRejected,
+                    onRetake = {
+                        hasRecordedOrientationAtCaptureStart.value = false
+                        hasRecordedOrientationAtCaptureEnd.value = false
+                        (
+                            MetadataManager.providers[
+                                MetadataProvider.MetadataProviderType.DeviceInfo
+                            ] as? DeviceInfoProvider
+                            )?.clearDeviceOrientation()
+                        viewModel.onSelfieRejected()
+                    },
                     scaleFactor = 1.25f,
                 )
                 return screen
             }
 
             else -> {
-                val hasRecordedOrientation = remember { mutableStateOf(false) }
                 LaunchedEffect(Unit) {
-                    if (!hasRecordedOrientation.value) {
+                    if (!hasRecordedOrientationAtCaptureStart.value) {
                         (
                             MetadataManager.providers[
                                 MetadataProvider.MetadataProviderType.DeviceInfo,
                             ] as? DeviceInfoProvider
                             )?.recordDeviceOrientation()
-                        hasRecordedOrientation.value = true
+                        hasRecordedOrientationAtCaptureStart.value = true
                     }
                 }
                 val screen = SelfieCaptureScreen(

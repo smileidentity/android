@@ -54,6 +54,10 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         orientations.add(getDeviceOrientation())
     }
 
+    fun clearDeviceOrientation() {
+        orientations.clear()
+    }
+
     private fun getDeviceOrientation(): String {
         val rotation: Int? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // API 30+: use context.display
