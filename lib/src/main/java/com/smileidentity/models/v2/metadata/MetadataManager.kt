@@ -9,6 +9,7 @@ interface MetadataProvider {
     enum class MetadataProviderType {
         Network,
         CarrierInfo,
+        DeviceInfo,
     }
 }
 
@@ -29,6 +30,9 @@ object MetadataManager {
         addMetadata(MetadataKey.Fingerprint, SmileID.fingerprint)
         addMetadata(MetadataKey.DeviceModel, model)
         addMetadata(MetadataKey.DeviceOS, os)
+        addMetadata(MetadataKey.Timezone, timezone)
+        addMetadata(MetadataKey.Locale, locale)
+        addMetadata(MetadataKey.SystemArchitecture, systemArchitecture)
     }
 
     fun register(type: MetadataProvider.MetadataProviderType, provider: MetadataProvider) {

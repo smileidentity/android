@@ -18,6 +18,7 @@ import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.v2.metadata.CarrierInfoProvider
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
@@ -166,6 +167,12 @@ object SmileID {
         MetadataManager.register(
             MetadataProvider.MetadataProviderType.CarrierInfo,
             carrierInfoProvider,
+        )
+
+        val deviceInfoProvider = DeviceInfoProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.DeviceInfo,
+            deviceInfoProvider,
         )
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())

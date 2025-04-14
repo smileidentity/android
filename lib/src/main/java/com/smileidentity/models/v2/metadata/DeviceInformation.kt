@@ -2,6 +2,8 @@ package com.smileidentity.models.v2.metadata
 
 import android.os.Build
 import com.smileidentity.SmileIDCrashReporting
+import java.util.Locale
+import java.util.TimeZone
 import timber.log.Timber
 
 private val isEmulator: Boolean
@@ -60,3 +62,35 @@ val model: String
  */
 internal val os: String
     get() = "Android API ${Build.VERSION.SDK_INT}"
+
+/**
+ * Returns the timezone of the device.
+ */
+internal val timezone: String
+    get() = TimeZone.getDefault().id
+
+/**
+ * Returns the locale of the device in the format "language_country". If an error occurs, it returns
+ * "unknown".
+ */
+internal val locale: String
+    get() {
+        return try {
+            val locale = Locale.getDefault()
+            "${locale.language}_${locale.country}"
+        } catch (e: Exception) {
+            "unknown"
+        }
+    }
+
+/**
+ * Returns the system architecture of the device. If an error occurs, it returns "unknown".
+ */
+internal val systemArchitecture: String
+    get() {
+        return try {
+            Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"
+        } catch (e: Throwable) {
+            "unknown"
+        }
+    }
