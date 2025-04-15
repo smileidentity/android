@@ -16,6 +16,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
@@ -90,6 +91,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
+    private var networkRetries = 0
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
@@ -271,6 +273,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             )
         }
 
+        networkRetries = 0
+        MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
+
         saveResult(
             selfieImage = selfieFileResult,
             documentFrontFile = documentFrontFileResult,
@@ -354,6 +359,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         step?.let { stepToRetry ->
             _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
+                networkRetries++
+                MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
                 submitJob()
             }
         }

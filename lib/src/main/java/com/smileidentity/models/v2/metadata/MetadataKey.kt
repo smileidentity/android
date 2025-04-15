@@ -21,6 +21,7 @@ enum class MetadataKey(val key: String) {
     LocalTimeOfEnrolment("local_time_of_enrolment"),
     MemoryInfo("memory_info"),
     NetworkConnection("network_connection"),
+    NetworkRetries("network_retries"),
     NumberOfCameras("number_of_cameras"),
     ProximitySensor("proximity_sensor"),
     ProxyDetected("proxy"),

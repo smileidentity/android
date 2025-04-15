@@ -9,6 +9,7 @@ import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.EnhancedKycRequest
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
@@ -42,6 +43,7 @@ class EnhancedKycViewModel : ViewModel() {
     private lateinit var idInfo: IdInfo
     private lateinit var consentInformation: ConsentInformation
     private var result: SmileIDResult<EnhancedKycResult>? = null
+    private var networkRetries = 0
 
     fun onIdInfoReceived(idInfo: IdInfo, consentInformation: ConsentInformation) {
         this.idInfo = idInfo
@@ -86,12 +88,16 @@ class EnhancedKycViewModel : ViewModel() {
                 metadata = metadata,
             )
             val response = SmileID.api.doEnhancedKyc(enhancedKycRequest)
+            networkRetries = 0
+            MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
             result = SmileIDResult.Success(EnhancedKycResult(enhancedKycRequest, response))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
         }
     }
 
     fun onRetry() {
+        networkRetries++
+        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
         doEnhancedKyc()
     }
 

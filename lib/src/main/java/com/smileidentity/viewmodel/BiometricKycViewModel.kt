@@ -14,6 +14,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
@@ -73,6 +74,7 @@ class BiometricKycViewModel(
     private var result: SmileIDResult<BiometricKycResult>? = null
     private var selfieFile: File? = null
     private var livenessFiles: List<File>? = null
+    private var networkRetries = 0
 
     fun onSelfieCaptured(selfieFile: File, livenessFiles: List<File>) {
         this.selfieFile = selfieFile
@@ -231,6 +233,8 @@ class BiometricKycViewModel(
                     },
                 )
             }
+            networkRetries = 0
+            MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
             result = SmileIDResult.Success(
                 BiometricKycResult(
                     selfieFile = selfieFileResult,
@@ -255,6 +259,8 @@ class BiometricKycViewModel(
             // Set processing state to null to redirect back to selfie capture
             _uiState.update { it.copy(processingState = null) }
         } else {
+            networkRetries++
+            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
             submitJob(selfieFile!!, livenessFiles!!)
         }
     }
