@@ -2,6 +2,8 @@ package com.smileidentity.models.v2.metadata
 
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
+import com.smileidentity.util.getCurrentIsoTimestamp
+import java.util.TimeZone
 
 interface MetadataProvider {
     fun collectMetadata(): Map<MetadataKey, Any>
@@ -10,6 +12,7 @@ interface MetadataProvider {
         Network,
         CarrierInfo,
         DeviceInfo,
+        ApplicationInfo,
     }
 }
 
@@ -33,6 +36,7 @@ object MetadataManager {
         addMetadata(MetadataKey.Timezone, timezone)
         addMetadata(MetadataKey.Locale, locale)
         addMetadata(MetadataKey.SystemArchitecture, systemArchitecture)
+        addMetadata(MetadataKey.LocalTimeOfEnrolment, getCurrentIsoTimestamp(TimeZone.getDefault()))
     }
 
     fun register(type: MetadataProvider.MetadataProviderType, provider: MetadataProvider) {

@@ -177,6 +177,7 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var retryCount = 0
 
     init {
         startStrictModeTimerIfNecessary()
@@ -442,6 +443,14 @@ class SmartSelfieEnhancedViewModel(
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
+
+            MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.HeadPose.value)
+            MetadataManager.addMetadata(
+                MetadataKey.SelfieCaptureDuration,
+                metadataTimerStart.elapsedNow().inWholeMilliseconds,
+            )
+            MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, retryCount.toString())
+
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
                 return@addOnSuccessListener
@@ -522,11 +531,6 @@ class SmartSelfieEnhancedViewModel(
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
-        MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.HeadPose.value)
-        MetadataManager.addMetadata(
-            MetadataKey.SelfieCaptureDuration,
-            metadataTimerStart.elapsedNow().inWholeMilliseconds,
-        )
         val metadata = MetadataManager.collectAllMetadata()
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(
@@ -562,6 +566,7 @@ class SmartSelfieEnhancedViewModel(
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
+        retryCount++
         shouldAnalyzeImages = true
     }
 
