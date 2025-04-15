@@ -34,4 +34,6 @@ enum class MetadataKey(val key: String) {
     SystemArchitecture("system_architecture"),
     Timezone("timezone"),
     VPNDetected("vpn"),
+    WrapperName("wrapper_name"),
+    WrapperVersion("wrapper_version"),
 }
