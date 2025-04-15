@@ -9,7 +9,7 @@ class ApplicationInfoProvider(context: Context) : MetadataProvider {
     private fun getHostApplicationInfo(): String {
         return try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
-            packageInfo?.let{
+            packageInfo?.let {
                 val applicationInfo = packageInfo.applicationInfo
                 applicationInfo?.let {
                     val appName = packageManager.getApplicationLabel(applicationInfo).toString()
