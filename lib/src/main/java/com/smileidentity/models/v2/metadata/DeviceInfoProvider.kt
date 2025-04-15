@@ -3,6 +3,8 @@ package com.smileidentity.models.v2.metadata
 import android.app.ActivityManager
 import android.content.Context
 import android.content.res.Configuration
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.DisplayMetrics
@@ -17,6 +19,7 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
     private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager?
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
     private val configuration = context.resources.configuration
     private val orientations: MutableList<String> = mutableListOf()
 
@@ -94,16 +97,26 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         }
     }
 
+    private fun hasProximitySensor(): Boolean {
+        val proximitySensor: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+        proximitySensor?.let {
+            return true
+        }
+        return false
+    }
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
         val jsonArray = JSONArray(orientations)
         val numberOfCameras = getNumberOfCameras()
+        val hasProximitySensor = hasProximitySensor()
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
             MetadataKey.DeviceOrientation to jsonArray,
             MetadataKey.NumberOfCameras to numberOfCameras,
+            MetadataKey.ProximitySensor to hasProximitySensor,
         )
     }
 }
