@@ -25,6 +25,7 @@ enum class MetadataKey(val key: String) {
     ProximitySensor("proximity_sensor"),
     ProxyDetected("proxy"),
     ScreenResolution("screen_resolution"),
+    SecurityPolicyVersion("security_policy_version"),
     SelfieCaptureDuration("selfie_capture_duration_ms"),
     SelfieCaptureRetries("selfie_capture_retries"),
     SelfieImageOrigin("selfie_image_origin"),
