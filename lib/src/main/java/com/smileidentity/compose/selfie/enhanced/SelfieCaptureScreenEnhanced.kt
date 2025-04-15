@@ -178,7 +178,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                     if (!hasRecordedOrientation.value) {
                         (
                             MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo
+                                MetadataProvider.MetadataProviderType.DeviceInfo,
                             ] as? DeviceInfoProvider
                             )?.recordDeviceOrientation()
                         hasRecordedOrientation.value = true
