@@ -16,7 +16,7 @@ enum class SelfieImageOriginValue(val value: String) {
     BackCamera("back_camera"),
 }
 
-enum class WrapperName(val value: String) {
+enum class WrapperSdkName(val value: String) {
     Flutter("flutter"),
     ReactNative("react_native"),
 }

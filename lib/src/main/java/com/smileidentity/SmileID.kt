@@ -25,7 +25,7 @@ import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
-import com.smileidentity.models.v2.metadata.WrapperName
+import com.smileidentity.models.v2.metadata.WrapperSdkName
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -117,12 +117,6 @@ object SmileID {
      * crashes. This is powered by Sentry, and further details on inner workings can be found in the
      * source docs for [SmileIDCrashReporting]
      * @param okHttpClient An optional [OkHttpClient.Builder] to use for the network requests
-     * @param wrapperSdkName An optional internal parameter which informs the native sdk that a
-     * x-platform sdk wraps the native sdk and sets the name of the wrapper sdk. This parameter is
-     * set automatically by SmileID and any partner developer should ignore it.
-     * @param wrapperSdkVersion An optional internal parameter which informs the native sdk that a
-     * x-platform sdk wraps the native sdk and sets the version of the wrapper sdk. This parameter
-     * is set automatically by SmileID and any partner developer should ignore it.
      */
     // "Using device identifiers is not recommended other than for high value fraud prevention"
     @SuppressLint("HardwareIds")
@@ -134,8 +128,6 @@ object SmileID {
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-        wrapperSdkName: WrapperName? = null,
-        wrapperSdkVersion: String? = null,
     ): Deferred<Result<Unit>> {
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
         // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
@@ -194,11 +186,6 @@ object SmileID {
         )
 
         trackSdkLaunchCount(context)
-        wrapperSdkName?.let {
-            wrapperSdkVersion?.let {
-                setWrapperInfo(wrapperSdkName, wrapperSdkVersion)
-            }
-        }
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {
@@ -224,12 +211,6 @@ object SmileID {
      * crashes. This is powered by Sentry, and further details on inner workings can be found in the
      * source docs for [SmileIDCrashReporting]
      * @param okHttpClient The [OkHttpClient] to use for the network requests
-     * @param wrapperSdkName An optional internal parameter which informs the native sdk that a
-     * x-platform sdk wraps the native sdk and sets the name of the wrapper sdk. This parameter is
-     * set automatically by SmileID and any partner developer should ignore it.
-     * @param wrapperSdkVersion An optional internal parameter which informs the native sdk that a
-     * x-platform sdk wraps the native sdk and sets the version of the wrapper sdk. This parameter
-     * is set automatically by SmileID and any partner developer should ignore it.
      */
     @JvmStatic
     @JvmOverloads
@@ -240,8 +221,6 @@ object SmileID {
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
-        wrapperSdkName: WrapperName? = null,
-        wrapperSdkVersion: String? = null,
     ): Deferred<Result<Unit>> {
         SmileID.apiKey = apiKey
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -252,8 +231,6 @@ object SmileID {
                 useSandbox = useSandbox,
                 enableCrashReporting = enableCrashReporting,
                 okHttpClient = okHttpClient,
-                wrapperSdkName = wrapperSdkName,
-                wrapperSdkVersion = wrapperSdkVersion,
             ).await()
         }
     }
@@ -605,7 +582,14 @@ object SmileID {
         MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount.toString())
     }
 
-    private fun setWrapperInfo(name: WrapperName, version: String) {
+    /**
+     * Sets the name and version of a x-platform sdk that wraps the native sdk. This is an internal
+     * function and should not be used by partner developers.
+     *
+     * @param name The name of the x-platform sdk that wraps the native sdk.
+     * @param version The version of the x-platform sdk that wraps the native sdk.
+     */
+    fun setWrapperInfo(name: WrapperSdkName, version: String) {
         MetadataManager.addMetadata(MetadataKey.WrapperName, name.value)
         MetadataManager.addMetadata(MetadataKey.WrapperVersion, version)
     }
