@@ -166,7 +166,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 consentInformation = consentInformation,
             )
 
-            val metadata = MetadataManager.collectAllMetadata()
+            var metadata = MetadataManager.collectAllMetadata()
             // We can stop monitoring the network traffic after we have collected the metadata
             (
                 MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
@@ -213,7 +213,18 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            MetadataManager.addMetadata(
+                                MetadataKey.NetworkRetries,
+                                networkRetries.toString(),
+                            )
+                            metadata = MetadataManager.collectAllMetadata()
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata,
+                                ),
+                            )
                         } else {
                             throw smileIDException
                         }
