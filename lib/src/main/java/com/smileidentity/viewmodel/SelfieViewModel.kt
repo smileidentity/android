@@ -131,6 +131,7 @@ class SelfieViewModel(
     private var previousHeadRotationY = Float.POSITIVE_INFINITY
     private var previousHeadRotationZ = Float.POSITIVE_INFINITY
     private var retryCount = 0
+    private var networkRetries = 0
 
     @VisibleForTesting
     internal var shouldAnalyzeImages = true
@@ -426,6 +427,8 @@ class SelfieViewModel(
                     apiResponse = apiResponse,
                 ),
             )
+            networkRetries = 0
+            MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
             _uiState.update {
                 it.copy(
                     processingState = ProcessingState.Success,
@@ -458,6 +461,8 @@ class SelfieViewModel(
     fun onRetry() {
         // If selfie file is present, all captures were completed, so we're retrying a network issue
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
+            networkRetries++
+            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
             submitJob(selfieFile!!, livenessFiles)
         } else {
             MetadataManager.removeMetadata(MetadataKey.SelfieCaptureDuration)

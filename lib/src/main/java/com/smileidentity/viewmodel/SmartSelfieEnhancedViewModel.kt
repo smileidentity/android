@@ -178,6 +178,7 @@ class SmartSelfieEnhancedViewModel(
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
     private var retryCount = 0
+    private var networkRetries = 0
 
     init {
         startStrictModeTimerIfNecessary()
@@ -488,6 +489,8 @@ class SmartSelfieEnhancedViewModel(
                                     selfieFile = selfieFile,
                                 )
                             }
+                            networkRetries = 0
+                            MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
                             // Delay to ensure the completion icon is shown for a little bit
                             delay(COMPLETED_DELAY_MS)
                             val result = SmartSelfieResult(
@@ -567,6 +570,8 @@ class SmartSelfieEnhancedViewModel(
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
         retryCount++
+        networkRetries++
+        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
         shouldAnalyzeImages = true
     }
 
