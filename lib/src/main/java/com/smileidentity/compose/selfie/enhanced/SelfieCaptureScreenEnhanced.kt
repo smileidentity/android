@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,9 +69,6 @@ import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.v2.metadata.DeviceInfoProvider
-import com.smileidentity.models.v2.metadata.MetadataManager
-import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -155,8 +151,6 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
     ForceBrightness()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    val hasRecordedOrientationAtCaptureStart = remember { mutableStateOf(false) }
-    val hasRecordedOrientationAtCaptureEnd = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -175,47 +169,33 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                 acknowledgedInstructions = true
             }
 
-            else -> {
-                LaunchedEffect(Unit) {
-                    if (!hasRecordedOrientationAtCaptureStart.value) {
-                        (
-                            MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo,
-                            ] as? DeviceInfoProvider
-                            )?.recordDeviceOrientation()
-                        hasRecordedOrientationAtCaptureStart.value = true
-                    }
-                }
-                val screen = SmartSelfieEnhancedScreen(
-                    state = uiState,
-                    showAttribution = showAttribution,
-                    modifier = modifier,
-                    onRetry = viewModel::onRetry,
-                    onResult = onResult,
-                    hasRecordedOrientationAtCaptureEnd = hasRecordedOrientationAtCaptureEnd,
-                    cameraPreview = {
-                        CameraPreview(
-                            cameraState = cameraState,
-                            camSelector = camSelector,
-                            implementationMode = ImplementationMode.Compatible,
-                            scaleType = ScaleType.FillCenter,
-                            imageAnalyzer = cameraState.rememberImageAnalyzer(
-                                analyze = {
-                                    viewModel.analyzeImage(
-                                        imageProxy = it,
-                                        camSelector = camSelector,
-                                    )
-                                },
-                            ),
-                            isImageAnalysisEnabled = true,
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .scale(VIEWFINDER_SCALE),
-                        )
-                    },
-                )
-                return screen
-            }
+            else -> SmartSelfieEnhancedScreen(
+                state = uiState,
+                showAttribution = showAttribution,
+                modifier = modifier,
+                onRetry = viewModel::onRetry,
+                onResult = onResult,
+                cameraPreview = {
+                    CameraPreview(
+                        cameraState = cameraState,
+                        camSelector = camSelector,
+                        implementationMode = ImplementationMode.Compatible,
+                        scaleType = ScaleType.FillCenter,
+                        imageAnalyzer = cameraState.rememberImageAnalyzer(
+                            analyze = {
+                                viewModel.analyzeImage(
+                                    imageProxy = it,
+                                    camSelector = camSelector,
+                                )
+                            },
+                        ),
+                        isImageAnalysisEnabled = true,
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .scale(VIEWFINDER_SCALE),
+                    )
+                },
+            )
         }
     }
 }
@@ -239,7 +219,6 @@ private fun SmartSelfieEnhancedScreen(
     onRetry: () -> Unit,
     onResult: SmileIDCallback<SmartSelfieResult>,
     cameraPreview: @Composable (BoxScope.() -> Unit),
-    hasRecordedOrientationAtCaptureEnd: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
 ) {
@@ -345,17 +324,6 @@ private fun SmartSelfieEnhancedScreen(
                                     modifier = Modifier
                                         .align(Alignment.Center),
                                 )
-                                LaunchedEffect(Unit) {
-                                    if (!hasRecordedOrientationAtCaptureEnd.value) {
-                                        (
-                                            MetadataManager.providers[
-                                                MetadataProvider.MetadataProviderType.DeviceInfo,
-                                            ]
-                                                as? DeviceInfoProvider
-                                            )?.recordDeviceOrientation()
-                                        hasRecordedOrientationAtCaptureEnd.value = true
-                                    }
-                                }
                                 onResult(
                                     SmileIDResult.Success(
                                         SmartSelfieResult(
