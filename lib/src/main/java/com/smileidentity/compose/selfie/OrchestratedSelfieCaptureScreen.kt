@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -26,9 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.models.v2.metadata.DeviceInfoProvider
-import com.smileidentity.models.v2.metadata.MetadataManager
-import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId
@@ -70,8 +65,6 @@ fun OrchestratedSelfieCaptureScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var acknowledgedInstructions by rememberSaveable { mutableStateOf(false) }
-    val hasRecordedOrientationAtCaptureStart = remember { mutableStateOf(false) }
-    val hasRecordedOrientationAtCaptureEnd = remember { mutableStateOf(false) }
     Box(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background)
@@ -107,68 +100,33 @@ fun OrchestratedSelfieCaptureScreen(
                 onClose = { viewModel.onFinished(onResult) },
             )
 
-            uiState.selfieToConfirm != null -> {
-                LaunchedEffect(Unit) {
-                    if (!hasRecordedOrientationAtCaptureEnd.value) {
-                        (
-                            MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo,
-                            ] as? DeviceInfoProvider
-                            )?.recordDeviceOrientation()
-                        hasRecordedOrientationAtCaptureEnd.value = true
-                    }
-                }
-                val screen = ImageCaptureConfirmationDialog(
-                    titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
-                    subtitleText = stringResource(
-                        R.string.si_smart_selfie_confirmation_dialog_subtitle,
-                    ),
-                    painter = BitmapPainter(
-                        BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath)
-                            .asImageBitmap(),
-                    ),
-                    confirmButtonText = stringResource(
-                        R.string.si_smart_selfie_confirmation_dialog_confirm_button,
-                    ),
-                    onConfirm = viewModel::submitJob,
-                    retakeButtonText = stringResource(
-                        R.string.si_smart_selfie_confirmation_dialog_retake_button,
-                    ),
-                    onRetake = {
-                        hasRecordedOrientationAtCaptureStart.value = false
-                        hasRecordedOrientationAtCaptureEnd.value = false
-                        (
-                            MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo,
-                            ] as? DeviceInfoProvider
-                            )?.clearDeviceOrientation()
-                        viewModel.onSelfieRejected()
-                    },
-                    scaleFactor = 1.25f,
-                )
-                return screen
-            }
+            uiState.selfieToConfirm != null -> ImageCaptureConfirmationDialog(
+                titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
+                subtitleText = stringResource(
+                    R.string.si_smart_selfie_confirmation_dialog_subtitle,
+                ),
+                painter = BitmapPainter(
+                    BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath)
+                        .asImageBitmap(),
+                ),
+                confirmButtonText = stringResource(
+                    R.string.si_smart_selfie_confirmation_dialog_confirm_button,
+                ),
+                onConfirm = viewModel::submitJob,
+                retakeButtonText = stringResource(
+                    R.string.si_smart_selfie_confirmation_dialog_retake_button,
+                ),
+                onRetake = viewModel::onSelfieRejected,
+                scaleFactor = 1.25f,
+            )
 
-            else -> {
-                LaunchedEffect(Unit) {
-                    if (!hasRecordedOrientationAtCaptureStart.value) {
-                        (
-                            MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo,
-                            ] as? DeviceInfoProvider
-                            )?.recordDeviceOrientation()
-                        hasRecordedOrientationAtCaptureStart.value = true
-                    }
-                }
-                val screen = SelfieCaptureScreen(
-                    userId = userId,
-                    jobId = jobId,
-                    isEnroll = isEnroll,
-                    allowAgentMode = allowAgentMode,
-                    skipApiSubmission = skipApiSubmission,
-                )
-                return screen
-            }
+            else -> SelfieCaptureScreen(
+                userId = userId,
+                jobId = jobId,
+                isEnroll = isEnroll,
+                allowAgentMode = allowAgentMode,
+                skipApiSubmission = skipApiSubmission,
+            )
         }
     }
 }
