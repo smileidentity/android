@@ -139,7 +139,7 @@ fun OrchestratedSelfieCaptureScreen(
                         hasRecordedOrientationAtCaptureEnd.value = false
                         (
                             MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo
+                                MetadataProvider.MetadataProviderType.DeviceInfo,
                             ] as? DeviceInfoProvider
                             )?.clearDeviceOrientation()
                         viewModel.onSelfieRejected()

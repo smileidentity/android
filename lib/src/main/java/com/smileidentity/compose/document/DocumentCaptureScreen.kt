@@ -26,9 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,10 +51,6 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.models.v2.metadata.DeviceInfoProvider
-import com.smileidentity.models.v2.metadata.MetadataKey
-import com.smileidentity.models.v2.metadata.MetadataManager
-import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -136,8 +130,6 @@ fun DocumentCaptureScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val documentImageToConfirm = uiState.documentImageToConfirm
     val captureError = uiState.captureError
-    val hasRecordedOrientationAtCaptureStart = remember { mutableStateOf(false) }
-    val hasRecordedOrientationAtCaptureEnd = remember { mutableStateOf(false) }
     when {
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
@@ -159,15 +151,6 @@ fun DocumentCaptureScreen(
         }
 
         documentImageToConfirm != null -> {
-            LaunchedEffect(Unit) {
-                if (!hasRecordedOrientationAtCaptureEnd.value) {
-                    (
-                        MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                            as? DeviceInfoProvider
-                        )?.recordDeviceOrientation()
-                    hasRecordedOrientationAtCaptureEnd.value = true
-                }
-            }
             val painter = remember {
                 val path = documentImageToConfirm.absolutePath
                 try {
@@ -194,16 +177,7 @@ fun DocumentCaptureScreen(
                     retakeButtonText = stringResource(
                         id = R.string.si_doc_v_confirmation_dialog_retake_button,
                     ),
-                    onRetake = {
-                        hasRecordedOrientationAtCaptureStart.value = false
-                        hasRecordedOrientationAtCaptureEnd.value = false
-                        (
-                            MetadataManager.providers[
-                                MetadataProvider.MetadataProviderType.DeviceInfo
-                            ] as? DeviceInfoProvider
-                            )?.clearDeviceOrientation()
-                        viewModel.onRetry()
-                    }
+                    onRetake = viewModel::onRetry,
                 )
             } else {
                 viewModel.onConfirm(documentImageToConfirm, onConfirm)
@@ -215,15 +189,6 @@ fun DocumentCaptureScreen(
                 targetValue = uiState.idAspectRatio,
                 label = "ID Aspect Ratio",
             )
-            LaunchedEffect(Unit) {
-                if (!hasRecordedOrientationAtCaptureStart.value) {
-                    (
-                        MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                            as? DeviceInfoProvider
-                        )?.recordDeviceOrientation()
-                    hasRecordedOrientationAtCaptureStart.value = true
-                }
-            }
             CaptureScreenContent(
                 titleText = captureTitleText,
                 subtitleText = stringResource(id = uiState.directive.displayText),

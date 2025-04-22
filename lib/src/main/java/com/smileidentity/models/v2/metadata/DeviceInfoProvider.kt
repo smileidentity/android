@@ -50,7 +50,7 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         return "unknown"
     }
 
-    fun recordDeviceOrientation() {
+    fun addDeviceOrientation() {
         orientations.add(getDeviceOrientation())
     }
 
