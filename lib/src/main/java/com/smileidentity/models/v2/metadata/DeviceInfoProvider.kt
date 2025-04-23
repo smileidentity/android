@@ -91,6 +91,8 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
         val jsonArray = JSONArray(orientations)
+        // we clear the device orientations after we collected them
+        orientations.clear()
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
