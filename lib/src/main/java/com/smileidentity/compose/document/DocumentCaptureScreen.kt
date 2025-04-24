@@ -26,9 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,9 +51,6 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.models.v2.metadata.DeviceInfoProvider
-import com.smileidentity.models.v2.metadata.MetadataManager
-import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -156,16 +151,6 @@ fun DocumentCaptureScreen(
         }
 
         documentImageToConfirm != null -> {
-            val hasRecordedOrientation = remember { mutableStateOf(false) }
-            LaunchedEffect(Unit) {
-                if (!hasRecordedOrientation.value) {
-                    (
-                        MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                            as? DeviceInfoProvider
-                        )?.recordDeviceOrientation()
-                    hasRecordedOrientation.value = true
-                }
-            }
             val painter = remember {
                 val path = documentImageToConfirm.absolutePath
                 try {
@@ -204,16 +189,6 @@ fun DocumentCaptureScreen(
                 targetValue = uiState.idAspectRatio,
                 label = "ID Aspect Ratio",
             )
-            val hasRecordedOrientation = remember { mutableStateOf(false) }
-            LaunchedEffect(Unit) {
-                if (!hasRecordedOrientation.value) {
-                    (
-                        MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                            as? DeviceInfoProvider
-                        )?.recordDeviceOrientation()
-                    hasRecordedOrientation.value = true
-                }
-            }
             CaptureScreenContent(
                 titleText = captureTitleText,
                 subtitleText = stringResource(id = uiState.directive.displayText),

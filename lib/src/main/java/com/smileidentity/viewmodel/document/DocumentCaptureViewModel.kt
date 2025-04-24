@@ -16,9 +16,11 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.DocumentImageOriginValue
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -83,6 +85,7 @@ class DocumentCaptureViewModel(
     private val defaultAspectRatio = knownAspectRatio ?: 1f
     private var retryCount = 0
     private val timerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
@@ -163,6 +166,11 @@ class DocumentCaptureViewModel(
                                             desiredAspectRatio = uiState.value.idAspectRatio,
                                         )
                                     }
+                                    (
+                                        MetadataManager.providers[
+                                            MetadataProvider.MetadataProviderType.DeviceInfo,
+                                        ] as? DeviceInfoProvider
+                                        )?.addDeviceOrientation()
                                     _uiState.update {
                                         it.copy(
                                             documentImageToConfirm = processedImage,
@@ -229,6 +237,12 @@ class DocumentCaptureViewModel(
                 MetadataManager.removeMetadata(MetadataKey.DocumentBackImageOrigin)
             }
         }
+        (
+            MetadataManager.providers[
+                MetadataProvider.MetadataProviderType.DeviceInfo,
+            ] as? DeviceInfoProvider
+            )?.clearDeviceOrientation()
+        hasRecordedOrientationAtCaptureStart = false
         isCapturing = false
         documentImageOrigin = null
         retryCount++
@@ -296,6 +310,14 @@ class DocumentCaptureViewModel(
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAnalysisTimeMs
         val enoughTimeHasPassed = elapsedTimeMs > ANALYSIS_SAMPLE_INTERVAL_MS
+
+        if (!hasRecordedOrientationAtCaptureStart) {
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
+            hasRecordedOrientationAtCaptureStart = true
+        }
 
         if (isCapturing || isFocusing || !enoughTimeHasPassed || image == null) {
             imageProxy.close()

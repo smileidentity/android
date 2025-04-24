@@ -21,6 +21,7 @@ import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
 import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
@@ -143,9 +144,18 @@ class SelfieViewModel(
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         if (!shouldAnalyzeImages || elapsedTimeMs < INTRA_IMAGE_MIN_DELAY_MS || image == null) {
@@ -249,6 +259,11 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
+                (
+                    MetadataManager.providers[
+                        MetadataProvider.MetadataProviderType.DeviceInfo,
+                    ] as? DeviceInfoProvider
+                    )?.addDeviceOrientation()
                 _uiState.update {
                     it.copy(
                         progress = 1f,
@@ -453,6 +468,12 @@ class SelfieViewModel(
         result = null
         retryCount++
         shouldAnalyzeImages = true
+        (
+            MetadataManager.providers[
+                MetadataProvider.MetadataProviderType.DeviceInfo,
+            ] as? DeviceInfoProvider
+            )?.clearDeviceOrientation()
+        hasRecordedOrientationAtCaptureStart = false
     }
 
     fun onRetry() {

@@ -20,10 +20,12 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
 import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.metadata.model
@@ -178,6 +180,7 @@ class SmartSelfieEnhancedViewModel(
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
     private var retryCount = 0
+    private var hasRecordedOrientationAtCaptureStart = false
 
     init {
         startStrictModeTimerIfNecessary()
@@ -221,6 +224,14 @@ class SmartSelfieEnhancedViewModel(
      */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
@@ -440,6 +451,12 @@ class SmartSelfieEnhancedViewModel(
                 }
                 return@addOnSuccessListener
             }
+            // capture the device orientation at the end of the capture (when all liveness images
+            // are captured)
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
@@ -568,6 +585,12 @@ class SmartSelfieEnhancedViewModel(
         startStrictModeTimerIfNecessary()
         retryCount++
         shouldAnalyzeImages = true
+        (
+            MetadataManager.providers[
+                MetadataProvider.MetadataProviderType.DeviceInfo,
+            ] as? DeviceInfoProvider
+            )?.clearDeviceOrientation()
+        hasRecordedOrientationAtCaptureStart = false
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {

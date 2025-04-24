@@ -55,8 +55,12 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         return "unknown"
     }
 
-    fun recordDeviceOrientation() {
+    fun addDeviceOrientation() {
         orientations.add(getDeviceOrientation())
+    }
+
+    fun clearDeviceOrientation() {
+        orientations.clear()
     }
 
     private fun getDeviceOrientation(): String {
@@ -105,8 +109,12 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
         val jsonArray = JSONArray(orientations)
+        // we clear the device orientations after we collected them
+        orientations.clear()
+
         val numberOfCameras = getNumberOfCameras()
         val hasProximitySensor = hasProximitySensor()
+
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
