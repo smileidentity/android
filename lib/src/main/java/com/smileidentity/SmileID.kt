@@ -571,13 +571,16 @@ object SmileID {
     }
 
     private fun trackSdkLaunchCount(context: Context) {
-        val sharedPreferences = context.getSharedPreferences("SmileIDPrefs", MODE_PRIVATE)
-        val key = "SmileID.SDKLaunchCount"
-        val currentCount = sharedPreferences.getInt(key, 0)
-        val newCount = currentCount + 1
-        sharedPreferences.edit { putInt(key, newCount) }
+        try {
+            val sharedPreferences = context.getSharedPreferences("SmileIDPrefs", MODE_PRIVATE)
+            val key = "SmileID.SDKLaunchCount"
+            val currentCount = sharedPreferences.getInt(key, 0)
+            val newCount = currentCount + 1
+            sharedPreferences.edit { putInt(key, newCount) }
 
-        // Add the launch count to metadata for tracking
-        MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount.toString())
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount.toString())
+        } catch (e: Exception) {
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, "unknown")
+        }
     }
 }
