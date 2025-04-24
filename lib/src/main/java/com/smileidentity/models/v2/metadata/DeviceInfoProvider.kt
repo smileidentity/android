@@ -98,11 +98,7 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     }
 
     private fun hasProximitySensor(): Boolean {
-        val proximitySensor: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY)
-        proximitySensor?.let {
-            return true
-        }
-        return false
+        return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
     }
 
     override fun collectMetadata(): Map<MetadataKey, Any> {
