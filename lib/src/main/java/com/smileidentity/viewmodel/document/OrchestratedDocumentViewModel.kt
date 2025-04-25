@@ -16,6 +16,7 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
@@ -80,6 +81,10 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
                 as? NetworkMetadataProvider
             )?.startMonitoring()
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                as? DeviceInfoProvider
+            )?.startRecordingDeviceOrientations()
     }
 
     private val _uiState = MutableStateFlow(OrchestratedDocumentUiState())
