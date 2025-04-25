@@ -2,26 +2,28 @@ package com.smileidentity.models.v2.metadata
 
 import android.app.ActivityManager
 import android.content.Context
-import android.content.res.Configuration
+import android.hardware.camera2.CameraManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
-import android.hardware.camera2.CameraManager
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.os.Build
 import android.util.DisplayMetrics
-import android.view.Surface
 import android.view.WindowManager
 import android.view.WindowMetrics
 import org.json.JSONArray
 
-class DeviceInfoProvider(private val context: Context) : MetadataProvider {
+class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListener {
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
     private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager?
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
-    private val configuration = context.resources.configuration
-    private val orientations: MutableList<String> = mutableListOf()
+    private val accelerometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    private var currentOrientation: String = "unknown"
+    private var deviceOrientations: MutableList<String> = mutableListOf()
+    private var isRecordingDeviceOrientations = false
 
     private fun getScreenResolution(): String {
         windowManager?.let {
@@ -55,41 +57,47 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
         return "unknown"
     }
 
+    fun startRecordingDeviceOrientations() {
+        accelerometer?.let {
+            if (isRecordingDeviceOrientations) {
+                // Early return if we are already recording the device orientations
+                return
+            }
+            isRecordingDeviceOrientations = true
+
+            sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
+
+    private fun stopRecordingDeviceOrientations() {
+        isRecordingDeviceOrientations = false
+        sensorManager?.unregisterListener(this)
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event?.let {
+            val x = it.values[0]
+            val y = it.values[1]
+            val z = it.values[2]
+
+            currentOrientation = when {
+                kotlin.math.abs(z) > 8.5 -> "Flat"
+                kotlin.math.abs(y) > kotlin.math.abs(x) -> "Portrait"
+                else -> "Landscape"
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // No-op
+    }
+
     fun addDeviceOrientation() {
-        orientations.add(getDeviceOrientation())
+        deviceOrientations.add(currentOrientation)
     }
 
-    fun clearDeviceOrientation() {
-        orientations.clear()
-    }
-
-    private fun getDeviceOrientation(): String {
-        val rotation: Int? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // API 30+: use context.display
-            context.display.rotation
-        } else {
-            // Below API 30: use defaultDisplay
-            @Suppress("DEPRECATION")
-            windowManager?.defaultDisplay?.rotation
-        }
-        val orientation = configuration.orientation
-
-        return when (orientation) {
-            Configuration.ORIENTATION_PORTRAIT -> {
-                "Portrait"
-            }
-            Configuration.ORIENTATION_LANDSCAPE -> {
-                "Landscape"
-            }
-            else -> {
-                // If orientation is unknown, default to rotation
-                when (rotation) {
-                    Surface.ROTATION_0, Surface.ROTATION_180 -> "Portrait"
-                    Surface.ROTATION_90, Surface.ROTATION_270 -> "Landscape"
-                    else -> "unknown"
-                }
-            }
-        }
+    fun clearDeviceOrientations() {
+        deviceOrientations.clear()
     }
 
     private fun getNumberOfCameras(): String {
@@ -106,14 +114,16 @@ class DeviceInfoProvider(private val context: Context) : MetadataProvider {
     }
 
     override fun collectMetadata(): Map<MetadataKey, Any> {
+        stopRecordingDeviceOrientations()
+
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
-        val jsonArray = JSONArray(orientations)
-        // we clear the device orientations after we collected them
-        orientations.clear()
-
         val numberOfCameras = getNumberOfCameras()
         val hasProximitySensor = hasProximitySensor()
+        val jsonArray = JSONArray(deviceOrientations)
+
+        // we clear the device orientations after we collected them
+        deviceOrientations.clear()
 
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,

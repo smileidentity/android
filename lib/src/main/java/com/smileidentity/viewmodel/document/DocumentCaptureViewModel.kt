@@ -241,7 +241,7 @@ class DocumentCaptureViewModel(
             MetadataManager.providers[
                 MetadataProvider.MetadataProviderType.DeviceInfo,
             ] as? DeviceInfoProvider
-            )?.clearDeviceOrientation()
+            )?.clearDeviceOrientations()
         hasRecordedOrientationAtCaptureStart = false
         isCapturing = false
         documentImageOrigin = null
