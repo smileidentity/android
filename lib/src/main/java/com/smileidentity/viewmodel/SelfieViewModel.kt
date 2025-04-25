@@ -112,6 +112,10 @@ class SelfieViewModel(
             MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
                 as? NetworkMetadataProvider
             )?.startMonitoring()
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                as? DeviceInfoProvider
+            )?.startRecordingDeviceOrientations()
     }
 
     private val _uiState = MutableStateFlow(SelfieUiState())
@@ -469,7 +473,7 @@ class SelfieViewModel(
             MetadataManager.providers[
                 MetadataProvider.MetadataProviderType.DeviceInfo,
             ] as? DeviceInfoProvider
-            )?.clearDeviceOrientation()
+            )?.clearDeviceOrientations()
         hasRecordedOrientationAtCaptureStart = false
     }
 
