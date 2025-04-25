@@ -2,11 +2,11 @@ package com.smileidentity.models.v2.metadata
 
 import android.app.ActivityManager
 import android.content.Context
-import android.hardware.camera2.CameraManager
 import android.hardware.Sensor
-import android.hardware.SensorManager
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
