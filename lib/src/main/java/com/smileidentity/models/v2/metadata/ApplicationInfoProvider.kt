@@ -26,10 +26,10 @@ class ApplicationInfoProvider(context: Context) : MetadataProvider {
         }
     }
 
-    override fun collectMetadata(): Map<MetadataKey, Any> {
+    override fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>> {
         val hostApplication = getHostApplicationInfo()
         return mapOf(
-            MetadataKey.HostApplication to hostApplication,
+            MetadataKey.HostApplication to mutableListOf(MetadataEntry(hostApplication)),
         )
     }
 }

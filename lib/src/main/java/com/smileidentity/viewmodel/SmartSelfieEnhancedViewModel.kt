@@ -477,7 +477,7 @@ class SmartSelfieEnhancedViewModel(
                 MetadataKey.SelfieCaptureDuration,
                 metadataTimerStart.elapsedNow().inWholeMilliseconds,
             )
-            MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, retryCount.toString())
+            MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, retryCount)
 
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
@@ -576,7 +576,7 @@ class SmartSelfieEnhancedViewModel(
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = Metadata(metadata),
+                metadata = metadata,
             )
         } else {
             SmileID.api.doSmartSelfieAuthentication(
@@ -585,7 +585,7 @@ class SmartSelfieEnhancedViewModel(
                 livenessImages = livenessFiles,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = Metadata(metadata),
+                metadata = metadata,
             )
         }
     }
@@ -604,7 +604,7 @@ class SmartSelfieEnhancedViewModel(
         startStrictModeTimerIfNecessary()
         retryCount++
         networkRetries++
-        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
+        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
         shouldAnalyzeImages = true
         (
             MetadataManager.providers[

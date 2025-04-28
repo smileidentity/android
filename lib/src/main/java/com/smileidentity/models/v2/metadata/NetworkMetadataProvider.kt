@@ -17,14 +17,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import timber.log.Timber
 
 class NetworkMetadataProvider(context: Context) : MetadataProvider {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private var coroutineScope: CoroutineScope? = null
-    private val connectionTypes = MutableStateFlow<List<String>>(emptyList())
+    private val connectionTypes = MutableStateFlow<List<MetadataEntry>>(listOf())
 
     fun startMonitoring() {
         // Check if the coroutine scope is already active to avoid starting multiple coroutines
@@ -35,11 +34,11 @@ class NetworkMetadataProvider(context: Context) : MetadataProvider {
         coroutineScope?.launch {
             while (isActive) {
                 val connection = getCurrentConnectionType()
-                connection?.let { connection ->
+                connection?.let { connectionType ->
                     val currentList = connectionTypes.value
-                    if (currentList.lastOrNull() != connection) {
-                        Timber.d("Connection type changed to $connection. Adding to the list.")
-                        connectionTypes.value = currentList + connection
+                    if (currentList.lastOrNull()?.value != connectionType) {
+                        Timber.d("Connection type changed to $connectionType. Adding to the list.")
+                        connectionTypes.value = currentList + MetadataEntry(connectionType)
                     }
                 }
                 // We check the connection every second if there has been a change
@@ -134,14 +133,14 @@ class NetworkMetadataProvider(context: Context) : MetadataProvider {
         return isVpnUsingNetworkType || isVpnUsingInterfaces
     }
 
-    override fun collectMetadata(): Map<MetadataKey, Any> {
-        val jsonArray = JSONArray(connectionTypes.value)
+    override fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>> {
+        val metadataEntries = connectionTypes.value
         val isVpnActive = isVPNActive()
         val isProxyDetected = isProxyDetected()
         return mapOf(
-            MetadataKey.NetworkConnection to jsonArray,
-            MetadataKey.VPNDetected to isVpnActive,
-            MetadataKey.ProxyDetected to isProxyDetected,
+            MetadataKey.NetworkConnection to metadataEntries.toMutableList(),
+            MetadataKey.VPNDetected to mutableListOf(MetadataEntry(isVpnActive)),
+            MetadataKey.ProxyDetected to mutableListOf(MetadataEntry(isProxyDetected)),
         )
     }
 }

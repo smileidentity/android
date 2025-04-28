@@ -270,7 +270,7 @@ class BiometricKycViewModel(
             _uiState.update { it.copy(processingState = null) }
         } else {
             networkRetries++
-            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
+            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
             submitJob(selfieFile!!, livenessFiles!!)
         }
     }
