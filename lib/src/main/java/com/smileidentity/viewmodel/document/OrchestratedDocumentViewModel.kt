@@ -365,6 +365,13 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     }
 
     fun onFinished(callback: SmileIDCallback<T>) = callback(result)
+
+    fun onBackButtonClicked() {
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                as? DeviceInfoProvider
+            )?.stopRecordingDeviceOrientations()
+    }
 }
 
 internal class DocumentVerificationViewModel(

@@ -499,4 +499,11 @@ class SelfieViewModel(
     fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
         callback(result!!)
     }
+
+    fun onBackButtonClicked() {
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                as? DeviceInfoProvider
+            )?.stopRecordingDeviceOrientations()
+    }
 }

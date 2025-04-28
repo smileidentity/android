@@ -1,6 +1,7 @@
 package com.smileidentity.compose.selfie
 
 import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,6 +33,7 @@ import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import timber.log.Timber
 
 /**
  * Orchestrates the selfie capture flow - navigates between instructions, requesting permissions,
@@ -127,6 +129,10 @@ fun OrchestratedSelfieCaptureScreen(
                 allowAgentMode = allowAgentMode,
                 skipApiSubmission = skipApiSubmission,
             )
+        }
+        BackHandler {
+            println("BackHandler - Back button pressed")
+            viewModel.onBackButtonClicked()
         }
     }
 }

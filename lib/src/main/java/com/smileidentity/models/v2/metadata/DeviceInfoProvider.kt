@@ -62,14 +62,16 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
                 return
             }
             isRecordingDeviceOrientations = true
+            println("start recording device orientations")
 
             sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
         }
     }
 
-    private fun stopRecordingDeviceOrientations() {
+    fun stopRecordingDeviceOrientations() {
         isRecordingDeviceOrientations = false
         sensorManager?.unregisterListener(this)
+        println("stop recording device orientations")
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -83,6 +85,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
                 kotlin.math.abs(y) > kotlin.math.abs(x) -> "Portrait"
                 else -> "Landscape"
             }
+            println("current device orientation: $currentOrientation")
         }
     }
 
