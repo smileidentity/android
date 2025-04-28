@@ -3,8 +3,8 @@ package com.smileidentity.models
 import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
-import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.Metadata
+import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.networking.calculateSignature
 import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json

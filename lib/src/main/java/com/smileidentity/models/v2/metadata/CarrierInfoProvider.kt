@@ -46,7 +46,7 @@ class CarrierInfoProvider(context: Context) : MetadataProvider {
             "unknown"
         }
         return mapOf(
-            MetadataKey.CarrierInfo to mutableListOf(MetadataEntry(carrierInfo))
+            MetadataKey.CarrierInfo to mutableListOf(MetadataEntry(carrierInfo)),
         )
     }
 }

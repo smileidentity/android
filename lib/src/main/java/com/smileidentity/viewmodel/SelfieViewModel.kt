@@ -23,7 +23,6 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider

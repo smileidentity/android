@@ -22,7 +22,6 @@ import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
