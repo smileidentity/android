@@ -7,6 +7,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
+import com.smileidentity.compose.metadata.Metadatum
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
@@ -16,7 +17,6 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
