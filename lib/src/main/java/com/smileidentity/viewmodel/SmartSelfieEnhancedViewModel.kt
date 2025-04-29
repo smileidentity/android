@@ -476,7 +476,10 @@ class SmartSelfieEnhancedViewModel(
                 MetadataKey.SelfieCaptureDuration,
                 metadataTimerStart.elapsedNow().inWholeMilliseconds,
             )
-            MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, selfieCaptureRetries.toString())
+            MetadataManager.addMetadata(
+                MetadataKey.SelfieCaptureRetries,
+                selfieCaptureRetries.toString(),
+            )
 
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)

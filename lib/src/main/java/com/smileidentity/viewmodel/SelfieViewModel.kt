@@ -318,7 +318,10 @@ class SelfieViewModel(
             MetadataKey.SelfieCaptureDuration,
             metadataTimerStart.elapsedNow().inWholeMilliseconds,
         )
-        MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, selfieCaptureRetries.toString())
+        MetadataManager.addMetadata(
+            MetadataKey.SelfieCaptureRetries,
+            selfieCaptureRetries.toString(),
+        )
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
