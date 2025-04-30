@@ -25,6 +25,7 @@ import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
+import com.smileidentity.models.v2.metadata.WrapperSdkName
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -582,5 +583,17 @@ object SmileID {
         } catch (e: Exception) {
             MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, "unknown")
         }
+    }
+
+    /**
+     * Sets the name and version of a x-platform sdk that wraps the native sdk. This is an internal
+     * function and should not be used by partner developers.
+     *
+     * @param name The name of the x-platform sdk that wraps the native sdk.
+     * @param version The version of the x-platform sdk that wraps the native sdk.
+     */
+    fun setWrapperInfo(name: WrapperSdkName, version: String) {
+        MetadataManager.addMetadata(MetadataKey.WrapperName, name.value)
+        MetadataManager.addMetadata(MetadataKey.WrapperVersion, version)
     }
 }

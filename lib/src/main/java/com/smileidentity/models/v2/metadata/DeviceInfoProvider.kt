@@ -113,7 +113,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
     }
 
-
     override fun collectMetadata(): Map<MetadataKey, Any> {
         stopRecordingDeviceOrientations()
 
@@ -121,7 +120,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         val totalMemory = getTotalMemoryInMB()
         val numberOfCameras = getNumberOfCameras()
         val hasProximitySensor = hasProximitySensor()
-
         val jsonArray = JSONArray(deviceOrientations)
 
         // we clear the device orientations after we collected them

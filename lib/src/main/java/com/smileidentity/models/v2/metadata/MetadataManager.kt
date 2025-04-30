@@ -37,6 +37,7 @@ object MetadataManager {
         addMetadata(MetadataKey.Locale, locale)
         addMetadata(MetadataKey.SystemArchitecture, systemArchitecture)
         addMetadata(MetadataKey.LocalTimeOfEnrolment, getCurrentIsoTimestamp(TimeZone.getDefault()))
+        addMetadata(MetadataKey.SecurityPolicyVersion, "0.3.0")
     }
 
     fun register(type: MetadataProvider.MetadataProviderType, provider: MetadataProvider) {

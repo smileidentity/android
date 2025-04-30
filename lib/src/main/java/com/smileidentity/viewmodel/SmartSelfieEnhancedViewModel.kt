@@ -180,6 +180,7 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var networkRetries = 0
     private var selfieCaptureRetries = 0
     private var hasRecordedOrientationAtCaptureStart = false
 
@@ -518,6 +519,8 @@ class SmartSelfieEnhancedViewModel(
                                     selfieFile = selfieFile,
                                 )
                             }
+                            networkRetries = 0
+                            MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
                             // Delay to ensure the completion icon is shown for a little bit
                             delay(COMPLETED_DELAY_MS)
                             val result = SmartSelfieResult(
@@ -602,6 +605,8 @@ class SmartSelfieEnhancedViewModel(
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
+        networkRetries++
+        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
         selfieCaptureRetries++
         shouldAnalyzeImages = true
         (
