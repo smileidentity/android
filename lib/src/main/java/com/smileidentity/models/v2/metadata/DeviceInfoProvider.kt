@@ -69,7 +69,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         }
     }
 
-    private fun stopRecordingDeviceOrientations() {
+    fun stopRecordingDeviceOrientations() {
         isRecordingDeviceOrientations = false
         sensorManager?.unregisterListener(this)
     }
@@ -100,6 +100,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         deviceOrientations.clear()
     }
 
+<<<<<<< HEAD
     private fun getNumberOfCameras(): String {
         return try {
             val numberOfCameras = cameraManager?.cameraIdList?.size
@@ -113,6 +114,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
     }
 
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         stopRecordingDeviceOrientations()
 
@@ -120,6 +122,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         val totalMemory = getTotalMemoryInMB()
         val numberOfCameras = getNumberOfCameras()
         val hasProximitySensor = hasProximitySensor()
+
         val jsonArray = JSONArray(deviceOrientations)
 
         // we clear the device orientations after we collected them
