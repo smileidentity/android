@@ -69,7 +69,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         }
     }
 
-    private fun stopRecordingDeviceOrientations() {
+    fun stopRecordingDeviceOrientations() {
         isRecordingDeviceOrientations = false
         sensorManager?.unregisterListener(this)
     }

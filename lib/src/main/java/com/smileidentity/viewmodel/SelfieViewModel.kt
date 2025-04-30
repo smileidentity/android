@@ -135,8 +135,8 @@ class SelfieViewModel(
     private var previousHeadRotationX = Float.POSITIVE_INFINITY
     private var previousHeadRotationY = Float.POSITIVE_INFINITY
     private var previousHeadRotationZ = Float.POSITIVE_INFINITY
-    private var retryCount = 0
     private var networkRetries = 0
+    private var selfieCaptureRetries = 0
 
     @VisibleForTesting
     internal var shouldAnalyzeImages = true
@@ -319,7 +319,10 @@ class SelfieViewModel(
             MetadataKey.SelfieCaptureDuration,
             metadataTimerStart.elapsedNow().inWholeMilliseconds,
         )
-        MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, retryCount.toString())
+        MetadataManager.addMetadata(
+            MetadataKey.SelfieCaptureRetries,
+            selfieCaptureRetries.toString(),
+        )
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -473,7 +476,7 @@ class SelfieViewModel(
         livenessFiles.removeAll { it.delete() }
         selfieFile = null
         result = null
-        retryCount++
+        selfieCaptureRetries++
         shouldAnalyzeImages = true
         (
             MetadataManager.providers[
@@ -493,7 +496,7 @@ class SelfieViewModel(
             MetadataManager.removeMetadata(MetadataKey.SelfieCaptureDuration)
             MetadataManager.removeMetadata(MetadataKey.ActiveLivenessType)
             MetadataManager.removeMetadata(MetadataKey.SelfieImageOrigin)
-            retryCount++
+            selfieCaptureRetries++
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)
