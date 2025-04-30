@@ -13,6 +13,10 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.compose.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.compose.metadata.updaters.MetadataInterface
+import com.smileidentity.compose.metadata.updaters.NetworkAwareMetadata
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

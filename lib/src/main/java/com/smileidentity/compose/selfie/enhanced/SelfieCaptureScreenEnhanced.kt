@@ -68,7 +68,7 @@ import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
 import com.smileidentity.compose.metadata.LocalMetadataProvider
-import com.smileidentity.compose.metadata.Metadatum
+import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.ml.SelfieQualityModel

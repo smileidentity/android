@@ -38,7 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.metadata.LocalMetadataProvider
-import com.smileidentity.compose.metadata.Metadatum
+import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.randomJobId

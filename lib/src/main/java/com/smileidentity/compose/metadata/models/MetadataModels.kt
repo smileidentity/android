@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata
+package com.smileidentity.compose.metadata.models
 
 enum class LivenessType(val value: String) {
     HeadPose("head_pose"),

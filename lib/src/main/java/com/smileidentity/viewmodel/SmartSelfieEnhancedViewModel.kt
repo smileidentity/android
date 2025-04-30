@@ -17,12 +17,12 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.compose.metadata.LivenessType
-import com.smileidentity.compose.metadata.Metadatum
-import com.smileidentity.compose.metadata.SelfieImageOriginValue.BackCamera
-import com.smileidentity.compose.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.compose.metadata.asNetworkRequest
-import com.smileidentity.compose.metadata.model
+import com.smileidentity.compose.metadata.device.model
+import com.smileidentity.compose.metadata.models.LivenessType
+import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.compose.metadata.models.SelfieImageOriginValue.BackCamera
+import com.smileidentity.compose.metadata.models.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse

@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata
+package com.smileidentity.compose.metadata.device
 
 import android.os.Build
 import com.smileidentity.SmileIDCrashReporting

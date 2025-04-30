@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata
+package com.smileidentity.compose.metadata.updaters
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,6 +8,7 @@ import android.net.NetworkRequest
 import android.os.Build
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
+import com.smileidentity.compose.metadata.models.Metadatum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

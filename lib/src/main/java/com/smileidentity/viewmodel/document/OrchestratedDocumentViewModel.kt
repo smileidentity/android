@@ -7,7 +7,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.compose.metadata.Metadatum
+import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
