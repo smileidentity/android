@@ -13,7 +13,7 @@ import kotlinx.parcelize.Parcelize
  * backend expects
  */
 @Parcelize
-internal data class Metadata(val items: List<Metadatum>) : Parcelable {
+data class Metadata(val items: List<Metadatum>) : Parcelable {
     companion object {
         fun default(): Metadata = Metadata(
             listOf(
@@ -112,4 +112,26 @@ open class Metadatum(
     @Parcelize
     data class DocumentBackCaptureDuration(val duration: Duration) :
         Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
+
+    @Parcelize
+    data class NetworkConnectivity(val status: String) :
+        Metadatum("network_connectivity", status) {
+
+        companion object {
+            val CONNECTED = NetworkConnectivity("connected")
+            val DISCONNECTED = NetworkConnectivity("disconnected")
+            val UNKNOWN = NetworkConnectivity("unknown")
+        }
+    }
+
+    @Parcelize
+    data class DeviceOrientation(val orientation: String) :
+        Metadatum("device_orientation", orientation) {
+
+        companion object {
+            val PORTRAIT = DeviceOrientation("portrait")
+            val LANDSCAPE = DeviceOrientation("landscape")
+            val UNKNOWN = DeviceOrientation("unknown")
+        }
+    }
 }
