@@ -131,7 +131,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
         },
     ),
 ) {
-    BackHandler { viewModel.onBackButtonClicked() }
+    BackHandler { onResult(SmileIDResult.Error(OperationCanceledException("User cancelled"))) }
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.CAMERA) { granted ->
         if (!granted) {

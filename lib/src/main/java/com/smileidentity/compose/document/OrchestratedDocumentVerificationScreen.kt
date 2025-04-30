@@ -1,7 +1,6 @@
 package com.smileidentity.compose.document
 
 import android.os.Parcelable
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -49,7 +48,6 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     useStrictMode: Boolean = false,
     onResult: SmileIDCallback<T> = {},
 ) {
-    BackHandler { viewModel.onBackButtonClicked() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selfieCaptureScreen = @Composable {
         if (useStrictMode) {

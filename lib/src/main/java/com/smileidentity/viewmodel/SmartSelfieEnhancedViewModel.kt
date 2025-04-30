@@ -3,7 +3,6 @@ package com.smileidentity.viewmodel
 import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
-import android.os.OperationCanceledException
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
@@ -611,15 +610,6 @@ class SmartSelfieEnhancedViewModel(
             MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
                 as? DeviceInfoProvider
             )?.startRecordingDeviceOrientations()
-    }
-
-    fun onBackButtonClicked() {
-        (
-            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
-                as? DeviceInfoProvider
-            )?.stopRecordingDeviceOrientations()
-
-        onResult(SmileIDResult.Error(OperationCanceledException("User cancelled")))
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
