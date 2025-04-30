@@ -106,7 +106,8 @@ fun OrchestratedSelfieCaptureScreen(
                     R.string.si_smart_selfie_confirmation_dialog_subtitle,
                 ),
                 painter = BitmapPainter(
-                    BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath).asImageBitmap(),
+                    BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath)
+                        .asImageBitmap(),
                 ),
                 confirmButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_confirm_button,

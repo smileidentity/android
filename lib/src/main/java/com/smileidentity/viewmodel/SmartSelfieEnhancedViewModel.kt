@@ -20,10 +20,13 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
 import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.BackCamera
 import com.smileidentity.models.v2.metadata.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.metadata.model
@@ -177,9 +180,19 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
 
     init {
         startStrictModeTimerIfNecessary()
+
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider
+            )?.startMonitoring()
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                as? DeviceInfoProvider
+            )?.startRecordingDeviceOrientations()
     }
 
     private fun isPortraitOrientation(degrees: Int): Boolean = degrees == 270
@@ -220,6 +233,14 @@ class SmartSelfieEnhancedViewModel(
      */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
@@ -439,6 +460,12 @@ class SmartSelfieEnhancedViewModel(
                 }
                 return@addOnSuccessListener
             }
+            // capture the device orientation at the end of the capture (when all liveness images
+            // are captured)
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
@@ -528,6 +555,12 @@ class SmartSelfieEnhancedViewModel(
             metadataTimerStart.elapsedNow().inWholeMilliseconds,
         )
         val metadata = MetadataManager.collectAllMetadata()
+        // We can stop monitoring the network traffic after we have collected the metadata
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider
+            )?.stopMonitoring()
+
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(
                 userId = userId,
@@ -563,6 +596,20 @@ class SmartSelfieEnhancedViewModel(
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
         shouldAnalyzeImages = true
+        (
+            MetadataManager.providers[
+                MetadataProvider.MetadataProviderType.DeviceInfo,
+            ] as? DeviceInfoProvider
+            )?.clearDeviceOrientations()
+        hasRecordedOrientationAtCaptureStart = false
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider
+            )?.startMonitoring()
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                as? DeviceInfoProvider
+            )?.startRecordingDeviceOrientations()
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
