@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import android.provider.Settings.Secure
+import androidx.core.content.edit
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.android.gms.tasks.Tasks
@@ -17,8 +18,10 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.ApplicationInfoProvider
 import com.smileidentity.models.v2.metadata.CarrierInfoProvider
 import com.smileidentity.models.v2.metadata.DeviceInfoProvider
+import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
@@ -174,6 +177,14 @@ object SmileID {
             MetadataProvider.MetadataProviderType.DeviceInfo,
             deviceInfoProvider,
         )
+
+        val applicationInfoProvider = ApplicationInfoProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.ApplicationInfo,
+            applicationInfoProvider,
+        )
+
+        trackSdkLaunchCount(context)
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {
@@ -556,6 +567,20 @@ object SmileID {
                 )
                 throw exception
             }
+        }
+    }
+
+    private fun trackSdkLaunchCount(context: Context) {
+        try {
+            val sharedPreferences = context.getSharedPreferences("SmileIDPrefs", MODE_PRIVATE)
+            val key = "SmileID.SDKLaunchCount"
+            val currentCount = sharedPreferences.getInt(key, 0)
+            val newCount = currentCount + 1
+            sharedPreferences.edit { putInt(key, newCount) }
+
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount.toString())
+        } catch (e: Exception) {
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, "unknown")
         }
     }
 }

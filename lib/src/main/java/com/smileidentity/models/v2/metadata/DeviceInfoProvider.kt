@@ -6,6 +6,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
@@ -17,6 +18,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+    private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager?
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
     private val accelerometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private var currentOrientation: String = "unknown"
@@ -62,7 +64,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
                 return
             }
             isRecordingDeviceOrientations = true
-            println("start recording device orientations")
 
             sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
         }
@@ -71,7 +72,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
     fun stopRecordingDeviceOrientations() {
         isRecordingDeviceOrientations = false
         sensorManager?.unregisterListener(this)
-        println("stop recording device orientations")
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -85,7 +85,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
                 kotlin.math.abs(y) > kotlin.math.abs(x) -> "Portrait"
                 else -> "Landscape"
             }
-            println("current device orientation: $currentOrientation")
         }
     }
 
@@ -101,19 +100,39 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         deviceOrientations.clear()
     }
 
+    private fun getNumberOfCameras(): String {
+        return try {
+            val numberOfCameras = cameraManager?.cameraIdList?.size
+            numberOfCameras.toString()
+        } catch (e: Exception) {
+            "unknown"
+        }
+    }
+
+    private fun hasProximitySensor(): Boolean {
+        return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
+    }
+
+
     override fun collectMetadata(): Map<MetadataKey, Any> {
         stopRecordingDeviceOrientations()
 
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
+        val numberOfCameras = getNumberOfCameras()
+        val hasProximitySensor = hasProximitySensor()
+
         val jsonArray = JSONArray(deviceOrientations)
 
         // we clear the device orientations after we collected them
         deviceOrientations.clear()
+
         return mapOf(
             MetadataKey.ScreenResolution to screenResolution,
             MetadataKey.MemoryInfo to totalMemory,
             MetadataKey.DeviceOrientation to jsonArray,
+            MetadataKey.NumberOfCameras to numberOfCameras,
+            MetadataKey.ProximitySensor to hasProximitySensor,
         )
     }
 }

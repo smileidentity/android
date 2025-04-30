@@ -180,6 +180,7 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var selfieCaptureRetries = 0
     private var hasRecordedOrientationAtCaptureStart = false
 
     init {
@@ -469,6 +470,17 @@ class SmartSelfieEnhancedViewModel(
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
+
+            MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.HeadPose.value)
+            MetadataManager.addMetadata(
+                MetadataKey.SelfieCaptureDuration,
+                metadataTimerStart.elapsedNow().inWholeMilliseconds,
+            )
+            MetadataManager.addMetadata(
+                MetadataKey.SelfieCaptureRetries,
+                selfieCaptureRetries.toString(),
+            )
+
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
                 return@addOnSuccessListener
@@ -549,11 +561,6 @@ class SmartSelfieEnhancedViewModel(
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
-        MetadataManager.addMetadata(MetadataKey.ActiveLivenessType, LivenessType.HeadPose.value)
-        MetadataManager.addMetadata(
-            MetadataKey.SelfieCaptureDuration,
-            metadataTimerStart.elapsedNow().inWholeMilliseconds,
-        )
         val metadata = MetadataManager.collectAllMetadata()
         // We can stop monitoring the network traffic after we have collected the metadata
         (
@@ -595,6 +602,7 @@ class SmartSelfieEnhancedViewModel(
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
+        selfieCaptureRetries++
         shouldAnalyzeImages = true
         (
             MetadataManager.providers[
