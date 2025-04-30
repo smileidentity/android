@@ -100,7 +100,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         deviceOrientations.clear()
     }
 
-<<<<<<< HEAD
     private fun getNumberOfCameras(): String {
         return try {
             val numberOfCameras = cameraManager?.cameraIdList?.size
