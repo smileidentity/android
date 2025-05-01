@@ -62,6 +62,7 @@ fun OrchestratedSelfieCaptureScreen(
                 allowNewEnroll = allowNewEnroll,
                 skipApiSubmission = skipApiSubmission,
                 extraPartnerParams = extraPartnerParams,
+                metadata = metadata,
             )
         },
     ),

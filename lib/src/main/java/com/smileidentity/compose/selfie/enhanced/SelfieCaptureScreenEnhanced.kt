@@ -131,6 +131,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                 selfieQualityModel = selfieQualityModel,
                 skipApiSubmission = skipApiSubmission,
                 onResult = onResult,
+                metadata = metadata,
             )
         },
     ),
