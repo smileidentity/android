@@ -20,6 +20,7 @@ import com.smileidentity.compose.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.compose.metadata.updaters.HostApplicationProvider
 import com.smileidentity.compose.metadata.updaters.MetadataInterface
 import com.smileidentity.compose.metadata.updaters.NetworkAwareMetadata
+import com.smileidentity.compose.metadata.updaters.ScreenResolutionProvider
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -72,6 +73,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     CarrierInfoProvider(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    ScreenResolutionProvider(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,
