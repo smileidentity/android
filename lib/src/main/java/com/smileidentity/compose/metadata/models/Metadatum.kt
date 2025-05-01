@@ -1,15 +1,11 @@
 package com.smileidentity.compose.metadata.models
 
 import android.os.Parcelable
-import com.smileidentity.BuildConfig
-import com.smileidentity.SmileID
-import com.smileidentity.compose.metadata.device.getIPAddress
-import com.smileidentity.compose.metadata.device.model
-import com.smileidentity.compose.metadata.device.os
+import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
 /**
  * key-value pair that can be used to store additional information about a job
@@ -18,100 +14,21 @@ import kotlinx.parcelize.Parcelize
 @JsonClass(generateAdapter = true)
 open class Metadatum(
     @Json(name = "name") val name: String,
-    @Json(name = "value") val value: String,
+    @Json(name = "value") val value: @RawValue Any,
+    @Json(name = "timestamp") val timestamp: String,
 ) : Parcelable {
-    @Parcelize
-    data object Sdk : Metadatum("sdk", "android")
+    constructor(
+        name: MetadataKey,
+        value: @RawValue Any,
+        timestamp: String = getCurrentIsoTimestamp(),
+        ) : this(
+        name.key, value, timestamp
+    )
+}
 
-    @Parcelize
-    data object SdkVersion : Metadatum("sdk_version", BuildConfig.VERSION_NAME)
-
-    @Parcelize
-    data class ActiveLivenessType(val type: LivenessType) :
-        Metadatum("active_liveness_type", type.value)
-
-    @Parcelize
-    data object ActiveLivenessVersion : Metadatum("active_liveness_version", "1.0.0")
-
-    @Parcelize
-    data object ClientIP : Metadatum("client_ip", getIPAddress(useIPv4 = true))
-
-    @Parcelize
-    data object DeviceModel : Metadatum("device_model", model)
-
-    @Parcelize
-    data object DeviceOS : Metadatum("device_os", os)
-
-    @Parcelize
-    data object Fingerprint : Metadatum("fingerprint", SmileID.fingerprint)
-
-    @Parcelize
-    data class CameraName(val cameraName: String) :
-        Metadatum("camera_name", cameraName)
-
-    @Parcelize
-    data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :
-        Metadatum("selfie_image_origin", origin.value)
-
-    /**
-     * This represents the time it took for the user to complete *their* portion of the task. It
-     * does *NOT* include network time.
-     */
-    @Parcelize
-    data class SelfieCaptureDuration(val duration: Duration) :
-        Metadatum("selfie_capture_duration_ms", duration.inWholeMilliseconds.toString())
-
-    @Parcelize
-    data class DocumentFrontImageOrigin(val origin: DocumentImageOriginValue) :
-        Metadatum("document_front_image_origin", origin.value)
-
-    @Parcelize
-    data class DocumentBackImageOrigin(val origin: DocumentImageOriginValue) :
-        Metadatum("document_back_image_origin", origin.value)
-
-    @Parcelize
-    data class DocumentFrontCaptureRetries(val retries: Int) :
-        Metadatum("document_front_capture_retries", retries.toString())
-
-    @Parcelize
-    data class DocumentBackCaptureRetries(val retries: Int) :
-        Metadatum("document_back_capture_retries", retries.toString())
-
-    /**
-     * This represents the time it took for the user to complete *their* portion of the task. It
-     * does *NOT* include network time.
-     */
-    @Parcelize
-    data class DocumentFrontCaptureDuration(val duration: Duration) :
-        Metadatum("document_front_capture_duration_ms", duration.inWholeMilliseconds.toString())
-
-    /**
-     * This represents the time it took for the user to complete *their* portion of the task. It
-     * does *NOT* include network time.
-     */
-    @Parcelize
-    data class DocumentBackCaptureDuration(val duration: Duration) :
-        Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
-
-    @Parcelize
-    data class NetworkConnectivity(val status: String) :
-        Metadatum("network_connectivity", status) {
-
-        companion object {
-            val CONNECTED = NetworkConnectivity("connected")
-            val DISCONNECTED = NetworkConnectivity("disconnected")
-            val UNKNOWN = NetworkConnectivity("unknown")
-        }
-    }
-
-    @Parcelize
-    data class DeviceOrientation(val orientation: String) :
-        Metadatum("device_orientation", orientation) {
-
-        companion object {
-            val PORTRAIT = DeviceOrientation("portrait")
-            val LANDSCAPE = DeviceOrientation("landscape")
-            val UNKNOWN = DeviceOrientation("unknown")
-        }
-    }
+/**
+ * A function that can be used to remove an entry in the Metadatum list
+ */
+fun MutableList<Metadatum>.remove(key: MetadataKey) {
+    this.removeAll { it.name == key.key }
 }

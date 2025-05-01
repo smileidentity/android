@@ -36,7 +36,6 @@ class DocumentCaptureViewModelTest {
             side = DocumentCaptureSide.Front,
             knownAspectRatio = null,
             objectDetector = objectDetector,
-            metadata = mutableListOf(),
         )
     }
 

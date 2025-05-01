@@ -1,6 +1,6 @@
 package com.smileidentity.networking
 
-import com.smileidentity.compose.metadata.Metadata
+import com.smileidentity.compose.metadata.models.Metadata
 import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult

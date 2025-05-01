@@ -13,7 +13,6 @@ internal fun SmileThemeSurface(
     typography: Typography,
     content: @Composable () -> Unit,
 ) {
-    // Use the network-aware provider to automatically update metadata
     LocalMetadataProvider.MetadataProvider {
         MaterialTheme(colorScheme = colorScheme, typography = typography) {
             Surface(content = content)

@@ -32,7 +32,6 @@ class SelfieViewModelTest {
             jobId = randomJobId(),
             allowNewEnroll = false,
             skipApiSubmission = false,
-            metadata = mutableListOf(),
         )
     }
 

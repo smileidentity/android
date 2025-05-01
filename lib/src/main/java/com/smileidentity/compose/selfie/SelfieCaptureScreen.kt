@@ -76,7 +76,6 @@ fun SelfieCaptureScreen(
                 jobId = jobId,
                 allowNewEnroll = allowNewEnroll,
                 skipApiSubmission = skipApiSubmission,
-                metadata = metadata,
             )
         },
     ),

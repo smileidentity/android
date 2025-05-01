@@ -233,7 +233,6 @@ fun SmileID.DocumentVerification(
                         useStrictMode = useStrictMode,
                         selfieFile = bypassSelfieCaptureWithFile,
                         extraPartnerParams = extraPartnerParams,
-                        metadata = metadata,
                     )
                 },
             ),
@@ -331,7 +330,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
                         selfieFile = bypassSelfieCaptureWithFile,
                         useStrictMode = useStrictMode,
                         extraPartnerParams = extraPartnerParams,
-                        metadata = metadata,
                     )
                 },
             ),

@@ -130,7 +130,6 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                 extraPartnerParams = extraPartnerParams,
                 selfieQualityModel = selfieQualityModel,
                 skipApiSubmission = skipApiSubmission,
-                metadata = metadata,
                 onResult = onResult,
             )
         },

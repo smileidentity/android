@@ -17,9 +17,9 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
-import com.smileidentity.compose.metadata.asNetworkRequest
 import com.smileidentity.compose.metadata.device.model
 import com.smileidentity.compose.metadata.models.LivenessType
+import com.smileidentity.compose.metadata.models.MetadataKey
 import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.metadata.models.SelfieImageOriginValue.BackCamera
 import com.smileidentity.compose.metadata.models.SelfieImageOriginValue.FrontCamera
@@ -177,6 +177,9 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var networkRetries = 0
+    private var selfieCaptureRetries = 0
+    private var hasRecordedOrientationAtCaptureStart = false
 
     init {
         startStrictModeTimerIfNecessary()
@@ -220,6 +223,14 @@ class SmartSelfieEnhancedViewModel(
      */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
@@ -439,9 +450,23 @@ class SmartSelfieEnhancedViewModel(
                 }
                 return@addOnSuccessListener
             }
+            // capture the device orientation at the end of the capture (when all liveness images
+            // are captured)
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
+
+            metadata.add(Metadatum(MetadataKey.ActiveLivenessType, LivenessType.HeadPose.value))
+            metadata.add(Metadatum(
+                MetadataKey.SelfieCaptureDuration,
+                metadataTimerStart.elapsedNow().inWholeMilliseconds,
+            ))
+            metadata.add(Metadatum(MetadataKey.SelfieCaptureRetries, selfieCaptureRetries))
+
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
                 return@addOnSuccessListener
@@ -479,6 +504,8 @@ class SmartSelfieEnhancedViewModel(
                                     selfieFile = selfieFile,
                                 )
                             }
+                            networkRetries = 0
+                            metadata.remove(MetadataKey.NetworkRetries)
                             // Delay to ensure the completion icon is shown for a little bit
                             delay(COMPLETED_DELAY_MS)
                             val result = SmartSelfieResult(
@@ -522,8 +549,6 @@ class SmartSelfieEnhancedViewModel(
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
-        metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
-        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(
                 userId = userId,
@@ -532,7 +557,7 @@ class SmartSelfieEnhancedViewModel(
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata.asNetworkRequest(),
+                metadata = metadata,
             )
         } else {
             SmileID.api.doSmartSelfieAuthentication(
@@ -541,7 +566,7 @@ class SmartSelfieEnhancedViewModel(
                 livenessImages = livenessFiles,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata.asNetworkRequest(),
+                metadata = metadata,
             )
         }
     }
@@ -552,27 +577,36 @@ class SmartSelfieEnhancedViewModel(
      * file IO scenario.
      */
     fun onRetry() {
-        metadata.removeAll { it is Metadatum.CameraName }
-        metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
-        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        metadata.remove(MetadataKey.CameraName)
+        metadata.remove(MetadataKey.SelfieCaptureDuration)
+        metadata.remove(MetadataKey.SelfieImageOrigin)
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
+        networkRetries++
+        metadata.add(Metadatum(MetadataKey.NetworkRetries, networkRetries))
+        selfieCaptureRetries++
         shouldAnalyzeImages = true
+        (
+            MetadataManager.providers[
+                MetadataProvider.MetadataProviderType.DeviceInfo,
+            ] as? DeviceInfoProvider
+            )?.clearDeviceOrientations()
+        hasRecordedOrientationAtCaptureStart = false
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
-        metadata.removeAll { it is Metadatum.SelfieImageOrigin }
-        metadata.removeAll { it is Metadatum.CameraName }
+        metadata.remove(MetadataKey.CameraName)
+        metadata.remove(MetadataKey.SelfieImageOrigin)
         when (camSelector) {
             CamSelector.Front -> {
-                metadata.add(Metadatum.SelfieImageOrigin(FrontCamera))
-                metadata.add(Metadatum.CameraName("""$model (Front Camera)"""))
+                metadata.add(Metadatum(MetadataKey.SelfieImageOrigin, FrontCamera.value))
+                metadata.add(Metadatum(MetadataKey.CameraName, """$model (Front Camera)"""))
             }
 
             CamSelector.Back -> {
-                metadata.add(Metadatum.SelfieImageOrigin(BackCamera))
-                metadata.add(Metadatum.CameraName("""$model (Back Camera)"""))
+                metadata.add(Metadatum(MetadataKey.SelfieImageOrigin, BackCamera.value))
+                    metadata.add(Metadatum(MetadataKey.CameraName, """$model (Back Camera)"""))
             }
         }
     }

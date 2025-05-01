@@ -7,7 +7,6 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
@@ -17,6 +16,8 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.compose.metadata.models.MetadataKey
+import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -82,6 +83,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
+    private var networkRetries = 0
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
@@ -155,7 +157,6 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 idInfo = IdInfo(countryCode, documentType),
                 consentInformation = consentInformation,
             )
-
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
@@ -196,7 +197,14 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            metadata.add(Metadatum(MetadataKey.NetworkRetries, networkRetries))
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata,
+                                ),
+                            )
                         } else {
                             throw smileIDException
                         }
@@ -255,6 +263,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 },
             )
         }
+
+        networkRetries = 0
+        metadata.remove(MetadataKey.NetworkRetries)
 
         saveResult(
             selfieImage = selfieFileResult,
@@ -339,6 +350,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         step?.let { stepToRetry ->
             _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
+                networkRetries++
+                metadata.add(Metadatum(MetadataKey.NetworkRetries, networkRetries))
                 submitJob()
             }
         }

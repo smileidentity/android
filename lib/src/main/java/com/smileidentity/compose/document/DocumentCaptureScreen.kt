@@ -106,7 +106,6 @@ fun DocumentCaptureScreen(
                 jobId,
                 side,
                 knownIdAspectRatio,
-                metadata,
             )
         },
         key = side.name,

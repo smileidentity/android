@@ -3,6 +3,7 @@ package com.smileidentity.models
 import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
+import com.smileidentity.compose.metadata.models.Metadata
 import com.smileidentity.networking.calculateSignature
 import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json
@@ -35,6 +36,7 @@ data class EnhancedKycRequest(
     @Json(name = "source_sdk_version") val sourceSdkVersion: String = BuildConfig.VERSION_NAME,
     @Json(name = "timestamp") val timestamp: String = getCurrentIsoTimestamp(),
     @Json(name = "signature") val signature: String = calculateSignature(timestamp),
+    @Json(name = "metadata") val metadata: Metadata? = Metadata.default(),
 ) : Parcelable
 
 @Parcelize
