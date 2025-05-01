@@ -28,37 +28,6 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
     private var deviceOrientations: MutableList<MetadataEntry> = mutableListOf()
     private var isRecordingDeviceOrientations = false
 
-    private fun getScreenResolution(): String {
-        windowManager?.let {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // API 30+
-                val windowMetrics: WindowMetrics = windowManager.currentWindowMetrics
-                val width = windowMetrics.bounds.width()
-                val height = windowMetrics.bounds.height()
-                "$width x $height"
-            } else {
-                // API 29-
-                val displayMetrics = DisplayMetrics()
-                @Suppress("DEPRECATION")
-                windowManager.defaultDisplay.getRealMetrics(displayMetrics)
-                val width = displayMetrics.widthPixels
-                val height = displayMetrics.heightPixels
-                "$width x $height"
-            }
-        }
-        return "unknown"
-    }
-
-    private fun getTotalMemoryInMB(): Any {
-        activityManager?.let {
-            val memoryInfo = ActivityManager.MemoryInfo()
-            activityManager.getMemoryInfo(memoryInfo)
-
-            val totalMemoryInMB = memoryInfo.totalMem / (1024 * 1024)
-            return totalMemoryInMB
-        }
-        return "unknown"
-    }
 
     fun startRecordingDeviceOrientations() {
         accelerometer?.let {

@@ -15,6 +15,7 @@ internal class CarrierInfoProvider(
     context: Context,
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
+
     private val packageManager = context.packageManager
     private val telephonyManager =
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?

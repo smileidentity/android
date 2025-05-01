@@ -15,9 +15,11 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.compose.metadata.models.Metadata
 import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.compose.metadata.updaters.CameraInfoProvider
 import com.smileidentity.compose.metadata.updaters.CarrierInfoProvider
 import com.smileidentity.compose.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.compose.metadata.updaters.HostApplicationProvider
+import com.smileidentity.compose.metadata.updaters.MemoryProvider
 import com.smileidentity.compose.metadata.updaters.MetadataInterface
 import com.smileidentity.compose.metadata.updaters.NetworkAwareMetadata
 import com.smileidentity.compose.metadata.updaters.ScreenResolutionProvider
@@ -76,6 +78,12 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     ScreenResolutionProvider(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    MemoryProvider(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    CameraInfoProvider(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,
