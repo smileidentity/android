@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.compose.metadata.models.Metadata
 import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.compose.metadata.updaters.HostApplicationProvider
 import com.smileidentity.compose.metadata.updaters.MetadataInterface
 import com.smileidentity.compose.metadata.updaters.NetworkAwareMetadata
 import kotlinx.collections.immutable.ImmutableList
@@ -64,6 +65,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     DeviceOrientationMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    HostApplicationProvider(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,

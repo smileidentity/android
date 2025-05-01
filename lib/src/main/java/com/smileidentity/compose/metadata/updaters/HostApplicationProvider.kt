@@ -1,15 +1,23 @@
 package com.smileidentity.compose.metadata.updaters
 
 import android.content.Context
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.smileidentity.compose.metadata.models.MetadataKey
-import com.smileidentity.models.v2.metadata.MetadataEntry
-import com.smileidentity.compose.metadata.MetadataProvider
+import com.smileidentity.compose.metadata.models.Metadatum
 
-class ApplicationInfoProvider(context: Context) : MetadataProvider {
+
+/**
+ * A manager that updates metadata with the host application information.
+ */
+internal class HostApplicationProvider(
+    context: Context,
+    private val metadata: SnapshotStateList<Metadatum>,
+) : MetadataInterface {
+
     private val packageManager = context.packageManager
     private val packageName = context.packageName
 
-    private fun getHostApplicationInfo(): String {
+    private fun getHostApplication(): String {
         return try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
             packageInfo?.let {
@@ -29,10 +37,7 @@ class ApplicationInfoProvider(context: Context) : MetadataProvider {
         }
     }
 
-    override fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>> {
-        val hostApplication = getHostApplicationInfo()
-        return mapOf(
-            MetadataKey.HostApplication to mutableListOf(MetadataEntry(hostApplication)),
-        )
+    override fun forceUpdate() {
+        metadata.add(Metadatum(MetadataKey.HostApplication, getHostApplication()))
     }
 }
