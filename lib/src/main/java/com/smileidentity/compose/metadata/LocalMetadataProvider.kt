@@ -22,6 +22,7 @@ import com.smileidentity.compose.metadata.updaters.HostApplicationProvider
 import com.smileidentity.compose.metadata.updaters.MemoryProvider
 import com.smileidentity.compose.metadata.updaters.MetadataInterface
 import com.smileidentity.compose.metadata.updaters.NetworkAwareMetadata
+import com.smileidentity.compose.metadata.updaters.ProximitySensorProvider
 import com.smileidentity.compose.metadata.updaters.ScreenResolutionProvider
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -84,6 +85,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     CameraInfoProvider(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    ProximitySensorProvider(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,
