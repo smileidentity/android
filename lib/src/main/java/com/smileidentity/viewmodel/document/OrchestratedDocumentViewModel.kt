@@ -219,10 +219,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
                             networkRetries++
-                            MetadataManager.addMetadata(
-                                MetadataKey.NetworkRetries,
-                                networkRetries.toString(),
-                            )
+                            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
                             metadata = MetadataManager.collectAllMetadata()
                             SmileID.api.prepUpload(
                                 prepUploadRequest.copy(
@@ -376,7 +373,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
                 networkRetries++
-                MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
+                MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
                 submitJob()
             }
         }

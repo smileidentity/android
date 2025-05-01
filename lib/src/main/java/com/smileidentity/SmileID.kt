@@ -579,7 +579,7 @@ object SmileID {
             val newCount = currentCount + 1
             sharedPreferences.edit { putInt(key, newCount) }
 
-            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount.toString())
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount)
         } catch (e: Exception) {
             MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, "unknown")
         }

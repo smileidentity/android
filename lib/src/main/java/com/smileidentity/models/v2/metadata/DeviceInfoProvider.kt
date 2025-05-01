@@ -11,7 +11,6 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import android.view.WindowMetrics
-import org.json.JSONArray
 
 class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListener {
     private val windowManager =
@@ -22,7 +21,7 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
     private val accelerometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private var currentOrientation: String = "unknown"
-    private var deviceOrientations: MutableList<String> = mutableListOf()
+    private var deviceOrientations: MutableList<MetadataEntry> = mutableListOf()
     private var isRecordingDeviceOrientations = false
 
     private fun getScreenResolution(): String {
@@ -46,13 +45,13 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         return "unknown"
     }
 
-    private fun getTotalMemoryInMB(): String {
+    private fun getTotalMemoryInMB(): Any {
         activityManager?.let {
             val memoryInfo = ActivityManager.MemoryInfo()
             activityManager.getMemoryInfo(memoryInfo)
 
             val totalMemoryInMB = memoryInfo.totalMem / (1024 * 1024)
-            return "$totalMemoryInMB"
+            return totalMemoryInMB
         }
         return "unknown"
     }
@@ -93,17 +92,16 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
     }
 
     fun addDeviceOrientation() {
-        deviceOrientations.add(currentOrientation)
+        deviceOrientations.add(MetadataEntry(currentOrientation))
     }
 
     fun clearDeviceOrientations() {
         deviceOrientations.clear()
     }
 
-    private fun getNumberOfCameras(): String {
+    private fun getNumberOfCameras(): Any {
         return try {
-            val numberOfCameras = cameraManager?.cameraIdList?.size
-            numberOfCameras.toString()
+            cameraManager?.cameraIdList?.size ?: "unknown"
         } catch (e: Exception) {
             "unknown"
         }
@@ -113,24 +111,25 @@ class DeviceInfoProvider(context: Context) : MetadataProvider, SensorEventListen
         return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
     }
 
-    override fun collectMetadata(): Map<MetadataKey, Any> {
+    override fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>> {
         stopRecordingDeviceOrientations()
 
         val screenResolution = getScreenResolution()
         val totalMemory = getTotalMemoryInMB()
         val numberOfCameras = getNumberOfCameras()
         val hasProximitySensor = hasProximitySensor()
-        val jsonArray = JSONArray(deviceOrientations)
 
-        // we clear the device orientations after we collected them
-        deviceOrientations.clear()
-
-        return mapOf(
-            MetadataKey.ScreenResolution to screenResolution,
-            MetadataKey.MemoryInfo to totalMemory,
-            MetadataKey.DeviceOrientation to jsonArray,
-            MetadataKey.NumberOfCameras to numberOfCameras,
-            MetadataKey.ProximitySensor to hasProximitySensor,
-        )
+        return try {
+            mapOf(
+                MetadataKey.ScreenResolution to mutableListOf(MetadataEntry(screenResolution)),
+                MetadataKey.MemoryInfo to mutableListOf(MetadataEntry(totalMemory)),
+                MetadataKey.DeviceOrientation to deviceOrientations.toMutableList(),
+                MetadataKey.NumberOfCameras to mutableListOf(MetadataEntry(numberOfCameras)),
+                MetadataKey.ProximitySensor to mutableListOf(MetadataEntry(hasProximitySensor)),
+            )
+        } finally {
+            // we clear the device orientations after we collected them
+            deviceOrientations.clear()
+        }
     }
 }

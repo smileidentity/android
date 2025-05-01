@@ -23,7 +23,6 @@ import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
@@ -319,10 +318,7 @@ class SelfieViewModel(
             MetadataKey.SelfieCaptureDuration,
             metadataTimerStart.elapsedNow().inWholeMilliseconds,
         )
-        MetadataManager.addMetadata(
-            MetadataKey.SelfieCaptureRetries,
-            selfieCaptureRetries.toString(),
-        )
+        MetadataManager.addMetadata(MetadataKey.SelfieCaptureRetries, selfieCaptureRetries)
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -411,7 +407,7 @@ class SelfieViewModel(
                     userId = userId,
                     partnerParams = extraPartnerParams,
                     allowNewEnroll = allowNewEnroll,
-                    metadata = Metadata(metadata),
+                    metadata = metadata,
                 )
             } else {
                 SmileID.api.doSmartSelfieAuthentication(
@@ -419,7 +415,7 @@ class SelfieViewModel(
                     livenessImages = livenessFiles,
                     userId = userId,
                     partnerParams = extraPartnerParams,
-                    metadata = Metadata(metadata),
+                    metadata = metadata,
                 )
             }
             // Move files from unsubmitted to submitted directories
@@ -490,7 +486,7 @@ class SelfieViewModel(
         // If selfie file is present, all captures were completed, so we're retrying a network issue
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
             networkRetries++
-            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
+            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
             submitJob(selfieFile!!, livenessFiles)
         } else {
             MetadataManager.removeMetadata(MetadataKey.SelfieCaptureDuration)

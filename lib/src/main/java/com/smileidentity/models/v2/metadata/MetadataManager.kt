@@ -6,7 +6,7 @@ import com.smileidentity.util.getCurrentIsoTimestamp
 import java.util.TimeZone
 
 interface MetadataProvider {
-    fun collectMetadata(): Map<MetadataKey, Any>
+    fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>>
 
     enum class MetadataProviderType {
         Network,
@@ -19,7 +19,7 @@ interface MetadataProvider {
 object MetadataManager {
     val providers: MutableMap<MetadataProvider.MetadataProviderType, MetadataProvider> =
         mutableMapOf()
-    private val staticMetadata: MutableMap<MetadataKey, String> = mutableMapOf()
+    private val staticMetadata: MutableMap<MetadataKey, MutableList<MetadataEntry>> = mutableMapOf()
 
     init {
         setDefaultMetadata()
@@ -45,7 +45,10 @@ object MetadataManager {
     }
 
     fun addMetadata(key: MetadataKey, value: Any) {
-        staticMetadata[key] = value.toString()
+        val entry = MetadataEntry(value)
+        staticMetadata.getOrPut(key) {
+            mutableListOf()
+        }.add(entry)
     }
 
     fun removeMetadata(key: MetadataKey) {
@@ -53,26 +56,30 @@ object MetadataManager {
     }
 
     fun getDefaultMetadata(): Metadata {
-        val metadata = staticMetadata.map { (key, value) ->
-            Metadatum(key.key, value)
+        val metadata = staticMetadata.flatMap { (key, entry) ->
+            entry.map { Metadatum(key.key, it.value, it.timestamp) }
         }
         return Metadata(metadata)
     }
 
-    fun collectAllMetadata(): List<Metadatum> {
-        val allMetadata = mutableMapOf<MetadataKey, String>().apply {
-            putAll(staticMetadata)
+    fun collectAllMetadata(): Metadata? {
+        val metadataList = mutableListOf<Metadatum>()
+
+        staticMetadata.forEach { (key, entries) ->
+            entries.forEach { entry ->
+                metadataList.add(Metadatum(key.key, entry.value, entry.timestamp))
+            }
         }
 
         for ((_, provider) in providers) {
             val providerMetadata = provider.collectMetadata()
-            for ((key, value) in providerMetadata) {
-                allMetadata[key] = value.toString()
+            providerMetadata.forEach { (key, entries) ->
+                entries.forEach { entry ->
+                    metadataList.add(Metadatum(key.key, entry.value, entry.timestamp))
+                }
             }
         }
 
-        return allMetadata.map { (key, value) ->
-            Metadatum(key.key, value)
-        }
+        return Metadata(metadataList)
     }
 }

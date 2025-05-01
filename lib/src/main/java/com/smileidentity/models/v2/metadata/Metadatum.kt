@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
 /**
  * key-value pair that can be used to store additional information about a job
@@ -12,7 +13,8 @@ import kotlinx.parcelize.Parcelize
 @JsonClass(generateAdapter = true)
 open class Metadatum(
     @Json(name = "name") val name: String,
-    @Json(name = "value") val value: String,
+    @Json(name = "value") val value: @RawValue Any,
+    @Json(name = "timestamp") val timestamp: String,
 ) : Parcelable
 
 /**

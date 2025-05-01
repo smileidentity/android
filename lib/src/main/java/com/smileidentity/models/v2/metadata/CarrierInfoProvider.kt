@@ -39,12 +39,14 @@ class CarrierInfoProvider(context: Context) : MetadataProvider {
         return "unknown"
     }
 
-    override fun collectMetadata(): Map<MetadataKey, Any> {
+    override fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>> {
         val carrierInfo = if (hasTelephonySubscription()) {
             getCarrierName()
         } else {
             "unknown"
         }
-        return mapOf(MetadataKey.CarrierInfo to carrierInfo)
+        return mapOf(
+            MetadataKey.CarrierInfo to mutableListOf(MetadataEntry(carrierInfo)),
+        )
     }
 }

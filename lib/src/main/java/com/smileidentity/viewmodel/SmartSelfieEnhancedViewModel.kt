@@ -22,7 +22,6 @@ import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.models.v2.metadata.DeviceInfoProvider
 import com.smileidentity.models.v2.metadata.LivenessType
-import com.smileidentity.models.v2.metadata.Metadata
 import com.smileidentity.models.v2.metadata.MetadataKey
 import com.smileidentity.models.v2.metadata.MetadataManager
 import com.smileidentity.models.v2.metadata.MetadataProvider
@@ -479,7 +478,7 @@ class SmartSelfieEnhancedViewModel(
             )
             MetadataManager.addMetadata(
                 MetadataKey.SelfieCaptureRetries,
-                selfieCaptureRetries.toString(),
+                selfieCaptureRetries,
             )
 
             if (skipApiSubmission) {
@@ -579,7 +578,7 @@ class SmartSelfieEnhancedViewModel(
                 allowNewEnroll = allowNewEnroll,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = Metadata(metadata),
+                metadata = metadata,
             )
         } else {
             SmileID.api.doSmartSelfieAuthentication(
@@ -588,7 +587,7 @@ class SmartSelfieEnhancedViewModel(
                 livenessImages = livenessFiles,
                 partnerParams = extraPartnerParams,
                 failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = Metadata(metadata),
+                metadata = metadata,
             )
         }
     }
@@ -606,7 +605,7 @@ class SmartSelfieEnhancedViewModel(
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
         networkRetries++
-        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries.toString())
+        MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
         selfieCaptureRetries++
         shouldAnalyzeImages = true
         (
