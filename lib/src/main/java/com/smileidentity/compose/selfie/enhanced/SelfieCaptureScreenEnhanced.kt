@@ -64,14 +64,14 @@ import com.smileidentity.compose.components.CameraPermissionButton
 import com.smileidentity.compose.components.DirectiveHaptics
 import com.smileidentity.compose.components.DirectiveVisual
 import com.smileidentity.compose.components.ForceBrightness
-import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
+import com.smileidentity.compose.metadata.LocalMetadataProvider
+import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.ml.SelfieQualityModel
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -120,7 +120,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
     allowNewEnroll: Boolean? = null,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     skipApiSubmission: Boolean = false,
-    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
+    metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
     viewModel: SmartSelfieEnhancedViewModel = viewModel(
         initializer = {
             SmartSelfieEnhancedViewModel(

@@ -50,10 +50,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
-import com.smileidentity.compose.components.LocalMetadata
+import com.smileidentity.compose.metadata.LocalMetadataProvider
+import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
@@ -98,7 +98,7 @@ fun DocumentCaptureScreen(
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
     showConfirmation: Boolean = true,
-    metadata: SnapshotStateList<Metadatum> = LocalMetadata.current,
+    metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
         factory = viewModelFactory {

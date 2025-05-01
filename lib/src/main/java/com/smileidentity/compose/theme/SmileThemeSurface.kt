@@ -1,14 +1,11 @@
-package com.smileidentity.compose.components
+package com.smileidentity.compose.theme
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
-import com.smileidentity.models.v2.Metadata
+import com.smileidentity.compose.metadata.LocalMetadataProvider
 
 @Composable
 internal fun SmileThemeSurface(
@@ -16,9 +13,8 @@ internal fun SmileThemeSurface(
     typography: Typography,
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(
-        LocalMetadata provides remember { Metadata.default().items.toMutableStateList() },
-    ) {
+    // Use the network-aware provider to automatically update metadata
+    LocalMetadataProvider.MetadataProvider {
         MaterialTheme(colorScheme = colorScheme, typography = typography) {
             Surface(content = content)
         }
