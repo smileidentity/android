@@ -83,7 +83,7 @@ class DocumentCaptureViewModel(
     private var documentFirstDetectedTimeMs: Long? = null
     private var captureNextAnalysisFrame = false
     private val defaultAspectRatio = knownAspectRatio ?: 1f
-    private var retryCount = 0
+    private var documentCaptureRetries = 0
     private val timerStart = TimeSource.Monotonic.markNow()
     private var hasRecordedOrientationAtCaptureStart = false
 
@@ -245,7 +245,7 @@ class DocumentCaptureViewModel(
         hasRecordedOrientationAtCaptureStart = false
         isCapturing = false
         documentImageOrigin = null
-        retryCount++
+        documentCaptureRetries++
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -261,7 +261,10 @@ class DocumentCaptureViewModel(
         val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
-                MetadataManager.addMetadata(MetadataKey.DocumentFrontCaptureRetries, retryCount)
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentFrontCaptureRetries,
+                    documentCaptureRetries,
+                )
                 MetadataManager.addMetadata(
                     MetadataKey.DocumentFrontCaptureDuration,
                     elapsed.inWholeMilliseconds,
@@ -275,7 +278,10 @@ class DocumentCaptureViewModel(
             }
 
             DocumentCaptureSide.Back -> {
-                MetadataManager.addMetadata(MetadataKey.DocumentBackCaptureRetries, retryCount)
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentBackCaptureRetries,
+                    documentCaptureRetries,
+                )
                 MetadataManager.addMetadata(
                     MetadataKey.DocumentBackCaptureDuration,
                     elapsed.inWholeMilliseconds,
