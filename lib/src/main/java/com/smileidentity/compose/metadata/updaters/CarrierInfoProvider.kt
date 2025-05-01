@@ -4,11 +4,17 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.TelephonyManager
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.smileidentity.compose.metadata.models.MetadataKey
-import com.smileidentity.models.v2.metadata.MetadataEntry
-import com.smileidentity.compose.metadata.MetadataProvider
+import com.smileidentity.compose.metadata.models.Metadatum
 
-class CarrierInfoProvider(context: Context) : MetadataProvider {
+/**
+ * A manager that updates metadata with the host application information.
+ */
+internal class CarrierInfoProvider(
+    context: Context,
+    private val metadata: SnapshotStateList<Metadatum>,
+) : MetadataInterface {
     private val packageManager = context.packageManager
     private val telephonyManager =
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
@@ -42,14 +48,12 @@ class CarrierInfoProvider(context: Context) : MetadataProvider {
         return "unknown"
     }
 
-    override fun collectMetadata(): Map<MetadataKey, MutableList<MetadataEntry>> {
+    override fun forceUpdate() {
         val carrierInfo = if (hasTelephonySubscription()) {
             getCarrierName()
         } else {
             "unknown"
         }
-        return mapOf(
-            MetadataKey.CarrierInfo to mutableListOf(MetadataEntry(carrierInfo)),
-        )
+        metadata.add(Metadatum(MetadataKey.CarrierInfo, carrierInfo))
     }
 }

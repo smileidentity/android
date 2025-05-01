@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.compose.metadata.models.Metadata
 import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.compose.metadata.updaters.CarrierInfoProvider
 import com.smileidentity.compose.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.compose.metadata.updaters.HostApplicationProvider
 import com.smileidentity.compose.metadata.updaters.MetadataInterface
@@ -68,6 +69,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     HostApplicationProvider(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    CarrierInfoProvider(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,
