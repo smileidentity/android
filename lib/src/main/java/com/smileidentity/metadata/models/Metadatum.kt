@@ -106,6 +106,25 @@ open class Metadatum(
         Metadatum("local_time_of_enrolment", getCurrentIsoTimestamp(TimeZone.getDefault()))
 
     @Parcelize
+    data class MemoryInfo(val memoryInfo: String) : Metadatum("memory_info", memoryInfo)
+
+    @Parcelize
+    data class NetworkConnection(val networkConnection: String) :
+        Metadatum("network_connection", networkConnection)
+
+    @Parcelize
+    data class NumberOfCameras(val numberOfCameras: String) :
+        Metadatum("number_of_cameras", numberOfCameras)
+
+    @Parcelize
+    data class ProximitySensor(val proximitySensor: String) :
+        Metadatum("proximity_sensor", proximitySensor)
+
+    @Parcelize
+    data class ScreenResolution(val screenResolution: String) :
+        Metadatum("screen_resolution", screenResolution)
+
+    @Parcelize
     data object SecurityPolicyVersion : Metadatum("security_policy_version", "0.3.0")
 
     @Parcelize
@@ -131,14 +150,4 @@ open class Metadatum(
 
     @Parcelize
     data object Timezone : Metadatum("timezone", TimeZone.getDefault().id)
-
-    @Parcelize
-    data class NetworkConnectivity(val status: String) : Metadatum("network_connectivity", status) {
-
-        companion object {
-            val CONNECTED = NetworkConnectivity("connected")
-            val DISCONNECTED = NetworkConnectivity("disconnected")
-            val UNKNOWN = NetworkConnectivity("unknown")
-        }
-    }
 }
