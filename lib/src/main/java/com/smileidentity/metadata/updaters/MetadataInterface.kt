@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata.updaters
+package com.smileidentity.metadata.updaters
 
 import androidx.lifecycle.DefaultLifecycleObserver
 

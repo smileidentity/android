@@ -16,8 +16,8 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
-import com.smileidentity.compose.metadata.models.DocumentImageOriginValue
-import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.metadata.models.DocumentImageOriginValue
+import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage

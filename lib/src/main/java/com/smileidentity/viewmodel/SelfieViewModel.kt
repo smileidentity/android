@@ -15,11 +15,11 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
-import com.smileidentity.compose.metadata.asNetworkRequest
-import com.smileidentity.compose.metadata.models.LivenessType
-import com.smileidentity.compose.metadata.models.Metadatum
-import com.smileidentity.compose.metadata.models.SelfieImageOriginValue.BackCamera
-import com.smileidentity.compose.metadata.models.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.metadata.asNetworkRequest
+import com.smileidentity.metadata.models.LivenessType
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.models.SelfieImageOriginValue.BackCamera
+import com.smileidentity.metadata.models.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment

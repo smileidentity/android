@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata.updaters
+package com.smileidentity.metadata.updaters
 
 import android.content.Context
 import android.content.res.Configuration
@@ -6,7 +6,7 @@ import android.hardware.SensorManager
 import android.view.OrientationEventListener
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
-import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.metadata.models.Metadatum
 
 /**
  * A metadata updater that monitors device orientation and updates

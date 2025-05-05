@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata
+package com.smileidentity.metadata
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,10 +13,10 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.smileidentity.compose.metadata.models.Metadatum
-import com.smileidentity.compose.metadata.updaters.DeviceOrientationMetadata
-import com.smileidentity.compose.metadata.updaters.MetadataInterface
-import com.smileidentity.compose.metadata.updaters.NetworkAwareMetadata
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.metadata.updaters.MetadataInterface
+import com.smileidentity.metadata.updaters.NetworkAwareMetadata
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

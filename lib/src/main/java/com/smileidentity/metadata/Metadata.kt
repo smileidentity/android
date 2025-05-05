@@ -1,7 +1,7 @@
-package com.smileidentity.compose.metadata
+package com.smileidentity.metadata
 
 import android.os.Parcelable
-import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.metadata.models.Metadatum
 import kotlinx.parcelize.Parcelize
 
 /**

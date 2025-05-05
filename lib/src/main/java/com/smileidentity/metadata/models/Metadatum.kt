@@ -1,11 +1,11 @@
-package com.smileidentity.compose.metadata.models
+package com.smileidentity.metadata.models
 
 import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
-import com.smileidentity.compose.metadata.device.getIPAddress
-import com.smileidentity.compose.metadata.device.model
-import com.smileidentity.compose.metadata.device.os
+import com.smileidentity.metadata.device.getIPAddress
+import com.smileidentity.metadata.device.model
+import com.smileidentity.metadata.device.os
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.time.Duration

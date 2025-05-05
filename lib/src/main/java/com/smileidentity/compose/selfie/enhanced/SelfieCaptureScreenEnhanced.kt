@@ -67,10 +67,10 @@ import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.components.OvalCutout
 import com.smileidentity.compose.components.SmileIDAttribution
 import com.smileidentity.compose.components.cameraFrameCornerBorder
-import com.smileidentity.compose.metadata.LocalMetadataProvider
-import com.smileidentity.compose.metadata.models.Metadatum
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.metadata.LocalMetadataProvider
+import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback

@@ -25,8 +25,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.ProcessingScreen
-import com.smileidentity.compose.metadata.LocalMetadataProvider
-import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.metadata.LocalMetadataProvider
+import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomJobId

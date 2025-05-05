@@ -1,4 +1,4 @@
-package com.smileidentity.compose.metadata.device
+package com.smileidentity.metadata.device
 
 import java.net.InetAddress
 import java.net.NetworkInterface

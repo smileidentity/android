@@ -4,7 +4,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDOptIn
-import com.smileidentity.compose.metadata.Metadata
+import com.smileidentity.metadata.Metadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse

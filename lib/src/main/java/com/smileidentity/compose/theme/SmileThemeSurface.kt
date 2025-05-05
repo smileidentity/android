@@ -5,7 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import com.smileidentity.compose.metadata.LocalMetadataProvider
+import com.smileidentity.metadata.LocalMetadataProvider
 
 @Composable
 internal fun SmileThemeSurface(

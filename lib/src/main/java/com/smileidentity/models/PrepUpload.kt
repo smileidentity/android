@@ -4,7 +4,7 @@ package com.smileidentity.models
 
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
-import com.smileidentity.compose.metadata.models.Metadatum
+import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.networking.calculateSignature
 import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json

@@ -14,11 +14,11 @@ import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
-import com.smileidentity.compose.metadata.LocalMetadataProvider
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
