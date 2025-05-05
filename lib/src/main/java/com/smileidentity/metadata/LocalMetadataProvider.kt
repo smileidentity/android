@@ -14,10 +14,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updaters.CameraInfoMetadata
 import com.smileidentity.metadata.updaters.CarrierInfoMetadata
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.metadata.updaters.HostApplicationMetadata
+import com.smileidentity.metadata.updaters.MemoryMetadata
 import com.smileidentity.metadata.updaters.MetadataInterface
-import com.smileidentity.metadata.updaters.NetworkAwareMetadata
+import com.smileidentity.metadata.updaters.ProximitySensorMetadata
+import com.smileidentity.metadata.updaters.ScreenResolutionMetadata
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -60,13 +64,25 @@ internal object LocalMetadataProvider {
         providers: ImmutableList<(Context, SnapshotStateList<Metadatum>) -> MetadataInterface> =
             persistentListOf(
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
-                    NetworkAwareMetadata(context, metadata)
+                    CameraInfoMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    CarrierInfoMetadata(context, metadata)
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     DeviceOrientationMetadata(context, metadata)
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
-                    CarrierInfoMetadata(context, metadata)
+                    HostApplicationMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    MemoryMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    ProximitySensorMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    ScreenResolutionMetadata(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,

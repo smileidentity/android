@@ -10,7 +10,7 @@ import com.smileidentity.metadata.models.Metadatum.CarrierInfo
 import com.smileidentity.metadata.updateOrAddBy
 
 /**
- * A manager that updates metadata with the host application information.
+ * A manager that updates metadata with the carrier information.
  */
 internal class CarrierInfoMetadata(
     context: Context,
