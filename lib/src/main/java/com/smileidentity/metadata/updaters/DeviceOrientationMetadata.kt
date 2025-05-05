@@ -7,6 +7,7 @@ import android.view.OrientationEventListener
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updateOrAddBy
 
 /**
  * A metadata updater that monitors device orientation and updates
@@ -64,13 +65,7 @@ class DeviceOrientationMetadata(
             OrientationType.UNKNOWN -> Metadatum.DeviceOrientation.UNKNOWN
         }
 
-        // Find and update existing metadata entry or add a new one
-        val index = metadata.indexOfFirst { it.name == metadataName }
-        if (index != -1) {
-            metadata[index] = orientationMetadatum
-        } else {
-            metadata.add(orientationMetadatum)
-        }
+        metadata.updateOrAddBy(orientationMetadatum) { it.name == metadataName }
     }
 
     /**

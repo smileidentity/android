@@ -13,16 +13,33 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
     companion object {
         fun default(): Metadata = Metadata(
             listOf(
-                Metadatum.Sdk,
-                Metadatum.SdkVersion,
                 Metadatum.ActiveLivenessVersion,
                 Metadatum.ClientIP,
-                Metadatum.Fingerprint,
                 Metadatum.DeviceModel,
                 Metadatum.DeviceOS,
+                Metadatum.Fingerprint,
+                Metadatum.Locale,
+                Metadatum.LocalTimeOfEnrolment,
+                Metadatum.SecurityPolicyVersion,
+                Metadatum.Sdk,
+                Metadatum.SdkVersion,
+                Metadatum.SystemArchitecture,
+                Metadatum.Timezone,
             ),
         )
     }
 }
 
 internal fun List<Metadatum>.asNetworkRequest(): Metadata = Metadata(this)
+
+/**
+ * Generic extension function to update or add an item in a MutableList based on a predicate
+ */
+fun <T> MutableList<T>.updateOrAddBy(item: T, predicate: (T) -> Boolean) {
+    val index = indexOfFirst(predicate)
+    if (index != -1) {
+        this[index] = item
+    } else {
+        add(item)
+    }
+}

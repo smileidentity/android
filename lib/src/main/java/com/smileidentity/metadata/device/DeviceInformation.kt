@@ -27,6 +27,7 @@ private val isEmulator: Boolean
                     Build.PRODUCT.contains("simulator")
                 )
         } catch (e: Exception) {
+            Timber.e(e)
             return false
         }
     }
