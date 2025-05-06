@@ -313,8 +313,8 @@ fun getFilesByType(
     }
 
     // If no valid directories found, throw the same exception as before
-    if (allFiles.isEmpty() && !currentDirectory.exists()
-        && (savePath == oldSavePath || !File(oldSavePath, "$stateDirectory/$folderName").exists())
+    if (allFiles.isEmpty() && !currentDirectory.exists() &&
+        (savePath == oldSavePath || !File(oldSavePath, "$stateDirectory/$folderName").exists())
     ) {
         Timber.w("The path provided is not a valid directory.")
         throw IllegalArgumentException("The path provided is not a valid directory.")
