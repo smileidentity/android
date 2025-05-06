@@ -6,6 +6,7 @@
   failure message if not present
 * Changed File save path from cacheDir to fileDir (and maintain compatibility till next major
   breaking release)
+* Updated the preview to throw SmileIDException and not crash if the file is null
 
 ## 10.6.0
 * Changes the `allow_new_enroll` flag to be a real boolean instead of a string for prepUpload
