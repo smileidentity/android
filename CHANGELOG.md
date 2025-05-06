@@ -2,7 +2,10 @@
 
 ## 10.6.1
 * Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    
-* Added messages from SmartSelfie™ errors will show correctly if present and will show default failure message if not  present  
+* Added messages from SmartSelfie™ errors will show correctly if present and will show default
+  failure message if not present
+* Changed File save path from cacheDir to fileDir (and maintain compatibility till next major
+  breaking release)
 
 ## 10.6.0
 * Changes the `allow_new_enroll` flag to be a real boolean instead of a string for prepUpload
