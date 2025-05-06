@@ -3,7 +3,7 @@ version: 2
 updates:
   - package-ecosystem: "gradle"
     assignees:
-      - jumaallen
+      - jumaallan
     directory: "/"
     schedule:
       interval: "weekly"
@@ -36,7 +36,7 @@ updates:
           - "*"
   - package-ecosystem: github-actions
     assignees:
-      - jumaallen
+      - jumaallan
     directory: /
     schedule:
       interval: "monthly"
