@@ -2,6 +2,7 @@ package com.smileidentity
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import android.provider.Settings.Secure
 import com.google.android.gms.common.moduleinstall.ModuleInstall
@@ -96,6 +97,13 @@ object SmileID {
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
+
+    /**
+     * We need this to not break the old sdk implementation
+     *
+     * We will remove this in the next breaking version (v11)
+     */
+    internal lateinit var oldFileSavePath: String
     internal var fingerprint = ""
 
     /**
@@ -150,6 +158,10 @@ object SmileID {
 
         // Usually looks like: /data/data/0/<package-name>/files/SmileID
         fileSavePath = File("${context.filesDir.absolutePath}/SmileID").absolutePath
+
+        // todo :: will remove this in v11 (breaking change)
+        // Usually looks like: /data/user/0/<package name>/app_SmileID
+        oldFileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
 
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
