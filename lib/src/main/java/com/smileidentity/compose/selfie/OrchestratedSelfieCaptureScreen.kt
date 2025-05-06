@@ -23,18 +23,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.R
+import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ImageCaptureConfirmationDialog
 import com.smileidentity.compose.components.LocalMetadata
 import com.smileidentity.compose.components.ProcessingScreen
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
+import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import timber.log.Timber
 
 /**
  * Orchestrates the selfie capture flow - navigates between instructions, requesting permissions,
@@ -77,6 +81,30 @@ fun OrchestratedSelfieCaptureScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
+        val bitmap = if (uiState.selfieToConfirm != null) {
+            try {
+                BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath)
+                    ?: throw SmileIDException(
+                        SmileIDException.Details(
+                            code = "IMAGE_DECODE_ERROR",
+                            message = "Failed to decode the selfie image file",
+                        ),
+                    )
+            } catch (e: SmileIDException) {
+                Timber.e(
+                    e,
+                    "Failed to decode selfie image from " +
+                        "${uiState.selfieToConfirm.absolutePath}",
+                )
+                SmileIDCrashReporting.hub.captureException(e)
+                viewModel.result = SmileIDResult.Error(e)
+                viewModel.onFinished(onResult)
+                null
+            }
+        } else {
+            null
+        }
+
         when {
             showInstructions && !acknowledgedInstructions -> SmartSelfieInstructionsScreen(
                 showAttribution = showAttribution,
@@ -105,14 +133,12 @@ fun OrchestratedSelfieCaptureScreen(
                 onClose = { viewModel.onFinished(onResult) },
             )
 
-            uiState.selfieToConfirm != null -> ImageCaptureConfirmationDialog(
+            uiState.selfieToConfirm != null && bitmap != null -> ImageCaptureConfirmationDialog(
                 titleText = stringResource(R.string.si_smart_selfie_confirmation_dialog_title),
                 subtitleText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_subtitle,
                 ),
-                painter = BitmapPainter(
-                    BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath).asImageBitmap(),
-                ),
+                painter = BitmapPainter(bitmap.asImageBitmap()),
                 confirmButtonText = stringResource(
                     R.string.si_smart_selfie_confirmation_dialog_confirm_button,
                 ),
