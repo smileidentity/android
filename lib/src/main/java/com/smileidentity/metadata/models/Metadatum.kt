@@ -143,6 +143,9 @@ open class Metadatum(
     data object Sdk : Metadatum("sdk", "android")
 
     @Parcelize
+    data object SdkLaunchCount : Metadatum("sdk_launch_count", SmileID.sdkLaunchCount.toString())
+
+    @Parcelize
     data object SdkVersion : Metadatum("sdk_version", BuildConfig.VERSION_NAME)
 
     @Parcelize
@@ -150,4 +153,10 @@ open class Metadatum(
 
     @Parcelize
     data object Timezone : Metadatum("timezone", TimeZone.getDefault().id)
+
+    @Parcelize
+    data object WrapperSdkName : Metadatum("wrapper_name", SmileID.wrapperSdkName.toString())
+
+    @Parcelize
+    data object WrapperSdkVersion : Metadatum("wrapper_version", SmileID.wrapperSdkVersion.toString())
 }

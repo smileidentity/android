@@ -23,9 +23,12 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
                 Metadatum.SecurityPolicyVersion,
                 Metadatum.Sdk,
                 Metadatum.SdkVersion,
+                Metadatum.SdkLaunchCount,
                 Metadatum.SystemArchitecture,
                 Metadatum.Timezone,
-            ),
+                Metadatum.WrapperSdkName,
+                Metadatum.WrapperSdkVersion,
+                ),
         )
     }
 }
