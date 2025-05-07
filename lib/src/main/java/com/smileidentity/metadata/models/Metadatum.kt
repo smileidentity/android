@@ -111,7 +111,15 @@ open class Metadatum(
 
     @Parcelize
     data class NetworkConnection(val networkConnection: String) :
-        Metadatum("network_connection", networkConnection)
+        Metadatum("network_connection", networkConnection) {
+
+        companion object {
+            val WIFI = NetworkConnection("wifi")
+            val CELLULAR = NetworkConnection("cellular")
+            val OTHER = NetworkConnection("other")
+            val UNKNOWN = NetworkConnection("unknown")
+        }
+    }
 
     @Parcelize
     data class NumberOfCameras(val numberOfCameras: String) :

@@ -20,6 +20,7 @@ import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.metadata.updaters.HostApplicationMetadata
 import com.smileidentity.metadata.updaters.MemoryMetadata
 import com.smileidentity.metadata.updaters.MetadataInterface
+import com.smileidentity.metadata.updaters.NetworkMetadata
 import com.smileidentity.metadata.updaters.ProximitySensorMetadata
 import com.smileidentity.metadata.updaters.ScreenResolutionMetadata
 import com.smileidentity.metadata.updaters.VpnMetadata
@@ -78,6 +79,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     MemoryMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    NetworkMetadata(context, metadata)
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     ProximitySensorMetadata(context, metadata)

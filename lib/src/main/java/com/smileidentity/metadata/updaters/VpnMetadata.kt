@@ -22,7 +22,7 @@ internal class VpnMetadata(
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    fun isVPNActive(): Boolean {
+    private fun isVPNActive(): Boolean {
         val isVpnUsingNetworkType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // API 23+ (Marshmallow and above)
             val network = connectivityManager.activeNetwork
