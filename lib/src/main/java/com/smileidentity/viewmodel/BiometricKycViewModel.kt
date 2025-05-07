@@ -175,8 +175,8 @@ class BiometricKycViewModel(
                             SmileID.api.prepUpload(
                                 prepUploadRequest.copy(
                                     retry = true,
-                                    metadata = metadata
-                                )
+                                    metadata = metadata,
+                                ),
                             )
                         } else {
                             throw smileIDException
