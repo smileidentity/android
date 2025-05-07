@@ -158,5 +158,8 @@ open class Metadatum(
     data object WrapperSdkName : Metadatum("wrapper_name", SmileID.wrapperSdkName.toString())
 
     @Parcelize
-    data object WrapperSdkVersion : Metadatum("wrapper_version", SmileID.wrapperSdkVersion.toString())
+    data object WrapperSdkVersion : Metadatum(
+        "wrapper_version",
+        SmileID.wrapperSdkVersion.toString(),
+    )
 }

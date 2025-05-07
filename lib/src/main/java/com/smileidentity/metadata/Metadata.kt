@@ -28,7 +28,7 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
                 Metadatum.Timezone,
                 Metadatum.WrapperSdkName,
                 Metadatum.WrapperSdkVersion,
-                ),
+            ),
         )
     }
 }
