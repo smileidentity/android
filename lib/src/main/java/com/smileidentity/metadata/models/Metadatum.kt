@@ -123,6 +123,10 @@ open class Metadatum(
     }
 
     @Parcelize
+    data class NetworkRetries(val retries: Int) :
+        Metadatum("network_retries", retries.toString())
+
+    @Parcelize
     data class NumberOfCameras(val numberOfCameras: String) :
         Metadatum("number_of_cameras", numberOfCameras)
 

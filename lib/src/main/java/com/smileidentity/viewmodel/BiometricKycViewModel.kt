@@ -6,6 +6,7 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
+import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
@@ -55,6 +56,7 @@ class BiometricKycViewModel(
     private val jobId: String,
     private val allowNewEnroll: Boolean,
     private val useStrictMode: Boolean = false,
+    private val metadata: MutableList<Metadatum>,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricKycUiState())
@@ -63,6 +65,7 @@ class BiometricKycViewModel(
     private var result: SmileIDResult<BiometricKycResult>? = null
     private var selfieFile: File? = null
     private var livenessFiles: List<File>? = null
+    private var networkRetries = 0
 
     fun onSelfieCaptured(selfieFile: File, livenessFiles: List<File>) {
         this.selfieFile = selfieFile
@@ -134,6 +137,7 @@ class BiometricKycViewModel(
                         allowNewEnroll = allowNewEnroll,
                         timestamp = "",
                         signature = "",
+                        metadata = metadata,
                     ),
                 )
                 createUploadRequestFile(
@@ -154,7 +158,10 @@ class BiometricKycViewModel(
                 allowNewEnroll = allowNewEnroll,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
+                metadata = metadata,
             )
+
+            metadata.add(Metadatum.NetworkRetries(networkRetries))
 
             val prepUploadResponse = runCatching {
                 SmileID.api.prepUpload(prepUploadRequest)
@@ -163,7 +170,14 @@ class BiometricKycViewModel(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            metadata.add(Metadatum.NetworkRetries(networkRetries))
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata
+                                )
+                            )
                         } else {
                             throw smileIDException
                         }
@@ -236,6 +250,7 @@ class BiometricKycViewModel(
             // Set processing state to null to redirect back to selfie capture
             _uiState.update { it.copy(processingState = null) }
         } else {
+            networkRetries++
             submitJob(selfieFile!!, livenessFiles!!)
         }
     }
