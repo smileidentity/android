@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.smileidentity.BuildConfig
 import com.smileidentity.SmileID
 import com.smileidentity.metadata.device.getIPAddress
+import com.smileidentity.metadata.device.isProxyDetected
 import com.smileidentity.metadata.device.locale
 import com.smileidentity.metadata.device.model
 import com.smileidentity.metadata.device.os
@@ -119,6 +120,9 @@ open class Metadatum(
     @Parcelize
     data class ProximitySensor(val proximitySensor: String) :
         Metadatum("proximity_sensor", proximitySensor)
+
+    @Parcelize
+    data object Proxy : Metadatum("proxy", isProxyDetected().toString())
 
     @Parcelize
     data class ScreenResolution(val screenResolution: String) :
