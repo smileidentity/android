@@ -24,6 +24,7 @@ import kotlinx.parcelize.Parcelize
 open class Metadatum(
     @Json(name = "name") val name: String,
     @Json(name = "value") val value: String,
+    @Json(name = "timestamp") val timestamp: String = getCurrentIsoTimestamp(),
 ) : Parcelable {
     @Parcelize
     data class ActiveLivenessType(val type: LivenessType) :
