@@ -159,6 +159,10 @@ open class Metadatum(
     data object Timezone : Metadatum("timezone", TimeZone.getDefault().id)
 
     @Parcelize
+    data class Vpn(val vpnDetected: Boolean) :
+        Metadatum("vpn", vpnDetected.toString())
+
+    @Parcelize
     data object WrapperSdkName : Metadatum("wrapper_name", SmileID.wrapperSdkName.toString())
 
     @Parcelize

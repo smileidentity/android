@@ -22,6 +22,7 @@ import com.smileidentity.metadata.updaters.MemoryMetadata
 import com.smileidentity.metadata.updaters.MetadataInterface
 import com.smileidentity.metadata.updaters.ProximitySensorMetadata
 import com.smileidentity.metadata.updaters.ScreenResolutionMetadata
+import com.smileidentity.metadata.updaters.VpnMetadata
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -83,6 +84,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     ScreenResolutionMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    VpnMetadata(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,
