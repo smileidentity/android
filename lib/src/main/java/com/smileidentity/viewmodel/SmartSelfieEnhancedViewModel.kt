@@ -177,6 +177,7 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var selfieCaptureRetries = 0
 
     init {
         startStrictModeTimerIfNecessary()
@@ -442,6 +443,11 @@ class SmartSelfieEnhancedViewModel(
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
+
+            metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
+            metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
+            metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
                 return@addOnSuccessListener
@@ -522,8 +528,6 @@ class SmartSelfieEnhancedViewModel(
     }
 
     private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
-        metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
-        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         return if (isEnroll) {
             SmileID.api.doSmartSelfieEnrollment(
                 userId = userId,
@@ -558,6 +562,7 @@ class SmartSelfieEnhancedViewModel(
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
+        selfieCaptureRetries++
         shouldAnalyzeImages = true
     }
 

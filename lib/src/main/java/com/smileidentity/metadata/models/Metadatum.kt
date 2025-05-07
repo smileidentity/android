@@ -153,6 +153,10 @@ open class Metadatum(
         Metadatum("selfie_capture_duration_ms", duration.inWholeMilliseconds.toString())
 
     @Parcelize
+    data class SelfieCaptureRetries(val retries: Int) :
+        Metadatum("selfie_capture_retries", retries.toString())
+
+    @Parcelize
     data object Sdk : Metadatum("sdk", "android")
 
     @Parcelize

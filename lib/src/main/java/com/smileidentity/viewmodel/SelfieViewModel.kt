@@ -133,6 +133,7 @@ class SelfieViewModel(
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var selfieCaptureRetries = 0
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
@@ -284,6 +285,7 @@ class SelfieViewModel(
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
+        metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -428,6 +430,7 @@ class SelfieViewModel(
         livenessFiles.removeAll { it.delete() }
         selfieFile = null
         result = null
+        selfieCaptureRetries++
         shouldAnalyzeImages = true
     }
 
@@ -439,6 +442,7 @@ class SelfieViewModel(
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
             metadata.removeAll { it is Metadatum.ActiveLivenessType }
             metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+            selfieCaptureRetries++
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)
