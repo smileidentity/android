@@ -23,11 +23,11 @@ internal class NetworkMetadata(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     override fun onStart(owner: LifecycleOwner) {
-
+        // todo
     }
 
     override fun onStop(owner: LifecycleOwner) {
-
+        // todo
     }
 
     override fun forceUpdate() {
@@ -49,8 +49,8 @@ internal class NetworkMetadata(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // API 23+ (Marshmallow and above)
             val network = connectivityManager.activeNetwork ?: return NetworkConnection.UNKNOWN
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?:
-            return NetworkConnection.UNKNOWN
+            val capabilities = connectivityManager.getNetworkCapabilities(network)
+                ?: return NetworkConnection.UNKNOWN
 
             when {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ->
@@ -61,8 +61,8 @@ internal class NetworkMetadata(
             }
         } else {
             // API 21 & 22 (Lollipop)
-            val networkInfo = connectivityManager.activeNetworkInfo ?:
-            return NetworkConnection.UNKNOWN
+            val networkInfo = connectivityManager.activeNetworkInfo
+                ?: return NetworkConnection.UNKNOWN
             return when (networkInfo.type) {
                 ConnectivityManager.TYPE_WIFI -> NetworkConnection.WIFI
                 ConnectivityManager.TYPE_MOBILE -> NetworkConnection.CELLULAR
