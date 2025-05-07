@@ -4,6 +4,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDOptIn
+import com.smileidentity.compose.metadata.models.Metadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AuthenticationResponse
 import com.smileidentity.models.BiometricKycJobStatusResponse
@@ -29,7 +30,6 @@ import com.smileidentity.models.SubmitBvnTotpResponse
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.models.ValidDocumentsResponse
 import com.smileidentity.models.v2.FailureReason
-import com.smileidentity.models.v2.Metadata
 import com.smileidentity.models.v2.SmartSelfieResponse
 import java.io.File
 import kotlin.time.Duration
@@ -91,7 +91,7 @@ interface SmileIDService {
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
         @Part("allow_new_enroll") allowNewEnroll: Boolean? = null,
-        @Part("metadata") metadata: Metadata? = Metadata.default(),
+        @Part("metadata") metadata: Metadata = Metadata.default(),
     ): SmartSelfieResponse
 
     /**
@@ -115,7 +115,7 @@ interface SmileIDService {
         @Part("failure_reason") failureReason: FailureReason? = null,
         @Part("callback_url") callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
         @Part("sandbox_result") sandboxResult: Int? = null,
-        @Part("metadata") metadata: Metadata? = Metadata.default(),
+        @Part("metadata") metadata: Metadata = Metadata.default(),
     ): SmartSelfieResponse
 
     /**
@@ -237,7 +237,7 @@ suspend fun SmileIDService.doSmartSelfieEnrollment(
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
     allowNewEnroll: Boolean? = null,
-    metadata: Metadata? = Metadata.default(),
+    metadata: Metadata = Metadata.default(),
 ) = doSmartSelfieEnrollment(
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
     livenessImages = livenessImages.asFormDataParts("liveness_images", "image/jpeg"),
@@ -270,7 +270,7 @@ suspend fun SmileIDService.doSmartSelfieAuthentication(
     failureReason: FailureReason? = null,
     callbackUrl: String? = SmileID.callbackUrl.ifBlank { null },
     sandboxResult: Int? = null,
-    metadata: Metadata? = Metadata.default(),
+    metadata: Metadata = Metadata.default(),
 ) = doSmartSelfieAuthentication(
     userId = userId,
     selfieImage = selfieImage.asFormDataPart("selfie_image", "image/jpeg"),
