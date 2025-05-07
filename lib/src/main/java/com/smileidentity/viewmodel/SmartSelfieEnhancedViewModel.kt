@@ -178,6 +178,7 @@ class SmartSelfieEnhancedViewModel(
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
     private var selfieCaptureRetries = 0
+    private var networkRetries = 0
 
     init {
         startStrictModeTimerIfNecessary()
@@ -447,6 +448,7 @@ class SmartSelfieEnhancedViewModel(
             metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
             metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
             metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+            metadata.add(Metadatum.NetworkRetries(networkRetries))
 
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
@@ -563,6 +565,7 @@ class SmartSelfieEnhancedViewModel(
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
         selfieCaptureRetries++
+        networkRetries++
         shouldAnalyzeImages = true
     }
 

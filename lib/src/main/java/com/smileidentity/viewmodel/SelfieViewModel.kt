@@ -134,6 +134,7 @@ class SelfieViewModel(
 
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
     private var selfieCaptureRetries = 0
+    private var networkRetries = 0
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
@@ -286,6 +287,7 @@ class SelfieViewModel(
         metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+        metadata.add(Metadatum.NetworkRetries(networkRetries))
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
@@ -437,6 +439,7 @@ class SelfieViewModel(
     fun onRetry() {
         // If selfie file is present, all captures were completed, so we're retrying a network issue
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
+            networkRetries++
             submitJob(selfieFile!!, livenessFiles)
         } else {
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }

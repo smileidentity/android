@@ -82,6 +82,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
+    private var networkRetries = 0
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
@@ -181,6 +182,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             val authResponse = SmileID.api.authenticate(authRequest)
 
+            metadata.add(Metadatum.NetworkRetries(networkRetries))
+
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 allowNewEnroll = allowNewEnroll,
@@ -196,7 +199,14 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            metadata.add(Metadatum.NetworkRetries(networkRetries))
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata,
+                                ),
+                            )
                         } else {
                             throw smileIDException
                         }
@@ -339,6 +349,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         step?.let { stepToRetry ->
             _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
+                networkRetries++
                 submitJob()
             }
         }
