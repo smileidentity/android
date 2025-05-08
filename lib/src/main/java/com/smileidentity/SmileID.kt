@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import android.provider.Settings.Secure
+import androidx.core.content.edit
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.android.gms.tasks.Tasks
@@ -17,6 +18,14 @@ import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.ApplicationInfoProvider
+import com.smileidentity.models.v2.metadata.CarrierInfoProvider
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
+import com.smileidentity.models.v2.metadata.MetadataKey
+import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
+import com.smileidentity.models.v2.metadata.WrapperSdkName
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
 import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
@@ -151,6 +160,32 @@ object SmileID {
         fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
+
+        val networkMetadataProvider = NetworkMetadataProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.Network,
+            networkMetadataProvider,
+        )
+
+        val carrierInfoProvider = CarrierInfoProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.CarrierInfo,
+            carrierInfoProvider,
+        )
+
+        val deviceInfoProvider = DeviceInfoProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.DeviceInfo,
+            deviceInfoProvider,
+        )
+
+        val applicationInfoProvider = ApplicationInfoProvider(context)
+        MetadataManager.register(
+            MetadataProvider.MetadataProviderType.ApplicationInfo,
+            applicationInfoProvider,
+        )
+
+        trackSdkLaunchCount(context)
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {
@@ -534,5 +569,31 @@ object SmileID {
                 throw exception
             }
         }
+    }
+
+    private fun trackSdkLaunchCount(context: Context) {
+        try {
+            val sharedPreferences = context.getSharedPreferences("SmileIDPrefs", MODE_PRIVATE)
+            val key = "SmileID.SDKLaunchCount"
+            val currentCount = sharedPreferences.getInt(key, 0)
+            val newCount = currentCount + 1
+            sharedPreferences.edit { putInt(key, newCount) }
+
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, newCount)
+        } catch (e: Exception) {
+            MetadataManager.addMetadata(MetadataKey.SdkLaunchCount, "unknown")
+        }
+    }
+
+    /**
+     * Sets the name and version of a x-platform sdk that wraps the native sdk. This is an internal
+     * function and should not be used by partner developers.
+     *
+     * @param name The name of the x-platform sdk that wraps the native sdk.
+     * @param version The version of the x-platform sdk that wraps the native sdk.
+     */
+    fun setWrapperInfo(name: WrapperSdkName, version: String) {
+        MetadataManager.addMetadata(MetadataKey.WrapperName, name.value)
+        MetadataManager.addMetadata(MetadataKey.WrapperVersion, version)
     }
 }

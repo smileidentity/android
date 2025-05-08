@@ -16,8 +16,11 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
-import com.smileidentity.models.v2.DocumentImageOriginValue
-import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.models.v2.metadata.DeviceInfoProvider
+import com.smileidentity.models.v2.metadata.DocumentImageOriginValue
+import com.smileidentity.models.v2.metadata.MetadataKey
+import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -64,7 +67,6 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
-    private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
@@ -81,8 +83,9 @@ class DocumentCaptureViewModel(
     private var documentFirstDetectedTimeMs: Long? = null
     private var captureNextAnalysisFrame = false
     private val defaultAspectRatio = knownAspectRatio ?: 1f
-    private var retryCount = 0
+    private var documentCaptureRetries = 0
     private val timerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
@@ -163,6 +166,11 @@ class DocumentCaptureViewModel(
                                             desiredAspectRatio = uiState.value.idAspectRatio,
                                         )
                                     }
+                                    (
+                                        MetadataManager.providers[
+                                            MetadataProvider.MetadataProviderType.DeviceInfo,
+                                        ] as? DeviceInfoProvider
+                                        )?.addDeviceOrientation()
                                     _uiState.update {
                                         it.copy(
                                             documentImageToConfirm = processedImage,
@@ -218,20 +226,26 @@ class DocumentCaptureViewModel(
         uiState.value.documentImageToConfirm?.delete()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.removeAll { it is Metadatum.DocumentFrontCaptureRetries }
-                metadata.removeAll { it is Metadatum.DocumentFrontCaptureDuration }
-                metadata.removeAll { it is Metadatum.DocumentFrontImageOrigin }
+                MetadataManager.removeMetadata(MetadataKey.DocumentFrontCaptureRetries)
+                MetadataManager.removeMetadata(MetadataKey.DocumentFrontCaptureDuration)
+                MetadataManager.removeMetadata(MetadataKey.DocumentFrontImageOrigin)
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.removeAll { it is Metadatum.DocumentBackCaptureRetries }
-                metadata.removeAll { it is Metadatum.DocumentBackCaptureDuration }
-                metadata.removeAll { it is Metadatum.DocumentBackImageOrigin }
+                MetadataManager.removeMetadata(MetadataKey.DocumentBackCaptureRetries)
+                MetadataManager.removeMetadata(MetadataKey.DocumentBackCaptureDuration)
+                MetadataManager.removeMetadata(MetadataKey.DocumentBackImageOrigin)
             }
         }
+        (
+            MetadataManager.providers[
+                MetadataProvider.MetadataProviderType.DeviceInfo,
+            ] as? DeviceInfoProvider
+            )?.clearDeviceOrientations()
+        hasRecordedOrientationAtCaptureStart = false
         isCapturing = false
         documentImageOrigin = null
-        retryCount++
+        documentCaptureRetries++
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -247,15 +261,37 @@ class DocumentCaptureViewModel(
         val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.add(Metadatum.DocumentFrontCaptureRetries(retryCount))
-                metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
-                documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentFrontCaptureRetries,
+                    documentCaptureRetries,
+                )
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentFrontCaptureDuration,
+                    elapsed.inWholeMilliseconds,
+                )
+                documentImageOrigin?.let {
+                    MetadataManager.addMetadata(
+                        MetadataKey.DocumentFrontImageOrigin,
+                        (documentImageOrigin as DocumentImageOriginValue).value,
+                    )
+                }
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.add(Metadatum.DocumentBackCaptureRetries(retryCount))
-                metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
-                documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentBackCaptureRetries,
+                    documentCaptureRetries,
+                )
+                MetadataManager.addMetadata(
+                    MetadataKey.DocumentBackCaptureDuration,
+                    elapsed.inWholeMilliseconds,
+                )
+                documentImageOrigin?.let {
+                    MetadataManager.addMetadata(
+                        MetadataKey.DocumentBackImageOrigin,
+                        (documentImageOrigin as DocumentImageOriginValue).value,
+                    )
+                }
             }
         }
         onConfirm(documentImageToConfirm)
@@ -280,6 +316,14 @@ class DocumentCaptureViewModel(
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAnalysisTimeMs
         val enoughTimeHasPassed = elapsedTimeMs > ANALYSIS_SAMPLE_INTERVAL_MS
+
+        if (!hasRecordedOrientationAtCaptureStart) {
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.DeviceInfo]
+                    as? DeviceInfoProvider
+                )?.addDeviceOrientation()
+            hasRecordedOrientationAtCaptureStart = true
+        }
 
         if (isCapturing || isFocusing || !enoughTimeHasPassed || image == null) {
             imageProxy.close()

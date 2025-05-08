@@ -14,6 +14,10 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
+import com.smileidentity.models.v2.metadata.MetadataKey
+import com.smileidentity.models.v2.metadata.MetadataManager
+import com.smileidentity.models.v2.metadata.MetadataProvider
+import com.smileidentity.models.v2.metadata.NetworkMetadataProvider
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.results.BiometricKycResult
@@ -57,12 +61,20 @@ class BiometricKycViewModel(
     private val useStrictMode: Boolean = false,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
+    init {
+        (
+            MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                as? NetworkMetadataProvider
+            )?.startMonitoring()
+    }
+
     private val _uiState = MutableStateFlow(BiometricKycUiState())
     val uiState = _uiState.asStateFlow()
 
     private var result: SmileIDResult<BiometricKycResult>? = null
     private var selfieFile: File? = null
     private var livenessFiles: List<File>? = null
+    private var networkRetries = 0
 
     fun onSelfieCaptured(selfieFile: File, livenessFiles: List<File>) {
         this.selfieFile = selfieFile
@@ -120,6 +132,13 @@ class BiometricKycViewModel(
                 jobId = jobId,
             )
 
+            var metadata = MetadataManager.collectAllMetadata()
+            // We can stop monitoring the network traffic after we have collected the metadata
+            (
+                MetadataManager.providers[MetadataProvider.MetadataProviderType.Network]
+                    as? NetworkMetadataProvider
+                )?.stopMonitoring()
+
             if (SmileID.allowOfflineMode) {
                 createAuthenticationRequestFile(jobId, authRequest)
                 createPrepUploadFile(
@@ -132,6 +151,7 @@ class BiometricKycViewModel(
                             extras = extraPartnerParams,
                         ),
                         allowNewEnroll = allowNewEnroll,
+                        metadata = metadata,
                         timestamp = "",
                         signature = "",
                     ),
@@ -152,6 +172,7 @@ class BiometricKycViewModel(
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 allowNewEnroll = allowNewEnroll,
+                metadata = metadata,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
             )
@@ -163,12 +184,22 @@ class BiometricKycViewModel(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            MetadataManager.addMetadata(
+                                MetadataKey.NetworkRetries,
+                                networkRetries.toString(),
+                            )
+                            metadata = MetadataManager.collectAllMetadata()
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata,
+                                ),
+                            )
                         } else {
                             throw smileIDException
                         }
                     }
-
                     else -> {
                         throw throwable
                     }
@@ -212,6 +243,8 @@ class BiometricKycViewModel(
                     },
                 )
             }
+            networkRetries = 0
+            MetadataManager.removeMetadata(MetadataKey.NetworkRetries)
             result = SmileIDResult.Success(
                 BiometricKycResult(
                     selfieFile = selfieFileResult,
@@ -236,6 +269,8 @@ class BiometricKycViewModel(
             // Set processing state to null to redirect back to selfie capture
             _uiState.update { it.copy(processingState = null) }
         } else {
+            networkRetries++
+            MetadataManager.addMetadata(MetadataKey.NetworkRetries, networkRetries)
             submitJob(selfieFile!!, livenessFiles!!)
         }
     }

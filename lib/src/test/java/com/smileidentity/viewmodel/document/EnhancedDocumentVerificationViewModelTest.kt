@@ -57,7 +57,6 @@ class EnhancedDocumentVerificationViewModelTest {
             documentType = "ID_CARD",
             selfieFile = selfieFile,
             captureBothSides = false,
-            metadata = mutableListOf(),
             consentInformation = ConsentInformation(
                 consentGrantedDate = "somedate",
                 personalDetailsConsentGranted = true,
