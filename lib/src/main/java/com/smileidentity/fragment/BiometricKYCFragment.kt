@@ -17,6 +17,7 @@ import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.models.ConsentInformation
+import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDResult
@@ -82,10 +83,12 @@ class BiometricKYCFragment : Fragment() {
         fun newInstance(
             idInfo: IdInfo,
             consentInformation: ConsentInformation = ConsentInformation(
-                consentGrantedDate = getCurrentIsoTimestamp(),
-                personalDetailsConsentGranted = false,
-                contactInfoConsentGranted = false,
-                documentInfoConsentGranted = false,
+                consented = ConsentedInformation(
+                    consentGrantedDate = getCurrentIsoTimestamp(),
+                    personalDetails = false,
+                    contactInformation = false,
+                    documentInformation = false,
+                ),
             ),
             userId: String = randomUserId(),
             jobId: String = randomJobId(),

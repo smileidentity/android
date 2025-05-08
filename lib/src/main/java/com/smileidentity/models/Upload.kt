@@ -56,10 +56,17 @@ data class IdInfo(
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class ConsentInformation(
+    @Json(name = "consented") val consented: ConsentedInformation,
+) : Parcelable
+
+@Serializable
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class ConsentedInformation(
     @Json(name = "consent_granted_date") val consentGrantedDate: String = getCurrentIsoTimestamp(),
-    @Json(name = "personal_details_consent_granted") val personalDetailsConsentGranted: Boolean,
-    @Json(name = "contact_information_consent_granted") val contactInfoConsentGranted: Boolean,
-    @Json(name = "document_information_consent_granted") val documentInfoConsentGranted: Boolean,
+    @Json(name = "personal_details") val personalDetails: Boolean,
+    @Json(name = "contact_information") val contactInformation: Boolean,
+    @Json(name = "document_information") val documentInformation: Boolean,
 ) : Parcelable
 
 enum class ImageType {
