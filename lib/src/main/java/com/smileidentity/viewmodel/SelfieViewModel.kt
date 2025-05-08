@@ -295,13 +295,21 @@ class SelfieViewModel(
         metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
-        metadata.add(Metadatum.NetworkRetries(networkRetries))
+
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
             return
         }
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
+
+        /*
+         We add the network retries to the metadata here, because of the way we implement
+         the biometric kyc and document verification which is calling the selfie component
+         with skip api submission. If it is added before the skip api submission, it will be
+         added to the metadata twice.
+         */
+        metadata.add(Metadatum.NetworkRetries(networkRetries))
 
         val proxy = fun(e: Throwable) {
             val didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
