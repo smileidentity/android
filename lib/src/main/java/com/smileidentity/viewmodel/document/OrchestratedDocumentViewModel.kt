@@ -8,6 +8,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updateOrAddBy
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
@@ -200,7 +201,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
                             networkRetries++
-                            metadata.add(Metadatum.NetworkRetries(networkRetries))
+                            metadata.updateOrAddBy(Metadatum.NetworkRetries(networkRetries)) {
+                                it.name == "network_retries"
+                            }
                             SmileID.api.prepUpload(
                                 prepUploadRequest.copy(
                                     retry = true,
@@ -265,6 +268,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 },
             )
         }
+
+        networkRetries = 0
+        metadata.removeAll { it is Metadatum.NetworkRetries }
 
         saveResult(
             selfieImage = selfieFileResult,

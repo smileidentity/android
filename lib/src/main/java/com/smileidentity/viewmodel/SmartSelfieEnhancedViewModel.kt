@@ -487,6 +487,10 @@ class SmartSelfieEnhancedViewModel(
                                     selfieFile = selfieFile,
                                 )
                             }
+
+                            networkRetries = 0
+                            metadata.removeAll { it is Metadatum.NetworkRetries }
+
                             // Delay to ensure the completion icon is shown for a little bit
                             delay(COMPLETED_DELAY_MS)
                             val result = SmartSelfieResult(

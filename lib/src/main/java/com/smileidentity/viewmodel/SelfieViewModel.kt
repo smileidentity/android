@@ -400,6 +400,10 @@ class SelfieViewModel(
                 )
                 selfieFile to livenessFiles
             }
+
+            networkRetries = 0
+            metadata.removeAll { it is Metadatum.NetworkRetries }
+
             result = SmileIDResult.Success(
                 SmartSelfieResult(
                     selfieFile = selfieFileResult,
