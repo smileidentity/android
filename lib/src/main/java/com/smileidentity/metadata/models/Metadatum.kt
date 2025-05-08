@@ -57,6 +57,7 @@ open class Metadatum(
         companion object {
             val PORTRAIT = DeviceOrientation("portrait")
             val LANDSCAPE = DeviceOrientation("landscape")
+            val FLAT = DeviceOrientation("flat")
             val UNKNOWN = DeviceOrientation("unknown")
         }
     }

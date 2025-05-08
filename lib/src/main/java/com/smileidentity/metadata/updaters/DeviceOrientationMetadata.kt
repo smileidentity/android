@@ -1,54 +1,71 @@
 package com.smileidentity.metadata.updaters
 
 import android.content.Context
-import android.content.res.Configuration
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.view.OrientationEventListener
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
 import com.smileidentity.metadata.models.Metadatum
-import com.smileidentity.metadata.updateOrAddBy
+import kotlin.math.abs
 
 /**
- * A metadata updater that monitors device orientation and updates
- * the corresponding metadata entry.
+ * A metadata updater that monitors device orientation and updates the corresponding metadata entry.
  */
 class DeviceOrientationMetadata(
-    private val context: Context,
+    context: Context,
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
     override val metadataName: String = "device_orientation"
 
-    // Create orientation listener with medium sensor sensitivity
-    private val orientationListener = object : OrientationEventListener(
-        context,
-        SensorManager.SENSOR_DELAY_NORMAL,
-    ) {
-        override fun onOrientationChanged(orientation: Int) {
-            if (orientation != ORIENTATION_UNKNOWN) {
-                val currentOrientation = getCurrentOrientation()
-                updateOrientationMetadata(currentOrientation)
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
+    private val accelerometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+    private val sensorEventListener = object : SensorEventListener {
+        var currentOrientation: OrientationType = OrientationType.UNKNOWN
+
+        override fun onSensorChanged(event: SensorEvent?) {
+            event?.let {
+                val x = it.values[0]
+                val y = it.values[1]
+                val z = it.values[2]
+
+                currentOrientation = when {
+                    abs(z) > 8.5 -> OrientationType.FLAT
+                    abs(y) > abs(x) -> OrientationType.PORTRAIT
+                    else -> OrientationType.LANDSCAPE
+                }
             }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            // No-op
         }
     }
 
+    companion object {
+        lateinit var shared: DeviceOrientationMetadata
+            private set
+    }
+
     init {
-        // Add initial orientation value to metadata
-        updateOrientationMetadata(getCurrentOrientation())
+        shared = this
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        if (orientationListener.canDetectOrientation()) {
-            orientationListener.enable()
-
-            // Set initial orientation
-            updateOrientationMetadata(getCurrentOrientation())
+        accelerometer?.let {
+            sensorManager?.registerListener(
+                sensorEventListener,
+                it,
+                SensorManager.SENSOR_DELAY_NORMAL,
+            )
         }
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        orientationListener.disable()
+        sensorManager?.unregisterListener(sensorEventListener)
     }
 
     override fun forceUpdate() {
@@ -62,26 +79,24 @@ class DeviceOrientationMetadata(
         val orientationMetadatum = when (orientation) {
             OrientationType.PORTRAIT -> Metadatum.DeviceOrientation.PORTRAIT
             OrientationType.LANDSCAPE -> Metadatum.DeviceOrientation.LANDSCAPE
+            OrientationType.FLAT -> Metadatum.DeviceOrientation.FLAT
             OrientationType.UNKNOWN -> Metadatum.DeviceOrientation.UNKNOWN
         }
 
-        metadata.updateOrAddBy(orientationMetadatum) { it.name == metadataName }
+        metadata.add(Metadatum.DeviceOrientation(orientationMetadatum.orientation))
     }
 
     /**
      * Get the current device orientation
      */
     private fun getCurrentOrientation(): OrientationType {
-        return when (context.resources.configuration.orientation) {
-            Configuration.ORIENTATION_PORTRAIT -> OrientationType.PORTRAIT
-            Configuration.ORIENTATION_LANDSCAPE -> OrientationType.LANDSCAPE
-            else -> OrientationType.UNKNOWN
-        }
+        return sensorEventListener.currentOrientation
     }
 
     enum class OrientationType {
         PORTRAIT,
         LANDSCAPE,
+        FLAT,
         UNKNOWN,
     }
 }

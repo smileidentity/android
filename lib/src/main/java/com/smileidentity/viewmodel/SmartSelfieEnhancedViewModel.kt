@@ -23,6 +23,7 @@ import com.smileidentity.metadata.models.LivenessType
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.SelfieImageOriginValue.BackCamera
 import com.smileidentity.metadata.models.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
@@ -177,6 +178,7 @@ class SmartSelfieEnhancedViewModel(
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
     private var selfieCaptureRetries = 0
     private var networkRetries = 0
 
@@ -222,6 +224,11 @@ class SmartSelfieEnhancedViewModel(
      */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            DeviceOrientationMetadata.shared.forceUpdate()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
@@ -442,6 +449,8 @@ class SmartSelfieEnhancedViewModel(
                 return@addOnSuccessListener
             }
 
+            DeviceOrientationMetadata.shared.forceUpdate()
+
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
 
@@ -565,12 +574,14 @@ class SmartSelfieEnhancedViewModel(
         metadata.removeAll { it is Metadatum.CameraName }
         metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
         metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        metadata.removeAll { it is Metadatum.DeviceOrientation }
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
         selfieCaptureRetries++
         networkRetries++
         shouldAnalyzeImages = true
+        hasRecordedOrientationAtCaptureStart = false
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {

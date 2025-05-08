@@ -20,6 +20,7 @@ import com.smileidentity.metadata.models.LivenessType
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.SelfieImageOriginValue.BackCamera
 import com.smileidentity.metadata.models.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
@@ -133,11 +134,17 @@ class SelfieViewModel(
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
     private var selfieCaptureRetries = 0
     private var networkRetries = 0
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            DeviceOrientationMetadata.shared.forceUpdate()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         if (!shouldAnalyzeImages || elapsedTimeMs < INTRA_IMAGE_MIN_DELAY_MS || image == null) {
@@ -241,6 +248,7 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
+                DeviceOrientationMetadata.shared.forceUpdate()
                 _uiState.update {
                     it.copy(
                         progress = 1f,
@@ -438,6 +446,8 @@ class SelfieViewModel(
         result = null
         selfieCaptureRetries++
         shouldAnalyzeImages = true
+        hasRecordedOrientationAtCaptureStart = false
+        metadata.removeAll { it is Metadatum.DeviceOrientation }
     }
 
     fun onRetry() {
