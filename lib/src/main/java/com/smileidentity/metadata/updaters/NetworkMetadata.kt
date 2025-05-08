@@ -23,8 +23,14 @@ internal class NetworkMetadata(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        private var connectionType: NetworkConnection? = null
+
         override fun onAvailable(network: android.net.Network) {
-            updateNetworkMetadata(getConnectionType())
+            val currentConnectionType = getConnectionType()
+            if (currentConnectionType != connectionType) {
+                updateNetworkMetadata(currentConnectionType)
+                connectionType = currentConnectionType
+            }
         }
     }
 
