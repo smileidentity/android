@@ -18,6 +18,10 @@ internal class HostApplicationMetadata(
     private val packageManager = context.packageManager
     private val packageName = context.packageName
 
+    init {
+        forceUpdate()
+    }
+
     private fun getHostApplication(): String {
         return try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)

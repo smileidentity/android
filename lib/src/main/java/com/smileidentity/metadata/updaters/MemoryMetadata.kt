@@ -20,6 +20,10 @@ internal class MemoryMetadata(
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
 
+    init {
+        forceUpdate()
+    }
+
     private fun getTotalMemoryInMB(): Long {
         activityManager?.let {
             val memoryInfo = ActivityManager.MemoryInfo()

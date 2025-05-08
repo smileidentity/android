@@ -22,6 +22,10 @@ internal class ScreenResolutionMetadata(
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
 
+    init {
+        forceUpdate()
+    }
+
     private fun getScreenResolution(): String {
         windowManager?.let {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

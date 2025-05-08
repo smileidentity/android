@@ -3,11 +3,11 @@ package com.smileidentity.metadata.updaters
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
 import com.smileidentity.metadata.models.Metadatum
-import com.smileidentity.metadata.updateOrAddBy
 
 /**
  * A manager that updates metadata with network connection information.
@@ -22,12 +22,23 @@ internal class NetworkMetadata(
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: android.net.Network) {
+            updateNetworkMetadata(getConnectionType())
+        }
+    }
+
     override fun onStart(owner: LifecycleOwner) {
-        // todo
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        } else {
+            val request = NetworkRequest.Builder().build()
+            connectivityManager.registerNetworkCallback(request, networkCallback)
+        }
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        // todo
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     override fun forceUpdate() {
@@ -42,7 +53,7 @@ internal class NetworkMetadata(
             NetworkConnection.UNKNOWN -> Metadatum.NetworkConnection.UNKNOWN
         }
 
-        metadata.updateOrAddBy(connectionMetadatum) { it.name == metadataName }
+        metadata.add(Metadatum.NetworkConnection(connectionMetadatum.networkConnection))
     }
 
     private fun getConnectionType(): NetworkConnection {

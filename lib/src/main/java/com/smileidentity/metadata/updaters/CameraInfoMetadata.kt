@@ -19,6 +19,10 @@ internal class CameraInfoMetadata(
 
     private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager?
 
+    init {
+        forceUpdate()
+    }
+
     private fun getNumberOfCameras(): Int {
         return try {
             cameraManager?.cameraIdList?.size ?: -1

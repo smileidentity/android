@@ -23,6 +23,10 @@ internal class CarrierInfoMetadata(
     private val telephonyManager =
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
 
+    init {
+        forceUpdate()
+    }
+
     /**
      * Checks if the device supports telephony subscriptions.
      * This ensures the device has SIM support and can manage cellular network subscriptions.

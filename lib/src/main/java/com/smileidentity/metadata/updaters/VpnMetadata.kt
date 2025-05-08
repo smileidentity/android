@@ -22,6 +22,10 @@ internal class VpnMetadata(
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+    init {
+        forceUpdate()
+    }
+
     private fun isVPNActive(): Boolean {
         val isVpnUsingNetworkType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // API 23+ (Marshmallow and above)
@@ -44,8 +48,6 @@ internal class VpnMetadata(
     }
 
     override fun forceUpdate() {
-        metadata.updateOrAddBy(
-            Metadatum.Vpn(isVPNActive()),
-        ) { it.name == metadataName }
+        metadata.updateOrAddBy(Metadatum.Vpn(isVPNActive())) { it.name == metadataName }
     }
 }

@@ -19,6 +19,10 @@ internal class ProximitySensorMetadata(
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
 
+    init {
+        forceUpdate()
+    }
+
     private fun hasProximitySensor(): Boolean {
         return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
     }
