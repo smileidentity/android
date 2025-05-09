@@ -15,6 +15,7 @@ import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.models.ConsentInformation
+import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.getCurrentIsoTimestamp
@@ -77,10 +78,12 @@ class EnhancedDocumentVerificationFragment : Fragment() {
         fun newInstance(
             countryCode: String,
             consentInformation: ConsentInformation = ConsentInformation(
-                consentGrantedDate = getCurrentIsoTimestamp(),
-                personalDetailsConsentGranted = false,
-                contactInfoConsentGranted = false,
-                documentInfoConsentGranted = false,
+                consented = ConsentedInformation(
+                    consentGrantedDate = getCurrentIsoTimestamp(),
+                    personalDetails = false,
+                    contactInformation = false,
+                    documentInformation = false,
+                ),
             ),
             documentType: String? = null,
             userId: String = randomUserId(),

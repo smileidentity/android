@@ -8,6 +8,7 @@ import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.AvailableIdType
 import com.smileidentity.models.ConsentInformation
+import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.models.CountryInfo
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.IdTypes
@@ -34,10 +35,12 @@ data class IdTypeSelectorAndFieldInputUiState(
     val showLoading: Boolean = true,
     val showConsent: Boolean = false,
     val consentInformation: ConsentInformation = ConsentInformation(
-        consentGrantedDate = getCurrentIsoTimestamp(),
-        personalDetailsConsentGranted = false,
-        contactInfoConsentGranted = false,
-        documentInfoConsentGranted = false,
+        consented = ConsentedInformation(
+            consentGrantedDate = getCurrentIsoTimestamp(),
+            personalDetails = false,
+            contactInformation = false,
+            documentInformation = false,
+        ),
     ),
     val countries: ImmutableList<SearchableInputFieldItem>? = null,
     val selectedCountry: SearchableInputFieldItem? = null,
