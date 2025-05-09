@@ -2,6 +2,7 @@ package com.smileidentity.networking
 
 import com.smileidentity.metadata.Metadata
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.models.Value
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult
 import com.smileidentity.models.EnhancedDocumentVerificationJobResult
@@ -287,4 +288,29 @@ object MetadataAdapter {
 
     @FromJson
     fun fromJson(value: String): Metadata = throw NotImplementedError("MetadataAdapter.fromJson")
+}
+
+object ValueJsonAdapter {
+    @ToJson
+    fun toJson(writer: JsonWriter, value: Value?) {
+        when (value) {
+            is Value.StringValue -> writer.value(value.value)
+            is Value.IntValue -> writer.value(value.value)
+            is Value.LongValue -> writer.value(value.value)
+            is Value.BoolValue -> writer.value(value.value)
+            null -> writer.nullValue()
+        }
+    }
+
+    @FromJson
+    fun fromJson(reader: JsonReader): Value? {
+        val jsonValue = reader.readJsonValue()
+        return when (jsonValue) {
+            is String -> Value.StringValue(jsonValue)
+            is Int -> Value.IntValue(jsonValue)
+            is Long -> Value.LongValue(jsonValue)
+            is Boolean -> Value.BoolValue(jsonValue)
+            else -> null
+        }
+    }
 }

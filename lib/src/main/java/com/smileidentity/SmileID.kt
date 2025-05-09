@@ -35,6 +35,7 @@ import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
+import com.smileidentity.networking.ValueJsonAdapter
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -484,6 +485,7 @@ object SmileID {
             .add(PartnerParamsAdapter)
             .add(StringifiedBooleanAdapter)
             .add(MetadataAdapter)
+            .add(ValueJsonAdapter)
             .add(FileNameAdapter)
             .add(FileAdapter)
             .add(SmartSelfieJobResultAdapter)
