@@ -1,4 +1,11 @@
 # Release Notes
+## 10.6.2
+
+### Changed
+*  Restructured JSON output properties to match API
+* personalDetailsConsentGranted → personalDetails
+* contactInformationConsentGranted → contactInformation
+* documentInformationConsentGranted → documentInformation
 
 ## 10.6.1
 * Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    

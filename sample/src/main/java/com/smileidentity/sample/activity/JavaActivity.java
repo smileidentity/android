@@ -1,5 +1,6 @@
 package com.smileidentity.sample.activity;
 
+import static com.smileidentity.util.UtilKt.getCurrentIsoTimestamp;
 import static com.smileidentity.util.UtilKt.randomJobId;
 import static com.smileidentity.util.UtilKt.randomUserId;
 
@@ -68,7 +69,7 @@ public class JavaActivity extends FragmentActivity {
         IdInfo idInfo = new IdInfo("GH", "PASSPORT", "1234567890",
             null, null, null, null, null, null);
         ConsentedInformation consentedInfo = new ConsentedInformation(
-            "", true, true, true
+            getCurrentIsoTimestamp(), true, true, true
         );
         ConsentInformation consentInformation = new ConsentInformation(consentedInfo);
         BiometricKYCFragment biometricKYCFragment = BiometricKYCFragment
