@@ -52,13 +52,204 @@ data class IdInfo(
     @Json(name = "entered") val entered: Boolean? = null,
 ) : Parcelable
 
+/**
+ * Class representing user consent information submitted with verification jobs.
+ * As of version 10.6.2, the structure was updated to match API requirements by nesting
+ * consent fields under a "consented" object. This class provides backward compatibility
+ * with previous SDK versions while maintaining the new API-compatible JSON structure.
+ *
+ * Preferred usage (current API format):
+ * ```
+ * val consentInfo = ConsentInformation(
+ *     consented = ConsentedInformation(
+ *         consentGrantedDate = getCurrentIsoTimestamp(),
+ *         personalDetails = true,
+ *         contactInformation = true,
+ *         documentInformation = true
+ *     )
+ * )
+ * ```
+ *
+ * For backward compatibility, you can also use the secondary constructor with the old property names:
+ * ```
+ * // Direct construction with legacy property names (will be converted to the new structure internally)
+ * val consentInfo = ConsentInformation(
+ *     consentGrantedDate = getCurrentIsoTimestamp(),
+ *     personalDetailsConsentGranted = true,
+ *     contactInfoConsentGranted = true,
+ *     documentInfoConsentGranted = true
+ * )
+ * ```
+ *
+ * Or the legacy factory method:
+ * ```
+ * // Legacy factory method (will be converted to the new structure internally)
+ * val consentInfo = ConsentInformation.createLegacy(
+ *     consentGrantedDate = getCurrentIsoTimestamp(),
+ *     personalDetailsConsentGranted = true,
+ *     contactInfoConsentGranted = true,
+ *     documentInfoConsentGranted = true
+ * )
+ * ```
+ *
+ * All three approaches will produce identical API-compatible JSON output with the nested structure.
+ *
+ * @property consented The nested consent information object containing all consent fields
+ */
 @Serializable
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class ConsentInformation(
     @Json(name = "consented") val consented: ConsentedInformation,
-) : Parcelable
+) : Parcelable {
 
+    /**
+     * Secondary constructor to support direct creation with legacy properties.
+     * This constructor creates the object with the new nested structure
+     * but accepts parameters in the old format for backward compatibility.
+     *
+     * @param consentGrantedDate The timestamp of when consent was granted
+     * @param personalDetailsConsentGranted Whether consent for personal details was granted
+     * @param contactInfoConsentGranted Whether consent for contact information was granted
+     * @param documentInfoConsentGranted Whether consent for document information was granted
+     */
+    @Deprecated(
+        message = "Use primary constructor with ConsentedInformation instead",
+        replaceWith = ReplaceWith(
+            """ConsentInformation(
+                ConsentedInformation(
+                    consentGrantedDate,
+                    personalDetailsConsentGranted,
+                    contactInfoConsentGranted,
+                    documentInfoConsentGranted
+                )
+            )""",
+        ),
+    )
+    constructor(
+        consentGrantedDate: String = getCurrentIsoTimestamp(),
+        personalDetailsConsentGranted: Boolean = false,
+        contactInfoConsentGranted: Boolean = false,
+        documentInfoConsentGranted: Boolean = false,
+    ) : this(
+        consented = ConsentedInformation(
+            consentGrantedDate = consentGrantedDate,
+            personalDetails = personalDetailsConsentGranted,
+            contactInformation = contactInfoConsentGranted,
+            documentInformation = documentInfoConsentGranted,
+        ),
+    )
+    // Backward compatibility with previous versions - delegated properties that
+    // map to the nested structure
+
+    /**
+     * Access the consent granted date from the nested structure.
+     *
+     * @return The consent granted date
+     * @deprecated Use [consented.consentGrantedDate] instead
+     */
+    @get:Deprecated(
+        message = "Use consented.consentGrantedDate instead",
+        replaceWith = ReplaceWith("consented.consentGrantedDate"),
+    )
+    val consentGrantedDate: String
+        get() = consented.consentGrantedDate
+
+    /**
+     * Access whether consent for personal details was granted from the nested structure.
+     *
+     * @return Whether consent for personal details was granted
+     * @deprecated Use [consented.personalDetails] instead
+     */
+    @get:Deprecated(
+        message = "Use consented.personalDetails instead",
+        replaceWith = ReplaceWith("consented.personalDetails"),
+    )
+    val personalDetailsConsentGranted: Boolean
+        get() = consented.personalDetails
+
+    /**
+     * Access whether consent for contact information was granted from the nested structure.
+     *
+     * @return Whether consent for contact information was granted
+     * @deprecated Use [consented.contactInformation] instead
+     */
+    @get:Deprecated(
+        message = "Use consented.contactInformation instead",
+        replaceWith = ReplaceWith("consented.contactInformation"),
+    )
+    val contactInfoConsentGranted: Boolean
+        get() = consented.contactInformation
+
+    /**
+     * Access whether consent for document information was granted from the nested structure.
+     *
+     * @return Whether consent for document information was granted
+     * @deprecated Use [consented.documentInformation] instead
+     */
+    @get:Deprecated(
+        message = "Use consented.documentInformation instead",
+        replaceWith = ReplaceWith("consented.documentInformation"),
+    )
+    val documentInfoConsentGranted: Boolean
+        get() = consented.documentInformation
+
+    /**
+     * Contains factory methods for backward compatibility with older SDK versions.
+     */
+    companion object {
+        /**
+         * Creates a ConsentInformation object using the legacy flat structure.
+         * Internally converts to the new nested structure required by the API.
+         *
+         * @param consentGrantedDate The timestamp of when consent was granted
+         * @param personalDetailsConsentGranted Whether consent for personal details was granted
+         * @param contactInfoConsentGranted Whether consent for contact information was granted
+         * @param documentInfoConsentGranted Whether consent for document information was granted
+         * @return A ConsentInformation object with the properly nested structure
+         * @deprecated Use the primary constructor with a [ConsentedInformation] object
+         */
+        @JvmStatic
+        @Deprecated(
+            message = "Use primary constructor with ConsentedInformation instead",
+            replaceWith = ReplaceWith(
+                """ConsentInformation(
+                    ConsentedInformation(
+                        consentGrantedDate,
+                        personalDetailsConsentGranted,
+                        contactInfoConsentGranted,
+                        documentInfoConsentGranted
+                    )
+                )""",
+            ),
+        )
+        fun createLegacy(
+            consentGrantedDate: String = getCurrentIsoTimestamp(),
+            personalDetailsConsentGranted: Boolean = false,
+            contactInfoConsentGranted: Boolean = false,
+            documentInfoConsentGranted: Boolean = false,
+        ): ConsentInformation {
+            return ConsentInformation(
+                consented = ConsentedInformation(
+                    consentGrantedDate = consentGrantedDate,
+                    personalDetails = personalDetailsConsentGranted,
+                    contactInformation = contactInfoConsentGranted,
+                    documentInformation = documentInfoConsentGranted,
+                ),
+            )
+        }
+    }
+}
+
+/**
+ * Represents the detailed consent information nested within [ConsentInformation].
+ * This class follows the API's expected structure for consent data.
+ *
+ * @property consentGrantedDate The ISO timestamp of when consent was granted
+ * @property personalDetails Whether consent for personal details was granted
+ * @property contactInformation Whether consent for contact information was granted
+ * @property documentInformation Whether consent for document information was granted
+ */
 @Serializable
 @Parcelize
 @JsonClass(generateAdapter = true)
