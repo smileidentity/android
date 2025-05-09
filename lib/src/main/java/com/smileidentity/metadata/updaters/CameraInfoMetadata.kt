@@ -34,7 +34,7 @@ internal class CameraInfoMetadata(
     }
 
     override fun forceUpdate() {
-        metadata.updateOrAddBy(Metadatum.NumberOfCameras(getNumberOfCameras().toString())) {
+        metadata.updateOrAddBy(Metadatum.NumberOfCameras(getNumberOfCameras())) {
             it.name == metadataName
         }
     }

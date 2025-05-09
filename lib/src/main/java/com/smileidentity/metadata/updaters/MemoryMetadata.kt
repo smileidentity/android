@@ -37,8 +37,6 @@ internal class MemoryMetadata(
     }
 
     override fun forceUpdate() {
-        metadata.updateOrAddBy(
-            MemoryInfo(getTotalMemoryInMB().toString()),
-        ) { it.name == metadataName }
+        metadata.updateOrAddBy(MemoryInfo(getTotalMemoryInMB())) { it.name == metadataName }
     }
 }

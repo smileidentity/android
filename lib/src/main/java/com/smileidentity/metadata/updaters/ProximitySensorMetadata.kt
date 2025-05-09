@@ -29,7 +29,7 @@ internal class ProximitySensorMetadata(
     }
 
     override fun forceUpdate() {
-        metadata.updateOrAddBy(Metadatum.ProximitySensor(hasProximitySensor().toString())) {
+        metadata.updateOrAddBy(Metadatum.ProximitySensor(hasProximitySensor())) {
             it.name == metadataName
         }
     }

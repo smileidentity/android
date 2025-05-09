@@ -15,6 +15,21 @@ import com.squareup.moshi.JsonClass
 import java.util.TimeZone
 import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
+
+sealed class Value {
+    @JsonClass(generateAdapter = true)
+    data class StringValue(val value: String) : Value()
+
+    @JsonClass(generateAdapter = true)
+    data class IntValue(val value: Int) : Value()
+
+    @JsonClass(generateAdapter = true)
+    data class LongValue(val value: Long) : Value()
+
+    @JsonClass(generateAdapter = true)
+    data class BoolValue(val value: Boolean) : Value()
+}
 
 /**
  * key-value pair that can be used to store additional information about a job
@@ -23,16 +38,32 @@ import kotlinx.parcelize.Parcelize
 @JsonClass(generateAdapter = true)
 open class Metadatum(
     @Json(name = "name") val name: String,
-    @Json(name = "value") val value: String,
+    @Json(name = "value") val value: @RawValue Value,
     @Json(name = "timestamp") val timestamp: String,
 ) : Parcelable {
     constructor(
         name: MetadataKey,
         value: String,
         timestamp: String = getCurrentIsoTimestamp(),
-    ) : this(
-        name.key, value, timestamp
-    )
+    ) : this(name.key, Value.StringValue(value), timestamp)
+
+    constructor(
+        name: MetadataKey,
+        value: Int,
+        timestamp: String = getCurrentIsoTimestamp(),
+    ) : this(name.key, Value.IntValue(value), timestamp)
+
+    constructor(
+        name: MetadataKey,
+        value: Long,
+        timestamp: String = getCurrentIsoTimestamp(),
+    ) : this(name.key, Value.LongValue(value), timestamp)
+
+    constructor(
+        name: MetadataKey,
+        value: Boolean,
+        timestamp: String = getCurrentIsoTimestamp(),
+    ) : this(name.key, Value.BoolValue(value), timestamp)
 
     @Parcelize
     data class ActiveLivenessType(val type: LivenessType) :
@@ -80,11 +111,11 @@ open class Metadatum(
 
     @Parcelize
     data class DocumentFrontCaptureRetries(val retries: Int) :
-        Metadatum(MetadataKey.DocumentFrontCaptureRetries, retries.toString())
+        Metadatum(MetadataKey.DocumentFrontCaptureRetries, retries)
 
     @Parcelize
     data class DocumentBackCaptureRetries(val retries: Int) :
-        Metadatum(MetadataKey.DocumentBackCaptureRetries, retries.toString())
+        Metadatum(MetadataKey.DocumentBackCaptureRetries, retries)
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -92,10 +123,7 @@ open class Metadatum(
      */
     @Parcelize
     data class DocumentFrontCaptureDuration(val duration: Duration) :
-        Metadatum(
-            MetadataKey.DocumentFrontCaptureDuration,
-            duration.inWholeMilliseconds.toString(),
-        )
+        Metadatum(MetadataKey.DocumentFrontCaptureDuration, duration.inWholeMilliseconds)
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -103,10 +131,7 @@ open class Metadatum(
      */
     @Parcelize
     data class DocumentBackCaptureDuration(val duration: Duration) :
-        Metadatum(
-            MetadataKey.DocumentBackCaptureDuration,
-            duration.inWholeMilliseconds.toString(),
-        )
+        Metadatum(MetadataKey.DocumentBackCaptureDuration, duration.inWholeMilliseconds)
 
     @Parcelize
     data object Fingerprint : Metadatum(MetadataKey.Fingerprint, SmileID.fingerprint)
@@ -126,10 +151,7 @@ open class Metadatum(
         )
 
     @Parcelize
-    data class MemoryInfo(val memoryInfo: String) : Metadatum(
-        MetadataKey.MemoryInfo,
-        memoryInfo,
-    )
+    data class MemoryInfo(val memoryInfo: Long) : Metadatum(MetadataKey.MemoryInfo, memoryInfo)
 
     @Parcelize
     data class NetworkConnection(val networkConnection: String) :
@@ -144,19 +166,18 @@ open class Metadatum(
     }
 
     @Parcelize
-    data class NetworkRetries(val retries: Int) :
-        Metadatum(MetadataKey.NetworkRetries, retries.toString())
+    data class NetworkRetries(val retries: Int) : Metadatum(MetadataKey.NetworkRetries, retries)
 
     @Parcelize
-    data class NumberOfCameras(val numberOfCameras: String) :
+    data class NumberOfCameras(val numberOfCameras: Int) :
         Metadatum(MetadataKey.NumberOfCameras, numberOfCameras)
 
     @Parcelize
-    data class ProximitySensor(val proximitySensor: String) :
-        Metadatum(MetadataKey.ProximitySensor, proximitySensor)
+    data class ProximitySensor(val hasProximitySensor: Boolean) :
+        Metadatum(MetadataKey.ProximitySensor, hasProximitySensor)
 
     @Parcelize
-    data object Proxy : Metadatum(MetadataKey.ProxyDetected, isProxyDetected().toString())
+    data object Proxy : Metadatum(MetadataKey.ProxyDetected, isProxyDetected())
 
     @Parcelize
     data class ScreenResolution(val screenResolution: String) :
@@ -175,36 +196,29 @@ open class Metadatum(
      */
     @Parcelize
     data class SelfieCaptureDuration(val duration: Duration) :
-        Metadatum(MetadataKey.SelfieCaptureDuration, duration.inWholeMilliseconds.toString())
+        Metadatum(MetadataKey.SelfieCaptureDuration, duration.inWholeMilliseconds)
 
     @Parcelize
     data class SelfieCaptureRetries(val retries: Int) :
-        Metadatum(MetadataKey.SelfieCaptureRetries, retries.toString())
+        Metadatum(MetadataKey.SelfieCaptureRetries, retries)
 
     @Parcelize
     data object Sdk : Metadatum(MetadataKey.Sdk, "android")
 
     @Parcelize
-    data object SdkLaunchCount : Metadatum(
-        MetadataKey.SdkLaunchCount,
-        SmileID.sdkLaunchCount.toString(),
-    )
+    data object SdkLaunchCount : Metadatum(MetadataKey.SdkLaunchCount, SmileID.sdkLaunchCount)
 
     @Parcelize
     data object SdkVersion : Metadatum(MetadataKey.SdkVersion, BuildConfig.VERSION_NAME)
 
     @Parcelize
-    data object SystemArchitecture : Metadatum(
-        MetadataKey.SystemArchitecture,
-        systemArchitecture,
-    )
+    data object SystemArchitecture : Metadatum(MetadataKey.SystemArchitecture, systemArchitecture)
 
     @Parcelize
     data object Timezone : Metadatum(MetadataKey.Timezone, TimeZone.getDefault().id)
 
     @Parcelize
-    data class Vpn(val vpnDetected: Boolean) :
-        Metadatum(MetadataKey.VPNDetected, vpnDetected.toString())
+    data class Vpn(val vpnDetected: Boolean) : Metadatum(MetadataKey.VPNDetected, vpnDetected)
 
     @Parcelize
     data object WrapperSdkName : Metadatum(
