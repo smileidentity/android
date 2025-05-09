@@ -28,31 +28,31 @@ open class Metadatum(
 ) : Parcelable {
     @Parcelize
     data class ActiveLivenessType(val type: LivenessType) :
-        Metadatum("active_liveness_type", type.value)
+        Metadatum(MetadataKey.ActiveLivenessType.key, type.value)
 
     @Parcelize
-    data object ActiveLivenessVersion : Metadatum("active_liveness_version", "1.0.0")
+    data object ActiveLivenessVersion : Metadatum(MetadataKey.ActiveLivenessVersion.key, "1.0.0")
 
     @Parcelize
     data class CameraName(val cameraName: String) :
-        Metadatum("camera_name", cameraName) // todo
+        Metadatum(MetadataKey.CameraName.key, cameraName) // todo
 
     @Parcelize
     data class CarrierInfo(val carrierInfo: String) :
-        Metadatum("carrier_info", carrierInfo)
+        Metadatum(MetadataKey.CarrierInfo.key, carrierInfo)
 
     @Parcelize
-    data object ClientIP : Metadatum("client_ip", getIPAddress(useIPv4 = true))
+    data object ClientIP : Metadatum(MetadataKey.ClientIP.key, getIPAddress(useIPv4 = true))
 
     @Parcelize
-    data object DeviceModel : Metadatum("device_model", model)
+    data object DeviceModel : Metadatum(MetadataKey.DeviceModel.key, model)
 
     @Parcelize
-    data object DeviceOS : Metadatum("device_os", os)
+    data object DeviceOS : Metadatum(MetadataKey.DeviceOS.key, os)
 
     @Parcelize
     data class DeviceOrientation(val orientation: String) :
-        Metadatum("device_orientation", orientation) {
+        Metadatum(MetadataKey.DeviceOrientation.key, orientation) {
 
         companion object {
             val PORTRAIT = DeviceOrientation("portrait")
@@ -64,19 +64,19 @@ open class Metadatum(
 
     @Parcelize
     data class DocumentFrontImageOrigin(val origin: DocumentImageOriginValue) :
-        Metadatum("document_front_image_origin", origin.value)
+        Metadatum(MetadataKey.DocumentFrontImageOrigin.key, origin.value)
 
     @Parcelize
     data class DocumentBackImageOrigin(val origin: DocumentImageOriginValue) :
-        Metadatum("document_back_image_origin", origin.value)
+        Metadatum(MetadataKey.DocumentBackImageOrigin.key, origin.value)
 
     @Parcelize
     data class DocumentFrontCaptureRetries(val retries: Int) :
-        Metadatum("document_front_capture_retries", retries.toString())
+        Metadatum(MetadataKey.DocumentFrontCaptureRetries.key, retries.toString())
 
     @Parcelize
     data class DocumentBackCaptureRetries(val retries: Int) :
-        Metadatum("document_back_capture_retries", retries.toString())
+        Metadatum(MetadataKey.DocumentBackCaptureRetries.key, retries.toString())
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -84,7 +84,10 @@ open class Metadatum(
      */
     @Parcelize
     data class DocumentFrontCaptureDuration(val duration: Duration) :
-        Metadatum("document_front_capture_duration_ms", duration.inWholeMilliseconds.toString())
+        Metadatum(
+            MetadataKey.DocumentFrontCaptureDuration.key,
+            duration.inWholeMilliseconds.toString(),
+        )
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -92,28 +95,37 @@ open class Metadatum(
      */
     @Parcelize
     data class DocumentBackCaptureDuration(val duration: Duration) :
-        Metadatum("document_back_capture_duration_ms", duration.inWholeMilliseconds.toString())
+        Metadatum(
+            MetadataKey.DocumentBackCaptureDuration.key,
+            duration.inWholeMilliseconds.toString(),
+        )
 
     @Parcelize
-    data object Fingerprint : Metadatum("fingerprint", SmileID.fingerprint)
+    data object Fingerprint : Metadatum(MetadataKey.Fingerprint.key, SmileID.fingerprint)
 
     @Parcelize
     data class HostApplication(val hostApplication: String) :
-        Metadatum("host_application", hostApplication)
+        Metadatum(MetadataKey.HostApplication.key, hostApplication)
 
     @Parcelize
-    data object Locale : Metadatum("locale", locale)
+    data object Locale : Metadatum(MetadataKey.Locale.key, locale)
 
     @Parcelize
     data object LocalTimeOfEnrolment :
-        Metadatum("local_time_of_enrolment", getCurrentIsoTimestamp(TimeZone.getDefault()))
+        Metadatum(
+            MetadataKey.LocalTimeOfEnrolment.key,
+            getCurrentIsoTimestamp(TimeZone.getDefault()),
+        )
 
     @Parcelize
-    data class MemoryInfo(val memoryInfo: String) : Metadatum("memory_info", memoryInfo)
+    data class MemoryInfo(val memoryInfo: String) : Metadatum(
+        MetadataKey.MemoryInfo.key,
+        memoryInfo,
+    )
 
     @Parcelize
     data class NetworkConnection(val networkConnection: String) :
-        Metadatum("network_connection", networkConnection) {
+        Metadatum(MetadataKey.NetworkConnection.key, networkConnection) {
 
         companion object {
             val WIFI = NetworkConnection("wifi")
@@ -125,29 +137,29 @@ open class Metadatum(
 
     @Parcelize
     data class NetworkRetries(val retries: Int) :
-        Metadatum("network_retries", retries.toString())
+        Metadatum(MetadataKey.NetworkRetries.key, retries.toString())
 
     @Parcelize
     data class NumberOfCameras(val numberOfCameras: String) :
-        Metadatum("number_of_cameras", numberOfCameras)
+        Metadatum(MetadataKey.NumberOfCameras.key, numberOfCameras)
 
     @Parcelize
     data class ProximitySensor(val proximitySensor: String) :
-        Metadatum("proximity_sensor", proximitySensor)
+        Metadatum(MetadataKey.ProximitySensor.key, proximitySensor)
 
     @Parcelize
-    data object Proxy : Metadatum("proxy", isProxyDetected().toString())
+    data object Proxy : Metadatum(MetadataKey.ProxyDetected.key, isProxyDetected().toString())
 
     @Parcelize
     data class ScreenResolution(val screenResolution: String) :
-        Metadatum("screen_resolution", screenResolution)
+        Metadatum(MetadataKey.ScreenResolution.key, screenResolution)
 
     @Parcelize
-    data object SecurityPolicyVersion : Metadatum("security_policy_version", "0.3.0")
+    data object SecurityPolicyVersion : Metadatum(MetadataKey.SecurityPolicyVersion.key, "0.3.0")
 
     @Parcelize
     data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :
-        Metadatum("selfie_image_origin", origin.value)
+        Metadatum(MetadataKey.SelfieImageOrigin.key, origin.value)
 
     /**
      * This represents the time it took for the user to complete *their* portion of the task. It
@@ -155,37 +167,46 @@ open class Metadatum(
      */
     @Parcelize
     data class SelfieCaptureDuration(val duration: Duration) :
-        Metadatum("selfie_capture_duration_ms", duration.inWholeMilliseconds.toString())
+        Metadatum(MetadataKey.SelfieCaptureDuration.key, duration.inWholeMilliseconds.toString())
 
     @Parcelize
     data class SelfieCaptureRetries(val retries: Int) :
-        Metadatum("selfie_capture_retries", retries.toString())
+        Metadatum(MetadataKey.SelfieCaptureRetries.key, retries.toString())
 
     @Parcelize
-    data object Sdk : Metadatum("sdk", "android")
+    data object Sdk : Metadatum(MetadataKey.Sdk.key, "android")
 
     @Parcelize
-    data object SdkLaunchCount : Metadatum("sdk_launch_count", SmileID.sdkLaunchCount.toString())
+    data object SdkLaunchCount : Metadatum(
+        MetadataKey.SdkLaunchCount.key,
+        SmileID.sdkLaunchCount.toString(),
+    )
 
     @Parcelize
-    data object SdkVersion : Metadatum("sdk_version", BuildConfig.VERSION_NAME)
+    data object SdkVersion : Metadatum(MetadataKey.SdkVersion.key, BuildConfig.VERSION_NAME)
 
     @Parcelize
-    data object SystemArchitecture : Metadatum("system_architecture", systemArchitecture)
+    data object SystemArchitecture : Metadatum(
+        MetadataKey.SystemArchitecture.key,
+        systemArchitecture,
+    )
 
     @Parcelize
-    data object Timezone : Metadatum("timezone", TimeZone.getDefault().id)
+    data object Timezone : Metadatum(MetadataKey.Timezone.key, TimeZone.getDefault().id)
 
     @Parcelize
     data class Vpn(val vpnDetected: Boolean) :
-        Metadatum("vpn", vpnDetected.toString())
+        Metadatum(MetadataKey.VPNDetected.key, vpnDetected.toString())
 
     @Parcelize
-    data object WrapperSdkName : Metadatum("wrapper_name", SmileID.wrapperSdkName.toString())
+    data object WrapperSdkName : Metadatum(
+        MetadataKey.WrapperName.key,
+        SmileID.wrapperSdkName.toString(),
+    )
 
     @Parcelize
     data object WrapperSdkVersion : Metadatum(
-        "wrapper_version",
+        MetadataKey.WrapperVersion.key,
         SmileID.wrapperSdkVersion.toString(),
     )
 }

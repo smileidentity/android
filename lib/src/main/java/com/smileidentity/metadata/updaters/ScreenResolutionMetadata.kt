@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.WindowManager
 import android.view.WindowMetrics
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updateOrAddBy
 
@@ -17,7 +18,7 @@ internal class ScreenResolutionMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "screen_resolution"
+    override val metadataName: String = MetadataKey.ScreenResolution.key
 
     private val windowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?

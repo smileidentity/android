@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.TelephonyManager
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.Metadatum.CarrierInfo
 import com.smileidentity.metadata.updateOrAddBy
@@ -17,7 +18,7 @@ internal class CarrierInfoMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "carrier_info"
+    override val metadataName: String = MetadataKey.CarrierInfo.key
 
     private val packageManager = context.packageManager
     private val telephonyManager =

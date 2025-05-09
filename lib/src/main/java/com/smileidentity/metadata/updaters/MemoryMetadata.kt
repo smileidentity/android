@@ -3,6 +3,7 @@ package com.smileidentity.metadata.updaters
 import android.app.ActivityManager
 import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.Metadatum.MemoryInfo
 import com.smileidentity.metadata.updateOrAddBy
@@ -15,7 +16,7 @@ internal class MemoryMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "memory_info"
+    override val metadataName: String = MetadataKey.MemoryInfo.key
 
     private val activityManager =
         context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?

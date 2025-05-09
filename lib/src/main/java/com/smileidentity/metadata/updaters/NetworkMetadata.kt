@@ -7,6 +7,7 @@ import android.net.NetworkRequest
 import android.os.Build
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 
 /**
@@ -17,7 +18,7 @@ internal class NetworkMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "network_connection"
+    override val metadataName: String = MetadataKey.NetworkConnection.key
 
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

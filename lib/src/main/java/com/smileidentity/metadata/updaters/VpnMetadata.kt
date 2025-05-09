@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updateOrAddBy
 import java.net.NetworkInterface
@@ -17,7 +18,7 @@ internal class VpnMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "vpn"
+    override val metadataName: String = MetadataKey.VPNDetected.key
 
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

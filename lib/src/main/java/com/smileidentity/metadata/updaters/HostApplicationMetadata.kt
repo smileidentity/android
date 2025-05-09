@@ -2,6 +2,7 @@ package com.smileidentity.metadata.updaters
 
 import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updateOrAddBy
 
@@ -13,7 +14,7 @@ internal class HostApplicationMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "host_application"
+    override val metadataName: String = MetadataKey.HostApplication.key
 
     private val packageManager = context.packageManager
     private val packageName = context.packageName

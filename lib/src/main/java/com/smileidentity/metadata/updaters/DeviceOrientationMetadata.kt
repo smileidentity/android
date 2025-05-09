@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
+import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import kotlin.math.abs
 
@@ -18,7 +19,7 @@ class DeviceOrientationMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = "device_orientation"
+    override val metadataName: String = MetadataKey.DeviceOrientation.key
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager?
     private val accelerometer: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
