@@ -15,17 +15,18 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
+import com.smileidentity.metadata.asNetworkRequest
+import com.smileidentity.metadata.models.LivenessType
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.models.SelfieImageOriginValue.BackCamera
+import com.smileidentity.metadata.models.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
-import com.smileidentity.models.v2.LivenessType
-import com.smileidentity.models.v2.Metadatum
-import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
-import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
-import com.smileidentity.models.v2.asNetworkRequest
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -133,9 +134,17 @@ class SelfieViewModel(
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
     private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
+    private var selfieCaptureRetries = 0
+    private var networkRetries = 0
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            DeviceOrientationMetadata.shared.forceUpdate()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         val image = imageProxy.image
         val elapsedTimeMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         if (!shouldAnalyzeImages || elapsedTimeMs < INTRA_IMAGE_MIN_DELAY_MS || image == null) {
@@ -239,6 +248,7 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
+                DeviceOrientationMetadata.shared.forceUpdate()
                 _uiState.update {
                     it.copy(
                         progress = 1f,
@@ -284,12 +294,22 @@ class SelfieViewModel(
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
+        metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))
             _uiState.update { it.copy(processingState = ProcessingState.Success) }
             return
         }
         _uiState.update { it.copy(processingState = ProcessingState.InProgress) }
+
+        /*
+         We add the network retries to the metadata here, because of the way we implement
+         the biometric kyc and document verification which is calling the selfie component
+         with skip api submission. If it is added before the skip api submission, it will be
+         added to the metadata twice.
+         */
+        metadata.add(Metadatum.NetworkRetries(networkRetries))
 
         val proxy = fun(e: Throwable) {
             val didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
@@ -396,6 +416,10 @@ class SelfieViewModel(
                 )
                 selfieFile to livenessFiles
             }
+
+            networkRetries = 0
+            metadata.removeAll { it is Metadatum.NetworkRetries }
+
             result = SmileIDResult.Success(
                 SmartSelfieResult(
                     selfieFile = selfieFileResult,
@@ -428,17 +452,22 @@ class SelfieViewModel(
         livenessFiles.removeAll { it.delete() }
         selfieFile = null
         result = null
+        selfieCaptureRetries++
         shouldAnalyzeImages = true
+        hasRecordedOrientationAtCaptureStart = false
+        metadata.removeAll { it is Metadatum.DeviceOrientation }
     }
 
     fun onRetry() {
         // If selfie file is present, all captures were completed, so we're retrying a network issue
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
+            networkRetries++
             submitJob(selfieFile!!, livenessFiles)
         } else {
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
             metadata.removeAll { it is Metadatum.ActiveLivenessType }
             metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+            selfieCaptureRetries++
             shouldAnalyzeImages = true
             _uiState.update {
                 it.copy(processingState = null)

@@ -16,8 +16,9 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
-import com.smileidentity.models.v2.DocumentImageOriginValue
-import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.metadata.models.DocumentImageOriginValue
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -81,7 +82,8 @@ class DocumentCaptureViewModel(
     private var documentFirstDetectedTimeMs: Long? = null
     private var captureNextAnalysisFrame = false
     private val defaultAspectRatio = knownAspectRatio ?: 1f
-    private var retryCount = 0
+    private var hasRecordedOrientationAtCaptureStart = false
+    private var documentCaptureRetries = 0
     private val timerStart = TimeSource.Monotonic.markNow()
 
     init {
@@ -163,6 +165,7 @@ class DocumentCaptureViewModel(
                                             desiredAspectRatio = uiState.value.idAspectRatio,
                                         )
                                     }
+                                    DeviceOrientationMetadata.shared.forceUpdate()
                                     _uiState.update {
                                         it.copy(
                                             documentImageToConfirm = processedImage,
@@ -231,7 +234,9 @@ class DocumentCaptureViewModel(
         }
         isCapturing = false
         documentImageOrigin = null
-        retryCount++
+        documentCaptureRetries++
+        hasRecordedOrientationAtCaptureStart = false
+        metadata.removeAll { it is Metadatum.DeviceOrientation }
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -247,13 +252,13 @@ class DocumentCaptureViewModel(
         val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.add(Metadatum.DocumentFrontCaptureRetries(retryCount))
+                metadata.add(Metadatum.DocumentFrontCaptureRetries(documentCaptureRetries))
                 metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.add(Metadatum.DocumentBackCaptureRetries(retryCount))
+                metadata.add(Metadatum.DocumentBackCaptureRetries(documentCaptureRetries))
                 metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
             }
@@ -275,6 +280,11 @@ class DocumentCaptureViewModel(
 
     @OptIn(ExperimentalGetImage::class)
     fun analyze(imageProxy: ImageProxy, cameraState: CameraState) {
+        if (!hasRecordedOrientationAtCaptureStart) {
+            DeviceOrientationMetadata.shared.forceUpdate()
+            hasRecordedOrientationAtCaptureStart = true
+        }
+
         // YUV_420_888 is the format produced by CameraX
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val image = imageProxy.image
