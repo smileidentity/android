@@ -19,5 +19,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://maven-sdk.unico.run/sdk-mobile")
     }
 }

@@ -116,6 +116,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.timber)
 
+    implementation(libs.capture)
+
     // Debug Helpers
     debugImplementation(libs.chucker)
     releaseImplementation(libs.chucker.noop)
