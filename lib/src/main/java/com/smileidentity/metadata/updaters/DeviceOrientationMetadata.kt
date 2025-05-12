@@ -48,7 +48,6 @@ class DeviceOrientationMetadata(
 
     companion object {
         lateinit var shared: DeviceOrientationMetadata
-            private set
     }
 
     init {
