@@ -77,25 +77,17 @@ internal fun cleanupJobs(
     deleteSubmittedJobs: Boolean = false,
     deleteUnsubmittedJobs: Boolean = false,
     jobIds: List<String>? = null,
-    // Default to the base save path used by createSmileTempFile
-    savePath: String = SmileID.fileSavePath,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ) {
     val pathsToClean = mutableListOf<String>()
 
-    // Get the old file path
-    val oldSavePath = SmileID.oldFileSavePath
-
-    // Add current paths based on parameters
-    if (deleteSubmittedJobs) {
-        pathsToClean.add("$savePath/$SUBMITTED_PATH")
-        // Add old path if it's different from current save path
-        if (savePath != oldSavePath) pathsToClean.add("$oldSavePath/$SUBMITTED_PATH")
-    }
-
-    if (deleteUnsubmittedJobs) {
-        pathsToClean.add("$savePath/$UNSUBMITTED_PATH")
-        // Add old path if it's different from current save path
-        if (savePath != oldSavePath) pathsToClean.add("$oldSavePath/$UNSUBMITTED_PATH")
+    basePaths.forEach { basePath ->
+        if (deleteSubmittedJobs) {
+            pathsToClean.add("$basePath/$SUBMITTED_PATH")
+        }
+        if (deleteUnsubmittedJobs) {
+            pathsToClean.add("$basePath/$UNSUBMITTED_PATH")
+        }
     }
 
     if (jobIds == null) {
@@ -192,28 +184,20 @@ internal fun doGetSubmittedJobs(): List<String> {
 private fun listJobIds(
     includeSubmitted: Boolean = true,
     includeUnsubmitted: Boolean = false,
-    savePath: String = SmileID.fileSavePath,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ): List<String> {
     val jobIds = mutableListOf<String>()
     val pathsToInclude = mutableListOf<String>()
 
-    // Get the old file path
-    val oldSavePath = SmileID.oldFileSavePath
-
-    // Add paths based on the parameters
-    if (includeSubmitted) {
-        pathsToInclude.add("$savePath/$SUBMITTED_PATH")
-        // Add old path if it's not the same as current save path
-        if (savePath != oldSavePath) pathsToInclude.add("$oldSavePath/$SUBMITTED_PATH")
+    basePaths.forEach { basePath ->
+        if (includeSubmitted) {
+            pathsToInclude.add("$basePath/$SUBMITTED_PATH")
+        }
+        if (includeUnsubmitted) {
+            pathsToInclude.add("$basePath/$UNSUBMITTED_PATH")
+        }
     }
 
-    if (includeUnsubmitted) {
-        pathsToInclude.add("$savePath/$UNSUBMITTED_PATH")
-        // Add old path if it's not the same as current save path
-        if (savePath != oldSavePath) pathsToInclude.add("$oldSavePath/$UNSUBMITTED_PATH")
-    }
-
-    // Check all paths and collect job IDs
     pathsToInclude.forEach { path ->
         val dir = File(path)
         if (dir.exists() && dir.isDirectory) {
@@ -247,17 +231,11 @@ private fun listJobIds(
  * @return A File object that matches the specified type and submission status within the specified
  * folder. The file is filtered and sorted by name to ensure consistent ordering.
  */
-fun getFileByType(
-    folderName: String,
-    fileType: FileType,
-    savePath: String = SmileID.fileSavePath,
-    submitted: Boolean = true,
-): File? {
+fun getFileByType(folderName: String, fileType: FileType, submitted: Boolean = true): File? {
     return getFilesByType(
-        folderName,
-        fileType,
-        savePath,
-        submitted,
+        folderName = folderName,
+        fileType = fileType,
+        submitted = submitted,
     ).firstOrNull()
 }
 
@@ -285,42 +263,28 @@ fun getFileByType(
 fun getFilesByType(
     folderName: String,
     fileType: FileType,
-    savePath: String = SmileID.fileSavePath,
     submitted: Boolean = true,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ): List<File> {
     val stateDirectory = if (submitted) SUBMITTED_PATH else UNSUBMITTED_PATH
-
-    // Get the old file path
-    val oldSavePath = SmileID.oldFileSavePath
-
-    // Create list for all found files
     val allFiles = mutableListOf<File>()
 
-    // Check current directory
-    val currentDirectory = File(savePath, "$stateDirectory/$folderName")
-    if (currentDirectory.exists() && currentDirectory.isDirectory) {
-        val files = currentDirectory.listFiles() ?: emptyArray()
-        allFiles.addAll(files.filter { it.name.startsWith(fileType.fileType) })
-    }
+    val validPaths = basePaths.map { File(it, "$stateDirectory/$folderName") }
 
-    // Check old directory path if different from current
-    if (savePath != oldSavePath) {
-        val oldDirectory = File(oldSavePath, "$stateDirectory/$folderName")
-        if (oldDirectory.exists() && oldDirectory.isDirectory) {
-            val oldFiles = oldDirectory.listFiles() ?: emptyArray()
-            allFiles.addAll(oldFiles.filter { it.name.startsWith(fileType.fileType) })
+    for (dir in validPaths) {
+        if (dir.exists() && dir.isDirectory) {
+            val files = dir.listFiles() ?: emptyArray()
+            allFiles.addAll(files.filter { it.name.startsWith(fileType.fileType) })
         }
     }
 
-    // If no valid directories found, throw the same exception as before
-    if (allFiles.isEmpty() && !currentDirectory.exists() &&
-        (savePath == oldSavePath || !File(oldSavePath, "$stateDirectory/$folderName").exists())
-    ) {
+    // Check if none of the directories existed
+    val anyValidDirExists = validPaths.any { it.exists() && it.isDirectory }
+    if (allFiles.isEmpty() && !anyValidDirExists) {
         Timber.w("The path provided is not a valid directory.")
         throw IllegalArgumentException("The path provided is not a valid directory.")
     }
 
-    // Sort all files by name
     return allFiles.sortedBy { it.name }
 }
 

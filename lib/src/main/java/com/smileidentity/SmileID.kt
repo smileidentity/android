@@ -325,9 +325,9 @@ object SmileID {
             throw IllegalArgumentException("Invalid jobId or not found")
         }
         val authRequestJsonString = getSmileTempFile(
-            jobId,
-            AUTH_REQUEST_FILE,
-            true,
+            folderName = jobId,
+            fileName = AUTH_REQUEST_FILE,
+            isUnsubmitted = true,
         ).useLines { it.joinToString("\n") }
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)?.apply {
@@ -381,12 +381,20 @@ object SmileID {
             }
         }.getOrThrow()
 
-        val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
-        val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
+        val selfieFileResult = getFileByType(
+            folderName = jobId,
+            fileType = FileType.SELFIE,
+            submitted = false,
+        )
+        val livenessFilesResult = getFilesByType(
+            folderName = jobId,
+            fileType = FileType.LIVENESS,
+            submitted = false,
+        )
         val documentFrontFileResult =
-            getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
+            getFileByType(folderName = jobId, fileType = FileType.DOCUMENT_FRONT, submitted = false)
         val documentBackFileResult =
-            getFileByType(jobId, FileType.DOCUMENT_BACK, submitted = false)
+            getFileByType(folderName = jobId, fileType = FileType.DOCUMENT_BACK, submitted = false)
 
         val selfieImageInfo = selfieFileResult?.asSelfieImage()
         val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }

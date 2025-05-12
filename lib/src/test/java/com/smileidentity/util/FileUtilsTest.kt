@@ -41,7 +41,7 @@ class FileUtilsTest {
             deleteSubmittedJobs = true,
             deleteUnsubmittedJobs = true,
             jobIds = listOf(),
-            savePath = testDir.absolutePath,
+            basePaths = mutableListOf(testDir.absolutePath),
         )
         // Assert files are deleted when jobIds is empty
         assertTrue(File(testDir, submittedPath).list()?.isNotEmpty() ?: true)
@@ -50,7 +50,11 @@ class FileUtilsTest {
 
     @Test
     fun `should clean up all completed jobs if deleteCompletedJobs is true`() {
-        cleanupJobs(deleteSubmittedJobs = true, jobIds = null, savePath = testDir.absolutePath)
+        cleanupJobs(
+            deleteSubmittedJobs = true,
+            jobIds = null,
+            basePaths = mutableListOf(testDir.absolutePath),
+        )
         // Assert all files in submitted are deleted
         assertTrue(File(testDir, submittedPath).list()?.isEmpty() ?: true)
         // Assert unsubmitted files are untouched
@@ -59,7 +63,11 @@ class FileUtilsTest {
 
     @Test
     fun `should clean up all pending jobs if deletePendingJobs is true`() {
-        cleanupJobs(deleteUnsubmittedJobs = true, jobIds = null, savePath = testDir.absolutePath)
+        cleanupJobs(
+            deleteUnsubmittedJobs = true,
+            jobIds = null,
+            basePaths = mutableListOf(testDir.absolutePath),
+        )
         // Assert all files in unsubmitted are deleted
         assertTrue(File(testDir, unSubmittedPath).list()?.isEmpty() ?: true)
         // Assert submitted files are untouched
@@ -73,7 +81,7 @@ class FileUtilsTest {
             deleteSubmittedJobs = true,
             deleteUnsubmittedJobs = true,
             jobIds = jobIds,
-            savePath = testDir.absolutePath,
+            basePaths = mutableListOf(testDir.absolutePath),
         )
         // Assert specified jobs are deleted from both submitted and unsubmitted
         assertFalse(File(testDir, "$submittedPath/job_1").exists())
@@ -91,7 +99,7 @@ class FileUtilsTest {
             deleteSubmittedJobs = false,
             deleteUnsubmittedJobs = false,
             jobIds = null,
-            savePath = testDir.absolutePath,
+            basePaths = mutableListOf(testDir.absolutePath),
         )
         // Assert no files are deleted when both flags are false
         File(testDir, submittedPath).list()?.let { assertTrue(it.isNotEmpty()) }

@@ -48,6 +48,7 @@ class SmileIDTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         mockkObject(SmileID)
         every { SmileID.fileSavePath } returns testPath
+        every { SmileID.oldFileSavePath } returns testPath
         mockkStatic("com.smileidentity.util.FileUtilsKt")
         SmileID.config = Config(
             partnerId = "partnerId",
@@ -99,7 +100,7 @@ class SmileIDTest {
                 deleteSubmittedJobs = true,
                 deleteUnsubmittedJobs = true,
                 jobIds = listOf(jobId),
-                savePath = any(),
+                basePaths = any(),
             )
         }
     }
@@ -116,7 +117,7 @@ class SmileIDTest {
                 deleteSubmittedJobs = true,
                 deleteUnsubmittedJobs = true,
                 jobIds = expectedList,
-                savePath = any(),
+                basePaths = any(),
             )
         }
     }
@@ -131,7 +132,7 @@ class SmileIDTest {
                 deleteSubmittedJobs = true,
                 deleteUnsubmittedJobs = true,
                 jobIds = null,
-                savePath = any(),
+                basePaths = any(),
             )
         }
     }
