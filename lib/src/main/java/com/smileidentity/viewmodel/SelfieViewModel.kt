@@ -133,16 +133,21 @@ class SelfieViewModel(
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
 
-    private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var captureDuration = TimeSource.Monotonic.markNow()
     private var hasRecordedOrientationAtCaptureStart = false
     private var selfieCaptureRetries = 0
     private var networkRetries = 0
 
     @OptIn(ExperimentalGetImage::class)
     internal fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        /*
+         At the start of the capture, we record the device orientation and start the capture
+         duration timer.
+         */
         if (!hasRecordedOrientationAtCaptureStart) {
             DeviceOrientationMetadata.shared.forceUpdate()
             hasRecordedOrientationAtCaptureStart = true
+            captureDuration = TimeSource.Monotonic.markNow()
         }
 
         val image = imageProxy.image
@@ -248,7 +253,13 @@ class SelfieViewModel(
                 )
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
+
+                /*
+                 At the end of the capture, we record the device orientation and capture duration
+                 */
                 DeviceOrientationMetadata.shared.forceUpdate()
+                metadata.add(Metadatum.SelfieCaptureDuration(captureDuration.elapsedNow()))
+
                 _uiState.update {
                     it.copy(
                         progress = 1f,
@@ -293,7 +304,6 @@ class SelfieViewModel(
 
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
-        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
         metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
 
         if (skipApiSubmission) {

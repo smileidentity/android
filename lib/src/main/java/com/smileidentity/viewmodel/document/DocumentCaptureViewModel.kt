@@ -84,7 +84,7 @@ class DocumentCaptureViewModel(
     private val defaultAspectRatio = knownAspectRatio ?: 1f
     private var hasRecordedOrientationAtCaptureStart = false
     private var documentCaptureRetries = 0
-    private val timerStart = TimeSource.Monotonic.markNow()
+    private var captureDuration = TimeSource.Monotonic.markNow()
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
@@ -165,7 +165,29 @@ class DocumentCaptureViewModel(
                                             desiredAspectRatio = uiState.value.idAspectRatio,
                                         )
                                     }
+
+                                    /*
+                                     At the end of the capture, we record the device orientation and
+                                     the capture duration
+                                     */
                                     DeviceOrientationMetadata.shared.forceUpdate()
+                                    when (side) {
+                                        DocumentCaptureSide.Front -> {
+                                            metadata.add(
+                                                Metadatum.DocumentFrontCaptureDuration(
+                                                    captureDuration.elapsedNow(),
+                                                ),
+                                            )
+                                        }
+                                        DocumentCaptureSide.Back -> {
+                                            metadata.add(
+                                                Metadatum.DocumentBackCaptureDuration(
+                                                    captureDuration.elapsedNow(),
+                                                ),
+                                            )
+                                        }
+                                    }
+
                                     _uiState.update {
                                         it.copy(
                                             documentImageToConfirm = processedImage,
@@ -249,17 +271,14 @@ class DocumentCaptureViewModel(
     }
 
     fun onConfirm(documentImageToConfirm: File, onConfirm: (File) -> Unit) {
-        val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
                 metadata.add(Metadatum.DocumentFrontCaptureRetries(documentCaptureRetries))
-                metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
             }
 
             DocumentCaptureSide.Back -> {
                 metadata.add(Metadatum.DocumentBackCaptureRetries(documentCaptureRetries))
-                metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
             }
         }
@@ -280,9 +299,14 @@ class DocumentCaptureViewModel(
 
     @OptIn(ExperimentalGetImage::class)
     fun analyze(imageProxy: ImageProxy, cameraState: CameraState) {
+        /*
+         At the start of the capture, we record the device orientation and start the capture
+         duration timer.
+         */
         if (!hasRecordedOrientationAtCaptureStart) {
             DeviceOrientationMetadata.shared.forceUpdate()
             hasRecordedOrientationAtCaptureStart = true
+            captureDuration = TimeSource.Monotonic.markNow()
         }
 
         // YUV_420_888 is the format produced by CameraX

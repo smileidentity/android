@@ -177,7 +177,7 @@ class SmartSelfieEnhancedViewModel(
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
-    private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var captureDuration = TimeSource.Monotonic.markNow()
     private var hasRecordedOrientationAtCaptureStart = false
     private var selfieCaptureRetries = 0
     private var networkRetries = 0
@@ -224,9 +224,14 @@ class SmartSelfieEnhancedViewModel(
      */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        /*
+         At the start of the capture, we record the device orientation and start the capture
+         duration timer.
+         */
         if (!hasRecordedOrientationAtCaptureStart) {
             DeviceOrientationMetadata.shared.forceUpdate()
             hasRecordedOrientationAtCaptureStart = true
+            captureDuration = TimeSource.Monotonic.markNow()
         }
 
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
@@ -449,14 +454,16 @@ class SmartSelfieEnhancedViewModel(
                 return@addOnSuccessListener
             }
 
+            /*
+             At the end of the capture, we record the device orientation and capture duration
+             */
             DeviceOrientationMetadata.shared.forceUpdate()
+            metadata.add(Metadatum.SelfieCaptureDuration(captureDuration.elapsedNow()))
+            metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
+            metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
-
-            metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
-            metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
-            metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
 
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
