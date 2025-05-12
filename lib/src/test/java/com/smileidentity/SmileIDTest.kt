@@ -157,10 +157,10 @@ class SmileIDTest {
                 every { doGetUnsubmittedJobs() } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
-                        jobId,
-                        AUTH_REQUEST_FILE,
-                        any(),
-                        any(),
+                        folderName = jobId,
+                        fileName = AUTH_REQUEST_FILE,
+                        isUnsubmitted = any(),
+                        savePath = any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
                 SmileID.submitJob(jobId, true, this).join()
@@ -177,10 +177,10 @@ class SmileIDTest {
                 every { doGetUnsubmittedJobs() } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
-                        jobId,
-                        PREP_UPLOAD_REQUEST_FILE,
-                        any(),
-                        any(),
+                        folderName = jobId,
+                        fileName = PREP_UPLOAD_REQUEST_FILE,
+                        isUnsubmitted = any(),
+                        savePath = any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
                 SmileID.submitJob(jobId, true, this).join()
