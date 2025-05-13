@@ -2,6 +2,7 @@ package com.smileidentity.viewmodel
 
 import androidx.camera.core.ImageProxy
 import com.smileidentity.R
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.util.StringResource
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
@@ -26,6 +27,7 @@ class SelfieViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
+        DeviceOrientationMetadata.shared = mockk(relaxed = true)
         subject = SelfieViewModel(
             isEnroll = true,
             userId = randomUserId(),
