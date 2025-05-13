@@ -1,5 +1,6 @@
 package com.smileidentity.sample.activity;
 
+import static com.smileidentity.util.UtilKt.getCurrentIsoTimestamp;
 import static com.smileidentity.util.UtilKt.randomJobId;
 import static com.smileidentity.util.UtilKt.randomUserId;
 
@@ -20,6 +21,7 @@ import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
 import com.smileidentity.models.ConsentInformation;
+import com.smileidentity.models.ConsentedInformation;
 import com.smileidentity.models.IdInfo;
 import com.smileidentity.results.BiometricKycResult;
 import com.smileidentity.results.DocumentVerificationResult;
@@ -66,9 +68,10 @@ public class JavaActivity extends FragmentActivity {
     private void doBiometricKYC() {
         IdInfo idInfo = new IdInfo("GH", "PASSPORT", "1234567890",
             null, null, null, null, null, null);
-        ConsentInformation consentInformation = new ConsentInformation(
-            "", true, true, true
+        ConsentedInformation consentedInfo = new ConsentedInformation(
+            getCurrentIsoTimestamp(), true, true, true
         );
+        ConsentInformation consentInformation = new ConsentInformation(consentedInfo);
         BiometricKYCFragment biometricKYCFragment = BiometricKYCFragment
             .newInstance(idInfo, consentInformation);
         getSupportFragmentManager().setFragmentResultListener(
@@ -265,9 +268,10 @@ public class JavaActivity extends FragmentActivity {
     }
 
     private void doEnhancedDocumentVerification() {
-        ConsentInformation consentInformation = new ConsentInformation(
+        ConsentedInformation consentedInfo = new ConsentedInformation(
             "", true, true, true
         );
+        ConsentInformation consentInformation = new ConsentInformation(consentedInfo);
         EnhancedDocumentVerificationFragment enhancedDocVFragment = EnhancedDocumentVerificationFragment
             .newInstance("GH", consentInformation, "DRIVERS_LICENSE");
         getSupportFragmentManager().setFragmentResultListener(
