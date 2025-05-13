@@ -1,4 +1,8 @@
 # Release Notes
+## 10.6.2
+
+### Changed
+*  Restructured consent object that is being sent to the backend API for biometric kyc, enhanced kyc and enhanced document verification
 
 ## Unreleased
 
