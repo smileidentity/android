@@ -77,12 +77,18 @@ internal fun cleanupJobs(
     deleteSubmittedJobs: Boolean = false,
     deleteUnsubmittedJobs: Boolean = false,
     jobIds: List<String>? = null,
-    // Default to the base save path used by createSmileTempFile
-    savePath: String = SmileID.fileSavePath,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ) {
     val pathsToClean = mutableListOf<String>()
-    if (deleteSubmittedJobs) pathsToClean.add("$savePath/$SUBMITTED_PATH")
-    if (deleteUnsubmittedJobs) pathsToClean.add("$savePath/$UNSUBMITTED_PATH")
+
+    basePaths.forEach { basePath ->
+        if (deleteSubmittedJobs) {
+            pathsToClean.add("$basePath/$SUBMITTED_PATH")
+        }
+        if (deleteUnsubmittedJobs) {
+            pathsToClean.add("$basePath/$UNSUBMITTED_PATH")
+        }
+    }
 
     if (jobIds == null) {
         // Nuke all files in specified paths
@@ -92,10 +98,13 @@ internal fun cleanupJobs(
     } else {
         // Delete only specified jobIds within each folder inside the base paths
         pathsToClean.forEach { basePath ->
-            File(basePath).walk().forEach { folder ->
-                if (folder.isDirectory) {
-                    jobIds.forEach { jobId ->
-                        File(folder, jobId).deleteRecursively()
+            val baseDir = File(basePath)
+            if (baseDir.exists() && baseDir.isDirectory) {
+                baseDir.walk().forEach { folder ->
+                    if (folder.isDirectory) {
+                        jobIds.forEach { jobId ->
+                            File(folder, jobId).deleteRecursively()
+                        }
                     }
                 }
             }
@@ -146,22 +155,6 @@ internal fun cleanupJobs(scope: DeleteScope = DeleteScope.All, jobIds: List<Stri
     }
 }
 
-/**
- * Lists only the subdirectories of a given directory.
- *
- * @param rootDir The root directory to walk through.
- * @return A list of File objects representing the subdirectories.
- */
-private fun listSubdirectories(rootDir: File): List<File> {
-    // Check if rootDir is a directory
-    if (!rootDir.isDirectory) {
-        throw IllegalArgumentException("The provided path is not a directory.")
-    }
-
-    // Filter only directories
-    return rootDir.listFiles { file -> file.isDirectory }.orEmpty().toList()
-}
-
 internal fun doGetUnsubmittedJobs(): List<String> =
     listJobIds(includeSubmitted = false, includeUnsubmitted = true)
 
@@ -189,13 +182,19 @@ internal fun doGetSubmittedJobs(): List<String> =
 private fun listJobIds(
     includeSubmitted: Boolean = true,
     includeUnsubmitted: Boolean = false,
-    savePath: String = SmileID.fileSavePath,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ): List<String> {
     val jobIds = mutableListOf<String>()
     val pathsToInclude = mutableListOf<String>()
 
-    if (includeSubmitted) pathsToInclude.add("$savePath/$SUBMITTED_PATH")
-    if (includeUnsubmitted) pathsToInclude.add("$savePath/$UNSUBMITTED_PATH")
+    basePaths.forEach { basePath ->
+        if (includeSubmitted) {
+            pathsToInclude.add("$basePath/$SUBMITTED_PATH")
+        }
+        if (includeUnsubmitted) {
+            pathsToInclude.add("$basePath/$UNSUBMITTED_PATH")
+        }
+    }
 
     pathsToInclude.forEach { path ->
         val dir = File(path)
@@ -230,17 +229,12 @@ private fun listJobIds(
  * @return A File object that matches the specified type and submission status within the specified
  * folder. The file is filtered and sorted by name to ensure consistent ordering.
  */
-fun getFileByType(
-    folderName: String,
-    fileType: FileType,
-    savePath: String = SmileID.fileSavePath,
-    submitted: Boolean = true,
-): File? = getFilesByType(
-    folderName,
-    fileType,
-    savePath,
-    submitted,
-).firstOrNull()
+fun getFileByType(folderName: String, fileType: FileType, submitted: Boolean = true): File? =
+    getFilesByType(
+        folderName = folderName,
+        fileType = fileType,
+        submitted = submitted,
+    ).firstOrNull()
 
 /**
  * Retrieves a list of files of a specified type from a given folder, either from submitted or
@@ -266,17 +260,29 @@ fun getFileByType(
 fun getFilesByType(
     folderName: String,
     fileType: FileType,
-    savePath: String = SmileID.fileSavePath,
     submitted: Boolean = true,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ): List<File> {
     val stateDirectory = if (submitted) SUBMITTED_PATH else UNSUBMITTED_PATH
-    val directory = File(savePath, "$stateDirectory/$folderName")
-    if (!directory.exists() || !directory.isDirectory) {
+    val allFiles = mutableListOf<File>()
+
+    val validPaths = basePaths.map { File(it, "$stateDirectory/$folderName") }
+
+    for (dir in validPaths) {
+        if (dir.exists() && dir.isDirectory) {
+            val files = dir.listFiles() ?: emptyArray()
+            allFiles.addAll(files.filter { it.name.startsWith(fileType.fileType) })
+        }
+    }
+
+    // Check if none of the directories existed
+    val anyValidDirExists = validPaths.any { it.exists() && it.isDirectory }
+    if (allFiles.isEmpty() && !anyValidDirExists) {
         Timber.w("The path provided is not a valid directory.")
         throw IllegalArgumentException("The path provided is not a valid directory.")
     }
-    val files = directory.listFiles() ?: emptyArray()
-    return files.filter { it.name.startsWith(fileType.fileType) }.sortedBy { it.name }
+
+    return allFiles.sortedBy { it.name }
 }
 
 /**
@@ -521,6 +527,16 @@ internal fun createAuthenticationRequestFile(
             .toJson(sink, authRequest.copy(authToken = ""))
     }
     return file
+}
+
+internal fun File?.isNull(): Boolean {
+    if (this == null) return false
+
+    if (!this.exists() || !this.isFile || this.length() <= 0) {
+        return false
+    }
+
+    return true
 }
 
 enum class DeleteScope { Unsubmitted, Submitted, All }
