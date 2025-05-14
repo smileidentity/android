@@ -32,6 +32,7 @@ import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
+import com.smileidentity.util.isNull
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -81,9 +82,9 @@ fun OrchestratedSelfieCaptureScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        val bitmap = if (uiState.selfieToConfirm != null) {
+        val bitmap = if (uiState.selfieToConfirm.isNull()) {
             try {
-                BitmapFactory.decodeFile(uiState.selfieToConfirm.absolutePath)
+                BitmapFactory.decodeFile(uiState.selfieToConfirm?.absolutePath)
                     ?: throw SmileIDException(
                         SmileIDException.Details(
                             code = "IMAGE_DECODE_ERROR",
@@ -94,7 +95,7 @@ fun OrchestratedSelfieCaptureScreen(
                 Timber.e(
                     e,
                     "Failed to decode selfie image from " +
-                        "${uiState.selfieToConfirm.absolutePath}",
+                        "${uiState.selfieToConfirm?.absolutePath}",
                 )
                 SmileIDCrashReporting.hub.captureException(e)
                 viewModel.result = SmileIDResult.Error(e)

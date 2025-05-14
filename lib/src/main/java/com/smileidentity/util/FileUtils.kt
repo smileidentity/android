@@ -529,4 +529,14 @@ internal fun createAuthenticationRequestFile(
     return file
 }
 
+internal fun File?.isNull(): Boolean {
+    if (this == null) return false
+
+    if (!this.exists() || !this.isFile || this.length() <= 0) {
+        return false
+    }
+
+    return true
+}
+
 enum class DeleteScope { Unsubmitted, Submitted, All }
