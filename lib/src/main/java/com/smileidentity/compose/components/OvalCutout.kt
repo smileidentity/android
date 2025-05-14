@@ -123,7 +123,8 @@ fun OvalCutout(
             )
         }
 
-        if (selfieBitmap != null && (
+        if (selfieBitmap != null &&
+            (
                 state.selfieState is SelfieState.Processing ||
                     state.selfieState is SelfieState.Success
                 )

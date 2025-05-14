@@ -73,8 +73,7 @@ open class Metadatum(
     data object Fingerprint : Metadatum("fingerprint", SmileID.fingerprint)
 
     @Parcelize
-    data class CameraName(val cameraName: String) :
-        Metadatum("camera_name", cameraName)
+    data class CameraName(val cameraName: String) : Metadatum("camera_name", cameraName)
 
     @Parcelize
     data class SelfieImageOrigin(val origin: SelfieImageOriginValue) :

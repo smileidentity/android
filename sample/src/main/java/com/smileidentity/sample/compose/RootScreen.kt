@@ -145,9 +145,8 @@ fun RootScreen(
     }
 }
 
-private fun Context.isConfigDefineInAssets(): Boolean {
-    return assets.list("")?.contains("smile_config.json") ?: false
-}
+private fun Context.isConfigDefineInAssets(): Boolean =
+    assets.list("")?.contains("smile_config.json") ?: false
 
 private sealed class InitializationState {
     data object NotInitialized : InitializationState()
