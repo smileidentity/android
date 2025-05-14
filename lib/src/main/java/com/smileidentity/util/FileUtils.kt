@@ -162,13 +162,11 @@ private fun listSubdirectories(rootDir: File): List<File> {
     return rootDir.listFiles { file -> file.isDirectory }.orEmpty().toList()
 }
 
-internal fun doGetUnsubmittedJobs(): List<String> {
-    return listJobIds(includeSubmitted = false, includeUnsubmitted = true)
-}
+internal fun doGetUnsubmittedJobs(): List<String> =
+    listJobIds(includeSubmitted = false, includeUnsubmitted = true)
 
-internal fun doGetSubmittedJobs(): List<String> {
-    return listJobIds(includeSubmitted = true, includeUnsubmitted = false)
-}
+internal fun doGetSubmittedJobs(): List<String> =
+    listJobIds(includeSubmitted = true, includeUnsubmitted = false)
 
 /**
  * Lists the job IDs based on their completion status. This function can retrieve job IDs from both
@@ -237,14 +235,12 @@ fun getFileByType(
     fileType: FileType,
     savePath: String = SmileID.fileSavePath,
     submitted: Boolean = true,
-): File? {
-    return getFilesByType(
-        folderName,
-        fileType,
-        savePath,
-        submitted,
-    ).firstOrNull()
-}
+): File? = getFilesByType(
+    folderName,
+    fileType,
+    savePath,
+    submitted,
+).firstOrNull()
 
 /**
  * Retrieves a list of files of a specified type from a given folder, either from submitted or
@@ -395,9 +391,8 @@ internal fun createSmileImageFile(imageType: FileType, folderName: String): File
  *                     folder does not exist and cannot be created, or if there is insufficient
  *                     permission to write to the specified directory.
  */
-internal fun createSmileJsonFile(fileName: String, folderName: String): File {
-    return createSmileTempFile(folderName, fileName)
-}
+internal fun createSmileJsonFile(fileName: String, folderName: String): File =
+    createSmileTempFile(folderName, fileName)
 
 /**
  * Moves a folder from 'unsubmitted' to 'submitted' within the app's specific directory, handling

@@ -466,22 +466,20 @@ object SmileID {
      * config JSON file directly into a [Config], which needs to happen as a prerequisite to the
      * [initialize] call
      */
-    private fun initMoshi(): Moshi {
-        return Moshi.Builder()
-            .add(JobTypeAdapter)
-            .add(PartnerParamsAdapter)
-            .add(StringifiedBooleanAdapter)
-            .add(MetadataAdapter)
-            .add(FileNameAdapter)
-            .add(FileAdapter)
-            .add(SmartSelfieJobResultAdapter)
-            .add(DocumentVerificationJobResultAdapter)
-            .add(BiometricKycJobResultAdapter)
-            .add(EnhancedDocumentVerificationJobResultAdapter)
-            .add(JobResultAdapter)
-            .add(FallbackEnum.ADAPTER_FACTORY)
-            .build()
-    }
+    private fun initMoshi(): Moshi = Moshi.Builder()
+        .add(JobTypeAdapter)
+        .add(PartnerParamsAdapter)
+        .add(StringifiedBooleanAdapter)
+        .add(MetadataAdapter)
+        .add(FileNameAdapter)
+        .add(FileAdapter)
+        .add(SmartSelfieJobResultAdapter)
+        .add(DocumentVerificationJobResultAdapter)
+        .add(BiometricKycJobResultAdapter)
+        .add(EnhancedDocumentVerificationJobResultAdapter)
+        .add(JobResultAdapter)
+        .add(FallbackEnum.ADAPTER_FACTORY)
+        .build()
 
     /**
      * Request Google Play Services to install the Face Detection Module, if not already installed.

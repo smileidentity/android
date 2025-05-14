@@ -63,5 +63,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: musichin/ktlint-check@v3
-#        with:
-#          ktlint-version: "1.5.0"
+        with:
+          ktlint-version: "1.5.0"

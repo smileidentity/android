@@ -182,9 +182,8 @@ object DataStoreRepository {
     /**
      * The [DataStore] instance for the given partner+environment combination
      */
-    private fun jobDataStore(partnerId: String, isProduction: Boolean): DataStore<Preferences> {
-        return jobsDataStores.getValue(partnerId to isProduction)
-    }
+    private fun jobDataStore(partnerId: String, isProduction: Boolean): DataStore<Preferences> =
+        jobsDataStores.getValue(partnerId to isProduction)
 
     /**
      * The set of keys to be used with [mainDataStore].
