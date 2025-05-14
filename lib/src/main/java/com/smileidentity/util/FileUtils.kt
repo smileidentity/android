@@ -158,7 +158,6 @@ internal fun cleanupJobs(scope: DeleteScope = DeleteScope.All, jobIds: List<Stri
 internal fun doGetUnsubmittedJobs(): List<String> =
     listJobIds(includeSubmitted = false, includeUnsubmitted = true)
 
-
 internal fun doGetSubmittedJobs(): List<String> =
     listJobIds(includeSubmitted = true, includeUnsubmitted = false)
 
@@ -230,17 +229,12 @@ private fun listJobIds(
  * @return A File object that matches the specified type and submission status within the specified
  * folder. The file is filtered and sorted by name to ensure consistent ordering.
  */
-fun getFileByType(
-    folderName: String,
-    fileType: FileType,
-    savePath: String = SmileID.fileSavePath,
-    submitted: Boolean = true,
-): File? = getFilesByType(
-    folderName,
-    fileType,
-    savePath,
-    submitted,
-).firstOrNull()
+fun getFileByType(folderName: String, fileType: FileType, submitted: Boolean = true): File? =
+    getFilesByType(
+        folderName = folderName,
+        fileType = fileType,
+        submitted = submitted,
+    ).firstOrNull()
 
 /**
  * Retrieves a list of files of a specified type from a given folder, either from submitted or

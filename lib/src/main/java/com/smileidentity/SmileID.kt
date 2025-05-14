@@ -335,7 +335,8 @@ object SmileID {
             }
             ?: run {
                 Timber.v(
-                    "Error decoding AuthenticationRequest JSON to class: %s", authRequestJsonString,
+                    "Error decoding AuthenticationRequest JSON to class: %s",
+                    authRequestJsonString,
                 )
                 throw IllegalArgumentException("Invalid jobId information")
             }
@@ -415,7 +416,8 @@ object SmileID {
                 .fromJson(uploadRequestJson)
                 ?: run {
                     Timber.v(
-                        "Error decoding UploadRequest JSON to class: %s", uploadRequestJson,
+                        "Error decoding UploadRequest JSON to class: %s",
+                        uploadRequestJson,
                     )
                     throw IllegalArgumentException("Invalid jobId information")
                 }
