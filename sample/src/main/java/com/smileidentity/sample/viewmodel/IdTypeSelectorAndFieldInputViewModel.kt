@@ -62,9 +62,7 @@ data class IdTypeSelectorAndFieldInputUiState(
         get() = isIdTypeContinueEnabled && idInputFieldValues.values.all { it.isNotBlank() }
 }
 
-class IdTypeSelectorAndFieldInputViewModel(
-    private val jobType: JobType,
-) : ViewModel() {
+class IdTypeSelectorAndFieldInputViewModel(private val jobType: JobType) : ViewModel() {
     private val _uiState = MutableStateFlow(IdTypeSelectorAndFieldInputUiState())
     val uiState = _uiState.asStateFlow()
 

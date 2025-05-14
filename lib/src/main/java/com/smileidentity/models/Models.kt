@@ -12,7 +12,9 @@ import kotlinx.parcelize.Parcelize
 
 @Suppress("MemberVisibilityCanBePrivate")
 @Parcelize
-class SmileIDException(val details: Details) : Exception(details.message), Parcelable {
+class SmileIDException(val details: Details) :
+    Exception(details.message),
+    Parcelable {
 
     /**
      * This Exception+Details is defined in this way to satisfy Moshi (it doesn't like data classes
@@ -27,7 +29,8 @@ class SmileIDException(val details: Details) : Exception(details.message), Parce
     data class Details(
         @Json(name = "code") val code: String?,
         @Json(name = "error") val message: String,
-    ) : Parcelable, Serializable
+    ) : Parcelable,
+        Serializable
 }
 
 /**

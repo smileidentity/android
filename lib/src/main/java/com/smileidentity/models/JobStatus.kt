@@ -91,9 +91,8 @@ interface JobResult : Parcelable {
 
     @JvmInline
     @Parcelize
-    value class Freeform(
-        val result: String,
-    ) : SmartSelfieJobResult,
+    value class Freeform(val result: String) :
+        SmartSelfieJobResult,
         DocumentVerificationJobResult,
         BiometricKycJobResult,
         EnhancedDocumentVerificationJobResult
@@ -117,7 +116,8 @@ sealed interface SmartSelfieJobResult : JobResult {
         @Json(name = "SmileJobID") override val smileJobId: String,
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
         @Json(name = "ConfidenceValue") val confidence: Double?,
-    ) : SmartSelfieJobResult, JobResult.Entry
+    ) : SmartSelfieJobResult,
+        JobResult.Entry
 }
 
 sealed interface DocumentVerificationJobResult : JobResult {
@@ -140,7 +140,8 @@ sealed interface DocumentVerificationJobResult : JobResult {
         @Json(name = "PhoneNumber") val phoneNumber: String?,
         @Json(name = "PhoneNumber2") val phoneNumber2: String?,
         @Json(name = "Address") val address: String?,
-    ) : DocumentVerificationJobResult, JobResult.Entry
+    ) : DocumentVerificationJobResult,
+        JobResult.Entry
 }
 
 sealed interface BiometricKycJobResult : JobResult {
@@ -170,7 +171,8 @@ sealed interface BiometricKycJobResult : JobResult {
         @Json(name = "Secondary_ID_Number") val secondaryIdNumber: String?,
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
-    ) : BiometricKycJobResult, JobResult.Entry
+    ) : BiometricKycJobResult,
+        JobResult.Entry
 }
 
 sealed interface EnhancedDocumentVerificationJobResult : JobResult {
@@ -200,14 +202,13 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
         @Json(name = "Secondary_ID_Number") val secondaryIdNumber: String?,
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
-    ) : EnhancedDocumentVerificationJobResult, JobResult.Entry
+    ) : EnhancedDocumentVerificationJobResult,
+        JobResult.Entry
 }
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class Antifraud(
-    @Json(name = "SuspectUsers") val suspectUsers: List<SuspectUser>,
-) : Parcelable
+data class Antifraud(@Json(name = "SuspectUsers") val suspectUsers: List<SuspectUser>) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)

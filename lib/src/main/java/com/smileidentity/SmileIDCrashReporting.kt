@@ -135,9 +135,8 @@ object SmileIDCrashReporting {
      * an actual brand called "studio" or an actual device called "layoutlib" then we would
      * ignore exceptions from those devices
      */
-    private fun isEventFromIDE(event: SentryEvent): Boolean {
-        return "JetBrains" in (event.getTag("runtime") ?: "") ||
+    private fun isEventFromIDE(event: SentryEvent): Boolean =
+        "JetBrains" in (event.getTag("runtime") ?: "") ||
             event.getTag(TAG_BRAND) == "studio" ||
             event.getTag(TAG_DEVICE) == "layoutlib"
-    }
 }

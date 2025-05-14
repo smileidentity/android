@@ -11,10 +11,7 @@ data class ServicesResponse(
 )
 
 @JsonClass(generateAdapter = true)
-data class BankCode(
-    @Json(name = "name") val name: String,
-    @Json(name = "code") val code: String,
-)
+data class BankCode(@Json(name = "name") val name: String, @Json(name = "code") val code: String)
 
 /**
  * The key is the 2 letter ISO country code for the country. The key should be copied in to
