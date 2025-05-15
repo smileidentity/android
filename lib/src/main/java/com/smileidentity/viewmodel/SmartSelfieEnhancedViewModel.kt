@@ -104,9 +104,7 @@ sealed interface SelfieState {
     ) : SelfieState
 }
 
-enum class SelfieHint(
-    @StringRes val text: Int,
-) {
+enum class SelfieHint(@StringRes val text: Int) {
     NeedLight(text = R.string.si_smart_selfie_enhanced_directive_need_more_light),
     SearchingForFace(text = R.string.si_smart_selfie_enhanced_directive_place_entire_head_in_frame),
     MoveBack(text = R.string.si_smart_selfie_enhanced_directive_move_back),

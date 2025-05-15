@@ -10,7 +10,5 @@ internal sealed interface DocumentCaptureFlow {
     data object FrontDocumentCapture : DocumentCaptureFlow
     data object BackDocumentCapture : DocumentCaptureFlow
     data object SelfieCapture : DocumentCaptureFlow
-    data class ProcessingScreen(
-        val processingState: ProcessingState,
-    ) : DocumentCaptureFlow
+    data class ProcessingScreen(val processingState: ProcessingState) : DocumentCaptureFlow
 }

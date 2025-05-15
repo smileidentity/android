@@ -76,8 +76,8 @@ fun SnackbarHostState.showSnackbar(
     }
 }
 
-fun jobResultMessageBuilder(jobName: String, didSubmitJob: Boolean): String {
-    return jobResultMessageBuilder(
+fun jobResultMessageBuilder(jobName: String, didSubmitJob: Boolean): String =
+    jobResultMessageBuilder(
         jobName,
         didSubmitJob,
         jobComplete = false,
@@ -86,7 +86,6 @@ fun jobResultMessageBuilder(jobName: String, didSubmitJob: Boolean): String {
         resultCode = null,
         resultText = null,
     )
-}
 
 /**
  * Builds a display message for a job result. Since each job type has a different response type,
