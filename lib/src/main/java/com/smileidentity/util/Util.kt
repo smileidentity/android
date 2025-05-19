@@ -452,9 +452,7 @@ internal fun Face.isLookingLeft(
     minAngle: Float,
     maxAngle: Float,
     verticalAngleBuffer: Float,
-): Boolean {
-    return headEulerAngleY in minAngle..maxAngle && abs(headEulerAngleX) < verticalAngleBuffer
-}
+): Boolean = headEulerAngleY in minAngle..maxAngle && abs(headEulerAngleX) < verticalAngleBuffer
 
 /**
  * Determines whether the face is looking right, within some thresholds
@@ -467,9 +465,7 @@ internal fun Face.isLookingRight(
     minAngle: Float,
     maxAngle: Float,
     verticalAngleBuffer: Float,
-): Boolean {
-    return headEulerAngleY in -maxAngle..-minAngle && abs(headEulerAngleX) < verticalAngleBuffer
-}
+): Boolean = headEulerAngleY in -maxAngle..-minAngle && abs(headEulerAngleX) < verticalAngleBuffer
 
 /**
  * Determines whether the face is looking up, within some thresholds
@@ -482,9 +478,7 @@ internal fun Face.isLookingUp(
     minAngle: Float,
     maxAngle: Float,
     horizontalAngleBuffer: Float,
-): Boolean {
-    return headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
-}
+): Boolean = headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
 
 /**
  * Converts current time to ISO8601 string with milliseconds in UTC

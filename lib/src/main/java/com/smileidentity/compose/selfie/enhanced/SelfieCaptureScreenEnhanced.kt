@@ -170,6 +170,7 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
         when {
             showInstructions && !acknowledgedInstructions -> SelfieCaptureInstructionScreenEnhanced(
                 modifier = Modifier.fillMaxSize(),
+                showAttribution = showAttribution,
             ) {
                 acknowledgedInstructions = true
             }

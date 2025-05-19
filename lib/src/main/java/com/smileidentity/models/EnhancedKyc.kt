@@ -18,10 +18,12 @@ data class EnhancedKycRequest(
     @Json(name = "id_number") val idNumber: String,
     @Json(name = "consent_information") val consentInformation: ConsentInformation =
         ConsentInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetailsConsentGranted = false,
-            contactInfoConsentGranted = false,
-            documentInfoConsentGranted = false,
+            consented = ConsentedInformation(
+                consentGrantedDate = getCurrentIsoTimestamp(),
+                personalDetails = false,
+                contactInformation = false,
+                documentInformation = false,
+            ),
         ),
     @Json(name = "first_name") val firstName: String? = null,
     @Json(name = "middle_name") val middleName: String? = null,

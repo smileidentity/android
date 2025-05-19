@@ -369,8 +369,11 @@ class DocumentCaptureViewModel(
                         )
                     }
 
-                    if (captureNextAnalysisFrame && areEdgesDetected && !isCapturing &&
-                        !isFocusing && uiState.value.documentImageToConfirm == null
+                    if (captureNextAnalysisFrame &&
+                        areEdgesDetected &&
+                        !isCapturing &&
+                        !isFocusing &&
+                        uiState.value.documentImageToConfirm == null
                     ) {
                         captureNextAnalysisFrame = false
                         documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture

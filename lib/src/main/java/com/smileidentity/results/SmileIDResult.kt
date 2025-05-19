@@ -63,10 +63,8 @@ data class SmartSelfieResult(
  */
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class EnhancedKycResult(
-    val request: EnhancedKycRequest,
-    val response: EnhancedKycResponse?,
-) : Parcelable
+data class EnhancedKycResult(val request: EnhancedKycRequest, val response: EnhancedKycResponse?) :
+    Parcelable
 
 /**
  * The result of a document verification which consist of

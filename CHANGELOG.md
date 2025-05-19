@@ -1,5 +1,15 @@
 # Release Notes
 
+## 10.6.3
+
+### Fixed
+* Fixed `showAttribution` parameter not being passed to the instruction screen in enhanced selfie capture
+
+## 10.6.2
+
+### Changed
+*  Restructured consent object that is being sent to the backend API for biometric kyc, enhanced kyc and enhanced document verification
+
 ## 10.6.1
 * Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    
 * Added messages from SmartSelfie™ errors will show correctly if present and will show default failure message if not  present  
