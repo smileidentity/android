@@ -1,4 +1,10 @@
 # Release Notes
+
+## 10.6.3
+
+### Fixed
+* Fixed `showAttribution` parameter not being passed to the instruction screen in enhanced selfie capture
+
 ## 10.6.2
 
 ### Changed
