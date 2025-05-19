@@ -76,7 +76,8 @@ class BiometricKycViewModel(
             val didMoveToSubmitted: Boolean
             if (useStrictMode) {
                 didMoveToSubmitted =
-                    handleOfflineJobFailure(jobId, e) && handleOfflineJobFailure(userId, e)
+                    handleOfflineJobFailure(jobId, e) &&
+                    handleOfflineJobFailure(userId, e)
             } else {
                 didMoveToSubmitted = handleOfflineJobFailure(jobId, e)
             }

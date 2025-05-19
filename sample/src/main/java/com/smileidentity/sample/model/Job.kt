@@ -52,14 +52,12 @@ private val inputFormat =
 /**
  * Converts "2023-07-10T21:58:07.183Z" to "7/10/23, 2:58 PM" (assuming PST timezone)
  */
-private fun toHumanReadableTimestamp(timestamp: String): String {
-    return try {
-        val date = inputFormat.parse(timestamp) as Date
-        outputFormat.format(date)
-    } catch (e: Exception) {
-        Timber.e(e, "Failed to parse timestamp: $timestamp")
-        timestamp
-    }
+private fun toHumanReadableTimestamp(timestamp: String): String = try {
+    val date = inputFormat.parse(timestamp) as Date
+    outputFormat.format(date)
+} catch (e: Exception) {
+    Timber.e(e, "Failed to parse timestamp: $timestamp")
+    timestamp
 }
 
 fun getCurrentTimeAsHumanReadableTimestamp() = toHumanReadableTimestamp(inputFormat.format(Date()))

@@ -45,9 +45,7 @@ internal data class BvnConsentUiState(
     val bvnVerificationModes: ImmutableList<BvnOtpVerificationMode> = persistentListOf(),
 )
 
-internal class BvnConsentViewModel(
-    private val userId: String,
-) : ViewModel() {
+internal class BvnConsentViewModel(private val userId: String) : ViewModel() {
     private val _uiState = MutableStateFlow(BvnConsentUiState())
     val uiState = _uiState.asStateFlow()
 

@@ -30,17 +30,15 @@ internal class GzipRequestInterceptor : Interceptor {
         return chain.proceed(compressedRequest)
     }
 
-    private fun gzip(body: RequestBody): RequestBody {
-        return object : RequestBody() {
-            override fun contentType() = body.contentType()
+    private fun gzip(body: RequestBody): RequestBody = object : RequestBody() {
+        override fun contentType() = body.contentType()
 
-            // We don't know the compressed length in advance
-            override fun contentLength(): Long = -1
+        // We don't know the compressed length in advance
+        override fun contentLength(): Long = -1
 
-            override fun writeTo(sink: BufferedSink) = GzipSink(sink).buffer().use {
-                Timber.v("Gzipping request body")
-                body.writeTo(it)
-            }
+        override fun writeTo(sink: BufferedSink) = GzipSink(sink).buffer().use {
+            Timber.v("Gzipping request body")
+            body.writeTo(it)
         }
     }
 }

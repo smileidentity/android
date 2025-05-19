@@ -108,9 +108,8 @@ data class IdInfo(
 @Serializable
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class ConsentInformation(
-    @Json(name = "consented") val consented: ConsentedInformation,
-) : Parcelable {
+data class ConsentInformation(@Json(name = "consented") val consented: ConsentedInformation) :
+    Parcelable {
 
     /**
      * Secondary constructor to support direct creation with legacy properties.
@@ -237,16 +236,14 @@ data class ConsentInformation(
             personalDetailsConsentGranted: Boolean = false,
             contactInfoConsentGranted: Boolean = false,
             documentInfoConsentGranted: Boolean = false,
-        ): ConsentInformation {
-            return ConsentInformation(
-                consented = ConsentedInformation(
-                    consentGrantedDate = consentGrantedDate,
-                    personalDetails = personalDetailsConsentGranted,
-                    contactInformation = contactInfoConsentGranted,
-                    documentInformation = documentInfoConsentGranted,
-                ),
-            )
-        }
+        ): ConsentInformation = ConsentInformation(
+            consented = ConsentedInformation(
+                consentGrantedDate = consentGrantedDate,
+                personalDetails = personalDetailsConsentGranted,
+                contactInformation = contactInfoConsentGranted,
+                documentInformation = documentInfoConsentGranted,
+            ),
+        )
     }
 }
 
