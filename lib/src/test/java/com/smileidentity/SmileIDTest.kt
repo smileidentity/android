@@ -160,7 +160,7 @@ class SmileIDTest {
                         folderName = jobId,
                         fileName = AUTH_REQUEST_FILE,
                         isUnsubmitted = any(),
-                        savePath = any(),
+                        basePaths = any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
                 SmileID.submitJob(jobId, true, this).join()
@@ -180,7 +180,7 @@ class SmileIDTest {
                         folderName = jobId,
                         fileName = PREP_UPLOAD_REQUEST_FILE,
                         isUnsubmitted = any(),
-                        savePath = any(),
+                        basePaths = any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
                 SmileID.submitJob(jobId, true, this).join()
