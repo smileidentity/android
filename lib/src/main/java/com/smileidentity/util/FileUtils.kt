@@ -331,7 +331,7 @@ internal fun getSmileTempFile(
     folderName: String,
     fileName: String,
     isUnsubmitted: Boolean = true,
-    savePath: String = SmileID.fileSavePath,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
 ): File {
     if (folderName.isBlank() || fileName.isBlank()) {
         throw IllegalArgumentException(
@@ -340,18 +340,17 @@ internal fun getSmileTempFile(
     }
 
     val stateDirectory = if (isUnsubmitted) UNSUBMITTED_PATH else SUBMITTED_PATH
-    val directory = File(savePath, "$stateDirectory/$folderName")
 
-    if (!directory.exists() && !directory.mkdirs()) {
-        throw IllegalArgumentException("Invalid jobId or not found")
+    for (basePath in basePaths) {
+        val directory = File(basePath, "$stateDirectory/$folderName")
+        val fullPath = File(directory, fileName)
+
+        if (fullPath.exists()) {
+            return fullPath
+        }
     }
 
-    val fullPath = File(directory, fileName)
-
-    if (!fullPath.exists()) {
-        throw IllegalArgumentException("Invalid file name or not found")
-    }
-    return fullPath
+    throw IllegalArgumentException("Invalid file name or not found")
 }
 
 /**
