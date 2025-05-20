@@ -413,42 +413,44 @@ internal fun createSmileJsonFile(fileName: String, folderName: String): File =
  */
 internal fun moveJobToSubmitted(
     folderName: String,
+    basePaths: List<String> = listOf(SmileID.fileSavePath, SmileID.oldFileSavePath).distinct(),
     savePath: String = SmileID.fileSavePath,
 ): Boolean {
-    val unSubmittedPath = File(savePath, "$UNSUBMITTED_PATH/$folderName")
-    val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
+    val sourceUnsubmittedPath = basePaths
+        .map { File(it, "$UNSUBMITTED_PATH/$folderName") }
+        .find { it.exists() && it.isDirectory }
 
-    if (!unSubmittedPath.exists() || !unSubmittedPath.isDirectory) {
-        val message = "Unsubmitted directory does not exist or is not a directory"
+    if (sourceUnsubmittedPath == null) {
+        val message = "Unsubmitted directory not found in any path"
         Timber.v(message)
         SmileIDCrashReporting.hub.addBreadcrumb(message)
         return false
     }
 
+    val submittedPath = File(savePath, "$SUBMITTED_PATH/$folderName")
+
     try {
-        unSubmittedPath.walk().filter { it.isFile && it.extension == "json" }.forEach { file ->
-            if (!file.delete()) {
-                throw IOException("Failed to delete JSON file ${file.path}")
+        sourceUnsubmittedPath.walk()
+            .filter { it.isFile && it.extension == "json" }
+            .forEach { file ->
+                if (!file.delete()) {
+                    throw IOException("Failed to delete JSON file ${file.path}")
+                }
             }
+
+        if (!sourceUnsubmittedPath.copyRecursively(submittedPath, overwrite = true)) {
+            throw IOException("Failed to copy files to ${submittedPath.path}")
         }
-        if (unSubmittedPath.copyRecursively(submittedPath, overwrite = true)) {
-            // After successfully deleting JSON files, delete the original directory if empty or any
-            // remaining files
-            if (!unSubmittedPath.deleteRecursively()) {
-                throw IOException(
-                    "Failed to delete the source directory or " +
-                        "some files within it ${unSubmittedPath.path}",
-                )
-            }
-        } else {
-            throw IOException("Failed to copy files to the target directory ${submittedPath.path}")
+
+        if (!sourceUnsubmittedPath.deleteRecursively()) {
+            throw IOException("Failed to delete source directory ${sourceUnsubmittedPath.path}")
         }
+
+        return true
     } catch (e: IOException) {
-        Timber.w(e, "Failed to move job to submitted")
+        Timber.w(e, "Failed to move job to submitted: ${e.message}")
         return false
     }
-
-    return true
 }
 
 internal fun createLivenessFile(jobId: String) = createSmileImageFile(FileType.LIVENESS, jobId)
