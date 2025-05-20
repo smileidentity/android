@@ -554,27 +554,25 @@ class SmartSelfieEnhancedViewModel(
         onResult(SmileIDResult.Success(result))
     }
 
-    private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
-        return if (isEnroll) {
-            SmileID.api.doSmartSelfieEnrollment(
-                userId = userId,
-                selfieImage = selfieFile,
-                livenessImages = livenessFiles,
-                allowNewEnroll = allowNewEnroll,
-                partnerParams = extraPartnerParams,
-                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata.asNetworkRequest(),
-            )
-        } else {
-            SmileID.api.doSmartSelfieAuthentication(
-                userId = userId,
-                selfieImage = selfieFile,
-                livenessImages = livenessFiles,
-                partnerParams = extraPartnerParams,
-                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata.asNetworkRequest(),
-            )
-        }
+    private suspend fun submitJob(selfieFile: File): SmartSelfieResponse = if (isEnroll) {
+        SmileID.api.doSmartSelfieEnrollment(
+            userId = userId,
+            selfieImage = selfieFile,
+            livenessImages = livenessFiles,
+            allowNewEnroll = allowNewEnroll,
+            partnerParams = extraPartnerParams,
+            failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
+            metadata = metadata.asNetworkRequest(),
+        )
+    } else {
+        SmileID.api.doSmartSelfieAuthentication(
+            userId = userId,
+            selfieImage = selfieFile,
+            livenessImages = livenessFiles,
+            partnerParams = extraPartnerParams,
+            failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
+            metadata = metadata.asNetworkRequest(),
+        )
     }
 
     /**

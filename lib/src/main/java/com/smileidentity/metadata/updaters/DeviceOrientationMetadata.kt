@@ -89,9 +89,7 @@ class DeviceOrientationMetadata(
     /**
      * Get the current device orientation
      */
-    private fun getCurrentOrientation(): OrientationType {
-        return sensorEventListener.currentOrientation
-    }
+    private fun getCurrentOrientation(): OrientationType = sensorEventListener.currentOrientation
 
     enum class OrientationType {
         PORTRAIT,
