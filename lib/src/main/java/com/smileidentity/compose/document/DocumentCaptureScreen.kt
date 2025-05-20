@@ -53,7 +53,7 @@ import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.createDocumentFile
-import com.smileidentity.util.isNull
+import com.smileidentity.util.isNotNullOrEmpty
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
 import com.smileidentity.util.writeUriToFile
@@ -133,7 +133,7 @@ fun DocumentCaptureScreen(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val captureError = uiState.captureError
-    val bitmap = if (uiState.documentImageToConfirm.isNull()) {
+    val bitmap = if (uiState.documentImageToConfirm.isNotNullOrEmpty()) {
         try {
             BitmapFactory.decodeFile(uiState.documentImageToConfirm?.absolutePath)
                 ?: throw SmileIDException(

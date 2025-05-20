@@ -32,7 +32,7 @@ import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.util.isNull
+import com.smileidentity.util.isNotNullOrEmpty
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.SelfieViewModel
@@ -82,7 +82,7 @@ fun OrchestratedSelfieCaptureScreen(
             .consumeWindowInsets(WindowInsets.statusBars)
             .fillMaxSize(),
     ) {
-        val bitmap = if (uiState.selfieToConfirm.isNull()) {
+        val bitmap = if (uiState.selfieToConfirm.isNotNullOrEmpty()) {
             try {
                 BitmapFactory.decodeFile(uiState.selfieToConfirm?.absolutePath)
                     ?: throw SmileIDException(

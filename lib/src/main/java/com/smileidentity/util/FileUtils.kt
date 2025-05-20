@@ -529,7 +529,7 @@ internal fun createAuthenticationRequestFile(
     return file
 }
 
-internal fun File?.isNull(): Boolean {
+internal fun File?.isNotNullOrEmpty(): Boolean {
     if (this == null) return false
 
     if (!this.exists() || !this.isFile || this.length() <= 0) {
