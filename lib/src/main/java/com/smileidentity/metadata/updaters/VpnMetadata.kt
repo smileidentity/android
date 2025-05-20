@@ -13,10 +13,8 @@ import java.net.NetworkInterface
 /**
  * A manager that updates metadata with VPN information.
  */
-internal class VpnMetadata(
-    context: Context,
-    private val metadata: SnapshotStateList<Metadatum>,
-) : MetadataInterface {
+internal class VpnMetadata(context: Context, private val metadata: SnapshotStateList<Metadatum>) :
+    MetadataInterface {
 
     override val metadataName: String = MetadataKey.VPNDetected.key
 
@@ -40,10 +38,10 @@ internal class VpnMetadata(
 
         // Check for VPN interfaces (Works across all API levels)
         val vpnInterfacePrefixes = listOf("tun", "tap", "ppp", "ipsec", "utun")
-        val isVpnUsingInterfaces = NetworkInterface.getNetworkInterfaces()?.toList()?.any {
-                networkInterface ->
-            vpnInterfacePrefixes.any { prefix -> networkInterface.name.startsWith(prefix) }
-        } == true
+        val isVpnUsingInterfaces =
+            NetworkInterface.getNetworkInterfaces()?.toList()?.any { networkInterface ->
+                vpnInterfacePrefixes.any { prefix -> networkInterface.name.startsWith(prefix) }
+            } == true
 
         return isVpnUsingNetworkType || isVpnUsingInterfaces
     }

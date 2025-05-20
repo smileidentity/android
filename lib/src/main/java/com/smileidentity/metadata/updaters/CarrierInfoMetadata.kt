@@ -32,13 +32,12 @@ internal class CarrierInfoMetadata(
      * Checks if the device supports telephony subscriptions.
      * This ensures the device has SIM support and can manage cellular network subscriptions.
      */
-    private fun hasTelephonySubscription(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+    private fun hasTelephonySubscription(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
             packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_SUBSCRIPTION)
         } else {
             packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
         }
-    }
 
     /**
      * Gets the carrier name.

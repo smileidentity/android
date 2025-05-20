@@ -24,9 +24,8 @@ internal class ProximitySensorMetadata(
         forceUpdate()
     }
 
-    private fun hasProximitySensor(): Boolean {
-        return sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
-    }
+    private fun hasProximitySensor(): Boolean =
+        sensorManager?.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null
 
     override fun forceUpdate() {
         metadata.updateOrAddBy(Metadatum.ProximitySensor(hasProximitySensor())) {

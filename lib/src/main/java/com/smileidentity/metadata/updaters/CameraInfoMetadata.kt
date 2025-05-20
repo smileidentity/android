@@ -24,13 +24,11 @@ internal class CameraInfoMetadata(
         forceUpdate()
     }
 
-    private fun getNumberOfCameras(): Int {
-        return try {
-            cameraManager?.cameraIdList?.size ?: -1
-        } catch (e: Exception) {
-            Timber.e(e)
-            -1
-        }
+    private fun getNumberOfCameras(): Int = try {
+        cameraManager?.cameraIdList?.size ?: -1
+    } catch (e: Exception) {
+        Timber.e(e)
+        -1
     }
 
     override fun forceUpdate() {

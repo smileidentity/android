@@ -50,9 +50,7 @@ internal object LocalMetadataProvider {
 
     internal infix fun provides(
         metadata: SnapshotStateList<Metadatum>,
-    ): ProvidedValue<SnapshotStateList<Metadatum>> {
-        return LocalMetadata.provides(metadata)
-    }
+    ): ProvidedValue<SnapshotStateList<Metadatum>> = LocalMetadata.provides(metadata)
 
     /**
      * Provides a fully extensible metadata provider that automatically updates
