@@ -46,6 +46,7 @@ import com.smileidentity.util.isNetworkFailure
 import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.postProcessImageBitmap
 import com.smileidentity.util.rotated
+import com.smileidentity.util.watermark.utils.createInvisibleTextMark
 import com.ujizin.camposer.state.CamSelector
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
@@ -227,6 +228,9 @@ class SelfieViewModel(
                     resizeLongerDimensionTo = LIVENESS_IMAGE_SIZE,
                 )
                 livenessFiles.add(livenessFile)
+                viewModelScope.launch {
+                    createInvisibleTextMark(bitmap, livenessFile)
+                }
                 _uiState.update { it.copy(progress = livenessFiles.size / TOTAL_STEPS.toFloat()) }
             } else {
                 selfieFile = createSelfieFile(jobId)
@@ -237,6 +241,9 @@ class SelfieViewModel(
                     compressionQuality = 80,
                     resizeLongerDimensionTo = SELFIE_IMAGE_SIZE,
                 )
+                viewModelScope.launch {
+                    createInvisibleTextMark(bitmap, selfieFile!!)
+                }
                 shouldAnalyzeImages = false
                 setCameraFacingMetadata(camSelector)
                 _uiState.update {
