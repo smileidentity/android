@@ -27,16 +27,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -54,7 +51,9 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.models.SmileIDException
 import com.smileidentity.util.createDocumentFile
+import com.smileidentity.util.isNotNullOrEmpty
 import com.smileidentity.util.isValidDocumentImage
 import com.smileidentity.util.toast
 import com.smileidentity.util.writeUriToFile
@@ -133,8 +132,29 @@ fun DocumentCaptureScreen(
         },
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val documentImageToConfirm = uiState.documentImageToConfirm
     val captureError = uiState.captureError
+    val bitmap = if (uiState.documentImageToConfirm.isNotNullOrEmpty()) {
+        try {
+            BitmapFactory.decodeFile(uiState.documentImageToConfirm?.absolutePath)
+                ?: throw SmileIDException(
+                    SmileIDException.Details(
+                        code = "IMAGE_DECODE_ERROR",
+                        message = "Failed to decode the document image file",
+                    ),
+                )
+        } catch (e: SmileIDException) {
+            Timber.e(
+                e,
+                "Error loading document image at ${uiState.documentImageToConfirm?.absolutePath}",
+            )
+            SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image")
+            SmileIDCrashReporting.hub.captureException(e)
+            onError(e)
+            null
+        }
+    } else {
+        null
+    }
     when {
         captureError != null -> onError(captureError)
         showInstructions && !uiState.acknowledgedInstructions -> {
@@ -155,37 +175,31 @@ fun DocumentCaptureScreen(
             )
         }
 
-        documentImageToConfirm != null -> {
-            val painter = remember {
-                val path = documentImageToConfirm.absolutePath
-                try {
-                    BitmapPainter(BitmapFactory.decodeFile(path).asImageBitmap())
-                } catch (e: Exception) {
-                    SmileIDCrashReporting.hub.addBreadcrumb("Error loading document image at $path")
-                    SmileIDCrashReporting.hub.captureException(e)
-                    onError(e)
-                    ColorPainter(Color.Black)
-                }
-            }
+        uiState.documentImageToConfirm != null && bitmap != null -> {
             if (showConfirmation) {
                 ImageCaptureConfirmationDialog(
                     titleText = stringResource(id = R.string.si_doc_v_confirmation_dialog_title),
                     subtitleText = stringResource(
                         id = R.string.si_doc_v_confirmation_dialog_subtitle,
                     ),
-                    painter = painter,
+                    painter = BitmapPainter(bitmap.asImageBitmap()),
                     scaleFactor = PREVIEW_SCALE_FACTOR,
                     confirmButtonText = stringResource(
                         id = R.string.si_doc_v_confirmation_dialog_confirm_button,
                     ),
-                    onConfirm = { viewModel.onConfirm(documentImageToConfirm, onConfirm) },
+                    onConfirm = {
+                        viewModel.onConfirm(
+                            uiState.documentImageToConfirm!!,
+                            onConfirm,
+                        )
+                    },
                     retakeButtonText = stringResource(
                         id = R.string.si_doc_v_confirmation_dialog_retake_button,
                     ),
                     onRetake = viewModel::onRetry,
                 )
             } else {
-                viewModel.onConfirm(documentImageToConfirm, onConfirm)
+                viewModel.onConfirm(uiState.documentImageToConfirm!!, onConfirm)
             }
         }
 
