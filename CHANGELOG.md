@@ -6,6 +6,9 @@
 * Changed File save path from cacheDir to fileDir (and maintain compatibility till next major
   breaking release)
 
+### Fixed
+* Fixed a bug where a filepath wasn't updated on a retry of a document verification job
+
 ## 10.6.3
 
 ### Fixed
