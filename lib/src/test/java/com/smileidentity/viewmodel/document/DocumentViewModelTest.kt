@@ -107,6 +107,9 @@ class DocumentViewModelTest {
     fun `submitJob should move processingState to Error`() = runTest {
         // given
         SmileID.api = mockk()
+        SmileID.fileSavePath = "this-is-just-a-random-path-to-init-the-variable"
+        SmileID.oldFileSavePath = "this-is-just-a-random-path-to-init-the-variable"
+
         coEvery { SmileID.api.authenticate(any()) } throws RuntimeException()
 
         // when
@@ -122,6 +125,9 @@ class DocumentViewModelTest {
     fun `submitJob should include idInfo`() = runTest {
         // given
         SmileID.api = mockk()
+        SmileID.fileSavePath = "this-is-just-a-random-path-to-init-the-variable"
+        SmileID.oldFileSavePath = "this-is-just-a-random-path-to-init-the-variable"
+
         coEvery { SmileID.api.authenticate(any()) } returns AuthenticationResponse(
             success = true,
             signature = "signature",
@@ -162,6 +168,9 @@ class DocumentViewModelTest {
     @Test
     fun `should submit liveness photos after selfie capture`() = runTest {
         SmileID.api = mockk()
+        SmileID.fileSavePath = "this-is-just-a-random-path-to-init-the-variable"
+        SmileID.oldFileSavePath = "this-is-just-a-random-path-to-init-the-variable"
+
         val selfieResult = SmartSelfieResult(
             selfieFile = selfieFile,
             livenessFiles = listOf(File.createTempFile("liveness", ".jpg")),
