@@ -1,5 +1,10 @@
 # Release Notes
 
+## Unreleased
+
+### Added
+* Added enhanced metadata collection to improve fraud prevention and behavioral signal analysis
+
 ## 10.6.3
 
 ### Fixed
