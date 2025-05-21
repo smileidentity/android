@@ -48,6 +48,7 @@ class SmileIDTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         mockkObject(SmileID)
         every { SmileID.fileSavePath } returns testPath
+        every { SmileID.oldFileSavePath } returns testPath
         mockkStatic("com.smileidentity.util.FileUtilsKt")
         SmileID.config = Config(
             partnerId = "partnerId",
@@ -99,7 +100,7 @@ class SmileIDTest {
                 deleteSubmittedJobs = true,
                 deleteUnsubmittedJobs = true,
                 jobIds = listOf(jobId),
-                savePath = any(),
+                basePaths = any(),
             )
         }
     }
@@ -116,7 +117,7 @@ class SmileIDTest {
                 deleteSubmittedJobs = true,
                 deleteUnsubmittedJobs = true,
                 jobIds = expectedList,
-                savePath = any(),
+                basePaths = any(),
             )
         }
     }
@@ -131,7 +132,7 @@ class SmileIDTest {
                 deleteSubmittedJobs = true,
                 deleteUnsubmittedJobs = true,
                 jobIds = null,
-                savePath = any(),
+                basePaths = any(),
             )
         }
     }
@@ -156,10 +157,10 @@ class SmileIDTest {
                 every { doGetUnsubmittedJobs() } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
-                        jobId,
-                        AUTH_REQUEST_FILE,
-                        any(),
-                        any(),
+                        folderName = jobId,
+                        fileName = AUTH_REQUEST_FILE,
+                        isUnsubmitted = any(),
+                        basePaths = any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
                 SmileID.submitJob(jobId, true, this).join()
@@ -176,10 +177,10 @@ class SmileIDTest {
                 every { doGetUnsubmittedJobs() } returns listOf("validJobId")
                 every {
                     getSmileTempFile(
-                        jobId,
-                        PREP_UPLOAD_REQUEST_FILE,
-                        any(),
-                        any(),
+                        folderName = jobId,
+                        fileName = PREP_UPLOAD_REQUEST_FILE,
+                        isUnsubmitted = any(),
+                        basePaths = any(),
                     )
                 } throws IllegalArgumentException("Invalid file name or not found")
                 SmileID.submitJob(jobId, true, this).join()

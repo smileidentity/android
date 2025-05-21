@@ -251,6 +251,7 @@ class SelfieViewModel(
             }
         }.addOnFailureListener { exception ->
             Timber.e(exception, "Error detecting faces")
+            cleanupImageFiles()
             result = SmileIDResult.Error(exception)
             _uiState.update {
                 it.copy(
@@ -422,11 +423,7 @@ class SelfieViewModel(
                 progress = 0f,
             )
         }
-        selfieFile?.delete()?.also { deleted ->
-            if (!deleted) Timber.w("Failed to delete $selfieFile")
-        }
-        livenessFiles.removeAll { it.delete() }
-        selfieFile = null
+        cleanupImageFiles()
         result = null
         shouldAnalyzeImages = true
     }
@@ -436,6 +433,7 @@ class SelfieViewModel(
         if (selfieFile != null && livenessFiles.size == NUM_LIVENESS_IMAGES) {
             submitJob(selfieFile!!, livenessFiles)
         } else {
+            cleanupImageFiles()
             metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
             metadata.removeAll { it is Metadatum.ActiveLivenessType }
             metadata.removeAll { it is Metadatum.SelfieImageOrigin }
@@ -452,5 +450,13 @@ class SelfieViewModel(
 
     fun onFinished(callback: SmileIDCallback<SmartSelfieResult>) {
         callback(result!!)
+    }
+
+    private fun cleanupImageFiles() {
+        selfieFile?.delete()?.also { deleted ->
+            if (!deleted) Timber.w("Failed to delete $selfieFile")
+        }
+        livenessFiles.removeAll { it.delete() }
+        selfieFile = null
     }
 }

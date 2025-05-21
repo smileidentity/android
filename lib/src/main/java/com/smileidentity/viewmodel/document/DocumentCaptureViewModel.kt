@@ -215,7 +215,7 @@ class DocumentCaptureViewModel(
     fun onRetry() {
         // It is safe to delete the file here, even though it may have been selected from the
         // gallery because we copied the URI contents to a new File first
-        uiState.value.documentImageToConfirm?.delete()
+        cleanupImageFiles()
         when (side) {
             DocumentCaptureSide.Front -> {
                 metadata.removeAll { it is Metadatum.DocumentFrontCaptureRetries }
@@ -403,5 +403,11 @@ class DocumentCaptureViewModel(
     ): Boolean {
         val expectedAspectRatio = knownAspectRatio ?: detectedAspectRatio
         return abs(detectedAspectRatio - expectedAspectRatio) < tolerance
+    }
+
+    private fun cleanupImageFiles() {
+        uiState.value.documentImageToConfirm?.delete()?.also { deleted ->
+            if (!deleted) Timber.w("Failed to delete ${uiState.value.documentImageToConfirm}")
+        }
     }
 }

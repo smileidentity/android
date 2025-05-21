@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.SmileID.initialize
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
@@ -54,6 +55,7 @@ import com.smileidentity.util.toSmileIDException
 import com.squareup.moshi.Moshi
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
+import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
@@ -95,6 +97,13 @@ object SmileID {
     internal var apiKey: String? = null
 
     internal lateinit var fileSavePath: String
+
+    /**
+     * We need this to not break the old sdk implementation
+     *
+     * We will remove this in the next breaking version (v11)
+     */
+    internal lateinit var oldFileSavePath: String
     internal var fingerprint = ""
 
     /**
@@ -147,8 +156,13 @@ object SmileID {
 
         api = retrofit.create(SmileIDService::class.java)
 
+        // Usually looks like: /data/data/0/<package-name>/files/SmileID
+        fileSavePath = File("${context.filesDir.absolutePath}/SmileID").absolutePath
+
+        // todo :: will remove this in v11 (breaking change)
         // Usually looks like: /data/user/0/<package name>/app_SmileID
-        fileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
+        oldFileSavePath = context.getDir("SmileID", MODE_PRIVATE).absolutePath
+
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
 
@@ -311,9 +325,9 @@ object SmileID {
             throw IllegalArgumentException("Invalid jobId or not found")
         }
         val authRequestJsonString = getSmileTempFile(
-            jobId,
-            AUTH_REQUEST_FILE,
-            true,
+            folderName = jobId,
+            fileName = AUTH_REQUEST_FILE,
+            isUnsubmitted = true,
         ).useLines { it.joinToString("\n") }
         val authRequest = moshi.adapter(AuthenticationRequest::class.java)
             .fromJson(authRequestJsonString)?.apply {
@@ -321,8 +335,8 @@ object SmileID {
             }
             ?: run {
                 Timber.v(
-                    "Error decoding AuthenticationRequest JSON to class: " +
-                        authRequestJsonString,
+                    "Error decoding AuthenticationRequest JSON to class: %s",
+                    authRequestJsonString,
                 )
                 throw IllegalArgumentException("Invalid jobId information")
             }
@@ -338,8 +352,8 @@ object SmileID {
             .fromJson(prepUploadRequestJsonString)
             ?: run {
                 Timber.v(
-                    "Error decoding PrepUploadRequest JSON to class: " +
-                        prepUploadRequestJsonString,
+                    "Error decoding PrepUploadRequest JSON to class: %s",
+                    prepUploadRequestJsonString,
                 )
                 throw IllegalArgumentException("Invalid jobId information")
             }
@@ -368,12 +382,20 @@ object SmileID {
             }
         }.getOrThrow()
 
-        val selfieFileResult = getFileByType(jobId, FileType.SELFIE, submitted = false)
-        val livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS, submitted = false)
+        val selfieFileResult = getFileByType(
+            folderName = jobId,
+            fileType = FileType.SELFIE,
+            submitted = false,
+        )
+        val livenessFilesResult = getFilesByType(
+            folderName = jobId,
+            fileType = FileType.LIVENESS,
+            submitted = false,
+        )
         val documentFrontFileResult =
-            getFileByType(jobId, FileType.DOCUMENT_FRONT, submitted = false)
+            getFileByType(folderName = jobId, fileType = FileType.DOCUMENT_FRONT, submitted = false)
         val documentBackFileResult =
-            getFileByType(jobId, FileType.DOCUMENT_BACK, submitted = false)
+            getFileByType(folderName = jobId, fileType = FileType.DOCUMENT_BACK, submitted = false)
 
         val selfieImageInfo = selfieFileResult?.asSelfieImage()
         val livenessImageInfo = livenessFilesResult.map { it.asLivenessImage() }
@@ -394,8 +416,8 @@ object SmileID {
                 .fromJson(uploadRequestJson)
                 ?: run {
                     Timber.v(
-                        "Error decoding UploadRequest JSON to class: " +
-                            uploadRequestJson,
+                        "Error decoding UploadRequest JSON to class: %s",
+                        uploadRequestJson,
                     )
                     throw IllegalArgumentException("Invalid jobId information")
                 }
