@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-* Added enhanced metadata collection to improve fraud prevention and behavioral signal analysis
+* Enhanced fraud signals collection to improve fraud prevention
 
 ## 10.6.3
 
