@@ -286,6 +286,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         if (didMoveToSubmitted) {
             this.selfieFile = getFileByType(jobId, FileType.SELFIE)
             this.livenessFiles = getFilesByType(jobId, FileType.LIVENESS)
+            this.documentFrontFile = getFileByType(jobId, FileType.DOCUMENT_FRONT)
+            this.documentBackFile = getFileByType(jobId, FileType.DOCUMENT_BACK)
         }
         stepToRetry = uiState.value.currentStep
         _uiState.update {
