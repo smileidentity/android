@@ -485,7 +485,11 @@ internal fun Face.isLookingUp(
  * Format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
  */
 internal fun getCurrentIsoTimestamp(timeZone: TimeZone = TimeZone.getTimeZone("UTC")): String {
-    val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    /*
+    For UTC timezone the pattern adds 'Z' at the end of the string. For any other timezone the
+    pattern adds the timezone offset in format +hh:mm or -hh:mm.
+     */
+    val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     val sdf = SimpleDateFormat(pattern, Locale.US)
     sdf.timeZone = timeZone
     return sdf.format(Date())
