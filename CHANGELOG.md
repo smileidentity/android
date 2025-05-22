@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Enhanced fraud signals collection to improve fraud prevention
+
 ### Changed
 * Changed File save path from cacheDir to fileDir (and maintain compatibility till next major
   breaking release)

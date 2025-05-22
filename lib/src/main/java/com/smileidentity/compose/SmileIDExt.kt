@@ -11,14 +11,14 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.SmileID
 import com.smileidentity.compose.biometric.OrchestratedBiometricKYCScreen
-import com.smileidentity.compose.components.LocalMetadata
-import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.consent.OrchestratedConsentScreen
 import com.smileidentity.compose.consent.bvn.OrchestratedBvnConsentScreen
 import com.smileidentity.compose.document.OrchestratedDocumentVerificationScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
+import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.models.IdInfo
@@ -79,6 +79,7 @@ fun SmileID.SmartSelfieEnrollment(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    // todo provide viewmodel here so we remove metadata from composable constructor
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
             modifier = modifier,
@@ -208,7 +209,7 @@ fun SmileID.DocumentVerification(
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val metadata = LocalMetadata.current
+        val metadata = LocalMetadataProvider.current
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
@@ -307,7 +308,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val metadata = LocalMetadata.current
+        val metadata = LocalMetadataProvider.current
         OrchestratedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,

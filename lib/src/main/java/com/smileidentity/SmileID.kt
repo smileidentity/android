@@ -5,13 +5,14 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
 import android.provider.Settings.Secure
+import androidx.core.content.edit
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
-import com.smileidentity.SmileID.initialize
+import com.smileidentity.metadata.models.WrapperSdkName
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
@@ -34,6 +35,7 @@ import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
+import com.smileidentity.networking.ValueJsonAdapter
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -106,6 +108,14 @@ object SmileID {
     internal lateinit var oldFileSavePath: String
     internal var fingerprint = ""
 
+    internal var wrapperSdkName: WrapperSdkName? = null
+        private set
+    internal var wrapperSdkVersion: String? = null
+        private set
+
+    internal var sdkLaunchCount = 0
+        private set
+
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
      *
@@ -165,6 +175,8 @@ object SmileID {
 
         // ANDROID_ID may be null. Since Android 8, each app has a different value
         Secure.getString(context.contentResolver, Secure.ANDROID_ID)?.let { fingerprint = it }
+
+        trackSdkLaunchCount(context)
 
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {
@@ -493,6 +505,7 @@ object SmileID {
         .add(PartnerParamsAdapter)
         .add(StringifiedBooleanAdapter)
         .add(MetadataAdapter)
+        .add(ValueJsonAdapter)
         .add(FileNameAdapter)
         .add(FileAdapter)
         .add(SmartSelfieJobResultAdapter)
@@ -554,5 +567,31 @@ object SmileID {
                 throw exception
             }
         }
+    }
+
+    private fun trackSdkLaunchCount(context: Context) {
+        try {
+            val sharedPreferences = context.getSharedPreferences("SmileIDPrefs", MODE_PRIVATE)
+            val key = "SmileID.SDKLaunchCount"
+            val currentCount = sharedPreferences.getInt(key, 0)
+            val newCount = currentCount + 1
+            sharedPreferences.edit { putInt(key, newCount) }
+
+            sdkLaunchCount = newCount
+        } catch (e: Exception) {
+            // do nothing, it's just metadata
+        }
+    }
+
+    /**
+     * Sets the name and version of a x-platform sdk that wraps the native sdk. This is an internal
+     * function and should not be used by partner developers.
+     *
+     * @param name The name of the x-platform sdk that wraps the native sdk.
+     * @param version The version of the x-platform sdk that wraps the native sdk.
+     */
+    fun setWrapperInfo(name: WrapperSdkName, version: String) {
+        wrapperSdkName = name
+        wrapperSdkVersion = version
     }
 }

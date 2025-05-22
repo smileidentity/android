@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -19,6 +20,8 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
+import com.smileidentity.metadata.LocalMetadataProvider
+import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
@@ -45,6 +48,7 @@ fun OrchestratedBiometricKYCScreen(
     showInstructions: Boolean = true,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
+    metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
     viewModel: BiometricKycViewModel = viewModel(
         factory = viewModelFactory {
             BiometricKycViewModel(
@@ -55,6 +59,7 @@ fun OrchestratedBiometricKYCScreen(
                 useStrictMode = useStrictMode,
                 extraPartnerParams = extraPartnerParams,
                 consentInformation = consentInformation,
+                metadata = metadata,
             )
         },
     ),
