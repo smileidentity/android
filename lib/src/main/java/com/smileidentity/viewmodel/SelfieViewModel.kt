@@ -145,7 +145,14 @@ class SelfieViewModel(
          duration timer.
          */
         if (!hasRecordedOrientationAtCaptureStart) {
-            DeviceOrientationMetadata.shared.forceUpdate()
+            try {
+                DeviceOrientationMetadata.shared.forceUpdate()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device orientation is only metadata we ignore it and take no action.
+                 */
+            }
             hasRecordedOrientationAtCaptureStart = true
             captureDuration = TimeSource.Monotonic.markNow()
         }
@@ -257,7 +264,14 @@ class SelfieViewModel(
                 /*
                  At the end of the capture, we record the device orientation and capture duration
                  */
-                DeviceOrientationMetadata.shared.forceUpdate()
+                try {
+                    DeviceOrientationMetadata.shared.forceUpdate()
+                } catch (_: UninitializedPropertyAccessException) {
+                    /*
+                    In case .shared isn't initialised it throws the above exception. Given that the
+                    device orientation is only metadata we ignore it and take no action.
+                     */
+                }
                 metadata.add(Metadatum.SelfieCaptureDuration(captureDuration.elapsedNow()))
 
                 _uiState.update {

@@ -170,7 +170,15 @@ class DocumentCaptureViewModel(
                                      At the end of the capture, we record the device orientation and
                                      the capture duration
                                      */
-                                    DeviceOrientationMetadata.shared.forceUpdate()
+                                    try {
+                                        DeviceOrientationMetadata.shared.forceUpdate()
+                                    } catch (_: UninitializedPropertyAccessException) {
+                                        /*
+                                        In case .shared isn't initialised it throws the above
+                                        exception. Given that the device orientation is only
+                                        metadata we ignore it and take no action.
+                                         */
+                                    }
                                     when (side) {
                                         DocumentCaptureSide.Front -> {
                                             metadata.add(
@@ -304,7 +312,14 @@ class DocumentCaptureViewModel(
          duration timer.
          */
         if (!hasRecordedOrientationAtCaptureStart) {
-            DeviceOrientationMetadata.shared.forceUpdate()
+            try {
+                DeviceOrientationMetadata.shared.forceUpdate()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device orientation is only metadata we ignore it and take no action.
+                 */
+            }
             hasRecordedOrientationAtCaptureStart = true
             captureDuration = TimeSource.Monotonic.markNow()
         }
