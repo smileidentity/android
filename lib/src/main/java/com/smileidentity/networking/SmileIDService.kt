@@ -52,6 +52,8 @@ interface SmileIDService {
      * necessary only when using the [com.smileidentity.models.Config.authToken] and
      * *not* using the API key.
      */
+    @SmileHeaderMetadata
+    @SmileIDSecurity
     @POST("/v1/auth_smile")
     suspend fun authenticate(@Body request: AuthenticationRequest): AuthenticationResponse
 
