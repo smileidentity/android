@@ -16,6 +16,7 @@ enum class MetadataKey(val key: String) {
     DocumentFrontCaptureDuration("document_front_capture_duration_ms"),
     DocumentFrontImageOrigin("document_front_image_origin"),
     Fingerprint("fingerprint"),
+    Geolocation("geolocation"),
     HostApplication("host_application"),
     Locale("locale"),
     LocalTimeOfEnrolment("local_time_of_enrolment"),

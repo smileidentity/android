@@ -9,6 +9,7 @@ import com.smileidentity.metadata.device.locale
 import com.smileidentity.metadata.device.model
 import com.smileidentity.metadata.device.os
 import com.smileidentity.metadata.device.systemArchitecture
+import com.smileidentity.networking.ValueParceler
 import com.smileidentity.util.getCurrentIsoTimestamp
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -16,19 +17,33 @@ import java.util.TimeZone
 import kotlin.time.Duration
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
+import kotlinx.parcelize.TypeParceler
 
-sealed class Value {
+@Parcelize
+sealed class Value : Parcelable {
+    @Parcelize
     @JsonClass(generateAdapter = true)
     data class StringValue(val value: String) : Value()
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     data class IntValue(val value: Int) : Value()
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     data class LongValue(val value: Long) : Value()
 
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    data class DoubleValue(val value: Double) : Value()
+
+    @Parcelize
     @JsonClass(generateAdapter = true)
     data class BoolValue(val value: Boolean) : Value()
+
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    data class ObjectValue(val map: Map<String, Value>) : Value()
 }
 
 /**
@@ -64,6 +79,12 @@ open class Metadatum(
         value: Boolean,
         timestamp: String = getCurrentIsoTimestamp(),
     ) : this(name.key, Value.BoolValue(value), timestamp)
+
+    constructor(
+        name: MetadataKey,
+        value: Map<String, Value>,
+        timestamp: String = getCurrentIsoTimestamp(),
+    ) : this(name.key, Value.ObjectValue(value), timestamp)
 
     @Parcelize
     data class ActiveLivenessType(val type: LivenessType) :
@@ -149,6 +170,11 @@ open class Metadatum(
             MetadataKey.LocalTimeOfEnrolment,
             getCurrentIsoTimestamp(TimeZone.getDefault()),
         )
+
+    @TypeParceler<Value, ValueParceler>
+    @Parcelize
+    data class GeoLocation(val geolocation: Map<String, Value>) :
+        Metadatum(MetadataKey.Geolocation, geolocation)
 
     @Parcelize
     data class MemoryInfo(val memoryInfo: Long) : Metadatum(MetadataKey.MemoryInfo, memoryInfo)
