@@ -19,7 +19,6 @@ import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.Value
 import timber.log.Timber
 
-
 /**
  * A manager that updates metadata with location information.
  */
@@ -34,7 +33,7 @@ internal class LocationMetadata(
         val latitude: Double,
         val longitude: Double,
         val accuracy: Accuracy,
-        val source: Source
+        val source: Source,
     ) {
         companion object {
             val UNKNOWN = LocationInfo(
@@ -75,7 +74,7 @@ internal class LocationMetadata(
             "latitude" to Value.DoubleValue(locationInfo.latitude),
             "longitude" to Value.DoubleValue(locationInfo.longitude),
             "accuracy" to Value.StringValue(locationInfo.accuracy.key),
-            "source" to Value.StringValue(locationInfo.source.key)
+            "source" to Value.StringValue(locationInfo.source.key),
         )
         metadata.add(Metadatum.GeoLocation(info))
     }
@@ -96,49 +95,49 @@ internal class LocationMetadata(
             .build()
         Timber.d("Location request created: $request")
 
-        fusedClient.requestLocationUpdates(request, object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                Timber.d("Location result received: ${result.lastLocation}")
-                val location = result.lastLocation ?:
-                    return updateLocationMetadata(LocationInfo.UNKNOWN)
-                val (accuracy, source) = classifyLocation(location)
-                val info = LocationInfo(
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    accuracy = accuracy,
-                    source = source
-                )
-                Timber.d("Location received: $info")
-                updateLocationMetadata(info)
-                fusedClient.removeLocationUpdates(this)
-            }
-
-            override fun onLocationAvailability(availability: LocationAvailability) {
-                if (!availability.isLocationAvailable) {
-                    Timber.d("Location not available, updating with UNKNOWN location")
-                    updateLocationMetadata(LocationInfo.UNKNOWN)
+        fusedClient.requestLocationUpdates(
+            request,
+            object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    Timber.d("Location result received: ${result.lastLocation}")
+                    val location = result.lastLocation
+                        ?: return updateLocationMetadata(LocationInfo.UNKNOWN)
+                    val (accuracy, source) = classifyLocation(location)
+                    val info = LocationInfo(
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        accuracy = accuracy,
+                        source = source,
+                    )
+                    Timber.d("Location received: $info")
+                    updateLocationMetadata(info)
+                    fusedClient.removeLocationUpdates(this)
                 }
-                Timber.d("Location availability: ${availability.isLocationAvailable}")
-            }
-        }, null)
+
+                override fun onLocationAvailability(availability: LocationAvailability) {
+                    if (!availability.isLocationAvailable) {
+                        Timber.d("Location not available, updating with UNKNOWN location")
+                        updateLocationMetadata(LocationInfo.UNKNOWN)
+                    }
+                    Timber.d("Location availability: ${availability.isLocationAvailable}")
+                }
+            },
+            null,
+        )
     }
 
-    private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
+    private fun hasLocationPermission(): Boolean = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    ) == PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-    }
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+        ) == PackageManager.PERMISSION_GRANTED
 
-    private fun classifyLocation(location: Location): Pair<Accuracy, Source> {
-        return when {
-            location.accuracy < 20 -> Accuracy.PRECISE to Source.GPS
-            location.accuracy < 100 -> Accuracy.APPROXIMATE to Source.NETWORK
-            else -> Accuracy.UNKNOWN to Source.UNKNOWN
-        }
+    private fun classifyLocation(location: Location): Pair<Accuracy, Source> = when {
+        location.accuracy < 20 -> Accuracy.PRECISE to Source.GPS
+        location.accuracy < 100 -> Accuracy.APPROXIMATE to Source.NETWORK
+        else -> Accuracy.UNKNOWN to Source.UNKNOWN
     }
 }

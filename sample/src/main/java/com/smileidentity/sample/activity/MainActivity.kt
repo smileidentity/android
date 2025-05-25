@@ -27,12 +27,12 @@ class MainActivity : ComponentActivity() {
     private fun checkAndRequestLocationPermissions() {
         val fineLocationGranted = ContextCompat.checkSelfPermission(
             this,
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
 
         val coarseLocationGranted = ContextCompat.checkSelfPermission(
             this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
 
         if (!fineLocationGranted && !coarseLocationGranted) {
@@ -40,9 +40,9 @@ class MainActivity : ComponentActivity() {
                 this,
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                 ),
-                LOCATION_PERMISSION_REQUEST_CODE
+                LOCATION_PERMISSION_REQUEST_CODE,
             )
         }
     }
