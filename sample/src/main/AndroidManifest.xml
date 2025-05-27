@@ -21,8 +21,26 @@
                 android:value="face,barcode_ui"
                 tools:replace="android:value"/> <!-- Needed to override the metadata value from lib module -->
 
+<!--        <activity-->
+<!--                android:name=".activity.MainActivity"-->
+<!--                android:exported="true"-->
+<!--                android:windowSoftInputMode="adjustResize"-->
+<!--                android:screenOrientation="portrait">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+
         <activity
-                android:name=".activity.MainActivity"
+                android:name=".activity.JavaActivity"
+                android:label="Java Activity"
+                android:exported="true" />
+
+        <activity
+                android:name="com.smileidentity.unico.UnicoVerificationActivity"
                 android:exported="true"
                 android:windowSoftInputMode="adjustResize"
                 android:screenOrientation="portrait">
@@ -33,11 +51,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity
-                android:name=".activity.JavaActivity"
-                android:label="Java Activity"
-                android:exported="true" />
 
     </application>
 

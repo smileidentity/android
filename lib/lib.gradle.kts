@@ -236,4 +236,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.fragment)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.uiautomator)
+
+    api("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.6") {
+        exclude(group = "org.json", module = "json") // provided by Android natively
+    }
 }
