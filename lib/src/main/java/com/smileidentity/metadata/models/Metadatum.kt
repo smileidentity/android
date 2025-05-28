@@ -76,6 +76,12 @@ open class Metadatum(
 
     constructor(
         name: MetadataKey,
+        value: Double,
+        timestamp: String = getCurrentIsoTimestamp(),
+    ) : this(name.key, Value.DoubleValue(value), timestamp)
+
+    constructor(
+        name: MetadataKey,
         value: Boolean,
         timestamp: String = getCurrentIsoTimestamp(),
     ) : this(name.key, Value.BoolValue(value), timestamp)
@@ -106,6 +112,10 @@ open class Metadatum(
 
     @Parcelize
     data object DeviceModel : Metadatum(MetadataKey.DeviceModel, model)
+
+    @Parcelize
+    data class DeviceMovement(val movementChange: Double) :
+        Metadatum(MetadataKey.DeviceMovementDetected, movementChange)
 
     @Parcelize
     data object DeviceOS : Metadatum(MetadataKey.DeviceOS, os)

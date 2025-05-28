@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
@@ -30,40 +32,42 @@ internal class LocationMetadata(
 
     override val metadataName: String = MetadataKey.Geolocation.key
 
-    data class LocationInfo(
-        val latitude: Double,
-        val longitude: Double,
-        val accuracy: Accuracy,
-        val source: Source,
-    ) {
-        companion object {
-            val UNKNOWN = LocationInfo(
-                0.0,
-                0.0,
-                Accuracy.UNKNOWN,
-                Source.UNKNOWN,
+    private var fusedClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
+
+    private val locationListener = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult) {
+            Timber.d("Location result received: ${result.lastLocation}")
+            val location = result.lastLocation
+                ?: return updateLocationMetadata(LocationInfo.UNKNOWN)
+            val (accuracy, source) = classifyLocation(location)
+            val info = LocationInfo(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                accuracy = accuracy,
+                source = source,
             )
+            Timber.d("Location received: $info")
+            updateLocationMetadata(info)
+            fusedClient.removeLocationUpdates(this)
+        }
+
+        override fun onLocationAvailability(availability: LocationAvailability) {
+            if (!availability.isLocationAvailable) {
+                Timber.d("Location not available, updating with UNKNOWN location")
+                updateLocationMetadata(LocationInfo.UNKNOWN)
+            }
+            Timber.d("Location availability: ${availability.isLocationAvailable}")
         }
     }
 
-    enum class Accuracy(val key: String) {
-        PRECISE("precise"),
-        APPROXIMATE("approximate"),
-        UNKNOWN("unknown"),
-    }
-
-    enum class Source(val key: String) {
-        GPS("gps"),
-        NETWORK("network"),
-        FUSED("fused"),
-        UNKNOWN("unknown"),
-    }
-
-    private val fusedClient: FusedLocationProviderClient =
-        LocationServices.getFusedLocationProviderClient(context)
-
-    init {
+    override fun onStart(owner: LifecycleOwner) {
+        fusedClient = LocationServices.getFusedLocationProviderClient(context)
         forceUpdate()
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        fusedClient.removeLocationUpdates(locationListener)
     }
 
     override fun forceUpdate() {
@@ -98,31 +102,7 @@ internal class LocationMetadata(
 
         fusedClient.requestLocationUpdates(
             request,
-            object : LocationCallback() {
-                override fun onLocationResult(result: LocationResult) {
-                    Timber.d("Location result received: ${result.lastLocation}")
-                    val location = result.lastLocation
-                        ?: return updateLocationMetadata(LocationInfo.UNKNOWN)
-                    val (accuracy, source) = classifyLocation(location)
-                    val info = LocationInfo(
-                        latitude = location.latitude,
-                        longitude = location.longitude,
-                        accuracy = accuracy,
-                        source = source,
-                    )
-                    Timber.d("Location received: $info")
-                    updateLocationMetadata(info)
-                    fusedClient.removeLocationUpdates(this)
-                }
-
-                override fun onLocationAvailability(availability: LocationAvailability) {
-                    if (!availability.isLocationAvailable) {
-                        Timber.d("Location not available, updating with UNKNOWN location")
-                        updateLocationMetadata(LocationInfo.UNKNOWN)
-                    }
-                    Timber.d("Location availability: ${availability.isLocationAvailable}")
-                }
-            },
+            locationListener,
             null,
         )
     }
@@ -149,5 +129,34 @@ internal class LocationMetadata(
             else -> Source.UNKNOWN
         }
         return accuracy to source
+    }
+
+    data class LocationInfo(
+        val latitude: Double,
+        val longitude: Double,
+        val accuracy: Accuracy,
+        val source: Source,
+    ) {
+        companion object {
+            val UNKNOWN = LocationInfo(
+                0.0,
+                0.0,
+                Accuracy.UNKNOWN,
+                Source.UNKNOWN,
+            )
+        }
+    }
+
+    enum class Accuracy(val key: String) {
+        PRECISE("precise"),
+        APPROXIMATE("approximate"),
+        UNKNOWN("unknown"),
+    }
+
+    enum class Source(val key: String) {
+        GPS("gps"),
+        NETWORK("network"),
+        FUSED("fused"),
+        UNKNOWN("unknown"),
     }
 }
