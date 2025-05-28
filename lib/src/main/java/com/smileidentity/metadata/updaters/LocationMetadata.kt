@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -89,7 +90,7 @@ internal class LocationMetadata(
         }
 
         Timber.d("Location permission granted, proceeding with location request")
-        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
+        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0L)
             .setWaitForAccurateLocation(false)
             .setMaxUpdates(1)
             .build()
@@ -135,9 +136,18 @@ internal class LocationMetadata(
             Manifest.permission.ACCESS_COARSE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
 
-    private fun classifyLocation(location: Location): Pair<Accuracy, Source> = when {
-        location.accuracy < 20 -> Accuracy.PRECISE to Source.GPS
-        location.accuracy < 100 -> Accuracy.APPROXIMATE to Source.NETWORK
-        else -> Accuracy.UNKNOWN to Source.UNKNOWN
+    private fun classifyLocation(location: Location): Pair<Accuracy, Source> {
+        val accuracy = when {
+            location.accuracy < 20 -> Accuracy.PRECISE
+            location.accuracy < 100 -> Accuracy.APPROXIMATE
+            else -> Accuracy.UNKNOWN
+        }
+        val source = when (location.provider) {
+            LocationManager.GPS_PROVIDER -> Source.GPS
+            LocationManager.NETWORK_PROVIDER -> Source.NETWORK
+            LocationManager.FUSED_PROVIDER -> Source.FUSED
+            else -> Source.UNKNOWN
+        }
+        return accuracy to source
     }
 }
