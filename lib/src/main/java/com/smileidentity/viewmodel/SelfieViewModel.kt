@@ -146,7 +146,7 @@ class SelfieViewModel(
          */
         if (!hasRecordedOrientationAtCaptureStart) {
             try {
-                DeviceOrientationMetadata.shared.forceUpdate()
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
             } catch (_: UninitializedPropertyAccessException) {
                 /*
                 In case .shared isn't initialised it throws the above exception. Given that the
@@ -265,7 +265,7 @@ class SelfieViewModel(
                  At the end of the capture, we record the device orientation and capture duration
                  */
                 try {
-                    DeviceOrientationMetadata.shared.forceUpdate()
+                    DeviceOrientationMetadata.shared.storeDeviceOrientation()
                 } catch (_: UninitializedPropertyAccessException) {
                     /*
                     In case .shared isn't initialised it throws the above exception. Given that the
@@ -320,6 +320,14 @@ class SelfieViewModel(
     private fun submitJob(selfieFile: File, livenessFiles: List<File>) {
         metadata.add(Metadatum.ActiveLivenessType(LivenessType.Smile))
         metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+        try {
+            DeviceOrientationMetadata.shared.storeDeviceMovement()
+        } catch (_: UninitializedPropertyAccessException) {
+            /*
+            In case .shared isn't initialised it throws the above exception. Given that the
+            device movement is only metadata we ignore it and take no action.
+             */
+        }
 
         if (skipApiSubmission) {
             result = SmileIDResult.Success(SmartSelfieResult(selfieFile, livenessFiles, null))

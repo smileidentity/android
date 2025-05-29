@@ -27,6 +27,7 @@ class DeviceOrientationMetadata(
 
     private val sensorEventListener = object : SensorEventListener {
         var currentOrientation: OrientationType = OrientationType.UNKNOWN
+        var deviceMovements: MutableList<Double> = mutableListOf()
         private var lastUpdateTime: Long = 0
 
         override fun onSensorChanged(event: SensorEvent?) {
@@ -67,7 +68,7 @@ class DeviceOrientationMetadata(
 
                 val gravity = SensorManager.GRAVITY_EARTH
                 val movementChange = abs(magnitude - gravity)
-                updateMovementMetadata(movementChange.toDouble())
+                deviceMovements.add(movementChange.toDouble())
             }
         }
     }
@@ -94,11 +95,10 @@ class DeviceOrientationMetadata(
         sensorManager?.unregisterListener(sensorEventListener)
     }
 
-    override fun forceUpdate() {
-        updateOrientationMetadata(getCurrentOrientation())
-    }
+    override fun forceUpdate() {}
 
-    private fun updateOrientationMetadata(orientation: OrientationType) {
+    fun storeDeviceOrientation() {
+        val orientation = sensorEventListener.currentOrientation
         val orientationMetadatum = when (orientation) {
             OrientationType.PORTRAIT -> Metadatum.DeviceOrientation.PORTRAIT
             OrientationType.LANDSCAPE -> Metadatum.DeviceOrientation.LANDSCAPE
@@ -109,9 +109,17 @@ class DeviceOrientationMetadata(
         metadata.add(Metadatum.DeviceOrientation(orientationMetadatum.orientation))
     }
 
-    private fun getCurrentOrientation(): OrientationType = sensorEventListener.currentOrientation
-
-    private fun updateMovementMetadata(movementChange: Double) {
+    fun storeDeviceMovement() {
+        /*
+         The movement change is the difference between the minimum movement change and the
+         maximum movement change.
+        */
+        val deviceMovements = sensorEventListener.deviceMovements
+        val movementChange: Double = deviceMovements.minOrNull()?.let { minMovementChange ->
+            deviceMovements.maxOrNull()?.let { maxMovementChange ->
+                maxMovementChange - minMovementChange
+            }
+        } ?: -1.0
         metadata.add(Metadatum.DeviceMovement(movementChange))
     }
 

@@ -37,6 +37,7 @@ internal class LocationMetadata(
     private val isFusedLocationAvailable: Boolean by lazy {
         val availability = GoogleApiAvailability.getInstance()
         val result = availability.isGooglePlayServicesAvailable(context)
+        Timber.d("Google Play Services availability: $result")
         result == ConnectionResult.SUCCESS
     }
 

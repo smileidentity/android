@@ -8,6 +8,7 @@ import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updateOrAddBy
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
@@ -119,6 +120,15 @@ class BiometricKycViewModel(
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceMovement()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device movement is only metadata we ignore it and take no action.
+                 */
+            }
+
             val authRequest = AuthenticationRequest(
                 jobType = JobType.BiometricKyc,
                 userId = userId,

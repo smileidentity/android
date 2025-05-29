@@ -171,7 +171,7 @@ class DocumentCaptureViewModel(
                                      the capture duration
                                      */
                                     try {
-                                        DeviceOrientationMetadata.shared.forceUpdate()
+                                        DeviceOrientationMetadata.shared.storeDeviceOrientation()
                                     } catch (_: UninitializedPropertyAccessException) {
                                         /*
                                         In case .shared isn't initialised it throws the above
@@ -313,7 +313,7 @@ class DocumentCaptureViewModel(
          */
         if (!hasRecordedOrientationAtCaptureStart) {
             try {
-                DeviceOrientationMetadata.shared.forceUpdate()
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
             } catch (_: UninitializedPropertyAccessException) {
                 /*
                 In case .shared isn't initialised it throws the above exception. Given that the
