@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
 import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updateOrAddBy
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -120,7 +121,9 @@ class DeviceOrientationMetadata(
                 maxMovementChange - minMovementChange
             }
         } ?: -1.0
-        metadata.add(Metadatum.DeviceMovement(movementChange))
+        metadata.updateOrAddBy(Metadatum.DeviceMovement(movementChange)) {
+            it.name == MetadataKey.DeviceMovementDetected.key
+        }
     }
 
     enum class OrientationType {
