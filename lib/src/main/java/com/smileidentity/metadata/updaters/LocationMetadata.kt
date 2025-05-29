@@ -10,6 +10,8 @@ import android.location.LocationManager
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
@@ -32,8 +34,12 @@ internal class LocationMetadata(
 
     override val metadataName: String = MetadataKey.Geolocation.key
 
-    private var fusedClient: FusedLocationProviderClient =
-        LocationServices.getFusedLocationProviderClient(context)
+    private lateinit var fusedClient: FusedLocationProviderClient
+    private val isFusedLocationAvailable: Boolean by lazy {
+        val availability = GoogleApiAvailability.getInstance()
+        val result = availability.isGooglePlayServicesAvailable(context)
+        result == ConnectionResult.SUCCESS
+    }
 
     private val locationListener = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -62,6 +68,12 @@ internal class LocationMetadata(
     }
 
     override fun onStart(owner: LifecycleOwner) {
+        if (!isFusedLocationAvailable) {
+            Timber.w("Fused Location Services not available, cannot update location metadata")
+            updateLocationMetadata(LocationInfo.UNKNOWN)
+            return
+        }
+
         fusedClient = LocationServices.getFusedLocationProviderClient(context)
         forceUpdate()
     }
