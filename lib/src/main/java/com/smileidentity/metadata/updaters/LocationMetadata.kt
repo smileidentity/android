@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
 import androidx.compose.runtime.snapshots.SnapshotStateList

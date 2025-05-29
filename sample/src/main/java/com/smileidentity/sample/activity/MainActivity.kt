@@ -12,7 +12,7 @@ import androidx.core.view.WindowCompat
 import com.smileidentity.sample.compose.RootScreen
 
 class MainActivity : ComponentActivity() {
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    private val locationPermissionRequestCode = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                 ),
-                LOCATION_PERMISSION_REQUEST_CODE,
+                locationPermissionRequestCode,
             )
         }
     }
