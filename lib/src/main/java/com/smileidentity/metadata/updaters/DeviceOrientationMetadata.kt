@@ -113,7 +113,7 @@ class DeviceOrientationMetadata(
         /*
          The movement change is the difference between the minimum movement change and the
          maximum movement change.
-        */
+         */
         val deviceMovements = sensorEventListener.deviceMovements
         val movementChange: Double = deviceMovements.minOrNull()?.let { minMovementChange ->
             deviceMovements.maxOrNull()?.let { maxMovementChange ->
