@@ -21,7 +21,7 @@ import com.google.android.gms.location.Priority
 import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.Value
-import timber.log.Timber
+import com.smileidentity.metadata.updateOrAddBy
 
 /**
  * A manager that updates metadata with location information.
@@ -37,13 +37,11 @@ internal class LocationMetadata(
     private val isFusedLocationAvailable: Boolean by lazy {
         val availability = GoogleApiAvailability.getInstance()
         val result = availability.isGooglePlayServicesAvailable(context)
-        Timber.d("Google Play Services availability: $result")
         result == ConnectionResult.SUCCESS
     }
 
     private val locationListener = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
-            Timber.d("Location result received: ${result.lastLocation}")
             val location = result.lastLocation
                 ?: return updateLocationMetadata(LocationInfo.UNKNOWN)
             val (accuracy, source) = classifyLocation(location)
@@ -53,23 +51,19 @@ internal class LocationMetadata(
                 accuracy = accuracy,
                 source = source,
             )
-            Timber.d("Location received: $info")
             updateLocationMetadata(info)
             fusedClient.removeLocationUpdates(this)
         }
 
         override fun onLocationAvailability(availability: LocationAvailability) {
             if (!availability.isLocationAvailable) {
-                Timber.d("Location not available, updating with UNKNOWN location")
                 updateLocationMetadata(LocationInfo.UNKNOWN)
             }
-            Timber.d("Location availability: ${availability.isLocationAvailable}")
         }
     }
 
     override fun onStart(owner: LifecycleOwner) {
         if (!isFusedLocationAvailable) {
-            Timber.w("Fused Location Services not available, cannot update location metadata")
             updateLocationMetadata(LocationInfo.UNKNOWN)
             return
         }
@@ -79,6 +73,7 @@ internal class LocationMetadata(
     }
 
     override fun onStop(owner: LifecycleOwner) {
+        if (!::fusedClient.isInitialized) return
         fusedClient.removeLocationUpdates(locationListener)
     }
 
@@ -93,24 +88,20 @@ internal class LocationMetadata(
             "accuracy" to Value.StringValue(locationInfo.accuracy.key),
             "source" to Value.StringValue(locationInfo.source.key),
         )
-        metadata.add(Metadatum.GeoLocation(info))
+        metadata.updateOrAddBy(Metadatum.GeoLocation(info)) { it.name == metadataName }
     }
 
     @SuppressLint("MissingPermission")
     private fun requestLocation() {
-        Timber.d("Requesting location updates")
         if (!hasLocationPermission()) {
-            Timber.d("Location permission not granted, cannot request location updates")
             updateLocationMetadata(LocationInfo.UNKNOWN)
             return
         }
 
-        Timber.d("Location permission granted, proceeding with location request")
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0L)
             .setWaitForAccurateLocation(false)
             .setMaxUpdates(1)
             .build()
-        Timber.d("Location request created: $request")
 
         fusedClient.requestLocationUpdates(
             request,

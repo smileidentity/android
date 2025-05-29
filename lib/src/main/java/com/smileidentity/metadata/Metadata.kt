@@ -37,12 +37,14 @@ data class Metadata(val items: List<Metadatum>) : Parcelable {
 internal fun List<Metadatum>.asNetworkRequest(): Metadata = Metadata(this)
 
 /**
- * Generic extension function to update or add an item in a MutableList based on a predicate
+ * Extension function to update or add an item in a MutableList based on a predicate,
+ * safe for use with SnapshotStateList (do not call during iteration).
  */
 fun <T> MutableList<T>.updateOrAddBy(item: T, predicate: (T) -> Boolean) {
     val index = indexOfFirst(predicate)
-    if (index != -1) {
-        this[index] = item
+    if (index >= 0) {
+        removeAt(index)
+        add(index, item)
     } else {
         add(item)
     }
