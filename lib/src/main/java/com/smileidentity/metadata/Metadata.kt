@@ -43,8 +43,7 @@ internal fun List<Metadatum>.asNetworkRequest(): Metadata = Metadata(this)
 fun <T> MutableList<T>.updateOrAddBy(item: T, predicate: (T) -> Boolean) {
     val index = indexOfFirst(predicate)
     if (index >= 0) {
-        removeAt(index)
-        add(index, item)
+        this[index] = item
     } else {
         add(item)
     }

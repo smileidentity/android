@@ -22,6 +22,7 @@ import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.Value
 import com.smileidentity.metadata.updateOrAddBy
+import kotlinx.coroutines.launch
 
 /**
  * A manager that updates metadata with location information.
@@ -88,7 +89,9 @@ internal class LocationMetadata(
             "accuracy" to Value.StringValue(locationInfo.accuracy.key),
             "source" to Value.StringValue(locationInfo.source.key),
         )
-        metadata.updateOrAddBy(Metadatum.GeoLocation(info)) { it.name == metadataName }
+        kotlinx.coroutines.MainScope().launch {
+            metadata.updateOrAddBy(Metadatum.GeoLocation(info)) { it.name == metadataName }
+        }
     }
 
     @SuppressLint("MissingPermission")
