@@ -6,6 +6,9 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updateOrAddBy
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
@@ -55,6 +58,7 @@ class BiometricKycViewModel(
     private val jobId: String,
     private val allowNewEnroll: Boolean,
     private val useStrictMode: Boolean = false,
+    private val metadata: MutableList<Metadatum>,
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BiometricKycUiState())
@@ -63,6 +67,7 @@ class BiometricKycViewModel(
     private var result: SmileIDResult<BiometricKycResult>? = null
     private var selfieFile: File? = null
     private var livenessFiles: List<File>? = null
+    private var networkRetries = 0
 
     fun onSelfieCaptured(selfieFile: File, livenessFiles: List<File>) {
         this.selfieFile = selfieFile
@@ -115,6 +120,15 @@ class BiometricKycViewModel(
             }
         }
         viewModelScope.launch(getExceptionHandler(proxy)) {
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceMovement()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device movement is only metadata we ignore it and take no action.
+                 */
+            }
+
             val authRequest = AuthenticationRequest(
                 jobType = JobType.BiometricKyc,
                 userId = userId,
@@ -135,6 +149,7 @@ class BiometricKycViewModel(
                         allowNewEnroll = allowNewEnroll,
                         timestamp = "",
                         signature = "",
+                        metadata = metadata,
                     ),
                 )
                 createUploadRequestFile(
@@ -155,7 +170,10 @@ class BiometricKycViewModel(
                 allowNewEnroll = allowNewEnroll,
                 signature = authResponse.signature,
                 timestamp = authResponse.timestamp,
+                metadata = metadata,
             )
+
+            metadata.add(Metadatum.NetworkRetries(networkRetries))
 
             val prepUploadResponse = runCatching {
                 SmileID.api.prepUpload(prepUploadRequest)
@@ -164,7 +182,16 @@ class BiometricKycViewModel(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            metadata.updateOrAddBy(Metadatum.NetworkRetries(networkRetries)) {
+                                it.name == "network_retries"
+                            }
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata,
+                                ),
+                            )
                         } else {
                             throw smileIDException
                         }
@@ -213,6 +240,10 @@ class BiometricKycViewModel(
                     },
                 )
             }
+
+            networkRetries = 0
+            metadata.removeAll { it is Metadatum.NetworkRetries }
+
             result = SmileIDResult.Success(
                 BiometricKycResult(
                     selfieFile = selfieFileResult,
@@ -237,6 +268,7 @@ class BiometricKycViewModel(
             // Set processing state to null to redirect back to selfie capture
             _uiState.update { it.copy(processingState = null) }
         } else {
+            networkRetries++
             submitJob(selfieFile!!, livenessFiles!!)
         }
     }

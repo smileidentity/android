@@ -16,8 +16,9 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.compose.document.DocumentCaptureSide
-import com.smileidentity.models.v2.DocumentImageOriginValue
-import com.smileidentity.models.v2.Metadatum
+import com.smileidentity.metadata.models.DocumentImageOriginValue
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -81,8 +82,9 @@ class DocumentCaptureViewModel(
     private var documentFirstDetectedTimeMs: Long? = null
     private var captureNextAnalysisFrame = false
     private val defaultAspectRatio = knownAspectRatio ?: 1f
-    private var retryCount = 0
-    private val timerStart = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
+    private var documentCaptureRetries = 0
+    private var captureDuration = TimeSource.Monotonic.markNow()
 
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
@@ -163,6 +165,37 @@ class DocumentCaptureViewModel(
                                             desiredAspectRatio = uiState.value.idAspectRatio,
                                         )
                                     }
+
+                                    /*
+                                     At the end of the capture, we record the device orientation and
+                                     the capture duration
+                                     */
+                                    try {
+                                        DeviceOrientationMetadata.shared.storeDeviceOrientation()
+                                    } catch (_: UninitializedPropertyAccessException) {
+                                        /*
+                                        In case .shared isn't initialised it throws the above
+                                        exception. Given that the device orientation is only
+                                        metadata we ignore it and take no action.
+                                         */
+                                    }
+                                    when (side) {
+                                        DocumentCaptureSide.Front -> {
+                                            metadata.add(
+                                                Metadatum.DocumentFrontCaptureDuration(
+                                                    captureDuration.elapsedNow(),
+                                                ),
+                                            )
+                                        }
+                                        DocumentCaptureSide.Back -> {
+                                            metadata.add(
+                                                Metadatum.DocumentBackCaptureDuration(
+                                                    captureDuration.elapsedNow(),
+                                                ),
+                                            )
+                                        }
+                                    }
+
                                     _uiState.update {
                                         it.copy(
                                             documentImageToConfirm = processedImage,
@@ -231,7 +264,9 @@ class DocumentCaptureViewModel(
         }
         isCapturing = false
         documentImageOrigin = null
-        retryCount++
+        documentCaptureRetries++
+        hasRecordedOrientationAtCaptureStart = false
+        metadata.removeAll { it is Metadatum.DeviceOrientation }
         _uiState.update {
             it.copy(
                 captureError = null,
@@ -244,17 +279,14 @@ class DocumentCaptureViewModel(
     }
 
     fun onConfirm(documentImageToConfirm: File, onConfirm: (File) -> Unit) {
-        val elapsed = timerStart.elapsedNow()
         when (side) {
             DocumentCaptureSide.Front -> {
-                metadata.add(Metadatum.DocumentFrontCaptureRetries(retryCount))
-                metadata.add(Metadatum.DocumentFrontCaptureDuration(elapsed))
+                metadata.add(Metadatum.DocumentFrontCaptureRetries(documentCaptureRetries))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentFrontImageOrigin(it)) }
             }
 
             DocumentCaptureSide.Back -> {
-                metadata.add(Metadatum.DocumentBackCaptureRetries(retryCount))
-                metadata.add(Metadatum.DocumentBackCaptureDuration(elapsed))
+                metadata.add(Metadatum.DocumentBackCaptureRetries(documentCaptureRetries))
                 documentImageOrigin?.let { metadata.add(Metadatum.DocumentBackImageOrigin(it)) }
             }
         }
@@ -275,6 +307,23 @@ class DocumentCaptureViewModel(
 
     @OptIn(ExperimentalGetImage::class)
     fun analyze(imageProxy: ImageProxy, cameraState: CameraState) {
+        /*
+         At the start of the capture, we record the device orientation and start the capture
+         duration timer.
+         */
+        if (!hasRecordedOrientationAtCaptureStart) {
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device orientation is only metadata we ignore it and take no action.
+                 */
+            }
+            hasRecordedOrientationAtCaptureStart = true
+            captureDuration = TimeSource.Monotonic.markNow()
+        }
+
         // YUV_420_888 is the format produced by CameraX
         check(imageProxy.format == YUV_420_888) { "Unsupported format: ${imageProxy.format}" }
         val image = imageProxy.image

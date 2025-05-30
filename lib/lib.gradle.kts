@@ -216,6 +216,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // Unbundled model -- will be dynamically downloaded via Google Play Services
+    implementation(libs.play.services.location)
     implementation(libs.play.services.mlkit.face.detection)
 
     // Bundled model
