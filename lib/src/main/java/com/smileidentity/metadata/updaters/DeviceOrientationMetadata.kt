@@ -9,7 +9,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
 import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updateOrAddBy
 import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * A metadata updater that monitors device orientation and updates the corresponding metadata entry.
@@ -26,8 +28,23 @@ class DeviceOrientationMetadata(
 
     private val sensorEventListener = object : SensorEventListener {
         var currentOrientation: OrientationType = OrientationType.UNKNOWN
+        var deviceMovements: MutableList<Double> = mutableListOf()
+        private var lastUpdateTime: Long = 0
 
         override fun onSensorChanged(event: SensorEvent?) {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastUpdateTime >= 500) { // 0.5 seconds = 500 ms
+                lastUpdateTime = currentTime
+                detectOrientationChange(event)
+                detectMovementChange(event)
+            }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            // No-op
+        }
+
+        private fun detectOrientationChange(event: SensorEvent?) {
             event?.let {
                 val x = it.values[0]
                 val y = it.values[1]
@@ -41,8 +58,19 @@ class DeviceOrientationMetadata(
             }
         }
 
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            // No-op
+        private fun detectMovementChange(event: SensorEvent?) {
+            event?.let {
+                val x = it.values[0]
+                val y = it.values[1]
+                val z = it.values[2]
+
+                // Calculate the acceleration magnitude
+                val magnitude = sqrt(x * x + y * y + z * z)
+
+                val gravity = SensorManager.GRAVITY_EARTH
+                val movementChange = abs(magnitude - gravity)
+                deviceMovements.add(movementChange.toDouble())
+            }
         }
     }
 
@@ -68,14 +96,10 @@ class DeviceOrientationMetadata(
         sensorManager?.unregisterListener(sensorEventListener)
     }
 
-    override fun forceUpdate() {
-        updateOrientationMetadata(getCurrentOrientation())
-    }
+    override fun forceUpdate() {}
 
-    /**
-     * Update the device orientation metadata in the list
-     */
-    private fun updateOrientationMetadata(orientation: OrientationType) {
+    fun storeDeviceOrientation() {
+        val orientation = sensorEventListener.currentOrientation
         val orientationMetadatum = when (orientation) {
             OrientationType.PORTRAIT -> Metadatum.DeviceOrientation.PORTRAIT
             OrientationType.LANDSCAPE -> Metadatum.DeviceOrientation.LANDSCAPE
@@ -86,10 +110,21 @@ class DeviceOrientationMetadata(
         metadata.add(Metadatum.DeviceOrientation(orientationMetadatum.orientation))
     }
 
-    /**
-     * Get the current device orientation
-     */
-    private fun getCurrentOrientation(): OrientationType = sensorEventListener.currentOrientation
+    fun storeDeviceMovement() {
+        /*
+         The movement change is the difference between the minimum movement change and the
+         maximum movement change.
+         */
+        val deviceMovements = sensorEventListener.deviceMovements
+        val movementChange: Double = deviceMovements.minOrNull()?.let { minMovementChange ->
+            deviceMovements.maxOrNull()?.let { maxMovementChange ->
+                maxMovementChange - minMovementChange
+            }
+        } ?: -1.0
+        metadata.updateOrAddBy(Metadatum.DeviceMovement(movementChange)) {
+            it.name == MetadataKey.DeviceMovementDetected.key
+        }
+    }
 
     enum class OrientationType {
         PORTRAIT,

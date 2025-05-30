@@ -18,6 +18,7 @@ import com.smileidentity.metadata.updaters.CameraInfoMetadata
 import com.smileidentity.metadata.updaters.CarrierInfoMetadata
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.metadata.updaters.HostApplicationMetadata
+import com.smileidentity.metadata.updaters.LocationMetadata
 import com.smileidentity.metadata.updaters.MemoryMetadata
 import com.smileidentity.metadata.updaters.MetadataInterface
 import com.smileidentity.metadata.updaters.NetworkMetadata
@@ -89,6 +90,9 @@ internal object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     VpnMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    LocationMetadata(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,

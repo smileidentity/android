@@ -228,7 +228,7 @@ class SmartSelfieEnhancedViewModel(
          */
         if (!hasRecordedOrientationAtCaptureStart) {
             try {
-                DeviceOrientationMetadata.shared.forceUpdate()
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
             } catch (_: UninitializedPropertyAccessException) {
                 /*
                 In case .shared isn't initialised it throws the above exception. Given that the
@@ -463,7 +463,7 @@ class SmartSelfieEnhancedViewModel(
              At the end of the capture, we record the device orientation and capture duration
              */
             try {
-                DeviceOrientationMetadata.shared.forceUpdate()
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
             } catch (_: UninitializedPropertyAccessException) {
                 /*
                 In case .shared isn't initialised it throws the above exception. Given that the
@@ -473,6 +473,15 @@ class SmartSelfieEnhancedViewModel(
             metadata.add(Metadatum.SelfieCaptureDuration(captureDuration.elapsedNow()))
             metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
             metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceMovement()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device movement is only metadata we ignore it and take no action.
+                 */
+            }
 
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)

@@ -298,6 +298,15 @@ object ValueJsonAdapter {
             is Value.IntValue -> writer.value(value.value)
             is Value.LongValue -> writer.value(value.value)
             is Value.BoolValue -> writer.value(value.value)
+            is Value.DoubleValue -> writer.value(value.value)
+            is Value.ObjectValue -> {
+                writer.beginObject()
+                for ((key, v) in value.map) {
+                    writer.name(key)
+                    toJson(writer, v)
+                }
+                writer.endObject()
+            }
             null -> writer.nullValue()
         }
     }
@@ -310,6 +319,17 @@ object ValueJsonAdapter {
             is Int -> Value.IntValue(jsonValue)
             is Long -> Value.LongValue(jsonValue)
             is Boolean -> Value.BoolValue(jsonValue)
+            is Double -> Value.DoubleValue(jsonValue)
+            is Map<*, *> -> {
+                val map = jsonValue.mapNotNull { (key, value) ->
+                    if (key is String && value is Value) {
+                        key to value
+                    } else {
+                        null
+                    }
+                }.toMap()
+                Value.ObjectValue(map)
+            }
             else -> null
         }
     }
