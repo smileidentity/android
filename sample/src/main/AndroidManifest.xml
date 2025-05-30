@@ -6,6 +6,12 @@
     <!--  Though declared, must be manually enabled  -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Optional for partners: for fraud prevention purposes -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Optional for partners: for fraud prevention purposes -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
             android:name=".SmileIDApplication"
             android:icon="@mipmap/ic_launcher"

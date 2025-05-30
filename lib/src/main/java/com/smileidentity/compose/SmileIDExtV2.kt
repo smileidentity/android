@@ -10,8 +10,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.smileidentity.SmileID
-import com.smileidentity.compose.components.SmileThemeSurface
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
+import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typographyV2
 import com.smileidentity.ml.SelfieQualityModel
@@ -106,6 +106,7 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+        // todo provide view model here too
         OrchestratedSelfieCaptureScreenEnhanced(
             modifier = modifier,
             userId = userId,

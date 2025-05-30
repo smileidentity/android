@@ -16,7 +16,6 @@ import com.smileidentity.fragment.BiometricKYCFragment;
 import com.smileidentity.fragment.DocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment;
 import com.smileidentity.fragment.EnhancedSmartSelfieAuthenticationFragment;
-import com.smileidentity.fragment.EnhancedSmartSelfieAuthenticationFragmentKt;
 import com.smileidentity.fragment.EnhancedSmartSelfieEnrollmentFragment;
 import com.smileidentity.fragment.SmartSelfieAuthenticationFragment;
 import com.smileidentity.fragment.SmartSelfieEnrollmentFragment;
@@ -31,6 +30,7 @@ import com.smileidentity.sample.R;
 
 import java.io.File;
 import java.util.List;
+import java.util.TimeZone;
 
 import timber.log.Timber;
 
@@ -69,7 +69,10 @@ public class JavaActivity extends FragmentActivity {
         IdInfo idInfo = new IdInfo("GH", "PASSPORT", "1234567890",
             null, null, null, null, null, null);
         ConsentedInformation consentedInfo = new ConsentedInformation(
-            getCurrentIsoTimestamp(), true, true, true
+            getCurrentIsoTimestamp(TimeZone.getTimeZone("UTC")),
+            true,
+            true,
+            true
         );
         ConsentInformation consentInformation = new ConsentInformation(consentedInfo);
         BiometricKYCFragment biometricKYCFragment = BiometricKYCFragment

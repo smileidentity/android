@@ -7,6 +7,9 @@ import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.compose.components.ProcessingState
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updateOrAddBy
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.DocumentCaptureFlow
@@ -16,7 +19,6 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.PrepUploadRequest
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
@@ -82,6 +84,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
     private var documentBackFile: File? = null
     private var livenessFiles: List<File>? = null
     private var stepToRetry: DocumentCaptureFlow? = null
+    private var networkRetries = 0
 
     fun onDocumentFrontCaptureSuccess(documentImageFile: File) {
         documentFrontFile = documentImageFile
@@ -130,6 +133,15 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             ?: throw IllegalStateException("documentFrontFile is null")
         _uiState.update {
             it.copy(currentStep = DocumentCaptureFlow.ProcessingScreen(ProcessingState.InProgress))
+        }
+
+        try {
+            DeviceOrientationMetadata.shared.storeDeviceMovement()
+        } catch (_: UninitializedPropertyAccessException) {
+            /*
+            In case .shared isn't initialised it throws the above exception. Given that the
+            device movement is only metadata we ignore it and take no action.
+             */
         }
 
         viewModelScope.launch(getExceptionHandler(::onError)) {
@@ -181,6 +193,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             val authResponse = SmileID.api.authenticate(authRequest)
 
+            metadata.add(Metadatum.NetworkRetries(networkRetries))
+
             val prepUploadRequest = PrepUploadRequest(
                 partnerParams = authResponse.partnerParams.copy(extras = extraPartnerParams),
                 allowNewEnroll = allowNewEnroll,
@@ -196,7 +210,16 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     throwable is HttpException -> {
                         val smileIDException = throwable.toSmileIDException()
                         if (smileIDException.details.code == "2215") {
-                            SmileID.api.prepUpload(prepUploadRequest.copy(retry = true))
+                            networkRetries++
+                            metadata.updateOrAddBy(Metadatum.NetworkRetries(networkRetries)) {
+                                it.name == "network_retries"
+                            }
+                            SmileID.api.prepUpload(
+                                prepUploadRequest.copy(
+                                    retry = true,
+                                    metadata = metadata,
+                                ),
+                            )
                         } else {
                             throw smileIDException
                         }
@@ -255,6 +278,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                 },
             )
         }
+
+        networkRetries = 0
+        metadata.removeAll { it is Metadatum.NetworkRetries }
 
         saveResult(
             selfieImage = selfieFileResult,
@@ -341,6 +367,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
         step?.let { stepToRetry ->
             _uiState.update { it.copy(currentStep = stepToRetry) }
             if (stepToRetry is DocumentCaptureFlow.ProcessingScreen) {
+                networkRetries++
                 submitJob()
             }
         }

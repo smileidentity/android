@@ -4,7 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.smileidentity.SmileID
-import com.smileidentity.compose.components.SmileThemeSurface
+import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import org.junit.Rule

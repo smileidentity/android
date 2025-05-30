@@ -1,5 +1,8 @@
 package com.smileidentity.networking
 
+import com.smileidentity.metadata.Metadata
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.models.Value
 import com.smileidentity.models.BiometricKycJobResult
 import com.smileidentity.models.DocumentVerificationJobResult
 import com.smileidentity.models.EnhancedDocumentVerificationJobResult
@@ -9,8 +12,6 @@ import com.smileidentity.models.PartnerParams
 import com.smileidentity.models.SmartSelfieJobResult
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.models.v2.Metadata
-import com.smileidentity.models.v2.Metadatum
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
@@ -287,4 +288,49 @@ object MetadataAdapter {
 
     @FromJson
     fun fromJson(value: String): Metadata = throw NotImplementedError("MetadataAdapter.fromJson")
+}
+
+object ValueJsonAdapter {
+    @ToJson
+    fun toJson(writer: JsonWriter, value: Value?) {
+        when (value) {
+            is Value.StringValue -> writer.value(value.value)
+            is Value.IntValue -> writer.value(value.value)
+            is Value.LongValue -> writer.value(value.value)
+            is Value.BoolValue -> writer.value(value.value)
+            is Value.DoubleValue -> writer.value(value.value)
+            is Value.ObjectValue -> {
+                writer.beginObject()
+                for ((key, v) in value.map) {
+                    writer.name(key)
+                    toJson(writer, v)
+                }
+                writer.endObject()
+            }
+            null -> writer.nullValue()
+        }
+    }
+
+    @FromJson
+    fun fromJson(reader: JsonReader): Value? {
+        val jsonValue = reader.readJsonValue()
+        return when (jsonValue) {
+            is String -> Value.StringValue(jsonValue)
+            is Int -> Value.IntValue(jsonValue)
+            is Long -> Value.LongValue(jsonValue)
+            is Boolean -> Value.BoolValue(jsonValue)
+            is Double -> Value.DoubleValue(jsonValue)
+            is Map<*, *> -> {
+                val map = jsonValue.mapNotNull { (key, value) ->
+                    if (key is String && value is Value) {
+                        key to value
+                    } else {
+                        null
+                    }
+                }.toMap()
+                Value.ObjectValue(map)
+            }
+            else -> null
+        }
+    }
 }

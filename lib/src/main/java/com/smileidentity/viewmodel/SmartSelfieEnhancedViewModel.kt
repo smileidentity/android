@@ -17,15 +17,16 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
+import com.smileidentity.metadata.asNetworkRequest
+import com.smileidentity.metadata.device.model
+import com.smileidentity.metadata.models.LivenessType
+import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.models.SelfieImageOriginValue.BackCamera
+import com.smileidentity.metadata.models.SelfieImageOriginValue.FrontCamera
+import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
-import com.smileidentity.models.v2.LivenessType
-import com.smileidentity.models.v2.Metadatum
-import com.smileidentity.models.v2.SelfieImageOriginValue.BackCamera
-import com.smileidentity.models.v2.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.models.v2.SmartSelfieResponse
-import com.smileidentity.models.v2.asNetworkRequest
-import com.smileidentity.models.v2.model
 import com.smileidentity.networking.doSmartSelfieAuthentication
 import com.smileidentity.networking.doSmartSelfieEnrollment
 import com.smileidentity.results.SmartSelfieResult
@@ -174,7 +175,10 @@ class SmartSelfieEnhancedViewModel(
     private val selfieQualityHistory = mutableListOf<Float>()
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
-    private val metadataTimerStart = TimeSource.Monotonic.markNow()
+    private var captureDuration = TimeSource.Monotonic.markNow()
+    private var hasRecordedOrientationAtCaptureStart = false
+    private var selfieCaptureRetries = 0
+    private var networkRetries = 0
 
     init {
         startStrictModeTimerIfNecessary()
@@ -218,6 +222,23 @@ class SmartSelfieEnhancedViewModel(
      */
     @OptIn(ExperimentalGetImage::class)
     fun analyzeImage(imageProxy: ImageProxy, camSelector: CamSelector) {
+        /*
+         At the start of the capture, we record the device orientation and start the capture
+         duration timer.
+         */
+        if (!hasRecordedOrientationAtCaptureStart) {
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device orientation is only metadata we ignore it and take no action.
+                 */
+            }
+            hasRecordedOrientationAtCaptureStart = true
+            captureDuration = TimeSource.Monotonic.markNow()
+        }
+
         val elapsedTimeSinceCaptureMs = System.currentTimeMillis() - lastAutoCaptureTimeMs
         val enoughTimeHasPassed = elapsedTimeSinceCaptureMs > INTRA_IMAGE_MIN_DELAY_MS
         if (!enoughTimeHasPassed || !shouldAnalyzeImages) {
@@ -438,12 +459,45 @@ class SmartSelfieEnhancedViewModel(
                 return@addOnSuccessListener
             }
 
+            /*
+             At the end of the capture, we record the device orientation and capture duration
+             */
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceOrientation()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device orientation is only metadata we ignore it and take no action.
+                 */
+            }
+            metadata.add(Metadatum.SelfieCaptureDuration(captureDuration.elapsedNow()))
+            metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
+            metadata.add(Metadatum.SelfieCaptureRetries(selfieCaptureRetries))
+
+            try {
+                DeviceOrientationMetadata.shared.storeDeviceMovement()
+            } catch (_: UninitializedPropertyAccessException) {
+                /*
+                In case .shared isn't initialised it throws the above exception. Given that the
+                device movement is only metadata we ignore it and take no action.
+                 */
+            }
+
             shouldAnalyzeImages = false
             setCameraFacingMetadata(camSelector)
+
             if (skipApiSubmission) {
                 onSkipApiSubmission(selfieFile)
                 return@addOnSuccessListener
             } else {
+                /*
+                 We add the network retries to the metadata here, because of the way we implement
+                 the biometric kyc and document verification which is calling the selfie component
+                 with skip api submission. If it is added before the skip api submission, it will be
+                 added to the metadata twice.
+                 */
+                metadata.add(Metadatum.NetworkRetries(networkRetries))
+
                 val proxy = { e: Throwable ->
                     when {
                         e is IOException -> {
@@ -477,6 +531,10 @@ class SmartSelfieEnhancedViewModel(
                                     selfieFile = selfieFile,
                                 )
                             }
+
+                            networkRetries = 0
+                            metadata.removeAll { it is Metadatum.NetworkRetries }
+
                             // Delay to ensure the completion icon is shown for a little bit
                             delay(COMPLETED_DELAY_MS)
                             val result = SmartSelfieResult(
@@ -519,29 +577,25 @@ class SmartSelfieEnhancedViewModel(
         onResult(SmileIDResult.Success(result))
     }
 
-    private suspend fun submitJob(selfieFile: File): SmartSelfieResponse {
-        metadata.add(Metadatum.ActiveLivenessType(LivenessType.HeadPose))
-        metadata.add(Metadatum.SelfieCaptureDuration(metadataTimerStart.elapsedNow()))
-        return if (isEnroll) {
-            SmileID.api.doSmartSelfieEnrollment(
-                userId = userId,
-                selfieImage = selfieFile,
-                livenessImages = livenessFiles,
-                allowNewEnroll = allowNewEnroll,
-                partnerParams = extraPartnerParams,
-                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata.asNetworkRequest(),
-            )
-        } else {
-            SmileID.api.doSmartSelfieAuthentication(
-                userId = userId,
-                selfieImage = selfieFile,
-                livenessImages = livenessFiles,
-                partnerParams = extraPartnerParams,
-                failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
-                metadata = metadata.asNetworkRequest(),
-            )
-        }
+    private suspend fun submitJob(selfieFile: File): SmartSelfieResponse = if (isEnroll) {
+        SmileID.api.doSmartSelfieEnrollment(
+            userId = userId,
+            selfieImage = selfieFile,
+            livenessImages = livenessFiles,
+            allowNewEnroll = allowNewEnroll,
+            partnerParams = extraPartnerParams,
+            failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
+            metadata = metadata.asNetworkRequest(),
+        )
+    } else {
+        SmileID.api.doSmartSelfieAuthentication(
+            userId = userId,
+            selfieImage = selfieFile,
+            livenessImages = livenessFiles,
+            partnerParams = extraPartnerParams,
+            failureReason = FailureReason(activeLivenessTimedOut = forcedFailureTimerExpired),
+            metadata = metadata.asNetworkRequest(),
+        )
     }
 
     /**
@@ -553,10 +607,14 @@ class SmartSelfieEnhancedViewModel(
         metadata.removeAll { it is Metadatum.CameraName }
         metadata.removeAll { it is Metadatum.SelfieCaptureDuration }
         metadata.removeAll { it is Metadatum.SelfieImageOrigin }
+        metadata.removeAll { it is Metadatum.DeviceOrientation }
         resetCaptureProgress(SearchingForFace)
         forcedFailureTimerExpired = false
         startStrictModeTimerIfNecessary()
+        selfieCaptureRetries++
+        networkRetries++
         shouldAnalyzeImages = true
+        hasRecordedOrientationAtCaptureStart = false
     }
 
     private fun setCameraFacingMetadata(camSelector: CamSelector) {
