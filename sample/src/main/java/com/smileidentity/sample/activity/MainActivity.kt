@@ -24,6 +24,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /*
+    Using location permissions is optional for the Smile SDK. If no permissions are given or the
+    user denies the request, the SDK will not include location metadata in the request. This
+    implementation in the sample app is to demonstrate how to check and request location
+    permissions.
+     */
     private fun checkAndRequestLocationPermissions() {
         val fineLocationGranted = ContextCompat.checkSelfPermission(
             this,
