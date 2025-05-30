@@ -39,6 +39,7 @@ play-services-location = "21.3.0"
 play-services-mlkit-face-detection = "17.1.0"
 retrofit = "3.0.0"
 sentry = "7.20.1"
+smileid-security = "1.0.0"
 tflite = "2.17.0"
 tflite-metadata = "0.5.0"
 tflite-support = "0.5.0"
@@ -117,6 +118,7 @@ retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", 
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 sentry = { module = "io.sentry:sentry" }
 sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
+smileid-security = { module = "com.smileidentity:android-security", version.ref = "smileid-security" }
 tflite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tflite" }
 tflite-metadata = { group = "org.tensorflow", name = "tensorflow-lite-metadata", version.ref = "tflite-metadata" }
 tflite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tflite-support" }

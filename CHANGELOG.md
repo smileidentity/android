@@ -1,8 +1,9 @@
 # Release Notes
 
-## Unreleased
+## 11.0.0
 
 ### Added
+* Added a security feature to protect the payload between sdk and backend from unauthorized tampering.
 * Enhanced fraud signals collection to improve fraud prevention
 
 ### Changed
@@ -21,6 +22,12 @@
 
 ### Changed
 *  Restructured consent object that is being sent to the backend API for biometric kyc, enhanced kyc and enhanced document verification
+
+## Unreleased
+
+### Added
+ * Added a security feature to protect the payload between sdk and backend from unauthorized tampering.
+
 
 ## 10.6.1
 * Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    
