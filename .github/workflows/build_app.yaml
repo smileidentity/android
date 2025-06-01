@@ -62,7 +62,7 @@ jobs:
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
           releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
       - name: Send Slack
-        uses: slackapi/slack-github-action@v2.0.0
+        uses: slackapi/slack-github-action@v2.1.0
         with:
           payload: |
             {
