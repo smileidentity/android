@@ -440,7 +440,7 @@ class SelfieViewModel(
                 selfieFileResult to livenessFilesResult
             } else {
                 Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.hub.addBreadcrumb(
+                SmileIDCrashReporting.scopes?.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"

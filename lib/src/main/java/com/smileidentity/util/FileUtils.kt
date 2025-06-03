@@ -423,7 +423,7 @@ internal fun moveJobToSubmitted(
     if (sourceUnsubmittedPath == null) {
         val message = "Unsubmitted directory not found in any path"
         Timber.v(message)
-        SmileIDCrashReporting.hub.addBreadcrumb(message)
+        SmileIDCrashReporting.scopes?.addBreadcrumb(message)
         return false
     }
 
