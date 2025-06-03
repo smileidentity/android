@@ -3,6 +3,8 @@ package com.smileidentity
 import android.os.Build
 import com.smileidentity.SmileIDCrashReporting.disable
 import io.sentry.Hint
+import io.sentry.IScopes
+import io.sentry.NoOpScopes
 import io.sentry.Scope
 import io.sentry.Scopes
 import io.sentry.SentryClient
@@ -32,7 +34,7 @@ private const val TAG_SDK_VERSION = "sdk_version"
  */
 object SmileIDCrashReporting {
     private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
-    internal lateinit var scopes: Scopes
+    internal var scopes: IScopes = NoOpScopes.getInstance()
 
     @JvmStatic
     fun enable(isInDebugMode: Boolean = false) {
@@ -96,7 +98,13 @@ object SmileIDCrashReporting {
 
     @JvmStatic
     fun disable() {
-        scopes.close()
+        scopes.options.isEnableUncaughtExceptionHandler = false
+        for (it in scopes.options.integrations) {
+            if (it is UncaughtExceptionHandlerIntegration) {
+                it.close()
+            }
+        }
+        scopes = NoOpScopes.getInstance()
     }
 
     /**
