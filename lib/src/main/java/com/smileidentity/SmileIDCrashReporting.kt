@@ -3,9 +3,11 @@ package com.smileidentity
 import android.os.Build
 import com.smileidentity.SmileIDCrashReporting.disable
 import io.sentry.Hint
-import io.sentry.Hub
-import io.sentry.IHub
-import io.sentry.NoOpHub
+import io.sentry.IScopes
+import io.sentry.NoOpScopes
+import io.sentry.Scope
+import io.sentry.Scopes
+import io.sentry.SentryClient
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.SentryOptions.BeforeSendCallback
@@ -32,7 +34,7 @@ private const val TAG_SDK_VERSION = "sdk_version"
  */
 object SmileIDCrashReporting {
     private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
-    internal var hub: IHub = NoOpHub.getInstance()
+    internal var scopes: IScopes = NoOpScopes.getInstance()
 
     @JvmStatic
     fun enable(isInDebugMode: Boolean = false) {
@@ -60,43 +62,49 @@ object SmileIDCrashReporting {
             }
         }
 
-        hub = Hub(options).apply {
-            setTag(TAG_BRAND, Build.BRAND)
-            setTag(TAG_DEBUG_MODE, isInDebugMode.toString())
-            setTag(TAG_CPU_ABI, Build.SUPPORTED_ABIS?.first() ?: "unknown")
-            setTag(TAG_DEVICE, Build.DEVICE)
-            setTag(TAG_MANUFACTURER, Build.MANUFACTURER)
-            setTag(TAG_MODEL, Build.MODEL)
-            setTag(TAG_OS_API_LEVEL, Build.VERSION.SDK_INT.toString())
-            setTag(TAG_OS_VERSION, Build.VERSION.RELEASE)
-            setTag(TAG_PRODUCT, Build.PRODUCT)
-            setTag(TAG_SDK_VERSION, BuildConfig.VERSION_NAME)
-            try {
-                setTag("partner_id", SmileID.config.partnerId)
-                setUser(User().apply { id = SmileID.config.partnerId })
-            } catch (e: Exception) {
-                // Ignore
-                Timber.w(e, "Error while setting partner_id tag for Sentry")
-            }
+        // Create scopes
+        val globalScope = Scope(options)
+        val isolationScope = Scope(options)
+        val scope = Scope(options)
+
+        scope.setTag(TAG_BRAND, Build.BRAND)
+        scope.setTag(TAG_DEBUG_MODE, isInDebugMode.toString())
+        scope.setTag(TAG_CPU_ABI, Build.SUPPORTED_ABIS?.first() ?: "unknown")
+        scope.setTag(TAG_DEVICE, Build.DEVICE)
+        scope.setTag(TAG_MANUFACTURER, Build.MANUFACTURER)
+        scope.setTag(TAG_MODEL, Build.MODEL)
+        scope.setTag(TAG_OS_API_LEVEL, Build.VERSION.SDK_INT.toString())
+        scope.setTag(TAG_OS_VERSION, Build.VERSION.RELEASE)
+        scope.setTag(TAG_PRODUCT, Build.PRODUCT)
+        scope.setTag(TAG_SDK_VERSION, BuildConfig.VERSION_NAME)
+        try {
+            scope.setTag("partner_id", SmileID.config.partnerId)
+            scope.setUser(User().apply { id = SmileID.config.partnerId })
+        } catch (e: Exception) {
+            Timber.w(e, "Error while setting partner_id tag for Sentry")
         }
+
+        globalScope.bindClient(SentryClient(options))
+
+        scopes = Scopes(scope, isolationScope, globalScope, "SmileIDCrashReporting.init")
 
         // Once this UncaughtExceptionHandler handles the exception, it will pass the exception on
         // to any previously set handlers (if any). If someone registers a new handler after we
         // register ours, and they don't pass it on to us, we may not be notified of the crash.
         val integration = UncaughtExceptionHandlerIntegration()
         options.addIntegration(integration)
-        integration.register(hub, options)
+        integration.register(scopes, options)
     }
 
     @JvmStatic
     fun disable() {
-        hub.options.isEnableUncaughtExceptionHandler = false
-        for (it in hub.options.integrations) {
+        scopes.options.isEnableUncaughtExceptionHandler = false
+        for (it in scopes.options.integrations) {
             if (it is UncaughtExceptionHandlerIntegration) {
                 it.close()
             }
         }
-        hub = NoOpHub.getInstance()
+        scopes = NoOpScopes.getInstance()
     }
 
     /**

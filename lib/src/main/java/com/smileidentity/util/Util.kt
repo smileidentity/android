@@ -207,7 +207,7 @@ internal fun postProcessImageBitmap(
             true,
         ).compress(JPEG, compressionQuality, it)
         if (!compressSuccess) {
-            SmileIDCrashReporting.hub.addBreadcrumb("Failed to compress bitmap")
+            SmileIDCrashReporting.scopes.addBreadcrumb("Failed to compress bitmap")
             throw IOException("Failed to compress bitmap")
         }
     }
@@ -258,7 +258,7 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
             Timber.w(e, "Unable to convert HttpException to SmileIDException")
 
             // Report the *conversion* error to Sentry, rather than the original error
-            SmileIDCrashReporting.hub.captureException(e)
+            SmileIDCrashReporting.scopes.captureException(e)
             throwable.addSuppressed(e)
 
             // More informative to pass back the original exception than the conversion error
@@ -266,7 +266,7 @@ fun getExceptionHandler(proxy: (Throwable) -> Unit) = CoroutineExceptionHandler 
         }
     } else {
         // Unexpected error, report to Sentry
-        SmileIDCrashReporting.hub.captureException(throwable) {
+        SmileIDCrashReporting.scopes.captureException(throwable) {
             it.level = SentryLevel.INFO
             it.addBreadcrumb(Breadcrumb("Smile ID Coroutine Exception Handler"))
         }
@@ -354,7 +354,7 @@ fun handleOfflineJobFailure(
         didMove = moveJobToSubmitted(jobId)
         if (!didMove) {
             Timber.w("Failed to move job $jobId to complete")
-            SmileIDCrashReporting.hub.addBreadcrumb(
+            SmileIDCrashReporting.scopes.addBreadcrumb(
                 Breadcrumb().apply {
                     category = "Offline Mode"
                     message = "Failed to move job $jobId to complete"
@@ -383,7 +383,7 @@ internal fun writeUriToFile(file: File, uri: Uri, context: Context) {
     // by downstream business logic
     val uriInputStream = context.contentResolver.openInputStream(uri) ?: run {
         Timber.w("Unable to read URI $uri")
-        SmileIDCrashReporting.hub.addBreadcrumb("Unable to read URI $uri")
+        SmileIDCrashReporting.scopes.addBreadcrumb("Unable to read URI $uri")
         return
     }
     val fileOutputStream = file.outputStream().buffered()
