@@ -126,7 +126,9 @@ fun DocumentCaptureScreen(
                 writeUriToFile(documentFile, uri, context)
                 viewModel.onPhotoSelectedFromGallery(documentFile)
             } else {
-                SmileIDCrashReporting.scopes.addBreadcrumb("Gallery upload document image too small")
+                SmileIDCrashReporting.scopes.addBreadcrumb(
+                    "Gallery upload document image too small",
+                )
                 context.toast(R.string.si_doc_v_validation_image_too_small)
             }
         },
@@ -167,7 +169,9 @@ fun DocumentCaptureScreen(
                 showSkipButton = showSkipButton,
                 onInstructionsAcknowledgedSelectFromGallery = {
                     Timber.v("onInstructionsAcknowledgedSelectFromGallery")
-                    SmileIDCrashReporting.scopes.addBreadcrumb("Selecting document photo from gallery")
+                    SmileIDCrashReporting.scopes.addBreadcrumb(
+                        "Selecting document photo from gallery",
+                    )
                     photoPickerLauncher.launch(PickVisualMediaRequest(ImageOnly))
                 },
                 onInstructionsAcknowledgedTakePhoto = viewModel::onInstructionsAcknowledged,

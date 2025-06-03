@@ -86,7 +86,6 @@ object SmileIDCrashReporting {
 
         scopes = Scopes(scope, isolationScope, globalScope, "SmileIDCrashReporting.init")
 
-
         // Once this UncaughtExceptionHandler handles the exception, it will pass the exception on
         // to any previously set handlers (if any). If someone registers a new handler after we
         // register ours, and they don't pass it on to us, we may not be notified of the crash.
