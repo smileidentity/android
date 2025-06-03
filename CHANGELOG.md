@@ -1,5 +1,11 @@
 # Release Notes
 
+## 11.0.1
+
+### Changed
+* Updated Sentry version from 7.2.0 to the latest(8.13.2). Replaced the use of Sentry’s Hub-based 
+implementation with the new Scope and Scopes-based implementation.
+
 ## 11.0.0
 
 ### Added
