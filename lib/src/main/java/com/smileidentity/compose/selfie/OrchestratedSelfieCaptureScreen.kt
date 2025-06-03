@@ -97,7 +97,7 @@ fun OrchestratedSelfieCaptureScreen(
                     "Failed to decode selfie image from " +
                         "${uiState.selfieToConfirm?.absolutePath}",
                 )
-                SmileIDCrashReporting.scopes?.captureException(e)
+                SmileIDCrashReporting.scopes.captureException(e)
                 viewModel.result = SmileIDResult.Error(e)
                 viewModel.onFinished(onResult)
                 null

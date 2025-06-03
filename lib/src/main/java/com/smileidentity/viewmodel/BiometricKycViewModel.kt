@@ -232,7 +232,7 @@ class BiometricKycViewModel(
                 livenessFilesResult = getFilesByType(jobId, FileType.LIVENESS)
             } else {
                 Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.scopes?.addBreadcrumb(
+                SmileIDCrashReporting.scopes.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"

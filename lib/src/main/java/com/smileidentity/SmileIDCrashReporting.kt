@@ -32,7 +32,7 @@ private const val TAG_SDK_VERSION = "sdk_version"
  */
 object SmileIDCrashReporting {
     private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
-    internal var scopes: Scopes? = null
+    internal lateinit var scopes: Scopes
 
     @JvmStatic
     fun enable(isInDebugMode: Boolean = false) {
@@ -92,13 +92,12 @@ object SmileIDCrashReporting {
         // register ours, and they don't pass it on to us, we may not be notified of the crash.
         val integration = UncaughtExceptionHandlerIntegration()
         options.addIntegration(integration)
-        scopes?.let { integration.register(it, options) }
+        integration.register(scopes, options)
     }
 
     @JvmStatic
     fun disable() {
-        scopes?.close()
-        scopes = null
+        scopes.close()
     }
 
     /**

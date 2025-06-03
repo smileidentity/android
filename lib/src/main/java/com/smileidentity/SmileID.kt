@@ -452,7 +452,7 @@ object SmileID {
             val copySuccess = moveJobToSubmitted(jobId)
             if (!copySuccess) {
                 Timber.w("Failed to move job $jobId to complete")
-                SmileIDCrashReporting.scopes?.addBreadcrumb(
+                SmileIDCrashReporting.scopes.addBreadcrumb(
                     Breadcrumb().apply {
                         category = "Offline Mode"
                         message = "Failed to move job $jobId to complete"
@@ -537,7 +537,7 @@ object SmileID {
                             "bytesDownloaded=${it.progressInfo?.bytesDownloaded}, " +
                             "totalBytesToDownload=${it.progressInfo?.totalBytesToDownload}"
                         Timber.d(message)
-                        SmileIDCrashReporting.scopes?.addBreadcrumb(message)
+                        SmileIDCrashReporting.scopes.addBreadcrumb(message)
                     }.build()
 
                 val installTask =
@@ -558,12 +558,12 @@ object SmileID {
                                 "https://developers.google.com/ml-kit/vision/face-detection/android",
                         )
                     Timber.w(exception, "Face Detection install failed")
-                    SmileIDCrashReporting.scopes?.addBreadcrumb("Face Detection install failed")
+                    SmileIDCrashReporting.scopes.addBreadcrumb("Face Detection install failed")
                     throw exception
                 }
             } catch (exception: Exception) {
                 Timber.e(exception, "Error during Face Detection module installation")
-                SmileIDCrashReporting.scopes?.addBreadcrumb(
+                SmileIDCrashReporting.scopes.addBreadcrumb(
                     "Error during Face Detection module installation: ${exception.message}",
                 )
                 throw exception
