@@ -37,7 +37,7 @@ import kotlinx.collections.immutable.persistentListOf
  * The `current` property retrieves the `SnapshotStateList<Metadatum>` for the current composition.
  */
 @SuppressLint("ComposeCompositionLocalUsage")
-internal object LocalMetadataProvider {
+object LocalMetadataProvider {
     private val LocalMetadata = staticCompositionLocalOf<SnapshotStateList<Metadatum>> {
         error("LocalMetadataProvider was not set")
     }
