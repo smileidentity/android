@@ -1,5 +1,10 @@
 # Release Notes
 
+## 11.0.2
+
+### Fixed
+* Fixed a bug with geolocation 
+
 ## 11.0.1
 
 ### Changed

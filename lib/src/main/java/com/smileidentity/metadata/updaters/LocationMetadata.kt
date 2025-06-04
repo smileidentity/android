@@ -44,7 +44,7 @@ internal class LocationMetadata(
     private val locationListener = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             val location = result.lastLocation
-                ?: return updateLocationMetadata(LocationInfo.UNKNOWN)
+                ?: return
             val (accuracy, source) = classifyLocation(location)
             val info = LocationInfo(
                 latitude = location.latitude,
@@ -56,16 +56,11 @@ internal class LocationMetadata(
             fusedClient.removeLocationUpdates(this)
         }
 
-        override fun onLocationAvailability(availability: LocationAvailability) {
-            if (!availability.isLocationAvailable) {
-                updateLocationMetadata(LocationInfo.UNKNOWN)
-            }
-        }
+        override fun onLocationAvailability(availability: LocationAvailability) {}
     }
 
     override fun onStart(owner: LifecycleOwner) {
         if (!isFusedLocationAvailable) {
-            updateLocationMetadata(LocationInfo.UNKNOWN)
             return
         }
 
@@ -97,7 +92,6 @@ internal class LocationMetadata(
     @SuppressLint("MissingPermission")
     private fun requestLocation() {
         if (!hasLocationPermission()) {
-            updateLocationMetadata(LocationInfo.UNKNOWN)
             return
         }
 
