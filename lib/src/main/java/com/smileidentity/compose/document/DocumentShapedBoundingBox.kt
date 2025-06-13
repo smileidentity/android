@@ -1,7 +1,8 @@
 package com.smileidentity.compose.document
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 
@@ -46,7 +48,9 @@ fun DocumentShapedBoundingBox(
 
     Canvas(
         modifier = modifier
-            .fillMaxSize(),
+            // .fillMaxSize(), todo undo back to this
+            .fillMaxWidth()
+            .height(300.dp),
     ) {
         // Define the outline of the bounding box and add a stroke that shows different edge
         // detection states

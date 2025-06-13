@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.smileidentity.SmileID
 import com.smileidentity.compose.components.SmileThemeSurface
+import com.smileidentity.compose.document.composable.SmileDocumentCapture
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typographyV2
@@ -53,22 +54,27 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
     typography: Typography = SmileID.typographyV2,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
-    SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val context = LocalContext.current
-        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
-        OrchestratedSelfieCaptureScreenEnhanced(
-            modifier = modifier,
-            userId = userId,
-            allowNewEnroll = allowNewEnroll,
-            showInstructions = showInstructions,
-            isEnroll = true,
-            showAttribution = showAttribution,
-            skipApiSubmission = skipApiSubmission,
-            selfieQualityModel = selfieQualityModel,
-            extraPartnerParams = extraPartnerParams,
-            onResult = onResult,
-        )
-    }
+    SmileDocumentCapture(
+        onResult = {},
+        onError = {},
+    )
+
+    // SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
+    //     val context = LocalContext.current
+    //     val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
+    //     OrchestratedSelfieCaptureScreenEnhanced(
+    //         modifier = modifier,
+    //         userId = userId,
+    //         allowNewEnroll = allowNewEnroll,
+    //         showInstructions = showInstructions,
+    //         isEnroll = true,
+    //         showAttribution = showAttribution,
+    //         skipApiSubmission = skipApiSubmission,
+    //         selfieQualityModel = selfieQualityModel,
+    //         extraPartnerParams = extraPartnerParams,
+    //         onResult = onResult,
+    //     )
+    // }
 }
 
 /**
