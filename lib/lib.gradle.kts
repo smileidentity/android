@@ -217,6 +217,7 @@ dependencies {
 
     // Bundled model
     implementation(libs.mlkit.obj.detection)
+    implementation(libs.mlkit.text.recognition)
 
     implementation(libs.tflite)
     implementation(libs.tflite.metadata)
