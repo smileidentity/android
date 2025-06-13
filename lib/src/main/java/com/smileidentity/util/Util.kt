@@ -43,6 +43,7 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.sqrt
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okio.IOException
@@ -112,6 +113,84 @@ fun calculateLuminance(imageProxy: ImageProxy): Double {
         sum += data.get().toInt() and 0xFF
     }
     return sum / data.limit()
+}
+
+fun detectGlare(
+    imageProxy: ImageProxy,
+    glareBaseThreshold: Int = 230,
+    glareBaseGlareRatio: Double = 0.05,
+): Boolean {
+    require(glareBaseThreshold in 0..255) { "Threshold must be between 0 and 255" }
+    require(glareBaseGlareRatio in 0.0..1.0) { "Glare ratio must be between 0.0 and 1.0" }
+    require(imageProxy.planes.isNotEmpty()) { "ImageProxy must have at least one plane" }
+
+    val buffer = imageProxy.planes[0].buffer.apply { rewind() }
+    val pixelCount = buffer.remaining()
+    // Adjust glare sensitivity: stricter on high-res, looser on low-res
+    val adjustedGlareRatio = when {
+        imageProxy.width * imageProxy.height > 2_000_000 -> glareBaseGlareRatio * 0.8
+        imageProxy.width * imageProxy.height < 500_000 -> glareBaseGlareRatio * 1.2
+        else -> glareBaseGlareRatio
+    }
+    var highLuminancePixels = 0
+    while (buffer.hasRemaining()) {
+        val luminance = buffer.get().toInt() and 0xFF
+        if (luminance >= glareBaseThreshold) {
+            highLuminancePixels++
+        }
+    }
+    val ratio = highLuminancePixels.toDouble() / pixelCount
+    buffer.rewind()
+    return ratio > adjustedGlareRatio
+}
+
+fun detectBlur(imageProxy: ImageProxy, blurThreshold: Double = 2.5): Boolean {
+    require(blurThreshold > 0) { "Threshold must be positive" }
+
+    val planes = imageProxy.planes[0]
+    val buffer = planes.buffer.apply { rewind() }
+    val width = imageProxy.width
+    val height = imageProxy.height
+    val rowStride = planes.rowStride
+
+    // Adaptive sampling: higher resolution = more aggressive sampling for performance
+    val step = when {
+        width * height > 4_000_000 -> 3 // ~9x faster for very high-res (4K+)
+        width * height > 1_000_000 -> 2 // ~4x faster for high-res (1080p+)
+        else -> 1 // Full resolution for smaller images
+    }
+
+    var sumGradient = 0.0
+    var count = 0
+
+    // Process pixels with adaptive step size for performance
+    for (y in step until height step step) {
+        val currentRowStart = y * rowStride
+        val prevRowStart = (y - step) * rowStride
+
+        for (x in step until width step step) {
+            val idx = currentRowStart + x
+            val idxLeft = currentRowStart + x - step
+            val idxTop = prevRowStart + x
+
+            // Bounds check for buffer safety
+            if (idx >= buffer.limit() || idxTop >= buffer.limit()) continue
+
+            val current = buffer.get(idx).toInt() and 0xFF
+            val left = buffer.get(idxLeft).toInt() and 0xFF
+            val top = buffer.get(idxTop).toInt() and 0xFF
+
+            val gx = current - left
+            val gy = current - top
+            val gradient = sqrt((gx * gx + gy * gy).toDouble())
+
+            sumGradient += gradient
+            count++
+        }
+    }
+
+    val avgGradient = if (count > 0) sumGradient / count else 0.0
+    return avgGradient < blurThreshold
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
@@ -328,6 +407,7 @@ sealed interface StringResource {
                     exception.details.message
                 }
             }
+
             is Text -> text
         }
     }
