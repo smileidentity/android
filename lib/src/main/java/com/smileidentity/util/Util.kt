@@ -50,6 +50,9 @@ import okio.IOException
 import retrofit2.HttpException
 import timber.log.Timber
 
+private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
+private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
+
 internal fun createBvnOtpVerificationModes(maps: List<BvnVerificationMode>) = maps.flatMap {
     it.entries.map { (mode, value) ->
         BvnOtpVerificationMode(
@@ -105,7 +108,7 @@ internal fun isImageAtLeast(
     return (imageHeight >= (height ?: 0)) && (imageWidth >= (width ?: 0))
 }
 
-fun calculateLuminance(imageProxy: ImageProxy): Double {
+internal fun calculateLuminance(imageProxy: ImageProxy): Double {
     // planes[0] is the Y plane aka "luma"
     val data = imageProxy.planes[0].buffer.apply { rewind() }
     var sum = 0.0
@@ -115,7 +118,14 @@ fun calculateLuminance(imageProxy: ImageProxy): Double {
     return sum / data.limit()
 }
 
-fun detectGlare(
+/**
+ * Detects glare in an image by counting high-luminance pixels.
+ * @param imageProxy The image to analyze
+ * @param glareBaseThreshold The luminance threshold for a pixel to be considered as glare
+ * @param glareBaseGlareRatio The minimum ratio of high-luminance pixels for glare detection
+ * @return True if glare is detected, false otherwise
+ */
+internal fun detectGlare(
     imageProxy: ImageProxy,
     glareBaseThreshold: Int = 230,
     glareBaseGlareRatio: Double = 0.05,
@@ -126,6 +136,7 @@ fun detectGlare(
 
     val buffer = imageProxy.planes[0].buffer.apply { rewind() }
     val pixelCount = buffer.remaining()
+
     // Adjust glare sensitivity: stricter on high-res, looser on low-res
     val adjustedGlareRatio = when {
         imageProxy.width * imageProxy.height > 2_000_000 -> glareBaseGlareRatio * 0.8
@@ -144,53 +155,135 @@ fun detectGlare(
     return ratio > adjustedGlareRatio
 }
 
-fun detectBlur(imageProxy: ImageProxy, blurThreshold: Double = 2.5): Boolean {
-    require(blurThreshold > 0) { "Threshold must be positive" }
+/**
+ * Detects blur in an image by analyzing image gradients.
+ * @param imageProxy The image to analyze
+ * @param blurThreshold The threshold below which an image is considered blurry
+ * @return True if the image is blurry, false otherwise
+ */
+internal fun detectBlur(imageProxy: ImageProxy, blurThreshold: Double = 2.5): Boolean {
+    require(blurThreshold > 0) { "Blur threshold must be positive" }
 
-    val planes = imageProxy.planes[0]
-    val buffer = planes.buffer.apply { rewind() }
+    if (imageProxy.planes.isEmpty()) {
+        Timber.w("detectBlur: Image has no planes")
+        return true
+    }
+
+    val plane = imageProxy.planes[0]
+    val buffer = plane.buffer
+    val rowStride = plane.rowStride
+    val pixelStride = plane.pixelStride
     val width = imageProxy.width
     val height = imageProxy.height
-    val rowStride = planes.rowStride
 
-    // Adaptive sampling: higher resolution = more aggressive sampling for performance
-    val step = when {
-        width * height > 4_000_000 -> 3 // ~9x faster for very high-res (4K+)
-        width * height > 1_000_000 -> 2 // ~4x faster for high-res (1080p+)
-        else -> 1 // Full resolution for smaller images
+    if (width <= 1 || height <= 1) {
+        Timber.w("detectBlur: Image dimensions too small (${width}x$height)")
+        return true
     }
+
+    val step = when {
+        width * height > 4_000_000 -> 3
+        width * height > 1_000_000 -> 2
+        else -> 1
+    }
+
+    buffer.rewind()
+    val data = ByteArray(buffer.remaining())
+    buffer.get(data)
+    buffer.rewind()
 
     var sumGradient = 0.0
     var count = 0
 
-    // Process pixels with adaptive step size for performance
     for (y in step until height step step) {
-        val currentRowStart = y * rowStride
-        val prevRowStart = (y - step) * rowStride
-
         for (x in step until width step step) {
-            val idx = currentRowStart + x
-            val idxLeft = currentRowStart + x - step
-            val idxTop = prevRowStart + x
+            val idx = y * rowStride + x * pixelStride
+            val idxLeft = y * rowStride + (x - step) * pixelStride
+            val idxTop = (y - step) * rowStride + x * pixelStride
 
-            // Bounds check for buffer safety
-            if (idx >= buffer.limit() || idxTop >= buffer.limit()) continue
+            if (idx < 0 || idx >= data.size ||
+                idxLeft < 0 || idxLeft >= data.size ||
+                idxTop < 0 || idxTop >= data.size
+            ) {
+                continue
+            }
 
-            val current = buffer.get(idx).toInt() and 0xFF
-            val left = buffer.get(idxLeft).toInt() and 0xFF
-            val top = buffer.get(idxTop).toInt() and 0xFF
+            try {
+                val current = data[idx].toInt() and 0xFF
+                val left = data[idxLeft].toInt() and 0xFF
+                val top = data[idxTop].toInt() and 0xFF
 
-            val gx = current - left
-            val gy = current - top
-            val gradient = sqrt((gx * gx + gy * gy).toDouble())
+                val gx = current - left
+                val gy = current - top
+                val gradient = sqrt((gx * gx + gy * gy).toDouble())
 
-            sumGradient += gradient
-            count++
+                sumGradient += gradient
+                count++
+            } catch (e: Exception) {
+                Timber.e(e, "Error processing pixel at ($x, $y)")
+            }
         }
     }
 
-    val avgGradient = if (count > 0) sumGradient / count else 0.0
+    if (count == 0) {
+        Timber.w("detectBlur: No valid pixels processed.")
+        return true
+    }
+
+    val avgGradient = sumGradient / count
+
+    Timber.d(
+        "Blur detection: avgGradient=$avgGradient, threshold=$blurThreshold, " +
+            "resolution=${width}x$height, pixels processed=$count",
+    )
+
     return avgGradient < blurThreshold
+}
+
+internal fun isBoundingBoxCentered(
+    boundingBox: Rect,
+    imageWidth: Int,
+    imageHeight: Int,
+    imageRotation: Int,
+    tolerance: Int = CENTERED_BOUNDING_BOX_TOLERANCE,
+): Boolean {
+    if (imageRotation == 90 || imageRotation == 270) {
+        // The image height/width need to be swapped
+        return isBoundingBoxCentered(
+            boundingBox = boundingBox,
+            imageWidth = imageHeight,
+            imageHeight = imageWidth,
+            imageRotation = 0,
+            tolerance = tolerance,
+        )
+    }
+
+    // Sometimes, the bounding box is out of frame. This cannot be considered centered
+    // We check only left and right because the document should always fill the width but may
+    // not fill the height
+    if (boundingBox.left < tolerance || boundingBox.right > (imageWidth - tolerance)) {
+        return false
+    }
+
+    val imageCenterX = imageWidth / 2
+    val imageCenterY = imageHeight / 2
+
+    val deltaX = abs(imageCenterX - boundingBox.centerX())
+    val deltaY = abs(imageCenterY - boundingBox.centerY())
+
+    val isCenteredHorizontally = deltaX < tolerance
+    val isCenteredVertically = deltaY < tolerance
+
+    return isCenteredHorizontally && isCenteredVertically
+}
+
+internal fun isCorrectAspectRatio(
+    detectedAspectRatio: Float,
+    knownAspectRatio: Float?,
+    tolerance: Float = CORRECT_ASPECT_RATIO_TOLERANCE,
+): Boolean {
+    val expectedAspectRatio = knownAspectRatio ?: detectedAspectRatio
+    return abs(detectedAspectRatio - expectedAspectRatio) < tolerance
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =

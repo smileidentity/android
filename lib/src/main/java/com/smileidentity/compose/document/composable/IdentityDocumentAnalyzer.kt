@@ -1,7 +1,6 @@
 package com.smileidentity.compose.document.composable
 
 import android.graphics.ImageFormat.YUV_420_888
-import android.graphics.Point
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -10,17 +9,11 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.smileidentity.SmileIDCrashReporting
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.detectBlur
 import com.smileidentity.util.detectGlare
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import com.smileidentity.util.isBoundingBoxCentered
 import timber.log.Timber
 
 /**
@@ -38,10 +31,11 @@ class IdentityDocumentAnalyzer(
         isDocumentGlared: Boolean,
         isDocumentBlurry: Boolean,
         isDocumentTilted: Boolean,
+        isDocumentCentered: Boolean,
+        detectedAspectRatio: Float,
     ) -> Unit,
     private val onError: (Throwable) -> Unit,
 ) : ImageAnalysis.Analyzer {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private val objectDetector: ObjectDetector by lazy {
         val options = ObjectDetectorOptions.Builder()
@@ -54,6 +48,7 @@ class IdentityDocumentAnalyzer(
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
         val startTime = System.currentTimeMillis()
+        val knownAspectRatio = 3.375f / 2.125f
 
         // YUV_420_888 is the format produced by CameraX and needed for Luminance calculation
         check(imageProxy.format == YUV_420_888) {
@@ -83,20 +78,45 @@ class IdentityDocumentAnalyzer(
 
         objectDetector.process(inputImage)
             .addOnSuccessListener { detectedObjects ->
-                Timber.d("IdentityDocumentAnalyzer inside object detector")
-                for (detectedObject in detectedObjects) {
-                    val boundingBox = detectedObject.boundingBox
-                    val trackingId = detectedObject.trackingId
-                    for (label in detectedObject.labels) {
-                        val confidence = label.confidence
 
-                        // use classifier here
+                if (detectedObjects.isNotEmpty()) {
+                    val boundingBox = detectedObjects.first().boundingBox
 
-                        Timber.d(
-                            "IdentityDocumentAnalyzer bbox $boundingBox trackingID $trackingId " +
-                                "label ${label.text} confidence $confidence",
-                        )
-                    }
+                    val isCentered = isBoundingBoxCentered(
+                        boundingBox = boundingBox,
+                        imageWidth = inputImage.width,
+                        imageHeight = inputImage.height,
+                        imageRotation = rotation,
+                    )
+
+                    val detectedAspectRatio = boundingBox.width().toFloat() / boundingBox.height()
+
+                    // Do a glare check on the surface first (can be adjusted)
+                    val isGlareDetected = detectGlare(
+                        imageProxy = imageProxy,
+                        glareBaseThreshold = glareBaseThreshold,
+                        glareBaseGlareRatio = glareBaseGlareRatio,
+                    )
+
+                    // Do a blur check on the surface first (can be adjusted)
+                    val isBlurDetected = detectBlur(
+                        imageProxy = imageProxy,
+                        blurThreshold = blurThreshold,
+                    )
+
+                    Timber.d(
+                        "IdentityDocumentAnalyzer is glare $isGlareDetected blur $isBlurDetected",
+                    )
+
+                    onResult(
+                        false,
+                        true,
+                        isGlareDetected,
+                        isBlurDetected,
+                        false,
+                        isCentered,
+                        detectedAspectRatio,
+                    )
                 }
             }
             .addOnFailureListener { e ->
@@ -105,41 +125,5 @@ class IdentityDocumentAnalyzer(
                 onError(Throwable("Object Detection Failed: $e"))
             }
             .addOnCompleteListener { proxyToClose.close() }
-
-        // Do a glare check on the surface first (can be adjusted)
-        val isGlareDetected = detectGlare(
-            imageProxy = imageProxy,
-            glareBaseThreshold = glareBaseThreshold,
-            glareBaseGlareRatio = glareBaseGlareRatio,
-        )
-
-        // Do a blur check on the surface first (can be adjusted)
-        val isBlurDetected = detectBlur(
-            imageProxy = imageProxy,
-            blurThreshold = blurThreshold,
-        )
-
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        recognizer.process(inputImage)
-            .addOnSuccessListener { visionText ->
-                for (block in visionText.textBlocks) {
-                    val angle = block.cornerPoints?.let { calculateTextAngle(it) }
-                    if (abs(angle ?: 0f) > 5f) {
-                        // Text is tilted
-                        Timber.d(
-                            "IdentityDocumentAnalyzer Is tilted: ${(abs(angle ?: 0f) > 5f)}" +
-                                " at $angle",
-                        )
-                    }
-                }
-            }
-    }
-
-    private fun calculateTextAngle(corners: Array<Point>): Float {
-        val topLeft = corners[0]
-        val topRight = corners[1]
-        val deltaX = topRight.x - topLeft.x
-        val deltaY = topRight.y - topLeft.y
-        return Math.toDegrees(atan2(deltaY.toDouble(), deltaX.toDouble())).toFloat()
     }
 }

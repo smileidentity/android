@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +29,7 @@ import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.document.DocumentShapedBoundingBox
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
+import com.smileidentity.util.isCorrectAspectRatio
 import com.smileidentity.util.toast
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState
@@ -52,11 +51,11 @@ fun SmileDocumentCapture(
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val aspectRatio = 3.375f / 2.125f
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val camSelector by rememberCamSelector(CamSelector.Back)
-    var areEdgesDetected by remember { mutableStateOf((false)) }
 
     ForceBrightness()
 
@@ -87,7 +86,13 @@ fun SmileDocumentCapture(
                 isDocumentGlared: Boolean,
                 isDocumentBlurry: Boolean,
                 isDocumentTilted: Boolean,
+                isDocumentCentered: Boolean,
+                detectedAspectRatio: Float,
             ->
+            val isCorrectAspectRatio = isCorrectAspectRatio(
+                detectedAspectRatio = detectedAspectRatio,
+                knownAspectRatio = aspectRatio,
+            )
         },
         onError = { throwable -> onError(throwable) },
     )
@@ -111,8 +116,8 @@ fun SmileDocumentCapture(
             )
 
             DocumentShapedBoundingBox(
-                aspectRatio = 3.375f / 2.125f,
-                areEdgesDetected = areEdgesDetected,
+                aspectRatio = aspectRatio,
+                areEdgesDetected = false,
                 modifier = Modifier
                     .align(Alignment.TopCenter),
             )

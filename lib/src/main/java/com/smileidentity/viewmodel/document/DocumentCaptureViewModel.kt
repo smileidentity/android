@@ -1,7 +1,6 @@
 package com.smileidentity.viewmodel.document
 
 import android.graphics.ImageFormat.YUV_420_888
-import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
@@ -20,11 +19,12 @@ import com.smileidentity.models.v2.DocumentImageOriginValue
 import com.smileidentity.models.v2.Metadatum
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
+import com.smileidentity.util.isBoundingBoxCentered
+import com.smileidentity.util.isCorrectAspectRatio
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 import kotlinx.coroutines.Dispatchers
@@ -38,8 +38,6 @@ import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
 private const val LUMINANCE_THRESHOLD = 35
-private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
-private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
 private const val DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS = 1_000L
 
 data class DocumentCaptureUiState(
@@ -320,6 +318,7 @@ class DocumentCaptureViewModel(
                     val detectedAspectRatio = bBox.width().toFloat() / bBox.height()
                     val isCorrectAspectRatio = isCorrectAspectRatio(
                         detectedAspectRatio = detectedAspectRatio,
+                        knownAspectRatio = knownAspectRatio,
                     )
                     val idAspectRatio = if (rotation == 90 || rotation == 270) {
                         knownAspectRatio ?: detectedAspectRatio
@@ -358,51 +357,6 @@ class DocumentCaptureViewModel(
         _uiState.update {
             it.copy(areEdgesDetected = false, idAspectRatio = defaultAspectRatio)
         }
-    }
-
-    private fun isBoundingBoxCentered(
-        boundingBox: Rect,
-        imageWidth: Int,
-        imageHeight: Int,
-        imageRotation: Int,
-        tolerance: Int = CENTERED_BOUNDING_BOX_TOLERANCE,
-    ): Boolean {
-        if (imageRotation == 90 || imageRotation == 270) {
-            // The image height/width need to be swapped
-            return isBoundingBoxCentered(
-                boundingBox = boundingBox,
-                imageWidth = imageHeight,
-                imageHeight = imageWidth,
-                imageRotation = 0,
-                tolerance = tolerance,
-            )
-        }
-
-        // Sometimes, the bounding box is out of frame. This cannot be considered centered
-        // We check only left and right because the document should always fill the width but may
-        // not fill the height
-        if (boundingBox.left < tolerance || boundingBox.right > (imageWidth - tolerance)) {
-            return false
-        }
-
-        val imageCenterX = imageWidth / 2
-        val imageCenterY = imageHeight / 2
-
-        val deltaX = abs(imageCenterX - boundingBox.centerX())
-        val deltaY = abs(imageCenterY - boundingBox.centerY())
-
-        val isCenteredHorizontally = deltaX < tolerance
-        val isCenteredVertically = deltaY < tolerance
-
-        return isCenteredHorizontally && isCenteredVertically
-    }
-
-    private fun isCorrectAspectRatio(
-        detectedAspectRatio: Float,
-        tolerance: Float = CORRECT_ASPECT_RATIO_TOLERANCE,
-    ): Boolean {
-        val expectedAspectRatio = knownAspectRatio ?: detectedAspectRatio
-        return abs(detectedAspectRatio - expectedAspectRatio) < tolerance
     }
 
     private fun cleanupImageFiles() {
