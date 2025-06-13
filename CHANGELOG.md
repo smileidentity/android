@@ -1,5 +1,15 @@
 # Release Notes
 
+## 11.0.4 (Unreleased)
+
+### Changed
+* Migrated from tflite to litert 
+
+## 11.0.3
+
+### Changed
+* Fix/expose localmetadata provider
+
 ## 11.0.2
 
 ### Fixed
