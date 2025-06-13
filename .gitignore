@@ -22,7 +22,7 @@ captures/
 
 # IntelliJ
 *.iml
-.idea/
+.idea/*
 
 # Keystore files
 *.jks
