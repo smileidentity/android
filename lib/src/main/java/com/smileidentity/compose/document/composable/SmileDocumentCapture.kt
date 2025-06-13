@@ -1,22 +1,25 @@
-package com.smileidentity.compose.document
+package com.smileidentity.compose.document.composable
 
 import android.Manifest
 import android.os.OperationCanceledException
 import androidx.activity.compose.BackHandler
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageProxy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,10 +28,12 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.smileidentity.R
 import com.smileidentity.compose.components.ForceBrightness
+import com.smileidentity.compose.document.DocumentShapedBoundingBox
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.util.toast
 import com.ujizin.camposer.state.CamSelector
+import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.rememberCamSelector
 import java.io.File
 
@@ -39,17 +44,19 @@ import java.io.File
  * @param onResult Callback to be invoked when the document capture is successful
  * @param onError Callback to be invoked when the document capture has an error
  */
-@OptIn(ExperimentalPermissionsApi::class)
+@Suppress("UnsafeOptInUsage")
+@OptIn(ExperimentalGetImage::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SmileDocumentCapture(
-    documentType: SmileDocumentType,
     onResult: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val camSelector by rememberCamSelector(CamSelector.Back)
+    var areEdgesDetected by remember { mutableStateOf((false)) }
 
     ForceBrightness()
 
@@ -72,32 +79,51 @@ fun SmileDocumentCapture(
         }
     }
 
+    val analyzer = IdentityDocumentAnalyzer(
+        luminanceThreshold = 50,
+        onResult = {
+                needsMoreLighting: Boolean,
+                detectedDocument: Boolean,
+                isDocumentGlared: Boolean,
+                isDocumentBlurry: Boolean,
+                isDocumentTilted: Boolean,
+            ->
+        },
+        onError = { throwable -> onError(throwable) },
+    )
+
     Column(
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .consumeWindowInsets(WindowInsets.statusBars)
-            .fillMaxSize()
-            .height(IntrinsicSize.Min),
+            .fillMaxSize(),
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
             SmileCameraPreview(
                 camSelector = camSelector,
+                imageAnalyzer = { imageProxy: ImageProxy, cameraState: CameraState ->
+                    analyzer.analyze(imageProxy = imageProxy)
+                },
             )
 
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                DocumentShapedBoundingBox(
-                    aspectRatio = documentType.aspectRatio,
-                    areEdgesDetected = false,
-                    modifier = Modifier
-                        .windowInsetsPadding(WindowInsets.safeDrawing)
-                        .consumeWindowInsets(WindowInsets.safeDrawing)
-                        .fillMaxSize(),
-                )
-            }
+            DocumentShapedBoundingBox(
+                aspectRatio = 3.375f / 2.125f,
+                areEdgesDetected = areEdgesDetected,
+                modifier = Modifier
+                    .align(Alignment.TopCenter),
+            )
+
+            // QualityOverlay(
+            //     qualityState = debouncedQualityState,
+            //     modifier = Modifier
+            //         .align(Alignment.BottomCenter)
+            //         .fillMaxWidth()
+            //         .padding(16.dp),
+            // )
         }
     }
 }
@@ -107,7 +133,6 @@ fun SmileDocumentCapture(
 private fun SmileDocumentCapturePreview() {
     Preview {
         SmileDocumentCapture(
-            documentType = SmileDocumentType.ID_CARD,
             onResult = {},
             onError = {},
         )
