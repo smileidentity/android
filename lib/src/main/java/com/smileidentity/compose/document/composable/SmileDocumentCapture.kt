@@ -78,7 +78,7 @@ fun SmileDocumentCapture(
         }
     }
 
-    val analyzer = IdentityDocumentAnalyzer(
+    val analyzer = OpenCVIdentityDocumentAnalyzer(
         luminanceThreshold = 50,
         onResult = {
                 needsMoreLighting: Boolean,

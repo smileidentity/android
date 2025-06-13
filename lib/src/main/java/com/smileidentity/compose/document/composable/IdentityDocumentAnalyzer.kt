@@ -48,7 +48,6 @@ class IdentityDocumentAnalyzer(
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
         val startTime = System.currentTimeMillis()
-        val knownAspectRatio = 3.375f / 2.125f
 
         // YUV_420_888 is the format produced by CameraX and needed for Luminance calculation
         check(imageProxy.format == YUV_420_888) {

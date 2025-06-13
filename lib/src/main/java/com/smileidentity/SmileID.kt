@@ -68,6 +68,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.opencv.android.OpenCVLoader
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -133,6 +134,10 @@ object SmileID {
         // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
         if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
             Timber.plant(Timber.DebugTree())
+        }
+
+        if (OpenCVLoader.initLocal()) {
+            Timber.d("OpenCVIdentityDocumentAnalyzer loaded successfully")
         }
 
         SmileID.config = config

@@ -53,12 +53,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
         moduleName = "${groupId}_$artifactId"
         compileOptions {
             // https://kotlinlang.org/docs/opt-in-requirements.html#module-wide-opt-in
@@ -146,6 +146,8 @@ mavenPublishing {
 }
 
 dependencies {
+    implementation(project(":opencv"))
+
     // OkHttp is exposed in public SmileID interface (initialize), hence "api" vs "implementation"
     api(libs.okhttp)
     implementation(libs.retrofit)
