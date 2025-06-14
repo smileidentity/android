@@ -23,6 +23,7 @@ captures/
 # IntelliJ
 *.iml
 .idea/
+.idea/codeStyles
 
 # Keystore files
 *.jks
