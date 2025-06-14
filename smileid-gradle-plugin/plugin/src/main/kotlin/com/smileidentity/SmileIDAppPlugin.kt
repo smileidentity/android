@@ -42,6 +42,8 @@ internal class SmileIDAppPlugin : Plugin<Project> {
 
             dependencies {
                 add("implementation", libs.findLibrary("timber").get())
+                add("implementation", libs.findLibrary("coil.kt").get())
+                add("implementation", libs.findLibrary("coil.kt.compose").get())
             }
         }
     }

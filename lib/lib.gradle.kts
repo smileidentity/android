@@ -171,7 +171,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.annotation.experimental)
 
-    implementation(libs.coil)
+    // implementation(libs.coil.)
 
     // Logging
     implementation(libs.timber)
