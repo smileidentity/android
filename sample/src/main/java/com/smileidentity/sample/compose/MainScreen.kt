@@ -155,7 +155,7 @@ fun MainScreen(
                 navController,
                 startScreen.route,
                 Modifier
-                    .padding(innerPadding)
+                    .padding(innerPadding),
             ) {
                 composable(BottomNavigationScreen.Home.route) {
                     LaunchedEffect(Unit) { viewModel.onHomeSelected() }
