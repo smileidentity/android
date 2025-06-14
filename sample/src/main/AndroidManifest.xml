@@ -42,7 +42,6 @@
 
         <activity
                 android:name=".activity.JavaActivity"
-                android:label="Java Activity"
                 android:exported="true" />
 
     </application>

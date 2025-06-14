@@ -1,9 +1,10 @@
 package com.smileidentity.sample.compose
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.AutoMirrored
@@ -111,7 +112,7 @@ fun MainScreen(
         }
     }
     Scaffold(
-        modifier = modifier,
+        contentWindowInsets = WindowInsets.systemBars,
         snackbarHost = { Snackbar() },
         topBar = {
             // Show up button when not on a BottomNavigationScreen
@@ -149,13 +150,12 @@ fun MainScreen(
                 }
             }
         },
-        content = {
+        content = { innerPadding ->
             NavHost(
                 navController,
                 startScreen.route,
                 Modifier
-                    .padding(it)
-                    .consumeWindowInsets(it),
+                    .padding(innerPadding),
             ) {
                 composable(BottomNavigationScreen.Home.route) {
                     LaunchedEffect(Unit) { viewModel.onHomeSelected() }
