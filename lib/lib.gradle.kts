@@ -222,9 +222,9 @@ dependencies {
     // Bundled model
     implementation(libs.mlkit.obj.detection)
 
-    implementation(libs.tflite)
-    implementation(libs.tflite.metadata)
-    implementation(libs.tflite.support)
+    implementation(libs.litert)
+    implementation(libs.litert.metadata)
+    implementation(libs.litert.support)
 
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
