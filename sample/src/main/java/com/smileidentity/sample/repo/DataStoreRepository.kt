@@ -23,6 +23,7 @@ private typealias PartnerId = String
 private typealias IsProduction = Boolean
 private typealias JobsDataStoreMapKey = Pair<PartnerId, IsProduction>
 
+// todo delete this
 /**
  * Singleton wrapper to allow for typed usage of [androidx.datastore.core.DataStore].
  */
