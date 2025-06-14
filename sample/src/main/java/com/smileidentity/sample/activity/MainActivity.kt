@@ -10,8 +10,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.smileidentity.sample.compose.RootScreen
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class MainActivity : ComponentActivity() {
+@AndroidEntryPoint
+class MainActivity @Inject constructor() : ComponentActivity() {
     private val locationPermissionRequestCode = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
