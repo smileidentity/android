@@ -1,11 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
-rootProject.name = "SmileID"
-include("lib", "sample")
-rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
-
 pluginManagement {
     repositories {
+        includeBuild("smileid-gradle-plugin")
         google()
         mavenCentral()
         // gradlePluginPortal is last for faster builds
@@ -22,3 +19,8 @@ dependencyResolutionManagement {
         maven(url = "https://central.sonatype.com/repository/maven-snapshots/")
     }
 }
+
+rootProject.name = "SmileID"
+
+include("lib", "sample")
+rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }

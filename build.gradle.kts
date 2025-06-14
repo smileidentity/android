@@ -12,6 +12,8 @@ plugins {
     alias(libs.plugins.maven.publish) apply false
     alias(libs.plugins.moshix) apply false
     alias(libs.plugins.parcelize) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.room) apply false
 }
 
 tasks.create("clean", Delete::class.java) {

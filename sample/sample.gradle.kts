@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.smileid.android.app)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
@@ -11,12 +11,8 @@ plugins {
 
 android {
     namespace = "com.smileidentity.sample"
-    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.smileidentity.sample"
-        minSdk = 21
-        targetSdk = 35
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
         versionName = "1.6_" + project(":lib").version.toString()
