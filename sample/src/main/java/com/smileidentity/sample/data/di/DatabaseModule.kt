@@ -1,9 +1,9 @@
-package com.smileidentity.sample.database.di
+package com.smileidentity.sample.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.smileidentity.sample.database.SmileIDDatabase
-import com.smileidentity.sample.database.dao.JobsDao
+import com.smileidentity.sample.data.database.SmileIDDatabase
+import com.smileidentity.sample.data.database.dao.JobsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

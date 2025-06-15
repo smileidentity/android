@@ -1,17 +1,21 @@
-package com.smileidentity.sample.database.model
+package com.smileidentity.sample.data.database.model
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.smileidentity.models.JobType
 
-@Entity(indices = [Index(value = arrayOf("id"), unique = true)])
+@Entity(
+    indices = [
+        Index(value = arrayOf("jobId"), unique = true),
+    ],
+)
 data class Jobs(
-    @PrimaryKey
-    val id: String,
-    val jobType: JobType,
-    val timestamp: String,
-    val userId: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
+    val jobType: JobType = JobType.Unknown,
+    val timestamp: String = "",
+    val userId: String = "",
     val jobId: String,
     val jobComplete: Boolean = false,
     val jobSuccess: Boolean = false,

@@ -1,4 +1,4 @@
-package com.smileidentity.sample.database.migrations
+package com.smileidentity.sample.data.database.migrations
 
 /**
  * Automatic schema migrations sometimes require extra instructions to perform the migration, for
