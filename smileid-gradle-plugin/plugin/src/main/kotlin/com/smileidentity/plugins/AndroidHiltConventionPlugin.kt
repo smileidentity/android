@@ -18,6 +18,7 @@ internal object AndroidHiltConventionPlugin : Convention {
                 add("implementation", libs.findLibrary("hilt.core").get())
                 add("implementation", libs.findLibrary("hilt.android").get())
                 "ksp"(libs.findLibrary("hilt.compiler").get())
+                add("implementation", libs.findLibrary("hilt.compose").get())
                 add("androidTestImplementation", libs.findLibrary("hilt.android.testing").get())
                 add("testImplementation", libs.findLibrary("hilt.android.testing").get())
             }
