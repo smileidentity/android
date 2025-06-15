@@ -1,0 +1,118 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "b1911f9256a217779c2fd6358e413aa7",
+    "entities": [
+      {
+        "tableName": "Jobs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `jobType` INTEGER NOT NULL, `timestamp` TEXT NOT NULL, `userId` TEXT NOT NULL, `jobId` TEXT NOT NULL, `jobComplete` INTEGER NOT NULL, `jobSuccess` INTEGER NOT NULL, `code` TEXT, `resultCode` TEXT, `smileJobId` TEXT, `resultText` TEXT, `selfieImageUrl` TEXT, `livenessImagesUrl` TEXT, `documentFrontImageUrl` TEXT, `documentBackImageUrl` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "jobType",
+            "columnName": "jobType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "jobId",
+            "columnName": "jobId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "jobComplete",
+            "columnName": "jobComplete",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "jobSuccess",
+            "columnName": "jobSuccess",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "resultCode",
+            "columnName": "resultCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "smileJobId",
+            "columnName": "smileJobId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "resultText",
+            "columnName": "resultText",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "selfieImageUrl",
+            "columnName": "selfieImageUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "livenessImagesUrl",
+            "columnName": "livenessImagesUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "documentFrontImageUrl",
+            "columnName": "documentFrontImageUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "documentBackImageUrl",
+            "columnName": "documentBackImageUrl",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Jobs_jobId",
+            "unique": true,
+            "columnNames": [
+              "jobId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Jobs_jobId` ON `${TABLE_NAME}` (`jobId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b1911f9256a217779c2fd6358e413aa7')"
+    ]
+  }
+}
