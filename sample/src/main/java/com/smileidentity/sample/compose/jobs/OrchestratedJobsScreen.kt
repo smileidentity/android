@@ -7,10 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.sample.compose.components.ErrorScreen
+import com.smileidentity.sample.viewmodel.JobViewModel
 import com.smileidentity.sample.viewmodel.JobsViewModel
 import com.smileidentity.viewmodel.viewModelFactory
 
@@ -18,11 +20,13 @@ import com.smileidentity.viewmodel.viewModelFactory
 fun OrchestratedJobsScreen(
     isProduction: Boolean,
     modifier: Modifier = Modifier,
+    jobViewModel: JobViewModel = hiltViewModel(),
     viewModel: JobsViewModel = viewModel(
         key = isProduction.toString(),
         factory = viewModelFactory { JobsViewModel(isProduction) },
     ),
 ) {
+    jobViewModel.getLocalJobs()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val jobs by viewModel.jobs.collectAsStateWithLifecycle()
     Box(
