@@ -1,9 +1,10 @@
 # Release Notes
 
-## 11.0.4 (Unreleased)
+## 11.0.4
 
 ### Changed
-* Migrated from tflite to litert 
+* Migrated from tflite to litert
+* Updated to v1.0.1 of security sdk 
 
 ## 11.0.3
 
