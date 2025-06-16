@@ -92,12 +92,13 @@ jobs:
           name: Sample App APK
           path: sample/build/outputs/apk/release/sample-release.apk
       - name: Create GitHub Release
-        uses: elgohr/Github-Release-Action@v5
+        id: create_release
+        uses: softprops/action-gh-release@v2
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          title: v${{ steps.read_version.outputs.version }}
-          tag: v${{ steps.read_version.outputs.version }}
+          tag_name: v${{ steps.read_version.outputs.version }}
+          name: v${{ steps.read_version.outputs.version }}
           prerelease: ${{ steps.read_version.outputs.is_prerelease }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
@@ -117,28 +118,3 @@ jobs:
           asset_path: sample/build/outputs/apk/release/sample-release.apk
           asset_name: sample_${{ steps.read_version.outputs.version }}.apk
           asset_content_type: application/vnd.android.package-archive
-      - name: Bump Version
-        if: ${{ github.event.inputs.bump_version == 'true' }}
-        run: |
-          version=${{ steps.read_version.outputs.version }}
-          is_prerelease=${{ steps.read_version.outputs.is_prerelease }}
-          major=$(echo $version | cut -d. -f1)
-          minor=$(echo $version | cut -d. -f2)
-          patch=$(echo $version | cut -d. -f3)
-          if [[ $is_prerelease == "true" ]]; then
-            prerelease=$(echo $version | cut -d- -f2)
-            prerelease_number=$(echo $prerelease | cut -d0 -f2)
-            new_prerelease_number=$((prerelease_number + 1))
-            new_prerelease=$(echo $prerelease | sed "s/$prerelease_number/$new_prerelease_number/")
-            new_version="$major.$minor.$patch-$new_prerelease"
-          else
-            patch=$((patch + 1))
-            new_version="$major.$minor.$patch-SNAPSHOT"
-          fi
-          echo $new_version > ./lib/VERSION
-          
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --local user.name "${{ github.actor }}"
-          git add ./lib/VERSION
-          git commit -m "Prepare for next development iteration"
-          git push
