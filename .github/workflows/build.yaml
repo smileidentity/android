@@ -45,7 +45,7 @@ jobs:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Publish Snapshot
-        if: github.actor != 'dependabot[bot]'
+        if: github.event.pull_request.user.login != 'dependabot[bot]'
         run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
