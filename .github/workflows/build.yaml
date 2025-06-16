@@ -34,6 +34,9 @@ jobs:
             echo "Version $VERSION does not contain -SNAPSHOT"
             echo "version=$VERSION-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build, Test, Lint, Assemble
         # NB! The "lint" gradle action here is different than ktLint
         run: ./gradlew lint build assembleDebug
@@ -51,7 +54,6 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY_ID }}
-
       - name: Archive SDK AAR
         uses: actions/upload-artifact@v4
         with:
