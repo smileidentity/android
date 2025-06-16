@@ -29,7 +29,6 @@ import com.smileidentity.compose.components.ForceBrightness
 import com.smileidentity.compose.document.DocumentShapedBoundingBox
 import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
-import com.smileidentity.util.isCorrectAspectRatio
 import com.smileidentity.util.toast
 import com.ujizin.camposer.state.CamSelector
 import com.ujizin.camposer.state.CameraState
@@ -78,7 +77,7 @@ fun SmileDocumentCapture(
         }
     }
 
-    val analyzer = OpenCVIdentityDocumentAnalyzer(
+    val openCVAnalyzer = OpenCVIdentityDocumentAnalyzer(
         luminanceThreshold = 50,
         onResult = {
                 needsMoreLighting: Boolean,
@@ -89,10 +88,21 @@ fun SmileDocumentCapture(
                 isDocumentCentered: Boolean,
                 detectedAspectRatio: Float,
             ->
-            val isCorrectAspectRatio = isCorrectAspectRatio(
-                detectedAspectRatio = detectedAspectRatio,
-                knownAspectRatio = aspectRatio,
-            )
+        },
+        onError = { throwable -> onError(throwable) },
+    )
+
+    val documentAnalyzer = IdentityDocumentAnalyzer(
+        luminanceThreshold = 50,
+        onResult = {
+                needsMoreLighting: Boolean,
+                detectedDocument: Boolean,
+                isDocumentGlared: Boolean,
+                isDocumentBlurry: Boolean,
+                isDocumentTilted: Boolean,
+                isDocumentCentered: Boolean,
+                detectedAspectRatio: Float,
+            ->
         },
         onError = { throwable -> onError(throwable) },
     )
@@ -111,7 +121,16 @@ fun SmileDocumentCapture(
             SmileCameraPreview(
                 camSelector = camSelector,
                 imageAnalyzer = { imageProxy: ImageProxy, cameraState: CameraState ->
-                    analyzer.analyze(imageProxy = imageProxy)
+                    // only set one analyzer at a go
+
+                    // will use opencv implementation
+                    // Filter logcat with OpenCVIdentityDocumentAnalyzer to see the logs
+                    openCVAnalyzer.analyze(imageProxy = imageProxy)
+
+                    // will try to analyze pixels with no external library
+                    // could not get tilt detection to work here
+                    // Filter logcat with IdentityDocumentAnalyzer to see the logs
+                    // documentAnalyzer.analyze(imageProxy = imageProxy)
                 },
             )
 

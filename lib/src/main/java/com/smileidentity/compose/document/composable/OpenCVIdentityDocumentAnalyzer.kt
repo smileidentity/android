@@ -15,6 +15,11 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.smileidentity.SmileIDCrashReporting
+import com.smileidentity.util.calculateLuminance
+import java.io.ByteArrayOutputStream
+import java.text.DecimalFormat
+import kotlin.math.abs
+import kotlin.math.pow
 import org.opencv.android.Utils
 import org.opencv.core.Core
 import org.opencv.core.CvType
@@ -24,10 +29,6 @@ import org.opencv.core.MatOfPoint
 import org.opencv.core.MatOfPoint2f
 import org.opencv.imgproc.Imgproc
 import timber.log.Timber
-import java.io.ByteArrayOutputStream
-import java.text.DecimalFormat
-import kotlin.math.abs
-import kotlin.math.pow
 
 /**
  * Enhanced identity document analyzer that specifically detects ID cards, passports,
@@ -35,9 +36,10 @@ import kotlin.math.pow
  */
 class OpenCVIdentityDocumentAnalyzer(
     private val luminanceThreshold: Int = 50,
-    private val glareBaseThreshold: Int = 230,
+    private val glareBaseThreshold: Int = 240,
     private val glareBaseGlareRatio: Double = 0.05,
-    private val blurThreshold: Double = 2.5,
+    private val blurThreshold: Double = 100.0,
+    private val tiltAngleThreshold: Double = 5.0,
     private val onResult: (
         needsMoreLighting: Boolean,
         detectedDocument: Boolean,
@@ -64,13 +66,23 @@ class OpenCVIdentityDocumentAnalyzer(
 
         // YUV_420_888 is the format produced by CameraX and needed for Luminance calculation
         check(imageProxy.format == YUV_420_888) {
-            Timber.d("IdentityDocumentAnalyzer Unsupported format: ${imageProxy.format}")
+            Timber.d("OpenCVIdentityDocumentAnalyzer Unsupported format: ${imageProxy.format}")
             SmileIDCrashReporting.hub.addBreadcrumb("Unsupported format: ${imageProxy.format}")
             imageProxy.close()
             onError(Throwable("Unsupported format: ${imageProxy.format}"))
             return
         }
         val image = imageProxy.image
+
+        // Do a luminance check on the surface first
+        // the luminanceThreshold can be adjusted on the constructor
+        val luminance = calculateLuminance(imageProxy)
+        if (luminance < luminanceThreshold) {
+            Timber.d("OpenCVIdentityDocumentAnalyzer check Low luminance detected")
+            imageProxy.close()
+            onError(Throwable("Move to a well lit room"))
+            return
+        }
 
         val rotation = imageProxy.imageInfo.rotationDegrees
         val inputImage = InputImage.fromMediaImage(image!!, rotation)
@@ -81,25 +93,53 @@ class OpenCVIdentityDocumentAnalyzer(
         objectDetector.process(inputImage)
             .addOnSuccessListener { detectedObjects ->
                 if (detectedObjects.isNotEmpty()) {
-//                    val result = detectBlur(imageProxyToBitmap(imageProxy))
-//                    if (result.isBlurry) {
-//                        Timber.d("OpenCVIdentityDocumentAnalyzer Image is blurry. Blur value: ${result.blurValue}")
-//                    } else {
-//                        Timber.d("OpenCVIdentityDocumentAnalyzer Image is sharp. Blur value: ${result.blurValue}")
-//                    }
-
-//                    val result = detectGlare(imageProxyToBitmap(imageProxy))
-//                    if (result.hasGlare) {
-//                        Timber.d("OpenCVIdentityDocumentAnalyzer Image is Glared. Glare value: ${result.glareRatio}")
-//                    } else {
-//                        Timber.d("OpenCVIdentityDocumentAnalyzer Image is sharp. Glare value: ${result.glareRatio}")
-//                    }
-
-                    val tiltResult = detectTilt(imageProxyToBitmap(imageProxy))
-                    if (tiltResult.isTilted) {
-                        Timber.d("OpenCVIdentityDocumentAnalyzer Image is tilted by ${tiltResult.tiltAngle} degrees")
+                    val blurResult = detectBlur(
+                        bitmap = imageProxyToBitmap(imageProxy),
+                        threshold = blurThreshold,
+                    )
+                    if (blurResult.isBlurry) {
+                        Timber.d(
+                            "OpenCVIdentityDocumentAnalyzer Image is blurry. Blur value: " +
+                                "${blurResult.blurValue}",
+                        )
                     } else {
-                        Timber.d("OpenCVIdentityDocumentAnalyzer Image is properly aligned. Tilt angle: ${tiltResult.tiltAngle}")
+                        Timber.d(
+                            "OpenCVIdentityDocumentAnalyzer Image is sharp. Blur value: " +
+                                "${blurResult.blurValue}",
+                        )
+                    }
+
+                    val glareResult = detectGlare(
+                        bitmap = imageProxyToBitmap(imageProxy = imageProxy),
+                        pixelThreshold = glareBaseThreshold,
+                        glareRatioThreshold = glareBaseGlareRatio,
+                    )
+                    if (glareResult.hasGlare) {
+                        Timber.d(
+                            "OpenCVIdentityDocumentAnalyzer Image is Glared. Glare value: " +
+                                "${glareResult.glareRatio}",
+                        )
+                    } else {
+                        Timber.d(
+                            "OpenCVIdentityDocumentAnalyzer Image is sharp. Glare value: " +
+                                "${glareResult.glareRatio}",
+                        )
+                    }
+
+                    val tiltResult = detectTilt(
+                        bitmap = imageProxyToBitmap(imageProxy = imageProxy),
+                        angleThreshold = tiltAngleThreshold,
+                    )
+                    if (tiltResult.isTilted) {
+                        Timber.d(
+                            "OpenCVIdentityDocumentAnalyzer Image is tilted by " +
+                                "${tiltResult.tiltAngle} degrees",
+                        )
+                    } else {
+                        Timber.d(
+                            "OpenCVIdentityDocumentAnalyzer Image is properly aligned. " +
+                                "Tilt angle: ${tiltResult.tiltAngle}",
+                        )
                     }
                 }
             }
@@ -147,16 +187,12 @@ class OpenCVIdentityDocumentAnalyzer(
         val laplacianMat = Mat()
 
         try {
-            // Convert Bitmap to OpenCV Mat
             Utils.bitmapToMat(bitmap, sourceMat)
 
-            // Convert to grayscale
             Imgproc.cvtColor(sourceMat, grayMat, Imgproc.COLOR_BGR2GRAY)
 
-            // Apply Laplacian operator
             Imgproc.Laplacian(grayMat, laplacianMat, CvType.CV_64F)
 
-            // Calculate standard deviation
             val stdDev = MatOfDouble()
             Core.meanStdDev(laplacianMat, MatOfDouble(), stdDev)
             val variance = stdDev.get(0, 0)[0].pow(2.0)
@@ -183,7 +219,7 @@ class OpenCVIdentityDocumentAnalyzer(
     fun detectGlare(
         bitmap: Bitmap,
         pixelThreshold: Int = 240,
-        glareRatioThreshold: Double = 0.05
+        glareRatioThreshold: Double = 0.05,
     ): GlareResult {
         val src = Mat()
         val gray = Mat()
@@ -193,17 +229,21 @@ class OpenCVIdentityDocumentAnalyzer(
             Utils.bitmapToMat(bitmap, src)
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY)
 
-            // Threshold for very bright pixels
-            Imgproc.threshold(gray, thresholdMat, pixelThreshold.toDouble(), 255.0, Imgproc.THRESH_BINARY)
+            Imgproc.threshold(
+                gray,
+                thresholdMat,
+                pixelThreshold.toDouble(),
+                255.0,
+                Imgproc.THRESH_BINARY,
+            )
 
-            // Count bright pixels
             val brightPixels = Core.countNonZero(thresholdMat)
             val totalPixels = gray.rows() * gray.cols()
             val ratio = brightPixels.toDouble() / totalPixels.toDouble()
 
             return GlareResult(
                 hasGlare = ratio > glareRatioThreshold,
-                glareRatio = DecimalFormat("0.000").format(ratio).toDouble()
+                glareRatio = DecimalFormat("0.000").format(ratio).toDouble(),
             )
         } finally {
             src.release()
@@ -215,7 +255,7 @@ class OpenCVIdentityDocumentAnalyzer(
     data class GlareResult(val hasGlare: Boolean, val glareRatio: Double)
 
     /**
-     * Detects tilt angle of the dominant rectangular object (e.g., a document).
+     * Detects tilt angle of the dominant rectangular object (e.g a document).
      *
      * @param bitmap The input image (e.g., document photo).
      * @param angleThreshold Degrees of tilt allowed before it's considered "tilted".
@@ -228,31 +268,31 @@ class OpenCVIdentityDocumentAnalyzer(
         val contours = mutableListOf<MatOfPoint>()
 
         try {
-            // Step 1: Convert to grayscale
             Utils.bitmapToMat(bitmap, src)
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY)
 
-            // Step 2: Edge detection
             Imgproc.Canny(gray, edged, 50.0, 150.0)
 
-            // Step 3: Find contours
             val contourList = mutableListOf<MatOfPoint>()
-            Imgproc.findContours(edged, contourList, Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+            Imgproc.findContours(
+                edged,
+                contourList,
+                Mat(),
+                Imgproc.RETR_EXTERNAL,
+                Imgproc.CHAIN_APPROX_SIMPLE,
+            )
 
             if (contourList.isEmpty()) {
                 return TiltResult(true, 0.0) // No contours = assume upright or undecidable
             }
 
-            // Step 4: Find largest contour by area
-            val largestContour = contourList.maxByOrNull { Imgproc.contourArea(it) } ?: return TiltResult(true, 0.0)
+            val largestContour =
+                contourList.maxByOrNull { Imgproc.contourArea(it) } ?: return TiltResult(true, 0.0)
 
-            // Step 5: Get minAreaRect for the largest contour
             val contour2f = MatOfPoint2f(*largestContour.toArray())
             val rotatedRect = Imgproc.minAreaRect(contour2f)
             var angle = rotatedRect.angle
 
-            // Step 6: Normalize angle
-            // minAreaRect returns angle in range [-90, 0), adjust to human-readable form
             if (angle < -45) {
                 angle += 90
             }
@@ -260,7 +300,6 @@ class OpenCVIdentityDocumentAnalyzer(
             val isUpright = abs(angle) <= angleThreshold
 
             return TiltResult(!isUpright, DecimalFormat("0.0").format(angle).toDouble())
-
         } finally {
             src.release()
             gray.release()
@@ -270,5 +309,4 @@ class OpenCVIdentityDocumentAnalyzer(
     }
 
     data class TiltResult(val isTilted: Boolean, val tiltAngle: Double)
-
 }
