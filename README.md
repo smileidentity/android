@@ -6,7 +6,7 @@
 
 [![Build](https://github.com/smileidentity/android/actions/workflows/build.yaml/badge.svg)](https://github.com/smileidentity/android/actions/workflows/build.yaml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.smileidentity/android-sdk)](https://mvnrepository.com/artifact/com.smileidentity/android-sdk)
-[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.smileidentity/android-sdk?server=https%3A%2F%2Foss.sonatype.org)](https://oss.sonatype.org/content/repositories/snapshots/com/smileidentity/android-sdk/)
+[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.smileidentity/android-sdk?server=https%3A%2F%2Foss.sonatype.org)](https://central.sonatype.com/repository/maven-snapshots/snapshots/com/smileidentity/android-sdk/)
 [![Build Sample App](https://github.com/smileidentity/android/actions/workflows/build_app.yaml/badge.svg)](https://github.com/smileidentity/android/actions/workflows/build_app.yaml)
 
 Smile ID provides the best solutions for Real Time Digital KYC, Identity Verification, User
