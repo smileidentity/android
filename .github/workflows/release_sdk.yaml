@@ -6,11 +6,6 @@ on:
         description: 'The version to release. If not specified, the version will be inferred'
         required: false
         default: ''
-      bump_version:
-        type: boolean
-        description: 'Whether to automatically bump and commit the version after the release'
-        required: true
-        default: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
