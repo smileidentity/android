@@ -1,6 +1,6 @@
 # Release Notes
 
-## 11.0.4
+## 11.0.4 - June 16, 2025
 
 ### Changed
 * Migrated from tflite to litert
