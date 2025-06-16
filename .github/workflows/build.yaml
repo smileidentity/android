@@ -36,9 +36,17 @@ jobs:
           fi
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Build, Test, Lint, Assemble, Publish Snapshot
+
+      - name: Build, Test, Lint, Assemble
         # NB! The "lint" gradle action here is different than ktLint
-        run: ./gradlew lint build assembleDebug publish
+        run: ./gradlew lint build assembleDebug
+        env:
+          ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
+          ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+      - name: Publish Snapshot
+        if: github.event_name != 'pull_request' || github.event.pull_request.user.login != 'dependabot[bot]'
+        run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
