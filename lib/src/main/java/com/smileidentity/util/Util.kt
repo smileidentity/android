@@ -150,7 +150,10 @@ fun calculateBlur(imageProxy: ImageProxy): Double {
     buffer.get(pixelData)
     buffer.rewind()
 
-    Timber.d("Blur detection: Resolution: ${width}x$height, Sample rate: ${adaptiveSampleRate * 100}%, Buffer size: $bufferSize")
+    Timber.d(
+        "Blur detection: Resolution: ${width}x$height, Sample rate: " +
+            "${adaptiveSampleRate * 100}%, Buffer size: $bufferSize",
+    )
 
     val samplingStep = max(1, (1.0 / sqrt(adaptiveSampleRate)).toInt())
     var gradientSum = 0.0
@@ -159,7 +162,11 @@ fun calculateBlur(imageProxy: ImageProxy): Double {
     val maxY = min(height - samplingStep, (bufferSize / rowStride).toInt())
     for (y in samplingStep until maxY step samplingStep) {
         val rowStartOffset = y * rowStride
-        val maxX = min(width - samplingStep, ((bufferSize - rowStartOffset) / pixelStride).toInt() - samplingStep)
+        val maxX =
+            min(
+                width - samplingStep,
+                ((bufferSize - rowStartOffset) / pixelStride).toInt() - samplingStep,
+            )
 
         for (x in samplingStep until maxX step samplingStep) {
             try {
