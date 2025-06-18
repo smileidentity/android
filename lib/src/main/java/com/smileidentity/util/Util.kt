@@ -43,6 +43,7 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sqrt
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -115,10 +116,17 @@ fun calculateLuminance(imageProxy: ImageProxy): Double {
     return sum / data.limit()
 }
 
-internal fun detectBlur(imageProxy: ImageProxy, blurThreshold: Double = 100.0): Boolean {
-    require(blurThreshold > 0)
-
-    if (imageProxy.planes.isEmpty()) return true
+/**
+ * Calculates the blur level of an image using luminance gradients with adaptive sampling.
+ * Higher values indicate sharper images (less blur). Lower values indicate more blur.
+ *
+ * @param imageProxy The camera image to analyze
+ * @return Average gradient value (0.0 = maximum blur, higher values = sharper image)
+ */
+fun calculateBlur(imageProxy: ImageProxy): Double {
+    // Return 0.0 (maximum blur) for invalid inputs
+    if (imageProxy.planes.isEmpty()) return 0.0
+    if (imageProxy.width <= 2 || imageProxy.height <= 2) return 0.0
 
     val plane = imageProxy.planes[0]
     val buffer = plane.buffer
@@ -127,106 +135,63 @@ internal fun detectBlur(imageProxy: ImageProxy, blurThreshold: Double = 100.0): 
     val width = imageProxy.width
     val height = imageProxy.height
 
-    if (width <= 2 || height <= 2) return true
-
-    val step = when {
-        width * height > 4_000_000 -> 3
-        width * height > 1_000_000 -> 2
-        else -> 1
+    val pixelCount = width * height
+    val adaptiveSampleRate = when {
+        pixelCount >= 8_000_000 -> 0.01
+        pixelCount >= 3_000_000 -> 0.02
+        pixelCount >= 1_000_000 -> 0.03
+        pixelCount >= 500_000 -> 0.05
+        else -> 0.1
     }
 
     buffer.rewind()
-    val data = ByteArray(buffer.remaining())
-    buffer.get(data)
+    val bufferSize = buffer.remaining()
+    val pixelData = ByteArray(bufferSize)
+    buffer.get(pixelData)
+    buffer.rewind()
 
-    val gradients = mutableListOf<Double>()
+    Timber.d("Blur detection: Resolution: ${width}x$height, Sample rate: ${adaptiveSampleRate * 100}%, Buffer size: $bufferSize")
 
-    for (y in step until height - step step step) {
-        for (x in step until width - step step step) {
+    val samplingStep = max(1, (1.0 / sqrt(adaptiveSampleRate)).toInt())
+    var gradientSum = 0.0
+    var gradientCount = 0
+
+    val maxY = min(height - samplingStep, (bufferSize / rowStride).toInt())
+    for (y in samplingStep until maxY step samplingStep) {
+        val rowStartOffset = y * rowStride
+        val maxX = min(width - samplingStep, ((bufferSize - rowStartOffset) / pixelStride).toInt() - samplingStep)
+
+        for (x in samplingStep until maxX step samplingStep) {
             try {
-                val idxTL = (y - step) * rowStride + (x - step) * pixelStride
-                val idxTC = (y - step) * rowStride + x * pixelStride
-                val idxTR = (y - step) * rowStride + (x + step) * pixelStride
-
-                val idxCL = y * rowStride + (x - step) * pixelStride
-                val idxCR = y * rowStride + (x + step) * pixelStride
-
-                val idxBL = (y + step) * rowStride + (x - step) * pixelStride
-                val idxBC = (y + step) * rowStride + x * pixelStride
-                val idxBR = (y + step) * rowStride + (x + step) * pixelStride
-
-                if (idxTL < 0 || idxBR >= data.size) continue
-
-                val pTL = data[idxTL].toInt() and 0xFF
-                val pTC = data[idxTC].toInt() and 0xFF
-                val pTR = data[idxTR].toInt() and 0xFF
-                val pCL = data[idxCL].toInt() and 0xFF
-                val pCR = data[idxCR].toInt() and 0xFF
-                val pBL = data[idxBL].toInt() and 0xFF
-                val pBC = data[idxBC].toInt() and 0xFF
-                val pBR = data[idxBR].toInt() and 0xFF
-
-                val gx = (pTR + 2 * pCR + pBR) - (pTL + 2 * pCL + pBL)
-                val gy = (pBL + 2 * pBC + pBR) - (pTL + 2 * pTC + pTR)
-
-                val gradient = sqrt((gx * gx + gy * gy).toDouble())
-                gradients.add(gradient)
-
+                val idxCenter = rowStartOffset + x * pixelStride
+                if (idxCenter >= bufferSize) continue
+                val pCenter = pixelData[idxCenter].toInt() and 0xFF
+                val idxRight = rowStartOffset + (x + samplingStep) * pixelStride
+                if (idxRight < bufferSize) {
+                    val pRight = pixelData[idxRight].toInt() and 0xFF
+                    gradientSum += abs(pRight - pCenter)
+                    gradientCount++
+                }
+                val idxDown = (y + samplingStep) * rowStride + x * pixelStride
+                if (idxDown < bufferSize) {
+                    val pDown = pixelData[idxDown].toInt() and 0xFF
+                    gradientSum += abs(pDown - pCenter)
+                    gradientCount++
+                }
             } catch (e: Exception) {
-                Timber.e(e, "Blur detection: Error processing pixel at ($x, $y)")
+                Timber.w("Blur detection: Skipped pixel at ($x, $y): ${e.message}")
             }
         }
     }
 
-    if (gradients.isEmpty()) return true
+    Timber.d("Blur detection: samples=$gradientCount")
 
-    val median = getMedian(gradients)
-    Timber.d("Blur detection: medianGradient=$median, threshold=$blurThreshold")
-    return median < blurThreshold
-}
+    // Return 0.0 (maximum blur) if no gradients could be calculated
+    if (gradientCount == 0) return 0.0
 
-fun getMedian(gradients: MutableList<Double>): Double {
-    val size = gradients.size
-    return if (size % 2 == 1) {
-        quickSelect(gradients = gradients, k = size / 2)
-    } else {
-        val left = quickSelect(gradients.toMutableList(), size / 2 - 1)
-        val right = quickSelect(gradients, size / 2)
-        (left + right) / 2.0
-    }
-}
-
-fun quickSelect(gradients: MutableList<Double>, k: Int): Double {
-    fun partition(left: Int, right: Int, pivotIndex: Int): Int {
-        val pivotValue = gradients[pivotIndex]
-        gradients[pivotIndex] = gradients[right]
-        gradients[right] = pivotValue
-
-        var storeIndex = left
-        for (i in left until right) {
-            if (gradients[i] < pivotValue) {
-                gradients[i] = gradients[storeIndex].also { gradients[storeIndex] = gradients[i] }
-                storeIndex++
-            }
-        }
-        gradients[right] = gradients[storeIndex].also { gradients[storeIndex] = gradients[right] }
-        return storeIndex
-    }
-
-    var left = 0
-    var right = gradients.size - 1
-    var kIndex = k
-
-    while (true) {
-        val pivotIndex = (left..right).random()
-        val index = partition(left, right, pivotIndex)
-
-        when {
-            index == kIndex -> return gradients[kIndex]
-            index < kIndex -> left = index + 1
-            else -> right = index - 1
-        }
-    }
+    val avgGradient = gradientSum / gradientCount
+    Timber.d("Blur detection: avgGradient=$avgGradient, samples=$gradientCount")
+    return avgGradient
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =

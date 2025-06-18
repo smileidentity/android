@@ -19,9 +19,9 @@ import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.metadata.models.DocumentImageOriginValue
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.util.calculateBlur
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
-import com.smileidentity.util.detectBlur
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -40,6 +40,7 @@ import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
 private const val LUMINANCE_THRESHOLD = 35
+private const val BLUR_THRESHOLD = 10.0
 private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
 private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
 private const val DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS = 1_000L
@@ -58,7 +59,7 @@ data class DocumentCaptureUiState(
 enum class DocumentDirective(@StringRes val displayText: Int) {
     DefaultInstructions(R.string.si_doc_v_capture_directive_default),
     EnsureWellLit(R.string.si_doc_v_capture_directive_ensure_well_lit),
-    BlurryDocument(R.string.si_doc_v_capture_directive_ensure_well_lit),
+    BlurryDocument(R.string.si_doc_v_capture_directive_blurry_document),
     Focusing(R.string.si_doc_v_capture_directive_focusing),
     Capturing(R.string.si_doc_v_capture_directive_capturing),
 }
@@ -339,7 +340,7 @@ class DocumentCaptureViewModel(
         }
         lastAnalysisTimeMs = System.currentTimeMillis()
 
-        val luminance = calculateLuminance(imageProxy)
+        val luminance = calculateLuminance(imageProxy = imageProxy)
         if (luminance < LUMINANCE_THRESHOLD) {
             _uiState.update {
                 it.copy(directive = DocumentDirective.EnsureWellLit, areEdgesDetected = false)
@@ -348,7 +349,8 @@ class DocumentCaptureViewModel(
             return
         }
 
-        if (detectBlur(imageProxy)) {
+        val blur = calculateBlur(imageProxy = imageProxy)
+        if (blur < BLUR_THRESHOLD) {
             _uiState.update {
                 it.copy(directive = DocumentDirective.BlurryDocument, areEdgesDetected = false)
             }
