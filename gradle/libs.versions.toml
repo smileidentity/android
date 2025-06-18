@@ -54,12 +54,12 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
@@ -118,6 +118,7 @@ retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", 
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 sentry = { module = "io.sentry:sentry" }
 sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
+sentry-android-timber = { module = "io.sentry:sentry-android-timber" }
 smileid-security = { module = "com.smileidentity:android-security", version.ref = "smileid-security" }
 litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
 litert-metadata = { group = "com.google.ai.edge.litert", name = "litert-metadata", version.ref = "litert-metadata" }
