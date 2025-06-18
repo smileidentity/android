@@ -21,6 +21,7 @@ import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
+import com.smileidentity.util.detectBlur
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
@@ -57,6 +58,7 @@ data class DocumentCaptureUiState(
 enum class DocumentDirective(@StringRes val displayText: Int) {
     DefaultInstructions(R.string.si_doc_v_capture_directive_default),
     EnsureWellLit(R.string.si_doc_v_capture_directive_ensure_well_lit),
+    BlurryDocument(R.string.si_doc_v_capture_directive_ensure_well_lit),
     Focusing(R.string.si_doc_v_capture_directive_focusing),
     Capturing(R.string.si_doc_v_capture_directive_capturing),
 }
@@ -187,6 +189,7 @@ class DocumentCaptureViewModel(
                                                 ),
                                             )
                                         }
+
                                         DocumentCaptureSide.Back -> {
                                             metadata.add(
                                                 Metadatum.DocumentBackCaptureDuration(
@@ -340,6 +343,14 @@ class DocumentCaptureViewModel(
         if (luminance < LUMINANCE_THRESHOLD) {
             _uiState.update {
                 it.copy(directive = DocumentDirective.EnsureWellLit, areEdgesDetected = false)
+            }
+            imageProxy.close()
+            return
+        }
+
+        if (detectBlur(imageProxy)) {
+            _uiState.update {
+                it.copy(directive = DocumentDirective.BlurryDocument, areEdgesDetected = false)
             }
             imageProxy.close()
             return

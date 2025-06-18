@@ -43,6 +43,7 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.sqrt
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okio.IOException
@@ -112,6 +113,120 @@ fun calculateLuminance(imageProxy: ImageProxy): Double {
         sum += data.get().toInt() and 0xFF
     }
     return sum / data.limit()
+}
+
+internal fun detectBlur(imageProxy: ImageProxy, blurThreshold: Double = 100.0): Boolean {
+    require(blurThreshold > 0)
+
+    if (imageProxy.planes.isEmpty()) return true
+
+    val plane = imageProxy.planes[0]
+    val buffer = plane.buffer
+    val rowStride = plane.rowStride
+    val pixelStride = plane.pixelStride
+    val width = imageProxy.width
+    val height = imageProxy.height
+
+    if (width <= 2 || height <= 2) return true
+
+    val step = when {
+        width * height > 4_000_000 -> 3
+        width * height > 1_000_000 -> 2
+        else -> 1
+    }
+
+    buffer.rewind()
+    val data = ByteArray(buffer.remaining())
+    buffer.get(data)
+
+    val gradients = mutableListOf<Double>()
+
+    for (y in step until height - step step step) {
+        for (x in step until width - step step step) {
+            try {
+                val idxTL = (y - step) * rowStride + (x - step) * pixelStride
+                val idxTC = (y - step) * rowStride + x * pixelStride
+                val idxTR = (y - step) * rowStride + (x + step) * pixelStride
+
+                val idxCL = y * rowStride + (x - step) * pixelStride
+                val idxCR = y * rowStride + (x + step) * pixelStride
+
+                val idxBL = (y + step) * rowStride + (x - step) * pixelStride
+                val idxBC = (y + step) * rowStride + x * pixelStride
+                val idxBR = (y + step) * rowStride + (x + step) * pixelStride
+
+                if (idxTL < 0 || idxBR >= data.size) continue
+
+                val pTL = data[idxTL].toInt() and 0xFF
+                val pTC = data[idxTC].toInt() and 0xFF
+                val pTR = data[idxTR].toInt() and 0xFF
+                val pCL = data[idxCL].toInt() and 0xFF
+                val pCR = data[idxCR].toInt() and 0xFF
+                val pBL = data[idxBL].toInt() and 0xFF
+                val pBC = data[idxBC].toInt() and 0xFF
+                val pBR = data[idxBR].toInt() and 0xFF
+
+                val gx = (pTR + 2 * pCR + pBR) - (pTL + 2 * pCL + pBL)
+                val gy = (pBL + 2 * pBC + pBR) - (pTL + 2 * pTC + pTR)
+
+                val gradient = sqrt((gx * gx + gy * gy).toDouble())
+                gradients.add(gradient)
+
+            } catch (e: Exception) {
+                Timber.e(e, "Blur detection: Error processing pixel at ($x, $y)")
+            }
+        }
+    }
+
+    if (gradients.isEmpty()) return true
+
+    val median = getMedian(gradients)
+    Timber.d("Blur detection: medianGradient=$median, threshold=$blurThreshold")
+    return median < blurThreshold
+}
+
+fun getMedian(gradients: MutableList<Double>): Double {
+    val size = gradients.size
+    return if (size % 2 == 1) {
+        quickSelect(gradients = gradients, k = size / 2)
+    } else {
+        val left = quickSelect(gradients.toMutableList(), size / 2 - 1)
+        val right = quickSelect(gradients, size / 2)
+        (left + right) / 2.0
+    }
+}
+
+fun quickSelect(gradients: MutableList<Double>, k: Int): Double {
+    fun partition(left: Int, right: Int, pivotIndex: Int): Int {
+        val pivotValue = gradients[pivotIndex]
+        gradients[pivotIndex] = gradients[right]
+        gradients[right] = pivotValue
+
+        var storeIndex = left
+        for (i in left until right) {
+            if (gradients[i] < pivotValue) {
+                gradients[i] = gradients[storeIndex].also { gradients[storeIndex] = gradients[i] }
+                storeIndex++
+            }
+        }
+        gradients[right] = gradients[storeIndex].also { gradients[storeIndex] = gradients[right] }
+        return storeIndex
+    }
+
+    var left = 0
+    var right = gradients.size - 1
+    var kIndex = k
+
+    while (true) {
+        val pivotIndex = (left..right).random()
+        val index = partition(left, right, pivotIndex)
+
+        when {
+            index == kIndex -> return gradients[kIndex]
+            index < kIndex -> left = index + 1
+            else -> right = index - 1
+        }
+    }
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
