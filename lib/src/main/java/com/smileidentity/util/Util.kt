@@ -43,6 +43,8 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okio.IOException
@@ -112,6 +114,91 @@ fun calculateLuminance(imageProxy: ImageProxy): Double {
         sum += data.get().toInt() and 0xFF
     }
     return sum / data.limit()
+}
+
+/**
+ * Calculates the blur level of an image using luminance gradients with adaptive sampling.
+ * Higher values indicate sharper images (less blur). Lower values indicate more blur.
+ *
+ * @param imageProxy The camera image to analyze
+ * @return Average gradient value (0.0 = maximum blur, higher values = sharper image)
+ */
+fun calculateBlur(imageProxy: ImageProxy): Double {
+    // Return 0.0 (maximum blur) for invalid inputs
+    if (imageProxy.planes.isEmpty()) return 0.0
+    if (imageProxy.width <= 2 || imageProxy.height <= 2) return 0.0
+
+    val plane = imageProxy.planes[0]
+    val buffer = plane.buffer
+    val rowStride = plane.rowStride
+    val pixelStride = plane.pixelStride
+    val width = imageProxy.width
+    val height = imageProxy.height
+
+    val pixelCount = width * height
+    val adaptiveSampleRate = when {
+        pixelCount >= 8_000_000 -> 0.01
+        pixelCount >= 3_000_000 -> 0.02
+        pixelCount >= 1_000_000 -> 0.03
+        pixelCount >= 500_000 -> 0.05
+        else -> 0.1
+    }
+
+    buffer.rewind()
+    val bufferSize = buffer.remaining()
+    val pixelData = ByteArray(bufferSize)
+    buffer.get(pixelData)
+    buffer.rewind()
+
+    Timber.d(
+        "Blur detection: Resolution: ${width}x$height, Sample rate: " +
+            "${adaptiveSampleRate * 100}%, Buffer size: $bufferSize",
+    )
+
+    val samplingStep = max(1, (1.0 / sqrt(adaptiveSampleRate)).toInt())
+    var gradientSum = 0.0
+    var gradientCount = 0
+
+    val maxY = min(height - samplingStep, (bufferSize / rowStride).toInt())
+    for (y in samplingStep until maxY step samplingStep) {
+        val rowStartOffset = y * rowStride
+        val maxX =
+            min(
+                width - samplingStep,
+                ((bufferSize - rowStartOffset) / pixelStride).toInt() - samplingStep,
+            )
+
+        for (x in samplingStep until maxX step samplingStep) {
+            try {
+                val idxCenter = rowStartOffset + x * pixelStride
+                if (idxCenter >= bufferSize) continue
+                val pCenter = pixelData[idxCenter].toInt() and 0xFF
+                val idxRight = rowStartOffset + (x + samplingStep) * pixelStride
+                if (idxRight < bufferSize) {
+                    val pRight = pixelData[idxRight].toInt() and 0xFF
+                    gradientSum += abs(pRight - pCenter)
+                    gradientCount++
+                }
+                val idxDown = (y + samplingStep) * rowStride + x * pixelStride
+                if (idxDown < bufferSize) {
+                    val pDown = pixelData[idxDown].toInt() and 0xFF
+                    gradientSum += abs(pDown - pCenter)
+                    gradientCount++
+                }
+            } catch (e: Exception) {
+                Timber.w("Blur detection: Skipped pixel at ($x, $y): ${e.message}")
+            }
+        }
+    }
+
+    Timber.d("Blur detection: samples=$gradientCount")
+
+    // Return 0.0 (maximum blur) if no gradients could be calculated
+    if (gradientCount == 0) return 0.0
+
+    val avgGradient = gradientSum / gradientCount
+    Timber.d("Blur detection: avgGradient=$avgGradient, samples=$gradientCount")
+    return avgGradient
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
