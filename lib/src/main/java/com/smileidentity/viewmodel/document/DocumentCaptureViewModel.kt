@@ -142,7 +142,7 @@ class DocumentCaptureViewModel(
      * To be called when auto capture determines the image quality is sufficient or when the user
      * taps the manual capture button.
      */
-    fun captureDocument(cameraState: CameraState) {
+    private fun captureDocument(cameraState: CameraState) {
         if (isCapturing || uiState.value.documentImageToConfirm != null) {
             Timber.v("Already capturing. Skipping duplicate capture request")
             return
@@ -154,9 +154,7 @@ class DocumentCaptureViewModel(
                 _uiState.update {
                     it.copy(showCaptureInProgress = true, directive = DocumentDirective.Capturing)
                 }
-
                 val documentFile = createDocumentFile(jobId, (side == DocumentCaptureSide.Front))
-
                 cameraState.takePicture(documentFile) { result ->
                     when (result) {
                         is ImageCaptureResult.Success -> {
@@ -349,15 +347,6 @@ class DocumentCaptureViewModel(
             return
         }
 
-        val blur = calculateBlur(imageProxy = imageProxy)
-        if (blur < BLUR_THRESHOLD) {
-            _uiState.update {
-                it.copy(directive = DocumentDirective.BlurryDocument, areEdgesDetected = false)
-            }
-            imageProxy.close()
-            return
-        }
-
         _uiState.update { it.copy(directive = DocumentDirective.DefaultInstructions) }
         val rotation = imageProxy.imageInfo.rotationDegrees
         val inputImage = InputImage.fromMediaImage(image, rotation)
@@ -397,6 +386,17 @@ class DocumentCaptureViewModel(
                         )
                     }
 
+                    val blur = calculateBlur(imageProxy = imageProxy)
+                    if (blur < BLUR_THRESHOLD) {
+                        _uiState.update {
+                            it.copy(
+                                directive = DocumentDirective.BlurryDocument,
+                                areEdgesDetected = false,
+                            )
+                        }
+                        imageProxy.close()
+                    }
+
                     if (captureNextAnalysisFrame &&
                         areEdgesDetected &&
                         !isCapturing &&
@@ -405,7 +405,16 @@ class DocumentCaptureViewModel(
                     ) {
                         captureNextAnalysisFrame = false
                         documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
-                        captureDocument(cameraState)
+
+                        val documentFile = createDocumentFile(
+                            jobId = jobId,
+                            isFront = (side == DocumentCaptureSide.Front),
+                        )
+
+                        postProcessImage(
+                            file = documentFile,
+                            desiredAspectRatio = uiState.value.idAspectRatio,
+                        )
                     }
                 }
             }
