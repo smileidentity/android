@@ -4,6 +4,7 @@ import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
@@ -142,6 +143,7 @@ class DocumentCaptureViewModel(
      * To be called when auto capture determines the image quality is sufficient or when the user
      * taps the manual capture button.
      */
+    @VisibleForTesting
     private fun captureDocument(cameraState: CameraState) {
         if (isCapturing || uiState.value.documentImageToConfirm != null) {
             Timber.v("Already capturing. Skipping duplicate capture request")
@@ -378,14 +380,6 @@ class DocumentCaptureViewModel(
                         1 / (knownAspectRatio ?: detectedAspectRatio)
                     }
 
-                    val areEdgesDetected = isCentered && isCorrectAspectRatio
-                    _uiState.update {
-                        it.copy(
-                            areEdgesDetected = areEdgesDetected,
-                            idAspectRatio = idAspectRatio,
-                        )
-                    }
-
                     val blur = calculateBlur(imageProxy = imageProxy)
                     if (blur < BLUR_THRESHOLD) {
                         _uiState.update {
@@ -395,6 +389,14 @@ class DocumentCaptureViewModel(
                             )
                         }
                         imageProxy.close()
+                    }
+
+                    val areEdgesDetected = isCentered && isCorrectAspectRatio
+                    _uiState.update {
+                        it.copy(
+                            areEdgesDetected = areEdgesDetected,
+                            idAspectRatio = idAspectRatio,
+                        )
                     }
 
                     if (captureNextAnalysisFrame &&
