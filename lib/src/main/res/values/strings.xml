@@ -84,6 +84,7 @@
     <string name="si_doc_v_capture_instructions_back_title">Back of ID</string>
     <string name="si_doc_v_capture_directive_default">Please fill the frame with your ID. Ensure all corners are visible and there is no glare</string>
     <string name="si_doc_v_capture_directive_ensure_well_lit">Ensure the document is well lit</string>
+    <string name="si_doc_v_capture_directive_blurry_document">Ensure the document is not blurry</string>
     <string name="si_doc_v_capture_directive_focusing">Focusing…</string>
     <string name="si_doc_v_capture_directive_capturing">Capturing…</string>
     <string name="si_doc_v_capture_error_subtitle">Your document capture failed to process</string>
