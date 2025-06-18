@@ -66,8 +66,8 @@ object SmileIDCrashReporting {
             addIntegration(
                 SentryTimberIntegration(
                     minEventLevel = SentryLevel.ERROR,
-                    minBreadcrumbLevel = SentryLevel.INFO
-                )
+                    minBreadcrumbLevel = SentryLevel.INFO,
+                ),
             )
         }
 
