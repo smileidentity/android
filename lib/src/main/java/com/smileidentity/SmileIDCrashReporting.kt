@@ -9,9 +9,11 @@ import io.sentry.Scope
 import io.sentry.Scopes
 import io.sentry.SentryClient
 import io.sentry.SentryEvent
+import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.SentryOptions.BeforeSendCallback
 import io.sentry.UncaughtExceptionHandlerIntegration
+import io.sentry.android.timber.SentryTimberIntegration
 import io.sentry.protocol.User
 import timber.log.Timber
 
@@ -60,6 +62,13 @@ object SmileIDCrashReporting {
                 }
                 return@BeforeSendCallback null
             }
+            // Add the Timber integration to capture logs as breadcrumbs
+            addIntegration(
+                SentryTimberIntegration(
+                    minEventLevel = SentryLevel.ERROR,
+                    minBreadcrumbLevel = SentryLevel.INFO,
+                ),
+            )
         }
 
         // Create scopes
