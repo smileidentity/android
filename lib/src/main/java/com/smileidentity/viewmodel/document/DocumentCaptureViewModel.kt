@@ -4,7 +4,6 @@ import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
-import androidx.annotation.VisibleForTesting
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
@@ -143,8 +142,7 @@ class DocumentCaptureViewModel(
      * To be called when auto capture determines the image quality is sufficient or when the user
      * taps the manual capture button.
      */
-    @VisibleForTesting
-    private fun captureDocument(cameraState: CameraState) {
+    fun captureDocument(cameraState: CameraState) {
         if (isCapturing || uiState.value.documentImageToConfirm != null) {
             Timber.v("Already capturing. Skipping duplicate capture request")
             return
