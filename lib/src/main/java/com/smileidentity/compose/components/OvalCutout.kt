@@ -79,26 +79,24 @@ fun OvalCutout(
     val progressAnimationSpec = spring<Float>(
         dampingRatio = Spring.DampingRatioLowBouncy,
         stiffness = Spring.StiffnessVeryLow,
+        visibilityThreshold = 0.003f,
     )
 
     val topProgress by animateFloatAsState(
         targetValue = state.topProgress,
         animationSpec = progressAnimationSpec,
-        visibilityThreshold = 0.01f,
         label = "selfie_top_progress",
     )
 
     val rightProgress by animateFloatAsState(
         targetValue = state.rightProgress,
         animationSpec = progressAnimationSpec,
-        visibilityThreshold = 0.01f,
         label = "selfie_right_progress",
     )
 
     val leftProgress by animateFloatAsState(
         targetValue = state.leftProgress,
         animationSpec = progressAnimationSpec,
-        visibilityThreshold = 0.01f,
         label = "selfie_left_progress",
     )
 
