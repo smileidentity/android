@@ -23,6 +23,8 @@ import com.smileidentity.util.calculateBlur
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
+import com.smileidentity.util.postProcessImageBitmap
+import com.smileidentity.util.rotated
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
@@ -40,10 +42,10 @@ import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
 private const val LUMINANCE_THRESHOLD = 35
-private const val BLUR_THRESHOLD = 10.0
+private const val DOCUMENT_QUALITY_THRESHOLD = 0.5f
+private const val DOCUMENT_QUALITY_HISTORY_LENGTH = 5
 private const val CORRECT_ASPECT_RATIO_TOLERANCE = 0.1f
 private const val CENTERED_BOUNDING_BOX_TOLERANCE = 30
-private const val DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS = 1_000L
 
 data class DocumentCaptureUiState(
     val acknowledgedInstructions: Boolean = false,
@@ -79,6 +81,7 @@ class DocumentCaptureViewModel(
         private set
     private val _uiState = MutableStateFlow(DocumentCaptureUiState())
     val uiState = _uiState.asStateFlow()
+    private val blurQualityHistory = mutableListOf<Float>()
     private var lastAnalysisTimeMs = 0L
     private var isCapturing = false
     private var isFocusing = false
@@ -245,6 +248,7 @@ class DocumentCaptureViewModel(
                 metadata.removeAll { it is Metadatum.DocumentBackImageOrigin }
             }
         }
+        blurQualityHistory.clear()
         isCapturing = false
         documentImageOrigin = null
         documentCaptureRetries++
@@ -332,6 +336,8 @@ class DocumentCaptureViewModel(
         val rotation = imageProxy.imageInfo.rotationDegrees
         val inputImage = InputImage.fromMediaImage(image, rotation)
 
+        val bitmap = imageProxy.toBitmap().rotated(imageProxy.imageInfo.rotationDegrees)
+
         // Create a separate variable to close later
         val proxyToClose = imageProxy
 
@@ -359,17 +365,6 @@ class DocumentCaptureViewModel(
                         1 / (knownAspectRatio ?: detectedAspectRatio)
                     }
 
-                    val blur = calculateBlur(imageProxy = imageProxy)
-                    if (blur < BLUR_THRESHOLD) {
-                        _uiState.update {
-                            it.copy(
-                                directive = DocumentDirective.BlurryDocument,
-                                areEdgesDetected = false,
-                            )
-                        }
-                        imageProxy.close()
-                    }
-
                     val areEdgesDetected = isCentered && isCorrectAspectRatio
                     _uiState.update {
                         it.copy(
@@ -378,23 +373,50 @@ class DocumentCaptureViewModel(
                         )
                     }
 
-                    if (
-                        areEdgesDetected &&
-                        !isCapturing &&
-                        !isFocusing &&
-                        uiState.value.documentImageToConfirm == null
-                    ) {
-                        documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
+                    val output = calculateBlur(imageProxy)
 
-                        val documentFile = createDocumentFile(
-                            jobId = jobId,
-                            isFront = (side == DocumentCaptureSide.Front),
-                        )
+                    blurQualityHistory.add(output)
+                    if (blurQualityHistory.size == DOCUMENT_QUALITY_HISTORY_LENGTH) {
+                        Timber.d("Document quality count ${blurQualityHistory.size}")
 
-                        postProcessImage(
-                            file = documentFile,
-                            desiredAspectRatio = uiState.value.idAspectRatio,
-                        )
+                        val averageBlurQuality = blurQualityHistory.average()
+                        if (averageBlurQuality < DOCUMENT_QUALITY_THRESHOLD) {
+                            Timber.d("Document quality not met ($averageBlurQuality)")
+                            _uiState.update {
+                                it.copy(
+                                    directive = DocumentDirective.BlurryDocument,
+                                    areEdgesDetected = false,
+                                )
+                            }
+                            imageProxy.close()
+                        }
+
+                        if (
+                            areEdgesDetected &&
+                            !isCapturing &&
+                            !isFocusing &&
+                            uiState.value.documentImageToConfirm == null
+                        ) {
+                            documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
+
+                            val documentFile = createDocumentFile(
+                                jobId = jobId,
+                                isFront = (side == DocumentCaptureSide.Front),
+                            )
+
+                            val processedImage = postProcessImageBitmap(
+                                file = documentFile,
+                                bitmap = bitmap,
+                                desiredAspectRatio = uiState.value.idAspectRatio,
+                            )
+
+                            _uiState.update {
+                                it.copy(
+                                    documentImageToConfirm = processedImage,
+                                    showCaptureInProgress = false,
+                                )
+                            }
+                        }
                     }
                 }
             }

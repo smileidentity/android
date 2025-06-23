@@ -123,10 +123,10 @@ fun calculateLuminance(imageProxy: ImageProxy): Double {
  * @param imageProxy The camera image to analyze
  * @return Average gradient value (0.0 = maximum blur, higher values = sharper image)
  */
-fun calculateBlur(imageProxy: ImageProxy): Double {
+fun calculateBlur(imageProxy: ImageProxy): Float {
     // Return 0.0 (maximum blur) for invalid inputs
-    if (imageProxy.planes.isEmpty()) return 0.0
-    if (imageProxy.width <= 2 || imageProxy.height <= 2) return 0.0
+    if (imageProxy.planes.isEmpty()) return 0.0.toFloat()
+    if (imageProxy.width <= 2 || imageProxy.height <= 2) return 0.0.toFloat()
 
     val plane = imageProxy.planes[0]
     val buffer = plane.buffer
@@ -194,11 +194,11 @@ fun calculateBlur(imageProxy: ImageProxy): Double {
     Timber.d("Blur detection: samples=$gradientCount")
 
     // Return 0.0 (maximum blur) if no gradients could be calculated
-    if (gradientCount == 0) return 0.0
+    if (gradientCount == 0) return 0.0.toFloat()
 
     val avgGradient = gradientSum / gradientCount
     Timber.d("Blur detection: avgGradient=$avgGradient, samples=$gradientCount")
-    return avgGradient
+    return avgGradient.toFloat()
 }
 
 internal fun isValidDocumentImage(context: Context, uri: Uri?) =
