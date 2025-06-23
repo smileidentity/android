@@ -82,8 +82,6 @@ class DocumentCaptureViewModel(
     private var lastAnalysisTimeMs = 0L
     private var isCapturing = false
     private var isFocusing = false
-    private var documentFirstDetectedTimeMs: Long? = null
-    private var captureNextAnalysisFrame = false
     private val defaultAspectRatio = knownAspectRatio ?: 1f
     private var hasRecordedOrientationAtCaptureStart = false
     private var documentCaptureRetries = 0
@@ -96,23 +94,6 @@ class DocumentCaptureViewModel(
         viewModelScope.launch {
             delay(10.seconds)
             _uiState.update { it.copy(showManualCaptureButton = true) }
-        }
-
-        viewModelScope.launch {
-            uiState.collect {
-                if (it.areEdgesDetected) {
-                    documentFirstDetectedTimeMs?.let {
-                        if (System.currentTimeMillis() - it > DOCUMENT_AUTO_CAPTURE_WAIT_TIME_MS) {
-                            captureNextAnalysisFrame = true
-                        }
-                    }
-                    if (documentFirstDetectedTimeMs == null) {
-                        documentFirstDetectedTimeMs = System.currentTimeMillis()
-                    }
-                } else {
-                    documentFirstDetectedTimeMs = null
-                }
-            }
         }
     }
 
@@ -397,13 +378,12 @@ class DocumentCaptureViewModel(
                         )
                     }
 
-                    if (captureNextAnalysisFrame &&
+                    if (
                         areEdgesDetected &&
                         !isCapturing &&
                         !isFocusing &&
                         uiState.value.documentImageToConfirm == null
                     ) {
-                        captureNextAnalysisFrame = false
                         documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture
 
                         val documentFile = createDocumentFile(
