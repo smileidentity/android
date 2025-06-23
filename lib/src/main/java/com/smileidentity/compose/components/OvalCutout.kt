@@ -81,11 +81,6 @@ fun OvalCutout(
         stiffness = Spring.StiffnessVeryLow,
     )
 
-    // val progressAnimationSpec = tween<Float>(
-    //     durationMillis = 300,
-    //     easing = CubicBezierEasing(0.2f, 0.0f, 0.2f, 1.0f)
-    // )
-
     val topProgress by animateFloatAsState(
         targetValue = state.topProgress,
         animationSpec = progressAnimationSpec,
