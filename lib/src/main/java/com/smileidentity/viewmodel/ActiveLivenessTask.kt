@@ -198,20 +198,22 @@ internal class ActiveLivenessTask(
             when (direction) {
                 is Left -> {
                     val newProgress = minOf(targetProgress, leftProgress + dynamicIncrement)
-                    leftProgress =
-                        (newProgress * SMOOTHING_FACTOR) + (lastLeftProgress * (1 - SMOOTHING_FACTOR))
+                    leftProgress = (newProgress * SMOOTHING_FACTOR) +
+                        (lastLeftProgress * (1 - SMOOTHING_FACTOR))
                     lastLeftProgress = leftProgress
                 }
                 is Right -> {
                     val newProgress = minOf(targetProgress, rightProgress + dynamicIncrement)
                     rightProgress =
-                        (newProgress * SMOOTHING_FACTOR) + (lastRightProgress * (1 - SMOOTHING_FACTOR))
+                        (newProgress * SMOOTHING_FACTOR) +
+                            (lastRightProgress * (1 - SMOOTHING_FACTOR))
                     lastRightProgress = rightProgress
                 }
                 is Up -> {
                     val newProgress = minOf(targetProgress, topProgress + dynamicIncrement)
                     topProgress =
-                        (newProgress * SMOOTHING_FACTOR) + (lastTopProgress * (1 - SMOOTHING_FACTOR))
+                        (newProgress * SMOOTHING_FACTOR) +
+                            (lastTopProgress * (1 - SMOOTHING_FACTOR))
                     lastTopProgress = topProgress
                 }
             }
