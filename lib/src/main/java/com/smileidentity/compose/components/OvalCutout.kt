@@ -2,9 +2,9 @@ package com.smileidentity.compose.components
 
 import android.graphics.BitmapFactory
 import androidx.annotation.FloatRange
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -76,9 +76,10 @@ fun OvalCutout(
         }
     }
 
-    val progressAnimationSpec = tween<Float>(
-        durationMillis = 50,
-        easing = FastOutSlowInEasing,
+    val progressAnimationSpec = spring<Float>(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessVeryLow,
+        visibilityThreshold = 0.003f,
     )
 
     val topProgress by animateFloatAsState(
