@@ -67,6 +67,8 @@ class RootViewModel : ViewModel() {
             pendingConfig?.let { config ->
                 viewModelScope.launch {
                     DataStoreRepository.setConfig(config)
+                    _uiState.update { it.copy(showSmileConfigConfirmation = false) }
+                    pendingConfig = null
                 }
             }
         } catch (e: Exception) {
