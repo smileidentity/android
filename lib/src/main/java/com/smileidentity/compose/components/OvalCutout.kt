@@ -47,6 +47,7 @@ fun OvalCutout(
     arcColor: Color = MaterialTheme.colorScheme.tertiary,
     selfieFile: File? = null,
 ) {
+    val currentHint = (state.selfieState as? SelfieState.Analyzing)?.hint
     val color = when (state.selfieState) {
         is SelfieState.Analyzing -> {
             when (state.selfieState.hint) {
@@ -76,26 +77,26 @@ fun OvalCutout(
         }
     }
 
-    val progressAnimationSpec = spring<Float>(
+    val progressAnimationSpec = spring(
         dampingRatio = Spring.DampingRatioLowBouncy,
         stiffness = Spring.StiffnessVeryLow,
         visibilityThreshold = 0.003f,
     )
 
     val topProgress by animateFloatAsState(
-        targetValue = state.topProgress,
+        targetValue = if (currentHint == SelfieHint.LookUp) state.topProgress else 0f,
         animationSpec = progressAnimationSpec,
         label = "selfie_top_progress",
     )
 
     val rightProgress by animateFloatAsState(
-        targetValue = state.rightProgress,
+        targetValue = if (currentHint == SelfieHint.LookRight) state.rightProgress else 0f,
         animationSpec = progressAnimationSpec,
         label = "selfie_right_progress",
     )
 
     val leftProgress by animateFloatAsState(
-        targetValue = state.leftProgress,
+        targetValue = if (currentHint == SelfieHint.LookLeft) state.leftProgress else 0f,
         animationSpec = progressAnimationSpec,
         label = "selfie_left_progress",
     )
