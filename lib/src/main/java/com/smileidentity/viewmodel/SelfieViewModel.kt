@@ -194,8 +194,6 @@ class SelfieViewModel(
 
             val face = faces.first()
 
-            Timber.d("Juuuuuuma ${face.trackingId}")
-
             // Ensure trackingId is available
             val currentTrackingId = face.trackingId
             if (currentTrackingId == null) {
