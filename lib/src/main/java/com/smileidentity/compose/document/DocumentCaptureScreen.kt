@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -212,6 +213,19 @@ fun DocumentCaptureScreen(
                 targetValue = uiState.idAspectRatio,
                 label = "ID Aspect Ratio",
             )
+
+            context.assets.list("documents/")?.mapNotNull { fileName ->
+
+                LaunchedEffect(key1 = "documents/$fileName") {
+                    viewModel.ocr(
+                        bitmap = context.assets
+                            .open("documents/$fileName")
+                            .use(BitmapFactory::decodeStream),
+                        fileName = fileName,
+                    )
+                }
+            }
+
             CaptureScreenContent(
                 titleText = captureTitleText,
                 subtitleText = stringResource(id = uiState.directive.displayText),

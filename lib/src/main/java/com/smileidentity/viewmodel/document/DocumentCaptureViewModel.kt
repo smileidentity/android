@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel.document
 
+import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
@@ -14,7 +15,11 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.smileidentity.R
+import com.smileidentity.SmileID
 import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.metadata.models.DocumentImageOriginValue
 import com.smileidentity.metadata.models.Metadatum
@@ -35,6 +40,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.sink
 import timber.log.Timber
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
@@ -70,6 +77,9 @@ class DocumentCaptureViewModel(
         ObjectDetectorOptions.Builder()
             .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
             .build(),
+    ),
+    private val recognizer: TextRecognizer = TextRecognition.getClient(
+        TextRecognizerOptions.DEFAULT_OPTIONS,
     ),
 ) : ViewModel() {
     var documentImageOrigin: DocumentImageOriginValue? = null
@@ -187,6 +197,7 @@ class DocumentCaptureViewModel(
                                                 ),
                                             )
                                         }
+
                                         DocumentCaptureSide.Back -> {
                                             metadata.add(
                                                 Metadatum.DocumentBackCaptureDuration(
@@ -303,6 +314,40 @@ class DocumentCaptureViewModel(
                 )
             }
         }
+    }
+
+    internal fun createOCRFile(ocr: String, fileName: String): File {
+        val txtFileName = fileName.replaceAfterLast('.', "txt")
+        val directory = File(SmileID.fileSavePath, "ocr")
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        val file = File(directory, txtFileName)
+
+        file.sink().buffer().use { sink ->
+            sink.writeUtf8(ocr)
+        }
+
+        return file
+    }
+
+    fun ocr(bitmap: Bitmap, fileName: String) {
+        val inputImage = InputImage.fromBitmap(bitmap, 0)
+
+        recognizer.process(inputImage)
+            .addOnSuccessListener { visionText ->
+                val allText = buildString {
+                    for (block in visionText.textBlocks) {
+                        val blockText = block.text
+                        Timber.d("OCR blockText $blockText")
+                        appendLine(blockText)
+                    }
+                }
+                createOCRFile(ocr = allText, fileName = fileName)
+            }
+            .addOnFailureListener { e ->
+                Timber.e(e, "Text recognition failed")
+            }
     }
 
     @OptIn(ExperimentalGetImage::class)

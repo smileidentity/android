@@ -306,26 +306,15 @@ fun MainScreen(
                 }
                 composable(ProductScreen.DocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
-                    DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
-                        navController.navigate(
-                            route = ProductScreen.DocumentVerification.route +
-                                "/$country/$idType/$captureBothSides",
-                        ) { popUpTo(ProductScreen.DocumentVerification.route) }
-                    }
-                }
-                composable(
-                    ProductScreen.DocumentVerification.route +
-                        "/{country}/{idType}/{captureBothSides}",
-                ) {
-                    LaunchedEffect(Unit) { viewModel.onDocumentVerificationSelected() }
+
                     val userId = rememberSaveable { randomUserId() }
                     val jobId = rememberSaveable { randomJobId() }
                     SmileID.DocumentVerification(
                         userId = userId,
                         jobId = jobId,
-                        countryCode = it.arguments?.getString("country")!!,
-                        documentType = it.arguments?.getString("idType"),
-                        captureBothSides = it.arguments?.getString("captureBothSides").toBoolean(),
+                        countryCode = "KE",
+                        documentType = "",
+                        captureBothSides = true,
                         showInstructions = true,
                         allowGalleryUpload = true,
                     ) { result ->
@@ -339,6 +328,18 @@ fun MainScreen(
                             navController.popBackStack()
                         }
                     }
+                    // DocumentVerificationIdTypeSelector { country, idType, captureBothSides ->
+                    //     navController.navigate(
+                    //         route = ProductScreen.DocumentVerification.route +
+                    //             "/$country/$idType/$captureBothSides",
+                    //     ) { popUpTo(ProductScreen.DocumentVerification.route) }
+                    // }
+                }
+                composable(
+                    ProductScreen.DocumentVerification.route +
+                        "/{country}/{idType}/{captureBothSides}",
+                ) {
+
                 }
                 composable(ProductScreen.EnhancedDocumentVerification.route) {
                     LaunchedEffect(Unit) { viewModel.onEnhancedDocumentVerificationSelected() }

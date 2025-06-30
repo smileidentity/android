@@ -146,6 +146,8 @@ mavenPublishing {
 }
 
 dependencies {
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
     // OkHttp is exposed in public SmileID interface (initialize), hence "api" vs "implementation"
     api(libs.okhttp)
     implementation(libs.retrofit)
