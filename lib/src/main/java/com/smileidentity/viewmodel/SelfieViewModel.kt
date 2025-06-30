@@ -197,7 +197,7 @@ class SelfieViewModel(
             // Ensure trackingId is available
             val currentTrackingId = face.trackingId
             if (currentTrackingId == null) {
-                _uiState.update { it.copy(directive = SelfieDirective.EnsureFaceInFrame) }
+                _uiState.update { it.copy(directive = SelfieDirective.EnsureOnlyOneFace) }
                 return@addOnSuccessListener
             }
 
