@@ -65,6 +65,7 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
+    private val enableAutoCapture: Boolean,
     private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
@@ -89,9 +90,13 @@ class DocumentCaptureViewModel(
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
 
-        // Show manual capture after 10 seconds
-        viewModelScope.launch {
-            delay(10.seconds)
+        // Show manual capture after 10 seconds if enableAutoCapture is enabled
+        if (enableAutoCapture) {
+            viewModelScope.launch {
+                delay(10.seconds)
+                _uiState.update { it.copy(showManualCaptureButton = true) }
+            }
+        } else {
             _uiState.update { it.copy(showManualCaptureButton = true) }
         }
 
@@ -388,7 +393,8 @@ class DocumentCaptureViewModel(
                         areEdgesDetected &&
                         !isCapturing &&
                         !isFocusing &&
-                        uiState.value.documentImageToConfirm == null
+                        uiState.value.documentImageToConfirm == null &&
+                        enableAutoCapture
                     ) {
                         captureNextAnalysisFrame = false
                         documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture

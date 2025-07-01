@@ -41,6 +41,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    enableAutoCapture: Boolean = true,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
@@ -97,6 +98,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Front,
+                enableAutoCapture = enableAutoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
@@ -117,6 +119,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Back,
+                enableAutoCapture = enableAutoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
