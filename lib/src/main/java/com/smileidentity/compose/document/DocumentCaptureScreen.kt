@@ -96,16 +96,18 @@ fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
+    enableAutoCapture: Boolean = true,
     showConfirmation: Boolean = true,
     metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
     onSkip: () -> Unit = { },
     viewModel: DocumentCaptureViewModel = viewModel(
         factory = viewModelFactory {
             DocumentCaptureViewModel(
-                jobId,
-                side,
-                knownIdAspectRatio,
-                metadata,
+                jobId = jobId,
+                side = side,
+                knownAspectRatio = knownIdAspectRatio,
+                enableAutoCapture = enableAutoCapture,
+                metadata = metadata,
             )
         },
         key = side.name,
