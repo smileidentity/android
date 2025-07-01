@@ -1,5 +1,11 @@
 # Release Notes
 
+## Unreleased
+
+### Changed
+
+* Added Face Tracking in Selfie Capture to ensure only same face is used during capture
+
 ## 11.0.4 - June 16, 2025
 
 ### Changed
