@@ -1,5 +1,10 @@
 # Release Notes
 
+## 11.0.5 - (Unreleased)
+
+### Added
+* Introduce blur detection on document capture
+
 ## 11.0.4 - June 16, 2025
 
 ### Changed
