@@ -25,7 +25,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.Face
 import com.smileidentity.R
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
@@ -41,7 +40,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import kotlin.math.abs
 import kotlin.math.max
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -440,45 +438,6 @@ inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String):
     SDK_INT >= UPSIDE_DOWN_CAKE -> getSerializable(key, T::class.java)
     else -> getSerializable(key) as? T
 }
-
-/**
- * Determines whether the face is looking left, within some thresholds
- *
- * @param minAngle The minimum angle the face should be looking left
- * @param maxAngle The maximum angle the face should be looking left
- * @param verticalAngleBuffer The buffer for the vertical angle
- */
-internal fun Face.isLookingLeft(
-    minAngle: Float,
-    maxAngle: Float,
-    verticalAngleBuffer: Float,
-): Boolean = headEulerAngleY in minAngle..maxAngle && abs(headEulerAngleX) < verticalAngleBuffer
-
-/**
- * Determines whether the face is looking right, within some thresholds
- *
- * @param minAngle The minimum angle the face should be looking right
- * @param maxAngle The maximum angle the face should be looking right
- * @param verticalAngleBuffer The buffer for the vertical angle
- */
-internal fun Face.isLookingRight(
-    minAngle: Float,
-    maxAngle: Float,
-    verticalAngleBuffer: Float,
-): Boolean = headEulerAngleY in -maxAngle..-minAngle && abs(headEulerAngleX) < verticalAngleBuffer
-
-/**
- * Determines whether the face is looking up, within some thresholds
- *
- * @param minAngle The minimum angle the face should be looking up
- * @param maxAngle The maximum angle the face should be looking up
- * @param horizontalAngleBuffer The buffer for the horizontal angle
- */
-internal fun Face.isLookingUp(
-    minAngle: Float,
-    maxAngle: Float,
-    horizontalAngleBuffer: Float,
-): Boolean = headEulerAngleX in minAngle..maxAngle && abs(headEulerAngleY) < horizontalAngleBuffer
 
 /**
  * Converts current time to ISO8601 string with milliseconds in UTC
