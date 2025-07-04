@@ -87,30 +87,3 @@ val SmileID.typographyV2: Typography
         labelMedium = MaterialTheme.typography.labelMedium.copy(fontFamily = dmSans),
         labelSmall = MaterialTheme.typography.labelSmall.copy(fontFamily = dmSans),
     )
-
-@Suppress("UnusedReceiverParameter")
-val SmileID.typographyV3: Typography
-    @Composable
-    @ReadOnlyComposable
-    get() = Typography(
-        titleMedium = MaterialTheme.typography.titleMedium.copy(fontFamily = dmSans, fontSize = 35.sp),
-
-        // reworking this
-        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = dmSans),
-        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = dmSans),
-        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = dmSans),
-        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = dmSans),
-        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = dmSans),
-        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = dmSans),
-        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = dmSans),
-        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = dmSans),
-        bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontFamily = dmSans),
-        bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontFamily = dmSans),
-        bodySmall = MaterialTheme.typography.bodySmall.copy(fontFamily = dmSans),
-        labelLarge = MaterialTheme.typography.labelLarge.copy(
-            fontFamily = dmSans,
-            fontWeight = FontWeight.Bold,
-        ),
-        labelMedium = MaterialTheme.typography.labelMedium.copy(fontFamily = dmSans),
-        labelSmall = MaterialTheme.typography.labelSmall.copy(fontFamily = dmSans),
-    )
