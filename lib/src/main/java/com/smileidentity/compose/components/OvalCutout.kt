@@ -2,9 +2,9 @@ package com.smileidentity.compose.components
 
 import android.graphics.BitmapFactory
 import androidx.annotation.FloatRange
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +47,7 @@ fun OvalCutout(
     arcColor: Color = MaterialTheme.colorScheme.tertiary,
     selfieFile: File? = null,
 ) {
+    val currentHint = (state.selfieState as? SelfieState.Analyzing)?.hint
     val color = when (state.selfieState) {
         is SelfieState.Analyzing -> {
             when (state.selfieState.hint) {
@@ -76,25 +77,26 @@ fun OvalCutout(
         }
     }
 
-    val progressAnimationSpec = tween<Float>(
-        durationMillis = 50,
-        easing = FastOutSlowInEasing,
+    val progressAnimationSpec = spring(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessVeryLow,
+        visibilityThreshold = 0.003f,
     )
 
     val topProgress by animateFloatAsState(
-        targetValue = state.topProgress,
+        targetValue = if (currentHint == SelfieHint.LookUp) state.topProgress else 0f,
         animationSpec = progressAnimationSpec,
         label = "selfie_top_progress",
     )
 
     val rightProgress by animateFloatAsState(
-        targetValue = state.rightProgress,
+        targetValue = if (currentHint == SelfieHint.LookRight) state.rightProgress else 0f,
         animationSpec = progressAnimationSpec,
         label = "selfie_right_progress",
     )
 
     val leftProgress by animateFloatAsState(
-        targetValue = state.leftProgress,
+        targetValue = if (currentHint == SelfieHint.LookLeft) state.leftProgress else 0f,
         animationSpec = progressAnimationSpec,
         label = "selfie_left_progress",
     )

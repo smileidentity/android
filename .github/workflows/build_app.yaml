@@ -61,16 +61,3 @@ jobs:
           track: internalsharing
           releaseFiles: sample/build/outputs/bundle/release/sample-release.aab
           releaseName: Smile ID (Partner ${{ steps.write_smile_config.outputs.partner_id }})
-      - name: Send Slack
-        uses: slackapi/slack-github-action@v2.1.0
-        with:
-          payload: |
-            {
-              "play_store_url": "${{ steps.upload.outputs.internalSharingDownloadUrl }}",
-              "partner_id": "${{ steps.write_smile_config.outputs.partner_id }}",
-              "branch": "${{ github.ref }}",
-              "commit_sha": "${{ github.sha }}",
-              "changelog": "${{ github.event.inputs.changelog }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_SAMPLE_APP_DOWNLOAD }}
