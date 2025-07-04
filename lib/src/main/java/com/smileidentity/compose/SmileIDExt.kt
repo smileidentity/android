@@ -18,6 +18,7 @@ import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
+import com.smileidentity.compose.theme.typographyV2
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.ConsentedInformation
@@ -397,7 +398,7 @@ fun SmileID.BiometricKYC(
         ),
     ),
     colorScheme: ColorScheme = SmileID.colorScheme,
-    typography: Typography = SmileID.typography,
+    typography: Typography = SmileID.typographyV2,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
