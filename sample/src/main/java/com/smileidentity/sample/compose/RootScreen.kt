@@ -37,10 +37,7 @@ import timber.log.Timber
  * For instructions on initializing the SDK, please refer to [SmileIDApplication].
  */
 @Composable
-fun RootScreen(
-    modifier: Modifier = Modifier,
-    viewModel: RootViewModel = viewModel(),
-) {
+fun RootScreen(modifier: Modifier = Modifier, viewModel: RootViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val runtimeConfig by viewModel.runtimeConfig.collectAsStateWithLifecycle()
     val context = LocalContext.current

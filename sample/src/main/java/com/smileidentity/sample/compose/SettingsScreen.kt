@@ -32,10 +32,7 @@ import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 import com.smileidentity.sample.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen(
-    modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = viewModel(),
-) {
+fun SettingsScreen(modifier: Modifier = Modifier, viewModel: SettingsViewModel = viewModel()) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val settings = listOf(
