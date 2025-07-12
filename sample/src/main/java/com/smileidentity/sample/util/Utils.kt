@@ -1,4 +1,4 @@
-package com.smileidentity.sample
+package com.smileidentity.sample.util
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import com.smileidentity.R
 import com.smileidentity.models.JobType
 import com.smileidentity.sample.compose.components.SearchableInputFieldItem
 import java.text.SimpleDateFormat
@@ -132,13 +133,13 @@ fun jobResultMessageBuilder(
 val JobType.label: Int
     @StringRes
     get() = when (this) {
-        JobType.SmartSelfieEnrollment -> com.smileidentity.R.string.si_smart_selfie_enrollment_product_name
-        JobType.SmartSelfieAuthentication -> com.smileidentity.R.string.si_smart_selfie_authentication_product_name
-        JobType.EnhancedKyc -> R.string.enhanced_kyc_product_name
-        JobType.BiometricKyc -> com.smileidentity.R.string.si_biometric_kyc_product_name
-        JobType.DocumentVerification -> com.smileidentity.R.string.si_doc_v_product_name
-        JobType.BVN -> com.smileidentity.R.string.si_bvn_product_name
-        JobType.EnhancedDocumentVerification -> com.smileidentity.R.string.si_enhanced_docv_product_name
+        JobType.SmartSelfieEnrollment -> R.string.si_smart_selfie_enrollment_product_name
+        JobType.SmartSelfieAuthentication -> R.string.si_smart_selfie_authentication_product_name
+        JobType.EnhancedKyc -> com.smileidentity.sample.R.string.enhanced_kyc_product_name
+        JobType.BiometricKyc -> R.string.si_biometric_kyc_product_name
+        JobType.DocumentVerification -> R.string.si_doc_v_product_name
+        JobType.BVN -> R.string.si_bvn_product_name
+        JobType.EnhancedDocumentVerification -> R.string.si_enhanced_docv_product_name
         JobType.Unknown -> -1
     }
 

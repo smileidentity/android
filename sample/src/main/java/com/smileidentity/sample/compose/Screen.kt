@@ -1,4 +1,4 @@
-package com.smileidentity.sample
+package com.smileidentity.sample.compose
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.smileidentity.R
 
 sealed interface Screen {
     val route: String
@@ -27,48 +28,48 @@ enum class ProductScreen(
 ) : Screen {
     SmartSelfieEnrollment(
         "smart_selfie_enrollment",
-        com.smileidentity.R.string.si_smart_selfie_enrollment_product_name,
-        com.smileidentity.R.drawable.si_smart_selfie_instructions_hero,
+        R.string.si_smart_selfie_enrollment_product_name,
+        R.drawable.si_smart_selfie_instructions_hero,
     ),
     SmartSelfieAuthentication(
         "smart_selfie_authentication",
-        com.smileidentity.R.string.si_smart_selfie_authentication_product_name,
-        R.drawable.smart_selfie_authentication,
+        R.string.si_smart_selfie_authentication_product_name,
+        com.smileidentity.sample.R.drawable.smart_selfie_authentication,
     ),
     SmartSelfieEnrollmentEnhanced(
         "smart_selfie_enrollment_enhanced",
-        com.smileidentity.R.string.si_smart_selfie_enhanced_enroll_product_name,
-        R.drawable.smart_selfie_enrollment_enhanced,
+        R.string.si_smart_selfie_enhanced_enroll_product_name,
+        com.smileidentity.sample.R.drawable.smart_selfie_enrollment_enhanced,
     ),
     SmartSelfieAuthenticationEnhanced(
         "smart_selfie_authentication_enhanced",
-        com.smileidentity.R.string.si_smart_selfie_enhanced_auth_product_name,
-        R.drawable.smart_selfie_authentication_enhanced,
+        R.string.si_smart_selfie_enhanced_auth_product_name,
+        com.smileidentity.sample.R.drawable.smart_selfie_authentication_enhanced,
     ),
     BiometricKyc(
         "biometric_kyc",
-        com.smileidentity.R.string.si_biometric_kyc_product_name,
-        R.drawable.biometric_kyc,
+        R.string.si_biometric_kyc_product_name,
+        com.smileidentity.sample.R.drawable.biometric_kyc,
     ),
     DocumentVerification(
         "document_verification",
-        com.smileidentity.R.string.si_doc_v_product_name,
-        R.drawable.doc_v,
+        R.string.si_doc_v_product_name,
+        com.smileidentity.sample.R.drawable.doc_v,
     ),
     EnhancedDocumentVerification(
         "enhanced_docv",
-        com.smileidentity.R.string.si_enhanced_docv_product_name,
-        R.drawable.enhanced_doc_v,
+        R.string.si_enhanced_docv_product_name,
+        com.smileidentity.sample.R.drawable.enhanced_doc_v,
     ),
     EnhancedKyc(
         "enhanced_kyc",
-        R.string.enhanced_kyc_product_name,
-        R.drawable.enhanced_kyc,
+        com.smileidentity.sample.R.string.enhanced_kyc_product_name,
+        com.smileidentity.sample.R.drawable.enhanced_kyc,
     ),
     BvnConsent(
         "bvn_consent",
-        com.smileidentity.R.string.si_bvn_product_name,
-        R.drawable.bvn_consent,
+        R.string.si_bvn_product_name,
+        com.smileidentity.sample.R.drawable.bvn_consent,
     ),
 }
 
@@ -80,25 +81,25 @@ enum class BottomNavigationScreen(
 ) : Screen {
     Home(
         "home",
-        R.string.home,
+        com.smileidentity.sample.R.string.home,
         Filled.Home,
         Outlined.Home,
     ),
     Jobs(
         "jobs",
-        R.string.jobs,
+        com.smileidentity.sample.R.string.jobs,
         AutoMirrored.Filled.List,
         AutoMirrored.Outlined.List,
     ),
     Resources(
         "resources",
-        R.string.resources,
+        com.smileidentity.sample.R.string.resources,
         Filled.Info,
         Outlined.Info,
     ),
     Settings(
         "settings",
-        R.string.settings,
+        com.smileidentity.sample.R.string.settings,
         Filled.Settings,
         Outlined.Settings,
     ),

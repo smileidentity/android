@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -53,8 +52,8 @@ import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.sample.compose.SmileIDTheme
 import com.smileidentity.sample.compose.components.ErrorScreen
-import com.smileidentity.sample.label
 import com.smileidentity.sample.model.Job
+import com.smileidentity.sample.util.label
 import kotlinx.collections.immutable.ImmutableList
 import timber.log.Timber
 

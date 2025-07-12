@@ -66,8 +66,6 @@ import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.sample.BottomNavigationScreen
-import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.IdTypeSelectorAndFieldInputScreen
 import com.smileidentity.sample.compose.components.IdTypeSelectorScreen

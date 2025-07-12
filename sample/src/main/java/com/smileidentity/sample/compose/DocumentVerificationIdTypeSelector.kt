@@ -52,7 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.models.IdType
 import com.smileidentity.models.ValidDocument
 import com.smileidentity.sample.R
-import com.smileidentity.sample.toast
+import com.smileidentity.sample.util.toast
 import com.smileidentity.sample.viewmodel.DocumentSelectorViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

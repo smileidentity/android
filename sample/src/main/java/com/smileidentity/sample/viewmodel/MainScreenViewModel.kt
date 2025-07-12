@@ -23,14 +23,14 @@ import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.EnhancedKycResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.sample.BottomNavigationScreen
-import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
+import com.smileidentity.sample.compose.BottomNavigationScreen
+import com.smileidentity.sample.compose.ProductScreen
 import com.smileidentity.sample.data.mapper.toJob
-import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.getCurrentTimeAsHumanReadableTimestamp
 import com.smileidentity.sample.repo.DataStoreRepository
+import com.smileidentity.sample.util.jobResultMessageBuilder
 import com.smileidentity.util.getExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

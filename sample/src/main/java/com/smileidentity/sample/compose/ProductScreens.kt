@@ -33,9 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.SmileID
 import com.smileidentity.sample.BuildConfig
-import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
-import com.smileidentity.sample.Screen
 
 private val products = ProductScreen.entries
 private val roundedCornerShape = RoundedCornerShape(16.dp)
