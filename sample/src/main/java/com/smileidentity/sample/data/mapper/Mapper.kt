@@ -1,4 +1,4 @@
-package com.smileidentity.sample.model
+package com.smileidentity.sample.data.mapper
 
 import com.smileidentity.models.BiometricKycJobStatusResponse
 import com.smileidentity.models.DocumentVerificationJobStatusResponse
@@ -14,58 +14,13 @@ import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobStatusResponse
-import com.smileidentity.sample.repo.DataStoreRepository
-import com.squareup.moshi.JsonClass
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import com.smileidentity.sample.data.database.model.Job
 import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
-import timber.log.Timber
-
-/**
- * This class is used by the [DataStoreRepository] to store Preferences/to be shown on the Jobs
- * screen. It is saved to Preferences by saving as JSON String using Moshi. As a result, be very
- * careful about breaking changes to the JSON schema!
- */
-@JsonClass(generateAdapter = true)
-data class Job(
-    val jobType: JobType,
-    val timestamp: String,
-    val userId: String,
-    val jobId: String,
-    val jobComplete: Boolean = false,
-    val jobSuccess: Boolean = false,
-    val code: String? = null,
-    val resultCode: String? = null,
-    val smileJobId: String? = null,
-    val resultText: String? = null,
-    val selfieImageUrl: String? = null,
-)
-
-private val outputFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
-private val inputFormat =
-    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }
-
-/**
- * Converts "2023-07-10T21:58:07.183Z" to "7/10/23, 2:58 PM" (assuming PST timezone)
- */
-private fun toHumanReadableTimestamp(timestamp: String): String = try {
-    val date = inputFormat.parse(timestamp) as Date
-    outputFormat.format(date)
-} catch (e: Exception) {
-    Timber.e(e, "Failed to parse timestamp: $timestamp")
-    timestamp
-}
-
-fun getCurrentTimeAsHumanReadableTimestamp() = toHumanReadableTimestamp(inputFormat.format(Date()))
 
 fun EnhancedKycResponse.toJob() = Job(
     jobType = EnhancedKyc,
     // Enhanced KYC is a synchronous response
-    timestamp = toHumanReadableTimestamp(inputFormat.format(Date())),
+    timestamp = Date().toString(),
     userId = partnerParams.userId,
     jobId = partnerParams.jobId,
     jobComplete = true,
@@ -107,7 +62,7 @@ fun EnhancedDocumentVerificationJobStatusResponse.toJob(userId: String, jobId: S
 // TODO: Make this support offline mode
 fun JobStatusResponse.toJob(userId: String, jobId: String, jobType: JobType) = Job(
     jobType = jobType,
-    timestamp = toHumanReadableTimestamp(timestamp),
+    timestamp = timestamp,
     userId = userId,
     jobId = jobId,
     jobComplete = jobComplete,

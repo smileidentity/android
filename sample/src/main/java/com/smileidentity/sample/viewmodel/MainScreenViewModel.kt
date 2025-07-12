@@ -26,10 +26,10 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.BottomNavigationScreen
 import com.smileidentity.sample.ProductScreen
 import com.smileidentity.sample.R
+import com.smileidentity.sample.data.mapper.toJob
 import com.smileidentity.sample.jobResultMessageBuilder
 import com.smileidentity.sample.model.Job
 import com.smileidentity.sample.model.getCurrentTimeAsHumanReadableTimestamp
-import com.smileidentity.sample.model.toJob
 import com.smileidentity.sample.repo.DataStoreRepository
 import com.smileidentity.util.getExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi

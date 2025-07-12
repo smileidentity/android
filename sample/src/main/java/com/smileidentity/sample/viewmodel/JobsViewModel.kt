@@ -3,52 +3,19 @@ package com.smileidentity.sample.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
-import com.smileidentity.compose.components.ProcessingState
 import com.smileidentity.models.JobType
-import com.smileidentity.sample.data.database.model.Jobs
+import com.smileidentity.sample.data.database.model.Job
 import com.smileidentity.sample.data.repository.JobsRepository
-import com.smileidentity.sample.repo.DataStoreRepository.getAllJobs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
-
-data class JobsUiState(
-    val processingState: ProcessingState = ProcessingState.InProgress,
-    val errorMessage: String? = null,
-)
-
-// todo delete this too
-/**
- * The job list to show is determined by a composite key of partnerId and environment
- */
-class JobsViewModel(isProduction: Boolean) : ViewModel() {
-    private val _uiState = MutableStateFlow(JobsUiState())
-    val uiState = _uiState.asStateFlow()
-    val jobs = getAllJobs(SmileID.config.partnerId, isProduction).catch {
-        Timber.e(it)
-        _uiState.update { it.copy(processingState = ProcessingState.Error) }
-    }.onEach {
-        _uiState.update { it.copy(processingState = ProcessingState.Success) }
-    }.stateIn(
-        scope = viewModelScope,
-        started = WhileSubscribed(),
-        initialValue = persistentListOf(),
-    )
-}
 
 data class JobsUI(
-    val id: Long,
     val jobType: JobType,
     val timestamp: String,
     val userId: String,
@@ -110,8 +77,7 @@ class JobViewModel @Inject constructor(
     }
 }
 
-fun Jobs.toUIModel() = JobsUI(
-    id = id,
+fun Job.toUIModel() = JobsUI(
     jobType = jobType,
     timestamp = timestamp,
     userId = userId,

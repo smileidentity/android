@@ -10,13 +10,12 @@ import com.smileidentity.models.JobType
         Index(value = arrayOf("jobId"), unique = true),
     ],
 )
-data class Jobs(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
+data class Job(
+    @PrimaryKey
+    val jobId: String,
     val jobType: JobType = JobType.Unknown,
     val timestamp: String = "",
     val userId: String = "",
-    val jobId: String,
     val jobComplete: Boolean = false,
     val jobSuccess: Boolean = false,
     val code: String? = null,
