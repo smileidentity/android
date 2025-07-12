@@ -1,8 +1,8 @@
 package com.smileidentity.compose.selfie
 
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -109,9 +109,13 @@ fun SelfieCaptureScreen(
                 // "out of bounds" content as a fraud prevention technique
                 .scale(viewfinderZoom),
         )
+        val progressAnimationSpec = spring<Float>(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessVeryLow,
+        )
         val animatedProgress by animateFloatAsState(
             targetValue = uiState.progress,
-            animationSpec = tween(easing = LinearEasing),
+            animationSpec = progressAnimationSpec,
             label = "selfie_progress",
         )
         FaceShapedProgressIndicator(
