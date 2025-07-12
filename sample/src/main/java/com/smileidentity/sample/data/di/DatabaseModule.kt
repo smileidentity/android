@@ -28,5 +28,6 @@ object DatabaseModule {
     @Provides
     fun providesJobsDao(database: SmileIDDatabase): JobsDao = database.jobsDao()
 
+    @Provides
     fun providesConfigDao(database: SmileIDDatabase): ConfigDao = database.configDao()
 }

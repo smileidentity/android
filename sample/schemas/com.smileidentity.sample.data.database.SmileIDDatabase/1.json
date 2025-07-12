@@ -2,16 +2,16 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b1911f9256a217779c2fd6358e413aa7",
+    "identityHash": "cb9e60428e258c3337c5d31c4f71ae60",
     "entities": [
       {
-        "tableName": "Jobs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `jobType` INTEGER NOT NULL, `timestamp` TEXT NOT NULL, `userId` TEXT NOT NULL, `jobId` TEXT NOT NULL, `jobComplete` INTEGER NOT NULL, `jobSuccess` INTEGER NOT NULL, `code` TEXT, `resultCode` TEXT, `smileJobId` TEXT, `resultText` TEXT, `selfieImageUrl` TEXT, `livenessImagesUrl` TEXT, `documentFrontImageUrl` TEXT, `documentBackImageUrl` TEXT)",
+        "tableName": "Job",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`jobId` TEXT NOT NULL, `jobType` INTEGER NOT NULL, `timestamp` TEXT NOT NULL, `userId` TEXT NOT NULL, `jobComplete` INTEGER NOT NULL, `jobSuccess` INTEGER NOT NULL, `code` TEXT, `resultCode` TEXT, `smileJobId` TEXT, `resultText` TEXT, `selfieImageUrl` TEXT, `livenessImagesUrl` TEXT, `documentFrontImageUrl` TEXT, `documentBackImageUrl` TEXT, PRIMARY KEY(`jobId`))",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
+            "fieldPath": "jobId",
+            "columnName": "jobId",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -29,12 +29,6 @@
           {
             "fieldPath": "userId",
             "columnName": "userId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "jobId",
-            "columnName": "jobId",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -92,27 +86,78 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "id"
+            "jobId"
           ]
         },
         "indices": [
           {
-            "name": "index_Jobs_jobId",
+            "name": "index_Job_jobId",
             "unique": true,
             "columnNames": [
               "jobId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Jobs_jobId` ON `${TABLE_NAME}` (`jobId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Job_jobId` ON `${TABLE_NAME}` (`jobId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "ConfigModel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`partnerId` TEXT NOT NULL, `prodAuthToken` TEXT, `testAuthToken` TEXT, `prodLambdaUrl` TEXT NOT NULL, `testLambdaUrl` TEXT NOT NULL, PRIMARY KEY(`partnerId`))",
+        "fields": [
+          {
+            "fieldPath": "partnerId",
+            "columnName": "partnerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prodAuthToken",
+            "columnName": "prodAuthToken",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "testAuthToken",
+            "columnName": "testAuthToken",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "prodLambdaUrl",
+            "columnName": "prodLambdaUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testLambdaUrl",
+            "columnName": "testLambdaUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "partnerId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ConfigModel_partnerId",
+            "unique": true,
+            "columnNames": [
+              "partnerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ConfigModel_partnerId` ON `${TABLE_NAME}` (`partnerId`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b1911f9256a217779c2fd6358e413aa7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cb9e60428e258c3337c5d31c4f71ae60')"
     ]
   }
 }

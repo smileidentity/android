@@ -30,12 +30,11 @@ import com.smileidentity.sample.BuildConfig
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.components.SmileConfigModalBottomSheet
 import com.smileidentity.sample.viewmodel.SettingsViewModel
-import com.smileidentity.viewmodel.viewModelFactory
 
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = viewModel(factory = viewModelFactory { SettingsViewModel() }),
+    viewModel: SettingsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

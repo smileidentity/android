@@ -1,14 +1,14 @@
 package com.smileidentity.sample.data.repository
 
 import com.smileidentity.sample.data.database.dao.ConfigDao
-import com.smileidentity.sample.data.database.model.Config
+import com.smileidentity.sample.data.database.model.ConfigModel
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 
 interface ConfigRepository {
-    suspend fun createConfig(config: Config)
-    fun fetchConfigs(): Flow<List<Config?>>
+    suspend fun createConfig(configModel: ConfigModel)
+    fun fetchConfigs(): Flow<List<ConfigModel?>>
 }
 
 @Singleton
@@ -16,7 +16,7 @@ class ConfigDataSource @Inject constructor(
     private val dao: ConfigDao,
 ) : ConfigRepository {
 
-    override suspend fun createConfig(config: Config) = dao.insert(item = config)
+    override suspend fun createConfig(configModel: ConfigModel) = dao.insert(item = configModel)
 
     override fun fetchConfigs() = dao.fetchConfigs()
 }

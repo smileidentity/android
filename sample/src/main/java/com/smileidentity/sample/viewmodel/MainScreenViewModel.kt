@@ -6,17 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smileidentity.SmileID
 import com.smileidentity.models.AuthenticationRequest
-import com.smileidentity.models.JobStatusRequest
-import com.smileidentity.models.JobType.BiometricKyc
-import com.smileidentity.models.JobType.DocumentVerification
-import com.smileidentity.models.JobType.EnhancedDocumentVerification
-import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
-import com.smileidentity.models.v2.SmartSelfieStatus
-import com.smileidentity.networking.pollBiometricKycJobStatus
-import com.smileidentity.networking.pollDocumentVerificationJobStatus
-import com.smileidentity.networking.pollEnhancedDocumentVerificationJobStatus
-import com.smileidentity.networking.pollSmartSelfieJobStatus
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -26,21 +16,11 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.sample.R
 import com.smileidentity.sample.compose.BottomNavigationScreen
 import com.smileidentity.sample.compose.ProductScreen
-import com.smileidentity.sample.data.mapper.toJob
-import com.smileidentity.sample.model.Job
-import com.smileidentity.sample.model.getCurrentTimeAsHumanReadableTimestamp
-import com.smileidentity.sample.repo.DataStoreRepository
 import com.smileidentity.sample.util.jobResultMessageBuilder
 import com.smileidentity.util.getExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -80,78 +60,78 @@ class MainScreenViewModel : ViewModel() {
     ) {
         val authRequest = AuthenticationRequest(SmartSelfieEnrollment)
         val authResponse = SmileID.api.authenticate(authRequest)
-        DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
-            .distinctUntilChanged()
-            .flatMapMerge { it.asFlow() }
-            .collect { job ->
-                val userId = job.userId
-                val jobId = job.jobId
-                val jobType = job.jobType
-                val request = JobStatusRequest(
-                    userId = userId,
-                    jobId = jobId,
-                    includeImageLinks = false,
-                    includeHistory = false,
-                    partnerId = SmileID.config.partnerId,
-                    timestamp = authResponse.timestamp,
-                    signature = authResponse.signature,
-                )
-                val pollFlow = when (jobType) {
-                    SmartSelfieAuthentication -> SmileID.api.pollSmartSelfieJobStatus(request)
-                    SmartSelfieEnrollment -> SmileID.api.pollSmartSelfieJobStatus(request)
-                    DocumentVerification -> SmileID.api.pollDocumentVerificationJobStatus(request)
-                    BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
-                    EnhancedDocumentVerification ->
-                        SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
-
-                    else -> {
-                        Timber.e("Unexpected pending job: $job")
-                        throw IllegalStateException("Unexpected pending job: $job")
-                    }
-                }
-                    .map { it.toJob(userId, jobId, jobType) }
-                    .catch {
-                        Timber.e(it, "Job polling failed")
-                        DataStoreRepository.markPendingJobAsCompleted(
-                            partnerId = SmileID.config.partnerId,
-                            isProduction = !SmileID.useSandbox,
-                            completedJob = job.copy(
-                                jobComplete = true,
-                                resultText = "Job polling error",
-                            ),
-                        )
-                    }
-
-                // launch, instead of immediately collecting, so that we don't block the flow
-                launch {
-                    // We only care about the last value - either the job completed or timed out
-                    // NB! We will *not* update the state once the job has locally timed out
-                    pollFlow.lastOrNull()?.let {
-                        if (it.jobComplete) {
-                            DataStoreRepository.markPendingJobAsCompleted(
-                                partnerId = SmileID.config.partnerId,
-                                isProduction = !SmileID.useSandbox,
-                                completedJob = it,
-                            )
-                            _uiState.update {
-                                it.copy(snackbarMessage = "Job Completed")
-                            }
-                        } else {
-                            DataStoreRepository.markPendingJobAsCompleted(
-                                partnerId = SmileID.config.partnerId,
-                                isProduction = !SmileID.useSandbox,
-                                completedJob = it.copy(
-                                    jobComplete = true,
-                                    resultText = "Job polling timed out",
-                                ),
-                            )
-                            _uiState.update {
-                                it.copy(snackbarMessage = "Job Polling Timed Out")
-                            }
-                        }
-                    }
-                }
-            }
+        // DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
+        //     .distinctUntilChanged()
+        //     .flatMapMerge { it.asFlow() }
+        //     .collect { job ->
+        //         val userId = job.userId
+        //         val jobId = job.jobId
+        //         val jobType = job.jobType
+        //         val request = JobStatusRequest(
+        //             userId = userId,
+        //             jobId = jobId,
+        //             includeImageLinks = false,
+        //             includeHistory = false,
+        //             partnerId = SmileID.config.partnerId,
+        //             timestamp = authResponse.timestamp,
+        //             signature = authResponse.signature,
+        //         )
+        //         val pollFlow = when (jobType) {
+        //             SmartSelfieAuthentication -> SmileID.api.pollSmartSelfieJobStatus(request)
+        //             SmartSelfieEnrollment -> SmileID.api.pollSmartSelfieJobStatus(request)
+        //             DocumentVerification -> SmileID.api.pollDocumentVerificationJobStatus(request)
+        //             BiometricKyc -> SmileID.api.pollBiometricKycJobStatus(request)
+        //             EnhancedDocumentVerification ->
+        //                 SmileID.api.pollEnhancedDocumentVerificationJobStatus(request)
+        //
+        //             else -> {
+        //                 Timber.e("Unexpected pending job: $job")
+        //                 throw IllegalStateException("Unexpected pending job: $job")
+        //             }
+        //         }
+        //             .map { it.toJob(userId, jobId, jobType) }
+        //             .catch {
+        //                 Timber.e(it, "Job polling failed")
+        //                 DataStoreRepository.markPendingJobAsCompleted(
+        //                     partnerId = SmileID.config.partnerId,
+        //                     isProduction = !SmileID.useSandbox,
+        //                     completedJob = job.copy(
+        //                         jobComplete = true,
+        //                         resultText = "Job polling error",
+        //                     ),
+        //                 )
+        //             }
+        //
+        //         // launch, instead of immediately collecting, so that we don't block the flow
+        //         launch {
+        //             // We only care about the last value - either the job completed or timed out
+        //             // NB! We will *not* update the state once the job has locally timed out
+        //             pollFlow.lastOrNull()?.let {
+        //                 if (it.jobComplete) {
+        //                     DataStoreRepository.markPendingJobAsCompleted(
+        //                         partnerId = SmileID.config.partnerId,
+        //                         isProduction = !SmileID.useSandbox,
+        //                         completedJob = it,
+        //                     )
+        //                     _uiState.update {
+        //                         it.copy(snackbarMessage = "Job Completed")
+        //                     }
+        //                 } else {
+        //                     DataStoreRepository.markPendingJobAsCompleted(
+        //                         partnerId = SmileID.config.partnerId,
+        //                         isProduction = !SmileID.useSandbox,
+        //                         completedJob = it.copy(
+        //                             jobComplete = true,
+        //                             resultText = "Job polling timed out",
+        //                         ),
+        //                     )
+        //                     _uiState.update {
+        //                         it.copy(snackbarMessage = "Job Polling Timed Out")
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
     }
 
     private fun createPendingJobCountPoller() = viewModelScope.launch(
@@ -162,12 +142,12 @@ class MainScreenViewModel : ViewModel() {
             }
         },
     ) {
-        DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
-            .distinctUntilChanged()
-            .map { it.size }
-            .collect { count ->
-                _uiState.update { it.copy(pendingJobCount = count) }
-            }
+        // DataStoreRepository.getPendingJobs(SmileID.config.partnerId, !SmileID.useSandbox)
+        //     .distinctUntilChanged()
+        //     .map { it.size }
+        //     .collect { count ->
+        //         _uiState.update { it.copy(pendingJobCount = count) }
+        //     }
     }
 
     fun onHomeSelected() {
@@ -234,20 +214,20 @@ class MainScreenViewModel : ViewModel() {
                 it.copy(clipboardText = AnnotatedString(userId), snackbarMessage = message)
             }
             viewModelScope.launch {
-                DataStoreRepository.addCompletedJob(
-                    partnerId = SmileID.config.partnerId,
-                    isProduction = uiState.value.isProduction,
-                    job = Job(
-                        jobType = SmartSelfieEnrollment,
-                        timestamp = response.createdAt,
-                        userId = userId,
-                        jobId = jobId,
-                        jobComplete = true,
-                        jobSuccess = response.status == SmartSelfieStatus.Approved,
-                        code = response.code,
-                        resultText = response.message,
-                    ),
-                )
+                // DataStoreRepository.addCompletedJob(
+                //     partnerId = SmileID.config.partnerId,
+                //     isProduction = uiState.value.isProduction,
+                //     job = Job(
+                //         jobType = SmartSelfieEnrollment,
+                //         timestamp = response.createdAt,
+                //         userId = userId,
+                //         jobId = jobId,
+                //         jobComplete = true,
+                //         jobSuccess = response.status == SmartSelfieStatus.Approved,
+                //         code = response.code,
+                //         resultText = response.message,
+                //     ),
+                // )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -283,20 +263,20 @@ class MainScreenViewModel : ViewModel() {
             )
             _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
-                DataStoreRepository.addCompletedJob(
-                    partnerId = SmileID.config.partnerId,
-                    isProduction = uiState.value.isProduction,
-                    job = Job(
-                        jobType = SmartSelfieAuthentication,
-                        timestamp = response.createdAt,
-                        userId = userId,
-                        jobId = jobId,
-                        jobComplete = response.status != SmartSelfieStatus.Pending,
-                        jobSuccess = response.status == SmartSelfieStatus.Approved,
-                        code = response.code,
-                        resultText = response.message,
-                    ),
-                )
+                // DataStoreRepository.addCompletedJob(
+                //     partnerId = SmileID.config.partnerId,
+                //     isProduction = uiState.value.isProduction,
+                //     job = Job(
+                //         jobType = SmartSelfieAuthentication,
+                //         timestamp = response.createdAt,
+                //         userId = userId,
+                //         jobId = jobId,
+                //         jobComplete = response.status != SmartSelfieStatus.Pending,
+                //         jobSuccess = response.status == SmartSelfieStatus.Approved,
+                //         code = response.code,
+                //         resultText = response.message,
+                //     ),
+                // )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -332,20 +312,20 @@ class MainScreenViewModel : ViewModel() {
                 it.copy(clipboardText = AnnotatedString(response.userId), snackbarMessage = message)
             }
             viewModelScope.launch {
-                DataStoreRepository.addCompletedJob(
-                    partnerId = SmileID.config.partnerId,
-                    isProduction = uiState.value.isProduction,
-                    job = Job(
-                        jobType = SmartSelfieEnrollment,
-                        timestamp = response.createdAt,
-                        userId = response.userId,
-                        jobId = response.jobId,
-                        jobComplete = true,
-                        jobSuccess = true,
-                        code = response.code,
-                        resultText = response.message,
-                    ),
-                )
+                // DataStoreRepository.addCompletedJob(
+                //     partnerId = SmileID.config.partnerId,
+                //     isProduction = uiState.value.isProduction,
+                //     job = Job(
+                //         jobType = SmartSelfieEnrollment,
+                //         timestamp = response.createdAt,
+                //         userId = response.userId,
+                //         jobId = response.jobId,
+                //         jobComplete = true,
+                //         jobSuccess = true,
+                //         code = response.code,
+                //         resultText = response.message,
+                //     ),
+                // )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -379,20 +359,20 @@ class MainScreenViewModel : ViewModel() {
             )
             _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
-                DataStoreRepository.addCompletedJob(
-                    partnerId = SmileID.config.partnerId,
-                    isProduction = uiState.value.isProduction,
-                    job = Job(
-                        jobType = SmartSelfieAuthentication,
-                        timestamp = response.createdAt,
-                        userId = response.userId,
-                        jobId = response.jobId,
-                        jobComplete = true,
-                        jobSuccess = true,
-                        code = response.code,
-                        resultText = response.message,
-                    ),
-                )
+                // DataStoreRepository.addCompletedJob(
+                //     partnerId = SmileID.config.partnerId,
+                //     isProduction = uiState.value.isProduction,
+                //     job = Job(
+                //         jobType = SmartSelfieAuthentication,
+                //         timestamp = response.createdAt,
+                //         userId = response.userId,
+                //         jobId = response.jobId,
+                //         jobComplete = true,
+                //         jobSuccess = true,
+                //         code = response.code,
+                //         resultText = response.message,
+                //     ),
+                // )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -426,11 +406,11 @@ class MainScreenViewModel : ViewModel() {
             _uiState.update { it.copy(snackbarMessage = message) }
             viewModelScope.launch {
                 // Enhanced KYC completes synchronously
-                DataStoreRepository.addCompletedJob(
-                    partnerId = SmileID.config.partnerId,
-                    isProduction = uiState.value.isProduction,
-                    job = resultData.toJob(),
-                )
+                // DataStoreRepository.addCompletedJob(
+                //     partnerId = SmileID.config.partnerId,
+                //     isProduction = uiState.value.isProduction,
+                //     job = resultData.toJob(),
+                // )
             }
         } else if (result is SmileIDResult.Error) {
             val th = result.throwable
@@ -459,16 +439,16 @@ class MainScreenViewModel : ViewModel() {
             _uiState.update { it.copy(snackbarMessage = message) }
             if (result.data.didSubmitBiometricKycJob) {
                 viewModelScope.launch {
-                    DataStoreRepository.addPendingJob(
-                        partnerId = SmileID.config.partnerId,
-                        isProduction = uiState.value.isProduction,
-                        job = Job(
-                            jobType = BiometricKyc,
-                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
-                            userId = userId,
-                            jobId = jobId,
-                        ),
-                    )
+                    // DataStoreRepository.addPendingJob(
+                    //     partnerId = SmileID.config.partnerId,
+                    //     isProduction = uiState.value.isProduction,
+                    //     job = Job(
+                    //         jobType = BiometricKyc,
+                    //         timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                    //         userId = userId,
+                    //         jobId = jobId,
+                    //     ),
+                    // )
                 }
             } else {
                 Timber.w(" $jobId not saved to pending job, offline enabled")
@@ -499,16 +479,16 @@ class MainScreenViewModel : ViewModel() {
             _uiState.update { it.copy(snackbarMessage = message) }
             if (result.data.didSubmitDocumentVerificationJob) {
                 viewModelScope.launch {
-                    DataStoreRepository.addPendingJob(
-                        partnerId = SmileID.config.partnerId,
-                        isProduction = uiState.value.isProduction,
-                        job = Job(
-                            jobType = DocumentVerification,
-                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
-                            userId = userId,
-                            jobId = jobId,
-                        ),
-                    )
+                    // DataStoreRepository.addPendingJob(
+                    //     partnerId = SmileID.config.partnerId,
+                    //     isProduction = uiState.value.isProduction,
+                    //     job = Job(
+                    //         jobType = DocumentVerification,
+                    //         timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                    //         userId = userId,
+                    //         jobId = jobId,
+                    //     ),
+                    // )
                 }
             } else {
                 Timber.w(" $jobId not saved to pending job, offline enabled")
@@ -551,16 +531,16 @@ class MainScreenViewModel : ViewModel() {
             _uiState.update { it.copy(snackbarMessage = message) }
             if (result.data.didSubmitEnhancedDocVJob) {
                 viewModelScope.launch {
-                    DataStoreRepository.addPendingJob(
-                        partnerId = SmileID.config.partnerId,
-                        isProduction = uiState.value.isProduction,
-                        job = Job(
-                            jobType = EnhancedDocumentVerification,
-                            timestamp = getCurrentTimeAsHumanReadableTimestamp(),
-                            userId = userId,
-                            jobId = jobId,
-                        ),
-                    )
+                    // DataStoreRepository.addPendingJob(
+                    //     partnerId = SmileID.config.partnerId,
+                    //     isProduction = uiState.value.isProduction,
+                    //     job = Job(
+                    //         jobType = EnhancedDocumentVerification,
+                    //         timestamp = getCurrentTimeAsHumanReadableTimestamp(),
+                    //         userId = userId,
+                    //         jobId = jobId,
+                    //     ),
+                    // )
                 }
             } else {
                 Timber.w(" $jobId not saved to pending job, offline enabled")
@@ -575,7 +555,7 @@ class MainScreenViewModel : ViewModel() {
 
     fun clearJobs() {
         viewModelScope.launch {
-            DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)
+            // DataStoreRepository.clearJobs(SmileID.config.partnerId, !SmileID.useSandbox)
         }
     }
 

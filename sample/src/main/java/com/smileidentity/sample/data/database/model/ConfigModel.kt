@@ -9,11 +9,11 @@ import androidx.room.PrimaryKey
         Index(value = arrayOf("partnerId"), unique = true),
     ],
 )
-data class Config(
+data class ConfigModel(
     @PrimaryKey
     val partnerId: String,
-    val prodAuthToken: String,
-    val testAuthToken: String,
+    val prodAuthToken: String?,
+    val testAuthToken: String?,
     val prodLambdaUrl: String,
     val testLambdaUrl: String,
 )

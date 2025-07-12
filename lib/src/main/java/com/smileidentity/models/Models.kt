@@ -60,7 +60,7 @@ enum class JobType(val value: Int) {
      * by the SDK. Please update the SDK to the latest version to support the latest values.
      */
     Unknown(-1),
-    ;3
+    ;
 
     companion object {
         @JvmStatic

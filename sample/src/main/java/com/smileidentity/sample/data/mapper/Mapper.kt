@@ -1,6 +1,7 @@
 package com.smileidentity.sample.data.mapper
 
 import com.smileidentity.models.BiometricKycJobStatusResponse
+import com.smileidentity.models.Config
 import com.smileidentity.models.DocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedDocumentVerificationJobStatusResponse
 import com.smileidentity.models.EnhancedKycResponse
@@ -14,8 +15,17 @@ import com.smileidentity.models.JobType.EnhancedKyc
 import com.smileidentity.models.JobType.SmartSelfieAuthentication
 import com.smileidentity.models.JobType.SmartSelfieEnrollment
 import com.smileidentity.models.SmartSelfieJobStatusResponse
+import com.smileidentity.sample.data.database.model.ConfigModel
 import com.smileidentity.sample.data.database.model.Job
 import java.util.Date
+
+fun Config.toModel() = ConfigModel(
+    partnerId = partnerId,
+    prodAuthToken = authToken,
+    testAuthToken = "",
+    prodLambdaUrl = prodLambdaUrl,
+    testLambdaUrl = testLambdaUrl,
+)
 
 fun EnhancedKycResponse.toJob() = Job(
     jobType = EnhancedKyc,

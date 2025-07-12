@@ -27,7 +27,6 @@ import com.smileidentity.sample.SmileIDApplication
 import com.smileidentity.sample.util.isInternetAvailable
 import com.smileidentity.sample.util.toast
 import com.smileidentity.sample.viewmodel.RootViewModel
-import com.smileidentity.viewmodel.viewModelFactory
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -40,7 +39,7 @@ import timber.log.Timber
 @Composable
 fun RootScreen(
     modifier: Modifier = Modifier,
-    viewModel: RootViewModel = viewModel(factory = viewModelFactory { RootViewModel() }),
+    viewModel: RootViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val runtimeConfig by viewModel.runtimeConfig.collectAsStateWithLifecycle()
@@ -60,7 +59,6 @@ fun RootScreen(
             runtimeConfig != null -> {
                 SmileID.initialize(
                     context = context,
-                    config = runtimeConfig!!,
                     useSandbox = false,
                     enableCrashReporting = !BuildConfig.DEBUG,
                     okHttpClient = client,

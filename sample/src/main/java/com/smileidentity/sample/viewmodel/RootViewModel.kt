@@ -7,7 +7,10 @@ import com.smileidentity.SmileID
 import com.smileidentity.models.Config
 import com.smileidentity.sample.R
 import com.smileidentity.sample.SmileIDApplication
-import com.smileidentity.sample.repo.DataStoreRepository
+import com.smileidentity.sample.data.mapper.toModel
+import com.smileidentity.sample.data.repository.ConfigRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,11 +33,14 @@ data class RootUiState(
     val showSmileConfigConfirmation: Boolean = false,
 )
 
-class RootViewModel : ViewModel() {
+@HiltViewModel
+class RootViewModel @Inject constructor(
+    private val repository: ConfigRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RootUiState())
     val uiState = _uiState.asStateFlow()
 
-    val runtimeConfig = DataStoreRepository.getConfig().stateIn(
+    val runtimeConfig = repository.fetchConfigs().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = null,
@@ -66,7 +72,7 @@ class RootViewModel : ViewModel() {
         try {
             pendingConfig?.let { config ->
                 viewModelScope.launch {
-                    DataStoreRepository.setConfig(config)
+                    repository.createConfig(configModel = config.toModel())
                 }
             }
         } catch (e: Exception) {
