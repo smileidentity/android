@@ -173,6 +173,8 @@ fun SmileID.SmartSelfieAuthentication(
  * @param jobId The job ID to associate with the Document Verification. Most often, this will
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
+ * @param enableAutoCapture Enable or disable document auto capture
+ * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be displayed
  * allowing toggling between the back camera and front camera. If not allowed, only the front
@@ -197,6 +199,7 @@ fun SmileID.DocumentVerification(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    enableAutoCapture: Boolean = true,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -214,6 +217,7 @@ fun SmileID.DocumentVerification(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
+            enableAutoCapture = enableAutoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
@@ -263,6 +267,8 @@ fun SmileID.DocumentVerification(
  * @param jobId The job ID to associate with the Enhanced Document Verification. Most often, this will
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
+ * @param enableAutoCapture Enable or disable document auto capture
+ * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
  * @param allowAgentMode Whether to allow Agent Mode or not. If allowed, a switch will be displayed
  * allowing toggling between the back camera and front camera. If not allowed, only the front
@@ -288,6 +294,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    enableAutoCapture: Boolean = true,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -313,6 +320,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
+            enableAutoCapture = enableAutoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,

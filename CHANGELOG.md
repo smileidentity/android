@@ -1,10 +1,16 @@
 # Release Notes
 
-## Unreleased
+# Unreleased 
 
-### Changed
+### Added
 
 * Added Face Tracking in Selfie Capture to ensure only same face is used during capture
+
+## 11.0.5 - July 2, 2025
+
+### Added
+
+* Added option to disable document auto capture in DocV and Enhanced DocV
 
 ## 11.0.4 - June 16, 2025
 
