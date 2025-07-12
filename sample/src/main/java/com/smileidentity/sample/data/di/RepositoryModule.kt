@@ -1,5 +1,7 @@
 package com.smileidentity.sample.data.di
 
+import com.smileidentity.sample.data.repository.ConfigDataSource
+import com.smileidentity.sample.data.repository.ConfigRepository
 import com.smileidentity.sample.data.repository.JobsDataSource
 import com.smileidentity.sample.data.repository.JobsRepository
 import dagger.Binds
@@ -15,4 +17,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideJobsRepository(repository: JobsDataSource): JobsRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideConfigRepository(repository: ConfigDataSource): ConfigRepository
 }

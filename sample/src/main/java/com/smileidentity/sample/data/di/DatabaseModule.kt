@@ -3,6 +3,7 @@ package com.smileidentity.sample.data.di
 import android.content.Context
 import androidx.room.Room
 import com.smileidentity.sample.data.database.SmileIDDatabase
+import com.smileidentity.sample.data.database.dao.ConfigDao
 import com.smileidentity.sample.data.database.dao.JobsDao
 import dagger.Module
 import dagger.Provides
@@ -26,4 +27,6 @@ object DatabaseModule {
 
     @Provides
     fun providesJobsDao(database: SmileIDDatabase): JobsDao = database.jobsDao()
+
+    fun providesConfigDao(database: SmileIDDatabase): ConfigDao = database.configDao()
 }
