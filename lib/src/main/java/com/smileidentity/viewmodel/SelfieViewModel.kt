@@ -1,5 +1,6 @@
 package com.smileidentity.viewmodel
 
+import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -52,6 +53,7 @@ import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.File
 import kotlin.math.absoluteValue
+import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 import kotlinx.collections.immutable.ImmutableMap
@@ -78,6 +80,10 @@ private const val MIN_FACE_AREA_THRESHOLD = 0.15f
 const val MAX_FACE_AREA_THRESHOLD = 0.30f
 private const val SMILE_THRESHOLD = 0.8f
 
+private val faceBoundingBoxQueue: ArrayDeque<Pair<Long, Rect>> = ArrayDeque()
+private val FACE_STABILITY_WINDOW_MS = 3000L // 3 seconds
+private val FACE_MOVEMENT_THRESHOLD_PX = 15 // acceptable pixel movement
+
 data class SelfieUiState(
     val directive: SelfieDirective = SelfieDirective.InitialInstruction,
     val progress: Float = 0f,
@@ -90,6 +96,7 @@ enum class SelfieDirective(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),
     Capturing(R.string.si_smart_selfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smart_selfie_directive_unable_to_detect_face),
+    HoldStill(R.string.si_smart_selfie_directive_hold_still),
     EnsureOnlyOneFace(R.string.si_smart_selfie_directive_multiple_faces),
     MoveCloser(R.string.si_smart_selfie_directive_face_too_far),
     MoveAway(R.string.si_smart_selfie_directive_face_too_close),
@@ -227,6 +234,11 @@ class SelfieViewModel(
                 face.boundingBox.bottom <= inputImage.height
             if (!faceCornersInImage) {
                 _uiState.update { it.copy(directive = SelfieDirective.EnsureFaceInFrame) }
+                return@addOnSuccessListener
+            }
+
+            if (!isFaceStable(face = face.boundingBox)) {
+                _uiState.update { it.copy(directive = SelfieDirective.HoldStill) }
                 return@addOnSuccessListener
             }
 
@@ -547,5 +559,38 @@ class SelfieViewModel(
         }
         livenessFiles.removeAll { it.delete() }
         selfieFile = null
+    }
+
+    private fun isFaceStable(face: Rect): Boolean {
+        val now = System.currentTimeMillis()
+
+        // Remove entries older than 3 seconds
+        val iterator = faceBoundingBoxQueue.iterator()
+        while (iterator.hasNext()) {
+            val (timestamp, _) = iterator.next()
+            if (now - timestamp > FACE_STABILITY_WINDOW_MS) {
+                iterator.remove()
+            }
+        }
+
+        // Add new bounding box
+        faceBoundingBoxQueue.addLast(now to Rect(face))
+
+        if (faceBoundingBoxQueue.size < 5) return false
+
+        // Allow some movement by checking average displacement from the mean center
+        val centers = faceBoundingBoxQueue.map { (_, box) -> box.centerX() to box.centerY() }
+
+        val avgX = centers.map { it.first }.average()
+        val avgY = centers.map { it.second }.average()
+
+        val maxDeviation = centers.maxOf {
+            val dx = it.first - avgX
+            val dy = it.second - avgY
+            sqrt((dx * dx + dy * dy))
+        }
+
+        // Allow ~25 pixels of deviation as "stable enough"
+        return maxDeviation < 25.0
     }
 }
