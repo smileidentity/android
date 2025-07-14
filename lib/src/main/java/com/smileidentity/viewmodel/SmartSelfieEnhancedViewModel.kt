@@ -141,6 +141,7 @@ class SmartSelfieEnhancedViewModel(
     private val extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     private val faceDetector: FaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder().apply {
+            enableTracking()
             setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
             setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
             setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
@@ -165,6 +166,7 @@ class SmartSelfieEnhancedViewModel(
         started = SharingStarted.WhileSubscribed(),
         initialValue = _uiState.value,
     )
+    private var faceTrackingId: Int? = null
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
@@ -303,6 +305,25 @@ class SmartSelfieEnhancedViewModel(
             val face = facesToConsider.firstOrNull() ?: run {
                 Timber.d("No face detected")
                 conditionFailedWithReasonAndTimeout(SearchingForFace)
+                return@addOnSuccessListener
+            }
+
+            // Ensure trackingId is available
+            val currentTrackingId = face.trackingId
+            if (currentTrackingId == null) {
+                conditionFailedWithReasonAndTimeout(OnlyOneFace)
+                return@addOnSuccessListener
+            }
+
+            // First time seeing a face — store the trackingId, else reset the capture
+            if (faceTrackingId == null) {
+                faceTrackingId = currentTrackingId
+            } else if (faceTrackingId != currentTrackingId) {
+                conditionFailedWithReasonAndTimeout(OnlyOneFace)
+                livenessFiles.removeAll { it.delete() }
+                selfieFile?.delete()
+                selfieFile = null
+                faceTrackingId = null
                 return@addOnSuccessListener
             }
 
