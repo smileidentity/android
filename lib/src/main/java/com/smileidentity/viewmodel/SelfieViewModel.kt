@@ -1,6 +1,5 @@
 package com.smileidentity.viewmodel
 
-import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -78,10 +77,6 @@ private const val FACE_ROTATION_THRESHOLD = 0.75f
 private const val MIN_FACE_AREA_THRESHOLD = 0.15f
 const val MAX_FACE_AREA_THRESHOLD = 0.30f
 private const val SMILE_THRESHOLD = 0.8f
-
-private val faceBoundingBoxQueue: ArrayDeque<Pair<Long, Rect>> = ArrayDeque()
-private val FACE_STABILITY_WINDOW_MS = 3000L // 3 seconds
-private val FACE_MOVEMENT_THRESHOLD_PX = 15 // acceptable pixel movement
 
 data class SelfieUiState(
     val directive: SelfieDirective = SelfieDirective.InitialInstruction,
