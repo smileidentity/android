@@ -35,7 +35,6 @@
     <string name="si_smart_selfie_directive_smile">Smile!</string>
     <string name="si_smart_selfie_directive_capturing">Capturing…</string>
     <string name="si_smart_selfie_directive_unable_to_detect_face">Position your face in the oval</string>
-    <string name="si_smart_selfie_directive_hold_still">Hold your phone steady</string>
     <string name="si_smart_selfie_directive_multiple_faces">Ensure only one face is visible</string>
     <string name="si_smart_selfie_directive_face_too_far">Move closer</string>
     <string name="si_smart_selfie_directive_face_too_close">Move farther away</string>

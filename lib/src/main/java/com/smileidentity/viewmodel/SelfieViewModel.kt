@@ -90,7 +90,6 @@ enum class SelfieDirective(@StringRes val displayText: Int) {
     InitialInstruction(R.string.si_smart_selfie_instructions),
     Capturing(R.string.si_smart_selfie_directive_capturing),
     EnsureFaceInFrame(R.string.si_smart_selfie_directive_unable_to_detect_face),
-    HoldStill(R.string.si_smart_selfie_directive_hold_still),
     EnsureOnlyOneFace(R.string.si_smart_selfie_directive_multiple_faces),
     MoveCloser(R.string.si_smart_selfie_directive_face_too_far),
     MoveAway(R.string.si_smart_selfie_directive_face_too_close),
