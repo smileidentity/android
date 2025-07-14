@@ -122,7 +122,6 @@ class SelfieViewModel(
     )
     var result: SmileIDResult<SmartSelfieResult>? = null
     private var faceTrackingId: Int? = null
-
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
@@ -137,6 +136,7 @@ class SelfieViewModel(
         enableTracking()
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+        setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
         setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
