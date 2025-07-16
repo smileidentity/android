@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.android.library)
@@ -57,15 +58,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-        moduleName = "${groupId}_$artifactId"
-        compileOptions {
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+            moduleName = "${groupId}_$artifactId"
             // https://kotlinlang.org/docs/opt-in-requirements.html#module-wide-opt-in
             // This is to provide us a blanket-allow us to use APIs annotated with @SmileIDOptIn
             // without having to add the opt-in annotation to every usage. The annotation's purpose
             // is primarily for consumers of the SDK to use, not for us.
-            freeCompilerArgs += "-opt-in=com.smileidentity.SmileIDOptIn"
+            freeCompilerArgs.add("-opt-in=com.smileidentity.SmileIDOptIn")
         }
     }
 
@@ -81,7 +82,6 @@ android {
 }
 
 composeCompiler {
-    featureFlags.addAll(ComposeFeatureFlag.StrongSkipping)
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }
