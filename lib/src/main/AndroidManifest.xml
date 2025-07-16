@@ -12,7 +12,9 @@
             android:name="android.hardware.camera"
             android:required="false" />
 
-    <application>
+    <application
+            android:pageSizeCompat="enabled"
+            tools:targetApi="36">
         <meta-data
                 android:name="com.google.mlkit.vision.DEPENDENCIES"
                 android:value="face" />
