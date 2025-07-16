@@ -99,6 +99,15 @@ interface JobResult : Parcelable {
 
     interface Entry : JobResult {
         val actions: Actions
+        val antifraud: Antifraud?
+        val resultCode: String
+        val resultText: String
+        val smileJobId: String
+        val partnerParams: PartnerParams
+    }
+
+    interface HistoryEntry : JobResult {
+        val actions: Actions
         val resultCode: String
         val resultText: String
         val smileJobId: String
@@ -111,13 +120,14 @@ sealed interface SmartSelfieJobResult : JobResult {
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Actions") override val actions: Actions,
+        @Json(name = "Antifraud") override val antifraud: Antifraud?,
         @Json(name = "ResultCode") override val resultCode: String,
         @Json(name = "ResultText") override val resultText: String,
         @Json(name = "SmileJobID") override val smileJobId: String,
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
         @Json(name = "ConfidenceValue") val confidence: Double?,
     ) : SmartSelfieJobResult,
-        JobResult.Entry
+        JobResult.Entry, JobResult.HistoryEntry
 }
 
 sealed interface DocumentVerificationJobResult : JobResult {
@@ -125,6 +135,7 @@ sealed interface DocumentVerificationJobResult : JobResult {
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Actions") override val actions: Actions,
+        @Json(name = "Antifraud") override val antifraud: Antifraud?,
         @Json(name = "ResultCode") override val resultCode: String,
         @Json(name = "ResultText") override val resultText: String,
         @Json(name = "SmileJobID") override val smileJobId: String,
@@ -141,7 +152,7 @@ sealed interface DocumentVerificationJobResult : JobResult {
         @Json(name = "PhoneNumber2") val phoneNumber2: String?,
         @Json(name = "Address") val address: String?,
     ) : DocumentVerificationJobResult,
-        JobResult.Entry
+        JobResult.Entry, JobResult.HistoryEntry
 }
 
 sealed interface BiometricKycJobResult : JobResult {
@@ -149,12 +160,12 @@ sealed interface BiometricKycJobResult : JobResult {
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Actions") override val actions: Actions,
+        @Json(name = "Antifraud") override val antifraud: Antifraud?,
         @Json(name = "ResultCode") override val resultCode: String,
         @Json(name = "ResultText") override val resultText: String,
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") override val smileJobId: String,
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
-        @Json(name = "Antifraud") val antifraud: Antifraud?,
         @Json(name = "DOB") val dob: String?,
         @Json(name = "Photo") val photoBase64: String?,
         @Json(name = "Gender") val gender: String?,
@@ -172,7 +183,7 @@ sealed interface BiometricKycJobResult : JobResult {
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
     ) : BiometricKycJobResult,
-        JobResult.Entry
+        JobResult.Entry, JobResult.HistoryEntry
 }
 
 sealed interface EnhancedDocumentVerificationJobResult : JobResult {
@@ -180,12 +191,12 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
     @JsonClass(generateAdapter = true)
     data class Entry(
         @Json(name = "Actions") override val actions: Actions,
+        @Json(name = "Antifraud") override val antifraud: Antifraud?,
         @Json(name = "ResultCode") override val resultCode: String,
         @Json(name = "ResultText") override val resultText: String,
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") override val smileJobId: String,
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
-        @Json(name = "Antifraud") val antifraud: Antifraud?,
         @Json(name = "DOB") val dob: String?,
         @Json(name = "Photo") val photoBase64: String?,
         @Json(name = "Gender") val gender: String?,
@@ -203,17 +214,35 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
     ) : EnhancedDocumentVerificationJobResult,
-        JobResult.Entry
+        JobResult.Entry, JobResult.HistoryEntry
 }
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class Antifraud(@Json(name = "SuspectUsers") val suspectUsers: List<SuspectUser>) : Parcelable
+data class Antifraud(
+    @Json(name = "summary") val summary: Summary,
+    @Json(name = "smile_secure") val smileSecure: SmileSecure,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class SmileSecure(
+    @Json(name = "ResultCode") val resultCode: String,
+    @Json(name = "ResultText") val resultText: String,
+    @Json(name = "SuspectUsers") val suspectUsers: List<SuspectUser>,
+) : Parcelable
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class Summary(
+    @Json(name = "fraud_sources") val fraudSources: List<String>,
+    @Json(name = "fraud_detected") val fraudDetected: Boolean,
+) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class SuspectUser(
-    @Json(name = "reason") val reason: String,
+    @Json(name = "reasons") val reason: List<String>,
     @Json(name = "user_id") val userId: String,
 ) : Parcelable
 
