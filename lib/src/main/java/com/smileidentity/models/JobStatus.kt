@@ -234,7 +234,7 @@ data class Summary(
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class SuspectUser(
-    @Json(name = "reasons") val reason: List<String>,
+    @Json(name = "reasons") val reasons: List<String>,
     @Json(name = "user_id") val userId: String,
 ) : Parcelable
 
