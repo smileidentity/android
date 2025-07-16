@@ -105,14 +105,6 @@ interface JobResult : Parcelable {
         val smileJobId: String
         val partnerParams: PartnerParams
     }
-
-    interface HistoryEntry : JobResult {
-        val actions: Actions
-        val resultCode: String
-        val resultText: String
-        val smileJobId: String
-        val partnerParams: PartnerParams
-    }
 }
 
 sealed interface SmartSelfieJobResult : JobResult {
@@ -127,8 +119,7 @@ sealed interface SmartSelfieJobResult : JobResult {
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
         @Json(name = "ConfidenceValue") val confidence: Double?,
     ) : SmartSelfieJobResult,
-        JobResult.Entry,
-        JobResult.HistoryEntry
+        JobResult.Entry
 }
 
 sealed interface DocumentVerificationJobResult : JobResult {
@@ -153,8 +144,7 @@ sealed interface DocumentVerificationJobResult : JobResult {
         @Json(name = "PhoneNumber2") val phoneNumber2: String?,
         @Json(name = "Address") val address: String?,
     ) : DocumentVerificationJobResult,
-        JobResult.Entry,
-        JobResult.HistoryEntry
+        JobResult.Entry
 }
 
 sealed interface BiometricKycJobResult : JobResult {
@@ -185,8 +175,7 @@ sealed interface BiometricKycJobResult : JobResult {
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
     ) : BiometricKycJobResult,
-        JobResult.Entry,
-        JobResult.HistoryEntry
+        JobResult.Entry
 }
 
 sealed interface EnhancedDocumentVerificationJobResult : JobResult {
@@ -217,8 +206,7 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
         @Json(name = "IDNumberPreviouslyRegistered") val idNumberPreviouslyRegistered: Boolean?,
         @Json(name = "UserIDsOfPreviousRegistrants") val previousRegistrantsUserIds: List<String>?,
     ) : EnhancedDocumentVerificationJobResult,
-        JobResult.Entry,
-        JobResult.HistoryEntry
+        JobResult.Entry
 }
 
 @Parcelize
