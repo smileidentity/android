@@ -23,7 +23,7 @@ project.version = findProperty("VERSION_NAME") as? String
 android {
     namespace = groupId
     resourcePrefix = "si_"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 21
