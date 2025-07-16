@@ -5,6 +5,7 @@
 ### Added
 
 * Added Face Tracking in Selfie Capture to ensure only same face is used during capture
+* Added AntiFraud response in JobStatus calls
 
 ## 11.0.5 - July 2, 2025
 
