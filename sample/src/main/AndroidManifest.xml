@@ -20,7 +20,7 @@
             android:allowBackup="false"
             android:enableOnBackInvokedCallback="true"
             android:theme="@style/Theme.SmileID.Splash"
-            tools:targetApi="33">
+            tools:targetApi="36">
 
         <meta-data
                 android:name="com.google.mlkit.vision.DEPENDENCIES"
