@@ -20,7 +20,6 @@ import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.models.ConsentInformation
-import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
@@ -28,7 +27,6 @@ import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
-import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
@@ -302,14 +300,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     showInstructions: Boolean = true,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    consentInformation: ConsentInformation = ConsentInformation(
-        consented = ConsentedInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetails = false,
-            contactInformation = false,
-            documentInformation = false,
-        ),
-    ),
+    consentInformation: ConsentInformation? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
@@ -388,14 +379,7 @@ fun SmileID.BiometricKYC(
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     useStrictMode: Boolean = false,
-    consentInformation: ConsentInformation = ConsentInformation(
-        consented = ConsentedInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetails = false,
-            contactInformation = false,
-            documentInformation = false,
-        ),
-    ),
+    consentInformation: ConsentInformation? = null,
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},

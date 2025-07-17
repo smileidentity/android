@@ -53,7 +53,7 @@ data class BiometricKycUiState(
 
 class BiometricKycViewModel(
     private val idInfo: IdInfo,
-    private val consentInformation: ConsentInformation,
+    private val consentInformation: ConsentInformation?,
     private val userId: String,
     private val jobId: String,
     private val allowNewEnroll: Boolean,

@@ -38,7 +38,7 @@ import kotlinx.collections.immutable.persistentMapOf
 @Composable
 fun OrchestratedBiometricKYCScreen(
     idInfo: IdInfo,
-    consentInformation: ConsentInformation,
+    consentInformation: ConsentInformation?,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
