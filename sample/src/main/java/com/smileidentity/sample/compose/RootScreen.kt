@@ -54,6 +54,7 @@ fun RootScreen(
     @SuppressLint("ProduceStateDoesNotAssignValue")
     val initializationState by produceState<InitializationState>(
         InitializationState.NotInitialized,
+        runtimeConfig,
     ) {
         delay(1000)
         when {

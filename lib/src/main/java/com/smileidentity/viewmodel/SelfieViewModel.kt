@@ -115,7 +115,7 @@ class SelfieViewModel(
         SelfieUiState(),
     )
     var result: SmileIDResult<SmartSelfieResult>? = null
-
+    private var faceTrackingId: Int? = null
     private val livenessFiles = mutableListOf<File>()
     private var selfieFile: File? = null
     private var lastAutoCaptureTimeMs = 0L
@@ -127,8 +127,10 @@ class SelfieViewModel(
     internal var shouldAnalyzeImages = true
 
     private val faceDetectorOptions = FaceDetectorOptions.Builder().apply {
+        enableTracking()
         setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+        setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
         setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
     }.build()
     private val faceDetector by lazy { FaceDetection.getClient(faceDetectorOptions) }
@@ -191,6 +193,32 @@ class SelfieViewModel(
             }
 
             val face = faces.first()
+
+            // Ensure trackingId is available
+            val currentTrackingId = face.trackingId
+            if (currentTrackingId == null) {
+                _uiState.update { it.copy(directive = SelfieDirective.EnsureOnlyOneFace) }
+                return@addOnSuccessListener
+            }
+
+            // First time seeing a face — store the trackingId, else reset the capture
+            if (faceTrackingId == null) {
+                faceTrackingId = currentTrackingId
+            } else if (faceTrackingId != currentTrackingId) {
+                _uiState.update {
+                    it.copy(
+                        directive = SelfieDirective.EnsureOnlyOneFace,
+                        progress = 0f,
+                        selfieToConfirm = null,
+                        processingState = null,
+                    )
+                }
+                livenessFiles.removeAll { it.delete() }
+                selfieFile?.delete()
+                selfieFile = null
+                faceTrackingId = null
+                return@addOnSuccessListener
+            }
 
             // Check that the corners of the face bounding box are within the inputImage
             val faceCornersInImage = face.boundingBox.left >= 0 &&

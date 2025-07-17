@@ -154,7 +154,6 @@ sealed interface BiometricKycJobResult : JobResult {
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") override val smileJobId: String,
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
-        @Json(name = "Antifraud") val antifraud: Antifraud?,
         @Json(name = "DOB") val dob: String?,
         @Json(name = "Photo") val photoBase64: String?,
         @Json(name = "Gender") val gender: String?,
@@ -185,7 +184,6 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
         @Json(name = "ResultType") val resultType: String,
         @Json(name = "SmileJobID") override val smileJobId: String,
         @Json(name = "PartnerParams") override val partnerParams: PartnerParams,
-        @Json(name = "Antifraud") val antifraud: Antifraud?,
         @Json(name = "DOB") val dob: String?,
         @Json(name = "Photo") val photoBase64: String?,
         @Json(name = "Gender") val gender: String?,
@@ -205,17 +203,6 @@ sealed interface EnhancedDocumentVerificationJobResult : JobResult {
     ) : EnhancedDocumentVerificationJobResult,
         JobResult.Entry
 }
-
-@Parcelize
-@JsonClass(generateAdapter = true)
-data class Antifraud(@Json(name = "SuspectUsers") val suspectUsers: List<SuspectUser>) : Parcelable
-
-@Parcelize
-@JsonClass(generateAdapter = true)
-data class SuspectUser(
-    @Json(name = "reason") val reason: String,
-    @Json(name = "user_id") val userId: String,
-) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
