@@ -428,7 +428,7 @@ internal class EnhancedDocumentVerificationViewModel(
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
-    consentInformation: ConsentInformation,
+    consentInformation: ConsentInformation?,
     captureBothSides: Boolean,
     selfieFile: File? = null,
     useStrictMode: Boolean = false,
