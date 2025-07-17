@@ -9,6 +9,7 @@
 ### Changed
 
 * Removed `AntiFraud` response in `JobStatus` calls
+* Updated the `targetSdk` to 36 and updated the AGP version
 
 ## 11.0.5 - July 2, 2025
 
