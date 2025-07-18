@@ -150,7 +150,7 @@ private var Bundle.userId: String
 
 private const val KEY_CONSENT_INFORMATION = "consentInformation"
 private var Bundle.consentInformation: ConsentInformation?
-    get() = getParcelableCompat(KEY_CONSENT_INFORMATION)!!
+    get() = getParcelableCompat(KEY_CONSENT_INFORMATION)
     set(value) = putParcelable(KEY_CONSENT_INFORMATION, value)
 
 private const val KEY_JOB_ID = "jobId"
