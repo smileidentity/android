@@ -1,11 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
-rootProject.name = "SmileID"
-
-include("analytics", "camera", "lib", "ml", "networking", "sample", "smileid", "storage", "ui")
-rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
-
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -23,3 +19,9 @@ dependencyResolutionManagement {
         maven(url = "https://central.sonatype.com/repository/maven-snapshots/")
     }
 }
+
+rootProject.name = "SmileID"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+include("analytics", "camera", "lib", "ml", "networking", "sample", "storage", "ui")
+rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
