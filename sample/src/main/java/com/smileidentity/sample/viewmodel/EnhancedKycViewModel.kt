@@ -30,10 +30,10 @@ class EnhancedKycViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private lateinit var idInfo: IdInfo
-    private lateinit var consentInformation: ConsentInformation
+    private var consentInformation: ConsentInformation? = null
     private var result: SmileIDResult<EnhancedKycResult>? = null
 
-    fun onIdInfoReceived(idInfo: IdInfo, consentInformation: ConsentInformation) {
+    fun onIdInfoReceived(idInfo: IdInfo, consentInformation: ConsentInformation?) {
         this.idInfo = idInfo
         this.consentInformation = consentInformation
         doEnhancedKyc()
