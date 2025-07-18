@@ -12,16 +12,10 @@ import com.smileidentity.fragment.BiometricKYCFragment.Companion.KEY_REQUEST
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.newInstance
 import com.smileidentity.fragment.BiometricKYCFragment.Companion.resultFromBundle
-import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_REQUEST
-import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.models.ConsentInformation
-import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
@@ -82,14 +76,7 @@ class BiometricKYCFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             idInfo: IdInfo,
-            consentInformation: ConsentInformation = ConsentInformation(
-                consented = ConsentedInformation(
-                    consentGrantedDate = getCurrentIsoTimestamp(),
-                    personalDetails = false,
-                    contactInformation = false,
-                    documentInformation = false,
-                ),
-            ),
+            consentInformation: ConsentInformation? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
             allowNewEnroll: Boolean = false,
@@ -149,7 +136,7 @@ private var Bundle.idInfo: IdInfo
     set(value) = putParcelable(KEY_ID_INFO, value)
 
 private const val KEY_CONSENT_INFORMATION = "consentInformation"
-private var Bundle.consentInformation: ConsentInformation
+private var Bundle.consentInformation: ConsentInformation?
     get() = getParcelableCompat(KEY_CONSENT_INFORMATION)!!
     set(value) = putParcelable(KEY_CONSENT_INFORMATION, value)
 
