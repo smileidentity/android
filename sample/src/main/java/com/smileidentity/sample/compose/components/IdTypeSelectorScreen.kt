@@ -20,7 +20,7 @@ fun IdTypeSelectorScreen(
     viewModel: IdTypeSelectorAndFieldInputViewModel = viewModel(
         factory = viewModelFactory { IdTypeSelectorAndFieldInputViewModel(jobType) },
     ),
-    onResult: (IdInfo, ConsentInformation) -> Unit,
+    onResult: (IdInfo, ConsentInformation?) -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     when {

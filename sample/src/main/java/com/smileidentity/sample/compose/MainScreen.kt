@@ -289,10 +289,9 @@ fun MainScreen(
                         )
                     }
                     val id = idInfo ?: return@composable
-                    val consent = consentInformation ?: return@composable
                     SmileID.BiometricKYC(
                         idInfo = id,
-                        consentInformation = consent,
+                        consentInformation = consentInformation,
                         userId = userId,
                         jobId = jobId,
                     ) { result ->
@@ -356,10 +355,9 @@ fun MainScreen(
                         )
                     }
                     val id = idInfo ?: return@composable
-                    val consent = consentInformation ?: return@composable
                     SmileID.EnhancedDocumentVerificationScreen(
                         userId = userId,
-                        consentInformation = consent,
+                        consentInformation = consentInformation,
                         jobId = jobId,
                         countryCode = id.country,
                         documentType = id.idType,

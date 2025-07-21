@@ -12,13 +12,9 @@ import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.KEY_RESULT
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.newInstance
 import com.smileidentity.fragment.EnhancedDocumentVerificationFragment.Companion.resultFromBundle
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.KEY_REQUEST
-import com.smileidentity.fragment.SmartSelfieEnrollmentFragment.Companion.resultFromBundle
 import com.smileidentity.models.ConsentInformation
-import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmileIDResult
-import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.getParcelableCompat
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
@@ -77,14 +73,7 @@ class EnhancedDocumentVerificationFragment : Fragment() {
         @JvmOverloads
         fun newInstance(
             countryCode: String,
-            consentInformation: ConsentInformation = ConsentInformation(
-                consented = ConsentedInformation(
-                    consentGrantedDate = getCurrentIsoTimestamp(),
-                    personalDetails = false,
-                    contactInformation = false,
-                    documentInformation = false,
-                ),
-            ),
+            consentInformation: ConsentInformation? = null,
             documentType: String? = null,
             userId: String = randomUserId(),
             jobId: String = randomJobId(),
@@ -160,8 +149,8 @@ private var Bundle.userId: String
     set(value) = putString(KEY_USER_ID, value)
 
 private const val KEY_CONSENT_INFORMATION = "consentInformation"
-private var Bundle.consentInformation: ConsentInformation
-    get() = getParcelableCompat(KEY_CONSENT_INFORMATION)!!
+private var Bundle.consentInformation: ConsentInformation?
+    get() = getParcelableCompat(KEY_CONSENT_INFORMATION)
     set(value) = putParcelable(KEY_CONSENT_INFORMATION, value)
 
 private const val KEY_JOB_ID = "jobId"
