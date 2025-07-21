@@ -18,8 +18,8 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
     }
 
@@ -36,7 +36,7 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin() =
         is KotlinAndroidProjectExtension -> compilerOptions
         else -> TODO("Unsupported project extension $this ${T::class}")
     }.apply {
-        jvmTarget = JvmTarget.JVM_11
+        jvmTarget = JvmTarget.JVM_17
         allWarningsAsErrors = warningsAsErrors
         freeCompilerArgs.add(
             // Enable experimental coroutines APIs, including Flow
