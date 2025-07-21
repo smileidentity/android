@@ -1,7 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
 rootProject.name = "SmileID"
-include("lib", "sample")
+
+include("analytics", "camera", "lib", "ml", "networking", "sample", "smileid", "storage", "ui")
 rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
 
 pluginManagement {
