@@ -66,10 +66,11 @@ fun Face(
                 val leftEyeStart = Offset(size.width / 3, size.height / 3)
                 val leftEyeEnd = Offset(size.width / 3, size.height / 2)
                 val leftEyeHeight = leftEyeEnd - leftEyeStart
-                val normalizedLeftEyeHeight = leftEyeHeight * min(
-                    sin(featureOffsetX.coerceAtMost(0.5f) * Math.PI.toFloat()),
-                    sin(featureOffsetY * Math.PI.toFloat()),
-                )
+                val normalizedLeftEyeHeight = leftEyeHeight *
+                    min(
+                        sin(featureOffsetX.coerceAtMost(0.5f) * Math.PI.toFloat()),
+                        sin(featureOffsetY * Math.PI.toFloat()),
+                    )
                 val normalizedLeftEyeOffset = (leftEyeHeight - normalizedLeftEyeHeight) / 2f
                 val normalizedLeftEyeStart = leftEyeStart + normalizedLeftEyeOffset
                 val normalizedLeftEyeEnd = leftEyeEnd - normalizedLeftEyeOffset
@@ -85,10 +86,11 @@ fun Face(
                 val rightEyeStart = Offset(size.width * 2 / 3, size.height / 3)
                 val rightEyeEnd = Offset(size.width * 2 / 3, size.height / 2)
                 val rightEyeHeight = rightEyeEnd - rightEyeStart
-                val normalizedRightEyeHeight = rightEyeHeight * min(
-                    sin(featureOffsetX.coerceAtLeast(0.5f) * Math.PI.toFloat()),
-                    sin(featureOffsetY * Math.PI.toFloat()),
-                )
+                val normalizedRightEyeHeight = rightEyeHeight *
+                    min(
+                        sin(featureOffsetX.coerceAtLeast(0.5f) * Math.PI.toFloat()),
+                        sin(featureOffsetY * Math.PI.toFloat()),
+                    )
                 val normalizedRightEyeOffset = (rightEyeHeight - normalizedRightEyeHeight) / 2f
                 val normalizedRightEyeStart = rightEyeStart + normalizedRightEyeOffset
                 val normalizedRightEyeEnd = rightEyeEnd - normalizedRightEyeOffset
@@ -104,10 +106,11 @@ fun Face(
                 val mouthStart = Offset(size.width * 0.4f, size.height * 2 / 3)
                 val mouthEnd = Offset(size.width * 0.6f, size.height * 2 / 3)
                 val mouthWidth = mouthEnd - mouthStart
-                val normalizedMouthWidth = mouthWidth * min(
-                    sin(featureOffsetX * Math.PI.toFloat()),
-                    sin(featureOffsetY * Math.PI.toFloat()),
-                )
+                val normalizedMouthWidth = mouthWidth *
+                    min(
+                        sin(featureOffsetX * Math.PI.toFloat()),
+                        sin(featureOffsetY * Math.PI.toFloat()),
+                    )
                 val normalizedMouthOffset = (mouthWidth - normalizedMouthWidth) / 2f
                 val normalizedMouthStart = mouthStart + normalizedMouthOffset
                 val normalizedMouthEnd = mouthEnd - normalizedMouthOffset

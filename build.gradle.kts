@@ -14,7 +14,7 @@ plugins {
     alias(libs.plugins.parcelize) apply false
 }
 
-tasks.create("clean", Delete::class.java) {
+tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 

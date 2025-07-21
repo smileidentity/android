@@ -163,7 +163,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     frontImageInfo,
                     backImageInfo,
                     selfieImageInfo,
-                ) + livenessImageInfo,
+                ) +
+                    livenessImageInfo,
                 idInfo = IdInfo(countryCode, documentType),
                 consentInformation = consentInformation,
             )
