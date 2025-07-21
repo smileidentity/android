@@ -18,15 +18,15 @@ import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.Type
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Converter
 import retrofit2.Retrofit
-import java.io.File
-import java.io.IOException
-import java.lang.reflect.Type
 
 @Suppress("unused")
 object JobTypeAdapter {
