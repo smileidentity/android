@@ -39,7 +39,7 @@ jobs:
 
       - name: Build, Test, Lint, Assemble
         # NB! The "lint" gradle action here is different than ktLint
-        run: ./gradlew lint build assembleDebug
+        run: ./gradlew ktlintCheck lint build assembleDebug
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -64,12 +64,3 @@ jobs:
         with:
           name: Sample App APK
           path: sample/build/outputs/apk/debug/sample-debug.apk
-
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - uses: actions/checkout@v4
-      - uses: musichin/ktlint-check@v3
-        with:
-          ktlint-version: "1.5.0"
