@@ -18,6 +18,7 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-ktlint {
-    android = true
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    version.set("1.7.0")
+    android.set(true)
 }
