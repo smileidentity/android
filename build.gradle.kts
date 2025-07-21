@@ -20,5 +20,4 @@ tasks.register<Delete>("clean") {
 
 ktlint {
     android = true
-    version = "1.5.0"
 }
