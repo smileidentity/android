@@ -71,10 +71,3 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: musichin/ktlint-check@v3
-        with:
-          ktlint-version: "1.7.0"
-          code-style: .editorconfig
-          relative: true
-          patterns: |
-            **/**.kt
-            !**/generated/**
