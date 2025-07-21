@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.SmileID.initialize
 import com.smileidentity.metadata.models.WrapperSdkName
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
@@ -442,7 +443,8 @@ object SmileID {
                 frontImageInfo,
                 backImageInfo,
                 selfieImageInfo,
-            ) + livenessImageInfo,
+            ) +
+                livenessImageInfo,
             idInfo = idInfo,
         )
         api.upload(prepUploadResponse.uploadUrl, uploadRequest)
