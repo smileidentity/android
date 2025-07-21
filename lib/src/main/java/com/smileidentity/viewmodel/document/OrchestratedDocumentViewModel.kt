@@ -42,7 +42,6 @@ import com.smileidentity.util.moveJobToSubmitted
 import com.smileidentity.util.toSmileIDException
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
-import java.io.File
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,6 +50,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.File
 
 internal data class OrchestratedDocumentUiState(
     val currentStep: DocumentCaptureFlow = DocumentCaptureFlow.FrontDocumentCapture,
@@ -163,7 +163,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     frontImageInfo,
                     backImageInfo,
                     selfieImageInfo,
-                ) + livenessImageInfo,
+                ) +
+                    livenessImageInfo,
                 idInfo = IdInfo(countryCode, documentType),
                 consentInformation = consentInformation,
             )

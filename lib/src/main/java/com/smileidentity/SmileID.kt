@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
 import com.serjltt.moshi.adapters.FallbackEnum
+import com.smileidentity.SmileID.initialize
 import com.smileidentity.metadata.models.WrapperSdkName
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
@@ -58,9 +59,6 @@ import com.smileidentity.util.toSmileIDException
 import com.squareup.moshi.Moshi
 import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
-import java.io.File
-import java.net.URL
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +74,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
+import java.io.File
+import java.net.URL
+import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 object SmileID {
@@ -442,7 +443,8 @@ object SmileID {
                 frontImageInfo,
                 backImageInfo,
                 selfieImageInfo,
-            ) + livenessImageInfo,
+            ) +
+                livenessImageInfo,
             idInfo = idInfo,
         )
         api.upload(prepUploadResponse.uploadUrl, uploadRequest)

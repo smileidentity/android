@@ -18,15 +18,15 @@ import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
-import java.io.File
-import java.io.IOException
-import java.lang.reflect.Type
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Converter
 import retrofit2.Retrofit
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.Type
 
 @Suppress("unused")
 object JobTypeAdapter {
@@ -46,11 +46,12 @@ object PartnerParamsAdapter {
         mapDelegate: JsonAdapter<Map<String, Any>>,
         jobTypeDelegate: JsonAdapter<JobType>,
     ) {
-        val map = partnerParams.extras + mapOf(
-            "job_id" to partnerParams.jobId,
-            "user_id" to partnerParams.userId,
-            "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
-        )
+        val map = partnerParams.extras +
+            mapOf(
+                "job_id" to partnerParams.jobId,
+                "user_id" to partnerParams.userId,
+                "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
+            )
         mapDelegate.toJson(writer, map)
     }
 

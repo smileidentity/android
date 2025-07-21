@@ -78,10 +78,11 @@ fun DocumentShapedBoundingBox(
                             height = (outlineBoundingBoxHeight - strokeWidth.toPx()),
                         ),
                     ),
-                    cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS - CornerRadius(
-                        strokeWidth.value,
-                        strokeWidth.value,
-                    ),
+                    cornerRadius = DOCUMENT_BOUNDING_BOX_RADIUS -
+                        CornerRadius(
+                            strokeWidth.value,
+                            strokeWidth.value,
+                        ),
                 ),
             )
         }
