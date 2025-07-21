@@ -73,7 +73,7 @@ jobs:
       - uses: musichin/ktlint-check@v3
         with:
           ktlint-version: "1.7.0"
-          code-style: android_studio
+          code-style: .editorconfig
           relative: true
           patterns: |
             **/**.kt
