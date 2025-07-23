@@ -33,7 +33,7 @@ internal data class DocumentDetectorOutput(
     val blurScore: Float,
 ) : AnalyzerOutput
 
-/**zxl
+/**
  * Output of FaceDetector
  */
 internal data class FaceDetectorOutput(val boundingBox: BoundingBox, val resultScore: Float) :
