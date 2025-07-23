@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.smileidentity.ml"
 }
+
+dependencies {
+    implementation(project(":camera"))
+}
