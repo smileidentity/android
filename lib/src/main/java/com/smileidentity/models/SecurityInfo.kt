@@ -14,7 +14,7 @@ import java.io.File
 data class SecurityInfo(
     @Json(name = "timestamp") val timestamp: String,
     @Json(name = "mac") val mac: String,
-    @Transient val files: List<File>? = null
+    @Transient val files: List<File>? = null,
 ) {
     companion object {
         /**

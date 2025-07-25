@@ -10,7 +10,6 @@ import java.io.File
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
-
 /**
  * This class represents info.json
  */
