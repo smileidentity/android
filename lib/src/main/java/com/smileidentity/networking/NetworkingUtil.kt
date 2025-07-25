@@ -3,11 +3,11 @@ package com.smileidentity.networking
 import com.smileidentity.SmileID
 import com.smileidentity.SmileID.moshi
 import com.smileidentity.models.ImageType
-import com.smileidentity.models.SecurityInfoRequest
+import com.smileidentity.models.SecurityInfo
+import com.smileidentity.models.SecurityInfo.Companion.encode
+import com.smileidentity.models.SecurityInfo.Companion.obfuscate
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
-import com.smileidentity.security.crypto.SmileIDCryptoManager
-import com.smileidentity.util.getCurrentIsoTimestamp
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileNotFoundException
@@ -70,9 +70,8 @@ fun UploadRequest.zip(): File {
 
     // Write security_info.json
     zipOutputStream.putNextEntry(ZipEntry("security_info.json"))
-    val securityInfo = createSecurityInfo(files = allFiles.sortedBy { it.name })
-    val securityJson = moshi.adapter(SecurityInfoRequest::class.java).toJson(securityInfo)
-    zipOutputStream.write(securityJson.toByteArray())
+    val securityInfo = SecurityInfo.create(files = allFiles).obfuscate().encode()
+    zipOutputStream.write(securityInfo)
     zipOutputStream.closeEntry()
 
     // Write images
@@ -146,18 +145,3 @@ fun File.asDocumentBackImage() = UploadImageInfo(
     imageTypeId = ImageType.IdCardRearJpgFile,
     image = this,
 )
-
-/**
- * Generates the security_info.json content for the zip file.
- * This includes the mac and timestamp for verification.
- *
- * @param files The files from the request
- */
-private fun createSecurityInfo(files: List<File>): SecurityInfoRequest {
-    val timestamp = getCurrentIsoTimestamp()
-    val signature = SmileIDCryptoManager.shared.sign(timestamp = timestamp, files = files)
-    return SecurityInfoRequest(
-        timestamp = timestamp,
-        mac = signature,
-    )
-}
