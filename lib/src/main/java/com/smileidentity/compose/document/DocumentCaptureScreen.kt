@@ -67,8 +67,10 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import java.io.File
 import timber.log.Timber
+import java.io.File
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
@@ -96,6 +98,7 @@ fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
+    autoCaptureTimeout: Duration = 10.seconds,
     enableAutoCapture: Boolean = true,
     showConfirmation: Boolean = true,
     metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
@@ -106,6 +109,7 @@ fun DocumentCaptureScreen(
                 jobId = jobId,
                 side = side,
                 knownAspectRatio = knownIdAspectRatio,
+                autoCaptureTimeout = autoCaptureTimeout,
                 enableAutoCapture = enableAutoCapture,
                 metadata = metadata,
             )

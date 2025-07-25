@@ -32,10 +32,12 @@ import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
 import com.smileidentity.viewmodel.viewModelFactory
-import java.io.File
-import java.net.URL
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import java.io.File
+import java.net.URL
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Perform a SmartSelfie™ Enrollment
@@ -171,6 +173,7 @@ fun SmileID.SmartSelfieAuthentication(
  * @param jobId The job ID to associate with the Document Verification. Most often, this will
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
+ * @param autoCaptureTimeout Change the default document auto capture timeout on the sdk
  * @param enableAutoCapture Enable or disable document auto capture
  * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
@@ -197,6 +200,7 @@ fun SmileID.DocumentVerification(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    autoCaptureTimeout: Duration = 10.seconds,
     enableAutoCapture: Boolean = true,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
@@ -215,6 +219,7 @@ fun SmileID.DocumentVerification(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
+            autoCaptureTimeout = autoCaptureTimeout,
             enableAutoCapture = enableAutoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
@@ -266,6 +271,7 @@ fun SmileID.DocumentVerification(
  * @param jobId The job ID to associate with the Enhanced Document Verification. Most often, this will
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
+ * @param autoCaptureTimeout Change the default document auto capture timeout on the sdk
  * @param enableAutoCapture Enable or disable document auto capture
  * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
@@ -293,6 +299,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    autoCaptureTimeout: Duration = 10.seconds,
     enableAutoCapture: Boolean = true,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
@@ -311,6 +318,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
+            autoCaptureTimeout = autoCaptureTimeout,
             enableAutoCapture = enableAutoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
