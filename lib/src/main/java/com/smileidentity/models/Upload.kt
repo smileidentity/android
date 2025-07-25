@@ -10,14 +10,6 @@ import java.io.File
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
-/**
- * This class represents security_info.json
- */
-@JsonClass(generateAdapter = true)
-data class SecurityInfoRequest(
-    @Json(name = "timestamp") val timestamp: String,
-    @Json(name = "mac") val mac: String,
-)
 
 /**
  * This class represents info.json
