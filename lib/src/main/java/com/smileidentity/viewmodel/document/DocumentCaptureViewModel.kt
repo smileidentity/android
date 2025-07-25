@@ -193,6 +193,7 @@ class DocumentCaptureViewModel(
                                                 ),
                                             )
                                         }
+
                                         DocumentCaptureSide.Back -> {
                                             metadata.add(
                                                 Metadatum.DocumentBackCaptureDuration(
