@@ -24,10 +24,6 @@ import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
-import java.io.File
-import kotlin.math.abs
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.TimeSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +32,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
+import kotlin.math.abs
+import kotlin.time.Duration
+import kotlin.time.TimeSource
 
 private const val ANALYSIS_SAMPLE_INTERVAL_MS = 350
 private const val LUMINANCE_THRESHOLD = 35
@@ -65,6 +65,7 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
+    private val autoCaptureTimeout: Duration,
     private val enableAutoCapture: Boolean,
     private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
@@ -93,7 +94,7 @@ class DocumentCaptureViewModel(
         // Show manual capture after 10 seconds if enableAutoCapture is enabled
         if (enableAutoCapture) {
             viewModelScope.launch {
-                delay(10.seconds)
+                delay(duration = autoCaptureTimeout)
                 _uiState.update { it.copy(showManualCaptureButton = true) }
             }
         } else {

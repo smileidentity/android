@@ -29,6 +29,8 @@ import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Orchestrates the document capture flow - navigates between instructions, requesting permissions,
@@ -41,6 +43,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
+    autoCaptureTimeout: Duration = 10.seconds,
     enableAutoCapture: Boolean = true,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -98,6 +101,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Front,
+                autoCaptureTimeout = autoCaptureTimeout,
                 enableAutoCapture = enableAutoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
@@ -119,6 +123,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Back,
+                autoCaptureTimeout = autoCaptureTimeout,
                 enableAutoCapture = enableAutoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
