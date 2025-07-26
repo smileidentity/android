@@ -34,7 +34,8 @@ internal fun CameraPreview(
         factory = { context ->
             PreviewView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                 )
                 controller = cameraState.controller.apply {
                     bindToLifecycle(lifecycleOwner)
@@ -47,7 +48,6 @@ internal fun CameraPreview(
         update = { preview ->
             if (cameraIsInitialized) {
                 with(preview) {
-
                 }
             }
         },

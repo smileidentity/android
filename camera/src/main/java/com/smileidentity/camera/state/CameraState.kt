@@ -31,5 +31,4 @@ class CameraState(context: Context) {
      * */
     var isStreaming: Boolean by mutableStateOf(false)
         internal set
-
 }
