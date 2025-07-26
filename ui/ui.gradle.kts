@@ -12,6 +12,9 @@ dependencies {
 
     implementation(libs.androidx.core)
 
+    // todo move the compose stuff to a bundle too, then apply like this
+    // implementation(platform(libs.compose.bom))
+    // implementation(libs.bundles.compose)
     // Jetpack Compose version is defined by BOM ("Bill-of-Materials")
     // Latest BOM version: https://developer.android.com/jetpack/compose/setup#bom-version-mapping
     val composeBom = platform(libs.androidx.compose.bom)
