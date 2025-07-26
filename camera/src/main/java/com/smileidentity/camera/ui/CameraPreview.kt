@@ -4,18 +4,15 @@ import android.view.ViewGroup
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.camera.state.CameraState
-import com.smileidentity.camera.state.rememberCameraState
+import com.smileidentity.camera.state.ImplementationMode
+import com.smileidentity.camera.state.ScaleType
+import com.smileidentity.camera.util.rememberCameraState
 
 /**
  * Creates a Camera Preview's composable.
@@ -24,13 +21,15 @@ import com.smileidentity.camera.state.rememberCameraState
 internal fun CameraPreview(
     modifier: Modifier = Modifier,
     cameraState: CameraState = rememberCameraState(),
+    scaleType: ScaleType,
+    implementationMode: ImplementationMode,
+    content: @Composable () -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraIsInitialized by rememberUpdatedState(cameraState.isInitialized)
-    var cameraOffset by remember { mutableStateOf(Offset.Zero) }
 
     AndroidView(
-        modifier = modifier.onGloballyPositioned { cameraOffset = it.positionInParent() },
+        modifier = modifier.onGloballyPositioned { },
         factory = { context ->
             PreviewView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
@@ -48,8 +47,14 @@ internal fun CameraPreview(
         update = { preview ->
             if (cameraIsInitialized) {
                 with(preview) {
+                    this.scaleType = scaleType.type
+                    this.implementationMode = implementationMode.value
                 }
+
+                cameraState.update()
             }
         },
     )
+
+    content()
 }

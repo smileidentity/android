@@ -1,8 +1,9 @@
-package com.smileidentity.camera.state
+package com.smileidentity.camera.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.smileidentity.camera.state.CameraState
 
 /**
  * Camera State from [CameraPreview] Composable.

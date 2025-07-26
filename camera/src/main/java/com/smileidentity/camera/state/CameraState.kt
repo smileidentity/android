@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 /**
  * A state object that can be hoisted to control camera, take picture or record video.
  *
- * To be created use [rememberCameraState].
+ * To be created use [com.smileidentity.camera.util.rememberCameraState].
  * */
 @Stable
 class CameraState(context: Context) {
@@ -31,4 +31,10 @@ class CameraState(context: Context) {
      * */
     var isStreaming: Boolean by mutableStateOf(false)
         internal set
+
+    /**
+     * Update all values from camera state.
+     * */
+    internal fun update() {
+    }
 }
