@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.camera.state.CameraState
@@ -18,18 +17,18 @@ import com.smileidentity.camera.util.rememberCameraState
  * Creates a Camera Preview's composable.
  */
 @Composable
-internal fun CameraPreview(
+fun CameraPreview(
     modifier: Modifier = Modifier,
     cameraState: CameraState = rememberCameraState(),
-    scaleType: ScaleType,
-    implementationMode: ImplementationMode,
+    scaleType: ScaleType = ScaleType.FillCenter,
+    implementationMode: ImplementationMode = ImplementationMode.Performance,
     content: @Composable () -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraIsInitialized by rememberUpdatedState(cameraState.isInitialized)
 
     AndroidView(
-        modifier = modifier.onGloballyPositioned { },
+        modifier = modifier,
         factory = { context ->
             PreviewView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(

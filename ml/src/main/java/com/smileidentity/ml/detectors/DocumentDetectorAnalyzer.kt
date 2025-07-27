@@ -6,8 +6,7 @@ import com.smileidentity.ml.states.IdentityScanState
 /**
  * Analyzer to run DocumentDetector.
  */
-internal class DocumentDetectorAnalyzer :
-    Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
+class DocumentDetectorAnalyzer : Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
 
     override suspend fun analyze(data: AnalyzerInput, state: IdentityScanState): AnalyzerOutput {
         TODO("Not yet implemented")

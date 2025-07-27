@@ -6,7 +6,7 @@ import com.smileidentity.ml.detectors.AnalyzerOutput
 /**
  * Interface to determine how to transition between [IdentityScanState]s.
  */
-internal interface IdentityScanStateTransitioner {
+interface IdentityScanStateTransitioner {
     suspend fun transitionFromInitial(
         initialState: IdentityScanState.Initial,
         analyzerInput: AnalyzerInput,

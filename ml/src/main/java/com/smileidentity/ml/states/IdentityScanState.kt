@@ -3,7 +3,7 @@ package com.smileidentity.ml.states
 import com.smileidentity.ml.detectors.AnalyzerInput
 import com.smileidentity.ml.detectors.AnalyzerOutput
 
-internal sealed class IdentityScanState(
+sealed class IdentityScanState(
     val type: ScanType,
     val transitioner: IdentityScanStateTransitioner,
 ) {
@@ -20,7 +20,7 @@ internal sealed class IdentityScanState(
     /**
      * Transitions to the next state based on model output.
      */
-    internal abstract suspend fun consumeTransition(
+    abstract suspend fun consumeTransition(
         analyzerInput: AnalyzerInput,
         analyzerOutput: AnalyzerOutput,
     ): IdentityScanState
@@ -28,7 +28,7 @@ internal sealed class IdentityScanState(
     /**
      * Initial state when scan starts, no faces/documents have been detected yet.
      */
-    internal class Initial(type: ScanType, transitioner: IdentityScanStateTransitioner) :
+    class Initial(type: ScanType, transitioner: IdentityScanStateTransitioner) :
         IdentityScanState(type, transitioner) {
         /**
          * Only transitions to [Found] when ML output type matches scan type
@@ -47,7 +47,7 @@ internal sealed class IdentityScanState(
      * State when scan has found the required type, the machine could stay in this state for a
      * while if more image needs to be processed to reach the next state.
      */
-    internal class Found(type: ScanType, transitioner: IdentityScanStateTransitioner) :
+    class Found(type: ScanType, transitioner: IdentityScanStateTransitioner) :
         IdentityScanState(type, transitioner) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
@@ -62,7 +62,7 @@ internal sealed class IdentityScanState(
     /**
      * State when satisfaction checking passed.
      */
-    internal class Satisfied(type: ScanType, transitioner: IdentityScanStateTransitioner) :
+    class Satisfied(type: ScanType, transitioner: IdentityScanStateTransitioner) :
         IdentityScanState(type, transitioner) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
@@ -77,7 +77,7 @@ internal sealed class IdentityScanState(
     /**
      * State when satisfaction checking failed.
      */
-    internal class Unsatisfied(
+    class Unsatisfied(
         val reason: String,
         type: ScanType,
         transitioner: IdentityScanStateTransitioner,
@@ -95,7 +95,7 @@ internal sealed class IdentityScanState(
     /**
      * Terminal state, indicting the scan is finished.
      */
-    internal class Finished(type: ScanType, transitioner: IdentityScanStateTransitioner) :
+    class Finished(type: ScanType, transitioner: IdentityScanStateTransitioner) :
         IdentityScanState(type, transitioner) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
@@ -106,7 +106,7 @@ internal sealed class IdentityScanState(
     /**
      * Terminal state, indicating the scan times out.
      */
-    internal class TimeOut(type: ScanType, transitioner: IdentityScanStateTransitioner) :
+    class TimeOut(type: ScanType, transitioner: IdentityScanStateTransitioner) :
         IdentityScanState(type, transitioner) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
@@ -114,7 +114,7 @@ internal sealed class IdentityScanState(
         ) = this
     }
 
-    internal companion object {
+    companion object {
         fun ScanType.isFront() = this == ScanType.DOCUMENT_FRONT
 
         fun ScanType.isBack() = this == ScanType.DOCUMENT_BACK

@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":camera"))
+    implementation(project(":ml"))
 
     implementation(libs.androidx.core)
 
