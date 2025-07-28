@@ -6,7 +6,7 @@ import com.smileidentity.ml.states.IdentityScanState
 /**
  * Analyzer to run FaceDetector.
  */
-internal class FaceDetectorAnalyzer : Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
+class FaceDetectorAnalyzer : Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
 
     override suspend fun analyze(data: AnalyzerInput, state: IdentityScanState): AnalyzerOutput {
         TODO("Not yet implemented")
