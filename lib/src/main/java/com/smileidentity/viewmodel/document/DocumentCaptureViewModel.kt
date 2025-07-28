@@ -26,7 +26,7 @@ import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
 import kotlin.math.abs
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration
 import kotlin.time.TimeSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -65,6 +65,7 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
+    private val autoCaptureTimeout: Duration,
     private val enableAutoCapture: Boolean,
     private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
@@ -93,7 +94,7 @@ class DocumentCaptureViewModel(
         // Show manual capture after 10 seconds if enableAutoCapture is enabled
         if (enableAutoCapture) {
             viewModelScope.launch {
-                delay(10.seconds)
+                delay(duration = autoCaptureTimeout)
                 _uiState.update { it.copy(showManualCaptureButton = true) }
             }
         } else {
@@ -192,6 +193,7 @@ class DocumentCaptureViewModel(
                                                 ),
                                             )
                                         }
+
                                         DocumentCaptureSide.Back -> {
                                             metadata.add(
                                                 Metadatum.DocumentBackCaptureDuration(
