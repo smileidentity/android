@@ -9,8 +9,8 @@ import java.io.File
 
 @Composable
 fun SmileCaptureView(
-    modifier: Modifier = Modifier,
     scanType: IdentityScanState.ScanType,
+    modifier: Modifier = Modifier,
     onResult: (File) -> Unit,
 ) {
     SmileCameraPreview(

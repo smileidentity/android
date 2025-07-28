@@ -6,6 +6,16 @@ plugins {
 
 android {
     namespace = "com.smileidentity.ui"
+
+    lint {
+        enable += "ComposeM2Api"
+        error += "ComposeM2Api"
+    }
+}
+
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 
 dependencies {
@@ -29,6 +39,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support
     debugImplementation(libs.androidx.compose.ui.tooling)
+    lintChecks(libs.compose.lint.checks)
 
     testImplementation(libs.junit)
 

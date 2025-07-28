@@ -3,6 +3,7 @@ package com.smileidentity.ui.utils
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import timber.log.Timber
 
 internal fun Context.getActivity(): Activity? {
     var context = this
