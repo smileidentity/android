@@ -67,10 +67,10 @@ import com.ujizin.camposer.state.ScaleType
 import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
-import timber.log.Timber
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import timber.log.Timber
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
 
