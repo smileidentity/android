@@ -13,6 +13,8 @@
 * Removed `AntiFraud` response in `JobStatus` calls
 * Updated the `targetSdk` to 36 and updated the AGP version
 * Removed the default `ConsentInformation` set when no consent is passed
+* Changed `enableAutoCapture` to `AutoCapture` enum to allow to allow partners change document
+  capture options
 
 ## 11.0.5 - July 2, 2025
 
