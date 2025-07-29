@@ -2,6 +2,7 @@ package com.smileidentity
 
 import android.os.Build
 import com.smileidentity.SmileIDCrashReporting.disable
+import com.smileidentity.security.arkana.ArkanaKeys
 import io.sentry.Hint
 import io.sentry.IScopes
 import io.sentry.NoOpScopes
@@ -41,7 +42,7 @@ object SmileIDCrashReporting {
     @JvmStatic
     fun enable(isInDebugMode: Boolean = false) {
         val options = SentryOptions().apply {
-            dsn = BuildConfig.SENTRY_DSN
+            dsn = ArkanaKeys.Global.sENTRY_DSN
             release = BuildConfig.VERSION_NAME
             isEnableUncaughtExceptionHandler = true
             beforeSend = BeforeSendCallback { event: SentryEvent, _: Hint? ->
