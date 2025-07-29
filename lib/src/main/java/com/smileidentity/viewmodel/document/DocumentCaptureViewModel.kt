@@ -19,6 +19,7 @@ import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.metadata.models.DocumentImageOriginValue
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -66,7 +67,7 @@ class DocumentCaptureViewModel(
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
     private val autoCaptureTimeout: Duration,
-    private val enableAutoCapture: Boolean,
+    private val autoCapture: AutoCapture = AutoCapture.AutoCapture,
     private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
@@ -91,14 +92,21 @@ class DocumentCaptureViewModel(
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
 
-        // Show manual capture after 10 seconds if enableAutoCapture is enabled
-        if (enableAutoCapture) {
-            viewModelScope.launch {
-                delay(duration = autoCaptureTimeout)
+        when (autoCapture) {
+            AutoCapture.ManualCaptureOnly -> {
                 _uiState.update { it.copy(showManualCaptureButton = true) }
             }
-        } else {
-            _uiState.update { it.copy(showManualCaptureButton = true) }
+
+            AutoCapture.AutoCaptureOnly -> {
+                _uiState.update { it.copy(showManualCaptureButton = false) }
+            }
+
+            AutoCapture.AutoCapture -> {
+                viewModelScope.launch {
+                    delay(duration = autoCaptureTimeout)
+                    _uiState.update { it.copy(showManualCaptureButton = true) }
+                }
+            }
         }
 
         viewModelScope.launch {
@@ -396,7 +404,7 @@ class DocumentCaptureViewModel(
                         !isCapturing &&
                         !isFocusing &&
                         uiState.value.documentImageToConfirm == null &&
-                        enableAutoCapture
+                        autoCapture in listOf(AutoCapture.AutoCapture, AutoCapture.AutoCaptureOnly)
                     ) {
                         captureNextAnalysisFrame = false
                         documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture

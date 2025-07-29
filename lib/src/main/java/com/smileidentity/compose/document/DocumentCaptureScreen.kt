@@ -51,6 +51,7 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isNotNullOrEmpty
@@ -99,7 +100,7 @@ fun DocumentCaptureScreen(
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
     autoCaptureTimeout: Duration = 10.seconds,
-    enableAutoCapture: Boolean = true,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     showConfirmation: Boolean = true,
     metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
     onSkip: () -> Unit = { },
@@ -110,7 +111,7 @@ fun DocumentCaptureScreen(
                 side = side,
                 knownAspectRatio = knownIdAspectRatio,
                 autoCaptureTimeout = autoCaptureTimeout,
-                enableAutoCapture = enableAutoCapture,
+                autoCapture = autoCapture,
                 metadata = metadata,
             )
         },
