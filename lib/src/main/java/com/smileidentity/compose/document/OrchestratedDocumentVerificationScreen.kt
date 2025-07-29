@@ -23,6 +23,7 @@ import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -44,7 +45,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     autoCaptureTimeout: Duration = 10.seconds,
-    enableAutoCapture: Boolean = true,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
@@ -102,7 +103,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Front,
                 autoCaptureTimeout = autoCaptureTimeout,
-                enableAutoCapture = enableAutoCapture,
+                autoCapture = autoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
@@ -124,7 +125,7 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Back,
                 autoCaptureTimeout = autoCaptureTimeout,
-                enableAutoCapture = enableAutoCapture,
+                autoCapture = autoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
