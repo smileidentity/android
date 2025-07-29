@@ -143,6 +143,8 @@ dependencies {
 
     implementation(libs.mlkit.code.scanner)
 
+    implementation(libs.play.integrity)
+
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
 
