@@ -19,6 +19,7 @@ import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.metadata.LocalMetadataProvider
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
@@ -32,12 +33,12 @@ import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
 import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewModel
 import com.smileidentity.viewmodel.viewModelFactory
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import java.io.File
 import java.net.URL
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
 
 /**
  * Perform a SmartSelfie™ Enrollment
@@ -201,7 +202,7 @@ fun SmileID.DocumentVerification(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     autoCaptureTimeout: Duration = 10.seconds,
-    enableAutoCapture: Boolean = true,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -220,7 +221,7 @@ fun SmileID.DocumentVerification(
             userId = userId,
             jobId = jobId,
             autoCaptureTimeout = autoCaptureTimeout,
-            enableAutoCapture = enableAutoCapture,
+            autoCapture = autoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
@@ -300,7 +301,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
     autoCaptureTimeout: Duration = 10.seconds,
-    enableAutoCapture: Boolean = true,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -319,7 +320,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             userId = userId,
             jobId = jobId,
             autoCaptureTimeout = autoCaptureTimeout,
-            enableAutoCapture = enableAutoCapture,
+            autoCapture = autoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
