@@ -19,6 +19,7 @@ import com.smileidentity.compose.document.DocumentCaptureSide
 import com.smileidentity.metadata.models.DocumentImageOriginValue
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.util.calculateLuminance
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.postProcessImage
@@ -26,7 +27,7 @@ import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import java.io.File
 import kotlin.math.abs
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration
 import kotlin.time.TimeSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -65,7 +66,8 @@ class DocumentCaptureViewModel(
     private val jobId: String,
     private val side: DocumentCaptureSide,
     private val knownAspectRatio: Float?,
-    private val enableAutoCapture: Boolean,
+    private val autoCaptureTimeout: Duration,
+    private val autoCapture: AutoCapture = AutoCapture.AutoCapture,
     private val metadata: MutableList<Metadatum>,
     private val objectDetector: ObjectDetector = ObjectDetection.getClient(
         ObjectDetectorOptions.Builder()
@@ -90,14 +92,21 @@ class DocumentCaptureViewModel(
     init {
         _uiState.update { it.copy(idAspectRatio = defaultAspectRatio) }
 
-        // Show manual capture after 10 seconds if enableAutoCapture is enabled
-        if (enableAutoCapture) {
-            viewModelScope.launch {
-                delay(10.seconds)
+        when (autoCapture) {
+            AutoCapture.ManualCaptureOnly -> {
                 _uiState.update { it.copy(showManualCaptureButton = true) }
             }
-        } else {
-            _uiState.update { it.copy(showManualCaptureButton = true) }
+
+            AutoCapture.AutoCaptureOnly -> {
+                _uiState.update { it.copy(showManualCaptureButton = false) }
+            }
+
+            AutoCapture.AutoCapture -> {
+                viewModelScope.launch {
+                    delay(duration = autoCaptureTimeout)
+                    _uiState.update { it.copy(showManualCaptureButton = true) }
+                }
+            }
         }
 
         viewModelScope.launch {
@@ -192,6 +201,7 @@ class DocumentCaptureViewModel(
                                                 ),
                                             )
                                         }
+
                                         DocumentCaptureSide.Back -> {
                                             metadata.add(
                                                 Metadatum.DocumentBackCaptureDuration(
@@ -394,7 +404,7 @@ class DocumentCaptureViewModel(
                         !isCapturing &&
                         !isFocusing &&
                         uiState.value.documentImageToConfirm == null &&
-                        enableAutoCapture
+                        autoCapture in listOf(AutoCapture.AutoCapture, AutoCapture.AutoCaptureOnly)
                     ) {
                         captureNextAnalysisFrame = false
                         documentImageOrigin = DocumentImageOriginValue.CameraAutoCapture

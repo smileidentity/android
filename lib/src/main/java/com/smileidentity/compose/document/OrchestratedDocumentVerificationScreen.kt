@@ -23,12 +23,15 @@ import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.OrchestratedDocumentViewModel
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Orchestrates the document capture flow - navigates between instructions, requesting permissions,
@@ -41,7 +44,8 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     idAspectRatio: Float? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
-    enableAutoCapture: Boolean = true,
+    autoCaptureTimeout: Duration = 10.seconds,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
     allowGalleryUpload: Boolean = false,
@@ -98,7 +102,8 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             DocumentCaptureFlow.FrontDocumentCapture -> DocumentCaptureScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Front,
-                enableAutoCapture = enableAutoCapture,
+                autoCaptureTimeout = autoCaptureTimeout,
+                autoCapture = autoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,
@@ -119,7 +124,8 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
             DocumentCaptureFlow.BackDocumentCapture -> DocumentCaptureScreen(
                 jobId = jobId,
                 side = DocumentCaptureSide.Back,
-                enableAutoCapture = enableAutoCapture,
+                autoCaptureTimeout = autoCaptureTimeout,
+                autoCapture = autoCapture,
                 showInstructions = showInstructions,
                 showAttribution = showAttribution,
                 allowGallerySelection = allowGalleryUpload,

@@ -46,11 +46,12 @@ object PartnerParamsAdapter {
         mapDelegate: JsonAdapter<Map<String, Any>>,
         jobTypeDelegate: JsonAdapter<JobType>,
     ) {
-        val map = partnerParams.extras + mapOf(
-            "job_id" to partnerParams.jobId,
-            "user_id" to partnerParams.userId,
-            "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
-        )
+        val map = partnerParams.extras +
+            mapOf(
+                "job_id" to partnerParams.jobId,
+                "user_id" to partnerParams.userId,
+                "job_type" to jobTypeDelegate.toJsonValue(partnerParams.jobType) as Long,
+            )
         mapDelegate.toJson(writer, map)
     }
 

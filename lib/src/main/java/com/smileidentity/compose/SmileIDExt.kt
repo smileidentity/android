@@ -19,8 +19,8 @@ import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typography
 import com.smileidentity.metadata.LocalMetadataProvider
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.ConsentInformation
-import com.smileidentity.models.ConsentedInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.results.BiometricKycResult
@@ -28,7 +28,6 @@ import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
-import com.smileidentity.util.getCurrentIsoTimestamp
 import com.smileidentity.util.randomJobId
 import com.smileidentity.util.randomUserId
 import com.smileidentity.viewmodel.document.DocumentVerificationViewModel
@@ -36,6 +35,8 @@ import com.smileidentity.viewmodel.document.EnhancedDocumentVerificationViewMode
 import com.smileidentity.viewmodel.viewModelFactory
 import java.io.File
 import java.net.URL
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -173,6 +174,7 @@ fun SmileID.SmartSelfieAuthentication(
  * @param jobId The job ID to associate with the Document Verification. Most often, this will
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
+ * @param autoCaptureTimeout Change the default document auto capture timeout on the sdk
  * @param enableAutoCapture Enable or disable document auto capture
  * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
@@ -199,7 +201,8 @@ fun SmileID.DocumentVerification(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
-    enableAutoCapture: Boolean = true,
+    autoCaptureTimeout: Duration = 10.seconds,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -217,7 +220,8 @@ fun SmileID.DocumentVerification(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
-            enableAutoCapture = enableAutoCapture,
+            autoCaptureTimeout = autoCaptureTimeout,
+            autoCapture = autoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
@@ -252,6 +256,7 @@ fun SmileID.DocumentVerification(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/enhanced-document-verification)
  *
  * @param countryCode The ISO 3166-1 alpha-3 country code of the document
+ * @param consentInformation We need you to pass the consent from the user
  * @param documentType An optional document type of the document
  * @param captureBothSides Determines if the document has a back side
  * @param captureBothSides Whether to capture both sides of the ID or not. Otherwise, only the front
@@ -267,6 +272,7 @@ fun SmileID.DocumentVerification(
  * @param jobId The job ID to associate with the Enhanced Document Verification. Most often, this will
  * correspond to a unique Job ID within your own system. If not provided, a random job ID will be
  * generated
+ * @param autoCaptureTimeout Change the default document auto capture timeout on the sdk
  * @param enableAutoCapture Enable or disable document auto capture
  * @param allowNewEnroll Allows a partner to enroll the same user id again
  * @param showAttribution Whether to show the Smile ID attribution or not on the Instructions screen
@@ -277,7 +283,6 @@ fun SmileID.DocumentVerification(
  * @param showInstructions Whether to deactivate capture screen's instructions for Document
  * Verification (NB! If instructions are disabled, gallery upload won't be possible)
  * @param extraPartnerParams Custom values specific to partners
- * @param consentInformation We need you to pass the consent from the user
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -287,6 +292,7 @@ fun SmileID.DocumentVerification(
 @Composable
 fun SmileID.EnhancedDocumentVerificationScreen(
     countryCode: String,
+    consentInformation: ConsentInformation?,
     modifier: Modifier = Modifier,
     documentType: String? = null,
     captureBothSides: Boolean = true,
@@ -294,7 +300,8 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     bypassSelfieCaptureWithFile: File? = null,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
-    enableAutoCapture: Boolean = true,
+    autoCaptureTimeout: Duration = 10.seconds,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     allowNewEnroll: Boolean = false,
     showAttribution: Boolean = true,
     allowAgentMode: Boolean = false,
@@ -302,14 +309,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     showInstructions: Boolean = true,
     useStrictMode: Boolean = false,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
-    consentInformation: ConsentInformation = ConsentInformation(
-        consented = ConsentedInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetails = false,
-            contactInformation = false,
-            documentInformation = false,
-        ),
-    ),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
@@ -320,7 +319,8 @@ fun SmileID.EnhancedDocumentVerificationScreen(
             modifier = modifier,
             userId = userId,
             jobId = jobId,
-            enableAutoCapture = enableAutoCapture,
+            autoCaptureTimeout = autoCaptureTimeout,
+            autoCapture = autoCapture,
             showAttribution = showAttribution,
             allowAgentMode = allowAgentMode,
             allowGalleryUpload = allowGalleryUpload,
@@ -358,6 +358,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * [Docs](https://docs.usesmileid.com/products/for-individuals-kyc/biometric-kyc)
  *
  * @param idInfo The ID information to look up in the ID Authority
+ * @param consentInformation We need you to pass the consent from the user
  * @param userId The user ID to associate with the Biometric KYC. Most often, this will correspond
  * to a unique User ID within your own system. If not provided, a random user ID will be generated
  * @param jobId The job ID to associate with the Biometric KYC. Most often, this will correspond
@@ -369,7 +370,6 @@ fun SmileID.EnhancedDocumentVerificationScreen(
  * @param showInstructions Whether to deactivate capture screen's instructions for SmartSelfie.
  * @param extraPartnerParams Custom values specific to partners
  * @param useStrictMode Strict mode will use enhanced SmartSelfie™
- * @param consentInformation We need you to pass the consent from the user
  * @param colorScheme The color scheme to use for the UI. This is passed in so that we show a Smile
  * ID branded UI by default, but allow the user to override it if they want.
  * @param typography The typography to use for the UI. This is passed in so that we show a Smile ID
@@ -379,6 +379,7 @@ fun SmileID.EnhancedDocumentVerificationScreen(
 @Composable
 fun SmileID.BiometricKYC(
     idInfo: IdInfo,
+    consentInformation: ConsentInformation?,
     modifier: Modifier = Modifier,
     userId: String = rememberSaveable { randomUserId() },
     jobId: String = rememberSaveable { randomJobId() },
@@ -388,14 +389,6 @@ fun SmileID.BiometricKYC(
     showInstructions: Boolean = true,
     extraPartnerParams: ImmutableMap<String, String> = persistentMapOf(),
     useStrictMode: Boolean = false,
-    consentInformation: ConsentInformation = ConsentInformation(
-        consented = ConsentedInformation(
-            consentGrantedDate = getCurrentIsoTimestamp(),
-            personalDetails = false,
-            contactInformation = false,
-            documentInformation = false,
-        ),
-    ),
     colorScheme: ColorScheme = SmileID.colorScheme,
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},

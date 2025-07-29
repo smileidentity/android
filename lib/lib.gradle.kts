@@ -23,7 +23,7 @@ project.version = findProperty("VERSION_NAME") as? String
 android {
     namespace = groupId
     resourcePrefix = "si_"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 21
@@ -34,9 +34,6 @@ android {
 
     buildTypes {
         all {
-            val sentryDsn = findProperty("SENTRY_DSN")
-                ?: throw IllegalArgumentException("Please set the SENTRY_DSN gradle property")
-            buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
             buildConfigField("String", "VERSION_NAME", "\"${version}\"")
         }
 

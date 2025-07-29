@@ -4,6 +4,7 @@ import androidx.camera.view.CameraController
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.smileidentity.SmileID
 import com.smileidentity.compose.document.DocumentCaptureSide
+import com.smileidentity.models.AutoCapture
 import com.ujizin.camposer.state.CameraState
 import com.ujizin.camposer.state.ImageCaptureResult
 import io.mockk.Runs
@@ -16,6 +17,7 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.setMain
@@ -36,7 +38,8 @@ class DocumentCaptureViewModelTest {
             side = DocumentCaptureSide.Front,
             knownAspectRatio = null,
             objectDetector = objectDetector,
-            enableAutoCapture = false,
+            autoCaptureTimeout = 10.seconds,
+            autoCapture = AutoCapture.AutoCapture,
             metadata = mutableListOf(),
         )
     }

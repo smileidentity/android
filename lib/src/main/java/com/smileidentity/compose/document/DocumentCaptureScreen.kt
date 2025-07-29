@@ -51,6 +51,7 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.SmileIDException
 import com.smileidentity.util.createDocumentFile
 import com.smileidentity.util.isNotNullOrEmpty
@@ -68,6 +69,8 @@ import com.ujizin.camposer.state.rememberCamSelector
 import com.ujizin.camposer.state.rememberCameraState
 import com.ujizin.camposer.state.rememberImageAnalyzer
 import java.io.File
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import timber.log.Timber
 
 const val PREVIEW_SCALE_FACTOR = 1.1f
@@ -96,7 +99,8 @@ fun DocumentCaptureScreen(
     onConfirm: (File) -> Unit,
     onError: (Throwable) -> Unit,
     modifier: Modifier = Modifier,
-    enableAutoCapture: Boolean = true,
+    autoCaptureTimeout: Duration = 10.seconds,
+    autoCapture: AutoCapture = AutoCapture.AutoCapture,
     showConfirmation: Boolean = true,
     metadata: SnapshotStateList<Metadatum> = LocalMetadataProvider.current,
     onSkip: () -> Unit = { },
@@ -106,7 +110,8 @@ fun DocumentCaptureScreen(
                 jobId = jobId,
                 side = side,
                 knownAspectRatio = knownIdAspectRatio,
-                enableAutoCapture = enableAutoCapture,
+                autoCaptureTimeout = autoCaptureTimeout,
+                autoCapture = autoCapture,
                 metadata = metadata,
             )
         },

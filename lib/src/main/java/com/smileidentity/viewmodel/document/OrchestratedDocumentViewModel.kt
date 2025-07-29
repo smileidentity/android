@@ -163,7 +163,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                     frontImageInfo,
                     backImageInfo,
                     selfieImageInfo,
-                ) + livenessImageInfo,
+                ) +
+                    livenessImageInfo,
                 idInfo = IdInfo(countryCode, documentType),
                 consentInformation = consentInformation,
             )
@@ -428,7 +429,7 @@ internal class EnhancedDocumentVerificationViewModel(
     allowNewEnroll: Boolean,
     countryCode: String,
     documentType: String? = null,
-    consentInformation: ConsentInformation,
+    consentInformation: ConsentInformation?,
     captureBothSides: Boolean,
     selfieFile: File? = null,
     useStrictMode: Boolean = false,
