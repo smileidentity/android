@@ -122,8 +122,8 @@ fun SelfieCaptureScreen(
             progress = animatedProgress,
             faceFillPercent = faceFillPercent,
             modifier = Modifier
-                .fillMaxSize()
                 .padding(bottom = bottomContentHeight)
+                .fillMaxSize()
                 .testTag("selfie_progress_indicator"),
         )
 
