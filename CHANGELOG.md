@@ -7,6 +7,7 @@
 * Added Face Tracking in Selfie Capture to ensure only same face is used during capture
 * Added `autoCaptureTimeout` that allows partners to override the default 10 seconds auto capture
   timeout
+* Added new wrapper name `ReactNativeExpo` for React Native Expo SDK.
 
 ### Changed
 

@@ -24,4 +24,6 @@ enum class WrapperSdkName(val value: String) {
     Flutter("flutter"),
 
     ReactNative("react_native"),
+
+    ReactNativeExpo("react_native_expo"),
 }
