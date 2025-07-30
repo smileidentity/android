@@ -6,7 +6,8 @@ import com.google.android.play.core.integrity.StandardIntegrityManager
 import timber.log.Timber
 
 class SmileIntegrityManager(private val appContext: Context) {
-    private var appIntegrityTokenProvider: StandardIntegrityManager.StandardIntegrityTokenProvider? = null
+    private var appIntegrityTokenProvider: StandardIntegrityManager.StandardIntegrityTokenProvider? =
+        null
 
     /**
      * This function is needed in case of standard verdict request by [requestIntegrityVerdictToken].
@@ -17,11 +18,11 @@ class SmileIntegrityManager(private val appContext: Context) {
         integrityManager.prepareIntegrityToken(
             StandardIntegrityManager.PrepareIntegrityTokenRequest.builder()
                 .setCloudProjectNumber(BuildConfig.GOOGLE_CLOUD_PROJECT_NUMBER.toLong())
-                .build()
+                .build(),
         ).addOnSuccessListener { tokenProvider ->
             appIntegrityTokenProvider = tokenProvider
         }.addOnFailureListener {
-            Timber.e(it,"Failed to prepare integrity token")
+            Timber.e(it, "Failed to prepare integrity token")
         }
     }
 
@@ -30,12 +31,14 @@ class SmileIntegrityManager(private val appContext: Context) {
      */
     fun requestIntegrityVerdictToken(onSuccess: (String) -> Unit) {
         if (appIntegrityTokenProvider == null) {
-            Timber.e("Integrity token provider is null during a verdict request. This should not be possible")
+            Timber.e(
+                "Integrity token provider is null during a verdict request. This should not be possible",
+            )
         } else {
             appIntegrityTokenProvider?.request(
                 StandardIntegrityManager.StandardIntegrityTokenRequest.builder()
                     .setRequestHash("aaaas")
-                    .build()
+                    .build(),
             )
                 ?.addOnSuccessListener { response ->
                     onSuccess(response.token())
