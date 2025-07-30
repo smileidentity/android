@@ -25,8 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -122,7 +124,7 @@ fun SelfieCaptureScreen(
             progress = animatedProgress,
             faceFillPercent = faceFillPercent,
             modifier = Modifier
-                .padding(bottom = bottomContentHeight)
+                .padding(bottom = bottomContentHeight, top = 16.dp)
                 .fillMaxSize()
                 .testTag("selfie_progress_indicator"),
         )
@@ -142,35 +144,52 @@ fun SelfieCaptureScreen(
                 fontWeight = FontWeight.Bold,
             )
 
-            if (allowAgentMode) {
-                AgentModeSwitch(
-                    isAgentModeEnabled = camSelector == CamSelector.Back,
-                    onCamSelectorChange = { camSelector = camSelector.inverse },
-                )
-            }
+            AgentModeSwitch(
+                isAgentModeEnabled = camSelector == CamSelector.Back,
+                onCamSelectorChange = { camSelector = camSelector.inverse },
+                allowAgentMode = allowAgentMode,
+            )
         }
     }
 }
 
 @Composable
-internal fun AgentModeSwitch(isAgentModeEnabled: Boolean, onCamSelectorChange: (Boolean) -> Unit) {
+internal fun AgentModeSwitch(
+    isAgentModeEnabled: Boolean,
+    onCamSelectorChange: (Boolean) -> Unit,
+    allowAgentMode: Boolean = false,
+) {
     val agentModeBackgroundColor = if (isAgentModeEnabled) {
         MaterialTheme.colorScheme.secondary
     } else {
         MaterialTheme.colorScheme.surfaceVariant
     }
+
+    val backgroundColor = if (allowAgentMode) {
+        agentModeBackgroundColor
+    } else {
+        Color.Transparent
+    }
+
+    val contentColor = if (allowAgentMode) {
+        contentColorFor(agentModeBackgroundColor)
+    } else {
+        Color.Transparent
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
         modifier = Modifier
             .wrapContentSize()
             .clip(RoundedCornerShape(32.dp))
-            .background(agentModeBackgroundColor)
-            .padding(8.dp, 0.dp),
+            .background(backgroundColor)
+            .padding(8.dp, 0.dp)
+            .alpha(if (allowAgentMode) 1f else 0f),
     ) {
         Text(
             text = stringResource(R.string.si_agent_mode),
-            color = contentColorFor(agentModeBackgroundColor),
+            color = contentColor,
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.padding(4.dp, 0.dp),
         )
