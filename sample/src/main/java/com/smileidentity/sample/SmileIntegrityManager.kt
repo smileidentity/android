@@ -6,8 +6,8 @@ import com.google.android.play.core.integrity.StandardIntegrityManager
 import timber.log.Timber
 
 class SmileIntegrityManager(private val appContext: Context) {
-    private var appIntegrityTokenProvider: StandardIntegrityManager.StandardIntegrityTokenProvider? =
-        null
+    private var appIntegrityTokenProvider:
+        StandardIntegrityManager.StandardIntegrityTokenProvider? = null
 
     /**
      * This function is needed in case of standard verdict request by [requestIntegrityVerdictToken].
