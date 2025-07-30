@@ -51,6 +51,8 @@ jobs:
         run: ./gradlew bundleRelease
         env:
           ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          ORG_GOOGLE_CLOUD_PROJECT_NUMBER: ${{ secrets.GOOGLE_CLOUD_PROJECT_NUMBER }}
+
       - name: Create Internal App Sharing Link
         uses: r0adkll/upload-google-play@v1
         id: upload
