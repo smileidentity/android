@@ -26,7 +26,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -86,8 +85,10 @@ fun SelfieCaptureScreen(
     var camSelector by rememberCamSelector(CamSelector.Front)
     val viewfinderZoom = 1.1f
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
-    // Force maximum brightness in order to light up the user's face
+    val bottomContentHeight = if (allowAgentMode) 120.dp else 80.dp
+
     ForceBrightness()
+
     Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
             cameraState = cameraState,
@@ -95,7 +96,6 @@ fun SelfieCaptureScreen(
             implementationMode = ImplementationMode.Performance,
             imageAnalyzer = cameraState.rememberImageAnalyzer(
                 analyze = { viewModel.analyzeImage(it, camSelector) },
-                // Guarantees only one image will be delivered for analysis at a time
                 imageAnalysisBackpressureStrategy = KeepOnlyLatest,
             ),
             isImageAnalysisEnabled = true,
@@ -104,27 +104,29 @@ fun SelfieCaptureScreen(
             modifier = Modifier
                 .testTag("selfie_camera_preview")
                 .fillMaxSize()
-                .clipToBounds()
-                // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
-                // "out of bounds" content as a fraud prevention technique
                 .scale(viewfinderZoom),
         )
+
         val progressAnimationSpec = spring<Float>(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessVeryLow,
         )
+
         val animatedProgress by animateFloatAsState(
             targetValue = uiState.progress,
             animationSpec = progressAnimationSpec,
             label = "selfie_progress",
         )
+
         FaceShapedProgressIndicator(
             progress = animatedProgress,
             faceFillPercent = faceFillPercent,
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = bottomContentHeight)
                 .testTag("selfie_progress_indicator"),
         )
+
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -139,6 +141,7 @@ fun SelfieCaptureScreen(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
+
             if (allowAgentMode) {
                 AgentModeSwitch(
                     isAgentModeEnabled = camSelector == CamSelector.Back,
