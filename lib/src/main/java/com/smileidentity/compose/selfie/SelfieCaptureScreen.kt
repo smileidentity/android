@@ -140,7 +140,6 @@ fun SelfieCaptureScreen(
                 text = stringResource(uiState.directive.displayText),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                maxLines = 3,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
