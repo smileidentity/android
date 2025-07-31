@@ -87,7 +87,7 @@ fun SelfieCaptureScreen(
     var camSelector by rememberCamSelector(CamSelector.Front)
     val viewfinderZoom = 1.1f
     val faceFillPercent = remember { MAX_FACE_AREA_THRESHOLD * viewfinderZoom * 2 }
-    val bottomContentHeight = if (allowAgentMode) 120.dp else 80.dp
+    val topContentHeight = if (allowAgentMode) 120.dp else 80.dp
 
     ForceBrightness()
 
@@ -124,7 +124,6 @@ fun SelfieCaptureScreen(
             progress = animatedProgress,
             faceFillPercent = faceFillPercent,
             modifier = Modifier
-                .padding(bottom = bottomContentHeight, top = 16.dp)
                 .fillMaxSize()
                 .testTag("selfie_progress_indicator"),
         )
@@ -133,7 +132,7 @@ fun SelfieCaptureScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Bottom),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(top = topContentHeight, start = 16.dp, end = 16.dp, bottom = 16.dp)
                 .fillMaxSize(),
         ) {
             Text(
