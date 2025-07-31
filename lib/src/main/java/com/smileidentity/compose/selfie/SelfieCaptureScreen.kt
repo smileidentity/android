@@ -124,8 +124,8 @@ fun SelfieCaptureScreen(
             progress = animatedProgress,
             faceFillPercent = faceFillPercent,
             modifier = Modifier
-                .padding(bottom = bottomContentHeight, top = 16.dp)
                 .fillMaxSize()
+                .padding(bottom = bottomContentHeight, top = 16.dp)
                 .testTag("selfie_progress_indicator"),
         )
 
@@ -140,7 +140,7 @@ fun SelfieCaptureScreen(
                 text = stringResource(uiState.directive.displayText),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                maxLines = 4,
+                maxLines = 3,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
             )
