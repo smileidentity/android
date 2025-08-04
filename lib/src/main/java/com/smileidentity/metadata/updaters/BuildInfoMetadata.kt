@@ -47,7 +47,6 @@ internal class BuildInfoMetadata(
             "build_source" to Value.StringValue(buildSource),
         )
     }
-    }
 
     override fun forceUpdate() {
         metadata.updateOrAddBy(Metadatum.BuildInfo(getBuildInfo())) { it.name == metadataName }
