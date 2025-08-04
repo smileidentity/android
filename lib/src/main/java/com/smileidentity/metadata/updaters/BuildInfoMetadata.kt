@@ -26,13 +26,17 @@ internal class BuildInfoMetadata(
     }
 
     private fun getBuildInfo(): Map<String, Value> {
-        val buildSource = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11 (API 30) and above
-            packageManager.getInstallSourceInfo(packageName).installingPackageName
-        } else {
-            // Below Android 11
-            packageManager.getInstallerPackageName(packageName)
-        } ?: "unknown"
+        val buildSource = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Android 11 (API 30) and above
+                packageManager.getInstallSourceInfo(packageName).installingPackageName
+            } else {
+                // Below Android 11
+                packageManager.getInstallerPackageName(packageName)
+            } ?: "unknown"
+        } catch (e: Exception) {
+            "unknown"
+        }
 
         return mapOf(
             "brand" to Value.StringValue(Build.BRAND),
@@ -42,6 +46,7 @@ internal class BuildInfoMetadata(
             "product" to Value.StringValue(Build.PRODUCT),
             "build_source" to Value.StringValue(buildSource),
         )
+    }
     }
 
     override fun forceUpdate() {
