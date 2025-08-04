@@ -40,6 +40,19 @@
             </intent-filter>
         </activity>
 
+<!--        <activity-->
+<!--            android:name=".activity.CameraActivity"-->
+<!--            android:exported="true"-->
+<!--            android:windowSoftInputMode="adjustResize"-->
+<!--            android:screenOrientation="portrait">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+
         <activity
                 android:name=".activity.JavaActivity"
                 android:exported="true" />
