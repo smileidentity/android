@@ -17,7 +17,7 @@ class SmileIDInstructionsScreenTest {
     fun test_continue_button_is_clickable() {
         composeTestRule.setContent {
             Box {
-                SmileIDInstructionsScreen { }
+                SmileIDInstructionsScreen()
             }
         }
 
