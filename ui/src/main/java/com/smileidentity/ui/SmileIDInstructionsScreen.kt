@@ -19,9 +19,9 @@ fun SmileIDInstructionsScreen(
             onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("continue_button"),
+                .testTag(tag = "continue_button"),
         ) {
-            Text("Continue")
+            Text(text = "Continue")
         }
     },
 ) {
@@ -45,7 +45,7 @@ private fun SmileIDInstructionsScreenCustomButtonPreview() {
                 onClick = { onContinueClick },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Custom Button")
+                Text(text = "Custom Button")
             }
         },
     )

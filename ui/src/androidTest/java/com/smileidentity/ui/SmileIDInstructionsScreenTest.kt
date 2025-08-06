@@ -22,7 +22,7 @@ class SmileIDInstructionsScreenTest {
         }
 
         composeTestRule
-            .onNodeWithTag("continue_button")
+            .onNodeWithTag(testTag = "continue_button")
             .assertExists()
             .assertHasClickAction()
     }
