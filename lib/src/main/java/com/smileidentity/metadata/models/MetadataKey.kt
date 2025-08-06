@@ -3,6 +3,7 @@ package com.smileidentity.metadata.models
 enum class MetadataKey(val key: String) {
     ActiveLivenessType("active_liveness_type"),
     ActiveLivenessVersion("active_liveness_version"),
+    BuildInfo("build_info"),
     CameraName("camera_name"),
     CarrierInfo("carrier_info"),
     ClientIP("client_ip"),
