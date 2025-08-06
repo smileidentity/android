@@ -13,11 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun SmileIDInstructionsScreen(
     modifier: Modifier = Modifier,
-    button: @Composable () -> Unit = {
+    onContinueClick: () -> Unit = {},
+    button: @Composable (onContinueClick: () -> Unit) -> Unit = { onClick ->
         Button(
-            onClick = {
-
-            },
+            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("continue_button"),
@@ -27,7 +26,7 @@ fun SmileIDInstructionsScreen(
     },
 ) {
     Column(modifier = modifier) {
-        button()
+        button(onContinueClick)
     }
 }
 
@@ -41,9 +40,9 @@ private fun SmileIDInstructionsScreenPreview() {
 @Composable
 private fun SmileIDInstructionsScreenCustomButtonPreview() {
     SmileIDInstructionsScreen(
-        button = {
+        button = { onContinueClick ->
             OutlinedButton(
-                onClick = { println("Custom action") },
+                onClick = { onContinueClick },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Custom Button")
