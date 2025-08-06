@@ -99,6 +99,11 @@ open class Metadatum(
     @Parcelize
     data object ActiveLivenessVersion : Metadatum(MetadataKey.ActiveLivenessVersion, "1.0.0")
 
+    @TypeParceler<Value, ValueParceler>
+    @Parcelize
+    data class BuildInfo(val buildInfo: Map<String, Value>) :
+        Metadatum(MetadataKey.BuildInfo, buildInfo)
+
     @Parcelize
     data class CameraName(val cameraName: String) :
         Metadatum(MetadataKey.CameraName, cameraName) // todo
