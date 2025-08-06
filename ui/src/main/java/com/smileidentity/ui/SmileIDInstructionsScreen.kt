@@ -2,27 +2,26 @@ package com.smileidentity.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import com.smileidentity.ui.components.SmileIDButton
 
 @Composable
 fun SmileIDInstructionsScreen(
     modifier: Modifier = Modifier,
     onContinueClick: () -> Unit = {},
     button: @Composable (onContinueClick: () -> Unit) -> Unit = { onClick ->
-        Button(
-            onClick = onClick,
+        SmileIDButton(
+            text = "Continue",
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(tag = "continue_button"),
-        ) {
-            Text(text = "Continue")
-        }
+            onContinueClick = onClick,
+        )
     },
 ) {
     Column(modifier = modifier) {
