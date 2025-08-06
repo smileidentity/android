@@ -1,19 +1,25 @@
 package com.smileidentity.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.components.SmileIDButton
 
@@ -46,7 +52,31 @@ fun SmileIDInstructionsScreen(
                 .verticalScroll(rememberScrollState())
                 .weight(1f),
         ) {
-
+            Image(
+                painter = painterResource(id = R.drawable.si_logo),
+                modifier = Modifier
+                    .size(178.dp)
+                    .padding(top = 8.dp)
+                    .testTag(tag = "instructions:logo"),
+                contentDescription = null,
+            )
+            Text(
+                text = "Some header here",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .testTag(tag = "instructions:header"),
+            )
+            Text(
+                text = "Some subtitle here",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 16.dp, bottom = 32.dp)
+                    .testTag(tag = "instructions:subtitle"),
+            )
         }
 
         Column(

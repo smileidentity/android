@@ -3,6 +3,7 @@ package com.smileidentity.ui
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import org.junit.Rule
@@ -25,5 +26,22 @@ class SmileIDInstructionsScreenTest {
             .onNodeWithTag(testTag = "instructions:continue_button")
             .assertExists()
             .assertHasClickAction()
+    }
+
+    @Test
+    fun test_header_subtitle_visible() {
+        composeTestRule.setContent {
+            Box {
+                SmileIDInstructionsScreen()
+            }
+        }
+
+        composeTestRule
+            .onNodeWithTag(testTag = "instructions:header")
+            .assertIsDisplayed()
+
+        composeTestRule
+            .onNodeWithTag(testTag = "instructions:subtitle")
+            .assertIsDisplayed()
     }
 }
