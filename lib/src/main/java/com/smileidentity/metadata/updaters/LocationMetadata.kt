@@ -136,16 +136,7 @@ internal class LocationMetadata(
         val longitude: Double,
         val accuracy: Accuracy,
         val source: Source,
-    ) {
-        companion object {
-            val UNKNOWN = LocationInfo(
-                0.0,
-                0.0,
-                Accuracy.UNKNOWN,
-                Source.UNKNOWN,
-            )
-        }
-    }
+    )
 
     enum class Accuracy(val key: String) {
         PRECISE("precise"),
