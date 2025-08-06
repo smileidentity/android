@@ -108,6 +108,7 @@ tasks.named("assemble") {
 }
 
 dependencies {
+    implementation(project(":camera"))
     implementation(project(":lib"))
     implementation(libs.kotlin.immutable.collections)
     implementation(libs.androidx.core)

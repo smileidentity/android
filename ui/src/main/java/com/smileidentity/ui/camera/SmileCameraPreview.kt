@@ -8,10 +8,15 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.testTag
 import com.smileidentity.camera.ui.CameraPreview
+import com.smileidentity.camera.viewmodel.CameraPreviewViewModel
 import com.smileidentity.ui.utils.ForceMaxBrightness
 
 @Composable
-fun SmileCameraPreview(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun SmileCameraPreview(
+    viewModel: CameraPreviewViewModel,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
     val viewfinderZoom = 1.1f
 
     // Force maximum brightness in order to light up the user's face
@@ -19,6 +24,7 @@ fun SmileCameraPreview(modifier: Modifier = Modifier, content: @Composable () ->
 
     Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
+            viewModel = viewModel,
             modifier = Modifier
                 .testTag("smile_camera_preview")
                 .fillMaxSize()
@@ -26,8 +32,6 @@ fun SmileCameraPreview(modifier: Modifier = Modifier, content: @Composable () ->
                 // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
                 // "out of bounds" content as a fraud prevention technique
                 .scale(viewfinderZoom),
-        ) {
-            content()
-        }
+        )
     }
 }
