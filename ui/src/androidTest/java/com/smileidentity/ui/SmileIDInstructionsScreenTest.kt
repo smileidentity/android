@@ -14,7 +14,7 @@ class SmileIDInstructionsScreenTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun test_continue_button_is_clickable() {
+    fun test_continue_button_exists_and_clickable() {
         composeTestRule.setContent {
             Box {
                 SmileIDInstructionsScreen()
