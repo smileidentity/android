@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun SmileIDInstructionsScreen(
     modifier: Modifier = Modifier,
-    actionButton: @Composable () -> Unit = {
+    button: @Composable () -> Unit = {
         Button(
             onClick = {
 
@@ -27,7 +27,7 @@ fun SmileIDInstructionsScreen(
     },
 ) {
     Column(modifier = modifier) {
-        actionButton()
+        button()
     }
 }
 
@@ -39,9 +39,9 @@ private fun SmileIDInstructionsScreenPreview() {
 
 @Preview
 @Composable
-private fun SmileIDInstructionsScreenCustomPreview() {
+private fun SmileIDInstructionsScreenCustomButtonPreview() {
     SmileIDInstructionsScreen(
-        actionButton = {
+        button = {
             OutlinedButton(
                 onClick = { println("Custom action") },
                 modifier = Modifier.fillMaxWidth(),
