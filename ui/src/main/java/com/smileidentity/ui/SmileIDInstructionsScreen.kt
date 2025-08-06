@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.components.SmileIDButton
 
@@ -27,7 +26,7 @@ fun SmileIDInstructionsScreen(
             text = "Continue",
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag(tag = "continue_button"),
+                .testTag(tag = "instructions:continue_button"),
             onContinueClick = onClick,
         )
     },
@@ -47,6 +46,7 @@ fun SmileIDInstructionsScreen(
                 .verticalScroll(rememberScrollState())
                 .weight(1f),
         ) {
+
         }
 
         Column(
@@ -60,13 +60,13 @@ fun SmileIDInstructionsScreen(
     }
 }
 
-@Preview
+@DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenPreview() {
     SmileIDInstructionsScreen()
 }
 
-@Preview
+@DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenCustomButtonPreview() {
     SmileIDInstructionsScreen(
