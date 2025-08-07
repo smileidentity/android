@@ -65,6 +65,6 @@ fun SmileIDCaptureScreen(
 @ThemePreviews
 @DevicePreviews
 @Composable
-private fun SmileIDCaptureViewPreview() {
+private fun SmileIDCaptureScreenPreview() {
     SmileIDCaptureScreen(scanType = IdentityScanState.ScanType.SELFIE) {}
 }
