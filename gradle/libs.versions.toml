@@ -127,7 +127,8 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [bundles]
-camerax = ["androidx-camera-core", "androidx-camera-compose", "androidx-camera-lifecycle", "androidx-camera-camera2", "camerax-view"]
+camerax = ["camerax-camera2", "camerax-lifecycle", "camerax-view"]
+androidx-compose-ui-test = ["androidx-compose-ui-test-junit4", "androidx-compose-ui-test-manifest"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

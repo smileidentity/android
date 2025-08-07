@@ -35,6 +35,8 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.androidx.compose.animation)
+    // Material Design components (ColorScheme and Typography exposed, hence api vs implementation)
+    api(libs.androidx.compose.material3)
     // Android Studio Preview support
     implementation(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support
@@ -46,4 +48,5 @@ dependencies {
     androidTestImplementation(composeBom)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.bundles.androidx.compose.ui.test)
 }
