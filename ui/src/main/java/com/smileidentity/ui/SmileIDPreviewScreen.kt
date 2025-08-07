@@ -59,4 +59,3 @@ fun SmileIDPreviewScreen(
 private fun SmileIDPreviewScreenPreview() {
     SmileIDPreviewScreen()
 }
-
