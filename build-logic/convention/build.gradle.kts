@@ -32,9 +32,17 @@ tasks {
 
 gradlePlugin {
     plugins {
+        register("androidApplicationJacoco") {
+            id = "smileid.android.application"
+            implementationClass = "AndroidApplicationJacocoConventionPlugin"
+        }
         register("androidLibrary") {
             id = "smileid.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidLibraryJacoco") {
+            id = "smileid.android.library.jacoco"
+            implementationClass = "AndroidLibraryJacocoConventionPlugin"
         }
     }
 }
