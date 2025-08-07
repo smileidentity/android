@@ -1,8 +1,9 @@
-package com.smileidentity.ui.camera
+package com.smileidentity.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.smileidentity.ml.states.IdentityScanState
+import com.smileidentity.ui.components.SmileCameraPreview
 import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
 import java.io.File
@@ -29,4 +30,11 @@ fun SmileCaptureView(
             IdentityScanState.ScanType.SELFIE -> FaceShapedView()
         }
     }
+}
+
+@ThemePreviews
+@DevicePreviews
+@Composable
+private fun SmileIDInstructionsScreenPreview() {
+    SmileCaptureView(scanType = IdentityScanState.ScanType.SELFIE) {}
 }

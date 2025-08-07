@@ -106,12 +106,14 @@ fun SmileIDInstructionsScreen(
     }
 }
 
+@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenPreview() {
     SmileIDInstructionsScreen()
 }
 
+@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenCustomButtonPreview() {

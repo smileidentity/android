@@ -1,4 +1,4 @@
-package com.smileidentity.ui.camera
+package com.smileidentity.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
