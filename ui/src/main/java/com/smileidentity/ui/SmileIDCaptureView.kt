@@ -9,7 +9,7 @@ import com.smileidentity.ui.components.FaceShapedView
 import java.io.File
 
 @Composable
-fun SmileCaptureView(
+fun SmileIDCaptureView(
     scanType: IdentityScanState.ScanType,
     modifier: Modifier = Modifier,
     onResult: (File) -> Unit,
@@ -35,6 +35,6 @@ fun SmileCaptureView(
 @ThemePreviews
 @DevicePreviews
 @Composable
-private fun SmileIDInstructionsScreenPreview() {
-    SmileCaptureView(scanType = IdentityScanState.ScanType.SELFIE) {}
+private fun SmileIDCaptureViewPreview() {
+    SmileIDCaptureView(scanType = IdentityScanState.ScanType.SELFIE) {}
 }
