@@ -1,0 +1,18 @@
+comment: no
+codecov:
+  require_ci_to_pass: no
+  max_report_age: off
+
+coverage:
+  status:
+    project:
+      default:
+        target: 78%
+        threshold: 3%
+    patch: off
+  range: 78...100
+  precision: 3
+  round: down
+
+ignore:
+  - "**/src/test/*"
