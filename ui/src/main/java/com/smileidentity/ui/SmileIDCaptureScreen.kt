@@ -18,7 +18,7 @@ import com.smileidentity.ui.components.SmileIDButton
 import java.io.File
 
 @Composable
-fun SmileIDCaptureView(
+fun SmileIDCaptureScreen(
     scanType: IdentityScanState.ScanType,
     modifier: Modifier = Modifier,
     continueButton: @Composable (onResult: (File) -> Unit) -> Unit = { onResult ->
@@ -64,5 +64,5 @@ fun SmileIDCaptureView(
 @DevicePreviews
 @Composable
 private fun SmileIDCaptureViewPreview() {
-    SmileIDCaptureView(scanType = IdentityScanState.ScanType.SELFIE) {}
+    SmileIDCaptureScreen(scanType = IdentityScanState.ScanType.SELFIE) {}
 }
