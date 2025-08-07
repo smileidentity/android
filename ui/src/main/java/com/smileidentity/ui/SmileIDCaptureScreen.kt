@@ -15,6 +15,8 @@ import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
 import com.smileidentity.ui.components.SmileCameraPreview
 import com.smileidentity.ui.components.SmileIDButton
+import com.smileidentity.ui.previews.DevicePreviews
+import com.smileidentity.ui.previews.ThemePreviews
 import java.io.File
 
 @Composable
