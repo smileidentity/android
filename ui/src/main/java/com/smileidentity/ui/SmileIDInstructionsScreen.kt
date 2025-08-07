@@ -1,11 +1,14 @@
 package com.smileidentity.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -26,14 +29,25 @@ import com.smileidentity.ui.components.SmileIDButton
 @Composable
 fun SmileIDInstructionsScreen(
     modifier: Modifier = Modifier,
-    onContinueClick: () -> Unit = {},
-    button: @Composable (onContinueClick: () -> Unit) -> Unit = { onClick ->
+    scrollState: ScrollState = rememberScrollState(),
+    onContinue: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    continueButton: @Composable (onContinue: () -> Unit) -> Unit = { onClick ->
         SmileIDButton(
             text = "Continue",
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(tag = "instructions:continue_button"),
-            onContinueClick = onClick,
+            onClick = onClick,
+        )
+    },
+    cancelButton: @Composable (onCancel: () -> Unit) -> Unit = { onClick ->
+        SmileIDButton(
+            text = "Cancel",
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(tag = "instructions:cancel_button"),
+            onClick = onClick,
         )
     },
 ) {
@@ -49,7 +63,7 @@ fun SmileIDInstructionsScreen(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(state = scrollState)
                 .weight(1f),
         ) {
             Image(
@@ -85,7 +99,9 @@ fun SmileIDInstructionsScreen(
                 .fillMaxWidth()
                 .padding(8.dp),
         ) {
-            button(onContinueClick)
+            continueButton(onContinue)
+            Spacer(modifier = Modifier.height(16.dp))
+            cancelButton(onCancel)
         }
     }
 }
@@ -100,9 +116,9 @@ private fun SmileIDInstructionsScreenPreview() {
 @Composable
 private fun SmileIDInstructionsScreenCustomButtonPreview() {
     SmileIDInstructionsScreen(
-        button = { onContinueClick ->
+        continueButton = { onContinue ->
             OutlinedButton(
-                onClick = { onContinueClick },
+                onClick = { onContinue },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = "Custom Button")

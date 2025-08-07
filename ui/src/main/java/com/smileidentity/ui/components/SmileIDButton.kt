@@ -10,9 +10,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SmileIDButton(text: String, modifier: Modifier = Modifier, onContinueClick: () -> Unit) {
+fun SmileIDButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
-        onClick = onContinueClick,
+        onClick = onClick,
         modifier = modifier.height(height = 58.dp),
     ) { Text(text) }
 }
