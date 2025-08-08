@@ -17,8 +17,7 @@ class OrchestratedSelfieCaptureScreenTest {
 
         // when
         composeTestRule.setContent {
-            OrchestratedSelfieCaptureScreen(
-            )
+            OrchestratedSelfieCaptureScreen()
         }
 
         // then
@@ -33,7 +32,7 @@ class OrchestratedSelfieCaptureScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedSelfieCaptureScreen(
-                showInstructions = false
+                showInstructions = false,
             )
         }
 

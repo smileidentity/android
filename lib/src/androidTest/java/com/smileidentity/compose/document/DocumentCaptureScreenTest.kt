@@ -49,8 +49,9 @@ class DocumentCaptureScreenTest {
                 allowGallerySelection = true,
                 showSkipButton = false,
                 instructionsTitleText = "Instructions",
-                instructionsSubtitleText = "Please follow the instructions below to take a good quality photo.",
-                instructionsHeroImage = R.drawable.si_photo_capture_instruction_clear_image
+                instructionsSubtitleText = "Please follow the instructions below to take a good " +
+                    "quality photo.",
+                instructionsHeroImage = R.drawable.si_photo_capture_instruction_clear_image,
             )
         }
 
@@ -82,8 +83,9 @@ class DocumentCaptureScreenTest {
                 allowGallerySelection = true,
                 showSkipButton = false,
                 instructionsTitleText = "Instructions",
-                instructionsSubtitleText = "Please follow the instructions below to take a good quality photo.",
-                instructionsHeroImage = R.drawable.si_photo_capture_instruction_clear_image
+                instructionsSubtitleText = "Please follow the instructions below to take a good " +
+                    "quality photo.",
+                instructionsHeroImage = R.drawable.si_photo_capture_instruction_clear_image,
             )
         }
 
