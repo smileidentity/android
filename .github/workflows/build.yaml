@@ -36,7 +36,7 @@ jobs:
           fi
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-c
+
       - name: Build, Lint, Assemble
         # NB! The "lint" gradle action here is different than ktLint
         run: ./gradlew ktlintCheck lint build assembleDebug
