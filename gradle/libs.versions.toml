@@ -142,6 +142,6 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 
-smileid-android-application = { id = "smileid.android.application" }
+smileid-android-application-jacoco = { id = "smileid.android.application.jacoco" }
 smileid-android-library = { id = "smileid.android.library" }
 smileid-android-library-jacoco = { id = "smileid.android.library.jacoco" }

@@ -86,11 +86,11 @@ internal fun Project.configureJacoco(
                 )
 
                 executionData.setFrom(
-                    project.fileTree("$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest")
-                        .matching { include("**/*.exec") },
+                    layout.buildDirectory.dir("outputs/unit_test_code_coverage/${variant.name}UnitTest")
+                        .map { it.asFileTree.matching { include("**/*.exec") } },
 
-                    project.fileTree("$buildDir/outputs/code_coverage/${variant.name}AndroidTest")
-                        .matching { include("**/*.ec") },
+                    layout.buildDirectory.dir("outputs/code_coverage/${variant.name}AndroidTest")
+                        .map { it.asFileTree.matching { include("**/*.ec") } },
                 )
             }
 
