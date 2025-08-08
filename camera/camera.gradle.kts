@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.smileid.android.library)
+    alias(libs.plugins.smileid.android.library.jacoco)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
 }

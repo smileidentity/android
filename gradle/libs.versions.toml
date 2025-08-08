@@ -48,6 +48,7 @@ timber = "5.0.1"
 truth = "1.4.4"
 uiautomator = "2.3.0"
 kotlinxSerializationJson = "1.9.0"
+jacoco = "0.8.12"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
@@ -143,4 +144,6 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 
+smileid-android-application-jacoco = { id = "smileid.android.application.jacoco" }
 smileid-android-library = { id = "smileid.android.library" }
+smileid-android-library-jacoco = { id = "smileid.android.library.jacoco" }

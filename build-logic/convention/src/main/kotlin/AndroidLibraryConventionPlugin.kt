@@ -23,8 +23,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "implementation"(libs.findLibrary("timber").get())
+
                 "androidTestImplementation"(libs.findLibrary("androidx.test.junit").get())
                 "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
+
                 "testImplementation"(libs.findLibrary("kotlin.test").get())
             }
         }
