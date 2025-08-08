@@ -94,7 +94,6 @@ internal fun Project.configureJacoco(
                 )
             }
 
-
         variant.artifacts.forScope(ScopedArtifacts.Scope.PROJECT)
             .use(reportTask)
             .toGet(
