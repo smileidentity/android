@@ -13,7 +13,7 @@ annotation class MainGraph {
     companion object Includes
 }
 
-class CoreFeatureNavigatorSettings(private val navigator: DestinationsNavigator)
+class CoreFeatureNavigatorSettings(val navigator: DestinationsNavigator)
 
 fun DependenciesContainerBuilder<*>.currentNavigator() =
     CoreFeatureNavigatorSettings(navigator = navController.toDestinationsNavigator())
