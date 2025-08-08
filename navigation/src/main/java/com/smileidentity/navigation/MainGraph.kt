@@ -5,23 +5,11 @@ import com.ramcosta.composedestinations.annotation.NavHostGraph
 import com.ramcosta.composedestinations.navigation.DependenciesContainerBuilder
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import com.smileidentity.navigation.graphs.BVNGraph
-import com.smileidentity.navigation.graphs.BiometricGraph
-import com.smileidentity.navigation.graphs.DocumentVerificationGraph
-import com.smileidentity.navigation.graphs.EnhancedDocumentVerificationGraph
-import com.smileidentity.navigation.graphs.EnhancedKycGraph
-import com.smileidentity.navigation.graphs.SmartSelfieAuthenticationGraph
-import com.smileidentity.navigation.graphs.SmartSelfieEnrollmentGraph
+import com.smileidentity.navigation.graph.SmileIDGraph
 
 @NavHostGraph
 annotation class MainGraph {
-    @ExternalNavGraph<BiometricGraph>
-    @ExternalNavGraph<BVNGraph>
-    @ExternalNavGraph<DocumentVerificationGraph>
-    @ExternalNavGraph<EnhancedDocumentVerificationGraph>
-    @ExternalNavGraph<EnhancedKycGraph>
-    @ExternalNavGraph<SmartSelfieAuthenticationGraph>
-    @ExternalNavGraph<SmartSelfieEnrollmentGraph>
+    @ExternalNavGraph<SmileIDGraph>
     companion object Includes
 }
 

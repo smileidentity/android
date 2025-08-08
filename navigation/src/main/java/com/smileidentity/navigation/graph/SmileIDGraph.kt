@@ -1,7 +1,7 @@
-package com.smileidentity.navigation.graphs
+package com.smileidentity.navigation.graph
 
 import com.ramcosta.composedestinations.annotation.ExternalModuleGraph
 import com.ramcosta.composedestinations.annotation.NavGraph
 
 @NavGraph<ExternalModuleGraph>
-annotation class EnhancedKycGraph
+annotation class SmileIDGraph
