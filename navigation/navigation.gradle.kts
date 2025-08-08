@@ -16,7 +16,11 @@ ksp {
 }
 
 dependencies {
-    implementation(libs.destinations)
-    implementation(libs.destinations.bottom.sheet)
+    implementation(project(":camera"))
+    implementation(project(":ml"))
+    implementation(project(":ui"))
+
+    api(libs.destinations)
+    api(libs.destinations.bottom.sheet)
     ksp(libs.destinations.ksp)
 }
