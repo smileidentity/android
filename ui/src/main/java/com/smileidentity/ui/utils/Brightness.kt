@@ -3,13 +3,17 @@ package com.smileidentity.ui.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 
 /**
  * Forces a Compose screen to be at a given brightness level and reverts after exiting screen
  */
 @Composable
 fun ForceMaxBrightness(brightness: Float = 1f) {
+    val isInPreview = LocalInspectionMode.current
+    if (isInPreview) return
     val activity = LocalContext.current.getActivity() ?: return
+
     DisposableEffect(Unit) {
         val window = activity.window
         val attributes = window.attributes
