@@ -51,7 +51,6 @@ internal fun Project.configureJacoco(
 
     androidComponentsExtension.onVariants { variant ->
         val myObjFactory = project.objects
-        val buildDir = layout.buildDirectory.get().asFile
         val allJars: ListProperty<RegularFile> = myObjFactory.listProperty(RegularFile::class.java)
         val allDirectories: ListProperty<Directory> =
             myObjFactory.listProperty(Directory::class.java)
