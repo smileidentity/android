@@ -24,9 +24,7 @@ private val coverageExclusions = listOf(
     "**/R.class",
     "**/R\$*.class",
     "**/BuildConfig.*",
-    "**/Manifest*.*",
-    "**/*_Hilt*.class",
-    "**/Hilt_*.class",
+    "**/Manifest*.*"
 )
 
 private fun String.capitalize() = replaceFirstChar {
@@ -51,6 +49,7 @@ internal fun Project.configureJacoco(
 
     androidComponentsExtension.onVariants { variant ->
         val myObjFactory = project.objects
+        val buildDir = layout.buildDirectory.get().asFile
         val allJars: ListProperty<RegularFile> = myObjFactory.listProperty(RegularFile::class.java)
         val allDirectories: ListProperty<Directory> =
             myObjFactory.listProperty(Directory::class.java)
@@ -85,11 +84,11 @@ internal fun Project.configureJacoco(
                 )
 
                 executionData.setFrom(
-                    layout.buildDirectory.dir("outputs/unit_test_code_coverage/${variant.name}UnitTest")
-                        .map { it.asFileTree.matching { include("**/*.exec") } },
+                    project.fileTree("$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest")
+                        .matching { include("**/*.exec") },
 
-                    layout.buildDirectory.dir("outputs/code_coverage/${variant.name}AndroidTest")
-                        .map { it.asFileTree.matching { include("**/*.ec") } },
+                    project.fileTree("$buildDir/outputs/code_coverage/${variant.name}AndroidTest")
+                        .matching { include("**/*.ec") },
                 )
             }
 

@@ -1,5 +1,8 @@
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
+import com.smileidentity.buildlogic.configureGradleManagedDevices
 import com.smileidentity.buildlogic.configureKotlinAndroid
+import com.smileidentity.buildlogic.disableUnnecessaryAndroidTests
 import com.smileidentity.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,12 +22,17 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 defaultConfig.targetSdk = 36
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 testOptions.animationsDisabled = true
+                configureGradleManagedDevices(this)
+            }
+            extensions.configure<LibraryAndroidComponentsExtension> {
+                disableUnnecessaryAndroidTests(target)
             }
 
             dependencies {
                 "implementation"(libs.findLibrary("timber").get())
 
                 "androidTestImplementation"(libs.findLibrary("androidx.test.junit").get())
+                "androidTestImplementation"(libs.findLibrary("androidx.test.runner").get())
                 "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
 
                 "testImplementation"(libs.findLibrary("kotlin.test").get())
