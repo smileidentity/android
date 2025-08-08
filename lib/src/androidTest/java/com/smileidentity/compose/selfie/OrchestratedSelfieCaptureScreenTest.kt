@@ -3,7 +3,6 @@ package com.smileidentity.compose.selfie
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import com.smileidentity.compose.nav.ResultCallbacks
 import org.junit.Rule
 import org.junit.Test
 
@@ -19,8 +18,6 @@ class OrchestratedSelfieCaptureScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedSelfieCaptureScreen(
-                content = {},
-                resultCallbacks = ResultCallbacks(),
             )
         }
 
@@ -36,9 +33,7 @@ class OrchestratedSelfieCaptureScreenTest {
         // when
         composeTestRule.setContent {
             OrchestratedSelfieCaptureScreen(
-                showInstructions = false,
-                content = {},
-                resultCallbacks = ResultCallbacks(),
+                showInstructions = false
             )
         }
 

@@ -13,6 +13,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.google.common.truth.Truth.assertThat
+import com.smileidentity.R
 import org.junit.Rule
 import org.junit.Test
 
@@ -43,6 +44,13 @@ class DocumentCaptureScreenTest {
                 knownIdAspectRatio = null,
                 onConfirm = {},
                 onError = {},
+                showInstructions = true,
+                showAttribution = true,
+                allowGallerySelection = true,
+                showSkipButton = false,
+                instructionsTitleText = "Instructions",
+                instructionsSubtitleText = "Please follow the instructions below to take a good quality photo.",
+                instructionsHeroImage = R.drawable.si_photo_capture_instruction_clear_image
             )
         }
 
@@ -69,6 +77,13 @@ class DocumentCaptureScreenTest {
                 knownIdAspectRatio = null,
                 onConfirm = {},
                 onError = {},
+                showInstructions = true,
+                showAttribution = true,
+                allowGallerySelection = true,
+                showSkipButton = false,
+                instructionsTitleText = "Instructions",
+                instructionsSubtitleText = "Please follow the instructions below to take a good quality photo.",
+                instructionsHeroImage = R.drawable.si_photo_capture_instruction_clear_image
             )
         }
 

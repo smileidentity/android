@@ -5,10 +5,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.smileidentity.R
-import java.net.URL
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.net.URL
 
 class ConsentScreenTest {
     @get:Rule
@@ -28,7 +28,9 @@ class ConsentScreenTest {
                 partnerName = "Smile ID",
                 productName = "BVN",
                 partnerPrivacyPolicy = URL("https://usesmileid.com/privacy"),
-                onContinue = onContinueClicked,
+                onContinue = {
+                    onContinueClicked()
+                },
                 onCancel = {},
             )
         }
