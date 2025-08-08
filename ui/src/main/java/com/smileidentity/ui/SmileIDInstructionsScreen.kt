@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.components.SmileIDButton
+import com.smileidentity.ui.previews.DevicePreviews
+import com.smileidentity.ui.previews.ThemePreviews
 
 @Composable
 fun SmileIDInstructionsScreen(
@@ -106,12 +108,14 @@ fun SmileIDInstructionsScreen(
     }
 }
 
+@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenPreview() {
     SmileIDInstructionsScreen()
 }
 
+@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenCustomButtonPreview() {
