@@ -6,10 +6,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 
 class SelfieScanViewModel : IdentityScanViewModel() {
 
-    class SelfieScanViewModelFactory() : ViewModelProvider.Factory {
+    class SelfieScanViewModelFactory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            return SelfieScanViewModel() as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
+            SelfieScanViewModel() as T
     }
 }

@@ -6,10 +6,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 
 class DocumentScanViewModel : IdentityScanViewModel() {
 
-    class IdentityScanViewModelFactory() : ViewModelProvider.Factory {
+    class IdentityScanViewModelFactory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            return DocumentScanViewModel() as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
+            DocumentScanViewModel() as T
     }
 }
