@@ -10,8 +10,11 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.DefaultFadingTransitions
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedInstructionsScreenDestination
 import com.ramcosta.composedestinations.generated.navigation.navgraphs.RootNavGraph
+import com.ramcosta.composedestinations.navigation.dependency
+import com.ramcosta.composedestinations.navigation.navGraph
 import com.ramcosta.composedestinations.spec.Direction
 import com.ramcosta.composedestinations.spec.DirectionNavHostGraphSpec
+import com.smileidentity.navigation.viewmodel.IdentityViewModel
 
 @Composable
 fun SmileIDNavigationHost(
@@ -29,5 +32,10 @@ fun SmileIDNavigationHost(
         navController = navController,
         defaultTransitions = DefaultFadingTransitions,
         start = startDestination,
+        dependenciesContainerBuilder = {
+            navGraph(navGraph = RootNavGraph) {
+                dependency(dependency = IdentityViewModel.IdentityViewModelFactory())
+            }
+        },
     )
 }

@@ -45,8 +45,8 @@ dependencies {
     lintChecks(libs.compose.lint.checks)
 
     // ViewModel and utilities for Compose
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
+    api(libs.androidx.lifecycle.viewmodel.compose)
+    api(libs.androidx.lifecycle.runtime.compose)
 
     testImplementation(libs.junit)
 
