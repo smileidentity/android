@@ -31,15 +31,15 @@ dependencies {
     // Jetpack Compose version is defined by BOM ("Bill-of-Materials")
     // Latest BOM version: https://developer.android.com/jetpack/compose/setup#bom-version-mapping
     val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
+    api(composeBom)
     // Jetpack Compose UI
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.text.google.fonts)
-    implementation(libs.androidx.compose.animation)
+    api(libs.androidx.compose.ui)
+    api(libs.androidx.compose.ui.text.google.fonts)
+    api(libs.androidx.compose.animation)
     // Material Design components (ColorScheme and Typography exposed, hence api vs implementation)
     api(libs.androidx.compose.material3)
     // Android Studio Preview support
-    implementation(libs.androidx.compose.ui.tooling.preview)
+    api(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support
     debugImplementation(libs.androidx.compose.ui.tooling)
     lintChecks(libs.compose.lint.checks)

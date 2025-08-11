@@ -1,0 +1,11 @@
+---
+title: Smile/main Navigation Graph
+---
+%%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
+graph TD
+smile/main(["MainGraph"]) -- "start" --- smile_i_d_nav_g(["SmileIDGraph 🧩"])
+
+click smile_i_d_nav_g "SmileIDNavGraph.mmd" "See SmileIDGraph details" _blank
+
+classDef navgraph fill:#63BC76,stroke:#ffffff;
+class smile/main,smile_i_d_nav_g navgraph;

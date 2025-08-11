@@ -1,0 +1,14 @@
+---
+title: Smile/smileID Navigation Graph
+---
+%%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
+graph TD
+smile/smile_i_d(["SmileIDNavGraph"]) -- "start" --- smile/orchestrated_instructions_screen("OrchestratedInstructionsScreen")
+smile/smile_i_d(["SmileIDNavGraph"]) --- smile/orchestrated_capture_screen("OrchestratedCaptureScreen")
+smile/smile_i_d(["SmileIDNavGraph"]) --- smile/orchestrated_processing_screen("OrchestratedProcessingScreen")
+
+
+classDef destination fill:#5383EC,stroke:#ffffff;
+class smile/orchestrated_capture_screen,smile/orchestrated_instructions_screen,smile/orchestrated_processing_screen destination;
+classDef navgraph fill:#63BC76,stroke:#ffffff;
+class smile/smile_i_d navgraph;

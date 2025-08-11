@@ -110,6 +110,7 @@ tasks.named("assemble") {
 
 dependencies {
     implementation(project(":lib"))
+    implementation(project(":navigation"))
     implementation(libs.kotlin.immutable.collections)
     implementation(libs.androidx.core)
     implementation(libs.datastore)
