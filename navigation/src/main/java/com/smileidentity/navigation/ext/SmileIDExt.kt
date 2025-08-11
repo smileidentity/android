@@ -19,16 +19,16 @@ fun SmartSelfieEnrollment(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     navController.navigatorProvider += bottomSheetNavigator
 
-    ModalBottomSheetLayout(
-        bottomSheetNavigator = bottomSheetNavigator,
-        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-    ) {
-        DestinationsNavHost(
-            navGraph = NavGraphs.root,
-            modifier = modifier
-                .fillMaxSize(),
-            navController = navController,
-            defaultTransitions = DefaultFadingTransitions,
-        )
-    }
+//    ModalBottomSheetLayout(
+//        bottomSheetNavigator = bottomSheetNavigator,
+//        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+//    ) {
+//        DestinationsNavHost(
+//            navGraph = NavGraphs.root,
+//            modifier = modifier
+//                .fillMaxSize(),
+//            navController = navController,
+//            defaultTransitions = DefaultFadingTransitions,
+//        )
+//    }
 }
