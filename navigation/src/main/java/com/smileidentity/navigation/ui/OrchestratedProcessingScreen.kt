@@ -13,10 +13,7 @@ import com.smileidentity.ui.previews.ThemePreviews
 
 @Destination<RootGraph>
 @Composable
-fun OrchestratedProcessingScreen(
-    modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
-) {
+fun OrchestratedProcessingScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
     SmileIDProcessingScreen(
         modifier = modifier,
         onContinue = {

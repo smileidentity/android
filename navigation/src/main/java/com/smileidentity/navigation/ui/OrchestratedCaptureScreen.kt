@@ -14,10 +14,7 @@ import com.smileidentity.ui.previews.ThemePreviews
 
 @Destination<RootGraph>
 @Composable
-fun OrchestratedCaptureScreen(
-    modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
-) {
+fun OrchestratedCaptureScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
     SmileIDCaptureScreen(
         scanType = IdentityScanState.ScanType.SELFIE,
         modifier = modifier,
