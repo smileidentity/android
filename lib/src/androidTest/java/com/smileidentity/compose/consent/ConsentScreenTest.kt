@@ -28,7 +28,9 @@ class ConsentScreenTest {
                 partnerName = "Smile ID",
                 productName = "BVN",
                 partnerPrivacyPolicy = URL("https://usesmileid.com/privacy"),
-                onContinue = onContinueClicked,
+                onContinue = {
+                    onContinueClicked()
+                },
                 onCancel = {},
             )
         }
