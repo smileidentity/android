@@ -3,19 +3,21 @@ package com.smileidentity.navigation.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.smile.destinations.OrchestratedCaptureScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.smileidentity.navigation.graph.SmileIDGraph
 import com.smileidentity.ui.SmileIDProcessingScreen
 
-@Destination<SmileIDGraph>
+@Destination<RootGraph>
 @Composable
-fun OrchestratedProcessingScreen(
-    modifier: Modifier = Modifier,
-    destination: DestinationsNavigator,
-) {
+fun OrchestratedProcessingScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
     SmileIDProcessingScreen(
         modifier = modifier,
-        onContinue = {},
-        onRetry = {},
+        onContinue = {
+            navigator.navigate(direction = OrchestratedCaptureScreenDestination)
+        },
+        onRetry = {
+            navigator.navigate(direction = OrchestratedCaptureScreenDestination)
+        },
     )
 }
