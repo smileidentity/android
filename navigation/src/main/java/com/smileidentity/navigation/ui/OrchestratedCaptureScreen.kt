@@ -8,6 +8,8 @@ import com.ramcosta.composedestinations.generated.navigation.destinations.Orches
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ui.SmileIDCaptureScreen
+import com.smileidentity.ui.previews.DevicePreviews
+import com.smileidentity.ui.previews.ThemePreviews
 
 @Destination<RootGraph>
 @Composable
@@ -23,4 +25,11 @@ fun OrchestratedCaptureScreen(
             navigator.navigate(direction = OrchestratedPreviewScreenDestination)
         },
     )
+}
+
+@ThemePreviews
+@DevicePreviews
+@Composable
+private fun OrchestratedCaptureScreenPreview() {
+//    OrchestratedCaptureScreen()
 }

@@ -7,6 +7,8 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedCaptureScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.smileidentity.ui.SmileIDProcessingScreen
+import com.smileidentity.ui.previews.DevicePreviews
+import com.smileidentity.ui.previews.ThemePreviews
 
 @Destination<RootGraph>
 @Composable
@@ -23,4 +25,11 @@ fun OrchestratedProcessingScreen(
             navigator.navigateUp()
         },
     )
+}
+
+@ThemePreviews
+@DevicePreviews
+@Composable
+private fun OrchestratedProcessingScreenPreview() {
+//    OrchestratedProcessingScreen()
 }

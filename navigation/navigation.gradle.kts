@@ -28,4 +28,10 @@ dependencies {
     implementation(libs.destinations)
     implementation(libs.destinations.bottom.sheet)
     ksp(libs.destinations.ksp)
+
+    val composeBom = platform(libs.androidx.compose.bom)
+    androidTestImplementation(composeBom)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.bundles.androidx.compose.ui.test)
 }

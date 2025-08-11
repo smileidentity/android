@@ -6,7 +6,11 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedProcessingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.smileidentity.ml.states.IdentityScanState
+import com.smileidentity.ui.SmileIDCaptureScreen
 import com.smileidentity.ui.SmileIDPreviewScreen
+import com.smileidentity.ui.previews.DevicePreviews
+import com.smileidentity.ui.previews.ThemePreviews
 
 @Destination<RootGraph>
 @Composable
@@ -23,4 +27,11 @@ fun OrchestratedPreviewScreen(
             navigator.navigateUp()
         },
     )
+}
+
+@ThemePreviews
+@DevicePreviews
+@Composable
+private fun OrchestratedPreviewScreenPreview() {
+//    OrchestratedPreviewScreen()
 }
