@@ -44,6 +44,10 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     lintChecks(libs.compose.lint.checks)
 
+    // ViewModel and utilities for Compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
     testImplementation(libs.junit)
 
     androidTestImplementation(composeBom)
