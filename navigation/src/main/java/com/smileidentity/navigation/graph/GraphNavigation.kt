@@ -12,7 +12,7 @@ import com.ramcosta.composedestinations.generated.navigation.destinations.Orches
 import com.ramcosta.composedestinations.generated.navigation.navgraphs.RootNavGraph
 
 @Composable
-fun DemoNavigation(modifier: Modifier = Modifier) {
+fun GraphNavigation(modifier: Modifier = Modifier) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController()
     navController.navigatorProvider += bottomSheetNavigator
