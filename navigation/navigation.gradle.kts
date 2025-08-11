@@ -1,11 +1,16 @@
 plugins {
     alias(libs.plugins.smileid.android.library)
     alias(libs.plugins.smileid.android.library.jacoco)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.smileidentity.navigation"
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 ksp {
