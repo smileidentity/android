@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smile/smileID Navigation Graph</title>
+</head>
+<body>
+<pre id='scene' class="mermaid">
+---
+title: Smile/smileID Navigation Graph
+---
+%%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
+graph TD
+smile/smile_i_d(["SmileIDGraph"]) -- "start" --- smile/orchestrated_instructions_screen("OrchestratedInstructionsScreen")
+smile/smile_i_d(["SmileIDGraph"]) --- smile/orchestrated_capture_screen("OrchestratedCaptureScreen")
+smile/smile_i_d(["SmileIDGraph"]) --- smile/orchestrated_processing_screen("OrchestratedProcessingScreen")
+
+
+classDef destination fill:#5383EC,stroke:#ffffff;
+class smile/orchestrated_capture_screen,smile/orchestrated_instructions_screen,smile/orchestrated_processing_screen destination;
+classDef navgraph fill:#63BC76,stroke:#ffffff;
+class smile/smile_i_d navgraph;
+
+</pre>
+<script src='https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js'></script>
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';</script>
+<script>
+var element = document.getElementById('scene')
+var pz = panzoom(element, {
+  minZoom: 0.5
+});
+
+function reset(e) {
+   pz.moveTo(0, 0); 
+   pz.zoomAbs(0, 0, 1);
+}
+
+function zoomIn(e) {
+   pz.smoothZoom(0, 0, 1.25);
+}
+
+function zoomOut(e) {
+   pz.smoothZoom(0, 0, 0.75);
+}
+
+document.addEventListener('keydown', function(event) {
+    const keycode = event.keyCode;
+    const key = event.key;
+    
+    switch(keycode) {
+        case 82: // R key
+            reset(event);
+            break;
+        case 187: // + key
+            zoomIn(event);
+            break;
+        case 189: // - key
+            zoomOut(event);
+            break;
+    }
+});
+</script>
+</body>
+</html>

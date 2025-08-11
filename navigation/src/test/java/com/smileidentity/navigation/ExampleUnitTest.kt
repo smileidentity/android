@@ -1,6 +1,6 @@
-package com.smileidentity.smileid
+package com.smileidentity.navigation
 
-import org.junit.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
 /**

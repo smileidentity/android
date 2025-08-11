@@ -19,6 +19,7 @@ camposer = "0.4.4"
 camerax = "1.5.0-alpha06"
 chucker = "4.2.0"
 coil = "2.7.0"
+destinations = "2.2.0"
 compose-lint-checks = "1.4.2"
 coroutines = "1.10.2"
 datastore = "1.1.7"
@@ -88,6 +89,9 @@ camposer = { module = "io.github.ujizin:camposer", version.ref = "camposer" }
 chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+destinations = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "destinations" }
+destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "destinations" }
+destinations-bottom-sheet = { module = "io.github.raamcosta.compose-destinations:bottom-sheet", version.ref = "destinations" }
 compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "compose-lint-checks" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
