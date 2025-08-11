@@ -24,7 +24,9 @@ private val coverageExclusions = listOf(
     "**/R.class",
     "**/R\$*.class",
     "**/BuildConfig.*",
-    "**/Manifest*.*"
+    "**/Manifest*.*",
+    // Current Lib module
+    "com/smileidentity/**",
 )
 
 private fun String.capitalize() = replaceFirstChar {
