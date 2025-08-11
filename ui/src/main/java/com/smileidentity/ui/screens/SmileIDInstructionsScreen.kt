@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.smileidentity.ui.R
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.ThemePreviews

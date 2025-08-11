@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,16 +17,16 @@ import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.ThemePreviews
 
 @Composable
-fun SmileIDProcessingScreen(
+fun SmileIDPreviewScreen(
     modifier: Modifier = Modifier,
     onContinue: () -> Unit = {},
     onRetry: () -> Unit = {},
     continueButton: @Composable (onContinue: () -> Unit) -> Unit = { onClick ->
         SmileIDButton(
-            text = "Close",
+            text = "Continue",
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag(tag = "preview:close_button"),
+                .testTag(tag = "preview:continue_button"),
             onClick = onClick,
         )
     },
@@ -56,6 +56,6 @@ fun SmileIDProcessingScreen(
 @ThemePreviews
 @DevicePreviews
 @Composable
-private fun SmileIDProcessingScreenPreview() {
-    SmileIDProcessingScreen()
+private fun SmileIDPreviewScreenPreview() {
+    SmileIDPreviewScreen()
 }
