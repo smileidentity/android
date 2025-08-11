@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.smile.destinations.OrchestratedCaptureScreenDestination
+import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedCaptureScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.smileidentity.ui.SmileIDProcessingScreen
 
@@ -12,7 +12,7 @@ import com.smileidentity.ui.SmileIDProcessingScreen
 @Composable
 fun OrchestratedProcessingScreen(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
 ) {
     SmileIDProcessingScreen(
         modifier = modifier,

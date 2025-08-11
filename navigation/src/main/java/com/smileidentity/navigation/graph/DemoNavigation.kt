@@ -8,8 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.DefaultFadingTransitions
-import com.ramcosta.composedestinations.generated.smile.SmileNavGraphs
-import com.ramcosta.composedestinations.generated.smile.destinations.OrchestratedInstructionsScreenDestination
+import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedInstructionsScreenDestination
+import com.ramcosta.composedestinations.generated.navigation.navgraphs.RootNavGraph
 
 @Composable
 fun DemoNavigation(modifier: Modifier = Modifier) {
@@ -18,7 +18,7 @@ fun DemoNavigation(modifier: Modifier = Modifier) {
     navController.navigatorProvider += bottomSheetNavigator
 
     DestinationsNavHost(
-        navGraph = SmileNavGraphs.root,
+        navGraph = RootNavGraph,
         modifier = modifier.fillMaxSize(),
         navController = navController,
         defaultTransitions = DefaultFadingTransitions,

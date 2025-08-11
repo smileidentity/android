@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.smile.destinations.OrchestratedProcessingScreenDestination
+import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedProcessingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.smileidentity.ui.SmileIDPreviewScreen
 

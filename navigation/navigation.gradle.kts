@@ -10,7 +10,7 @@ android {
 
 ksp {
     arg("compose-destinations.mode", "destinations")
-    arg("compose-destinations.moduleName", "smile")
+    arg("compose-destinations.moduleName", "navigation")
     arg("compose-destinations.htmlMermaidGraph", "$rootDir//navigation-docs")
     arg("compose-destinations.mermaidGraph", "$rootDir/navigation-docs")
 }

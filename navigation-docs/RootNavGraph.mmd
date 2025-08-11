@@ -1,15 +1,15 @@
 ---
-title: Smile/root Navigation Graph
+title: Navigation/root Navigation Graph
 ---
 %%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
 graph TD
-smile/root(["RootGraph"]) -- "start" --- smile/orchestrated_instructions_screen("OrchestratedInstructionsScreen")
-smile/root(["RootGraph"]) --- smile/orchestrated_capture_screen("OrchestratedCaptureScreen")
-smile/root(["RootGraph"]) --- smile/orchestrated_preview_screen("OrchestratedPreviewScreen")
-smile/root(["RootGraph"]) --- smile/orchestrated_processing_screen("OrchestratedProcessingScreen")
+navigation/root(["RootGraph"]) -- "start" --- navigation/orchestrated_instructions_screen("OrchestratedInstructionsScreen")
+navigation/root(["RootGraph"]) --- navigation/orchestrated_capture_screen("OrchestratedCaptureScreen")
+navigation/root(["RootGraph"]) --- navigation/orchestrated_preview_screen("OrchestratedPreviewScreen")
+navigation/root(["RootGraph"]) --- navigation/orchestrated_processing_screen("OrchestratedProcessingScreen")
 
 
 classDef destination fill:#5383EC,stroke:#ffffff;
-class smile/orchestrated_capture_screen,smile/orchestrated_instructions_screen,smile/orchestrated_preview_screen,smile/orchestrated_processing_screen destination;
+class navigation/orchestrated_capture_screen,navigation/orchestrated_instructions_screen,navigation/orchestrated_preview_screen,navigation/orchestrated_processing_screen destination;
 classDef navgraph fill:#63BC76,stroke:#ffffff;
-class smile/root navgraph;
+class navigation/root navgraph;
