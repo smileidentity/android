@@ -10,14 +10,17 @@ import com.smileidentity.ui.SmileIDProcessingScreen
 
 @Destination<RootGraph>
 @Composable
-fun OrchestratedProcessingScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
+fun OrchestratedProcessingScreen(
+    modifier: Modifier = Modifier,
+    navigator: DestinationsNavigator
+) {
     SmileIDProcessingScreen(
         modifier = modifier,
         onContinue = {
             navigator.navigate(direction = OrchestratedCaptureScreenDestination)
         },
         onRetry = {
-            navigator.navigate(direction = OrchestratedCaptureScreenDestination)
+            navigator.navigateUp()
         },
     )
 }

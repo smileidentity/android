@@ -5,10 +5,11 @@ title: Smile/root Navigation Graph
 graph TD
 smile/root(["RootGraph"]) -- "start" --- smile/orchestrated_instructions_screen("OrchestratedInstructionsScreen")
 smile/root(["RootGraph"]) --- smile/orchestrated_capture_screen("OrchestratedCaptureScreen")
+smile/root(["RootGraph"]) --- smile/orchestrated_preview_screen("OrchestratedPreviewScreen")
 smile/root(["RootGraph"]) --- smile/orchestrated_processing_screen("OrchestratedProcessingScreen")
 
 
 classDef destination fill:#5383EC,stroke:#ffffff;
-class smile/orchestrated_capture_screen,smile/orchestrated_instructions_screen,smile/orchestrated_processing_screen destination;
+class smile/orchestrated_capture_screen,smile/orchestrated_instructions_screen,smile/orchestrated_preview_screen,smile/orchestrated_processing_screen destination;
 classDef navgraph fill:#63BC76,stroke:#ffffff;
 class smile/root navgraph;
