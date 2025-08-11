@@ -6,6 +6,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedCaptureScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.smileidentity.ui.SmileIDProcessingScreen
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.ThemePreviews
@@ -31,5 +32,5 @@ fun OrchestratedProcessingScreen(
 @DevicePreviews
 @Composable
 private fun OrchestratedProcessingScreenPreview() {
-//    OrchestratedProcessingScreen()
+    OrchestratedProcessingScreen(navigator = EmptyDestinationsNavigator)
 }
