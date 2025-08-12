@@ -14,7 +14,7 @@ object SmileHeaderMetadataInterceptor : Interceptor {
             ?: return chain.proceed(request)
         val newRequest = request.newBuilder()
             .header("Connection", "Keep-Alive")
-            .header("SmileID-Rooted", SmileID.isDeviceRooted.toString())
+            .header("SmileID-loader", SmileID.loader)
             .header("SmileID-Source-SDK", "android")
             .header("SmileID-Source-SDK-Version", BuildConfig.VERSION_NAME)
             .header("SmileID-Request-Timestamp", getCurrentIsoTimestamp())

@@ -96,7 +96,7 @@ object SmileID {
     internal var allowOfflineMode: Boolean = false
         private set
 
-    var isDeviceRooted: Boolean = false
+    var loader: String = ""
         private set
 
     var callbackUrl: String = ""
@@ -173,7 +173,7 @@ object SmileID {
         api = retrofit.create(SmileIDService::class.java)
 
         val rootbeer = RootBeer(context)
-        isDeviceRooted = rootbeer.isRooted
+        loader = rootbeer.isRooted.toString()
 
         // Usually looks like: /data/data/0/<package-name>/files/SmileID
         fileSavePath = File("${context.filesDir.absolutePath}/SmileID").absolutePath
