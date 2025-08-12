@@ -1,5 +1,7 @@
 package com.smileidentity.ui.screens
 
+import androidx.annotation.OptIn
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,15 +12,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.camera.viewmodel.CameraPreviewViewModel
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
-import com.smileidentity.ui.components.SmileCameraPreview
 import com.smileidentity.ui.components.SmileIDButton
+import com.smileidentity.ui.components.SmileIDCameraPreview
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.ThemePreviews
+import com.smileidentity.ui.utils.viewModelFactory
 import java.io.File
 
+@OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun SmileIDCaptureScreen(
     scanType: IdentityScanState.ScanType,
@@ -35,7 +41,12 @@ fun SmileIDCaptureScreen(
     },
     onResult: (File) -> Unit,
 ) {
-    SmileCameraPreview(
+    SmileIDCameraPreview(
+        viewModel = viewModel(
+            factory = viewModelFactory {
+                CameraPreviewViewModel()
+            },
+        ),
         modifier = modifier,
     ) {
         /**
