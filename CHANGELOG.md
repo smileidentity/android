@@ -1,6 +1,6 @@
 # Release Notes
 
-# Unreleased 
+# 11.1.0 - July 31, 2025
 
 ### Added
 
@@ -16,6 +16,8 @@
 * Removed the default `ConsentInformation` set when no consent is passed
 * Changed `enableAutoCapture` to `AutoCapture` enum to allow to allow partners change document
   capture options
+* Fixed a bug on the `SelfieCaptureScreen` where the instruction text would overlap with the face
+  cutout and also fixed padding issues when agent mode hidden
 
 ## 11.0.5 - July 2, 2025
 
@@ -26,61 +28,77 @@
 ## 11.0.4 - June 16, 2025
 
 ### Changed
+
 * Migrated from tflite to litert
-* Updated to v1.0.1 of security sdk 
+* Updated to v1.0.1 of security sdk
 
 ## 11.0.3
 
 ### Changed
+
 * Fix/expose localmetadata provider
 
 ## 11.0.2
 
 ### Fixed
-* Fixed a bug with geolocation 
+
+* Fixed a bug with geolocation
 
 ## 11.0.1
 
 ### Changed
-* Updated Sentry version from 7.2.0 to the latest(8.13.2). Replaced the use of Sentry’s Hub-based 
-implementation with the new Scope and Scopes-based implementation.
+
+* Updated Sentry version from 7.2.0 to the latest(8.13.2). Replaced the use of Sentry’s Hub-based
+  implementation with the new Scope and Scopes-based implementation.
 
 ## 11.0.0
 
 ### Added
-* Added a security feature to protect the payload between sdk and backend from unauthorized tampering.
+
+* Added a security feature to protect the payload between sdk and backend from unauthorized
+  tampering.
 * Enhanced fraud signals collection to improve fraud prevention
 
 ### Changed
+
 * Changed File save path from cacheDir to fileDir (and maintain compatibility till next major
   breaking release)
 
 ### Fixed
+
 * Fixed a bug where a filepath wasn't updated on a retry of a document verification job
 
 ## 10.6.3
 
 ### Fixed
-* Fixed `showAttribution` parameter not being passed to the instruction screen in enhanced selfie capture
+
+* Fixed `showAttribution` parameter not being passed to the instruction screen in enhanced selfie
+  capture
 
 ## 10.6.2
 
 ### Changed
-*  Restructured consent object that is being sent to the backend API for biometric kyc, enhanced kyc and enhanced document verification
+
+* Restructured consent object that is being sent to the backend API for biometric kyc, enhanced kyc
+  and enhanced document verification
 
 ## Unreleased
 
 ### Added
- * Added a security feature to protect the payload between sdk and backend from unauthorized tampering.
 
+* Added a security feature to protect the payload between sdk and backend from unauthorized
+  tampering.
 
 ## 10.6.1
-* Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of when there is an error    
+
+* Changed Enhanced SmartSelfie™ viewmodels to call `onResult` when the user clicks cancel instead of
+  when there is an error
 * Added messages from SmartSelfie™ errors will show correctly if present and will show default
   failure message if not present
 * Updated the preview to throw SmileIDException and not crash if the file is null
 
 ## 10.6.0
+
 * Changes the `allow_new_enroll` flag to be a real boolean instead of a string for prepUpload
   requests and multi-part requests. This is a breaking change for stored offline jobs, where the job
   is written using an older sdk version and then submission is attempted using this version.
@@ -95,7 +113,7 @@ implementation with the new Scope and Scopes-based implementation.
 ## 10.5.1
 
 * Make ConsentInformation optional in EnhancedDocV, EnhancedKYC and BiometricKYC
-* Add strict mode to enable Enhanced SmartSelfie™ capture on the BiometricKYC, 
+* Add strict mode to enable Enhanced SmartSelfie™ capture on the BiometricKYC,
   DocumentVerification and EnhancedDocV fragments
 
 ## 10.5.0
