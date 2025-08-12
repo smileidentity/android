@@ -7,9 +7,9 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedProcessingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
-import com.smileidentity.ui.SmileIDPreviewScreen
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.ThemePreviews
+import com.smileidentity.ui.screens.SmileIDPreviewScreen
 
 @Destination<RootGraph>
 @Composable

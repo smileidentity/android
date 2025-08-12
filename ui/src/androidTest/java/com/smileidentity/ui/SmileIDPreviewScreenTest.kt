@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.smileidentity.ui.screens.SmileIDPreviewScreen
 import org.junit.Rule
 import org.junit.Test
 
