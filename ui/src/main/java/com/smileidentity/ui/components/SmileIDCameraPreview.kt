@@ -26,8 +26,7 @@ import com.smileidentity.ui.utils.ForceMaxBrightness
 @Composable
 fun SmileIDCameraPreview(
     viewModel: CameraPreviewViewModel,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier, content: @Composable () -> Unit
 ) {
     val viewfinderZoom = 1.1f
     val isInPreview = LocalInspectionMode.current
