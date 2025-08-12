@@ -1,4 +1,4 @@
-package com.smileidentity.ui
+package com.smileidentity.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
