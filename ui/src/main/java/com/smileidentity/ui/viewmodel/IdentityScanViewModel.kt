@@ -17,7 +17,7 @@ abstract class IdentityScanViewModel : ViewModel() {
         data object Initializing : State()
         class Scanning(val scanState: IdentityScanState? = null) : State()
         class Scanned(val result: IdentityScanState) : State()
-        class Timeout : State()
+        data object Timeout : State()
     }
 
     fun startScan(scanType: IdentityScanState.ScanType) {
