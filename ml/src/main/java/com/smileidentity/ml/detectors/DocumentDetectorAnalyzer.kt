@@ -1,6 +1,7 @@
 package com.smileidentity.ml.detectors
 
 import com.smileidentity.camera.Analyzer
+import com.smileidentity.ml.interpreter.InterpreterOptionsWrapper
 import com.smileidentity.ml.interpreter.InterpreterWrapper
 import com.smileidentity.ml.interpreter.InterpreterWrapperImpl
 import com.smileidentity.ml.states.IdentityScanState

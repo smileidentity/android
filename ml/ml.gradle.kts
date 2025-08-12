@@ -9,4 +9,8 @@ android {
 
 dependencies {
     implementation(project(":camera"))
+
+    implementation(libs.litert)
+    implementation(libs.litert.metadata)
+    implementation(libs.litert.support)
 }
