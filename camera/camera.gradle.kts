@@ -29,11 +29,18 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.animation)
+    api(libs.androidx.compose.material3)
     // Android Studio Preview support
     implementation(libs.androidx.compose.ui.tooling.preview)
     // Android Studio Preview support
     debugImplementation(libs.androidx.compose.ui.tooling)
     lintChecks(libs.compose.lint.checks)
 
+    // ViewModel and utilities for Compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // cameraX setup
     api(libs.bundles.camerax)
 }
