@@ -10,5 +10,11 @@ android {
 }
 
 dependencies {
+    // OkHttp is exposed in public SmileID interface (initialize), hence "api" vs "implementation"
+    api(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.scalars)
+    implementation(libs.okhttp.logging.interceptor)
+
     implementation(libs.kotlinx.serialization.json)
 }
