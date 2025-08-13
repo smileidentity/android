@@ -12,7 +12,10 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 /**
  * Create the SmileService instance used by the SDK.
  */
-internal fun initSmileAPI(useSandbox: Boolean, okHttpClient: OkHttpClient): SmileAPI {
+internal fun initSmileAPI(
+    useSandbox: Boolean,
+    okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
+): SmileAPI {
     val url =
         if (useSandbox) {
             "https://devapi.smileidentity.com/"
