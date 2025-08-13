@@ -26,6 +26,7 @@ import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
 import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
+import com.smileidentity.networking.SmileIDIntegrityInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.MetadataAdapter
@@ -41,6 +42,8 @@ import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
+import com.smileidentity.attestation.SmileIDIntegrityManager
+import com.smileidentity.attestation.SmileIDStandardRequestIntegrityManager
 import com.smileidentity.security.interceptor.SmileSecurityInterceptor
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
@@ -139,8 +142,24 @@ object SmileID {
         config: Config = Config.fromAssets(context),
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder(context).build(),
     ): Deferred<Result<Unit>> {
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+         // Warm up Integrity Token Provider
+         val smileIDIntegrityManager: SmileIDIntegrityManager =
+            SmileIDStandardRequestIntegrityManager(context)
+        scope.launch {
+            val result = smileIDIntegrityManager.warmUpTokenProvider()
+            result.fold(
+                onSuccess = {
+
+                },
+                onFailure = {
+
+                }
+            )
+        }
+
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
         // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
         if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
@@ -180,7 +199,6 @@ object SmileID {
 
         trackSdkLaunchCount(context)
 
-        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {
             runCatching {
                 requestFaceDetectionModuleInstallation(context)
@@ -213,7 +231,7 @@ object SmileID {
         config: Config = Config.fromAssets(context),
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder(context).build(),
     ): Deferred<Result<Unit>> {
         SmileID.apiKey = apiKey
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -471,7 +489,7 @@ object SmileID {
      * starting point if you need to customize an [OkHttpClient] for your own needs
      */
     @JvmStatic
-    fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
+    fun getOkHttpClientBuilder(context: Context) = OkHttpClient.Builder().apply {
         callTimeout(timeout = 120, TimeUnit.SECONDS)
         connectTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         readTimeout(timeout = 60, unit = TimeUnit.SECONDS)
@@ -479,6 +497,7 @@ object SmileID {
         addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
         addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileSecurityInterceptor)
+        addInterceptor(interceptor = SmileIDIntegrityInterceptor(context))
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the

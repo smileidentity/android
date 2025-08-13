@@ -10,16 +10,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.lifecycleScope
-import com.smileidentity.sample.SmileIntegrityManager
 import com.smileidentity.sample.compose.RootScreen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     private val locationPermissionRequestCode = 100
-    private val smileIntegrityManager = SmileIntegrityManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -30,7 +24,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             RootScreen()
         }
-        getIntegrityToken()
     }
 
     /*
@@ -59,16 +52,6 @@ class MainActivity : ComponentActivity() {
                 ),
                 locationPermissionRequestCode,
             )
-        }
-    }
-
-    fun getIntegrityToken() {
-        smileIntegrityManager.warmUpTokenProvider()
-        lifecycleScope.launch {
-            delay(10000) // Wait for the token provider to be ready
-            smileIntegrityManager.requestIntegrityVerdictToken { token ->
-                Timber.d("Received integrity token: $token")
-            }
         }
     }
 }
