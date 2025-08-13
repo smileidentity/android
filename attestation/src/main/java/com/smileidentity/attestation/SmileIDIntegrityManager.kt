@@ -46,7 +46,7 @@ class SmileIDStandardRequestIntegrityManager(
         val finishedTask: Task<StandardIntegrityTokenProvider> = standardIntegrityManager
             .prepareIntegrityToken(
                 PrepareIntegrityTokenRequest.builder()
-                    .setCloudProjectNumber(610984185237L)
+                    .setCloudProjectNumber(0L)
                     .build()
             ).awaitTask()
 
