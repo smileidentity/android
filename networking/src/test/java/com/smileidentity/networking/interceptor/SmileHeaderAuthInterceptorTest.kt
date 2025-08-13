@@ -4,12 +4,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import okhttp3.Interceptor
-import okhttp3.Request
-import org.junit.Before
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import okhttp3.Interceptor
+import okhttp3.Request
+import org.junit.Before
 
 class SmileHeaderAuthInterceptorTest {
     private val subject = SmileHeaderAuthInterceptor
@@ -40,4 +40,3 @@ class SmileHeaderAuthInterceptorTest {
         assertEquals(request.url, capturedRequest.captured.url)
     }
 }
-

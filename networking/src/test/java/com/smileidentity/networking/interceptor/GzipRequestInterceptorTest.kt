@@ -4,11 +4,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import okhttp3.Interceptor
-import okhttp3.Request
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import okhttp3.Interceptor
+import okhttp3.Request
 
 class GzipRequestInterceptorTest {
     private val subject = GzipRequestInterceptor()
