@@ -24,4 +24,5 @@ rootProject.name = "SmileID"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include("analytics", "camera", "lib", "ml", "networking", "sample", "storage", "ui", "attestation")
+include("analytics", "camera", "lib", "ml", "navigation", "networking", "sample", "storage", "ui")
 rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }

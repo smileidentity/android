@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.smileid.android.application.jacoco)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
@@ -120,7 +121,9 @@ tasks.named("assemble") {
 }
 
 dependencies {
+    implementation(project(":camera"))
     implementation(project(":lib"))
+    implementation(project(":navigation"))
     implementation(libs.kotlin.immutable.collections)
     implementation(libs.androidx.core)
     implementation(libs.datastore)

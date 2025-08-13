@@ -5,7 +5,7 @@ on:
   pull_request:
   merge_group:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -37,12 +37,20 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build, Test, Lint, Assemble
+      - name: Build, Lint, Assemble
         # NB! The "lint" gradle action here is different than ktLint
         run: ./gradlew ktlintCheck lint build assembleDebug
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
           ORG_GRADLE_PROJECT_GOOGLE_CLOUD_PROJECT_NUMBER: ${{ secrets.GOOGLE_CLOUD_PROJECT_NUMBER }}
+
+      - name: Run Tests and Collect Coverage
+        run: ./gradlew test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
 
       - name: Publish Snapshot
         if: github.event_name != 'pull_request' || github.event.pull_request.user.login != 'dependabot[bot]'
