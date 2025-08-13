@@ -18,4 +18,7 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
 
     implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.mockk)
 }
