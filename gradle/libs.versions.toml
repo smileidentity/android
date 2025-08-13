@@ -116,6 +116,7 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 play-services-mlkit-face-detection = { module = "com.google.android.gms:play-services-mlkit-face-detection", version.ref = "play-services-mlkit-face-detection" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+retrofit-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 sentry = { module = "io.sentry:sentry" }
 sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
