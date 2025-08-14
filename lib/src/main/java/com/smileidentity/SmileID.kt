@@ -88,6 +88,9 @@ object SmileID {
     lateinit var api: SmileIDService internal set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
 
+    @JvmStatic
+    lateinit var integrityManager: SmileIDIntegrityManager internal set
+
     lateinit var config: Config
         internal set
     private lateinit var retrofit: Retrofit
@@ -146,22 +149,13 @@ object SmileID {
         config: Config = Config.fromAssets(context),
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder(context).build(),
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ): Deferred<Result<Unit>> {
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
          // Warm up Integrity Token Provider
-         val smileIDIntegrityManager: SmileIDIntegrityManager =
-            SmileIDStandardRequestIntegrityManager(context)
+        integrityManager = SmileIDStandardRequestIntegrityManager(context)
         scope.launch {
-            val result = smileIDIntegrityManager.warmUpTokenProvider()
-            result.fold(
-                onSuccess = {
-
-                },
-                onFailure = {
-
-                }
-            )
+          integrityManager.warmUpTokenProvider()
         }
 
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
@@ -238,10 +232,15 @@ object SmileID {
         config: Config = Config.fromAssets(context),
         useSandbox: Boolean = false,
         enableCrashReporting: Boolean = true,
-        okHttpClient: OkHttpClient = getOkHttpClientBuilder(context).build(),
+        okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ): Deferred<Result<Unit>> {
         SmileID.apiKey = apiKey
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        // Warm up Integrity Token Provider
+        integrityManager = SmileIDStandardRequestIntegrityManager(context)
+        scope.launch {
+            integrityManager.warmUpTokenProvider()
+        }
         return scope.async {
             initialize(
                 context = context,
@@ -496,7 +495,7 @@ object SmileID {
      * starting point if you need to customize an [OkHttpClient] for your own needs
      */
     @JvmStatic
-    fun getOkHttpClientBuilder(context: Context) = OkHttpClient.Builder().apply {
+    fun getOkHttpClientBuilder() = OkHttpClient.Builder().apply {
         callTimeout(timeout = 120, TimeUnit.SECONDS)
         connectTimeout(timeout = 60, unit = TimeUnit.SECONDS)
         readTimeout(timeout = 60, unit = TimeUnit.SECONDS)
@@ -504,7 +503,7 @@ object SmileID {
         addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
         addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileSecurityInterceptor)
-        addInterceptor(interceptor = SmileIDIntegrityInterceptor(context))
+        addInterceptor(interceptor = SmileIDIntegrityInterceptor())
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the

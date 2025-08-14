@@ -43,18 +43,6 @@ android {
     }
 
     buildTypes {
-        all {
-            // todo we can migrate this to Arkana setup
-            val googleCloudProjectNumber = findProperty("GOOGLE_CLOUD_PROJECT_NUMBER")
-                ?: throw IllegalArgumentException(
-                    "Please set the GOOGLE_CLOUD_PROJECT_NUMBER gradle property",
-                )
-            buildConfigField(
-                "String",
-                "GOOGLE_CLOUD_PROJECT_NUMBER",
-                "\"$googleCloudProjectNumber\"",
-            )
-        }
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "_debug"

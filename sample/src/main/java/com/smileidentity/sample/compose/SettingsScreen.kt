@@ -47,7 +47,7 @@ fun SettingsScreen(
         ),
     )
     val client = remember {
-        SmileID.getOkHttpClientBuilder(context)
+        SmileID.getOkHttpClientBuilder()
             .addInterceptor(ChuckerInterceptor.Builder(context).build())
             .build()
     }

@@ -46,7 +46,7 @@ fun RootScreen(
     val runtimeConfig by viewModel.runtimeConfig.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val client = remember {
-        SmileID.getOkHttpClientBuilder(context)
+        SmileID.getOkHttpClientBuilder()
             .addInterceptor(ChuckerInterceptor.Builder(context).build())
             .build()
     }
