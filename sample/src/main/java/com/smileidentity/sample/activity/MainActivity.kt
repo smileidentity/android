@@ -13,7 +13,7 @@ import androidx.core.view.WindowCompat
 import com.smileidentity.sample.compose.RootScreen
 
 class MainActivity : ComponentActivity() {
-    private val locationPermissionRequestCode = 100
+    private val locationPermissionRequestCode = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
