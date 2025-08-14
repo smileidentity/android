@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "signature": "some-long-signature-here",
+  "timestamp": "timestamp",
+  "callback_url": "callback_url",
+  "partner_params": {
+    "job_type": 6,
+    "job_id": "job_id"
+  }
+}
