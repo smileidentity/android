@@ -14,6 +14,8 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.scottyab.rootbeer.RootBeer
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.SmileID.initialize
+import com.smileidentity.attestation.SmileIDIntegrityManager
+import com.smileidentity.attestation.SmileIDStandardRequestIntegrityManager
 import com.smileidentity.metadata.models.WrapperSdkName
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
@@ -27,7 +29,6 @@ import com.smileidentity.networking.EnhancedDocumentVerificationJobResultAdapter
 import com.smileidentity.networking.FileAdapter
 import com.smileidentity.networking.FileNameAdapter
 import com.smileidentity.networking.GzipRequestInterceptor
-import com.smileidentity.networking.SmileIDIntegrityInterceptor
 import com.smileidentity.networking.JobResultAdapter
 import com.smileidentity.networking.JobTypeAdapter
 import com.smileidentity.networking.MetadataAdapter
@@ -35,6 +36,7 @@ import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
+import com.smileidentity.networking.SmileIDIntegrityInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -43,8 +45,6 @@ import com.smileidentity.networking.asDocumentBackImage
 import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
-import com.smileidentity.attestation.SmileIDIntegrityManager
-import com.smileidentity.attestation.SmileIDStandardRequestIntegrityManager
 import com.smileidentity.security.interceptor.SmileSecurityInterceptor
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
@@ -152,10 +152,10 @@ object SmileID {
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ): Deferred<Result<Unit>> {
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-         // Warm up Integrity Token Provider
+        // Warm up Integrity Token Provider
         integrityManager = SmileIDStandardRequestIntegrityManager(context)
         scope.launch {
-          integrityManager.warmUpTokenProvider()
+            integrityManager.warmUpTokenProvider()
         }
 
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0

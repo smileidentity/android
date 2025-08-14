@@ -1,9 +1,7 @@
 package com.smileidentity.attestation
 
 import android.content.Context
-import com.google.android.gms.tasks.Task
 import com.google.android.play.core.integrity.IntegrityManagerFactory
-import com.google.android.play.core.integrity.StandardIntegrityManager
 import com.google.android.play.core.integrity.StandardIntegrityManager.PrepareIntegrityTokenRequest
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenProvider
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
@@ -22,14 +20,10 @@ interface SmileIDIntegrityManager {
      * @param requestIdentifier A string to be hashed to generate a request identifier.
      *
      */
-    suspend fun requestToken(
-        requestIdentifier: String
-    ): Result<String>
+    suspend fun requestToken(requestIdentifier: String): Result<String>
 }
 
-class SmileIDStandardRequestIntegrityManager(
-    context: Context
-): SmileIDIntegrityManager {
+class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrityManager {
     private val standardIntegrityManager = IntegrityManagerFactory.createStandard(context)
     private var integrityTokenProvider:
         StandardIntegrityTokenProvider? = null
@@ -39,11 +33,13 @@ class SmileIDStandardRequestIntegrityManager(
             if (integrityTokenProvider != null) {
                 return
             }
-       standardIntegrityManager
+            standardIntegrityManager
                 .prepareIntegrityToken(
                     PrepareIntegrityTokenRequest.builder()
-                        .setCloudProjectNumber(ArkanaKeys.Global.gOOGLE_CLOUD_PROJECT_NUMBER.toLong())
-                        .build()
+                        .setCloudProjectNumber(
+                            ArkanaKeys.Global.gOOGLE_CLOUD_PROJECT_NUMBER.toLong(),
+                        )
+                        .build(),
                 ).awaitTask()
                 .toResult()
                 .onSuccess {
@@ -59,20 +55,19 @@ class SmileIDStandardRequestIntegrityManager(
             }
     }
 
-    override suspend fun requestToken(
-        requestIdentifier: String
-    ): Result<String> = request(requestIdentifier)
+    override suspend fun requestToken(requestIdentifier: String): Result<String> =
+        request(requestIdentifier)
 
-    private suspend fun request(
-        requestHash: String,
-    ): Result<String> = runCatching {
+    private suspend fun request(requestHash: String): Result<String> = runCatching {
         val finishedTask = requireNotNull(
             value = integrityTokenProvider,
-            lazyMessage = { "Integrity token provider is not initialized. Call warmUpTokenProvider() first." }
+            lazyMessage = {
+                "Integrity token provider is not initialized. Call warmUpTokenProvider() first."
+            },
         ).request(
             StandardIntegrityTokenRequest.builder()
                 .setRequestHash(requestHash)
-                .build()
+                .build(),
         ).awaitTask()
 
         finishedTask.toResult().getOrThrow()
