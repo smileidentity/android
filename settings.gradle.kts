@@ -23,5 +23,16 @@ dependencyResolutionManagement {
 rootProject.name = "SmileID"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-include("analytics", "camera", "lib", "ml", "navigation", "networking", "sample", "storage", "ui")
+include(
+    "analytics",
+    "camera",
+    "lib",
+    "ml",
+    "navigation",
+    "networking",
+    "sample",
+    "storage",
+    "ui",
+    "attestation",
+)
 rootProject.children.forEach { it.buildFileName = "${it.name}.gradle.kts" }
