@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-larger
     environment: Play Store Internal App Sharing
     timeout-minutes: 15
     steps:
