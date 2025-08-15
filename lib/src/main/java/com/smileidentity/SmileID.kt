@@ -236,11 +236,6 @@ object SmileID {
     ): Deferred<Result<Unit>> {
         SmileID.apiKey = apiKey
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        // Warm up Integrity Token Provider
-        integrityManager = SmileIDStandardRequestIntegrityManager(context)
-        scope.launch {
-            integrityManager.warmUpTokenProvider()
-        }
         return scope.async {
             initialize(
                 context = context,

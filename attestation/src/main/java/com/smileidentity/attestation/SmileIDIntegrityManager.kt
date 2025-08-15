@@ -1,7 +1,8 @@
 package com.smileidentity.attestation
 
 import android.content.Context
-import com.google.android.play.core.integrity.IntegrityManagerFactory
+import com.google.android.gms.tasks.Task
+import com.google.android.play.core.integrity.StandardIntegrityManager
 import com.google.android.play.core.integrity.StandardIntegrityManager.PrepareIntegrityTokenRequest
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenProvider
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
@@ -12,7 +13,7 @@ interface SmileIDIntegrityManager {
     /**
      * Prepare the integrity token.Needs to be called before calling [requestToken].
      */
-    suspend fun warmUpTokenProvider()
+    suspend fun warmUpTokenProvider(): Result<Unit>
 
     /**
      * Requests an Integrity token.
@@ -24,16 +25,21 @@ interface SmileIDIntegrityManager {
 }
 
 class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrityManager {
-    private val standardIntegrityManager = IntegrityManagerFactory.createStandard(context)
+
+    private val smileIDStandardIntegrityManagerFactory: SmileIDIntegrityManagerFactory =
+        SmileIDStandardIntegrityManagerFactory(context)
+    private val standardIntegrityManager: StandardIntegrityManager by lazy {
+        smileIDStandardIntegrityManagerFactory.create()
+    }
     private var integrityTokenProvider:
         StandardIntegrityTokenProvider? = null
 
-    override suspend fun warmUpTokenProvider() {
+    override suspend fun warmUpTokenProvider(): Result<Unit> =
         runCatching {
             if (integrityTokenProvider != null) {
-                return
+                return Result.success(Unit)
             }
-            standardIntegrityManager
+            val finishedTask: Task<StandardIntegrityTokenProvider> = standardIntegrityManager
                 .prepareIntegrityToken(
                     PrepareIntegrityTokenRequest.builder()
                         .setCloudProjectNumber(
@@ -41,7 +47,7 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
                         )
                         .build(),
                 ).awaitTask()
-                .toResult()
+            finishedTask.toResult()
                 .onSuccess {
                     Timber.i("Integrity - Successfully prepared integrity token")
                     integrityTokenProvider = it
@@ -52,7 +58,7 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
             .recoverCatching {
                 Timber.w(it, "Integrity - Failed to prepare integrity token")
                 throw it
-            }
+
     }
 
     override suspend fun requestToken(requestIdentifier: String): Result<String> =
