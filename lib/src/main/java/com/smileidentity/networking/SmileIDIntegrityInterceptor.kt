@@ -1,7 +1,6 @@
 package com.smileidentity.networking
 
 import com.smileidentity.SmileID
-import com.smileidentity.security.crypto.SmileIDCryptoManager
 import java.io.IOException
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -23,7 +22,7 @@ class SmileIDIntegrityInterceptor : Interceptor {
         runBlocking {
             try {
                 token = SmileID.integrityManager.requestToken(
-                    requestIdentifier = macHeader
+                    requestIdentifier = macHeader,
                 ).getOrThrow()
             } catch (e: Exception) {
                 // https://stackoverflow.com/a/58711127/3831060

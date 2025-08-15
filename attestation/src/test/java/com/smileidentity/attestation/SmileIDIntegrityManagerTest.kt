@@ -58,10 +58,10 @@ class SmileIDStandardRequestIntegrityManagerTest {
     fun `warmUpTokenProvider should successfully prepare token provider`() = runTest {
         // Given
         val tokenProvider = FakeStandardIntegrityTokenProvider(
-            Tasks.forResult(FakeStandardIntegrityToken())
+            Tasks.forResult(FakeStandardIntegrityToken()),
         )
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(tokenProvider)
+            Tasks.forResult(tokenProvider),
         )
         setupIntegrityManager(factory)
 
@@ -74,33 +74,34 @@ class SmileIDStandardRequestIntegrityManagerTest {
     }
 
     @Test
-    fun `warmUpTokenProvider should return success immediately if provider already initialized`() = runTest {
-        // Given - First initialize the provider
-        val tokenProvider = FakeStandardIntegrityTokenProvider(
-            Tasks.forResult(FakeStandardIntegrityToken())
-        )
-        val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(tokenProvider)
-        )
-        setupIntegrityManager(factory)
+    fun `warmUpTokenProvider should return success immediately if provider already initialized`() =
+        runTest {
+            // Given - First initialize the provider
+            val tokenProvider = FakeStandardIntegrityTokenProvider(
+                Tasks.forResult(FakeStandardIntegrityToken()),
+            )
+            val factory = FakeSmileIDIntegrityManagerFactory(
+                Tasks.forResult(tokenProvider),
+            )
+            setupIntegrityManager(factory)
 
-        val firstResult = smileIDIntegrityManager.warmUpTokenProvider()
-        assertTrue(firstResult.isSuccess)
+            val firstResult = smileIDIntegrityManager.warmUpTokenProvider()
+            assertTrue(firstResult.isSuccess)
 
-        // When - Call warmUp again
-        val result = smileIDIntegrityManager.warmUpTokenProvider()
+            // When - Call warmUp again
+            val result = smileIDIntegrityManager.warmUpTokenProvider()
 
-        // Then - Should return success without preparing again
-        assertTrue("Result should be success", result.isSuccess)
-        assertEquals(Unit, result.getOrNull())
-    }
+            // Then - Should return success without preparing again
+            assertTrue("Result should be success", result.isSuccess)
+            assertEquals(Unit, result.getOrNull())
+        }
 
     @Test
     fun `warmUpTokenProvider should return failure when preparation fails`() = runTest {
         // Given
         val exception = Exception("Preparation failed")
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forException(exception)
+            Tasks.forException(exception),
         )
         setupIntegrityManager(factory)
 
@@ -119,10 +120,10 @@ class SmileIDStandardRequestIntegrityManagerTest {
         val expectedToken = "integrity-token-123"
         val integrityToken = FakeStandardIntegrityToken(expectedToken)
         val tokenProvider = FakeStandardIntegrityTokenProvider(
-            Tasks.forResult(integrityToken)
+            Tasks.forResult(integrityToken),
         )
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(tokenProvider)
+            Tasks.forResult(tokenProvider),
         )
         setupIntegrityManager(factory)
 
@@ -142,7 +143,7 @@ class SmileIDStandardRequestIntegrityManagerTest {
         // Given
         val requestIdentifier = "test-request-id"
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(mockk<StandardIntegrityTokenProvider>())
+            Tasks.forResult(mockk<StandardIntegrityTokenProvider>()),
         )
         setupIntegrityManager(factory)
 
@@ -152,10 +153,13 @@ class SmileIDStandardRequestIntegrityManagerTest {
         // Then
         assertTrue("Result should be failure", result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue("Exception should be IllegalArgumentException", exception is IllegalArgumentException)
+        assertTrue(
+            "Exception should be IllegalArgumentException",
+            exception is IllegalArgumentException,
+        )
         assertEquals(
             "Integrity token provider is not initialized. Call warmUpTokenProvider() first.",
-            exception?.message
+            exception?.message,
         )
     }
 
@@ -165,10 +169,10 @@ class SmileIDStandardRequestIntegrityManagerTest {
         val requestIdentifier = "test-request-id"
         val requestException = Exception("Token request failed")
         val tokenProvider = FakeStandardIntegrityTokenProvider(
-            Tasks.forException(requestException)
+            Tasks.forException(requestException),
         )
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(tokenProvider)
+            Tasks.forResult(tokenProvider),
         )
         setupIntegrityManager(factory)
 
@@ -189,10 +193,10 @@ class SmileIDStandardRequestIntegrityManagerTest {
         val requestIdentifier = "test-request-id"
         val integrityToken = FakeStandardIntegrityToken(null)
         val tokenProvider = FakeStandardIntegrityTokenProvider(
-            Tasks.forResult(integrityToken)
+            Tasks.forResult(integrityToken),
         )
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(tokenProvider)
+            Tasks.forResult(tokenProvider),
         )
         setupIntegrityManager(factory)
 
@@ -216,13 +220,14 @@ class SmileIDStandardRequestIntegrityManagerTest {
         // Create a custom token provider that returns different tokens
         val tokenProvider = object : StandardIntegrityTokenProvider {
             private var callCount = 0
-            override fun request(request: StandardIntegrityTokenRequest): Task<StandardIntegrityToken> {
-                return Tasks.forResult(FakeStandardIntegrityToken(tokens[callCount++]))
-            }
+            override fun request(
+                request: StandardIntegrityTokenRequest,
+            ): Task<StandardIntegrityToken> =
+                Tasks.forResult(FakeStandardIntegrityToken(tokens[callCount++]))
         }
 
         val factory = FakeSmileIDIntegrityManagerFactory(
-            Tasks.forResult(tokenProvider)
+            Tasks.forResult(tokenProvider),
         )
         setupIntegrityManager(factory)
 
@@ -254,25 +259,20 @@ interface SmileIDIntegrityManagerFactory {
 }
 
 class FakeSmileIDIntegrityManagerFactory(
-    private val prepareTask: Task<StandardIntegrityTokenProvider>
+    private val prepareTask: Task<StandardIntegrityTokenProvider>,
 ) : SmileIDIntegrityManagerFactory {
-    override fun create(): StandardIntegrityManager =
-        StandardIntegrityManager { prepareTask }
+    override fun create(): StandardIntegrityManager = StandardIntegrityManager { prepareTask }
 }
 
-class FakeStandardIntegrityTokenProvider(
-    private val requestTask: Task<StandardIntegrityToken>
-) : StandardIntegrityTokenProvider {
-    override fun request(request: StandardIntegrityTokenRequest): Task<StandardIntegrityToken> {
-        return requestTask
-    }
+class FakeStandardIntegrityTokenProvider(private val requestTask: Task<StandardIntegrityToken>) :
+    StandardIntegrityTokenProvider {
+    override fun request(request: StandardIntegrityTokenRequest): Task<StandardIntegrityToken> =
+        requestTask
 }
 
-class FakeStandardIntegrityToken(
-    private val tokenValue: String? = "default-token-123"
-) : StandardIntegrityToken() {
-    override fun showDialog(activity: Activity?, requestCode: Int): Task<Int> =
-        Tasks.forResult(0)
+class FakeStandardIntegrityToken(private val tokenValue: String? = "default-token-123") :
+    StandardIntegrityToken() {
+    override fun showDialog(activity: Activity?, requestCode: Int): Task<Int> = Tasks.forResult(0)
 
     override fun token(): String? = tokenValue
 }

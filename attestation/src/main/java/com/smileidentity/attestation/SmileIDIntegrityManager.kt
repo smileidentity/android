@@ -34,32 +34,30 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
     private var integrityTokenProvider:
         StandardIntegrityTokenProvider? = null
 
-    override suspend fun warmUpTokenProvider(): Result<Unit> =
-        runCatching {
-            if (integrityTokenProvider != null) {
-                return Result.success(Unit)
-            }
-            val finishedTask: Task<StandardIntegrityTokenProvider> = standardIntegrityManager
-                .prepareIntegrityToken(
-                    PrepareIntegrityTokenRequest.builder()
-                        .setCloudProjectNumber(
-                            ArkanaKeys.Global.gOOGLE_CLOUD_PROJECT_NUMBER.toLong(),
-                        )
-                        .build(),
-                ).awaitTask()
-            finishedTask.toResult()
-                .onSuccess {
-                    Timber.i("Integrity - Successfully prepared integrity token")
-                    integrityTokenProvider = it
-                }
-                .getOrThrow()
+    override suspend fun warmUpTokenProvider(): Result<Unit> = runCatching {
+        if (integrityTokenProvider != null) {
+            return Result.success(Unit)
         }
-            .map {}
-            .recoverCatching {
-                Timber.w(it, "Integrity - Failed to prepare integrity token")
-                throw it
-
+        val finishedTask: Task<StandardIntegrityTokenProvider> = standardIntegrityManager
+            .prepareIntegrityToken(
+                PrepareIntegrityTokenRequest.builder()
+                    .setCloudProjectNumber(
+                        ArkanaKeys.Global.gOOGLE_CLOUD_PROJECT_NUMBER.toLong(),
+                    )
+                    .build(),
+            ).awaitTask()
+        finishedTask.toResult()
+            .onSuccess {
+                Timber.i("Integrity - Successfully prepared integrity token")
+                integrityTokenProvider = it
+            }
+            .getOrThrow()
     }
+        .map {}
+        .recoverCatching {
+            Timber.w(it, "Integrity - Failed to prepare integrity token")
+            throw it
+        }
 
     override suspend fun requestToken(requestIdentifier: String): Result<String> =
         request(requestIdentifier)
