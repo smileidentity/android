@@ -18,15 +18,12 @@ class SmileIDIntegrityInterceptor : Interceptor {
         var token: String? = null
         request.getCustomAnnotation(SmileIDIntegrityHeader::class.java)
             ?: return chain.proceed(request)
+        val macHeader = request.header("SmileID-Request-Mac") ?: return chain.proceed(request)
         Timber.v("SmileIDIntegrityInterceptor: Interceptor called")
         runBlocking {
             try {
-                val mac = SmileIDCryptoManager.shared.sign(
-                    headers = request.headers,
-                    requestBody = request.body,
-                )
                 token = SmileID.integrityManager.requestToken(
-                    requestIdentifier = mac,
+                    requestIdentifier = macHeader
                 ).getOrThrow()
             } catch (e: Exception) {
                 // https://stackoverflow.com/a/58711127/3831060
