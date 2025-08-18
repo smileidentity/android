@@ -31,34 +31,38 @@ internal class BuildInfoMetadata(
     }
 
     private fun getCertificateSha256Digests(): List<String> {
-        val packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            packageManager.getPackageInfo(
-                packageName,
-                PackageManager.GET_SIGNING_CERTIFICATES,
-            )
-        } else {
-            packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-        }
-
-        val signatures: Array<out Signature?>? = if (Build.VERSION.SDK_INT >=
-            Build.VERSION_CODES.P
-        ) {
-            packageInfo.signingInfo?.apkContentsSigners
-        } else {
-            packageInfo.signatures
-        }
-
-        if (signatures == null) return emptyList()
-
-        val md = MessageDigest.getInstance("SHA-256")
-        return signatures.mapNotNull { signature ->
-            signature?.toByteArray()?.let { cert ->
-                val digest = md.digest(cert)
-                Base64.encodeToString(
-                    digest,
-                    Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE,
+        return try {
+            val packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(
+                    packageName,
+                    PackageManager.GET_SIGNING_CERTIFICATES,
                 )
+            } else {
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
             }
+
+            val signatures: Array<out Signature?>? = if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.P
+            ) {
+                packageInfo.signingInfo?.apkContentsSigners
+            } else {
+                packageInfo.signatures
+            }
+
+            if (signatures == null) return emptyList()
+
+            val md = MessageDigest.getInstance("SHA-256")
+            signatures.mapNotNull { signature ->
+                signature?.toByteArray()?.let { cert ->
+                    val digest = md.digest(cert)
+                    Base64.encodeToString(
+                        digest,
+                        Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE,
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 
