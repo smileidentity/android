@@ -1,0 +1,269 @@
+{
+  "valid_documents": [
+    {
+      "country": {
+        "code": "AF",
+        "continent": "ASIA",
+        "name": "Afghanistan"
+      },
+      "id_types": [
+        {
+          "code": "DRIVERS_LICENSE",
+          "example": [
+            "Driving License"
+          ],
+          "has_back": true,
+          "name": "Driver's License"
+        },
+        {
+          "code": "IDENTITY_CARD",
+          "example": [
+            "Consular IDs",
+            "Diplomat IDs",
+            "National IDs"
+          ],
+          "has_back": true,
+          "name": "Identity Card"
+        },
+        {
+          "code": "OCCUPATION_CARD",
+          "example": [
+            "Driver training certificate",
+            "Police Id",
+            "Professional Id"
+          ],
+          "has_back": false,
+          "name": "Occupation Card"
+        },
+        {
+          "code": "PASSPORT",
+          "example": [
+            "Passports"
+          ],
+          "has_back": false,
+          "name": "Passport"
+        },
+        {
+          "code": "TRAVEL_DOC",
+          "example": [
+            "Border crossing documents",
+            "Refugee document",
+            "Visas"
+          ],
+          "has_back": false,
+          "name": "Travel Document"
+        },
+        {
+          "code": "UNIFORMED_SERVICES_CARD",
+          "example": [
+            "Military",
+            "Other Armed Forces Id"
+          ],
+          "has_back": true,
+          "name": "Uniformed Services Card"
+        },
+        {
+          "code": "",
+          "example": [
+            "My document is not listed"
+          ],
+          "has_back": true,
+          "name": "Others"
+        }
+      ]
+    },
+    {
+      "country": {
+        "code": "AL",
+        "continent": "EUROPE",
+        "name": "Albania"
+      },
+      "id_types": [
+        {
+          "code": "ALIEN_CARD",
+          "example": [
+            "Alien Identity Card"
+          ],
+          "has_back": false,
+          "name": "Alien ID"
+        },
+        {
+          "code": "DRIVERS_LICENSE",
+          "example": [
+            "Driving License"
+          ],
+          "has_back": true,
+          "name": "Driver's License"
+        },
+        {
+          "code": "IDENTITY_CARD",
+          "example": [
+            "Consular IDs",
+            "Diplomat IDs",
+            "National IDs"
+          ],
+          "has_back": true,
+          "name": "Identity Card"
+        },
+        {
+          "code": "PASSPORT",
+          "example": [
+            "Passports"
+          ],
+          "has_back": false,
+          "name": "Passport"
+        },
+        {
+          "code": "SEAMANS_ID",
+          "example": [
+            "Seaman Book",
+            "Seaman Id"
+          ],
+          "has_back": false,
+          "name": "Seaman's ID"
+        },
+        {
+          "code": "TRAVEL_DOC",
+          "example": [
+            "Border crossing documents",
+            "Refugee document",
+            "Visas"
+          ],
+          "has_back": false,
+          "name": "Travel Document"
+        },
+        {
+          "code": "",
+          "example": [
+            "My document is not listed"
+          ],
+          "has_back": true,
+          "name": "Others"
+        }
+      ]
+    },
+    {
+      "country": {
+        "code": "DZ",
+        "continent": "AFRICA",
+        "name": "Algeria"
+      },
+      "id_types": [
+        {
+          "code": "DRIVERS_LICENSE",
+          "example": [
+            "Driving License"
+          ],
+          "has_back": true,
+          "name": "Driver's License"
+        },
+        {
+          "code": "HEALTH_CARD",
+          "example": [
+            "Health Card",
+            "Health Insurance Card"
+          ],
+          "has_back": true,
+          "name": "Health Card"
+        },
+        {
+          "code": "IDENTITY_CARD",
+          "example": [
+            "Consular IDs",
+            "Diplomat IDs",
+            "National IDs"
+          ],
+          "has_back": true,
+          "name": "Identity Card"
+        },
+        {
+          "code": "PASSPORT",
+          "example": [
+            "Passports"
+          ],
+          "has_back": false,
+          "name": "Passport"
+        },
+        {
+          "code": "REGISTRATION_CERTIFICATE",
+          "example": [
+            "Registration certificate"
+          ],
+          "has_back": true,
+          "name": "Registration Certificate"
+        },
+        {
+          "code": "TRAVEL_DOC",
+          "example": [
+            "Border crossing documents",
+            "Refugee document",
+            "Visas"
+          ],
+          "has_back": false,
+          "name": "Travel Document"
+        },
+        {
+          "code": "",
+          "example": [
+            "My document is not listed"
+          ],
+          "has_back": true,
+          "name": "Others"
+        }
+      ]
+    },
+    {
+      "country": {
+        "code": "AS",
+        "continent": "OCEANIA",
+        "name": "American Samoa"
+      },
+      "id_types": [
+        {
+          "code": "DRIVERS_LICENSE",
+          "example": [
+            "Driving License"
+          ],
+          "has_back": true,
+          "name": "Driver's License"
+        },
+        {
+          "code": "IDENTITY_CARD",
+          "example": [
+            "Consular IDs",
+            "Diplomat IDs",
+            "National IDs"
+          ],
+          "has_back": false,
+          "name": "Identity Card"
+        },
+        {
+          "code": "TRAVEL_DOC",
+          "example": [
+            "Border crossing documents",
+            "Refugee document",
+            "Visas"
+          ],
+          "has_back": true,
+          "name": "Travel Document"
+        },
+        {
+          "code": "VOTER_ID",
+          "example": [
+            "Voter's Identity Card"
+          ],
+          "has_back": true,
+          "name": "Voter's ID"
+        },
+        {
+          "code": "",
+          "example": [
+            "My document is not listed"
+          ],
+          "has_back": true,
+          "name": "Others"
+        }
+      ]
+    }
+  ]
+}

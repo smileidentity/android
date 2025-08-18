@@ -1,0 +1,179 @@
+{
+  "consentRequired": {
+    "NG": [
+      "BVN_MFA",
+      "BVN"
+    ]
+  },
+  "enterpriseId": "000000000",
+  "idSelection": {
+    "basic_kyc": {
+      "ZA": [
+        "PHONE_NUMBER",
+        "REFUGEE_ID",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "UG": [
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "CI": [
+        "RESIDENT_ID_NO_PHOTO",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "ZW": [
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "GH": [
+        "VOTER_ID",
+        "GHANA_CARD_NO_PHOTO",
+        "PASSPORT"
+      ],
+      "ZM": [
+        "TPIN",
+        "BANK_ACCOUNT"
+      ],
+      "KE": [
+        "KRA_PIN",
+        "ALIEN_CARD",
+        "NATIONAL_ID_NO_PHOTO",
+        "TAX_INFORMATION",
+        "PASSPORT"
+      ],
+      "NG": [
+        "V_NIN",
+        "VOTER_ID",
+        "BVN_MFA",
+        "NIN_SLIP",
+        "BANK_ACCOUNT",
+        "PHONE_NUMBER"
+      ]
+    },
+    "biometric_kyc": {
+      "ZA": [
+        "NATIONAL_ID",
+        "PHONE_NUMBER",
+        "REFUGEE_ID"
+      ],
+      "CI": [
+        "RESIDENT_ID_NO_PHOTO",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "ZW": [
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "GH": [
+        "VOTER_ID",
+        "GHANA_CARD",
+        "GHANA_CARD_NO_PHOTO",
+        "PASSPORT"
+      ],
+      "ZM": [
+        "TPIN",
+        "BANK_ACCOUNT"
+      ],
+      "KE": [
+        "KRA_PIN",
+        "NATIONAL_ID",
+        "ALIEN_CARD",
+        "TAX_INFORMATION",
+        "PASSPORT"
+      ],
+      "NG": [
+        "V_NIN",
+        "VOTER_ID",
+        "BVN_MFA",
+        "NIN_SLIP",
+        "NATIONAL_ID",
+        "BVN"
+      ]
+    },
+    "doc_verification": {
+      "ZA": [
+        "NATIONAL_ID",
+        "PHONE_NUMBER",
+        "REFUGEE_ID",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "CI": [
+        "RESIDENT_ID_NO_PHOTO",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "ZW": [
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "GH": [
+        "VOTER_ID",
+        "GHANA_CARD",
+        "GHANA_CARD_NO_PHOTO",
+        "PASSPORT"
+      ],
+      "ZM": [
+        "TPIN",
+        "BANK_ACCOUNT"
+      ],
+      "KE": [
+        "KRA_PIN",
+        "NATIONAL_ID",
+        "ALIEN_CARD",
+        "NATIONAL_ID_NO_PHOTO",
+        "TAX_INFORMATION",
+        "PASSPORT"
+      ],
+      "NG": [
+        "V_NIN",
+        "VOTER_ID",
+        "BVN_MFA",
+        "NIN_SLIP",
+        "BANK_ACCOUNT",
+        "NATIONAL_ID",
+        "TIN",
+        "BVN",
+        "PHONE_NUMBER",
+        "PASSPORT"
+      ]
+    },
+    "enhanced_kyc": {
+      "ZA": [
+        "NATIONAL_ID",
+        "PHONE_NUMBER",
+        "REFUGEE_ID",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "CI": [
+        "RESIDENT_ID_NO_PHOTO",
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "ZW": [
+        "NATIONAL_ID_NO_PHOTO"
+      ],
+      "GH": [
+        "VOTER_ID",
+        "GHANA_CARD",
+        "GHANA_CARD_NO_PHOTO",
+        "PASSPORT"
+      ],
+      "ZM": [
+        "TPIN",
+        "BANK_ACCOUNT"
+      ],
+      "KE": [
+        "KRA_PIN",
+        "NATIONAL_ID",
+        "ALIEN_CARD",
+        "NATIONAL_ID_NO_PHOTO",
+        "TAX_INFORMATION",
+        "PASSPORT"
+      ],
+      "NG": [
+        "V_NIN",
+        "VOTER_ID",
+        "BVN_MFA",
+        "NIN_SLIP",
+        "BANK_ACCOUNT",
+        "NATIONAL_ID",
+        "BVN",
+        "PHONE_NUMBER"
+      ]
+    }
+  }
+}
