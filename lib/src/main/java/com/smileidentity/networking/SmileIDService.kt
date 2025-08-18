@@ -54,7 +54,6 @@ interface SmileIDService {
      */
     @SmileHeaderMetadata
     @SmileIDSecurity
-    @SmileIDIntegrityHeader
     @POST("/v1/auth_smile")
     suspend fun authenticate(@Body request: AuthenticationRequest): AuthenticationResponse
 
