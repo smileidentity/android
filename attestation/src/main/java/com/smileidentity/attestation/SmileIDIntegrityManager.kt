@@ -18,10 +18,10 @@ interface SmileIDIntegrityManager {
     /**
      * Requests an Integrity token.
      *
-     * @param requestIdentifier A string to be hashed to generate a request identifier.
+     * @param requestHash A string to be hashed to generate a request identifier.
      *
      */
-    suspend fun requestToken(requestIdentifier: String): Result<String>
+    suspend fun requestToken(requestHash: String): Result<String>
 }
 
 class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrityManager {
@@ -48,30 +48,28 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
             ).awaitTask()
         finishedTask.toResult()
             .onSuccess {
-                Timber.i("Successfully prepared integrity token")
+                Timber.i("Integrity - Successfully prepared integrity token")
                 integrityTokenProvider = it
             }
             .getOrThrow()
     }
         .map {}
         .recoverCatching {
-            Timber.w(it, "Failed to prepare integrity token")
+            Timber.w(it, "Integrity - Failed to prepare integrity token")
             throw it
         }
 
-    override suspend fun requestToken(requestIdentifier: String): Result<String> =
-        request(requestIdentifier)
+    override suspend fun requestToken(requestHash: String): Result<String> =
+        request(requestHash)
 
     private suspend fun request(requestHash: String): Result<String> = runCatching {
-        val finishedTask = requireNotNull(
-            value = integrityTokenProvider,
-            lazyMessage = {
-                "Integrity token provider is not initialized. Call warmUpTokenProvider() first."
-            },
-        ).request(
+        val provider = integrityTokenProvider
+            ?: throw IllegalStateException("Integrity token provider is not initialized. Call warmUpTokenProvider() first.")
+
+        val finishedTask = provider.request(
             StandardIntegrityTokenRequest.builder()
                 .setRequestHash(requestHash)
-                .build(),
+                .build()
         ).awaitTask()
 
         finishedTask.toResult().getOrThrow()
