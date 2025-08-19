@@ -44,6 +44,10 @@
                 android:name=".activity.JavaActivity"
                 android:exported="true" />
 
+        <activity
+            android:name=".activity.V12Activity"
+            android:exported="true" />
+
     </application>
 
 </manifest>
