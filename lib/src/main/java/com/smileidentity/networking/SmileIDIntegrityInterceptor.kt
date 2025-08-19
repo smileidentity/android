@@ -38,7 +38,7 @@ class SmileIDIntegrityInterceptor : Interceptor {
         }
         token ?: return chain.proceed(request)
         val chainRequest = request.newBuilder()
-            .header("SmileID-Integrity-Token", token)
+            .header("SmileID-Device-Nonce", token)
             .build()
         return chain.proceed(chainRequest)
     }

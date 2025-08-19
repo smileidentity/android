@@ -48,14 +48,14 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
             ).awaitTask()
         finishedTask.toResult()
             .onSuccess {
-                Timber.i("Integrity - Successfully prepared integrity token")
+                Timber.i("Successfully prepared integrity token")
                 integrityTokenProvider = it
             }
             .getOrThrow()
     }
         .map {}
         .recoverCatching {
-            Timber.w(it, "Integrity - Failed to prepare integrity token")
+            Timber.w(it, "Failed to prepare integrity token")
             throw it
         }
 
@@ -77,7 +77,7 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
         finishedTask.toResult().getOrThrow()
     }.map { it.token() }
         .recoverCatching {
-            Timber.w(it, "Integrity - Failed to request integrity token")
+            Timber.w(it, "Failed to request integrity token")
             throw it
         }
 }
