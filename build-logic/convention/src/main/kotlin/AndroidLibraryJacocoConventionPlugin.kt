@@ -22,4 +22,3 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
         }
     }
 }
-

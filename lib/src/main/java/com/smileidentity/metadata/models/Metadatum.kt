@@ -44,6 +44,10 @@ sealed class Value : Parcelable {
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class ObjectValue(val map: Map<String, Value>) : Value()
+
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    data class ArrayValue(val list: List<Value>) : Value()
 }
 
 /**
@@ -91,6 +95,12 @@ open class Metadatum(
         value: Map<String, Value>,
         timestamp: String = getCurrentIsoTimestamp(),
     ) : this(name.key, Value.ObjectValue(value), timestamp)
+
+    constructor(
+        name: MetadataKey,
+        value: List<Value>,
+        timestamp: String = getCurrentIsoTimestamp(),
+    ) : this(name.key, Value.ArrayValue(value), timestamp)
 
     @Parcelize
     data class ActiveLivenessType(val type: LivenessType) :

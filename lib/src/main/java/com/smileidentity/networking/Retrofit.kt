@@ -308,6 +308,13 @@ object ValueJsonAdapter {
                 }
                 writer.endObject()
             }
+            is Value.ArrayValue -> {
+                writer.beginArray()
+                for (item in value.list) {
+                    toJson(writer, item)
+                }
+                writer.endArray()
+            }
             null -> writer.nullValue()
         }
     }
@@ -330,6 +337,10 @@ object ValueJsonAdapter {
                     }
                 }.toMap()
                 Value.ObjectValue(map)
+            }
+            is List<*> -> {
+                val list = jsonValue.mapNotNull { it as? Value }
+                Value.ArrayValue(list)
             }
             else -> null
         }

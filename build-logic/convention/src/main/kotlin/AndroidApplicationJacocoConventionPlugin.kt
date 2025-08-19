@@ -18,7 +18,9 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
                 enableUnitTestCoverage = true
             }
 
-            configureJacoco(androidComponentsExtension = extensions.getByType<ApplicationAndroidComponentsExtension>())
+            configureJacoco(
+                androidComponentsExtension = extensions.getByType<ApplicationAndroidComponentsExtension>(),
+            )
         }
     }
 }
