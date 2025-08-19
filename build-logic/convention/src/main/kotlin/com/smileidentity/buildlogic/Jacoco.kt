@@ -4,6 +4,7 @@ import com.android.build.api.artifact.ScopedArtifact
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ScopedArtifacts
 import com.android.build.api.variant.SourceDirectories
+import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
@@ -17,7 +18,6 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
-import java.util.Locale
 
 private val coverageExclusions = listOf(
     // Android
@@ -60,7 +60,6 @@ internal fun Project.configureJacoco(
                 "create${variant.name.capitalize()}CombinedCoverageReport",
                 JacocoReport::class,
             ) {
-
                 classDirectories.setFrom(
                     allJars,
                     allDirectories.map { dirs ->
@@ -81,12 +80,14 @@ internal fun Project.configureJacoco(
                 sourceDirectories.setFrom(
                     files(
                         variant.sources.java.toFilePaths(),
-                        variant.sources.kotlin.toFilePaths()
+                        variant.sources.kotlin.toFilePaths(),
                     ),
                 )
 
                 executionData.setFrom(
-                    project.fileTree("$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest")
+                    project.fileTree(
+                        "$buildDir/outputs/unit_test_code_coverage/${variant.name}UnitTest",
+                    )
                         .matching { include("**/*.exec") },
 
                     project.fileTree("$buildDir/outputs/code_coverage/${variant.name}AndroidTest")

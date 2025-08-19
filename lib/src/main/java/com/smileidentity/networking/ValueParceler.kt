@@ -21,6 +21,14 @@ object ValueParceler : kotlinx.parcelize.Parceler<Value> {
                 }
                 Value.ObjectValue(map)
             }
+            6 -> {
+                val size = parcel.readInt()
+                val array = mutableListOf<Value>()
+                repeat(size) {
+                    array.add(create(parcel))
+                }
+                Value.ArrayValue(array)
+            }
             else -> throw IllegalArgumentException("Unknown Value type")
         }
     }
@@ -53,6 +61,13 @@ object ValueParceler : kotlinx.parcelize.Parceler<Value> {
                 for ((k, v) in map) {
                     parcel.writeString(k)
                     v.write(parcel, flags)
+                }
+            }
+            is Value.ArrayValue -> {
+                parcel.writeInt(6)
+                parcel.writeInt(list.size)
+                for (item in list) {
+                    item.write(parcel, flags)
                 }
             }
         }
