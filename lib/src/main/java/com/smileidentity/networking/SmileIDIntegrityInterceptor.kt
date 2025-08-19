@@ -22,15 +22,16 @@ class SmileIDIntegrityInterceptor : Interceptor {
         Timber.v("SmileIDIntegrityInterceptor: Interceptor called")
         runBlocking {
             try {
-             SmileID.integrityManager.requestToken(
-                 requestHash = macHeader,
+                SmileID.integrityManager.requestToken(
+                    requestHash = macHeader,
                 ).onSuccess {
                     token = it
                 }.onFailure {
                     Timber.w(it, "Failed to request integrity token")
-                 SmileIDCrashReporting.scopes.addBreadcrumb("Failed to request integrity token $it")
-             }
-
+                    SmileIDCrashReporting.scopes.addBreadcrumb(
+                        "Failed to request integrity token $it",
+                    )
+                }
             } catch (e: Exception) {
                 // https://stackoverflow.com/a/58711127/3831060
                 // OkHttp only propagates IOExceptions, so we need to catch HttpException (which can

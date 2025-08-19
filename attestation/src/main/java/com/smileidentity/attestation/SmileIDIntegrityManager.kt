@@ -59,17 +59,19 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
             throw it
         }
 
-    override suspend fun requestToken(requestHash: String): Result<String> =
-        request(requestHash)
+    override suspend fun requestToken(requestHash: String): Result<String> = request(requestHash)
 
     private suspend fun request(requestHash: String): Result<String> = runCatching {
         val provider = integrityTokenProvider
-            ?: throw IllegalStateException("Integrity token provider is not initialized. Call warmUpTokenProvider() first.")
+            ?: throw IllegalStateException(
+                "Integrity token provider is not initialized. " +
+                    "Call warmUpTokenProvider() first.",
+            )
 
         val finishedTask = provider.request(
             StandardIntegrityTokenRequest.builder()
                 .setRequestHash(requestHash)
-                .build()
+                .build(),
         ).awaitTask()
 
         finishedTask.toResult().getOrThrow()
