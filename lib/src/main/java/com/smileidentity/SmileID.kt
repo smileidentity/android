@@ -14,6 +14,8 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.scottyab.rootbeer.RootBeer
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.SmileID.initialize
+import com.smileidentity.attestation.SmileIDIntegrityManager
+import com.smileidentity.attestation.SmileIDStandardRequestIntegrityManager
 import com.smileidentity.metadata.models.WrapperSdkName
 import com.smileidentity.models.AuthenticationRequest
 import com.smileidentity.models.Config
@@ -34,6 +36,7 @@ import com.smileidentity.networking.PartnerParamsAdapter
 import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
+import com.smileidentity.networking.SmileIDIntegrityInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -84,6 +87,9 @@ object SmileID {
     @JvmStatic
     lateinit var api: SmileIDService internal set
     val moshi: Moshi = initMoshi() // Initialized immediately so it can be used to parse Config
+
+    @JvmStatic
+    lateinit var integrityManager: SmileIDIntegrityManager internal set
 
     lateinit var config: Config
         internal set
@@ -145,6 +151,13 @@ object SmileID {
         enableCrashReporting: Boolean = true,
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ): Deferred<Result<Unit>> {
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        // Warm up Integrity Token Provider
+        integrityManager = SmileIDStandardRequestIntegrityManager(context)
+        scope.launch {
+            integrityManager.warmUpTokenProvider()
+        }
+
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
         // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
         if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
@@ -187,7 +200,6 @@ object SmileID {
 
         trackSdkLaunchCount(context)
 
-        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         return scope.async {
             runCatching {
                 requestFaceDetectionModuleInstallation(context)
@@ -486,6 +498,7 @@ object SmileID {
         addInterceptor(interceptor = SmileHeaderMetadataInterceptor)
         addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileSecurityInterceptor)
+        addInterceptor(interceptor = SmileIDIntegrityInterceptor())
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the

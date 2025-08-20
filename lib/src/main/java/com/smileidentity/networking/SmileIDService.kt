@@ -63,6 +63,7 @@ interface SmileIDService {
      */
     @SmileHeaderMetadata
     @SmileIDSecurity
+    @SmileIDIntegrityHeader
     @POST("/v1/upload")
     suspend fun prepUpload(@Body request: PrepUploadRequest): PrepUploadResponse
 
@@ -84,6 +85,7 @@ interface SmileIDService {
     @SmileHeaderAuth
     @SmileHeaderMetadata
     @SmileIDSecurity
+    @SmileIDIntegrityHeader
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-enroll")
@@ -110,6 +112,7 @@ interface SmileIDService {
     @SmileHeaderAuth
     @SmileHeaderMetadata
     @SmileIDSecurity
+    @SmileIDIntegrityHeader
     @SmileIDOptIn
     @Multipart
     @POST("/v2/smart-selfie-authentication")
@@ -135,6 +138,7 @@ interface SmileIDService {
      */
     @SmileHeaderMetadata
     @SmileIDSecurity
+    @SmileIDIntegrityHeader
     @POST("/v1/id_verification")
     suspend fun doEnhancedKyc(@Body request: EnhancedKycRequest): EnhancedKycResponse
 

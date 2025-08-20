@@ -38,11 +38,12 @@ moshi = "1.15.2"
 moshix = "0.31.0"
 moshi-lazy-adapters = "2.2"
 okhttp = "5.1.0"
+play-integrity = "1.4.0"
 play-services-location = "21.3.0"
 play-services-mlkit-face-detection = "17.1.0"
 retrofit = "3.0.0"
 sentry = "8.19.1"
-smileid-security = "11.1.0"
+smileid-security = "11.1.0-20250812.143927-5"
 litert = "1.4.0"
 litert-metadata = "1.4.0"
 litert-support = "1.4.0"
@@ -112,6 +113,7 @@ moshi-adapters-lazy = { module = "com.serjltt.moshi:moshi-lazy-adapters", versio
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
+play-integrity = { module = "com.google.android.play:integrity", version.ref = "play-integrity" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 play-services-mlkit-face-detection = { module = "com.google.android.gms:play-services-mlkit-face-detection", version.ref = "play-services-mlkit-face-detection" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }

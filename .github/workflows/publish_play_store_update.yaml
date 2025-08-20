@@ -52,6 +52,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_VERSION_CODE: ${{ steps.version_code.outputs.version_code }}
           ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+
       - name: Deploy Sample App to Play Store Internal Testing Track
         uses: r0adkll/upload-google-play@v1
         id: upload_to_play_store
