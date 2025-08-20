@@ -33,6 +33,7 @@ internal class BuildInfoMetadata(
     private fun getBuildBrand(): String = Build.BRAND
 
     private fun getBuildDevice(): String = Build.DEVICE
+
     private fun getBuildFingerprint(): String = Build.FINGERPRINT
 
     private fun getBuildHardware(): String = Build.HARDWARE
@@ -100,42 +101,42 @@ internal class BuildInfoMetadata(
             }
         }
         val buildDevice = getBuildDevice()
-        buildDevice.isNotEmpty().let {
+        if (buildDevice.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.BuildDevice(buildDevice)) {
                 it.name ==
                     MetadataKey.BuildDevice.key
             }
         }
         val buildFingerprint = getBuildFingerprint()
-        buildFingerprint.isNotEmpty().let {
+        if (buildFingerprint.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.BuildFingerprint(buildFingerprint)) {
                 it.name ==
                     MetadataKey.BuildFingerprint.key
             }
         }
         val buildHardware = getBuildHardware()
-        buildHardware.isNotEmpty().let {
+        if (buildHardware.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.BuildHardware(buildHardware)) {
                 it.name ==
                     MetadataKey.BuildHardware.key
             }
         }
         val buildProduct = getBuildProduct()
-        buildProduct.isNotEmpty().let {
+        if (buildProduct.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.BuildProduct(buildProduct)) {
                 it.name ==
                     MetadataKey.BuildProduct.key
             }
         }
         val buildSource = getBuildSource()
-        buildSource.isNotEmpty().let {
+        if (buildSource.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.BuildSource(buildSource)) {
                 it.name ==
                     MetadataKey.BuildSource.key
             }
         }
         val packageName = getPackageName()
-        packageName.isNotEmpty().let {
+        if (packageName.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.PackageName(packageName)) {
                 it.name ==
                     MetadataKey.PackageName.key
