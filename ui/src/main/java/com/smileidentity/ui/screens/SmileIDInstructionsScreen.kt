@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.R
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.previews.DevicePreviews
-import com.smileidentity.ui.previews.ThemePreviews
+import com.smileidentity.ui.previews.PreviewContent
 
 @Composable
 fun SmileIDInstructionsScreen(
@@ -109,25 +109,27 @@ fun SmileIDInstructionsScreen(
     }
 }
 
-@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenPreview() {
-    SmileIDInstructionsScreen()
+    PreviewContent {
+        SmileIDInstructionsScreen()
+    }
 }
 
-@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDInstructionsScreenCustomButtonPreview() {
-    SmileIDInstructionsScreen(
-        continueButton = { onContinue ->
-            OutlinedButton(
-                onClick = { onContinue },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(text = "Custom Button")
-            }
-        },
-    )
+    PreviewContent {
+        SmileIDInstructionsScreen(
+            continueButton = { onContinue ->
+                OutlinedButton(
+                    onClick = { onContinue },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = "Custom Button")
+                }
+            },
+        )
+    }
 }

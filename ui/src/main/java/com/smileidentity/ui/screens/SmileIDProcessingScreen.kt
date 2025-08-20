@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.previews.DevicePreviews
-import com.smileidentity.ui.previews.ThemePreviews
+import com.smileidentity.ui.previews.PreviewContent
 
 @Composable
 fun SmileIDProcessingScreen(
@@ -53,9 +53,10 @@ fun SmileIDProcessingScreen(
     }
 }
 
-@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDProcessingScreenPreview() {
-    SmileIDProcessingScreen()
+    PreviewContent {
+        SmileIDProcessingScreen()
+    }
 }

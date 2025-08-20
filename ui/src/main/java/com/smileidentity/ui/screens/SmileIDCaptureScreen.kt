@@ -20,7 +20,7 @@ import com.smileidentity.ui.components.FaceShapedView
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.components.SmileIDCameraPreview
 import com.smileidentity.ui.previews.DevicePreviews
-import com.smileidentity.ui.previews.ThemePreviews
+import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.utils.viewModelFactory
 import java.io.File
 
@@ -73,9 +73,10 @@ fun SmileIDCaptureScreen(
     }
 }
 
-@ThemePreviews
 @DevicePreviews
 @Composable
 private fun SmileIDCaptureScreenPreview() {
-    SmileIDCaptureScreen(scanType = IdentityScanState.ScanType.SELFIE) {}
+    PreviewContent {
+        SmileIDCaptureScreen(scanType = IdentityScanState.ScanType.SELFIE) {}
+    }
 }

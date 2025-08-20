@@ -9,7 +9,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ui.previews.DevicePreviews
-import com.smileidentity.ui.previews.ThemePreviews
 import com.smileidentity.ui.screens.SmileIDCaptureScreen
 
 @Destination<RootGraph>
