@@ -1,5 +1,6 @@
 package com.smileidentity.ui.previews
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -16,9 +17,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
+@SuppressLint("ComposePreviewPublic")
 @DevicePreviews
 @Composable
-internal fun PreviewContent(
+fun PreviewContent(
     contentPadding: PaddingValues = PaddingValues(16.dp),
     content: @Composable BoxScope.() -> Unit = {
         Text(

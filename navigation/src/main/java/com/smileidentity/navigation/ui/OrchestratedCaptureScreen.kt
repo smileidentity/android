@@ -9,6 +9,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ui.previews.DevicePreviews
+import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.screens.SmileIDCaptureScreen
 
 @Destination<RootGraph>
@@ -24,9 +25,10 @@ fun OrchestratedCaptureScreen(modifier: Modifier = Modifier, navigator: Destinat
     )
 }
 
-@ThemePreviews
 @DevicePreviews
 @Composable
 private fun OrchestratedCaptureScreenPreview() {
-    OrchestratedCaptureScreen(navigator = EmptyDestinationsNavigator)
+    PreviewContent {
+        OrchestratedCaptureScreen(navigator = EmptyDestinationsNavigator)
+    }
 }
