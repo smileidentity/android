@@ -21,7 +21,7 @@ internal class BuildInfoMetadata(
     private val metadata: SnapshotStateList<Metadatum>,
 ) : MetadataInterface {
 
-    override val metadataName: String = MetadataKey.BuildInfo.key
+    override val metadataName: String = ""
 
     private val packageManager = context.packageManager
     private val packageName = context.packageName
@@ -29,6 +29,32 @@ internal class BuildInfoMetadata(
     init {
         forceUpdate()
     }
+
+    private fun getBuildBrand(): String = Build.BRAND
+
+    private fun getBuildDevice(): String = Build.DEVICE
+    private fun getBuildFingerprint(): String = Build.FINGERPRINT
+
+    private fun getBuildHardware(): String = Build.HARDWARE
+
+    private fun getBuildProduct(): String = Build.PRODUCT
+
+    private fun getBuildSource(): String {
+        val buildSource = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Android 11 (API 30) and above
+                packageManager.getInstallSourceInfo(packageName).installingPackageName
+            } else {
+                // Below Android 11
+                packageManager.getInstallerPackageName(packageName)
+            } ?: "unknown"
+        } catch (e: Exception) {
+            "unknown"
+        }
+        return buildSource
+    }
+
+    private fun getPackageName(): String = packageName
 
     private fun getCertificateSha256Digests(): List<String> {
         return try {
@@ -66,39 +92,65 @@ internal class BuildInfoMetadata(
         }
     }
 
-    private fun getBuildSource(): String {
-        val buildSource = try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Android 11 (API 30) and above
-                packageManager.getInstallSourceInfo(packageName).installingPackageName
-            } else {
-                // Below Android 11
-                packageManager.getInstallerPackageName(packageName)
-            } ?: "unknown"
-        } catch (e: Exception) {
-            "unknown"
-        }
-        return buildSource
-    }
-
-    private fun getBuildInfo(): Map<String, Value> {
-        val buildSource = getBuildSource()
-        val certificateDigests = getCertificateSha256Digests()
-        return mapOf(
-            "brand" to Value.StringValue(Build.BRAND),
-            "device" to Value.StringValue(Build.DEVICE),
-            "fingerprint" to Value.StringValue(Build.FINGERPRINT),
-            "hardware" to Value.StringValue(Build.HARDWARE),
-            "product" to Value.StringValue(Build.PRODUCT),
-            "build_source" to Value.StringValue(buildSource),
-            "package_name" to Value.StringValue(packageName),
-            "certificate_digest" to Value.ArrayValue(
-                certificateDigests.map { Value.StringValue(it) },
-            ),
-        )
-    }
-
     override fun forceUpdate() {
-        metadata.updateOrAddBy(Metadatum.BuildInfo(getBuildInfo())) { it.name == metadataName }
+        val buildBrand = getBuildBrand()
+        buildBrand.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.BuildBrand(buildBrand)) {
+                it.name ==
+                    MetadataKey.BuildBrand.key
+            }
+        }
+        val buildDevice = getBuildDevice()
+        buildDevice.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.BuildDevice(buildDevice)) {
+                it.name ==
+                    MetadataKey.BuildDevice.key
+            }
+        }
+        val buildFingerprint = getBuildFingerprint()
+        buildFingerprint.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.BuildFingerprint(buildFingerprint)) {
+                it.name ==
+                    MetadataKey.BuildFingerprint.key
+            }
+        }
+        val buildHardware = getBuildHardware()
+        buildHardware.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.BuildHardware(buildHardware)) {
+                it.name ==
+                    MetadataKey.BuildHardware.key
+            }
+        }
+        val buildProduct = getBuildProduct()
+        buildProduct.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.BuildProduct(buildProduct)) {
+                it.name ==
+                    MetadataKey.BuildProduct.key
+            }
+        }
+        val buildSource = getBuildSource()
+        buildSource.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.BuildSource(buildSource)) {
+                it.name ==
+                    MetadataKey.BuildSource.key
+            }
+        }
+        val packageName = getPackageName()
+        packageName.isNotEmpty().let {
+            metadata.updateOrAddBy(Metadatum.PackageName(packageName)) {
+                it.name ==
+                    MetadataKey.PackageName.key
+            }
+        }
+        val certificateDigests = getCertificateSha256Digests()
+        if (certificateDigests.isNotEmpty()) {
+            metadata.updateOrAddBy(
+                Metadatum.CertificateDigest(
+                    Value.ArrayValue(
+                        certificateDigests.map { Value.StringValue(it) },
+                    ).list,
+                ),
+            ) { it.name == MetadataKey.CertificateDigest.key }
+        }
     }
 }

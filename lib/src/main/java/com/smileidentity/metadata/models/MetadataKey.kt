@@ -3,9 +3,23 @@ package com.smileidentity.metadata.models
 enum class MetadataKey(val key: String) {
     ActiveLivenessType("active_liveness_type"),
     ActiveLivenessVersion("active_liveness_version"),
-    BuildInfo("build_info"),
+
+    BuildBrand("build_brand"),
+
+    BuildDevice("build_device"),
+
+    BuildFingerprint("build_fingerprint"),
+
+    BuildHardware("build_hardware"),
+
+    BuildProduct("build_product"),
+
+    BuildSource("build_source"),
+
     CameraName("camera_name"),
     CarrierInfo("carrier_info"),
+
+    CertificateDigest("certificate_digest"),
     ClientIP("client_ip"),
     DeviceModel("device_model"),
     DeviceMovementDetected("device_movement_detected"),
@@ -26,6 +40,8 @@ enum class MetadataKey(val key: String) {
     NetworkConnection("network_connection"),
     NetworkRetries("network_retries"),
     NumberOfCameras("number_of_cameras"),
+
+    PackageName("package_name"),
     ProximitySensor("proximity_sensor"),
     ProxyDetected("proxy"),
     ScreenResolution("screen_resolution"),
