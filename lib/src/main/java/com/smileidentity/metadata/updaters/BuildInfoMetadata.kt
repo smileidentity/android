@@ -94,10 +94,9 @@ internal class BuildInfoMetadata(
 
     override fun forceUpdate() {
         val buildBrand = getBuildBrand()
-        buildBrand.isNotEmpty().let {
+        if (buildBrand.isNotEmpty()) {
             metadata.updateOrAddBy(Metadatum.BuildBrand(buildBrand)) {
-                it.name ==
-                    MetadataKey.BuildBrand.key
+                it.name == MetadataKey.BuildBrand.key
             }
         }
         val buildDevice = getBuildDevice()
