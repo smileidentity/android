@@ -154,8 +154,8 @@ class SmileIDStandardRequestIntegrityManagerTest {
         assertTrue("Result should be failure", result.isFailure)
         val exception = result.exceptionOrNull()
         assertTrue(
-            "Exception should be IllegalArgumentException",
-            exception is IllegalArgumentException,
+            "Exception should be IllegalStateException",
+            exception is IllegalStateException,
         )
         assertEquals(
             "Integrity token provider is not initialized. Call warmUpTokenProvider() first.",
