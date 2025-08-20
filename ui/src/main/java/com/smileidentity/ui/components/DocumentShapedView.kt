@@ -11,7 +11,7 @@ fun DocumentShapedView(modifier: Modifier = Modifier) {
 
 @DevicePreviews
 @Composable
-private fun SmileIDButtonPreview() {
+private fun DocumentShapedViewPreview() {
     PreviewContent {
         DocumentShapedView()
     }

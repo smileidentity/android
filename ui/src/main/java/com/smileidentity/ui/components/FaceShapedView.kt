@@ -11,7 +11,7 @@ fun FaceShapedView(modifier: Modifier = Modifier) {
 
 @DevicePreviews
 @Composable
-private fun SmileIDButtonPreview() {
+private fun FaceShapedViewPreview() {
     PreviewContent {
         FaceShapedView()
     }
