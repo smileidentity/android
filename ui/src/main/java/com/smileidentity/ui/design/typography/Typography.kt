@@ -25,8 +25,11 @@ import com.smileidentity.ui.previews.PreviewContent
 
 interface Typography {
     val dmSansFontFamily: FontFamily
-
-    val titleHuge: TextStyle
+    val pageHeading: TextStyle
+    val subHeading: TextStyle
+    val sectionHeading: TextStyle
+    val body: TextStyle
+    val button: TextStyle
 }
 
 internal object SmileIDTypography : Typography {
@@ -82,9 +85,41 @@ internal object SmileIDTypography : Typography {
         fontStyle = FontStyle.Normal,
     )
 
-    override val titleHuge = baseStyle.copy(
-        fontSize = 40.sp,
-        fontWeight = FontWeight.ExtraBold,
+    override val pageHeading: TextStyle = baseStyle.copy(
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        lineHeight = 48.sp,
+        fontFamily = dmSansFontFamily,
+        letterSpacing = (-1).sp,
+    )
+
+    override val subHeading: TextStyle = baseStyle.copy(
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 48.sp,
+        fontFamily = dmSansFontFamily,
+        letterSpacing = (-1).sp,
+    )
+
+    override val sectionHeading: TextStyle = baseStyle.copy(
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 48.sp,
+        fontFamily = dmSansFontFamily,
+        letterSpacing = (-1).sp,
+    )
+
+    override val body: TextStyle = baseStyle.copy(
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Normal,
+        lineHeight = 48.sp,
+        fontFamily = dmSansFontFamily,
+        letterSpacing = (-1).sp,
+    )
+
+    override val button: TextStyle = baseStyle.copy(
+        fontSize = 16.sp,
+        fontWeight = FontWeight.SemiBold,
         lineHeight = 48.sp,
         fontFamily = dmSansFontFamily,
         letterSpacing = (-1).sp,
@@ -95,7 +130,8 @@ internal object SmileIDTypography : Typography {
 @Composable
 private fun PreviewTitle() {
     PreviewTypographyGroup {
-        PreviewTypographyItem(style = SmileIDTypography.titleHuge, name = "Title Huge")
+        PreviewTypographyItem(style = SmileIDTypography.pageHeading, name = "Page Heading")
+        PreviewTypographyItem(style = SmileIDTypography.subHeading, name = "Sub Heading")
     }
 }
 
@@ -103,6 +139,8 @@ private fun PreviewTitle() {
 @Composable
 private fun PreviewBody() {
     PreviewTypographyGroup {
+        PreviewTypographyItem(style = SmileIDTypography.sectionHeading, name = "Section Heading")
+        PreviewTypographyItem(style = SmileIDTypography.body, name = "Body")
     }
 }
 
@@ -116,14 +154,8 @@ private fun PreviewButton() {
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            PreviewTypographyItem(style = SmileIDTypography.button, name = "Button")
         }
-    }
-}
-
-@Preview(device = Devices.NEXUS_10)
-@Composable
-private fun PreviewCaption() {
-    PreviewTypographyGroup {
     }
 }
 
@@ -165,7 +197,7 @@ private fun PreviewTypographyItem(name: String, style: TextStyle) {
                 font weight = ${style.fontWeight?.weight}
                 font letter spacing = ${style.letterSpacing}
             """.trimIndent(),
-            style = SmileIDTypography.titleHuge,
+            style = SmileIDTypography.body,
         )
     }
 }

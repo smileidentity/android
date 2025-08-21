@@ -25,7 +25,23 @@ import com.smileidentity.ui.previews.PreviewContent
 enum class SmileIDColor(private val light: Color, private val dark: Color) {
     background(
         light = Color(0xFF_FFFFFF),
-        dark = Color(0xFF_111112),
+        dark = Color(0xFF_1A1C23),
+    ),
+    foreground(
+        light = Color(0xFF_21232C),
+        dark = Color(0xFF_F2F2F2),
+    ),
+    cardForeground(
+        light = Color(0xFF_5E646E),
+        dark = Color(0xFF_C2C5CB),
+    ),
+    primary(
+        light = Color(0xFF_151F72),
+        dark = Color(0xFF_4D88FF),
+    ),
+    primaryForeground(
+        light = Color(0xFF_FFFFFF),
+        dark = Color(0xFF_FFFFFF),
     ),
     ;
 
