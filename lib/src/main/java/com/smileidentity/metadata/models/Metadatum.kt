@@ -109,10 +109,29 @@ open class Metadatum(
     @Parcelize
     data object ActiveLivenessVersion : Metadatum(MetadataKey.ActiveLivenessVersion, "1.0.0")
 
-    @TypeParceler<Value, ValueParceler>
     @Parcelize
-    data class BuildInfo(val buildInfo: Map<String, Value>) :
-        Metadatum(MetadataKey.BuildInfo, buildInfo)
+    data class BuildBrand(val buildBrand: String) :
+        Metadatum(MetadataKey.BuildBrand, buildBrand)
+
+    @Parcelize
+    data class BuildDevice(val buildDevice: String) :
+        Metadatum(MetadataKey.BuildDevice, buildDevice)
+
+    @Parcelize
+    data class BuildFingerprint(val buildFingerprint: String) :
+        Metadatum(MetadataKey.BuildFingerprint, buildFingerprint)
+
+    @Parcelize
+    data class BuildHardware(val buildHardware: String) :
+        Metadatum(MetadataKey.BuildHardware, buildHardware)
+
+    @Parcelize
+    data class BuildProduct(val buildProduct: String) :
+        Metadatum(MetadataKey.BuildProduct, buildProduct)
+
+    @Parcelize
+    data class BuildSource(val buildSource: String) :
+        Metadatum(MetadataKey.BuildSource, buildSource)
 
     @Parcelize
     data class CameraName(val cameraName: String) :
@@ -121,6 +140,11 @@ open class Metadatum(
     @Parcelize
     data class CarrierInfo(val carrierInfo: String) :
         Metadatum(MetadataKey.CarrierInfo, carrierInfo)
+
+    @TypeParceler<Value, ValueParceler>
+    @Parcelize
+    data class CertificateDigest(val certificateDigests: List<Value>) :
+        Metadatum(MetadataKey.CertificateDigest, certificateDigests)
 
     @Parcelize
     data object ClientIP : Metadatum(MetadataKey.ClientIP, getIPAddress(useIPv4 = true))
@@ -222,6 +246,10 @@ open class Metadatum(
     @Parcelize
     data class NumberOfCameras(val numberOfCameras: Int) :
         Metadatum(MetadataKey.NumberOfCameras, numberOfCameras)
+
+    @Parcelize
+    data class PackageName(val packageName: String) :
+        Metadatum(MetadataKey.PackageName, packageName)
 
     @Parcelize
     data class ProximitySensor(val hasProximitySensor: Boolean) :
