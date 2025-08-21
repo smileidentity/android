@@ -7,6 +7,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedProcessingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.screens.SmileIDPreviewScreen
@@ -14,15 +15,17 @@ import com.smileidentity.ui.screens.SmileIDPreviewScreen
 @Destination<RootGraph>
 @Composable
 fun OrchestratedPreviewScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
-    SmileIDPreviewScreen(
-        modifier = modifier,
-        onContinue = {
-            navigator.navigate(direction = OrchestratedProcessingScreenDestination)
-        },
-        onRetry = {
-            navigator.navigateUp()
-        },
-    )
+    SmileIDTheme {
+        SmileIDPreviewScreen(
+            modifier = modifier,
+            onContinue = {
+                navigator.navigate(direction = OrchestratedProcessingScreenDestination)
+            },
+            onRetry = {
+                navigator.navigateUp()
+            },
+        )
+    }
 }
 
 @DevicePreviews
