@@ -37,22 +37,12 @@ fun SmileIDInstructionsScreen(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onContinue: () -> Unit = {},
-    onCancel: () -> Unit = {},
     continueButton: @Composable (onContinue: () -> Unit) -> Unit = { onClick ->
         SmileIDButton(
-            text = "Continue",
+            text = "Take Selfie",
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(tag = "instructions:continue_button"),
-            onClick = onClick,
-        )
-    },
-    cancelButton: @Composable (onCancel: () -> Unit) -> Unit = { onClick ->
-        SmileIDButton(
-            text = "Cancel",
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(tag = "instructions:cancel_button"),
             onClick = onClick,
         )
     },
@@ -60,8 +50,8 @@ fun SmileIDInstructionsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(SmileIDTheme.colors[SmileIDColor.background])
-            .padding(16.dp),
+            .background(color = SmileIDTheme.colors[SmileIDColor.background])
+            .padding(all = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -107,8 +97,6 @@ fun SmileIDInstructionsScreen(
                 .padding(8.dp),
         ) {
             continueButton(onContinue)
-            Spacer(modifier = Modifier.height(16.dp))
-            cancelButton(onCancel)
         }
     }
 }

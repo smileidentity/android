@@ -24,9 +24,6 @@ fun OrchestratedInstructionsScreen(
             onContinue = {
                 navigator.navigate(direction = OrchestratedCaptureScreenDestination)
             },
-            onCancel = {
-                navigator.navigate(direction = OrchestratedCaptureScreenDestination)
-            },
         )
     }
 }
