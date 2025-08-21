@@ -18,7 +18,7 @@ import com.smileidentity.ui.previews.PreviewContent
 fun SmileIDButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(height = 58.dp),
+        modifier = modifier.height(height = 52.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = SmileIDTheme.colors[SmileIDColor.primary],
             contentColor = SmileIDTheme.colors[SmileIDColor.primaryForeground],
