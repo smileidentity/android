@@ -5,16 +5,13 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,7 +70,7 @@ fun SmileIDInstructionsScreen(
             )
             Text(
                 text = "Some header here",
-                style = MaterialTheme.typography.headlineLarge,
+                style = SmileIDTheme.typography.pageHeading,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -81,7 +78,7 @@ fun SmileIDInstructionsScreen(
             )
             Text(
                 text = "Some subtitle here",
-                style = MaterialTheme.typography.headlineSmall,
+                style = SmileIDTheme.typography.subHeading,
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
