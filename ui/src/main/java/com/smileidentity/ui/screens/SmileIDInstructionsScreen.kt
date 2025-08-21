@@ -2,6 +2,7 @@ package com.smileidentity.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.R
 import com.smileidentity.ui.components.SmileIDButton
+import com.smileidentity.ui.design.SmileIDTheme
+import com.smileidentity.ui.design.colors.SmileIDColor
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 
@@ -57,6 +60,7 @@ fun SmileIDInstructionsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(SmileIDTheme.colors[SmileIDColor.background])
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

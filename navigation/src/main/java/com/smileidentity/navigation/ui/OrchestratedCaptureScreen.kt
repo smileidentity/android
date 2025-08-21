@@ -8,6 +8,7 @@ import com.ramcosta.composedestinations.generated.navigation.destinations.Orches
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.smileidentity.ml.states.IdentityScanState
+import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.screens.SmileIDCaptureScreen
@@ -15,14 +16,16 @@ import com.smileidentity.ui.screens.SmileIDCaptureScreen
 @Destination<RootGraph>
 @Composable
 fun OrchestratedCaptureScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
-    SmileIDCaptureScreen(
-        scanType = IdentityScanState.ScanType.SELFIE,
-        modifier = modifier,
-        onResult = { file ->
-            // use the file here
-            navigator.navigate(direction = OrchestratedPreviewScreenDestination)
-        },
-    )
+    SmileIDTheme {
+        SmileIDCaptureScreen(
+            scanType = IdentityScanState.ScanType.SELFIE,
+            modifier = modifier,
+            onResult = { file ->
+                // use the file here
+                navigator.navigate(direction = OrchestratedPreviewScreenDestination)
+            },
+        )
+    }
 }
 
 @DevicePreviews

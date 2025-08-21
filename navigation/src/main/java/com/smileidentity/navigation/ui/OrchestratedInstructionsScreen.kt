@@ -7,6 +7,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.navigation.destinations.OrchestratedCaptureScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.screens.SmileIDInstructionsScreen
@@ -17,15 +18,17 @@ fun OrchestratedInstructionsScreen(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator,
 ) {
-    SmileIDInstructionsScreen(
-        modifier = modifier,
-        onContinue = {
-            navigator.navigate(direction = OrchestratedCaptureScreenDestination)
-        },
-        onCancel = {
-            navigator.navigate(direction = OrchestratedCaptureScreenDestination)
-        },
-    )
+    SmileIDTheme {
+        SmileIDInstructionsScreen(
+            modifier = modifier,
+            onContinue = {
+                navigator.navigate(direction = OrchestratedCaptureScreenDestination)
+            },
+            onCancel = {
+                navigator.navigate(direction = OrchestratedCaptureScreenDestination)
+            },
+        )
+    }
 }
 
 @DevicePreviews
