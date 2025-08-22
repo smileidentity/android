@@ -47,8 +47,7 @@ fun SmileIDInstructionsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = SmileIDTheme.colors[SmileIDColor.background])
-            .padding(all = 16.dp),
+            .background(color = SmileIDTheme.colors[SmileIDColor.background]),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(

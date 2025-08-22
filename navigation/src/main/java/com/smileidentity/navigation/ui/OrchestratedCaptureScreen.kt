@@ -1,5 +1,9 @@
 package com.smileidentity.navigation.ui
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.annotation.Destination
@@ -17,12 +21,17 @@ import com.smileidentity.ui.screens.SmileIDCaptureScreen
 @Composable
 fun OrchestratedCaptureScreen(modifier: Modifier = Modifier, navigator: DestinationsNavigator) {
     SmileIDTheme {
-        SmileIDCaptureScreen(
-            scanType = IdentityScanState.ScanType.SELFIE,
-            modifier = modifier,
-            onResult = { file ->
-                // use the file here
-                navigator.navigate(direction = OrchestratedPreviewScreenDestination)
+        Scaffold(
+            contentWindowInsets = WindowInsets.systemBars,
+            content = { innerPadding ->
+                SmileIDCaptureScreen(
+                    scanType = IdentityScanState.ScanType.SELFIE,
+                    modifier = modifier.padding(paddingValues = innerPadding),
+                    onResult = { file ->
+                        // use the file here
+                        navigator.navigate(direction = OrchestratedPreviewScreenDestination)
+                    },
+                )
             },
         )
     }
