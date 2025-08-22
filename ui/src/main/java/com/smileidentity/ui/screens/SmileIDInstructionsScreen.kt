@@ -1,6 +1,5 @@
 package com.smileidentity.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedButton
@@ -18,11 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.smileidentity.ui.R
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.design.colors.SmileIDColor
@@ -47,7 +41,8 @@ fun SmileIDInstructionsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = SmileIDTheme.colors[SmileIDColor.background]),
+            .background(color = SmileIDTheme.colors[SmileIDColor.background])
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -59,28 +54,18 @@ fun SmileIDInstructionsScreen(
                 .verticalScroll(state = scrollState)
                 .weight(1f),
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.si_logo),
-                modifier = Modifier
-                    .size(178.dp)
-                    .padding(top = 8.dp)
-                    .testTag(tag = "instructions:logo"),
-                contentDescription = null,
-            )
             Text(
-                text = "Some header here",
+                text = "Let's verify your selfie",
                 style = SmileIDTheme.typography.pageHeading,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .testTag(tag = "instructions:header"),
             )
             Text(
-                text = "Some subtitle here",
+                text = "Your selfie is encrypted and used only for verification.",
                 style = SmileIDTheme.typography.subHeading,
-                fontWeight = FontWeight.Light,
-                textAlign = TextAlign.Center,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 32.dp)
                     .testTag(tag = "instructions:subtitle"),
             )
