@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.R
 import com.smileidentity.ui.components.SmileIDButton
-import com.smileidentity.ui.design.SmileIDTheme
-import com.smileidentity.ui.design.colors.SmileIDColor
+import com.smileidentity.ui.theme.SmileIDTheme
+import com.smileidentity.ui.theme.SmileIDColor
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 

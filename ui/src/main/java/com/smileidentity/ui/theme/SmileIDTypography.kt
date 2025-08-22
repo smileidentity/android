@@ -1,4 +1,4 @@
-package com.smileidentity.ui.design.typography
+package com.smileidentity.ui.theme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,107 +24,110 @@ import androidx.compose.ui.unit.sp
 import com.smileidentity.ui.R
 import com.smileidentity.ui.previews.PreviewContent
 
-interface Typography {
+interface SmileIDTypography {
     val dmSansFontFamily: FontFamily
     val pageHeading: TextStyle
     val subHeading: TextStyle
     val sectionHeading: TextStyle
     val body: TextStyle
     val button: TextStyle
-}
 
-internal object SmileIDTypography : Typography {
-    private val fontProvider = GoogleFont.Provider(
-        providerAuthority = "com.google.android.gms.fonts",
-        providerPackage = "com.google.android.gms",
-        certificates = R.array.si_com_google_android_gms_fonts_certs,
-    )
+    companion object : SmileIDTypography {
+        private val fontProvider = GoogleFont.Provider(
+            providerAuthority = "com.google.android.gms.fonts",
+            providerPackage = "com.google.android.gms",
+            certificates = R.array.si_com_google_android_gms_fonts_certs,
+        )
 
-    private val dmSansGoogleFont = GoogleFont(name = "DM Sans")
+        private val dmSansGoogleFont = GoogleFont(name = "DM Sans")
 
-    override val dmSansFontFamily: FontFamily = FontFamily(
-        Font(
-            googleFont = dmSansGoogleFont,
-            fontProvider = fontProvider,
-            weight = FontWeight.Normal,
-            style = FontStyle.Normal,
-        ),
-        Font(
-            googleFont = dmSansGoogleFont,
-            fontProvider = fontProvider,
-            weight = FontWeight.Medium,
-            style = FontStyle.Normal,
-        ),
-        Font(
-            googleFont = dmSansGoogleFont,
-            fontProvider = fontProvider,
-            weight = FontWeight.Bold,
-            style = FontStyle.Normal,
-        ),
-        Font(
-            googleFont = dmSansGoogleFont,
-            fontProvider = fontProvider,
-            weight = FontWeight.Normal,
-            style = FontStyle.Italic,
-        ),
-        Font(
-            googleFont = dmSansGoogleFont,
-            fontProvider = fontProvider,
-            weight = FontWeight.Medium,
-            style = FontStyle.Italic,
-        ),
-        Font(
-            googleFont = dmSansGoogleFont,
-            fontProvider = fontProvider,
-            weight = FontWeight.Bold,
-            style = FontStyle.Italic,
-        ),
-    )
+        override val dmSansFontFamily: FontFamily = FontFamily(
+            Font(
+                googleFont = dmSansGoogleFont,
+                fontProvider = fontProvider,
+                weight = FontWeight.Normal,
+                style = FontStyle.Normal,
+            ),
+            Font(
+                googleFont = dmSansGoogleFont,
+                fontProvider = fontProvider,
+                weight = FontWeight.Medium,
+                style = FontStyle.Normal,
+            ),
+            Font(
+                googleFont = dmSansGoogleFont,
+                fontProvider = fontProvider,
+                weight = FontWeight.Bold,
+                style = FontStyle.Normal,
+            ),
+            Font(
+                googleFont = dmSansGoogleFont,
+                fontProvider = fontProvider,
+                weight = FontWeight.Normal,
+                style = FontStyle.Italic,
+            ),
+            Font(
+                googleFont = dmSansGoogleFont,
+                fontProvider = fontProvider,
+                weight = FontWeight.Medium,
+                style = FontStyle.Italic,
+            ),
+            Font(
+                googleFont = dmSansGoogleFont,
+                fontProvider = fontProvider,
+                weight = FontWeight.Bold,
+                style = FontStyle.Italic,
+            ),
+        )
 
-    private val baseStyle = TextStyle(
-        fontFamily = dmSansFontFamily,
-        fontStyle = FontStyle.Normal,
-    )
+        private val baseStyle = TextStyle(
+            fontFamily = dmSansFontFamily,
+            fontStyle = FontStyle.Normal,
+        )
 
-    override val pageHeading: TextStyle = baseStyle.copy(
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold,
-        lineHeight = 48.sp,
-        fontFamily = dmSansFontFamily,
-        letterSpacing = (-1).sp,
-    )
+        override val pageHeading: TextStyle = baseStyle.copy(
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 48.sp,
+            fontFamily = dmSansFontFamily,
+            letterSpacing = (-1).sp,
+        )
 
-    override val subHeading: TextStyle = baseStyle.copy(
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 48.sp,
-        fontFamily = dmSansFontFamily,
-        letterSpacing = (-1).sp,
-    )
+        override val subHeading: TextStyle = baseStyle.copy(
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            lineHeight = 48.sp,
+            fontFamily = dmSansFontFamily,
+            letterSpacing = (-1).sp,
+        )
 
-    override val sectionHeading: TextStyle = baseStyle.copy(
-        fontSize = 14.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 48.sp,
-        fontFamily = dmSansFontFamily,
-        letterSpacing = (-1).sp,
-    )
+        override val sectionHeading: TextStyle = baseStyle.copy(
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 48.sp,
+            fontFamily = dmSansFontFamily,
+            letterSpacing = (-1).sp,
+        )
 
-    override val body: TextStyle = baseStyle.copy(
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 48.sp,
-        fontFamily = dmSansFontFamily,
-        letterSpacing = (-1).sp,
-    )
+        override val body: TextStyle = baseStyle.copy(
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal,
+            lineHeight = 48.sp,
+            fontFamily = dmSansFontFamily,
+            letterSpacing = (-1).sp,
+        )
 
-    override val button: TextStyle = baseStyle.copy(
-        fontSize = 16.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 48.sp,
-        fontFamily = dmSansFontFamily,
-        letterSpacing = (-1).sp,
-    )
+        override val button: TextStyle = baseStyle.copy(
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 48.sp,
+            fontFamily = dmSansFontFamily,
+            letterSpacing = (-1).sp,
+        )
+
+        internal val material: Typography
+            get() = Typography()
+    }
 }
 
 @Preview(device = Devices.NEXUS_10)

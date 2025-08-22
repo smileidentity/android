@@ -1,4 +1,4 @@
-package com.smileidentity.ui.design.colors
+package com.smileidentity.ui.theme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,52 +21,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.previews.PreviewContent
 
-@Suppress("EnumEntryName")
-enum class SmileIDColor(private val light: Color, private val dark: Color) {
-    background(
-        light = Color(0xFF_FFFFFF),
-        dark = Color(0xFF_1A1C23),
-    ),
-    foreground(
-        light = Color(0xFF_21232C),
-        dark = Color(0xFF_F2F2F2),
-    ),
-    cardForeground(
-        light = Color(0xFF_5E646E),
-        dark = Color(0xFF_C2C5CB),
-    ),
-    primary(
-        light = Color(0xFF_151F72),
-        dark = Color(0xFF_4D88FF),
-    ),
-    primaryForeground(
-        light = Color(0xFF_FFFFFF),
-        dark = Color(0xFF_FFFFFF),
-    ),
-    ;
 
-    companion object : ColorPalette {
-        /**
-         * Get the theme color value for [SmileIDColor]
-         */
+data class SmileIDColors(
+    val background: Color,
+    val foreground: Color,
+    val cardForeground: Color,
+    val primary: Color,
+    val primaryForeground: Color,
+) {
+    companion object {
         @Composable
-        override operator fun get(color: SmileIDColor): Color = if (SmileIDTheme.darkMode) {
-            color.dark
+        internal fun defaultColors(smileIDColors: SmileIDColors) =
+            lightColorScheme(
+                smileIDColors.background,
+            )
+
+        @Composable
+        internal fun defaultDarkColors(smileIDColors: SmileIDColors) =
+            darkColorScheme(
+                smileIDColors.background,
+            )
+
+        @Composable
+        internal fun materialThemeColors(darkMode: Boolean) = if (darkMode) {
+            darkColorScheme(
+                background = defaultDarkColors().background,
+            )
         } else {
-            color.light
+            lightColorScheme(
+                background = defaultColors().background,
+            )
         }
     }
-}
-
-interface ColorPalette {
-    /**
-     * Get the theme color value for [SmileIDColor]
-     */
-    @Composable
-    operator fun get(color: SmileIDColor): Color
 }
 
 @Composable
@@ -96,19 +87,19 @@ private fun PreviewColor(label: String, color: Color) {
 
 @Composable
 private fun PreviewColorPalette() {
-    Row {
-        val groups = SmileIDColor.entries
-            .groupBy { it.name }
-            .values.toList()
-
-        groups.forEach { group ->
-            Column {
-                group.forEach {
-                    PreviewColor(it.name, SmileIDTheme.colors[it])
-                }
-            }
-        }
-    }
+//    Row {
+//        val groups = SmileIDColor.entries
+//            .groupBy { it.name }
+//            .values.toList()
+//
+//        groups.forEach { group ->
+//            Column {
+//                group.forEach {
+//                    PreviewColor(it.name, SmileIDTheme.colors[it])
+//                }
+//            }
+//        }
+//    }
 }
 
 @PreviewLightDark
