@@ -23,6 +23,7 @@ import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.SdkContext
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -81,6 +82,14 @@ fun SmileID.SmartSelfieEnrollment(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     // todo provide viewmodel here so we remove metadata from composable constructor
+    val sdkContext = SdkContext(
+        offlineMode = SmileID.allowOfflineMode,
+        agentMode = allowAgentMode,
+        allowNewEnroll = allowNewEnroll,
+        skipApiSubmission = skipApiSubmission,
+
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
             modifier = modifier,

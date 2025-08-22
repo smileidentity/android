@@ -22,6 +22,7 @@ import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SdkContext
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
@@ -127,6 +128,8 @@ object SmileID {
 
     internal var sdkLaunchCount = 0
         private set
+
+    internal var sdkContext: SdkContext? = null
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
