@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.smileidentity.ui.design.SmileIDTheme
 
 @SuppressLint("ComposePreviewPublic")
 @DevicePreviews
@@ -36,11 +37,12 @@ fun PreviewContent(
     LaunchedEffect(activity) {
         activity?.window?.let { window -> WindowCompat.setDecorFitsSystemWindows(window, false) }
     }
-    // Wrap this in our theme setup
-    Surface {
-        Box(
-            modifier = Modifier.padding(contentPadding),
-            content = content,
-        )
+    SmileIDTheme {
+        Surface {
+            Box(
+                modifier = Modifier.padding(contentPadding),
+                content = content,
+            )
+        }
     }
 }
