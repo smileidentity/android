@@ -23,24 +23,18 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.smileidentity.ui.components.InstructionItem
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.design.SmileIDTheme
@@ -140,7 +134,7 @@ fun SmileIDInstructionsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         SelfieInstruction.entries.forEachIndexed { index, instruction ->
                             InstructionItem(instruction = instruction)
@@ -161,8 +155,8 @@ fun SmileIDInstructionsScreen(
                     )
                     .background(
                         color = Color.Red.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(10.dp)
-                    )
+                        shape = RoundedCornerShape(10.dp),
+                    ),
             ) {
                 Row(
                     modifier = Modifier
@@ -177,7 +171,8 @@ fun SmileIDInstructionsScreen(
                         modifier = Modifier.size(24.dp),
                     )
                     Text(
-                        text = "Avoid poor lighting, accessories, or looking away as this may lead to rejection of your selfie.",
+                        text = "Avoid poor lighting, accessories, or looking away as this may " +
+                            "lead to rejection of your selfie.",
                         style = SmileIDTheme.typography.body,
                         modifier = Modifier.padding(start = 12.dp),
                     )
@@ -187,7 +182,8 @@ fun SmileIDInstructionsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "By clicking on Take Selfie, you consent to provide \nus with the requested data.",
+                text = "By clicking on Take Selfie, you consent to provide " +
+                    "\nus with the requested data.",
                 color = Color(0xFF888B98),
                 style = SmileIDTheme.typography.body,
                 modifier = Modifier
