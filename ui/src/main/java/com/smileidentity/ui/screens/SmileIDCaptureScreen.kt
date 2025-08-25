@@ -2,6 +2,7 @@ package com.smileidentity.ui.screens
 
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,8 @@ import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.components.SmileIDCameraPreview
+import com.smileidentity.ui.design.SmileIDTheme
+import com.smileidentity.ui.design.colors.SmileIDColor
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.utils.viewModelFactory
@@ -64,7 +67,8 @@ fun SmileIDCaptureScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(color = SmileIDTheme.colors[SmileIDColor.background]),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
         ) {
