@@ -88,7 +88,7 @@ internal object SmileIDTypography : Typography {
     override val pageHeading: TextStyle = baseStyle.copy(
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
-        lineHeight = 48.sp,
+        lineHeight = 20.sp,
         fontFamily = dmSansFontFamily,
         letterSpacing = (-1).sp,
     )
@@ -96,7 +96,7 @@ internal object SmileIDTypography : Typography {
     override val subHeading: TextStyle = baseStyle.copy(
         fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
-        lineHeight = 48.sp,
+        lineHeight = 20.sp,
         fontFamily = dmSansFontFamily,
         letterSpacing = (-1).sp,
     )
@@ -104,7 +104,7 @@ internal object SmileIDTypography : Typography {
     override val sectionHeading: TextStyle = baseStyle.copy(
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
-        lineHeight = 48.sp,
+        lineHeight = 20.sp,
         fontFamily = dmSansFontFamily,
         letterSpacing = (-1).sp,
     )
@@ -112,7 +112,7 @@ internal object SmileIDTypography : Typography {
     override val body: TextStyle = baseStyle.copy(
         fontSize = 12.sp,
         fontWeight = FontWeight.Normal,
-        lineHeight = 48.sp,
+        lineHeight = 20.sp,
         fontFamily = dmSansFontFamily,
         letterSpacing = (-1).sp,
     )
@@ -120,7 +120,7 @@ internal object SmileIDTypography : Typography {
     override val button: TextStyle = baseStyle.copy(
         fontSize = 16.sp,
         fontWeight = FontWeight.SemiBold,
-        lineHeight = 48.sp,
+        lineHeight = 20.sp,
         fontFamily = dmSansFontFamily,
         letterSpacing = (-1).sp,
     )
