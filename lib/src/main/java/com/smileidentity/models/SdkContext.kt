@@ -12,6 +12,7 @@ data class SdkContext(
     @Json(name = "allow_gallery_upload") val allowGalleryUpload: Boolean? = null,
     @Json(name = "allow_new_enroll") val allowNewEnroll: Boolean? = null,
     @Json(name = "autocapture") val autoCapture: String? = null,
+    @Json(name = "api_submission_only") val apiSubmissionOnly: Boolean? = null,
     @Json(name = "bypass_selfie") val bypassSelfie: Boolean? = null,
     @Json(name = "component_mode") val componentMode: Boolean? = null,
     @Json(name = "offline_mode") val offlineMode: Boolean? = null,

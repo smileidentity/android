@@ -38,6 +38,7 @@ import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDIntegrityInterceptor
+import com.smileidentity.networking.SmileIDSdkContextInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -502,6 +503,7 @@ object SmileID {
         addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileSecurityInterceptor)
         addInterceptor(interceptor = SmileIDIntegrityInterceptor())
+        addInterceptor(interceptor = SmileIDSdkContextInterceptor())
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the
