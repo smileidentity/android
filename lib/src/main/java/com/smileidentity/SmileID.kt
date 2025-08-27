@@ -22,6 +22,7 @@ import com.smileidentity.models.Config
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
 import com.smileidentity.models.PrepUploadRequest
+import com.smileidentity.models.SdkContext
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.networking.BiometricKycJobResultAdapter
 import com.smileidentity.networking.DocumentVerificationJobResultAdapter
@@ -37,6 +38,7 @@ import com.smileidentity.networking.SmartSelfieJobResultAdapter
 import com.smileidentity.networking.SmileHeaderAuthInterceptor
 import com.smileidentity.networking.SmileHeaderMetadataInterceptor
 import com.smileidentity.networking.SmileIDIntegrityInterceptor
+import com.smileidentity.networking.SmileIDSdkContextInterceptor
 import com.smileidentity.networking.SmileIDService
 import com.smileidentity.networking.StringifiedBooleanAdapter
 import com.smileidentity.networking.UploadRequestConverterFactory
@@ -127,6 +129,8 @@ object SmileID {
 
     internal var sdkLaunchCount = 0
         private set
+
+    internal var sdkContext: SdkContext? = null
 
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
@@ -499,6 +503,7 @@ object SmileID {
         addInterceptor(interceptor = SmileHeaderAuthInterceptor)
         addInterceptor(interceptor = SmileSecurityInterceptor)
         addInterceptor(interceptor = SmileIDIntegrityInterceptor())
+        addInterceptor(interceptor = SmileIDSdkContextInterceptor())
         addInterceptor(
             HttpLoggingInterceptor().apply {
                 // This BuildConfig.DEBUG will be false when the SDK is released, regardless of the

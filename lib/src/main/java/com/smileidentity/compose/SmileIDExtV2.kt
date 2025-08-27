@@ -15,6 +15,7 @@ import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typographyV2
 import com.smileidentity.ml.SelfieQualityModel
+import com.smileidentity.models.SdkContext
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomUserId
@@ -53,6 +54,16 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
     typography: Typography = SmileID.typographyV2,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    val sdkContext = SdkContext(
+        allowNewEnroll = allowNewEnroll,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        skipApiSubmission = skipApiSubmission,
+        useStrictMode = true,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
@@ -103,6 +114,16 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
     typography: Typography = SmileID.typographyV2,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    val sdkContext = SdkContext(
+        allowNewEnroll = allowNewEnroll,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        skipApiSubmission = skipApiSubmission,
+        useStrictMode = true,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val context = LocalContext.current
         val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }

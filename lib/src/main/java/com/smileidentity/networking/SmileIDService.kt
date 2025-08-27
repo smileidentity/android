@@ -62,6 +62,7 @@ interface SmileIDService {
      * [PrepUploadResponse.uploadUrl] that the file should eventually be uploaded to (via [upload]).
      */
     @SmileHeaderMetadata
+    @SmileIDSdkContextParameter
     @SmileIDSecurity
     @SmileIDIntegrityHeader
     @POST("/v1/upload")
@@ -84,6 +85,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDSdkContextParameter
     @SmileIDSecurity
     @SmileIDIntegrityHeader
     @SmileIDOptIn
@@ -111,6 +113,7 @@ interface SmileIDService {
      */
     @SmileHeaderAuth
     @SmileHeaderMetadata
+    @SmileIDSdkContextParameter
     @SmileIDSecurity
     @SmileIDIntegrityHeader
     @SmileIDOptIn
@@ -137,6 +140,7 @@ interface SmileIDService {
      * provider is unavailable, the response will be an error.
      */
     @SmileHeaderMetadata
+    @SmileIDSdkContextParameter
     @SmileIDSecurity
     @SmileIDIntegrityHeader
     @POST("/v1/id_verification")

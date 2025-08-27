@@ -23,6 +23,7 @@ import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.models.JobType
+import com.smileidentity.models.SdkContext
 import com.smileidentity.results.BiometricKycResult
 import com.smileidentity.results.DocumentVerificationResult
 import com.smileidentity.results.EnhancedDocumentVerificationResult
@@ -81,6 +82,17 @@ fun SmileID.SmartSelfieEnrollment(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     // todo provide viewmodel here so we remove metadata from composable constructor
+    val sdkContext = SdkContext(
+        agentMode = allowAgentMode,
+        allowNewEnroll = allowNewEnroll,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        skipApiSubmission = skipApiSubmission,
+        useStrictMode = false,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
             modifier = modifier,
@@ -137,6 +149,17 @@ fun SmileID.SmartSelfieAuthentication(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
+    val sdkContext = SdkContext(
+        agentMode = allowAgentMode,
+        allowNewEnroll = allowNewEnroll,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        skipApiSubmission = skipApiSubmission,
+        useStrictMode = false,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedSelfieCaptureScreen(
             modifier = modifier,
@@ -214,6 +237,19 @@ fun SmileID.DocumentVerification(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<DocumentVerificationResult> = {},
 ) {
+    val sdkContext = SdkContext(
+        agentMode = allowAgentMode,
+        allowGalleryUpload = allowGalleryUpload,
+        allowNewEnroll = allowNewEnroll,
+        autoCapture = autoCapture.name,
+        bypassSelfieCaptureWithFile != null,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        useStrictMode = useStrictMode,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val metadata = LocalMetadataProvider.current
         OrchestratedDocumentVerificationScreen(
@@ -313,6 +349,19 @@ fun SmileID.EnhancedDocumentVerificationScreen(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<EnhancedDocumentVerificationResult> = {},
 ) {
+    val sdkContext = SdkContext(
+        agentMode = allowAgentMode,
+        allowGalleryUpload = allowGalleryUpload,
+        allowNewEnroll = allowNewEnroll,
+        autoCapture = autoCapture.name,
+        bypassSelfieCaptureWithFile != null,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        useStrictMode = useStrictMode,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         val metadata = LocalMetadataProvider.current
         OrchestratedDocumentVerificationScreen(
@@ -393,6 +442,16 @@ fun SmileID.BiometricKYC(
     typography: Typography = SmileID.typography,
     onResult: SmileIDCallback<BiometricKycResult> = {},
 ) {
+    val sdkContext = SdkContext(
+        agentMode = allowAgentMode,
+        allowNewEnroll = allowNewEnroll,
+        componentMode = false,
+        offlineMode = SmileID.allowOfflineMode,
+        showAttribution = showAttribution,
+        showInstructions = showInstructions,
+        useStrictMode = useStrictMode,
+    )
+    SmileID.sdkContext = sdkContext
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
         OrchestratedBiometricKYCScreen(
             modifier = modifier,
