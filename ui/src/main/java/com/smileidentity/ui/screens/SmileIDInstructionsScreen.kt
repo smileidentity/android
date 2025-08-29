@@ -63,25 +63,30 @@ fun SmileIDInstructionsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(color = SmileIDTheme.colors[SmileIDColor.background])
-            .padding(horizontal = 16.dp, vertical = 0.dp),
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
-            contentAlignment = Alignment.TopEnd,
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(
-                onClick = onClose,
+            Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFF5F5F5)),
+                    .border(
+                        width = 1.dp,
+                        color = SmileIDTheme.colors[SmileIDColor.stroke],
+                        shape = RoundedCornerShape(10.dp),
+                    ),
+                contentAlignment = Alignment.TopEnd,
             ) {
                 Icon(
+
+                    modifier = Modifier
+                        .padding(6.dp),
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close",
-                    tint = Color.Black,
+                    tint = SmileIDTheme.colors[SmileIDColor.cardText],
                 )
             }
         }
@@ -101,12 +106,14 @@ fun SmileIDInstructionsScreen(
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White,
+                    containerColor = SmileIDTheme.colors[SmileIDColor.cardBackground],
                 ),
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 ) {
                     Column(
                         modifier = Modifier
@@ -115,6 +122,7 @@ fun SmileIDInstructionsScreen(
                         Text(
                             text = "Let's verify your selfie",
                             style = SmileIDTheme.typography.pageHeading,
+                            color = SmileIDTheme.colors[SmileIDColor.titleText],
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag(tag = "instructions:header"),
@@ -122,7 +130,7 @@ fun SmileIDInstructionsScreen(
 
                         Text(
                             text = "Your selfie is encrypted and used only for \nverification.",
-                            color = Color(0xFF667085),
+                            color = SmileIDTheme.colors[SmileIDColor.cardText],
                             style = SmileIDTheme.typography.subHeading,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -150,11 +158,11 @@ fun SmileIDInstructionsScreen(
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = Color.Red,
+                        color = SmileIDTheme.colors[SmileIDColor.warningStroke],
                         shape = RoundedCornerShape(10.dp),
                     )
                     .background(
-                        color = Color.Red.copy(alpha = 0.1f),
+                        color = SmileIDTheme.colors[SmileIDColor.warningFill],
                         shape = RoundedCornerShape(10.dp),
                     ),
             ) {
@@ -167,13 +175,14 @@ fun SmileIDInstructionsScreen(
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = "Warning",
-                        tint = Color(0xFFFF6B6B),
+                        tint = SmileIDTheme.colors[SmileIDColor.warningIcon],
                         modifier = Modifier.size(24.dp),
                     )
                     Text(
                         text = "Avoid poor lighting, accessories, or looking away as this may " +
                             "lead to rejection of your selfie.",
                         style = SmileIDTheme.typography.body,
+                        color = SmileIDTheme.colors[SmileIDColor.cardText],
                         modifier = Modifier.padding(start = 12.dp),
                     )
                 }
@@ -184,7 +193,7 @@ fun SmileIDInstructionsScreen(
             Text(
                 text = "By clicking on Take Selfie, you consent to provide " +
                     "\nus with the requested data.",
-                color = Color(0xFF888B98),
+                color = SmileIDTheme.colors[SmileIDColor.cardText],
                 style = SmileIDTheme.typography.body,
                 modifier = Modifier
                     .fillMaxWidth()

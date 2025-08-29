@@ -20,32 +20,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.smileidentity.ui.design.SmileIDTheme
+import com.smileidentity.ui.design.colors.SmileIDColor
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.utils.SelfieInstruction
 
 @Composable
-fun InstructionItem(instruction: SelfieInstruction, modifier: Modifier = Modifier) {
+fun InstructionItem(
+    instruction: SelfieInstruction,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Color(0xFFF8F8F8),
+                color = SmileIDTheme.colors[SmileIDColor.cardBackground],
                 shape = RoundedCornerShape(12.dp),
             )
             .border(
                 width = 1.dp,
-                color = Color(0xFFE6E6E6),
+                color = SmileIDTheme.colors[SmileIDColor.stroke],
                 shape = RoundedCornerShape(12.dp),
             )
-            .padding(16.dp),
-        verticalAlignment = Alignment.Top,
+            .padding(10.dp),
     ) {
         Box(
             modifier = Modifier
                 .size(40.dp)
                 .background(
-                    color = Color.LightGray.copy(alpha = 0.3f),
+                    color = SmileIDTheme.colors[SmileIDColor.stroke],
                     shape = CircleShape,
                 ),
             contentAlignment = Alignment.Center,
@@ -59,19 +62,19 @@ fun InstructionItem(instruction: SelfieInstruction, modifier: Modifier = Modifie
 
         Column(
             modifier = Modifier
-                .padding(start = 16.dp)
+                .padding(start = 10.dp)
                 .weight(1f),
         ) {
             Text(
                 text = instruction.title,
-                style = SmileIDTheme.typography.subHeading,
-                color = Color.Black,
+                style = SmileIDTheme.typography.cardTitle,
+                color = SmileIDTheme.colors[SmileIDColor.titleText],
             )
             Text(
                 text = instruction.description,
-                style = SmileIDTheme.typography.body,
-                color = Color(0xFF666666),
-                modifier = Modifier.padding(top = 4.dp),
+                style = SmileIDTheme.typography.cardSubTitle,
+                color = SmileIDTheme.colors[SmileIDColor.cardText],
+                modifier = Modifier.padding(top = 6.dp),
             )
         }
     }
