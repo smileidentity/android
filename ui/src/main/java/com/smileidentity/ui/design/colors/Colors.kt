@@ -23,25 +23,46 @@ import com.smileidentity.ui.previews.PreviewContent
 
 @Suppress("EnumEntryName")
 enum class SmileIDColor(private val light: Color, private val dark: Color) {
-    background(
-        light = Color(0xFF_FFFFFF),
-        dark = Color(0xFF_1A1C23),
-    ),
-    foreground(
-        light = Color(0xFF_21232C),
-        dark = Color(0xFF_F2F2F2),
-    ),
-    cardForeground(
-        light = Color(0xFF_5E646E),
-        dark = Color(0xFF_C2C5CB),
-    ),
     primary(
         light = Color(0xFF_151F72),
         dark = Color(0xFF_4D88FF),
     ),
+
     primaryForeground(
         light = Color(0xFF_FFFFFF),
         dark = Color(0xFF_FFFFFF),
+    ),
+    background(
+        light = Color(0xFF_F9FAFB),
+        dark = Color(0xFF_1A1C23),
+    ),
+    cardBackground(
+        light = Color(0xFF_FFFFFF),
+        dark = Color(0xFF_272A35),
+    ),
+    titleText(
+        light = Color(0xFF_21232C),
+        dark = Color(0xFF_F2F2F2),
+    ),
+    cardText(
+        light = Color(0xFF_5E646E),
+        dark = Color(0xFF_C2C5CB),
+    ),
+    stroke(
+        light = Color(0xFF_EAECF0),
+        dark = Color(0xFF_EAECF0),
+    ),
+    warningFill(
+        light = Color(0xFF_EF4343).copy(alpha = 0.1f),
+        dark = Color(0xFF_EA2d2d),
+    ),
+    warningIcon(
+        light = Color(0xFF_EF4343).copy(alpha = 0.1f),
+        dark = Color(0xFF_FFFFFF),
+    ),
+    warningStroke(
+        light = Color(0xFF_EF4343).copy(alpha = 0.3f),
+        dark = Color(0xFF_9F0000),
     ),
     ;
 
