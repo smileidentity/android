@@ -26,10 +26,7 @@ import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.utils.SelfieInstruction
 
 @Composable
-fun InstructionItem(
-    instruction: SelfieInstruction,
-    modifier: Modifier = Modifier
-) {
+fun InstructionItem(instruction: SelfieInstruction, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()

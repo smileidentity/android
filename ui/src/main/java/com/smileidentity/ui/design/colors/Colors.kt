@@ -63,7 +63,8 @@ enum class SmileIDColor(private val light: Color, private val dark: Color) {
     warningStroke(
         light = Color(0xFF_EF4343).copy(alpha = 0.3f),
         dark = Color(0xFF_9F0000),
-    );
+    ),
+    ;
 
     companion object : ColorPalette {
         /**
