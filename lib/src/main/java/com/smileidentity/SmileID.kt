@@ -397,13 +397,19 @@ object SmileID {
         )
 
         val prepUploadResponse = runCatching {
-            api.prepUpload(prepUploadRequest)
+            api.prepUpload(
+                headers = mapOf("Policy" to authResponse.policy.toString()),
+                request = prepUploadRequest,
+            )
         }.recoverCatching { throwable ->
             when {
                 throwable is HttpException -> {
                     val smileIDException = throwable.toSmileIDException()
                     if (smileIDException.details.code == "2215") {
-                        api.prepUpload(prepUploadRequest.copy(retry = true))
+                        api.prepUpload(
+                            headers = mapOf("Policy" to authResponse.policy.toString()),
+                            request = prepUploadRequest.copy(retry = true),
+                        )
                     } else {
                         throw smileIDException
                     }
