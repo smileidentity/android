@@ -35,11 +35,11 @@ object SmileHeaderAuthInterceptor : Interceptor {
                 }
             }
         }
-        SmileID.policy = authResponse.policy
         val newRequest = request.newBuilder()
             .header("SmileID-Partner-ID", SmileID.config.partnerId)
             .header("SmileID-Request-Signature", authResponse.signature)
             .header("SmileID-Timestamp", authResponse.timestamp)
+            .header("Policy", authResponse.policy.toString())
             .build()
         return chain.proceed(newRequest)
     }

@@ -105,8 +105,6 @@ object SmileID {
     var loader: String = ""
         private set
 
-    internal var policy: Int? = -1
-
     var callbackUrl: String = ""
         private set
 
