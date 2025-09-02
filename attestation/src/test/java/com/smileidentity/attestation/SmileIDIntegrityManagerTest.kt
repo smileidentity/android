@@ -254,14 +254,18 @@ class SmileIDStandardRequestIntegrityManagerTest {
 }
 
 // Test doubles
-interface SmileIDIntegrityManagerFactory {
-    fun create(): StandardIntegrityManager
-}
-
 class FakeSmileIDIntegrityManagerFactory(
     private val prepareTask: Task<StandardIntegrityTokenProvider>,
 ) : SmileIDIntegrityManagerFactory {
-    override fun create(): StandardIntegrityManager = StandardIntegrityManager { prepareTask }
+    override fun create(): StandardIntegrityManager = object : StandardIntegrityManager {
+        override fun prepareIntegrityToken(
+            request: StandardIntegrityManager.PrepareIntegrityTokenRequest,
+        ): Task<StandardIntegrityTokenProvider> = prepareTask
+
+        override fun showDialog(
+            standardIntegrityDialogRequest: StandardIntegrityManager.StandardIntegrityDialogRequest,
+        ): Task<Int> = Tasks.forResult(0)
+    }
 }
 
 class FakeStandardIntegrityTokenProvider(private val requestTask: Task<StandardIntegrityToken>) :
