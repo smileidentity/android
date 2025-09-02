@@ -30,11 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout android
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: android
       - name: Checkout docs
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: smileidentity/docs
           path: docs
