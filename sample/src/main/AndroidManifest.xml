@@ -12,8 +12,6 @@
     <!-- Optional for partners: for fraud prevention purposes -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <uses-sdk tools:overrideLibrary="com.google.android.play.core.integrity.client" />
-
     <application
         android:name=".SmileIDApplication"
         android:icon="@mipmap/ic_launcher"
