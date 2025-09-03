@@ -176,7 +176,11 @@ class BiometricKycViewModel(
             metadata.add(Metadatum.NetworkRetries(networkRetries))
 
             val prepUploadResponse = runCatching {
-                SmileID.api.prepUpload(prepUploadRequest)
+                SmileID.api.prepUpload(
+                    headers =
+                    authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
+                    request = prepUploadRequest,
+                )
             }.recoverCatching { throwable ->
                 when {
                     throwable is HttpException -> {
@@ -187,7 +191,10 @@ class BiometricKycViewModel(
                                 it.name == "network_retries"
                             }
                             SmileID.api.prepUpload(
-                                prepUploadRequest.copy(
+                                headers =
+                                authResponse.policy?.let { mapOf("Policy" to it.toString()) }
+                                    ?: emptyMap(),
+                                request = prepUploadRequest.copy(
                                     retry = true,
                                     metadata = metadata,
                                 ),
