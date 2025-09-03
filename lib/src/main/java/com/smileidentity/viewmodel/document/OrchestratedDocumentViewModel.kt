@@ -206,7 +206,8 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
 
             val prepUploadResponse = runCatching {
                 SmileID.api.prepUpload(
-                    headers = mapOf("Policy" to authResponse.policy.toString()),
+                    headers =
+                    authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
                     request = prepUploadRequest,
                 )
             }.recoverCatching { throwable ->
@@ -219,7 +220,9 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
                                 it.name == "network_retries"
                             }
                             SmileID.api.prepUpload(
-                                headers = mapOf("Policy" to authResponse.policy.toString()),
+                                headers =
+                                authResponse.policy?.let { mapOf("Policy" to it.toString()) }
+                                    ?: emptyMap(),
                                 request = prepUploadRequest.copy(
                                     retry = true,
                                     metadata = metadata,
