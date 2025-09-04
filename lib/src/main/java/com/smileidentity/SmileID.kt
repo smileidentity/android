@@ -155,7 +155,25 @@ object SmileID {
         // Warm up Integrity Token Provider
         integrityManager = SmileIDStandardRequestIntegrityManager(context)
         scope.launch {
-            integrityManager.warmUpTokenProvider()
+            integrityManager.warmUpTokenProvider().fold(
+                onSuccess = {
+                    Timber.d("Integrity token provider is ready")
+                },
+                onFailure = { throwable ->
+                    Timber.w(throwable, "Error warming up Integrity token provider")
+                    SmileIDCrashReporting.scopes.addBreadcrumb(
+                        Breadcrumb().apply {
+                            setData(
+                                "error", throwable,
+                            )
+                            category = "Integrity Warmup"
+                            message =
+                                "Error warming up Integrity token provider"
+                            level = SentryLevel.WARNING
+                        },
+                    )
+                },
+            )
         }
 
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
@@ -399,7 +417,7 @@ object SmileID {
         val prepUploadResponse = runCatching {
             api.prepUpload(
                 headers =
-                authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
+                    authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
                 request = prepUploadRequest,
             )
         }.recoverCatching { throwable ->
@@ -409,8 +427,8 @@ object SmileID {
                     if (smileIDException.details.code == "2215") {
                         api.prepUpload(
                             headers =
-                            authResponse.policy?.let { mapOf("Policy" to it.toString()) }
-                                ?: emptyMap(),
+                                authResponse.policy?.let { mapOf("Policy" to it.toString()) }
+                                    ?: emptyMap(),
                             request = prepUploadRequest.copy(retry = true),
                         )
                     } else {
