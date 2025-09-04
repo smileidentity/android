@@ -160,7 +160,6 @@ object SmileID {
                     Timber.d("Integrity token provider is ready")
                 },
                 onFailure = { throwable ->
-                    Timber.w(throwable, "Error warming up Integrity token provider")
                     SmileIDCrashReporting.scopes.addBreadcrumb(
                         Breadcrumb().apply {
                             setData(
@@ -170,9 +169,10 @@ object SmileID {
                             message =
                                 "Error warming up Integrity token provider"
                             level = SentryLevel.WARNING
-                        },
+                        }
                     )
-                },
+                    Timber.w(throwable, "Error warming up Integrity token provider")
+                }
             )
         }
 
