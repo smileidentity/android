@@ -155,7 +155,26 @@ object SmileID {
         // Warm up Integrity Token Provider
         integrityManager = SmileIDStandardRequestIntegrityManager(context)
         scope.launch {
-            integrityManager.warmUpTokenProvider()
+            integrityManager.warmUpTokenProvider().fold(
+                onSuccess = {
+                    Timber.d("Integrity token provider is ready")
+                },
+                onFailure = { throwable ->
+                    SmileIDCrashReporting.scopes.addBreadcrumb(
+                        Breadcrumb().apply {
+                            setData(
+                                "error",
+                                throwable,
+                            )
+                            category = "Integrity Warmup"
+                            message =
+                                "Error warming up Integrity token provider"
+                            level = SentryLevel.WARNING
+                        },
+                    )
+                    Timber.w(throwable, "Error warming up Integrity token provider")
+                },
+            )
         }
 
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
