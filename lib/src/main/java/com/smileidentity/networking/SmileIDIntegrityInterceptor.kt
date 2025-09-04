@@ -34,12 +34,13 @@ class SmileIDIntegrityInterceptor : Interceptor {
                         Breadcrumb().apply {
                             category = "Integrity Token Request"
                             setData(
-                                "macHeader", macHeader,
+                                "macHeader",
+                                macHeader,
                             )
                             setData("error", it)
                             message = "Failed to request integrity token"
                             level = SentryLevel.WARNING
-                        }
+                        },
                     )
                 }
             } catch (e: Exception) {

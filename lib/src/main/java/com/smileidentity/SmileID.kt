@@ -163,16 +163,17 @@ object SmileID {
                     SmileIDCrashReporting.scopes.addBreadcrumb(
                         Breadcrumb().apply {
                             setData(
-                                "error", throwable,
+                                "error",
+                                throwable,
                             )
                             category = "Integrity Warmup"
                             message =
                                 "Error warming up Integrity token provider"
                             level = SentryLevel.WARNING
-                        }
+                        },
                     )
                     Timber.w(throwable, "Error warming up Integrity token provider")
-                }
+                },
             )
         }
 
@@ -417,7 +418,7 @@ object SmileID {
         val prepUploadResponse = runCatching {
             api.prepUpload(
                 headers =
-                    authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
+                authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
                 request = prepUploadRequest,
             )
         }.recoverCatching { throwable ->
@@ -427,8 +428,8 @@ object SmileID {
                     if (smileIDException.details.code == "2215") {
                         api.prepUpload(
                             headers =
-                                authResponse.policy?.let { mapOf("Policy" to it.toString()) }
-                                    ?: emptyMap(),
+                            authResponse.policy?.let { mapOf("Policy" to it.toString()) }
+                                ?: emptyMap(),
                             request = prepUploadRequest.copy(retry = true),
                         )
                     } else {
