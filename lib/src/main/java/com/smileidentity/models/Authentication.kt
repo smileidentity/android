@@ -61,6 +61,7 @@ data class AuthenticationResponse(
     @Json(name = "success") val success: Boolean,
     @Json(name = "signature") val signature: String,
     @Json(name = "timestamp") val timestamp: String,
+    @Json(name = "policy") val policy: Int? = null,
     @Json(name = "partner_params") val partnerParams: PartnerParams,
     @Json(name = "callback_url") val callbackUrl: String? = SmileID.callbackUrl,
     @Json(name = "consent_info") val consentInfo: ConsentInfo? = null,

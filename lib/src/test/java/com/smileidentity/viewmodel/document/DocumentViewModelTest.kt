@@ -135,7 +135,7 @@ class DocumentViewModelTest {
             partnerParams = PartnerParams(jobType = JobType.DocumentVerification),
         )
 
-        coEvery { SmileID.api.prepUpload(any()) } returns PrepUploadResponse(
+        coEvery { SmileID.api.prepUpload(any(), any()) } returns PrepUploadResponse(
             code = "0",
             refId = "refId",
             uploadUrl = "uploadUrl",
@@ -183,7 +183,7 @@ class DocumentViewModelTest {
             partnerParams = PartnerParams(jobType = JobType.DocumentVerification),
         )
 
-        coEvery { SmileID.api.prepUpload(any()) } returns PrepUploadResponse(
+        coEvery { SmileID.api.prepUpload(any(), any()) } returns PrepUploadResponse(
             code = "0",
             refId = "refId",
             uploadUrl = "uploadUrl",

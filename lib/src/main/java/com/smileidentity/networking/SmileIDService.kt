@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.channelFlow
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HeaderMap
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -65,7 +66,10 @@ interface SmileIDService {
     @SmileIDSecurity
     @SmileIDIntegrityHeader
     @POST("/v1/upload")
-    suspend fun prepUpload(@Body request: PrepUploadRequest): PrepUploadResponse
+    suspend fun prepUpload(
+        @HeaderMap headers: Map<String, String>,
+        @Body request: PrepUploadRequest,
+    ): PrepUploadResponse
 
     /**
      * Uploads files to S3. The URL should be the one returned by [prepUpload]. The files will be

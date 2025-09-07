@@ -211,6 +211,7 @@ class SmileIDTest {
         val authResponse = mockk<AuthenticationResponse> {
             every { signature } returns "signature"
             every { timestamp } returns "timestamp"
+            every { policy } returns 1
         }
         val prepUploadResponse = mockk<PrepUploadResponse> {
             every { uploadUrl } returns "uploadUrl"
@@ -243,7 +244,7 @@ class SmileIDTest {
         } returns prepUploadRequest
 
         coEvery { api.authenticate(any()) } returns authResponse
-        coEvery { api.prepUpload(any()) } returns prepUploadResponse
+        coEvery { api.prepUpload(any(), any()) } returns prepUploadResponse
         coEvery { api.upload(any(), any()) } just Runs
 
         // Execute
@@ -255,7 +256,7 @@ class SmileIDTest {
 
         // Verify calls to ensure the API was interacted with as expected
         coVerify { api.authenticate(any()) }
-        coVerify { api.prepUpload(any()) }
+        coVerify { api.prepUpload(any(), any()) }
         coVerify { api.upload(any(), any()) }
     }
 
