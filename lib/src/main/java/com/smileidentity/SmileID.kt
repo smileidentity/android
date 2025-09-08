@@ -395,7 +395,7 @@ object SmileID {
         val prepUploadResponse = runCatching {
             api.prepUpload(
                 headers =
-                    authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
+                authResponse.policy?.let { mapOf("Policy" to it.toString()) } ?: emptyMap(),
                 request = prepUploadRequest,
             )
         }.recoverCatching { throwable ->
@@ -405,8 +405,8 @@ object SmileID {
                     if (smileIDException.details.code == "2215") {
                         api.prepUpload(
                             headers =
-                                authResponse.policy?.let { mapOf("Policy" to it.toString()) }
-                                    ?: emptyMap(),
+                            authResponse.policy?.let { mapOf("Policy" to it.toString()) }
+                                ?: emptyMap(),
                             request = prepUploadRequest.copy(retry = true),
                         )
                     } else {
@@ -635,11 +635,13 @@ object SmileID {
                     Timber.d("Integrity token provider is ready")
                 },
                 onFailure = { throwable ->
-                    SmileIDCrashReporting.scopes.captureMessage("SmileIDIntegrity Warmup Failed") { scope ->
+                    SmileIDCrashReporting.scopes.captureMessage(
+                        "SmileIDIntegrity Warmup Failed",
+                    ) { scope ->
                         scope.level = SentryLevel.ERROR
                         scope.setExtra("error", throwable.toString())
                     }
-                }
+                },
             )
         }
     }

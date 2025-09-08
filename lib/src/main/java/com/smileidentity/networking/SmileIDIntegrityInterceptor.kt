@@ -2,7 +2,6 @@ package com.smileidentity.networking
 
 import com.smileidentity.SmileID
 import com.smileidentity.SmileIDCrashReporting
-import io.sentry.Breadcrumb
 import io.sentry.SentryLevel
 import java.io.IOException
 import kotlinx.coroutines.runBlocking
@@ -29,7 +28,9 @@ class SmileIDIntegrityInterceptor : Interceptor {
                 ).onSuccess {
                     token = it
                 }.onFailure {
-                    SmileIDCrashReporting.scopes.captureMessage("SmileIDIntegrity Token Request Failed") { scope ->
+                    SmileIDCrashReporting.scopes.captureMessage(
+                        "SmileIDIntegrity Token Request Failed",
+                    ) { scope ->
                         scope.level = SentryLevel.ERROR
                         scope.setExtra("macHeader", macHeader)
                         scope.setExtra("error", it.toString())

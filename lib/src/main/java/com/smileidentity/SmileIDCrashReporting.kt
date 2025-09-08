@@ -171,7 +171,6 @@ object SmileIDCrashReporting {
         return false
     }
 
-
     /**
      * Determine whether the event was caused by an IDE. This is done heuristically by checking the
      * JVM runtime tag (which is likely "JetBrains s.r.o. 17.0.6", but it is possible for the
