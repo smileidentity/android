@@ -37,6 +37,7 @@ private const val TAG_SDK_VERSION = "sdk_version"
  */
 object SmileIDCrashReporting {
     private const val SMILE_ID_PACKAGE_PREFIX = "com.smileidentity"
+    private const val SMILE_ID_INTEGRITY_PREFIX = "SmileIDIntegrity"
     internal var scopes: IScopes = NoOpScopes.getInstance()
 
     @JvmStatic
@@ -51,6 +52,10 @@ object SmileIDCrashReporting {
                         // Ignore crashes from IDEs (possible if the SDK is initialized in a Jetpack
                         // Compose preview)
                         return@BeforeSendCallback null
+                    }
+                    // Always allow integrity messages
+                    if (isSmileIDIntegrityMessage(event)) {
+                        return@BeforeSendCallback event
                     }
                     // Only report crashes from the SmileID SDK
                     if (isCausedBySmileID(event.throwable)) {
@@ -145,6 +150,27 @@ object SmileIDCrashReporting {
         // recursive base case will be reached and false will be returned.
         return isCausedBySmileID(throwable.cause)
     }
+
+    /**
+     * Checks whether the provided event is a SmileIDIntegrity log message.
+     * This is done by checking if the event message starts with the given prefix.
+     *
+     * @param event The SentryEvent to check.
+     * @return true if the event message has the SmileIDIntegrity prefix, false otherwise.
+     */
+    private fun isSmileIDIntegrityMessage(event: SentryEvent?): Boolean {
+        if (event == null) return false
+
+        val message = event.message?.formatted ?: return false
+
+        if (message.startsWith(SMILE_ID_INTEGRITY_PREFIX)) {
+            Timber.d("Sentry message starts with Smile ID integrity prefix")
+            return true
+        }
+
+        return false
+    }
+
 
     /**
      * Determine whether the event was caused by an IDE. This is done heuristically by checking the

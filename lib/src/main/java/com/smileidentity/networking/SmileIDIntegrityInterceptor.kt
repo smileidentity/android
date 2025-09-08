@@ -29,19 +29,11 @@ class SmileIDIntegrityInterceptor : Interceptor {
                 ).onSuccess {
                     token = it
                 }.onFailure {
-                    Timber.w(it, "Failed to request integrity token")
-                    SmileIDCrashReporting.scopes.addBreadcrumb(
-                        Breadcrumb().apply {
-                            category = "Integrity Token Request"
-                            setData(
-                                "macHeader",
-                                macHeader,
-                            )
-                            setData("error", it)
-                            message = "Failed to request integrity token"
-                            level = SentryLevel.WARNING
-                        },
-                    )
+                    SmileIDCrashReporting.scopes.captureMessage("SmileIDIntegrity Token Request Failed") { scope ->
+                        scope.level = SentryLevel.ERROR
+                        scope.setExtra("macHeader", macHeader)
+                        scope.setExtra("error", it.toString())
+                    }
                 }
             } catch (e: Exception) {
                 // https://stackoverflow.com/a/58711127/3831060

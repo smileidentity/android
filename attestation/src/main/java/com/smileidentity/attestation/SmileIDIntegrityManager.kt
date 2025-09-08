@@ -64,7 +64,7 @@ class SmileIDStandardRequestIntegrityManager(context: Context) : SmileIDIntegrit
     private suspend fun request(requestHash: String): Result<String> = runCatching {
         val provider = integrityTokenProvider
             ?: throw IllegalStateException(
-                "Integrity token provider is not initialized. " +
+                "SmileIDIntegrity token provider is not initialized. " +
                     "Call warmUpTokenProvider() first.",
             )
 
