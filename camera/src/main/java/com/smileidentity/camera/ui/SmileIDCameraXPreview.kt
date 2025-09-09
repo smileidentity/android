@@ -101,9 +101,9 @@ fun SmileIDCameraXPreview(
 
     if (isCameraIdle) {
         latestBitmap?.let {
-            when (camSelector.selector.lensFacing) {
-                CameraSelector.LENS_FACING_FRONT -> onSwitchToFront(it)
-                CameraSelector.LENS_FACING_BACK -> onSwitchToBack(it)
+            when (camSelector.selector) {
+                CameraSelector.DEFAULT_FRONT_CAMERA -> onSwitchToFront(it)
+                CameraSelector.DEFAULT_BACK_CAMERA -> onSwitchToBack(it)
                 else -> Unit
             }
             LaunchedEffect(latestBitmap) {
