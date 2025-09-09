@@ -14,13 +14,11 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.annotation.VisibleForTesting
-import androidx.camera.core.CameraEffect
 import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.MeteringPoint
-import androidx.camera.core.TorchState
 import androidx.camera.video.FileDescriptorOutputOptions
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.MediaStoreOutputOptions
@@ -140,22 +138,10 @@ class CameraState(context: Context) {
     val isZoomSupported: Boolean by derivedStateOf { maxZoom != 1F }
 
     /**
-     * Check if focus on tap supported
-     * */
-    var isFocusOnTapSupported: Boolean by mutableStateOf(true)
-
-    /**
      * Check if camera state is initialized or not.
      * */
     var isInitialized: Boolean by mutableStateOf(false)
         internal set
-
-    /**
-     * Verify if camera has flash or not.
-     * */
-    var hasFlashUnit: Boolean by mutableStateOf(
-        controller.cameraInfo?.hasFlashUnit() ?: true,
-    )
 
     /**
      * Capture mode to be added on camera.
@@ -299,39 +285,6 @@ class CameraState(context: Context) {
         }
 
     /**
-     * Get if focus on tap is enabled from cameraX.
-     * */
-    internal var isFocusOnTapEnabled: Boolean
-        get() = controller.isTapToFocusEnabled
-        set(value) {
-            if (value == controller.isTapToFocusEnabled) return
-            controller.isTapToFocusEnabled = value
-        }
-
-    /**
-     * Flash Mode from the camera.
-     * @see FlashMode
-     * */
-    internal var flashMode: FlashMode
-        get() = FlashMode.find(controller.imageCaptureFlashMode)
-        set(value) {
-            if (hasFlashUnit && flashMode != value) {
-                controller.imageCaptureFlashMode = value.mode
-            }
-        }
-
-    /**
-     * Enabled/Disable torch from camera.
-     * */
-    internal var enableTorch: Boolean
-        get() = controller.torchState.value == TorchState.ON
-        set(value) {
-            if (enableTorch != value) {
-                controller.enableTorch(hasFlashUnit && value)
-            }
-        }
-
-    /**
      * Return if video is supported.
      * */
 
@@ -365,7 +318,7 @@ class CameraState(context: Context) {
             }
             controller.setEnabledUseCases(useCases)
         } catch (exception: IllegalStateException) {
-            Timber.e("Use case Image Analysis not supported")
+            Timber.e("Use case Image Analysis not supported $exception")
             controller.setEnabledUseCases(captureMode.value)
         }
     }
@@ -413,7 +366,10 @@ class CameraState(context: Context) {
      * @param onResult Callback called when [ImageCaptureResult] is ready
      * */
     fun takePicture(file: File, onResult: (ImageCaptureResult) -> Unit) {
-        takePicture(ImageCapture.OutputFileOptions.Builder(file).build(), onResult)
+        takePicture(
+            outputFileOptions = ImageCapture.OutputFileOptions.Builder(file).build(),
+            onResult = onResult,
+        )
     }
 
     /**
@@ -665,28 +621,9 @@ class CameraState(context: Context) {
     }
 
     private fun resetCamera() {
-        hasFlashUnit = controller.cameraInfo?.hasFlashUnit() ?: false
         isImageAnalysisSupported = isImageAnalysisSupported(camSelector)
         startZoom()
         startExposure()
-    }
-
-    /**
-     *  Set effects on camera
-     * */
-    fun setEffects(effects: Set<CameraEffect>) {
-        controller.setEffects(effects)
-    }
-
-    /**
-     *  Set effects on camera
-     * */
-    fun clearEffects() {
-        controller.clearEffects()
-    }
-
-    private fun Set<Int>.sumOr(initial: Int = 0): Int = fold(initial) { acc, current ->
-        acc or current
     }
 
     @SuppressLint("RestrictedApi")
@@ -707,12 +644,8 @@ class CameraState(context: Context) {
         isImageAnalysisEnabled: Boolean,
         imageAnalyzer: ImageAnalyzer?,
         implementationMode: ImplementationMode,
-        isFocusOnTapEnabled: Boolean,
-        flashMode: FlashMode,
         zoomRatio: Float,
         imageCaptureMode: ImageCaptureMode,
-        enableTorch: Boolean,
-        meteringPoint: MeteringPoint,
         exposureCompensation: Int,
         videoQualitySelector: QualitySelector,
     ) {
@@ -723,10 +656,6 @@ class CameraState(context: Context) {
         this.isImageAnalysisEnabled = isImageAnalysisEnabled
         this.imageAnalyzer = imageAnalyzer?.analyzer
         this.implementationMode = implementationMode
-        this.isFocusOnTapEnabled = isFocusOnTapEnabled
-        this.flashMode = flashMode
-        this.enableTorch = enableTorch
-        this.isFocusOnTapSupported = meteringPoint.isFocusMeteringSupported
         this.imageCaptureMode = imageCaptureMode
         this.videoQualitySelector = videoQualitySelector
         setExposureCompensation(exposureCompensation)
@@ -734,7 +663,6 @@ class CameraState(context: Context) {
     }
 
     private companion object {
-        private val TAG = this::class.java.name
         private const val INITIAL_ZOOM_VALUE = 1F
         private const val INITIAL_EXPOSURE_VALUE = 0
     }
