@@ -13,8 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smileidentity.camera.viewmodel.CameraPreviewViewModel
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
@@ -24,7 +22,6 @@ import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.design.colors.SmileIDColor
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
-import com.smileidentity.ui.utils.viewModelFactory
 import java.io.File
 
 @OptIn(ExperimentalCamera2Interop::class)
@@ -45,11 +42,6 @@ fun SmileIDCaptureScreen(
     onResult: (File) -> Unit,
 ) {
     SmileIDCameraPreview(
-        viewModel = viewModel(
-            factory = viewModelFactory {
-                CameraPreviewViewModel()
-            },
-        ),
         modifier = modifier,
     ) {
         /**

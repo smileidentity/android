@@ -43,4 +43,10 @@ dependencies {
 
     // cameraX setup
     api(libs.bundles.camerax)
+
+    androidTestImplementation(composeBom)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.bundles.androidx.compose.ui.test)
 }
