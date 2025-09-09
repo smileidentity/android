@@ -4,6 +4,9 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import com.smileidentity.camera.helper.CameraHelper
 
+/**
+ * Check if image analysis is supported by camera hardware level.
+ * */
 internal fun CameraManager.isImageAnalysisSupported(lensFacing: Int?): Boolean {
     val cameraId = cameraIdList.firstOrNull {
         getCameraCharacteristics(it).get(CameraCharacteristics.LENS_FACING) == lensFacing

@@ -230,7 +230,7 @@ class CameraState(context: Context) {
      * */
     var isImageAnalysisSupported: Boolean by mutableStateOf(
         isImageAnalysisSupported(
-            camSelector,
+            cameraSelector = camSelector,
         ),
     )
         private set
@@ -630,7 +630,7 @@ class CameraState(context: Context) {
     @VisibleForTesting
     internal fun isImageAnalysisSupported(cameraSelector: CamSelector = camSelector): Boolean =
         cameraManager?.isImageAnalysisSupported(
-            cameraSelector.selector.lensFacing,
+            lensFacing = cameraSelector.selector.lensFacing,
         ) ?: false
 
     /**
