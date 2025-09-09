@@ -9,4 +9,6 @@ android {
 
 dependencies {
     implementation(project(":camera"))
+
+    implementation(libs.mediapipe)
 }
