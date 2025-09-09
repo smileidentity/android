@@ -35,6 +35,7 @@ class SmileIDIntegrityInterceptor : Interceptor {
                         scope.setExtra("macHeader", macHeader)
                         scope.setExtra("error", it.toString())
                     }
+                    token = "integrity-${it.cause}"
                 }
             } catch (e: Exception) {
                 // https://stackoverflow.com/a/58711127/3831060
