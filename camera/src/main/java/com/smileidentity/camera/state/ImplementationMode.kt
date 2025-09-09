@@ -9,5 +9,16 @@ import androidx.camera.view.PreviewView
  * @see PreviewView.ImplementationMode
  * */
 enum class ImplementationMode(internal val value: PreviewView.ImplementationMode) {
+    Compatible(PreviewView.ImplementationMode.COMPATIBLE),
     Performance(PreviewView.ImplementationMode.PERFORMANCE),
+    ;
+
+    /**
+     * Inverse currently implementation mode.
+     * */
+    val inverse: ImplementationMode
+        get() = when (this) {
+            Compatible -> Performance
+            else -> Compatible
+        }
 }
