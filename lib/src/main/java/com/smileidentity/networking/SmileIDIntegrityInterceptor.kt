@@ -33,9 +33,9 @@ class SmileIDIntegrityInterceptor : Interceptor {
                     ) { scope ->
                         scope.level = SentryLevel.ERROR
                         scope.setExtra("macHeader", macHeader)
-                        scope.setExtra("error", it.toString())
+                        scope.setExtra("error", "ERR_$it")
                     }
-                    token = it.toString()
+                    token = "ERR_$it"
                 }
             } catch (e: Exception) {
                 // https://stackoverflow.com/a/58711127/3831060
