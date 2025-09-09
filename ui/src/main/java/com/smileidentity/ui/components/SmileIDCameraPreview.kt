@@ -12,23 +12,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.smileidentity.camera.ui.CameraPreview
-import com.smileidentity.camera.viewmodel.CameraPreviewViewModel
 import com.smileidentity.ui.utils.ForceMaxBrightness
 
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
-fun SmileIDCameraPreview(
-    viewModel: CameraPreviewViewModel,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
+fun SmileIDCameraPreview(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val viewfinderZoom = 1.1f
     val isInPreview = LocalInspectionMode.current
 
@@ -57,16 +50,7 @@ fun SmileIDCameraPreview(
                 content()
             }
         } else {
-            CameraPreview(
-                viewModel = viewModel,
-                modifier = Modifier
-                    .testTag("smile_camera_preview")
-                    .fillMaxSize()
-                    .clipToBounds()
-                    // Scales the *preview* WITHOUT changing the zoom ratio, to allow capture of
-                    // "out of bounds" content as a fraud prevention technique
-                    .scale(viewfinderZoom),
-            )
+            // replace camera implementation here
         }
     }
 }

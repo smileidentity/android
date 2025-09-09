@@ -158,7 +158,7 @@ class SmileIDStandardRequestIntegrityManagerTest {
             exception is IllegalStateException,
         )
         assertEquals(
-            "Integrity token provider is not initialized. Call warmUpTokenProvider() first.",
+            "SmileIDIntegrity token provider is not initialized. Call warmUpTokenProvider() first.",
             exception?.message,
         )
     }

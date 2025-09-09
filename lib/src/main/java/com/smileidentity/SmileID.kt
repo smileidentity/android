@@ -152,12 +152,6 @@ object SmileID {
         okHttpClient: OkHttpClient = getOkHttpClientBuilder().build(),
     ): Deferred<Result<Unit>> {
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        // Warm up Integrity Token Provider
-        integrityManager = SmileIDStandardRequestIntegrityManager(context)
-        scope.launch {
-            integrityManager.warmUpTokenProvider()
-        }
-
         val isInDebugMode = (context.applicationInfo.flags and FLAG_DEBUGGABLE) != 0
         // Plant a DebugTree if there isn't already one (e.g. when Partner also uses Timber)
         if (isInDebugMode && Timber.forest().none { it is Timber.DebugTree }) {
@@ -170,6 +164,8 @@ object SmileID {
         if (enableCrashReporting) {
             SmileIDCrashReporting.enable(isInDebugMode)
         }
+        // Warm up Integrity Token Provider
+        scope.warmUpTokenProvider(context)
 
         SmileID.useSandbox = useSandbox
         val url = if (useSandbox) config.testLambdaUrl else config.prodLambdaUrl
@@ -626,5 +622,27 @@ object SmileID {
     fun setWrapperInfo(name: WrapperSdkName, version: String) {
         wrapperSdkName = name
         wrapperSdkVersion = version
+    }
+
+    /**
+     * Warm up the Integrity token provider as early as possible, since it can take a few seconds
+     */
+    private fun CoroutineScope.warmUpTokenProvider(context: Context) {
+        integrityManager = SmileIDStandardRequestIntegrityManager(context)
+        this.launch {
+            integrityManager.warmUpTokenProvider().fold(
+                onSuccess = {
+                    Timber.d("Integrity token provider is ready")
+                },
+                onFailure = { throwable ->
+                    SmileIDCrashReporting.scopes.captureMessage(
+                        "SmileIDIntegrity Warmup Failed",
+                    ) { scope ->
+                        scope.level = SentryLevel.ERROR
+                        scope.setExtra("error", throwable.toString())
+                    }
+                },
+            )
+        }
     }
 }
