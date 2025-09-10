@@ -1,5 +1,12 @@
 # Release Notes
 
+# 11.1.1 - September 10, 2025
+
+### Added
+
+* Added Play Integrity checks on the SDK
+* Introduce policy checks to enable/disable SDK features
+
 # 11.1.0 - July 31, 2025
 
 ### Added
