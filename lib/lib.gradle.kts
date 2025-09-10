@@ -124,18 +124,18 @@ mavenPublishing {
                 organizationUrl = "https://usesmileid.com"
             }
             developer {
-                id = "JNdhlovu"
-                name = "Japhet Ndhlovu"
-                email = "japhet@usesmileid.com"
-                url = "https://github.com/jndhlovu"
-                organization = "Smile ID"
-                organizationUrl = "https://usesmileid.com"
-            }
-            developer {
                 id = "jumaallan"
                 name = "Juma Allan"
                 email = "juma@usesmileid.com"
                 url = "https://github.com/jumaallan"
+                organization = "Smile ID"
+                organizationUrl = "https://usesmileid.com"
+            }
+            developer {
+                id = "wangerekaharun"
+                name = "Harun Wangereka"
+                email = "harun@usesmileid.com"
+                url = "https://github.com/wangerekaharun"
                 organization = "Smile ID"
                 organizationUrl = "https://usesmileid.com"
             }

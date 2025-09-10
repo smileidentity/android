@@ -1,14 +1,5 @@
 # Release Notes
 
-## 11.1.2 - September 10, 2025
-
-### Changed
-
-* Fixed broken transitive dependency in `11.1.1` where the internal attestation module was not
-  published, causing resolution failure `Failed to resolve: SmileID:attestation:unspecified` for
-  consumers. The attestation module is now published as `com.smileidentity:android-attestation` and
-  referenced correctly by `android-sdk`.
-
 ## 11.1.1 - September 10, 2025
 
 ### Added
