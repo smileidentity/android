@@ -128,6 +128,8 @@ object SmileID {
     internal var sdkLaunchCount = 0
         private set
 
+    internal var policy: Int? = null
+
     /**
      * Initialize the SDK. This must be called before any other SDK methods.
      *
