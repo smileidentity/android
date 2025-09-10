@@ -19,7 +19,7 @@ plugins {
 val groupId = "com.smileidentity"
 val artifactId = "android-sdk"
 project.version = findProperty("VERSION_NAME") as? String
-    ?: file("VERSION").readText().trim().toString()
+    ?: file("VERSION").readText().trim()
 
 android {
     namespace = groupId
