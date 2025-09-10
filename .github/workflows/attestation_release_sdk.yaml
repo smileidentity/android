@@ -55,19 +55,19 @@ jobs:
           else
               echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
-      - name: Push Tag
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git tag -a "${tag}" -m "${message}"
-          git push origin "${tag}"
-        env:
-          tag: v${{ steps.read_version.outputs.version }}
-          message: Release v${{ steps.read_version.outputs.version }}
+      #      - name: Push Tag
+      #        run: |
+      #          git config user.name "${GITHUB_ACTOR}"
+      #          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      #          git tag -a "${tag}" -m "${message}"
+      #          git push origin "${tag}"
+      #        env:
+      #          tag: v${{ steps.read_version.outputs.version }}
+      #          message: Release v${{ steps.read_version.outputs.version }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Build, Test, Lint, and Publish
-        run: ./gradlew lint build assembleRelease publish
+        run: ./gradlew lint build assembleRelease :attestation:publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.read_version.outputs.version }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -75,40 +75,40 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ARTIFACT_GPG_SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_uploadKeystorePassword: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
-      - name: Archive SDK AAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: SDK AAR
-          path: lib/build/outputs/aar/lib-release.aar
-      - name: Archive Sample App
-        uses: actions/upload-artifact@v4
-        with:
-          name: Sample App APK
-          path: sample/build/outputs/apk/release/sample-release.apk
-      - name: Create GitHub Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.read_version.outputs.version }}
-          name: v${{ steps.read_version.outputs.version }}
-          prerelease: ${{ steps.read_version.outputs.is_prerelease }}
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: lib/build/outputs/aar/lib-release.aar
-          asset_name: com.smileidentity_android-sdk_${{ steps.read_version.outputs.version }}.aar
-          asset_content_type: application/octet-stream
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: sample/build/outputs/apk/release/sample-release.apk
-          asset_name: sample_${{ steps.read_version.outputs.version }}.apk
-          asset_content_type: application/vnd.android.package-archive
+#      - name: Archive SDK AAR
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: SDK AAR
+#          path: lib/build/outputs/aar/lib-release.aar
+#      - name: Archive Sample App
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: Sample App APK
+#          path: sample/build/outputs/apk/release/sample-release.apk
+#      - name: Create GitHub Release
+#        id: create_release
+#        uses: softprops/action-gh-release@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: v${{ steps.read_version.outputs.version }}
+#          name: v${{ steps.read_version.outputs.version }}
+#          prerelease: ${{ steps.read_version.outputs.is_prerelease }}
+#      - name: Upload Release Asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: lib/build/outputs/aar/lib-release.aar
+#          asset_name: com.smileidentity_android-sdk_${{ steps.read_version.outputs.version }}.aar
+#          asset_content_type: application/octet-stream
+#      - name: Upload Release Asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: sample/build/outputs/apk/release/sample-release.apk
+#          asset_name: sample_${{ steps.read_version.outputs.version }}.apk
+#          asset_content_type: application/vnd.android.package-archive
