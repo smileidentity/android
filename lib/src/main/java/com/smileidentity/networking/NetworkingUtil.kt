@@ -7,7 +7,7 @@ import com.smileidentity.models.SecurityInfoRequest
 import com.smileidentity.models.UploadImageInfo
 import com.smileidentity.models.UploadRequest
 import com.smileidentity.security.crypto.SmileIDCryptoManager
-import com.smileidentity.security.util.checkPayloadSigning
+import com.smileidentity.security.util.decodePolicyBitCode
 import com.smileidentity.util.getCurrentIsoTimestamp
 import java.io.BufferedOutputStream
 import java.io.File
@@ -70,8 +70,8 @@ fun UploadRequest.zip(): File {
     val allFiles = imageFiles + infoJsonFile
 
     // Write security_info.json
-    val isPayloadSigningEnabled = SmileID.policy.checkPayloadSigning()
-    if (isPayloadSigningEnabled) {
+    val policy = SmileID.policy.decodePolicyBitCode()
+    if (policy.first().active) {
         zipOutputStream.putNextEntry(ZipEntry("security_info.json"))
         val securityInfo = createSecurityInfo(files = allFiles.sortedBy { it.name })
         val securityJson = moshi.adapter(SecurityInfoRequest::class.java).toJson(securityInfo)
