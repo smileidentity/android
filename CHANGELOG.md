@@ -1,10 +1,29 @@
 # Release Notes
 
-# 11.1.1 - September 10, 2025
+## 11.1.1 - September 10, 2025
 
 ### Added
 
-* Added Play Integrity checks on the SDK
+* Version `11.1.1` introduces Play Integrity checks to the SDK, and it unintentionally introduced a
+  breaking change. When upgrading, you may encounter the error
+  `Failed to resolve: SmileID:attestation:unspecified`. To resolve this, update your dependency
+  configuration by excluding the transitive `attestation` module from
+  `com.smileidentity:android-sdk`and explicitly adding a constraint on
+  `com.smileidentity:android-attestation:11.1.1` as shown below:
+
+```kotlin
+dependencies {
+    implementation("com.smileidentity:android-sdk:11.1.1") {
+        exclude(group = "SmileID", module = "attestation")
+    }
+    constraints {
+        implementation("com.smileidentity:android-attestation:11.1.1") {
+            because("avoids 'Failed to resolve: SmileID:attestation:unspecified'")
+        }
+    }
+}
+```
+
 * Introduce policy checks to enable/disable SDK features
 
 # 11.1.0 - July 31, 2025
