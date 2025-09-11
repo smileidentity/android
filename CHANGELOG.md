@@ -8,7 +8,7 @@
   breaking change. When upgrading, you may encounter the error
   `Failed to resolve: SmileID:attestation:unspecified`. To fix this, update your dependency
   configuration by excluding the transitive `attestation` module from
-  `com.smileidentity:android-sdk`and explicitly adding `com.smileidentity:android-attestation:11.1.1` 
+  `com.smileidentity:android-sdk` and explicitly adding `com.smileidentity:android-attestation:11.1.1` 
    as shown below:
 
 ```kotlin
