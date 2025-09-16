@@ -69,23 +69,20 @@ internal class AttestationMetadata(
                     -2 // equivalent to SECURITY_LEVEL_UNKNOWN
                 }
             }
-
-            try {
-                val securityLevel = if (Build.VERSION.SDK_INT >= 31) {
-                    keyInfo.securityLevel
-                } else {
-                    if (keyInfo.isInsideSecureHardware) {
-                        1 // equivalent to SECURITY_LEVEL_TRUSTED_ENVIRONMENT
-                    } else {
-                        -2 // equivalent to SECURITY_LEVEL_UNKNOWN
-                    }
-                }
-                securityLevel
-            } finally {
-                keyStore.deleteEntry(keyAlias)
-            }
+            securityLevel
         } catch (e: Exception) {
             -2 // equivalent to SECURITY_LEVEL_UNKNOWN
+        } finally {
+            try {
+                val keyAlias = "SmileID_Attestation"
+                val keyStore = KeyStore.getInstance("AndroidKeyStore")
+                keyStore.load(null)
+                if (keyStore.containsAlias(keyAlias)) {
+                    keyStore.deleteEntry(keyAlias)
+                }
+            } catch (e: Exception) {
+                // Ignore cleanup exceptions
+            }
         }
     }
 
