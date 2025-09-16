@@ -52,6 +52,8 @@ enum class MetadataKey(val key: String) {
     Sdk("sdk"),
     SdkVersion("sdk_version"),
     SdkLaunchCount("sdk_launch_count"),
+
+    SupportsHardwareAttestation("supports_hardware_attestation"),
     SystemArchitecture("system_architecture"),
     Timezone("timezone"),
     VPNDetected("vpn"),

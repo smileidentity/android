@@ -291,6 +291,10 @@ open class Metadatum(
     data object SdkVersion : Metadatum(MetadataKey.SdkVersion, BuildConfig.VERSION_NAME)
 
     @Parcelize
+    data class SupportsHardwareAttestation(val supportsHardwareAttestation: Int) :
+        Metadatum(MetadataKey.SupportsHardwareAttestation, supportsHardwareAttestation)
+
+    @Parcelize
     data object SystemArchitecture : Metadatum(MetadataKey.SystemArchitecture, systemArchitecture)
 
     @Parcelize

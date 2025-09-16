@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.smileidentity.metadata.models.Metadatum
+import com.smileidentity.metadata.updaters.AttestationMetadata
 import com.smileidentity.metadata.updaters.BuildInfoMetadata
 import com.smileidentity.metadata.updaters.CameraInfoMetadata
 import com.smileidentity.metadata.updaters.CarrierInfoMetadata
@@ -97,6 +98,9 @@ object LocalMetadataProvider {
                 },
                 { context: Context, metadata: SnapshotStateList<Metadatum> ->
                     BuildInfoMetadata(context, metadata)
+                },
+                { context: Context, metadata: SnapshotStateList<Metadatum> ->
+                    AttestationMetadata(context, metadata)
                 },
             ),
         content: @Composable () -> Unit,
