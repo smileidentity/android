@@ -13,6 +13,7 @@ import com.smileidentity.metadata.updateOrAddBy
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
+import kotlinx.coroutines.launch
 
 /**
  * A manager that updates metadata with attestation information.
@@ -26,8 +27,10 @@ internal class AttestationMetadata(
     private var supportsHardwareAttestation: Int = -2
 
     override fun onStart(owner: LifecycleOwner) {
-        supportsHardwareAttestation = supportsHardwareAttestation()
-        forceUpdate()
+        kotlinx.coroutines.MainScope().launch {
+            supportsHardwareAttestation = supportsHardwareAttestation()
+            forceUpdate()
+        }
     }
 
     private fun supportsHardwareAttestation(): Int {
@@ -40,18 +43,20 @@ internal class AttestationMetadata(
 
             val keyGenParameterSpec = KeyGenParameterSpec.Builder(
                 keyAlias,
-                KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+                KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY,
             )
                 .setDigests(KeyProperties.DIGEST_SHA256)
                 .setUserAuthenticationRequired(false)
                 .build()
             val keyPairGenerator = KeyPairGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore"
+                KeyProperties.KEY_ALGORITHM_RSA,
+                "AndroidKeyStore",
             )
             keyPairGenerator.initialize(keyGenParameterSpec)
             val keyPair = keyPairGenerator.generateKeyPair()
             val keyFactory = KeyFactory.getInstance(
-                keyPair.private.algorithm, "AndroidKeyStore"
+                keyPair.private.algorithm,
+                "AndroidKeyStore",
             )
             val keyInfo = keyFactory.getKeySpec(keyPair.private, KeyInfo::class.java)
 
@@ -59,20 +64,23 @@ internal class AttestationMetadata(
                 keyInfo.securityLevel
             } else {
                 if (keyInfo.isInsideSecureHardware) {
-                    1   // equivalent to SECURITY_LEVEL_TRUSTED_ENVIRONMENT
+                    1 // equivalent to SECURITY_LEVEL_TRUSTED_ENVIRONMENT
                 } else {
-                    -2  // equivalent to SECURITY_LEVEL_UNKNOWN
+                    -2 // equivalent to SECURITY_LEVEL_UNKNOWN
                 }
             }
 
             keyStore.deleteEntry(keyAlias)
             securityLevel
         } catch (e: Exception) {
-            -2  // equivalent to SECURITY_LEVEL_UNKNOWN
+            -2 // equivalent to SECURITY_LEVEL_UNKNOWN
         }
     }
 
     override fun forceUpdate() {
-        metadata.updateOrAddBy(Metadatum.SupportsHardwareAttestation(supportsHardwareAttestation)) { it.name == metadataName }
+        metadata.updateOrAddBy(Metadatum.SupportsHardwareAttestation(supportsHardwareAttestation)) {
+            it.name ==
+                metadataName
+        }
     }
 }
