@@ -47,7 +47,6 @@ smileid-security = "11.1.1"
 litert = "1.4.0"
 litert-metadata = "1.4.0"
 litert-support = "1.4.0"
-rootbeer = "0.1.1"
 timber = "5.0.1"
 truth = "1.4.5"
 uiautomator = "2.3.0"
@@ -128,7 +127,6 @@ litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
 litert-metadata = { group = "com.google.ai.edge.litert", name = "litert-metadata", version.ref = "litert-metadata" }
 litert-support = { group = "com.google.ai.edge.litert", name = "litert-support", version.ref = "litert-support" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-rootbeer = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeer" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

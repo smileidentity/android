@@ -11,7 +11,6 @@ import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
-import com.scottyab.rootbeer.RootBeer
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.SmileID.initialize
 import com.smileidentity.attestation.SmileIDIntegrityManager
@@ -102,9 +101,6 @@ object SmileID {
     internal var allowOfflineMode: Boolean = false
         private set
 
-    var loader: String = ""
-        private set
-
     var callbackUrl: String = ""
         private set
 
@@ -182,9 +178,6 @@ object SmileID {
             .build()
 
         api = retrofit.create(SmileIDService::class.java)
-
-        val rootbeer = RootBeer(context)
-        loader = rootbeer.isRooted.toString()
 
         // Usually looks like: /data/data/0/<package-name>/files/SmileID
         fileSavePath = File("${context.filesDir.absolutePath}/SmileID").absolutePath
