@@ -11,7 +11,6 @@ import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.face.FaceDetection
-import com.scottyab.rootbeer.RootBeer
 import com.serjltt.moshi.adapters.FallbackEnum
 import com.smileidentity.SmileID.initialize
 import com.smileidentity.attestation.SmileIDIntegrityManager
@@ -46,6 +45,7 @@ import com.smileidentity.networking.asDocumentFrontImage
 import com.smileidentity.networking.asLivenessImage
 import com.smileidentity.networking.asSelfieImage
 import com.smileidentity.security.interceptor.SmileSecurityInterceptor
+import com.smileidentity.security.loader.SmileIDLoader
 import com.smileidentity.util.AUTH_REQUEST_FILE
 import com.smileidentity.util.FileType
 import com.smileidentity.util.PREP_UPLOAD_REQUEST_FILE
@@ -183,8 +183,7 @@ object SmileID {
 
         api = retrofit.create(SmileIDService::class.java)
 
-        val rootbeer = RootBeer(context)
-        loader = rootbeer.isRooted.toString()
+        loader = SmileIDLoader.shared.loader(context = context)
 
         // Usually looks like: /data/data/0/<package-name>/files/SmileID
         fileSavePath = File("${context.filesDir.absolutePath}/SmileID").absolutePath

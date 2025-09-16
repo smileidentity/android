@@ -174,8 +174,6 @@ dependencies {
     // Logging
     implementation(libs.timber)
 
-    implementation(libs.rootbeer)
-
     // Sentry (crash reporting, tracing, breadcrumbs)
     implementation(platform(libs.sentry.bom))
     implementation(libs.sentry)
