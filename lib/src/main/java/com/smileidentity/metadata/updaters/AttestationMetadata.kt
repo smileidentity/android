@@ -70,8 +70,20 @@ internal class AttestationMetadata(
                 }
             }
 
-            keyStore.deleteEntry(keyAlias)
-            securityLevel
+            try {
+                val securityLevel = if (Build.VERSION.SDK_INT >= 31) {
+                    keyInfo.securityLevel
+                } else {
+                    if (keyInfo.isInsideSecureHardware) {
+                        1 // equivalent to SECURITY_LEVEL_TRUSTED_ENVIRONMENT
+                    } else {
+                        -2 // equivalent to SECURITY_LEVEL_UNKNOWN
+                    }
+                }
+                securityLevel
+            } finally {
+                keyStore.deleteEntry(keyAlias)
+            }
         } catch (e: Exception) {
             -2 // equivalent to SECURITY_LEVEL_UNKNOWN
         }
