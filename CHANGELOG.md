@@ -1,5 +1,15 @@
 # Release Notes
 
+## Unreleased
+
+### Changed
+
+* Moving the attestation logic back to the library module for now. Since each module must be
+  published, keeping it in the library avoids that overhead. We published the attestation module to
+  Maven Central for v11.1.1 only to resolve the Failed to resolve: SmileID:attestation:unspecified
+  error. We’ll revisit this approach when we’re ready to publish a fully modularized version of the
+  SDK.
+
 ## 11.1.1 - September 10, 2025
 
 ### Added
@@ -8,8 +18,9 @@
   breaking change. When upgrading, you may encounter the error
   `Failed to resolve: SmileID:attestation:unspecified`. To fix this, update your dependency
   configuration by excluding the transitive `attestation` module from
-  `com.smileidentity:android-sdk` and explicitly adding `com.smileidentity:android-attestation:11.1.1` 
-   as shown below:
+  `com.smileidentity:android-sdk` and explicitly adding
+  `com.smileidentity:android-attestation:11.1.1`
+  as shown below:
 
 ```kotlin
 dependencies {
@@ -22,7 +33,7 @@ dependencies {
 
 * Introduce policy checks to enable/disable SDK features
 
-# 11.1.0 - July 31, 2025
+## 11.1.0 - July 31, 2025
 
 ### Added
 
