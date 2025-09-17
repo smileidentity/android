@@ -144,7 +144,6 @@ mavenPublishing {
 }
 
 dependencies {
-    implementation(projects.attestation)
     // OkHttp is exposed in public SmileID interface (initialize), hence "api" vs "implementation"
     api(libs.okhttp)
     implementation(libs.retrofit)
@@ -224,6 +223,8 @@ dependencies {
     implementation(libs.litert)
     implementation(libs.litert.metadata)
     implementation(libs.litert.support)
+    // Play Integrity
+    implementation(libs.play.integrity)
 
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
