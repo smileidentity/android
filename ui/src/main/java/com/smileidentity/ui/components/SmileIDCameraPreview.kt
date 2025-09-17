@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.smileidentity.camera.ui.SmileIDCameraXPreview
 import com.smileidentity.ui.utils.ForceMaxBrightness
 
 @OptIn(ExperimentalCamera2Interop::class)
@@ -50,7 +51,9 @@ fun SmileIDCameraPreview(modifier: Modifier = Modifier, content: @Composable () 
                 content()
             }
         } else {
-            // replace camera implementation here
+            SmileIDCameraXPreview {
+                content()
+            }
         }
     }
 }

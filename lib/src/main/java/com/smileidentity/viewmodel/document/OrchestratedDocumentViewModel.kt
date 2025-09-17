@@ -193,6 +193,7 @@ internal abstract class OrchestratedDocumentViewModel<T : Parcelable>(
             }
 
             val authResponse = SmileID.api.authenticate(authRequest)
+            SmileID.policy = authResponse.policy
 
             metadata.add(Metadatum.NetworkRetries(networkRetries))
 

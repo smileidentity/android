@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId = "com.smileidentity.sample"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = findProperty("VERSION_CODE")?.toString()?.toInt() ?: 1
         // Include the SDK version in the app version name
