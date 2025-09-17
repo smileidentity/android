@@ -1,11 +1,14 @@
 package com.smileidentity.ml.detectors
 
+import android.graphics.Bitmap
 import android.graphics.Rect
+import com.google.mediapipe.tasks.vision.facedetector.FaceDetectorResult
+import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetectorResult
 
 /**
  * Input from CameraAdapter, note: the bitmap should already be encoded in RGB value
  */
-data class AnalyzerInput(val viewFinderBounds: Rect)
+data class AnalyzerInput(val viewFinderBounds: Rect, val image: Bitmap)
 
 /**
  * Result bounding box coordinates of DocumentDetector/FaceDetector,
@@ -21,15 +24,9 @@ sealed interface AnalyzerOutput
 /**
  * Output of DocumentDetector
  */
-data class DocumentDetectorOutput(
-    val boundingBox: BoundingBox,
-    val resultScore: Float,
-    val allScores: List<Float>,
-    val blurScore: Float,
-) : AnalyzerOutput
+data class DocumentDetectorOutput(val result: ObjectDetectorResult) : AnalyzerOutput
 
 /**
  * Output of FaceDetector
  */
-data class FaceDetectorOutput(val boundingBox: BoundingBox, val resultScore: Float) :
-    AnalyzerOutput
+data class FaceDetectorOutput(val result: FaceDetectorResult) : AnalyzerOutput
