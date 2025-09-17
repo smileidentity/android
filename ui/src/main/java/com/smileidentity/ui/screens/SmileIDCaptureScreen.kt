@@ -59,8 +59,7 @@ fun SmileIDCaptureScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(color = SmileIDTheme.colors[SmileIDColor.background]),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
         ) {
