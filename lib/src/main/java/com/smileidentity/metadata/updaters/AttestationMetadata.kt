@@ -7,9 +7,11 @@ import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updateOrAddBy
+import kotlinx.coroutines.Dispatchers
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
@@ -27,7 +29,7 @@ internal class AttestationMetadata(
     private var supportsHardwareAttestation: Int = -2
 
     override fun onStart(owner: LifecycleOwner) {
-        kotlinx.coroutines.MainScope().launch {
+        owner.lifecycleScope.launch(Dispatchers.IO) {
             supportsHardwareAttestation = supportsHardwareAttestation()
             forceUpdate()
         }
