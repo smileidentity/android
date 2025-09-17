@@ -11,10 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import com.smileidentity.metadata.models.MetadataKey
 import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.updateOrAddBy
-import kotlinx.coroutines.Dispatchers
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
