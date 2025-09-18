@@ -66,7 +66,9 @@ fun SmileIDCaptureScreen(
     SmileIDCameraPreview(
         modifier = modifier,
         imageAnalyzer = cameraState.rememberImageAnalyzer(
-            analyze = { viewModel::analyze },
+            analyze = { imageProxy ->
+                viewModel.analyze(imageProxy = imageProxy)
+            },
             imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
         ),
     ) {
