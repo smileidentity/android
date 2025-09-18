@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 11.1.2 - September 18, 2025
 
 ### Changed
 
@@ -9,6 +9,7 @@
   Maven Central for v11.1.1 only to resolve the Failed to resolve: SmileID:attestation:unspecified
   error. We’ll revisit this approach when we’re ready to publish a fully modularized version of the
   SDK.
+* Updated the security SDK and collecting more metadata
 
 ## 11.1.1 - September 10, 2025
 
