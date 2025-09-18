@@ -123,7 +123,7 @@ internal class AttestationMetadata(
                 cert.encoded,
                 Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
             )
-        }
+        } ?: emptyList()
     } catch (e: Exception) {
         emptyList()
     }
