@@ -17,12 +17,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.smileidentity.camera.state.CamSelector
+import com.smileidentity.camera.state.ImageAnalyzer
+import com.smileidentity.camera.state.ImplementationMode
 import com.smileidentity.camera.ui.SmileIDCameraXPreview
 import com.smileidentity.ui.utils.ForceMaxBrightness
 
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
-fun SmileIDCameraPreview(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun SmileIDCameraPreview(
+    modifier: Modifier = Modifier,
+    imageAnalyzer: ImageAnalyzer? = null,
+    content: @Composable () -> Unit,
+) {
     val viewfinderZoom = 1.1f
     val isInPreview = LocalInspectionMode.current
 
@@ -51,7 +58,12 @@ fun SmileIDCameraPreview(modifier: Modifier = Modifier, content: @Composable () 
                 content()
             }
         } else {
-            SmileIDCameraXPreview {
+            SmileIDCameraXPreview(
+                imageAnalyzer = imageAnalyzer,
+                camSelector = CamSelector.Back,
+                implementationMode = ImplementationMode.Performance,
+                isImageAnalysisEnabled = true,
+            ) {
                 content()
             }
         }

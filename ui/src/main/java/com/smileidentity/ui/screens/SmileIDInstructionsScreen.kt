@@ -58,6 +58,7 @@ fun SmileIDInstructionsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(6.dp)
             .background(color = SmileIDTheme.colors[SmileIDColor.background]),
     ) {
         Row(
