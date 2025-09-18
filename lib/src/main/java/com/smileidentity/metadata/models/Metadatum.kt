@@ -109,6 +109,11 @@ open class Metadatum(
     @Parcelize
     data object ActiveLivenessVersion : Metadatum(MetadataKey.ActiveLivenessVersion, "1.0.0")
 
+    @TypeParceler<Value, ValueParceler>
+    @Parcelize
+    data class AttestationCertificateChain(val certificateChain: List<Value>) :
+        Metadatum(MetadataKey.AttestationCertificateChain, certificateChain)
+
     @Parcelize
     data class BuildBrand(val buildBrand: String) :
         Metadatum(MetadataKey.BuildBrand, buildBrand)
@@ -289,6 +294,10 @@ open class Metadatum(
 
     @Parcelize
     data object SdkVersion : Metadatum(MetadataKey.SdkVersion, BuildConfig.VERSION_NAME)
+
+    @Parcelize
+    data class SupportsHardwareAttestation(val supportsHardwareAttestation: Int) :
+        Metadatum(MetadataKey.SupportsHardwareAttestation, supportsHardwareAttestation)
 
     @Parcelize
     data object SystemArchitecture : Metadatum(MetadataKey.SystemArchitecture, systemArchitecture)
