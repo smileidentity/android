@@ -3,6 +3,7 @@ package com.smileidentity.metadata.models
 enum class MetadataKey(val key: String) {
     ActiveLivenessType("active_liveness_type"),
     ActiveLivenessVersion("active_liveness_version"),
+    AttestationCertificateChain("attestation_certificate_chain"),
     BuildBrand("build_brand"),
     BuildDevice("build_device"),
     BuildFingerprint("build_fingerprint"),
