@@ -118,7 +118,7 @@ internal class AttestationMetadata(
         val keyStore = KeyStore.getInstance(keyStoreType)
         keyStore.load(null)
         val certs = keyStore.getCertificateChain(keyAlias)
-        certs.map { cert ->
+        certs?.map { cert ->
             Base64.encodeToString(
                 cert.encoded,
                 Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
