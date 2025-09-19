@@ -10,6 +10,7 @@ import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.facedetector.FaceDetector
 import com.google.mediapipe.tasks.vision.facedetector.FaceDetectorResult
 import com.smileidentity.camera.Analyzer
+import com.smileidentity.camera.AnalyzerFactory
 import com.smileidentity.ml.states.IdentityScanState
 import timber.log.Timber
 
@@ -20,7 +21,7 @@ class FaceDetectorAnalyzer(context: Context) :
     Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
 
     val baseOptionsBuilder: BaseOptions = BaseOptions.builder()
-        .setModelAssetPath("blaze_face_short_range.tflite")
+        .setModelAssetPath(MODEL_NAME)
         .build()
 
     val optionsBuilder: FaceDetector.FaceDetectorOptions =
@@ -55,8 +56,37 @@ class FaceDetectorAnalyzer(context: Context) :
     }
 
     fun detect(image: Bitmap) {
+        val croppedImage = data.cameraPreviewImage.image.cropCenter(
+            size = maxAspectRatioInSize(
+                area = data.cameraPreviewImage.image.size(),
+                aspectRatio = 1f,
+            ),
+        )
+
         val image = BitmapImageBuilder(image).build()
         val frameTime = SystemClock.uptimeMillis()
         faceDetector.detectAsync(image, frameTime)
+    }
+
+    class Factory(val context: Context) :
+        AnalyzerFactory<
+            AnalyzerInput,
+            IdentityScanState,
+            AnalyzerOutput,
+            Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput>,
+            > {
+
+        override suspend fun newInstance(): Analyzer<
+            AnalyzerInput,
+            IdentityScanState,
+            AnalyzerOutput,
+            > =
+            FaceDetectorAnalyzer(context = context)
+    }
+
+    companion object {
+        const val INPUT_WIDTH = 128
+        const val INPUT_HEIGHT = 128
+        const val MODEL_NAME = "blaze_face_short_range.tflite"
     }
 }

@@ -8,8 +8,8 @@ import java.util.concurrent.Executor
 private class MainThreadExecutor(context: Context) : Executor {
     private val handler: Handler = Handler(context.mainLooper)
 
-    override fun execute(r: Runnable) {
-        handler.post(r)
+    override fun execute(runnable: Runnable) {
+        handler.post(runnable)
     }
 }
 

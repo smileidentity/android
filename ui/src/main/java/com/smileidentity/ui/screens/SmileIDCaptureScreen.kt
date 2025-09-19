@@ -22,6 +22,7 @@ import com.smileidentity.camera.state.ImageAnalysisBackpressureStrategy
 import com.smileidentity.camera.state.rememberCamSelector
 import com.smileidentity.camera.state.rememberCameraState
 import com.smileidentity.camera.state.rememberImageAnalyzer
+import com.smileidentity.camera.util.rotate
 import com.smileidentity.ml.detectors.FaceDetectorAnalyzer
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ml.viewmodel.FaceScanViewModel
@@ -67,7 +68,10 @@ fun SmileIDCaptureScreen(
         modifier = modifier,
         imageAnalyzer = cameraState.rememberImageAnalyzer(
             analyze = { imageProxy ->
+                val image = imageProxy.toBitmap()
+                    .rotate(rotationDegrees = imageProxy.imageInfo.rotationDegrees.toFloat())
                 viewModel.analyze(imageProxy = imageProxy)
+                imageProxy.close()
             },
             imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
         ),
