@@ -22,9 +22,9 @@ import com.smileidentity.camera.state.ImageAnalysisBackpressureStrategy
 import com.smileidentity.camera.state.rememberCamSelector
 import com.smileidentity.camera.state.rememberCameraState
 import com.smileidentity.camera.state.rememberImageAnalyzer
-import com.smileidentity.ml.detectors.DocumentDetectorAnalyzer
+import com.smileidentity.ml.detectors.FaceDetectorAnalyzer
 import com.smileidentity.ml.states.IdentityScanState
-import com.smileidentity.ml.viewmodel.DocumentScanViewModel
+import com.smileidentity.ml.viewmodel.FaceScanViewModel
 import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
 import com.smileidentity.ui.components.SmileIDButton
@@ -55,10 +55,10 @@ fun SmileIDCaptureScreen(
     val context = LocalContext.current
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-    val viewModel: DocumentScanViewModel = viewModel(
+    val viewModel: FaceScanViewModel = viewModel(
         factory = viewModelFactory {
-            DocumentScanViewModel(
-                detector = DocumentDetectorAnalyzer(context),
+            FaceScanViewModel(
+                detector = FaceDetectorAnalyzer(context),
             )
         },
     )

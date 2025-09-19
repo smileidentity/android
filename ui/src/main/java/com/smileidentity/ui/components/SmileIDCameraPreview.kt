@@ -60,7 +60,7 @@ fun SmileIDCameraPreview(
         } else {
             SmileIDCameraXPreview(
                 imageAnalyzer = imageAnalyzer,
-                camSelector = CamSelector.Back,
+                camSelector = CamSelector.Front,
                 implementationMode = ImplementationMode.Performance,
                 isImageAnalysisEnabled = true,
             ) {
