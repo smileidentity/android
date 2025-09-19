@@ -1,3 +1,7 @@
 package com.smileidentity.ml.viewmodel
 
-abstract class FaceScanViewModel : CameraViewModel()
+import android.graphics.Bitmap
+import com.smileidentity.ml.detectors.FaceDetectorAnalyzer
+
+class FaceScanViewModel(val detector: FaceDetectorAnalyzer) :
+    CameraViewModel<CameraPreviewImage<Bitmap>>()

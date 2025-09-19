@@ -2,7 +2,6 @@ package com.smileidentity.camera.extensions
 
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import com.smileidentity.camera.helper.CameraHelper
 
 /**
  * Check if image analysis is supported by camera hardware level.
@@ -15,5 +14,5 @@ internal fun CameraManager.isImageAnalysisSupported(lensFacing: Int?): Boolean {
     val level = getCameraCharacteristics(cameraId)
         .get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL) ?: 0
 
-    return level >= CameraHelper.compatHardwareLevel3
+    return level >= CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3
 }

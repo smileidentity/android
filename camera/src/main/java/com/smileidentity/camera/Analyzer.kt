@@ -8,3 +8,17 @@ package com.smileidentity.camera
 interface Analyzer<Input, State, Output> {
     suspend fun analyze(data: Input, state: State): Output
 }
+
+/**
+ * A factory to create analyzers.
+ */
+
+interface AnalyzerFactory<
+    Input,
+    State,
+    Output,
+    AnalyzerType :
+    Analyzer<Input, State, Output>,
+    > {
+    suspend fun newInstance(): AnalyzerType?
+}
