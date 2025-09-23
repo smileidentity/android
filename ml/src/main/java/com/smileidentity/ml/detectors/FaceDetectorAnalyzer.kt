@@ -1,6 +1,9 @@
 package com.smileidentity.ml.detectors
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Rect
+import androidx.core.graphics.toRect
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
@@ -12,21 +15,20 @@ import com.smileidentity.ml.states.IdentityScanState
 /**
  * Analyzer to run FaceDetector.
  */
-class FaceDetectorAnalyzer(context: Context) :
+class FaceDetectorAnalyzer(context: Context, minDetectionConfidence: Float) :
     Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
 
-    val baseOptionsBuilder: BaseOptions = BaseOptions.builder()
-        .setModelAssetPath(MODEL_NAME)
-        .build()
+    private val baseOptions = BaseOptions.builder().setModelAssetPath(MODEL_NAME).build()
 
-    val optionsBuilder: FaceDetector.FaceDetectorOptions =
-        FaceDetector.FaceDetectorOptions.builder()
-            .setBaseOptions(baseOptionsBuilder)
-            .setMinDetectionConfidence(0.5F)
+    private val faceDetectorOptions =
+        FaceDetector.FaceDetectorOptions
+            .builder()
+            .setBaseOptions(baseOptions)
+            .setMinDetectionConfidence(minDetectionConfidence)
             .setRunningMode(RunningMode.IMAGE)
             .build()
 
-    val faceDetector: FaceDetector = FaceDetector.createFromOptions(context, optionsBuilder)
+    private val faceDetector = FaceDetector.createFromOptions(context, faceDetectorOptions)
 
     /**
      * we will run face detection here, using MediaPipe and pass back the output
@@ -34,24 +36,34 @@ class FaceDetectorAnalyzer(context: Context) :
      * we can easily swap out implementations here for other analyzers like Huawei
      */
     override suspend fun analyze(data: AnalyzerInput, state: IdentityScanState): AnalyzerOutput {
-        val image = BitmapImageBuilder(data.cameraPreviewImage.image).build()
-        val result = faceDetector.detect(image)
-        val boundingBoxes = result.detections().map { it ->
-            BoundingBox(
-                left = it.boundingBox().left,
-                top = it.boundingBox().top,
-                width = it.boundingBox().width(),
-                height = it.boundingBox().height(),
-            )
-        }
-        return FaceDetectorOutput(
-            boundingBox = boundingBoxes,
-            resultScore = 0F,
-            timestampMs = result.timestampMs(),
-        )
+        val cameraFrameBitmap = data.cameraPreviewImage.image
+        val faces = faceDetector.detect(BitmapImageBuilder(cameraFrameBitmap).build())
+            .detections()
+            .filter { validateRect(cameraFrameBitmap, it.boundingBox().toRect()) }
+            .map { detection -> detection.boundingBox().toRect() }
+            .map { rect ->
+                val croppedBitmap =
+                    Bitmap.createBitmap(
+                        cameraFrameBitmap,
+                        rect.left,
+                        rect.top,
+                        rect.width(),
+                        rect.height(),
+                    )
+                Pair(croppedBitmap, rect)
+            }
+
+        return FaceDetectorOutput(faces = faces)
     }
 
-    class Factory(val context: Context) :
+    // Check if the bounds of `boundingBox` fit within the limits of `cameraFrameBitmap`
+    private fun validateRect(cameraFrameBitmap: Bitmap, boundingBox: Rect): Boolean =
+        boundingBox.left >= 0 &&
+            boundingBox.top >= 0 &&
+            (boundingBox.left + boundingBox.width()) < cameraFrameBitmap.width &&
+            (boundingBox.top + boundingBox.height()) < cameraFrameBitmap.height
+
+    class Factory(val context: Context, val minDetectionConfidence: Float) :
         AnalyzerFactory<
             AnalyzerInput,
             IdentityScanState,
@@ -64,12 +76,10 @@ class FaceDetectorAnalyzer(context: Context) :
             IdentityScanState,
             AnalyzerOutput,
             > =
-            FaceDetectorAnalyzer(context = context)
+            FaceDetectorAnalyzer(context = context, minDetectionConfidence = minDetectionConfidence)
     }
 
     companion object {
-        const val INPUT_WIDTH = 128
-        const val INPUT_HEIGHT = 128
         const val MODEL_NAME = "blaze_face_short_range.tflite"
     }
 }

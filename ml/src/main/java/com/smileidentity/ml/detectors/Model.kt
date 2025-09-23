@@ -1,6 +1,7 @@
 package com.smileidentity.ml.detectors
 
 import android.graphics.Bitmap
+import android.graphics.Rect
 import com.smileidentity.ml.viewmodel.CameraPreviewImage
 
 /**
@@ -37,8 +38,4 @@ data class DocumentDetectorOutput(
 /**
  * Output of FaceDetector
  */
-data class FaceDetectorOutput(
-    val boundingBox: List<BoundingBox>,
-    val resultScore: Float,
-    val timestampMs: Long,
-) : AnalyzerOutput
+data class FaceDetectorOutput(val faces: List<Pair<Bitmap, Rect>>) : AnalyzerOutput
