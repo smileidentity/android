@@ -23,3 +23,13 @@ data class DocumentDetectorOutput(val documents: List<Pair<Bitmap, Rect>>) : Ana
  * Output of FaceDetector
  */
 data class FaceDetectorOutput(val faces: List<Pair<Bitmap, Rect>>) : AnalyzerOutput
+
+/**
+ * Output of FaceSpoofDetector
+ */
+data class FaceSpoofDetectorOutput(
+    val isSpoof: Boolean,
+    val score: Float,
+    val timeMillis: Long
+) : AnalyzerOutput
+
