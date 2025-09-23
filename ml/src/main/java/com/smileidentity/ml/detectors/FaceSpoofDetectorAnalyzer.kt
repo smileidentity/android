@@ -57,24 +57,6 @@ class FaceSpoofDetectorAnalyzer(
             )
     }
 
-    init {
-//        val useGpuTask = TfLiteGpu.isGpuDelegateAvailable(context)
-//        useGpuTask.continueWith { task ->
-//            val interpreterOptions = InterpreterApi.Options()
-//                .setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY)
-//            if (task.result) {
-//                interpreterOptions.addDelegateFactory(GpuDelegateFactory()).apply {
-//                    if (!useGpu) {
-//                        numThreads = 4
-//                    }
-//                    useXNNPACK = useXNNPack
-//                    this.useNNAPI = useNNAPI
-//                }
-//            }
-
-//        }
-    }
-
     override suspend fun analyze(data: AnalyzerInput, state: IdentityScanState): AnalyzerOutput {
         val croppedImage = data.cameraPreviewImage.image.cropCenter(
             maxAspectRatioInSize(
