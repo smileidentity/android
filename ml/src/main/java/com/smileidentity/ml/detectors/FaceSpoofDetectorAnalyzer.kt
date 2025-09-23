@@ -1,7 +1,6 @@
 package com.smileidentity.ml.detectors
 
 import android.content.Context
-import com.google.android.gms.tflite.gpu.support.TfLiteGpu
 import com.smileidentity.camera.Analyzer
 import com.smileidentity.camera.AnalyzerFactory
 import com.smileidentity.ml.model.AnalyzerInput
@@ -13,7 +12,8 @@ import com.smileidentity.ml.util.maxAspectRatioInSize
 import com.smileidentity.ml.util.size
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
-import org.tensorflow.lite.gpu.GpuDelegateFactory
+import org.tensorflow.lite.gpu.CompatibilityList
+import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -35,25 +35,44 @@ class FaceSpoofDetectorAnalyzer(
             .build()
 
     init {
-        val useGpuTask = TfLiteGpu.isGpuDelegateAvailable(context)
-        useGpuTask.continueWith { task ->
-            val interpreterOptions = InterpreterApi.Options()
-                .setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY)
-            if (task.result) {
-                interpreterOptions.addDelegateFactory(GpuDelegateFactory()).apply {
-                    if (!useGpu) {
-                        numThreads = 4
+        val interpreterOptions =
+            InterpreterApi.Options().apply {
+                if (useGpu) {
+                    // Add the GPU Delegate if supported.
+                    // See -> https://www.tensorflow.org/lite/performance/gpu#android
+                    if (CompatibilityList().isDelegateSupportedOnThisDevice) {
+                        addDelegate(GpuDelegate(CompatibilityList().bestOptionsForThisDevice))
                     }
-                    useXNNPACK = useXNNPack
-                    this.useNNAPI = useNNAPI
+                } else {
+                    // Number of threads for computation
+                    numThreads = 4
                 }
+                useXNNPACK = useXNNPack
+                this.useNNAPI = useNNAPI
             }
-            interpreter =
-                InterpreterApi.create(
-                    FileUtil.loadMappedFile(context, MODEL_NAME),
-                    interpreterOptions,
-                )
-        }
+        interpreter =
+            InterpreterApi.create(
+                FileUtil.loadMappedFile(context, MODEL_NAME),
+                interpreterOptions,
+            )
+    }
+
+    init {
+//        val useGpuTask = TfLiteGpu.isGpuDelegateAvailable(context)
+//        useGpuTask.continueWith { task ->
+//            val interpreterOptions = InterpreterApi.Options()
+//                .setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY)
+//            if (task.result) {
+//                interpreterOptions.addDelegateFactory(GpuDelegateFactory()).apply {
+//                    if (!useGpu) {
+//                        numThreads = 4
+//                    }
+//                    useXNNPACK = useXNNPack
+//                    this.useNNAPI = useNNAPI
+//                }
+//            }
+
+//        }
     }
 
     override suspend fun analyze(data: AnalyzerInput, state: IdentityScanState): AnalyzerOutput {
