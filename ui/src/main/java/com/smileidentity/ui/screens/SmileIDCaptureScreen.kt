@@ -59,7 +59,10 @@ fun SmileIDCaptureScreen(
     val viewModel: FaceScanViewModel = viewModel(
         factory = viewModelFactory {
             FaceScanViewModel(
-                detector = FaceDetectorAnalyzer(context),
+                detector = FaceDetectorAnalyzer(
+                    context = context,
+                    minDetectionConfidence = 0.5F,
+                ),
             )
         },
     )
@@ -70,7 +73,7 @@ fun SmileIDCaptureScreen(
             analyze = { imageProxy ->
                 val image = imageProxy.toBitmap()
                     .rotate(rotationDegrees = imageProxy.imageInfo.rotationDegrees.toFloat())
-                viewModel.analyze(imageProxy = imageProxy)
+//                viewModel.analyze(imageProxy = imageProxy)
                 imageProxy.close()
             },
             imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
