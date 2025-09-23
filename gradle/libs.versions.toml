@@ -128,6 +128,7 @@ mediapipe = { module = "com.google.mediapipe:tasks-vision", version.ref = "media
 litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
 litert-metadata = { group = "com.google.ai.edge.litert", name = "litert-metadata", version.ref = "litert-metadata" }
 litert-support = { group = "com.google.ai.edge.litert", name = "litert-support", version.ref = "litert-support" }
+litert-gpu = { group = "com.google.ai.edge.litert", name = "litert-gpu", version.ref = "litert-support" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
