@@ -48,6 +48,7 @@ mediapipe = "0.20230731"
 litert = "2.0.2"
 litert-metadata = "1.4.0"
 litert-support = "1.4.0"
+play-services-tflite = "16.4.0"
 timber = "5.0.1"
 truth = "1.4.5"
 uiautomator = "2.3.0"
@@ -128,6 +129,9 @@ mediapipe = { module = "com.google.mediapipe:tasks-vision", version.ref = "media
 litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
 litert-metadata = { group = "com.google.ai.edge.litert", name = "litert-metadata", version.ref = "litert-metadata" }
 litert-support = { group = "com.google.ai.edge.litert", name = "litert-support", version.ref = "litert-support" }
+play-services-tflite-java = { group = "com.google.android.gms", name = "play-services-tflite-java", version.ref = "play-services-tflite" }
+play-services-tflite-support = { group = "com.google.android.gms", name = "play-services-tflite-support", version.ref = "play-services-tflite" }
+play-services-tflite-gpu = { group = "com.google.android.gms", name = "play-services-tflite-gpu", version.ref = "play-services-tflite" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
@@ -141,6 +145,7 @@ kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-pl
 [bundles]
 camerax = ["androidx-camera-core", "androidx-camera-compose", "androidx-camera-lifecycle", "androidx-camera-camera2", "camerax-view"]
 androidx-compose-ui-test = ["androidx-compose-ui-test-junit4", "androidx-compose-ui-test-manifest"]
+tflite = ["play-services-tflite-java", "play-services-tflite-support", "play-services-tflite-gpu"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

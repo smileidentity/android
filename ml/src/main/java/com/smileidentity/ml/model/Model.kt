@@ -27,9 +27,5 @@ data class FaceDetectorOutput(val faces: List<Pair<Bitmap, Rect>>) : AnalyzerOut
 /**
  * Output of FaceSpoofDetector
  */
-data class FaceSpoofDetectorOutput(
-    val isSpoof: Boolean,
-    val score: Float,
-    val timeMillis: Long
-) : AnalyzerOutput
-
+data class FaceSpoofDetectorOutput(val isSpoof: Boolean, val score: Float, val timeMillis: Long) :
+    AnalyzerOutput
