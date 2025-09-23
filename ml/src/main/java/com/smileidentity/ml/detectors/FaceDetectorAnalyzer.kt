@@ -2,7 +2,6 @@ package com.smileidentity.ml.detectors
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Rect
 import androidx.core.graphics.toRect
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
@@ -11,6 +10,7 @@ import com.google.mediapipe.tasks.vision.facedetector.FaceDetector
 import com.smileidentity.camera.Analyzer
 import com.smileidentity.camera.AnalyzerFactory
 import com.smileidentity.ml.states.IdentityScanState
+import com.smileidentity.ml.util.validateRect
 
 /**
  * Analyzer to run FaceDetector.
@@ -55,13 +55,6 @@ class FaceDetectorAnalyzer(context: Context, minDetectionConfidence: Float) :
 
         return FaceDetectorOutput(faces = faces)
     }
-
-    // Check if the bounds of `boundingBox` fit within the limits of `cameraFrameBitmap`
-    private fun validateRect(cameraFrameBitmap: Bitmap, boundingBox: Rect): Boolean =
-        boundingBox.left >= 0 &&
-            boundingBox.top >= 0 &&
-            (boundingBox.left + boundingBox.width()) < cameraFrameBitmap.width &&
-            (boundingBox.top + boundingBox.height()) < cameraFrameBitmap.height
 
     class Factory(val context: Context, val minDetectionConfidence: Float) :
         AnalyzerFactory<

@@ -1,6 +1,8 @@
 package com.smileidentity.ml.detectors
 
 import android.content.Context
+import android.graphics.Bitmap
+import androidx.core.graphics.toRect
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
@@ -8,51 +10,56 @@ import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetector
 import com.smileidentity.camera.Analyzer
 import com.smileidentity.camera.AnalyzerFactory
 import com.smileidentity.ml.states.IdentityScanState
+import com.smileidentity.ml.util.validateRect
 
 /**
  * Analyzer to run DocumentDetector.
  */
-class DocumentDetectorAnalyzer(context: Context) :
+class DocumentDetectorAnalyzer(context: Context, minDetectionConfidence: Float) :
     Analyzer<AnalyzerInput, IdentityScanState, AnalyzerOutput> {
 
-    val baseOptionsBuilder: BaseOptions = BaseOptions.builder()
-        .setModelAssetPath(MODEL_NAME)
-        .build()
+    private val baseOptions = BaseOptions.builder().setModelAssetPath(MODEL_NAME).build()
 
-    val optionsBuilder: ObjectDetector.ObjectDetectorOptions =
-        ObjectDetector.ObjectDetectorOptions.builder()
-            .setBaseOptions(baseOptionsBuilder)
+    private val documentDetectorOptions =
+        ObjectDetector.ObjectDetectorOptions
+            .builder()
+            .setBaseOptions(baseOptions)
+            .setScoreThreshold(minDetectionConfidence)
             .setRunningMode(RunningMode.IMAGE)
             .setMaxResults(5)
             .build()
 
-    val objectDetector: ObjectDetector = ObjectDetector.createFromOptions(context, optionsBuilder)
+    private val documentDetector = ObjectDetector.createFromOptions(
+        context,
+        documentDetectorOptions,
+    )
 
     /**
      * we will run document detection using MediaPipe and pass back the output
      *
      */
     override suspend fun analyze(data: AnalyzerInput, state: IdentityScanState): AnalyzerOutput {
-        val image = BitmapImageBuilder(data.cameraPreviewImage.image).build()
-        val result = objectDetector.detect(image)
-        val boundingBoxes = result.detections().map { it ->
-            BoundingBox(
-                left = it.boundingBox().left,
-                top = it.boundingBox().top,
-                width = it.boundingBox().width(),
-                height = it.boundingBox().height(),
-            )
-        }
-        return DocumentDetectorOutput(
-            boundingBox = boundingBoxes,
-            category = Category.ID_FRONT,
-            resultScore = 0F,
-            blurScore = 0F,
-            timestampMs = result.timestampMs(),
-        )
+        val cameraFrameBitmap = data.cameraPreviewImage.image
+        val documents = documentDetector.detect(BitmapImageBuilder(cameraFrameBitmap).build())
+            .detections()
+            .filter { validateRect(cameraFrameBitmap, it.boundingBox().toRect()) }
+            .map { detection -> detection.boundingBox().toRect() }
+            .map { rect ->
+                val croppedBitmap =
+                    Bitmap.createBitmap(
+                        cameraFrameBitmap,
+                        rect.left,
+                        rect.top,
+                        rect.width(),
+                        rect.height(),
+                    )
+                Pair(croppedBitmap, rect)
+            }
+
+        return DocumentDetectorOutput(documents = documents)
     }
 
-    class Factory(val context: Context) :
+    class Factory(val context: Context, val minDetectionConfidence: Float) :
         AnalyzerFactory<
             AnalyzerInput,
             IdentityScanState,
@@ -65,7 +72,10 @@ class DocumentDetectorAnalyzer(context: Context) :
             IdentityScanState,
             AnalyzerOutput,
             > =
-            DocumentDetectorAnalyzer(context = context)
+            DocumentDetectorAnalyzer(
+                context = context,
+                minDetectionConfidence = minDetectionConfidence,
+            )
     }
 
     companion object {

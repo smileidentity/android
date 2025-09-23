@@ -27,13 +27,7 @@ sealed interface AnalyzerOutput
 /**
  * Output of DocumentDetector
  */
-data class DocumentDetectorOutput(
-    val boundingBox: List<BoundingBox>,
-    val category: Category,
-    val resultScore: Float,
-    val blurScore: Float,
-    val timestampMs: Long,
-) : AnalyzerOutput
+data class DocumentDetectorOutput(val documents: List<Pair<Bitmap, Rect>>) : AnalyzerOutput
 
 /**
  * Output of FaceDetector
