@@ -9,6 +9,9 @@ import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.facedetector.FaceDetector
 import com.smileidentity.camera.Analyzer
 import com.smileidentity.camera.AnalyzerFactory
+import com.smileidentity.ml.model.AnalyzerInput
+import com.smileidentity.ml.model.AnalyzerOutput
+import com.smileidentity.ml.model.FaceDetectorOutput
 import com.smileidentity.ml.states.IdentityScanState
 import com.smileidentity.ml.util.validateRect
 

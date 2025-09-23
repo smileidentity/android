@@ -1,7 +1,7 @@
 package com.smileidentity.ml.states
 
-import com.smileidentity.ml.detectors.AnalyzerInput
-import com.smileidentity.ml.detectors.AnalyzerOutput
+import com.smileidentity.ml.model.AnalyzerInput
+import com.smileidentity.ml.model.AnalyzerOutput
 
 /**
  * Interface to determine how to transition between [IdentityScanState]s.

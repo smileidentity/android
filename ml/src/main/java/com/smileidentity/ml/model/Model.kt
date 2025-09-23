@@ -1,18 +1,8 @@
-package com.smileidentity.ml.detectors
+package com.smileidentity.ml.model
 
 import android.graphics.Bitmap
 import android.graphics.Rect
 import com.smileidentity.ml.viewmodel.CameraPreviewImage
-
-/**
- * Result category of IDDetector
- */
-enum class Category { NO_ID, PASSPORT, ID_FRONT, ID_BACK, INVALID }
-
-/**
- * Result bounding box coordinates of IDDetector, in percentage values with regard to original image's width/height
- */
-data class BoundingBox(val left: Float, val top: Float, val width: Float, val height: Float)
 
 /**
  * Input from CameraAdapter, note: the bitmap should already be encoded in RGB value
