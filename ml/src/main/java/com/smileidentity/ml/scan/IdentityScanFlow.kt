@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,7 +22,12 @@ import kotlinx.coroutines.withContext
  * or [com.smileidentity.ml.detectors.DocumentDetectorAnalyzer] to within a [ProcessBoundAnalyzerLoop] to analyze
  * a [Flow] of [CameraPreviewImage]s. The results are handled in [IdentityAggregator].
  */
-class IdentityScanFlow : ScanFlow<IdentityScanState.ScanType, CameraPreviewImage<Bitmap>> {
+class IdentityScanFlow(
+    private val context: Context,
+    private val analyzerLoopErrorListener: AnalyzerLoopErrorListener,
+    private val aggregateResultListener:
+    AggregateResultListener<IdentityAggregator.InterimResult, IdentityAggregator.FinalResult>,
+) : ScanFlow<IdentityScanState.ScanType, CameraPreviewImage<Bitmap>> {
 
     private var aggregator: IdentityAggregator? = null
 
@@ -68,7 +74,28 @@ class IdentityScanFlow : ScanFlow<IdentityScanState.ScanType, CameraPreviewImage
                 return@launch
             }
 
+            aggregator = IdentityAggregator(
+                identityScanType = parameters,
+                aggregateResultListener = aggregateResultListener,
+            )
+
+            requireNotNull(aggregator).bindToLifecycle(lifecycleOwner)
+
             try {
+                analyzerPool =
+                    AnalyzerPool.of(
+                        if (parameters == IdentityScanState.ScanType.SELFIE) {
+                            FaceDetectorAnalyzer.Factory(
+                                context = context,
+                                minDetectionConfidence = 0F,
+                            )
+                        } else {
+                            DocumentDetectorAnalyzer.Factory(
+                                context = context,
+                                minDetectionConfidence = 0F,
+                            )
+                        },
+                    )
             } catch (e: IllegalStateException) {
                 withContext(Dispatchers.Main) {
                     onError(e)
@@ -76,6 +103,19 @@ class IdentityScanFlow : ScanFlow<IdentityScanState.ScanType, CameraPreviewImage
 
                 return@launch
             }
+
+            loop = ProcessBoundAnalyzerLoop(
+                analyzerPool = requireNotNull(analyzerPool),
+                resultHandler = requireNotNull(aggregator),
+                analyzerLoopErrorListener = analyzerLoopErrorListener,
+            )
+
+            loopJob = requireNotNull(loop).subscribeTo(
+                flow = imageStream.map { cameraPreviewImage ->
+                    AnalyzerInput(cameraPreviewImage)
+                },
+                processingCoroutineScope = coroutineScope,
+            )
         }
     }
 
