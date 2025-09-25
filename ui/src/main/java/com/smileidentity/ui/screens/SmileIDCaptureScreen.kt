@@ -16,23 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smileidentity.camera.state.CamSelector
 import com.smileidentity.camera.state.ImageAnalysisBackpressureStrategy
 import com.smileidentity.camera.state.rememberCamSelector
 import com.smileidentity.camera.state.rememberCameraState
 import com.smileidentity.camera.state.rememberImageAnalyzer
 import com.smileidentity.camera.util.rotate
-import com.smileidentity.ml.detectors.FaceDetectorAnalyzer
 import com.smileidentity.ml.states.IdentityScanState
-import com.smileidentity.ml.viewmodel.FaceScanViewModel
 import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
 import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.components.SmileIDCameraPreview
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
-import com.smileidentity.ui.utils.viewModelFactory
 import java.io.File
 
 @SuppressLint("ComposeViewModelInjection")
@@ -56,16 +52,16 @@ fun SmileIDCaptureScreen(
     val context = LocalContext.current
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-    val viewModel: FaceScanViewModel = viewModel(
-        factory = viewModelFactory {
-            FaceScanViewModel(
-                detector = FaceDetectorAnalyzer(
-                    context = context,
-                    minDetectionConfidence = 0.5F,
-                ),
-            )
-        },
-    )
+//    val viewModel: FaceScanViewModel = viewModel(
+//        factory = viewModelFactory {
+//            FaceScanViewModel(
+//                detector = FaceDetectorAnalyzer(
+//                    context = context,
+//                    minDetectionConfidence = 0.5F,
+//                ),
+//            )
+//        },
+//    )
 
     SmileIDCameraPreview(
         modifier = modifier,
