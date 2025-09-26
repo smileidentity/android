@@ -56,7 +56,7 @@ class FaceDetectorAnalyzer(context: Context, minDetectionConfidence: Float) :
                 Pair(croppedBitmap, rect)
             }
 
-        return FaceDetectorOutput(faces = faces)
+        return FaceDetectorOutput(faces = faces, resultScore = 1F)
     }
 
     class Factory(val context: Context, val minDetectionConfidence: Float) :

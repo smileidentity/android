@@ -1,12 +1,20 @@
 package com.smileidentity.ml.states
 
+import androidx.annotation.IntegerRes
 import com.smileidentity.ml.model.AnalyzerInput
 import com.smileidentity.ml.model.AnalyzerOutput
+import com.smileidentity.ml.scan.ScanState
+import kotlin.time.ComparableTimeMark
+import kotlin.time.TimeSource
 
+/**
+ * States during scanning a document.
+ */
 sealed class IdentityScanState(
     val type: ScanType,
     val transitioner: IdentityScanStateTransitioner,
-) {
+    isFinal: Boolean,
+) : ScanState(isFinal = isFinal) {
 
     /**
      * Type of documents being scanned
@@ -26,10 +34,10 @@ sealed class IdentityScanState(
     ): IdentityScanState
 
     /**
-     * Initial state when scan starts, no faces/documents have been detected yet.
+     * Initial state when scan starts, no documents have been detected yet.
      */
     class Initial(type: ScanType, transitioner: IdentityScanStateTransitioner) :
-        IdentityScanState(type, transitioner) {
+        IdentityScanState(type = type, transitioner = transitioner, isFinal = false) {
         /**
          * Only transitions to [Found] when ML output type matches scan type
          */
@@ -47,8 +55,12 @@ sealed class IdentityScanState(
      * State when scan has found the required type, the machine could stay in this state for a
      * while if more image needs to be processed to reach the next state.
      */
-    class Found(type: ScanType, transitioner: IdentityScanStateTransitioner) :
-        IdentityScanState(type, transitioner) {
+    class Found(
+        type: ScanType,
+        transitioner: IdentityScanStateTransitioner,
+        internal var reachedStateAt: ComparableTimeMark = TimeSource.Monotonic.markNow(),
+        @IntegerRes val feedbackRes: Int? = null,
+    ) : IdentityScanState(type = type, transitioner = transitioner, isFinal = false) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
             analyzerOutput: AnalyzerOutput,
@@ -57,13 +69,25 @@ sealed class IdentityScanState(
             analyzerInput = analyzerInput,
             analyzerOutput = analyzerOutput,
         )
+
+        fun withFeedback(@IntegerRes feedbackRes: Int?) = Found(
+            type = type,
+            transitioner = transitioner,
+            reachedStateAt = reachedStateAt,
+            feedbackRes = feedbackRes,
+        )
     }
 
     /**
      * State when satisfaction checking passed.
+     *
+     * Note when Satisfied is reached, [timeoutAt] won't be checked.
      */
-    class Satisfied(type: ScanType, transitioner: IdentityScanStateTransitioner) :
-        IdentityScanState(type, transitioner) {
+    class Satisfied(
+        type: ScanType,
+        transitioner: IdentityScanStateTransitioner,
+        val reachedStateAt: ComparableTimeMark = TimeSource.Monotonic.markNow(),
+    ) : IdentityScanState(type = type, transitioner = transitioner, isFinal = false) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
             analyzerOutput: AnalyzerOutput,
@@ -81,7 +105,8 @@ sealed class IdentityScanState(
         val reason: String,
         type: ScanType,
         transitioner: IdentityScanStateTransitioner,
-    ) : IdentityScanState(type, transitioner) {
+        val reachedStateAt: ComparableTimeMark = TimeSource.Monotonic.markNow(),
+    ) : IdentityScanState(type = type, transitioner = transitioner, isFinal = false) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
             analyzerOutput: AnalyzerOutput,
@@ -96,7 +121,7 @@ sealed class IdentityScanState(
      * Terminal state, indicting the scan is finished.
      */
     class Finished(type: ScanType, transitioner: IdentityScanStateTransitioner) :
-        IdentityScanState(type, transitioner) {
+        IdentityScanState(type = type, transitioner = transitioner, isFinal = true) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
             analyzerOutput: AnalyzerOutput,
@@ -107,7 +132,7 @@ sealed class IdentityScanState(
      * Terminal state, indicating the scan times out.
      */
     class TimeOut(type: ScanType, transitioner: IdentityScanStateTransitioner) :
-        IdentityScanState(type, transitioner) {
+        IdentityScanState(type = type, transitioner = transitioner, isFinal = true) {
         override suspend fun consumeTransition(
             analyzerInput: AnalyzerInput,
             analyzerOutput: AnalyzerOutput,
