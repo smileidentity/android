@@ -2,7 +2,7 @@ package com.smileidentity.ml.model
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import com.smileidentity.ml.viewmodel.CameraPreviewImage
+import com.smileidentity.camera.CameraPreviewImage
 
 /**
  * Input from CameraAdapter, note: the bitmap should already be encoded in RGB value

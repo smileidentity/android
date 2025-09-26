@@ -3,12 +3,12 @@ package com.smileidentity.ml.scan
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.lifecycle.LifecycleOwner
+import com.smileidentity.camera.CameraPreviewImage
 import com.smileidentity.ml.detectors.DocumentDetectorAnalyzer
 import com.smileidentity.ml.detectors.FaceDetectorAnalyzer
 import com.smileidentity.ml.model.AnalyzerInput
 import com.smileidentity.ml.model.AnalyzerOutput
 import com.smileidentity.ml.states.IdentityScanState
-import com.smileidentity.ml.viewmodel.CameraPreviewImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,7 +23,6 @@ import kotlinx.coroutines.withContext
  * a [Flow] of [CameraPreviewImage]s. The results are handled in [IdentityAggregator].
  */
 class IdentityScanFlow(
-    private val context: Context,
     private val analyzerLoopErrorListener: AnalyzerLoopErrorListener,
     private val aggregateResultListener:
     AggregateResultListener<IdentityAggregator.InterimResult, IdentityAggregator.FinalResult>,
@@ -84,7 +83,7 @@ class IdentityScanFlow(
             try {
                 analyzerPool =
                     AnalyzerPool.of(
-                        if (parameters == IdentityScanState.ScanType.SELFIE) {
+                        analyzerFactory = if (parameters == IdentityScanState.ScanType.SELFIE) {
                             FaceDetectorAnalyzer.Factory(
                                 context = context,
                                 minDetectionConfidence = 0F,
@@ -96,7 +95,7 @@ class IdentityScanFlow(
                             )
                         },
                     )
-            } catch (e: IllegalStateException) {
+            } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     onError(e)
                 }

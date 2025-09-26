@@ -16,6 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.camera.CameraPreviewImage
 import com.smileidentity.camera.state.CamSelector
 import com.smileidentity.camera.state.ImageAnalysisBackpressureStrategy
 import com.smileidentity.camera.state.rememberCamSelector
@@ -29,6 +32,8 @@ import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.components.SmileIDCameraPreview
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
+import com.smileidentity.ui.utils.viewModelFactory
+import com.smileidentity.ui.viewmodel.SelfieScanViewModel
 import java.io.File
 
 @SuppressLint("ComposeViewModelInjection")
@@ -50,18 +55,14 @@ fun SmileIDCaptureScreen(
     onResult: (File) -> Unit,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-//    val viewModel: FaceScanViewModel = viewModel(
-//        factory = viewModelFactory {
-//            FaceScanViewModel(
-//                detector = FaceDetectorAnalyzer(
-//                    context = context,
-//                    minDetectionConfidence = 0.5F,
-//                ),
-//            )
-//        },
-//    )
+    val viewModel: SelfieScanViewModel = viewModel(
+        factory = viewModelFactory {
+            SelfieScanViewModel()
+        },
+    )
 
     SmileIDCameraPreview(
         modifier = modifier,
@@ -69,12 +70,17 @@ fun SmileIDCaptureScreen(
             analyze = { imageProxy ->
                 val image = imageProxy.toBitmap()
                     .rotate(rotationDegrees = imageProxy.imageInfo.rotationDegrees.toFloat())
-//                viewModel.analyze(imageProxy = imageProxy)
+                viewModel.sendImageToStream(image = CameraPreviewImage(image = image))
                 imageProxy.close()
             },
             imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
         ),
     ) {
+        viewModel.startScan(
+            context = context,
+            lifecycleOwner = lifecycleOwner,
+        )
+
         /**
          * We have different scan types here to allow us different analyzer depending on what we are
          * scanning
@@ -94,7 +100,10 @@ fun SmileIDCaptureScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
         ) {
-            continueButton {}
+            continueButton {
+//                LaunchedEffect(Unit) {
+//                }
+            }
         }
     }
 }
