@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.smileid.android.library.jacoco)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.smileid.android.library.koin)
 }
 
 android {

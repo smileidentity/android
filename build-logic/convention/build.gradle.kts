@@ -44,5 +44,9 @@ gradlePlugin {
             id = "smileid.android.library.jacoco"
             implementationClass = "AndroidLibraryJacocoConventionPlugin"
         }
+        register("androidLibraryKoin") {
+            id = "smileid.android.library.koin"
+            implementationClass = "KoinConventionPlugin"
+        }
     }
 }
