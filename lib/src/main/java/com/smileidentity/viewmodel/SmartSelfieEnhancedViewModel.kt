@@ -1,13 +1,11 @@
 package com.smileidentity.viewmodel
 
-import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
-import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
@@ -24,7 +22,6 @@ import com.smileidentity.metadata.models.Metadatum
 import com.smileidentity.metadata.models.SelfieImageOriginValue.BackCamera
 import com.smileidentity.metadata.models.SelfieImageOriginValue.FrontCamera
 import com.smileidentity.metadata.updaters.DeviceOrientationMetadata
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.v2.FailureReason
 import com.smileidentity.models.v2.SmartSelfieResponse
 import com.smileidentity.networking.doSmartSelfieAuthentication
@@ -46,13 +43,8 @@ import com.smileidentity.viewmodel.SelfieHint.MoveBack
 import com.smileidentity.viewmodel.SelfieHint.MoveCloser
 import com.smileidentity.viewmodel.SelfieHint.NeedLight
 import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
-import com.smileidentity.viewmodel.SelfieHint.PoorImageQuality
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
 import com.ujizin.camposer.state.CamSelector
-import java.io.File
-import java.io.IOException
-import kotlin.math.absoluteValue
-import kotlin.time.TimeSource
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
@@ -66,10 +58,12 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.tensorflow.lite.DataType
-import org.tensorflow.lite.support.image.TensorImage
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.File
+import java.io.IOException
+import kotlin.math.absoluteValue
+import kotlin.time.TimeSource
 
 /*
 This is used only when NOT in strict mode. In strict mode, the number of images is determined
@@ -77,7 +71,6 @@ by the liveness task
  */
 const val VIEWFINDER_SCALE = 1.3f
 private const val COMPLETED_DELAY_MS = 1500L
-private const val FACE_QUALITY_THRESHOLD = 0.5f
 private const val FORCED_FAILURE_TIMEOUT_MS = 120_000L
 private const val IGNORE_FACES_SMALLER_THAN = 0.03f
 private const val INTRA_IMAGE_MIN_DELAY_MS = 250
@@ -90,9 +83,7 @@ private const val MAX_FACE_ROLL_THRESHOLD = 30
 private const val MAX_FACE_YAW_THRESHOLD = 15
 private const val MIN_FACE_FILL_THRESHOLD = 0.1f
 private const val NO_FACE_RESET_DELAY_MS = 500
-private const val NUM_LIVENESS_IMAGES = 8
 private const val SELFIE_IMAGE_SIZE = 640
-private const val SELFIE_QUALITY_HISTORY_LENGTH = 5
 
 sealed interface SelfieState {
     data class Analyzing(val hint: SelfieHint) : SelfieState
@@ -134,7 +125,6 @@ data class SmartSelfieV2UiState(
 class SmartSelfieEnhancedViewModel(
     private val userId: String,
     private val isEnroll: Boolean,
-    private val selfieQualityModel: SelfieQualityModel,
     private val metadata: MutableList<Metadatum>,
     private val allowNewEnroll: Boolean? = null,
     private val skipApiSubmission: Boolean,
@@ -391,55 +381,6 @@ class SmartSelfieEnhancedViewModel(
                     Timber.d("Closed eyes detected")
                     conditionFailedWithReasonAndTimeout(LookStraight)
                     return@addOnSuccessListener
-                }
-
-                // We only run the image quality model on the selfie capture because the liveness
-                // task requires a turned head, which receives a lower score from the model
-
-                // Image Quality Model Inference
-                // Model input: nx120x120x3 - n images, each cropped to face bounding box
-                // Model output: nx2 - n images, each with 2 probabilities
-                // 1st column is the actual quality. 2nd column is 1-(1st_column)
-
-                // NB! Model is trained on *face mesh* crop, not face bounding box crop
-
-                val input = TensorImage(DataType.FLOAT32).apply {
-                    val modelInputBmp = Bitmap.createBitmap(
-                        bmp,
-                        contourRect.left,
-                        contourRect.top,
-                        contourRect.width(),
-                        contourRect.height(),
-                        // NB! input is not guaranteed to be square, so scale might squish the image
-                    ).scale(modelInputSize[1], modelInputSize[2], false)
-                    load(modelInputBmp)
-                }
-                val outputs = selfieQualityModel.process(input.tensorBuffer)
-                val output = outputs.outputFeature0AsTensorBuffer.floatArray.firstOrNull() ?: run {
-                    Timber.w("No image quality output")
-                    return@addOnSuccessListener
-                }
-                selfieQualityHistory.add(output)
-                if (selfieQualityHistory.size > SELFIE_QUALITY_HISTORY_LENGTH) {
-                    // We should only ever exceed history length by 1
-                    selfieQualityHistory.removeAt(0)
-                }
-
-                val averageFaceQuality = selfieQualityHistory.average()
-
-                if (averageFaceQuality < FACE_QUALITY_THRESHOLD) {
-                    // We don't want to reset the history here, since the model output is noisy, so
-                    // don't use the helper function
-                    Timber.d("Face quality not met ($averageFaceQuality)")
-                    _uiState.update {
-                        it.copy(selfieState = SelfieState.Analyzing(PoorImageQuality))
-                    }
-                    return@addOnSuccessListener
-                }
-                if (shouldUseActiveLiveness) {
-                    _uiState.update {
-                        it.copy(selfieState = SelfieState.Analyzing(activeLiveness.selfieHint))
-                    }
                 }
                 selfieCameraOrientation = imageProxy.imageInfo.rotationDegrees
                 lastAutoCaptureTimeMs = System.currentTimeMillis()

@@ -22,7 +22,6 @@ import com.smileidentity.R
 import com.smileidentity.compose.components.ProcessingScreen
 import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.AutoCapture
 import com.smileidentity.models.DocumentCaptureFlow
 import com.smileidentity.results.SmileIDCallback
@@ -56,15 +55,12 @@ internal fun <T : Parcelable> OrchestratedDocumentVerificationScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selfieCaptureScreen = @Composable {
         if (useStrictMode) {
-            val context = LocalContext.current
-            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenEnhanced(
                 userId = userId,
                 allowNewEnroll = false,
                 showInstructions = showInstructions,
                 isEnroll = false,
                 showAttribution = showAttribution,
-                selfieQualityModel = selfieQualityModel,
                 skipApiSubmission = true,
                 onResult = { result ->
                     when (result) {
