@@ -45,6 +45,10 @@ import com.smileidentity.viewmodel.SelfieHint.NeedLight
 import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
 import com.ujizin.camposer.state.CamSelector
+import java.io.File
+import java.io.IOException
+import kotlin.math.absoluteValue
+import kotlin.time.TimeSource
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.FlowPreview
@@ -60,10 +64,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
-import java.io.File
-import java.io.IOException
-import kotlin.math.absoluteValue
-import kotlin.time.TimeSource
 
 /*
 This is used only when NOT in strict mode. In strict mode, the number of images is determined
