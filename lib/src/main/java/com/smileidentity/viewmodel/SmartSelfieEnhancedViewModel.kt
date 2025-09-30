@@ -1,13 +1,11 @@
 package com.smileidentity.viewmodel
 
-import android.graphics.Bitmap
 import android.graphics.ImageFormat.YUV_420_888
 import android.graphics.Rect
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
-import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
@@ -45,7 +43,6 @@ import com.smileidentity.viewmodel.SelfieHint.MoveBack
 import com.smileidentity.viewmodel.SelfieHint.MoveCloser
 import com.smileidentity.viewmodel.SelfieHint.NeedLight
 import com.smileidentity.viewmodel.SelfieHint.OnlyOneFace
-import com.smileidentity.viewmodel.SelfieHint.PoorImageQuality
 import com.smileidentity.viewmodel.SelfieHint.SearchingForFace
 import com.ujizin.camposer.state.CamSelector
 import java.io.File
