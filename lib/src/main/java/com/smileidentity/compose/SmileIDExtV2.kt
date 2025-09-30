@@ -14,7 +14,6 @@ import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.theme.SmileThemeSurface
 import com.smileidentity.compose.theme.colorScheme
 import com.smileidentity.compose.theme.typographyV2
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.util.randomUserId
@@ -54,8 +53,6 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val context = LocalContext.current
-        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
         OrchestratedSelfieCaptureScreenEnhanced(
             modifier = modifier,
             userId = userId,
@@ -64,7 +61,6 @@ fun SmileID.SmartSelfieEnrollmentEnhanced(
             isEnroll = true,
             showAttribution = showAttribution,
             skipApiSubmission = skipApiSubmission,
-            selfieQualityModel = selfieQualityModel,
             extraPartnerParams = extraPartnerParams,
             onResult = onResult,
         )
@@ -104,8 +100,6 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
     onResult: SmileIDCallback<SmartSelfieResult> = {},
 ) {
     SmileThemeSurface(colorScheme = colorScheme, typography = typography) {
-        val context = LocalContext.current
-        val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
         // todo provide view model here too
         OrchestratedSelfieCaptureScreenEnhanced(
             modifier = modifier,
@@ -115,7 +109,6 @@ fun SmileID.SmartSelfieAuthenticationEnhanced(
             showAttribution = showAttribution,
             showInstructions = showInstructions,
             skipApiSubmission = skipApiSubmission,
-            selfieQualityModel = selfieQualityModel,
             extraPartnerParams = extraPartnerParams,
             onResult = onResult,
         )

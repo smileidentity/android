@@ -71,7 +71,6 @@ import com.smileidentity.compose.preview.Preview
 import com.smileidentity.compose.preview.SmilePreviews
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.metadata.models.Metadatum
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.results.SmartSelfieResult
 import com.smileidentity.results.SmileIDCallback
 import com.smileidentity.results.SmileIDResult
@@ -112,7 +111,6 @@ import kotlinx.collections.immutable.persistentMapOf
 fun OrchestratedSelfieCaptureScreenEnhanced(
     userId: String,
     isEnroll: Boolean,
-    selfieQualityModel: SelfieQualityModel,
     onResult: SmileIDCallback<SmartSelfieResult>,
     modifier: Modifier = Modifier,
     showAttribution: Boolean = true,
@@ -128,7 +126,6 @@ fun OrchestratedSelfieCaptureScreenEnhanced(
                 isEnroll = isEnroll,
                 allowNewEnroll = allowNewEnroll,
                 extraPartnerParams = extraPartnerParams,
-                selfieQualityModel = selfieQualityModel,
                 skipApiSubmission = skipApiSubmission,
                 metadata = metadata,
                 onResult = onResult,

@@ -22,7 +22,6 @@ import com.smileidentity.compose.selfie.OrchestratedSelfieCaptureScreen
 import com.smileidentity.compose.selfie.enhanced.OrchestratedSelfieCaptureScreenEnhanced
 import com.smileidentity.metadata.LocalMetadataProvider
 import com.smileidentity.metadata.models.Metadatum
-import com.smileidentity.ml.SelfieQualityModel
 import com.smileidentity.models.ConsentInformation
 import com.smileidentity.models.IdInfo
 import com.smileidentity.results.BiometricKycResult
@@ -68,15 +67,12 @@ fun OrchestratedBiometricKYCScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val selfieCaptureScreen = @Composable {
         if (useStrictMode) {
-            val context = LocalContext.current
-            val selfieQualityModel = remember { SelfieQualityModel.newInstance(context) }
             OrchestratedSelfieCaptureScreenEnhanced(
                 userId = userId,
                 allowNewEnroll = false,
                 showInstructions = showInstructions,
                 isEnroll = false,
                 showAttribution = showAttribution,
-                selfieQualityModel = selfieQualityModel,
                 skipApiSubmission = true,
                 onResult = { result ->
                     when (result) {
