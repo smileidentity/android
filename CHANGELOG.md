@@ -4,7 +4,7 @@
 
 ### Changed
 
-* Removed selfie quality checks on EnhancedSmartSelfie and cleaned up SelfieQualityModel
+* Removed selfie quality model on EnhancedSmartSelfie and cleaned up SelfieQualityModel
   references from biometric and document verification screens.
 
 ## 11.1.2 - September 18, 2025
