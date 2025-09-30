@@ -163,7 +163,7 @@ class SmartSelfieEnhancedViewModel(
     private var lastValidFaceDetectTime = 0L
     private var shouldAnalyzeImages = true
     private var selfieCameraOrientation: Int? = null
-    private val selfieQualityHistory = mutableListOf<Float>()
+    // Remove this line entirely
     private var forcedFailureTimerExpired = false
     private val shouldUseActiveLiveness: Boolean get() = !forcedFailureTimerExpired
     private var captureDuration = TimeSource.Monotonic.markNow()
