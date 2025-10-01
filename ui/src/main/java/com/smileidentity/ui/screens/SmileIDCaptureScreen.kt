@@ -1,6 +1,5 @@
 package com.smileidentity.ui.screens
 
-import android.annotation.SuppressLint
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.compose.foundation.layout.Arrangement
@@ -31,23 +30,22 @@ import com.smileidentity.ui.utils.viewModelFactory
 import com.smileidentity.ui.viewmodel.SelfieScanViewModel
 import java.io.File
 
-@SuppressLint("ComposeViewModelInjection")
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun SmileIDCaptureScreen(
     scanType: IdentityScanState.ScanType,
     modifier: Modifier = Modifier,
+    viewModel: SelfieScanViewModel = viewModel(
+        factory = viewModelFactory {
+            SelfieScanViewModel()
+        },
+    ),
     onResult: (File) -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-    val viewModel: SelfieScanViewModel = viewModel(
-        factory = viewModelFactory {
-            SelfieScanViewModel()
-        },
-    )
 
     SmileIDCameraPreview(
         modifier = modifier,
@@ -61,10 +59,11 @@ fun SmileIDCaptureScreen(
             imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
         ),
     ) {
-        viewModel.startScan(
-            context = context,
-            lifecycleOwner = lifecycleOwner,
-        )
+        // todo fix this with koin :)
+//        viewModel.startScan(
+//            context = context,
+//            lifecycleOwner = lifecycleOwner,
+//        )
 
         /**
          * We have different scan types here to allow us different analyzer depending on what we are
