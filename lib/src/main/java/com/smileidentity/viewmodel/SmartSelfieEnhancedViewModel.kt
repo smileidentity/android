@@ -622,7 +622,6 @@ class SmartSelfieEnhancedViewModel(
 
     private fun resetCaptureProgress(reason: SelfieHint) {
         _uiState.update { it.copy(selfieState = SelfieState.Analyzing(reason)) }
-        selfieQualityHistory.clear()
         livenessFiles.removeAll { it.delete() }
         selfieFile?.delete()
         selfieFile = null
