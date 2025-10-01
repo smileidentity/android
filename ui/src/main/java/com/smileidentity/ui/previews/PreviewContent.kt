@@ -2,6 +2,7 @@ package com.smileidentity.ui.previews
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,7 +34,7 @@ fun PreviewContent(
         )
     },
 ) {
-    val activity = (LocalContext.current as? Activity)
+    val activity = LocalActivity.current
     LaunchedEffect(activity) {
         activity?.window?.let { window -> WindowCompat.setDecorFitsSystemWindows(window, false) }
     }
