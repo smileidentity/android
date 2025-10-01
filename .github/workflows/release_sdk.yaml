@@ -66,8 +66,12 @@ jobs:
           message: Release v${{ steps.read_version.outputs.version }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
-      - name: Build, Test, Lint, and Publish
-        run: ./gradlew lint build assembleRelease publish
+      - name: Build, Test, Lint
+        run: ./gradlew lint build
+      - name: Assemble Release Build
+        run: ./gradlew assembleRelease
+      - name: Publish
+        run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.read_version.outputs.version }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
