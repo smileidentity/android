@@ -86,12 +86,12 @@ class IdentityScanFlow(
                         analyzerFactory = if (parameters == IdentityScanState.ScanType.SELFIE) {
                             FaceDetectorAnalyzer.Factory(
                                 context = context,
-                                minDetectionConfidence = 0F,
+                                minDetectionConfidence = 0.75F,
                             )
                         } else {
                             DocumentDetectorAnalyzer.Factory(
                                 context = context,
-                                minDetectionConfidence = 0F,
+                                minDetectionConfidence = 0.75F,
                             )
                         },
                     )
