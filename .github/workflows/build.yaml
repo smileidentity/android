@@ -37,9 +37,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Build, Lint, Assemble
+      - name: Build, Lint
         # NB! The "lint" gradle action here is different than ktLint
-        run: ./gradlew ktlintCheck lint build assembleDebug
+        run: ./gradlew ktlintCheck lint build
+        env:
+          ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
+
+      - name: Assemble
+        run: ./gradlew assembleDebug
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
 
