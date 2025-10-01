@@ -2,6 +2,7 @@ package com.smileidentity.ml.model
 
 import android.graphics.Bitmap
 import android.graphics.Rect
+import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
 import com.smileidentity.ml.viewmodel.CameraPreviewImage
 
 /**
@@ -23,6 +24,11 @@ data class DocumentDetectorOutput(val documents: List<Pair<Bitmap, Rect>>) : Ana
  * Output of FaceDetector
  */
 data class FaceDetectorOutput(val faces: List<Pair<Bitmap, Rect>>) : AnalyzerOutput
+
+/**
+ * Output of FaceLandmark
+ */
+data class FaceLandmarkOutput(val landmarks: FaceLandmarkerResult) : AnalyzerOutput
 
 /**
  * Output of FaceSpoofDetector
