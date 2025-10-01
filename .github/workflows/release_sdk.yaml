@@ -66,7 +66,7 @@ jobs:
           message: Release v${{ steps.read_version.outputs.version }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
-      - name: Build, Test, Lint
+      - name: Lint and Build
         run: ./gradlew lint build
       - name: Assemble Release Build
         run: ./gradlew assembleRelease
