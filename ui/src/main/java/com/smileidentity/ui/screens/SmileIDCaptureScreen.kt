@@ -1,71 +1,51 @@
 package com.smileidentity.ui.screens
 
-import android.annotation.SuppressLint
 import androidx.annotation.OptIn
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.smileidentity.camera.CameraPreviewImage
 import com.smileidentity.camera.state.CamSelector
 import com.smileidentity.camera.state.ImageAnalysisBackpressureStrategy
 import com.smileidentity.camera.state.rememberCamSelector
 import com.smileidentity.camera.state.rememberCameraState
 import com.smileidentity.camera.state.rememberImageAnalyzer
 import com.smileidentity.camera.util.rotate
-import com.smileidentity.ml.detectors.FaceDetectorAnalyzer
 import com.smileidentity.ml.states.IdentityScanState
-import com.smileidentity.ml.viewmodel.FaceScanViewModel
 import com.smileidentity.ui.components.DocumentShapedView
 import com.smileidentity.ui.components.FaceShapedView
-import com.smileidentity.ui.components.SmileIDButton
 import com.smileidentity.ui.components.SmileIDCameraPreview
 import com.smileidentity.ui.previews.DevicePreviews
 import com.smileidentity.ui.previews.PreviewContent
 import com.smileidentity.ui.utils.viewModelFactory
+import com.smileidentity.ui.viewmodel.SelfieScanViewModel
 import java.io.File
 
-@SuppressLint("ComposeViewModelInjection")
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun SmileIDCaptureScreen(
     scanType: IdentityScanState.ScanType,
     modifier: Modifier = Modifier,
-    continueButton: @Composable (onResult: (File) -> Unit) -> Unit = { onResult ->
-        SmileIDButton(
-            text = "Continue",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 16.dp)
-                .testTag(tag = "capture:continue_button"),
-            onClick = { onResult },
-        )
-    },
+    viewModel: SelfieScanViewModel = viewModel(
+        factory = viewModelFactory {
+            SelfieScanViewModel()
+        },
+    ),
     onResult: (File) -> Unit,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraState = rememberCameraState()
     var camSelector by rememberCamSelector(CamSelector.Front)
-    val viewModel: FaceScanViewModel = viewModel(
-        factory = viewModelFactory {
-            FaceScanViewModel(
-                detector = FaceDetectorAnalyzer(
-                    context = context,
-                    minDetectionConfidence = 0.5F,
-                ),
-            )
-        },
-    )
 
     SmileIDCameraPreview(
         modifier = modifier,
@@ -73,12 +53,18 @@ fun SmileIDCaptureScreen(
             analyze = { imageProxy ->
                 val image = imageProxy.toBitmap()
                     .rotate(rotationDegrees = imageProxy.imageInfo.rotationDegrees.toFloat())
-//                viewModel.analyze(imageProxy = imageProxy)
+                viewModel.sendImageToStream(image = CameraPreviewImage(image = image))
                 imageProxy.close()
             },
             imageAnalysisBackpressureStrategy = ImageAnalysisBackpressureStrategy.KeepOnlyLatest,
         ),
     ) {
+        // todo fix this with koin :)
+//        viewModel.startScan(
+//            context = context,
+//            lifecycleOwner = lifecycleOwner,
+//        )
+
         /**
          * We have different scan types here to allow us different analyzer depending on what we are
          * scanning
@@ -97,9 +83,7 @@ fun SmileIDCaptureScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
-        ) {
-            continueButton {}
-        }
+        ) {}
     }
 }
 

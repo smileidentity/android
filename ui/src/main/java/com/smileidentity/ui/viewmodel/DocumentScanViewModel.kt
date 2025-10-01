@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 
-class DocumentScanViewModel : IdentityScanViewModel() {
+class DocumentScanViewModel : ViewModel() {
 
     class DocumentScanViewModelFactory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
