@@ -65,7 +65,7 @@ jobs:
           tag: v${{ steps.read_version.outputs.version }}
           message: Release v${{ steps.read_version.outputs.version }}
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Build, Test, Lint, and Publish
         run: ./gradlew lint build assembleRelease publish
         env:
