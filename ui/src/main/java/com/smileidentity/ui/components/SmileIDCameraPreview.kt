@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,11 +14,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.smileidentity.camera.state.CamSelector
 import com.smileidentity.camera.state.ImageAnalyzer
 import com.smileidentity.camera.state.ImplementationMode
 import com.smileidentity.camera.ui.SmileIDCameraXPreview
+import com.smileidentity.ui.R
 import com.smileidentity.ui.utils.ForceMaxBrightness
 
 @OptIn(ExperimentalCamera2Interop::class)
@@ -50,7 +50,7 @@ fun SmileIDCameraPreview(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.PlayArrow,
+                    painter = painterResource(R.drawable.si_info),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(size = 48.dp),
