@@ -2,7 +2,8 @@ package com.smileidentity.ml.model
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import com.smileidentity.camera.CameraPreviewImage
+import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
+import com.smileidentity.ml.viewmodel.CameraPreviewImage
 
 /**
  * Input from CameraAdapter, note: the bitmap should already be encoded in RGB value
@@ -24,6 +25,11 @@ data class DocumentDetectorOutput(val documents: List<Pair<Bitmap, Rect>>) : Ana
  */
 data class FaceDetectorOutput(val faces: List<Pair<Bitmap, Rect>>, val resultScore: Float) :
     AnalyzerOutput
+
+/**
+ * Output of FaceLandmark
+ */
+data class FaceLandmarkOutput(val landmarks: FaceLandmarkerResult) : AnalyzerOutput
 
 /**
  * Output of FaceSpoofDetector

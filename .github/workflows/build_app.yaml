@@ -46,7 +46,7 @@ jobs:
           fileDir: './sample'
           encodedString: ${{ secrets.UPLOAD_KEYSTORE }}
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Bundle
         run: ./gradlew bundleRelease
         env:
