@@ -43,7 +43,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
 
-      - name: Assemble
+      - name: Assemble Debug Build
         run: ./gradlew assembleDebug
         env:
           ORG_GRADLE_PROJECT_VERSION_NAME: ${{ steps.version.outputs.version }}
