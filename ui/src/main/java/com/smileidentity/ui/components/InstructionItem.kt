@@ -10,15 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.smileidentity.ui.R
 import com.smileidentity.ui.design.SmileIDTheme
 import com.smileidentity.ui.design.colors.SmileIDColor
 import com.smileidentity.ui.previews.DevicePreviews
@@ -51,7 +51,7 @@ fun InstructionItem(instruction: SelfieInstruction, modifier: Modifier = Modifie
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Outlined.Info,
+                painter = painterResource(R.drawable.si_info),
                 contentDescription = "Placeholder icon",
                 tint = Color.DarkGray,
             )
