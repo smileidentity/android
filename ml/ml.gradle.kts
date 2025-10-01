@@ -16,6 +16,7 @@ dependencies {
     api(libs.androidx.lifecycle.runtime.compose)
 
     implementation(libs.mediapipe)
+    implementation(libs.mlkit.text.recognition)
     implementation(libs.litert)
     implementation(libs.litert.metadata)
     implementation(libs.litert.support)
