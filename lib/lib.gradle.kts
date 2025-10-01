@@ -70,7 +70,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-        mlModelBinding = true
     }
 
     lint {
@@ -219,10 +218,6 @@ dependencies {
 
     // Bundled model
     implementation(libs.mlkit.obj.detection)
-
-    implementation(libs.litert)
-    implementation(libs.litert.metadata)
-    implementation(libs.litert.support)
     // Play Integrity
     implementation(libs.play.integrity)
 
