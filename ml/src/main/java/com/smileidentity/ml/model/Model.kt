@@ -3,6 +3,7 @@ package com.smileidentity.ml.model
 import android.graphics.Bitmap
 import android.graphics.Rect
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
+import com.google.mlkit.vision.text.Text
 import com.smileidentity.ml.viewmodel.CameraPreviewImage
 
 /**
@@ -36,3 +37,8 @@ data class FaceLandmarkOutput(val landmarks: FaceLandmarkerResult) : AnalyzerOut
  */
 data class FaceSpoofDetectorOutput(val isSpoof: Boolean, val score: Float, val timeMillis: Long) :
     AnalyzerOutput
+
+/**
+ * Output of TextRecognition
+ */
+data class TextRecognitionOutput(val text: Text) : AnalyzerOutput
